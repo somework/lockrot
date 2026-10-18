@@ -760,6 +760,7 @@
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 1,
             "lead-first": 0,
@@ -1195,6 +1196,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.6",
                         "holder": null
                     }
@@ -1221,6 +1223,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -1269,7 +1272,8 @@
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -1421,6 +1425,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.6",
                                             "holder": null
                                         }

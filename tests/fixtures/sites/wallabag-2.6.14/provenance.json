@@ -1,0 +1,15 @@
+{
+ "repository": "https://github.com/wallabag/wallabag",
+ "tag": "2.6.14",
+ "files": [
+  "composer.json",
+  "composer.lock"
+ ],
+ "recorded": "2026-10-18",
+ "recorder": "GITHUB_TOKEN=$(gh auth token) bin/record-fixtures --into=tests/fixtures/sites/wallabag-2.6.14/http tests/fixtures/sites/wallabag-2.6.14",
+ "recordings": {
+  "http/p2": "the packagist.org p2 answer of every locked name, with conflict and provide kept for Composer's solver",
+  "http/github": "the GitHub answers of the locked names",
+  "http/advisories": "packagist.org's advisory answer for every locked name"
+ }
+}

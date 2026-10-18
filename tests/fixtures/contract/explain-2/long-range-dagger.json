@@ -137,6 +137,7 @@
                     "clears_hold"
                 ]
             },
+            "check": null,
             "composer_moves_because": [],
             "commands": [
                 [
@@ -208,7 +209,8 @@
                     "assumes": [
                         "clears_hold"
                     ]
-                }
+                },
+                "check": null
             },
             "move_in": "next_step",
             "gets": {
@@ -426,7 +428,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             }
         ],
@@ -1181,7 +1184,8 @@
                     "records": 1
                 }
             ]
-        }
+        },
+        "move_check": null
     },
     "generated_at": "2026-10-01T17:41:20+00:00",
     "notes": [],

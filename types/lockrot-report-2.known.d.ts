@@ -41,12 +41,18 @@ export type UnverifiedFactReason = "undated" | "no_release_data" | (string & {})
 export type AddedFactBasis = "released_before_ga" | "branch_not_releasing" | (string & {});
 /** open set at #/definitions/factBaseline/oneOf/0/properties/state */
 export type FactBaselineState = "known" | "covered" | "new" | "re_rated" | "fix_lost" | (string & {});
+/** closed set at #/definitions/moveCheck/oneOf/0/properties/result */
+export type MoveCheckResult = "resolves" | "refused" | "not_checked";
+/** closed set at #/definitions/moveCheck/oneOf/0/properties/form/oneOf/0 */
+export type MoveCheckForm = "inline" | "with-dependencies" | "with-all-dependencies";
+/** open set at #/definitions/moveCheck/oneOf/0/properties/reason/oneOf/0 */
+export type MoveCheckReason = "baseline_refused" | "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "no_release_read" | "pass_cap" | "solver_error" | (string & {});
 /** open set at #/definitions/holder/oneOf/0/properties/next_step/oneOf/0/properties/kind */
 export type HolderNextStepKind = "replace" | "find-alternative" | "tag" | "require" | "update" | "raise-php" | "test" | "blocked" | "no-tag" | "no-move" | "no-fix" | "no-single-fix" | (string & {});
 /** closed set at #/definitions/heldBy/properties/source */
 export type HeldBySource = "root" | "package";
 /** closed set at #/definitions/heldBy/properties/link */
-export type HeldByLink = "require" | "require-dev" | "conflict";
+export type HeldByLink = "require" | "require-dev" | "conflict" | "replace" | "root-require" | "platform";
 /** closed set at #/definitions/phpCheck/properties/raise_size/oneOf/0 */
 export type PhpCheckRaiseSize = "major" | "minor" | "patch";
 /** closed set at #/definitions/termMaintenance/properties/part */
@@ -383,6 +389,12 @@ export type RunTargetPhpSource = "option" | "env" | "config" | "platform" | "run
 export type RunFailOnSource = "option" | "env" | "config" | "default";
 /** open set at #/definitions/run/properties/mode */
 export type RunMode = "check" | "generate_baseline" | (string & {});
+/** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/ignores_extensions */
+export type RunMoveCheckIgnoresExtensions = true;
+/** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/baseline */
+export type RunMoveCheckBaseline = "resolves" | "refused" | "not_checked";
+/** open set at #/definitions/run/properties/move_check/oneOf/0/properties/reason/oneOf/0 */
+export type RunMoveCheckReason = "install_time_budget" | "no_composer_json" | "composer_json_invalid" | "solver_error" | (string & {});
 /** open set at #/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key */
 export type NoteAdvisoriesDisabledByPolicyPolicyKey = "policy" | "policy.advisories" | "policy.advisories.audit" | "COMPOSER_POLICY" | (string & {});
 /** open set at #/definitions/noteAbandonedNotAuditedByComposer/properties/policy_key */
@@ -393,8 +405,12 @@ export type NoteRepositoryActivityHostNotSupportedHostsItemListedIn = "github-do
 export type NoteBaselineTargetDiffersBaselineTargetPhpSource = "option" | "env" | "config" | "platform" | "runtime";
 /** closed set at #/definitions/noteBaselineTargetDiffers/properties/run_target_php_source */
 export type NoteBaselineTargetDiffersRunTargetPhpSource = "option" | "env" | "config" | "platform" | "runtime";
+/** open set at #/definitions/noteMovesNotChecked/properties/reason */
+export type NoteMovesNotCheckedReason = "baseline_refused" | (string & {});
+/** open set at #/definitions/noteUpdateNowNotChecked/properties/reason */
+export type NoteUpdateNowNotCheckedReason = "baseline_refused" | "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "no_release_read" | "pass_cap" | "solver_error" | (string & {});
 /** open set at #/definitions/noteCode */
-export type NoteCode = "offline" | "metadata_unavailable" | "monorepo_parent_unavailable" | "advisory_ignore_unreadable" | "advisories_unavailable" | "advisories_not_checked" | "repository_activity_not_checked" | "repository_activity_anonymous_cap" | "repository_activity_rate_limited" | "repository_activity_unreachable" | "repository_activity_not_found" | "not_from_composer_repository" | "baseline_target_differs" | "baseline_fix_model_differs" | "ignore_does_not_cover_advisories" | "advisories_disabled_by_policy" | "abandoned_markings_ignored" | "abandoned_not_audited_by_composer" | "abandoned_ignore_unreadable" | "repository_activity_host_not_supported" | (string & {});
+export type NoteCode = "offline" | "metadata_unavailable" | "monorepo_parent_unavailable" | "advisory_ignore_unreadable" | "advisories_unavailable" | "advisories_not_checked" | "repository_activity_not_checked" | "repository_activity_anonymous_cap" | "repository_activity_rate_limited" | "repository_activity_unreachable" | "repository_activity_not_found" | "not_from_composer_repository" | "baseline_target_differs" | "baseline_fix_model_differs" | "ignore_does_not_cover_advisories" | "advisories_disabled_by_policy" | "abandoned_markings_ignored" | "abandoned_not_audited_by_composer" | "abandoned_ignore_unreadable" | "repository_activity_host_not_supported" | "moves_not_checked" | "update_now_reduced" | "update_now_refused" | "update_now_not_checked" | "move_check_failed" | "package_name_invalid" | (string & {});
 /** closed set at #/definitions/noteDetail/anyOf/0/properties/code */
 export type NoteDetailCode = "offline";
 /** closed set at #/definitions/noteDetail/anyOf/1/properties/code */
@@ -435,6 +451,18 @@ export type NoteDetailCode18 = "abandoned_not_audited_by_composer";
 export type NoteDetailCode19 = "abandoned_ignore_unreadable";
 /** closed set at #/definitions/noteDetail/anyOf/19/properties/code */
 export type NoteDetailCode20 = "repository_activity_host_not_supported";
+/** closed set at #/definitions/noteDetail/anyOf/20/properties/code */
+export type NoteDetailCode21 = "moves_not_checked";
+/** closed set at #/definitions/noteDetail/anyOf/21/properties/code */
+export type NoteDetailCode22 = "update_now_reduced";
+/** closed set at #/definitions/noteDetail/anyOf/22/properties/code */
+export type NoteDetailCode23 = "update_now_refused";
+/** closed set at #/definitions/noteDetail/anyOf/23/properties/code */
+export type NoteDetailCode24 = "update_now_not_checked";
+/** closed set at #/definitions/noteDetail/anyOf/24/properties/code */
+export type NoteDetailCode25 = "move_check_failed";
+/** closed set at #/definitions/noteDetail/anyOf/25/properties/code */
+export type NoteDetailCode26 = "package_name_invalid";
 /** open set at #/definitions/gateNotApplied/properties/check */
 export type GateNotAppliedCheck = "advisories" | (string & {});
 /** open set at #/definitions/gateNotApplied/properties/reason */

@@ -600,6 +600,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -608,6 +609,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -619,7 +621,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -628,6 +631,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -639,7 +643,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -722,6 +727,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -730,6 +736,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -741,7 +748,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -750,6 +758,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -761,7 +770,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -832,6 +842,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -840,6 +851,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -851,7 +863,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -860,6 +873,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -871,7 +885,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -942,6 +957,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -950,6 +966,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -961,7 +978,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -970,6 +988,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -981,7 +1000,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -1052,6 +1072,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -1060,6 +1081,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -1071,7 +1093,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -1080,6 +1103,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -1091,7 +1115,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -1162,6 +1187,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -1170,6 +1196,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -1181,7 +1208,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -1190,6 +1218,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -1201,7 +1230,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -1272,6 +1302,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -1280,6 +1311,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -1291,7 +1323,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -1300,6 +1333,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -1311,7 +1345,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -1382,6 +1417,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -1390,6 +1426,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -1401,7 +1438,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -1410,6 +1448,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -1421,7 +1460,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -1492,6 +1532,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -1500,6 +1541,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -1511,7 +1553,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -1520,6 +1563,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -1531,7 +1575,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -1602,6 +1647,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -1610,6 +1656,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -1621,7 +1668,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -1630,6 +1678,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -1641,7 +1690,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -1712,6 +1762,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -1720,6 +1771,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -1731,7 +1783,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -1740,6 +1793,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -1751,7 +1805,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -1822,6 +1877,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -1830,6 +1886,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -1841,7 +1898,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -1850,6 +1908,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -1861,7 +1920,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -1932,6 +1992,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -1940,6 +2001,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -1951,7 +2013,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -1960,6 +2023,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -1971,7 +2035,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }
@@ -2042,6 +2107,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.4",
                                     "holder": null
                                 },
@@ -2050,6 +2116,7 @@
                                     "package": "bdunogier/guzzle-site-authenticator",
                                     "version": "1.1.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.3.1",
                                     "holder": {
                                         "verdict": "medium",
@@ -2061,7 +2128,8 @@
                                         "next_step": {
                                             "kind": "no-move",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 },
@@ -2070,6 +2138,7 @@
                                     "package": "php-http/guzzle5-adapter",
                                     "version": "2.0.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.1",
                                     "holder": {
                                         "verdict": "critical",
@@ -2081,7 +2150,8 @@
                                         "next_step": {
                                             "kind": "replace",
                                             "to_branch": null,
-                                            "constraint": null
+                                            "constraint": null,
+                                            "check": null
                                         }
                                     }
                                 }

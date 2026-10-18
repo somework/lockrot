@@ -398,6 +398,17 @@
             "argv": [
                 "composer",
                 "update",
+                "typo3/html-sanitizer:^2.3.2",
+                "--with-dependencies"
+            ],
+            "posix": "composer update 'typo3/html-sanitizer:^2.3.2' --with-dependencies",
+            "cmd": "composer update \"typo3/html-sanitizer:^2.3.2\" --with-dependencies",
+            "powershell": "composer --% update \"typo3/html-sanitizer:^2.3.2\" --with-dependencies"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
                 "vendor/package\u0000"
             ],
             "posix": null,

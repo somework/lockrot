@@ -38,7 +38,7 @@ use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Repository\MonorepoParents;
 use Lockrot\Lock\LockFile;
 
-const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'replace', 'type', 'extra'];
+const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'conflict', 'provide', 'replace', 'type', 'extra'];
 const REPOSITORY_BASE_URL = 'https://repo.packagist.org/p2/';
 const ADVISORY_API_URL = 'https://packagist.org/api/security-advisories/';
 const DRUPAL_NOTIFICATION = '{^https://packages\.drupal\.org/(\d+)/downloads$}';

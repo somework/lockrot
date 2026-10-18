@@ -234,6 +234,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^9.0",
                                     "holder": null
                                 },
@@ -242,6 +243,7 @@
                                     "package": "pragmarx/google2fa-laravel",
                                     "version": "v2.2.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
                                     "holder": {
                                         "verdict": "ok",
@@ -387,6 +389,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^9.0",
                                     "holder": null
                                 }
@@ -455,6 +458,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^9.0",
                                     "holder": null
                                 },
@@ -463,6 +467,7 @@
                                     "package": "pragmarx/google2fa-laravel",
                                     "version": "v2.2.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
                                     "holder": {
                                         "verdict": "ok",
@@ -537,6 +542,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^9.0",
                                     "holder": null
                                 },
@@ -545,6 +551,7 @@
                                     "package": "pragmarx/google2fa-laravel",
                                     "version": "v2.2.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
                                     "holder": {
                                         "verdict": "ok",
@@ -619,6 +626,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^9.0",
                                     "holder": null
                                 },
@@ -627,6 +635,7 @@
                                     "package": "pragmarx/google2fa-laravel",
                                     "version": "v2.2.0",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
                                     "holder": {
                                         "verdict": "ok",

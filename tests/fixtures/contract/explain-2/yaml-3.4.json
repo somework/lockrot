@@ -253,6 +253,7 @@
                     "composer_resolves"
                 ]
             },
+            "check": null,
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -307,7 +308,8 @@
                 "lowest": null,
                 "newest": "v3.4.47",
                 "held_by": [],
-                "if_applied": null
+                "if_applied": null,
+                "check": null
             },
             "move_in": "next_step",
             "gets": null,
@@ -599,7 +601,8 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             },
             {
@@ -638,7 +641,8 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             },
             {
@@ -677,7 +681,8 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             },
             {
@@ -716,7 +721,8 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             },
             {
@@ -747,7 +753,8 @@
                     "lowest": null,
                     "newest": "v4.4.45",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -778,7 +785,8 @@
                     "lowest": null,
                     "newest": "v3.4.47",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -809,7 +817,8 @@
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             }
         ],
@@ -1564,7 +1573,8 @@
                     "records": 5
                 }
             ]
-        }
+        },
+        "move_check": null
     },
     "generated_at": "2026-10-01T17:41:20+00:00",
     "notes": [],

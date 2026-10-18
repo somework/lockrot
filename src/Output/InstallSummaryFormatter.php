@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
-use Lockrot\Analyzer\Report2Root;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -45,7 +44,7 @@ final class InstallSummaryFormatter
             // it prints nothing and reads as a clean install.
             return $report->hadNetworkFailures() || $gateLine !== null ? $this->uncheckedLines($report, $gateLine) : [];
         }
-        $updateNow = Report2Root::updateNow($report->sorted());
+        $updateNow = $report->updateNowCommand() === null ? [] : $report->updateNow();
         $notes = self::notes($report, $run);
         $shownNotes = \array_slice($notes, 0, self::MAX_NOTES);
         // The header and the footer always print, `update now:` and the gate line when they apply.

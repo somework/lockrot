@@ -75,8 +75,11 @@ Nothing is added to these sets, removed from them or reordered within 1.x:
 - A flag's `headline.unit`: `years`, `php`, `reason`, `advisories`.
 - A flag's `headline.source`: `release`, `push`, `branch`.
 - A holder's `source`, in `held_by[]`: `root`, `package`.
-- A holder's `link`, in `held_by[]`: `require`, `require-dev`, `conflict`.
+- A holder's `link`, in `held_by[]`: `require`, `require-dev`, `conflict`, `replace`, `root-require`, `platform`.
 - A move's `composer_moves_because`: `holders`, `crosses_major`, `transitive`, `unreached`.
+- A move check's `result`: `resolves`, `refused`, `not_checked`.
+- `run.move_check.baseline`: `resolves`, `refused`, `not_checked`.
+- A move check's `form`: `inline`, `with-dependencies`, `with-all-dependencies`.
 - A PHP check's `raise_size`: `major`, `minor`, `patch`.
 - `allowlist.by`: `builtin`, `project`, `type`.
 - `allowlist.reason_by`: `user`, `lockrot`.

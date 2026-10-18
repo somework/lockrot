@@ -223,6 +223,7 @@
                     "clears_hold"
                 ]
             },
+            "check": null,
             "composer_moves_because": [],
             "commands": [
                 [
@@ -260,6 +261,7 @@
                             "package": null,
                             "version": null,
                             "link": "require",
+                            "target": null,
                             "constraint": "^2.6",
                             "holder": null
                         }
@@ -297,6 +299,7 @@
                             "composer_resolves"
                         ]
                     },
+                    "check": null,
                     "composer_moves_because": [
                         "crosses_major"
                     ],
@@ -353,7 +356,8 @@
                     "assumes": [
                         "clears_hold"
                     ]
-                }
+                },
+                "check": null
             },
             "move_in": "next_step",
             "gets": {
@@ -618,6 +622,7 @@
                             "package": null,
                             "version": null,
                             "link": "require",
+                            "target": null,
                             "constraint": "^2.6",
                             "holder": null
                         }
@@ -630,7 +635,8 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             },
             {
@@ -666,6 +672,7 @@
                             "package": null,
                             "version": null,
                             "link": "require",
+                            "target": null,
                             "constraint": "^2.6",
                             "holder": null
                         }
@@ -678,7 +685,8 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             },
             {
@@ -714,6 +722,7 @@
                             "package": null,
                             "version": null,
                             "link": "require",
+                            "target": null,
                             "constraint": "^2.6",
                             "holder": null
                         }
@@ -726,7 +735,8 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             },
             {
@@ -762,6 +772,7 @@
                             "package": null,
                             "version": null,
                             "link": "require",
+                            "target": null,
                             "constraint": "^2.6",
                             "holder": null
                         }
@@ -774,7 +785,8 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             },
             {
@@ -810,6 +822,7 @@
                             "package": null,
                             "version": null,
                             "link": "require",
+                            "target": null,
                             "constraint": "^2.6",
                             "holder": null
                         }
@@ -822,7 +835,8 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             },
             {
@@ -858,6 +872,7 @@
                             "package": null,
                             "version": null,
                             "link": "require",
+                            "target": null,
                             "constraint": "^2.6",
                             "holder": null
                         }
@@ -870,7 +885,8 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             },
             {
@@ -908,7 +924,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             }
         ],
@@ -1663,7 +1680,8 @@
                     "records": 1
                 }
             ]
-        }
+        },
+        "move_check": null
     },
     "generated_at": "2026-10-01T17:41:20+00:00",
     "notes": [],

@@ -777,7 +777,8 @@
      "records": 1
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "activity_cache_oldest_at": "2026-10-01T16:03:43+00:00",
  "activity_cache_age_hours": 1.6,
@@ -1193,6 +1194,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -1236,6 +1238,7 @@
       ],
       "clears_all": false,
       "if_applied": null,
+      "check": null,
       "composer_moves_because": [],
       "commands": [],
       "text": "no release fixes it"
@@ -1277,7 +1280,8 @@
      "lowest": null,
      "newest": "v2.8.52",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "also",
     "gets": {

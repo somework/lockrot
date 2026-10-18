@@ -15,6 +15,7 @@ use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Verdict\MoveChecks;
 
 /**
  * @internal
@@ -22,9 +23,10 @@ use Lockrot\Lock\ProjectConfig;
 final class AnalyzerBootstrap
 {
     /**
-     * @param callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory
-     * @param list<RepositoryInterface>                                                                                 $repositories
-     * @param array<string, mixed>                                                                                      $env
+     * @param callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null): Analyzer $analyzerFactory
+     * @param list<RepositoryInterface>                                                                                              $repositories
+     * @param array<string, mixed>                                                                                                   $env
+     * @param (\Closure(): MoveChecks)|null $checks the move check that the factory hands the analyzer, built only when the factory asks; null for none
      */
     public static function create(
         callable $analyzerFactory,
@@ -34,11 +36,12 @@ final class AnalyzerBootstrap
         ProjectConfig $project,
         LockrotConfig $lockrot,
         array $env,
-        Deadline $deadline
+        Deadline $deadline,
+        ?\Closure $checks = null
     ): Analyzer {
         $clock = Clock::fromEnvironment($env);
         $tokens = Tokens::fromEnvironment($env, ServiceFactory::githubTokenFromComposer($config));
-        $analyzer = $analyzerFactory($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline, $project->requirePhp());
+        $analyzer = $analyzerFactory($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline, $project->requirePhp(), $checks);
 
         return $analyzer
             ->withAllowlist($analyzer->allowlist()->merge(ProjectIgnoreList::fromExtra($project->lockrotExtra())))

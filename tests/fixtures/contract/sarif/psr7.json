@@ -309,6 +309,7 @@
                                     "package": "guzzlehttp/guzzle",
                                     "version": "6.5.8",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^1.9",
                                     "holder": {
                                         "verdict": "critical",
@@ -321,7 +322,8 @@
                                         "next_step": {
                                             "kind": "raise-php",
                                             "to_branch": "7.x",
-                                            "constraint": "^7.15.2"
+                                            "constraint": "^7.15.2",
+                                            "check": null
                                         }
                                     }
                                 }
@@ -403,6 +405,7 @@
                                     "package": "guzzlehttp/guzzle",
                                     "version": "6.5.8",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^1.9",
                                     "holder": {
                                         "verdict": "critical",
@@ -415,7 +418,8 @@
                                         "next_step": {
                                             "kind": "raise-php",
                                             "to_branch": "7.x",
-                                            "constraint": "^7.15.2"
+                                            "constraint": "^7.15.2",
+                                            "check": null
                                         }
                                     }
                                 }
@@ -485,6 +489,7 @@
                                     "package": "guzzlehttp/guzzle",
                                     "version": "6.5.8",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^1.9",
                                     "holder": {
                                         "verdict": "critical",
@@ -497,7 +502,8 @@
                                         "next_step": {
                                             "kind": "raise-php",
                                             "to_branch": "7.x",
-                                            "constraint": "^7.15.2"
+                                            "constraint": "^7.15.2",
+                                            "check": null
                                         }
                                     }
                                 }
@@ -567,6 +573,7 @@
                                     "package": "guzzlehttp/guzzle",
                                     "version": "6.5.8",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^1.9",
                                     "holder": {
                                         "verdict": "critical",
@@ -579,7 +586,8 @@
                                         "next_step": {
                                             "kind": "raise-php",
                                             "to_branch": "7.x",
-                                            "constraint": "^7.15.2"
+                                            "constraint": "^7.15.2",
+                                            "check": null
                                         }
                                     }
                                 }

@@ -7,6 +7,7 @@ namespace Lockrot\Verdict;
 use Lockrot\Score\IfApplied;
 use Lockrot\Security\Holder;
 use Lockrot\Security\PhpCheck;
+use Lockrot\Solver\MoveCheck;
 
 /**
  * One move of `next_step`, or an entry of its `also[]`: what to run, what it clears, leaves and
@@ -15,7 +16,7 @@ use Lockrot\Security\PhpCheck;
  *
  * @internal
  *
- * @phpstan-type Shape array{kind: string, source: string, merged: list<string>, fix_kind: ?string, reason: ?string, replacement: ?Replacement, quiet_years: ?float, to_branch: ?string, version: ?string, newest: ?string, constraint: ?string, latest: ?Latest, php_check: ?PhpCheck, crosses_major: ?bool, held_by: list<Holder>, clears: list<MoveFact>, unverified: list<MoveFact>, adds: list<MoveFact>, leaves: list<MoveFact>, clears_all: bool, if_applied: ?IfApplied, composer_moves_because: list<string>, commands: list<list<string>>, through?: list<ThroughEntry>, also?: list<self>, text: string}
+ * @phpstan-type Shape array{kind: string, source: string, merged: list<string>, fix_kind: ?string, reason: ?string, replacement: ?Replacement, quiet_years: ?float, to_branch: ?string, version: ?string, newest: ?string, constraint: ?string, latest: ?Latest, php_check: ?PhpCheck, crosses_major: ?bool, held_by: list<Holder>, clears: list<MoveFact>, unverified: list<MoveFact>, adds: list<MoveFact>, leaves: list<MoveFact>, clears_all: bool, if_applied: ?IfApplied, check: ?MoveCheck, composer_moves_because: list<string>, commands: list<list<string>>, through?: list<ThroughEntry>, also?: list<self>, text: string}
  */
 final class Move implements \JsonSerializable
 {
@@ -70,6 +71,7 @@ final class Move implements \JsonSerializable
     private array $composerMovesBecause;
     /** @var list<list<string>> */
     private array $commands;
+    private ?MoveCheck $check = null;
     /** @var list<ThroughEntry>|null null on an `also[]` move */
     private ?array $through = null;
     /** @var list<self>|null null on an `also[]` move */
@@ -155,6 +157,15 @@ final class Move implements \JsonSerializable
                 $clone->commands[] = $whyNot;
             }
         }
+
+        return $clone;
+    }
+
+    /** A copy with Composer's check of the move: null for a kind that runs no Composer request. */
+    public function withCheck(?MoveCheck $check): self
+    {
+        $clone = clone $this;
+        $clone->check = $check;
 
         return $clone;
     }
@@ -295,6 +306,11 @@ final class Move implements \JsonSerializable
         return $this->ifApplied;
     }
 
+    public function check(): ?MoveCheck
+    {
+        return $this->check;
+    }
+
     /** @return list<string> */
     public function composerMovesBecause(): array
     {
@@ -368,6 +384,7 @@ final class Move implements \JsonSerializable
             'leaves' => $this->leaves,
             'clears_all' => $this->clears !== [] && $this->leaves === [] && $this->unverified === [],
             'if_applied' => $this->ifApplied,
+            'check' => $this->check,
             'composer_moves_because' => $this->composerMovesBecause,
             'commands' => $this->commands,
         ];

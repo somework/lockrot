@@ -509,8 +509,8 @@ def _(d): sig(d['findings'][tw], 'S9')['data']['advisories'][0]['points'] = 7
 def _(d): d['findings'][OAUTH]['checks_skipped'] = [c for c in d['findings'][OAUTH]['checks_skipped'] if c['check'] != 'release_branch']
 @case('a4-headline-null-value-with-a-source', 'composite', f + '.flags[0]')
 def _(d): d['findings'][m]['flags'][0]['headline'].update(value=None, source='branch')
-@case('a4-update-now-command-null-beside-update-now', 'composite', 'security')
-def _(d): d['security']['update_now_command'] = None
+@case('move-check-form-on-a-refusal', 'composite', f + '.next_step.check')
+def _(d): d['findings'][m]['next_step']['check'] = {'result': 'refused', 'form': 'inline', 'reason': None}
 @case('a4-update-now-command-without-update-now', 'composite', 'security')
 def _(d): d['security']['update_now'] = []
 @case('a4-update-now-command-a-shell-pipe', 'composite', 'security.update_now_command')
@@ -822,6 +822,11 @@ def _(d): d['packages_unchecked_accepted'] = 1
 def _(d): del d['packages_unchecked_accepted']
 @case('strict-o9-accepted-reason-a-rerun-closes', 'host-accepted-dagger', 'findings[0].unchecked_accepted[0].reason', strict=True)
 def _(d): d['findings'][0]['unchecked_accepted'][0]['reason'] = 'rate_limit'  # open set: a later reason validates as published
+
+@case('run-move-check-reason-on-a-checked-baseline', 'move-check-dagger', 'run.move_check')
+def _(d): d['run']['move_check']['reason'] = 'solver_error'
+@case('run-move-check-not-checked-without-a-reason', 'move-check-dagger', 'run.move_check')
+def _(d): d['run']['move_check']['baseline'] = 'not_checked'
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)

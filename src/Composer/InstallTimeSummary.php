@@ -29,6 +29,8 @@ use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Output\RunGateText;
 use Lockrot\Output\TerminalText;
+use Lockrot\Solver\MoveCheckers;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Version;
 
 /**
@@ -43,13 +45,13 @@ use Lockrot\Version;
  */
 final class InstallTimeSummary
 {
-    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer */
+    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null): Analyzer */
     private $analyzerFactory;
     /** @var null|callable(): float */
     private $monotonicNow;
 
     /**
-     * @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory
+     * @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null): Analyzer $analyzerFactory
      * @param null|callable(): float $monotonicNow monotonic seconds, hrtime() when null
      */
     public function __construct(?callable $analyzerFactory = null, ?callable $monotonicNow = null)
@@ -134,7 +136,9 @@ final class InstallTimeSummary
         $config = $composer->getConfig();
         $repositories = array_values($composer->getRepositoryManager()->getRepositories());
 
-        $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $event->getIO(), $config, $repositories, $project, $lockrot, $env, $deadline);
+        // The check counts against the same budget: a move that it reaches too late is not checked.
+        $checks = static fn (): MoveChecks => MoveChecks::of(MoveCheckers::forProject($composer->getPackage(), $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), $deadline));
+        $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $event->getIO(), $config, $repositories, $project, $lockrot, $env, $deadline, $checks);
 
         $report = $analyzer->analyzePackages($packages, $lock, $project, $event->isDevMode());
         // The baseline reaches the gate only: the block still reports everything that this

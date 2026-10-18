@@ -17,6 +17,7 @@ use Lockrot\Security\Holder;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Signal;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
 
@@ -390,7 +391,8 @@ final class ExplainFormatter
         $lines = ['repository metadata', self::escape(\sprintf('     %-8s %-13s %-12s %-10s %s', 'branch', 'highest tag', 'released', 'php', 'fixes'))];
         foreach (\array_slice($rows, 0, Explanation::BRANCH_ROWS) as $row) {
             $released = $row['highest_released'] === null ? ($row['highest_commit_date'] === null ? 'undated' : 'commit '.$row['highest_commit_date']->format('Y-m-d')) : $row['highest_released']->format('Y-m-d');
-            $cell = isset($fixes[$row['branch']]) ? self::fixesCell($fixes[$row['branch']], $finding->details()->moves()->rowIfApplied($row['branch']), $row['branch'] === $moveBranch) : '';
+            $moves = $finding->details()->moves();
+            $cell = isset($fixes[$row['branch']]) ? self::fixesCell($fixes[$row['branch']], $moves->rowIfApplied($row['branch']), $moves->rowCheck($row['branch']), $row['branch'] === $moveBranch) : '';
             $lines[] = self::escape(rtrim(\sprintf('   %s %-8s %-13s %-12s %-10s %s', $row['installed'] ? '*' : ' ', $row['branch'], $row['highest'], $released, $row['php'] ?? '—', $cell)));
         }
         if (\count($rows) > Explanation::BRANCH_ROWS) {
@@ -417,7 +419,7 @@ final class ExplainFormatter
     }
 
     /** `{fixed} of {of}`, the fix word, `(lowest fix)` on the move's row, the holders and the score after it. */
-    private static function fixesCell(BranchFixes $row, ?IfApplied $after, bool $moveRow): string
+    private static function fixesCell(BranchFixes $row, ?IfApplied $after, ?MoveCheck $check, bool $moveRow): string
     {
         $cell = $row->fixed().' of '.$row->of();
         $candidate = $row->candidate();
@@ -430,7 +432,12 @@ final class ExplainFormatter
             $cell .= '; held by '.implode(' and ', array_unique($holders));
         }
         if ($after !== null) {
-            $cell .= '; after it: '.($after->atMost() ? 'at most ' : '').$after->total().', '.$after->verdict().', if Composer resolves it';
+            // D10: the caveat stays only where Composer's solver did not check the move.
+            $checked = $check !== null && $check->result() !== MoveCheck::NOT_CHECKED;
+            $cell .= '; after it: '.($after->atMost() ? 'at most ' : '').$after->total().', '.$after->verdict().($checked ? '' : ', if Composer resolves it');
+            if ($check !== null && $checked) {
+                $cell .= $check->isResolved() ? "; Composer's solver resolves it" : "; Composer's solver refuses it";
+            }
         }
 
         return $cell;

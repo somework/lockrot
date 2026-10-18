@@ -155,6 +155,7 @@
      "clears_hold"
     ]
    },
+   "check": null,
    "composer_moves_because": [],
    "commands": [
     [
@@ -245,7 +246,8 @@
      "assumes": [
       "clears_hold"
      ]
-    }
+    },
+    "check": null
    },
    "move_in": "next_step",
    "gets": {
@@ -1228,7 +1230,8 @@
      "records": 7
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "ok",

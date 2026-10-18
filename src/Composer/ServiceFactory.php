@@ -32,6 +32,7 @@ use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
 use Lockrot\Output\TerminalText;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Verdict\MoveChecks;
 
 /** @internal */
 final class ServiceFactory
@@ -40,8 +41,9 @@ final class ServiceFactory
      * @param list<RepositoryInterface> $repositories the project's configured Composer repositories, in lookup order
      * @param ?Deadline                 $deadline     install-time budget, null for no limit
      * @param ?string                   $projectPhp   the project's `require.php`, or null when the manifest has none, see {@see \Lockrot\Signal\PhpFloor}
+     * @param (\Closure(): MoveChecks)|null $checks the move check of the run (docs/verdicts.md#the-move-check), null for none
      */
-    public static function createAnalyzer(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null): Analyzer
+    public static function createAnalyzer(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer
     {
         $deadline ??= Deadline::never();
         $http = self::createHttp($io, $config, $lockrot, $clock, $deadline);
@@ -65,7 +67,9 @@ final class ServiceFactory
             AbandonedIgnore::fromConfig($config)
         );
 
-        return $analyzer->withDeadline($deadline);
+        $analyzer = $analyzer->withDeadline($deadline);
+
+        return $checks === null ? $analyzer : $analyzer->withMoveChecks($checks());
     }
 
     /**

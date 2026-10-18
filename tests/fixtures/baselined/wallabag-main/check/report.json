@@ -760,6 +760,13 @@
                 }
             ]
         },
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": true,
+            "ignores_extensions": true,
+            "baseline": "resolves",
+            "reason": null
+        },
         "score_rules_used": {
             "counted": 10,
             "lead-first": 70,
@@ -1191,7 +1198,7 @@
         "update_now_command": [
             "composer",
             "update",
-            "phpseclib/phpseclib"
+            "phpseclib/phpseclib:^3.0.57"
         ],
         "fix_unknown": 0
     },
@@ -1367,6 +1374,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -1725,6 +1733,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -2067,6 +2076,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -2461,10 +2471,20 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "scheb/2fa-google-authenticator",
+                        "constraint": "^5.13.2",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "scheb/2fa-google-authenticator",
                         "version": "v5.13.2",
                         "link": "require",
+                        "target": null,
                         "constraint": "^9.1|^10.0",
                         "holder": {
                             "verdict": "high",
@@ -2476,7 +2496,12 @@
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "7.x",
-                                "constraint": "^7.14"
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
                             }
                         }
                     }
@@ -2513,6 +2538,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -2532,7 +2562,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-google-authenticator ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "vulnerable",
@@ -2568,7 +2598,8 @@
                     "lowest": null,
                     "newest": "v10.0.3",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -2679,10 +2710,20 @@
                                     "php": ">=8.1",
                                     "held_by": [
                                         {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "root-require",
+                                            "target": "scheb/2fa-google-authenticator",
+                                            "constraint": "^5.13.2",
+                                            "holder": null
+                                        },
+                                        {
                                             "source": "package",
                                             "package": "scheb/2fa-google-authenticator",
                                             "version": "v5.13.2",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^9.1|^10.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -2694,7 +2735,12 @@
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "7.x",
-                                                    "constraint": "^7.14"
+                                                    "constraint": "^7.14",
+                                                    "check": {
+                                                        "result": "refused",
+                                                        "form": null,
+                                                        "reason": null
+                                                    }
                                                 }
                                             }
                                         }
@@ -2728,10 +2774,20 @@
                                     "php": ">=8.1",
                                     "held_by": [
                                         {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "root-require",
+                                            "target": "scheb/2fa-google-authenticator",
+                                            "constraint": "^5.13.2",
+                                            "holder": null
+                                        },
+                                        {
                                             "source": "package",
                                             "package": "scheb/2fa-google-authenticator",
                                             "version": "v5.13.2",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^9.1|^10.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -2743,7 +2799,12 @@
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "7.x",
-                                                    "constraint": "^7.14"
+                                                    "constraint": "^7.14",
+                                                    "check": {
+                                                        "result": "refused",
+                                                        "form": null,
+                                                        "reason": null
+                                                    }
                                                 }
                                             }
                                         }
@@ -3037,6 +3098,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -3423,6 +3485,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -3789,6 +3852,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -4169,6 +4233,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -4548,6 +4613,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -4928,6 +4994,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -5355,6 +5422,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -5760,6 +5828,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -6139,6 +6208,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -6450,14 +6520,145 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.2",
                         "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "dama/doctrine-test-bundle",
+                        "constraint": "^8.2.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "doctrine/dbal",
+                        "constraint": "^3.9.4",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "doctrine/migrations",
+                        "constraint": "^3.8.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "doctrine/orm",
+                        "constraint": "^2.20.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "doctrine/persistence",
+                        "constraint": "^3.4",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "symfony/doctrine-bridge",
+                        "constraint": "^5.4.48",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "dama/doctrine-test-bundle",
+                        "version": "v8.2.2",
+                        "link": "require",
+                        "target": "doctrine/dbal",
+                        "constraint": "^3.3 || ^4.0",
+                        "holder": {
+                            "verdict": "ok",
+                            "lead": null,
+                            "flag_ids": [],
+                            "replacement": null,
+                            "next_step": null
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "doctrine/dbal",
+                        "version": "3.10.5",
+                        "link": "require",
+                        "target": null,
+                        "constraint": "^1|^2",
+                        "holder": {
+                            "verdict": "ok",
+                            "lead": null,
+                            "flag_ids": [],
+                            "replacement": null,
+                            "next_step": null
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "doctrine/migrations",
+                        "version": "3.9.7",
+                        "link": "require",
+                        "target": null,
+                        "constraint": "^1.2 || ^2.0",
+                        "holder": {
+                            "verdict": "ok",
+                            "lead": null,
+                            "flag_ids": [],
+                            "replacement": null,
+                            "next_step": null
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "doctrine/orm",
+                        "version": "2.20.9",
+                        "link": "require",
+                        "target": null,
+                        "constraint": "^1.2 || ^2",
+                        "holder": {
+                            "verdict": "ok",
+                            "lead": null,
+                            "flag_ids": [],
+                            "replacement": null,
+                            "next_step": null
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "doctrine/persistence",
+                        "version": "3.4.3",
+                        "link": "require",
+                        "target": null,
+                        "constraint": "^1 || ^2",
+                        "holder": {
+                            "verdict": "ok",
+                            "lead": null,
+                            "flag_ids": [],
+                            "replacement": null,
+                            "next_step": null
+                        }
                     },
                     {
                         "source": "package",
                         "package": "symfony/doctrine-bridge",
                         "version": "v5.4.48",
                         "link": "require",
+                        "target": null,
                         "constraint": "~1.0",
                         "holder": {
                             "verdict": "ok",
@@ -6490,20 +6691,19 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "require",
-                        "doctrine/event-manager:^2.1"
-                    ]
-                ],
+                "commands": [],
                 "through": [],
                 "also": [],
-                "text": "require doctrine/event-manager ^2.1 \u2014 clears left-behind; 2.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.2) and symfony/doctrine-bridge v5.4.48 (requires ~1.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require doctrine/event-manager ^2.1 \u2014 clears left-behind; 2.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.2) and composer.json (requires dama/doctrine-test-bundle ^8.2.2) and composer.json (requires doctrine/dbal ^3.9.4) and composer.json (requires doctrine/migrations ^3.8.2) and composer.json (requires doctrine/orm ^2.20.2) and composer.json (requires doctrine/persistence ^3.4) and composer.json (requires symfony/doctrine-bridge ^5.4.48) and dama/doctrine-test-bundle v8.2.2 (requires doctrine/dbal ^3.3 || ^4.0) and doctrine/dbal 3.10.5 (requires ^1|^2) and doctrine/migrations 3.9.7 (requires ^1.2 || ^2.0) and doctrine/orm 2.20.9 (requires ^1.2 || ^2) and doctrine/persistence 3.4.3 (requires ^1 || ^2) and symfony/doctrine-bridge v5.4.48 (requires ~1.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -6798,7 +6998,17 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^4.3",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "scheb/2fa-trusted-device",
+                        "constraint": "^5.13.2",
                         "holder": null
                     },
                     {
@@ -6806,6 +7016,7 @@
                         "package": "scheb/2fa-trusted-device",
                         "version": "v5.13.2",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.4|^4.0",
                         "holder": {
                             "verdict": "high",
@@ -6817,7 +7028,12 @@
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "7.x",
-                                "constraint": "^7.14"
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
                             }
                         }
                     }
@@ -6844,20 +7060,19 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "require",
-                        "lcobucci/jwt:^5.6"
-                    ]
-                ],
+                "commands": [],
                 "through": [],
                 "also": [],
-                "text": "require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3) and scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3) and composer.json (requires scheb/2fa-trusted-device ^5.13.2) and scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -7138,8 +7353,44 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.13.2",
                         "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "scheb/2fa-bundle",
+                        "constraint": "^5.13.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-backup-code",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "scheb/2fa-bundle",
+                        "constraint": "self.version",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
                     }
                 ],
                 "clears": [
@@ -7164,19 +7415,19 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
+                    "holders",
                     "crosses_major"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "require",
-                        "scheb/2fa-backup-code:^7.14"
-                    ]
-                ],
+                "commands": [],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-backup-code ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require scheb/2fa-backup-code ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-backup-code v7.14.0 (requires scheb/2fa-bundle self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -7501,7 +7752,116 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.13.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "scheb/2fa-backup-code",
+                        "constraint": "^5.13.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "scheb/2fa-email",
+                        "constraint": "^5.13.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "scheb/2fa-google-authenticator",
+                        "constraint": "^5.13.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "scheb/2fa-trusted-device",
+                        "constraint": "^5.13.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "symfony/config",
+                        "constraint": "^5.4.46",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "symfony/dependency-injection",
+                        "constraint": "^5.4.48",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "symfony/event-dispatcher",
+                        "constraint": "^5.4.45",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "symfony/framework-bundle",
+                        "constraint": "^5.4.45",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "symfony/http-foundation",
+                        "constraint": "^5.4.48",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "symfony/http-kernel",
+                        "constraint": "^5.4.48",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "symfony/security-bundle",
+                        "constraint": "^5.4.45",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "symfony/twig-bundle",
+                        "constraint": "^5.4.45",
                         "holder": null
                     },
                     {
@@ -7509,6 +7869,7 @@
                         "package": "scheb/2fa-backup-code",
                         "version": "v5.13.2",
                         "link": "require",
+                        "target": null,
                         "constraint": "self.version",
                         "holder": {
                             "verdict": "high",
@@ -7520,7 +7881,246 @@
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "7.x",
-                                "constraint": "^7.14"
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-bundle",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "symfony/config",
+                        "constraint": "^6.4 || ^7.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-bundle",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "symfony/dependency-injection",
+                        "constraint": "^6.4 || ^7.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-bundle",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "symfony/event-dispatcher",
+                        "constraint": "^6.4 || ^7.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-bundle",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "symfony/framework-bundle",
+                        "constraint": "^6.4 || ^7.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-bundle",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "symfony/http-foundation",
+                        "constraint": "^6.4 || ^7.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-bundle",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "symfony/http-kernel",
+                        "constraint": "^6.4 || ^7.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-bundle",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "symfony/property-access",
+                        "constraint": "^6.4 || ^7.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-bundle",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "symfony/security-bundle",
+                        "constraint": "^6.4 || ^7.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-bundle",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "symfony/twig-bundle",
+                        "constraint": "^6.4 || ^7.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
                             }
                         }
                     },
@@ -7529,6 +8129,7 @@
                         "package": "scheb/2fa-email",
                         "version": "v5.13.2",
                         "link": "require",
+                        "target": null,
                         "constraint": "self.version",
                         "holder": {
                             "verdict": "high",
@@ -7540,7 +8141,12 @@
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "7.x",
-                                "constraint": "^7.14"
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
                             }
                         }
                     },
@@ -7549,6 +8155,7 @@
                         "package": "scheb/2fa-google-authenticator",
                         "version": "v5.13.2",
                         "link": "require",
+                        "target": null,
                         "constraint": "self.version",
                         "holder": {
                             "verdict": "high",
@@ -7560,7 +8167,12 @@
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "7.x",
-                                "constraint": "^7.14"
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
                             }
                         }
                     },
@@ -7569,6 +8181,7 @@
                         "package": "scheb/2fa-trusted-device",
                         "version": "v5.13.2",
                         "link": "require",
+                        "target": null,
                         "constraint": "self.version",
                         "holder": {
                             "verdict": "high",
@@ -7580,7 +8193,12 @@
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "7.x",
-                                "constraint": "^7.14"
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
                             }
                         }
                     }
@@ -7607,20 +8225,19 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "require",
-                        "scheb/2fa-bundle:^7.14"
-                    ]
-                ],
+                "commands": [],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-bundle ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and scheb/2fa-backup-code v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-trusted-device v5.13.2 (requires self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require scheb/2fa-bundle ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-backup-code ^5.13.2) and composer.json (requires scheb/2fa-email ^5.13.2) and composer.json (requires scheb/2fa-google-authenticator ^5.13.2) and composer.json (requires scheb/2fa-trusted-device ^5.13.2) and composer.json (requires symfony/config ^5.4.46) and composer.json (requires symfony/dependency-injection ^5.4.48) and composer.json (requires symfony/event-dispatcher ^5.4.45) and composer.json (requires symfony/framework-bundle ^5.4.45) and composer.json (requires symfony/http-foundation ^5.4.48) and composer.json (requires symfony/http-kernel ^5.4.48) and composer.json (requires symfony/security-bundle ^5.4.45) and composer.json (requires symfony/twig-bundle ^5.4.45) and scheb/2fa-backup-code v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires symfony/config ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires symfony/dependency-injection ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires symfony/event-dispatcher ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires symfony/framework-bundle ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires symfony/http-foundation ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires symfony/http-kernel ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires symfony/property-access ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires symfony/security-bundle ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires symfony/twig-bundle ^6.4 || ^7.0; itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-trusted-device v5.13.2 (requires self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -7927,8 +8544,44 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.13.2",
                         "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "scheb/2fa-bundle",
+                        "constraint": "^5.13.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-email",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "scheb/2fa-bundle",
+                        "constraint": "self.version",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
                     }
                 ],
                 "clears": [
@@ -7953,19 +8606,19 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
+                    "holders",
                     "crosses_major"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "require",
-                        "scheb/2fa-email:^7.14"
-                    ]
-                ],
+                "commands": [],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-email ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require scheb/2fa-email ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-email v7.14.0 (requires scheb/2fa-bundle self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -8269,8 +8922,70 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.13.2",
                         "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "scheb/2fa-bundle",
+                        "constraint": "^5.13.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-google-authenticator",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "scheb/2fa-bundle",
+                        "constraint": "self.version",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-google-authenticator",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "spomky-labs/otphp",
+                        "constraint": "^11.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
                     }
                 ],
                 "clears": [
@@ -8295,19 +9010,19 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
+                    "holders",
                     "crosses_major"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "require",
-                        "scheb/2fa-google-authenticator:^7.14"
-                    ]
-                ],
+                "commands": [],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-google-authenticator ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require scheb/2fa-google-authenticator ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v7.14.0 (requires scheb/2fa-bundle self.version; itself left-behind) and scheb/2fa-google-authenticator v7.14.0 (requires spomky-labs/otphp ^11.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -8658,8 +9373,79 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.13.2",
                         "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "lcobucci/jwt",
+                        "constraint": "^4.3",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "scheb/2fa-bundle",
+                        "constraint": "^5.13.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-trusted-device",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "lcobucci/jwt",
+                        "constraint": "^5.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-trusted-device",
+                        "version": "v7.14.0",
+                        "link": "require",
+                        "target": "scheb/2fa-bundle",
+                        "constraint": "self.version",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
                     }
                 ],
                 "clears": [
@@ -8684,19 +9470,19 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
+                    "holders",
                     "crosses_major"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "require",
-                        "scheb/2fa-trusted-device:^7.14"
-                    ]
-                ],
+                "commands": [],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-trusted-device ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require scheb/2fa-trusted-device ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires lcobucci/jwt ^4.3) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-trusted-device v7.14.0 (requires lcobucci/jwt ^5.0; itself left-behind) and scheb/2fa-trusted-device v7.14.0 (requires scheb/2fa-bundle self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -9038,6 +9824,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -9340,6 +10127,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.17.2",
                         "holder": null
                     }
@@ -9362,9 +10150,13 @@
                     "deciding_advisory": null,
                     "at_most": false,
                     "assumes": [
-                        "clears_hold",
-                        "composer_resolves"
+                        "clears_hold"
                     ]
+                },
+                "check": {
+                    "result": "resolves",
+                    "form": "inline",
+                    "reason": null
                 },
                 "composer_moves_because": [
                     "crosses_major"
@@ -9378,7 +10170,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/webpack-encore-bundle ^2.4 \u2014 clears left-behind; 2.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.17.2); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/webpack-encore-bundle ^2.4 \u2014 clears left-behind; 2.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.17.2); a new major brings its own requirements; Composer's solver checked it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -9658,6 +10450,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -10124,6 +10917,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -10631,6 +11425,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -10947,6 +11742,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -11242,6 +12038,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -11648,6 +12445,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -11987,6 +12785,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12327,6 +13126,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12666,6 +13466,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -13005,6 +13806,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -13345,6 +14147,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -13685,6 +14488,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14024,6 +14828,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14364,6 +15169,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14702,6 +15508,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15042,6 +15849,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15383,6 +16191,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15722,6 +16531,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16061,6 +16871,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16466,12 +17277,17 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "resolves",
+                    "form": "inline",
+                    "reason": null
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "phpseclib/phpseclib"
+                        "phpseclib/phpseclib:^3.0.57"
                     ]
                 ],
                 "through": [
@@ -16499,7 +17315,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update phpseclib/phpseclib (gets 3.0.57) \u2014 clears the advisory"
+                "text": "composer update 'phpseclib/phpseclib:^3.0.57' (gets 3.0.57) \u2014 clears the advisory; Composer's solver checked it against the lock"
             },
             "security": {
                 "status": "vulnerable",
@@ -16542,6 +17358,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "resolves",
+                        "form": "inline",
+                        "reason": null
                     }
                 },
                 "move_in": "next_step",
@@ -16828,6 +17649,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -17107,6 +17929,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -17363,6 +18186,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -17642,6 +18466,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -17993,6 +18818,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -18285,10 +19111,20 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "j0k3r/graby",
+                        "constraint": "^2.4.6",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "j0k3r/graby",
                         "version": "2.5.2",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.1",
                         "holder": {
                             "verdict": "ok",
@@ -18321,6 +19157,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -18340,7 +19181,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move smalot/pdfparser to ^2.12 through j0k3r/graby \u2014 clears left-behind; 2.x needs php >=7.1, which require.php allows; the target php 8.4 runs it; held by j0k3r/graby 2.5.2 (requires ^1.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move smalot/pdfparser to ^2.12 through j0k3r/graby \u2014 clears left-behind; 2.x needs php >=7.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires j0k3r/graby ^2.4.6) and j0k3r/graby 2.5.2 (requires ^1.1); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -18610,7 +19451,67 @@
                     "raise_size": null
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "sentry/sentry-symfony",
+                        "constraint": "^5.2.0",
+                        "holder": null
+                    },
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "symfony/http-foundation",
+                        "constraint": "^5.4.48",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "sentry/sentry-symfony",
+                        "version": "5.12.0",
+                        "link": "require",
+                        "target": null,
+                        "constraint": "^1.2||^2.0||^6.4||^7.0||^8.0",
+                        "holder": {
+                            "verdict": "ok",
+                            "lead": null,
+                            "flag_ids": [],
+                            "replacement": null,
+                            "next_step": null
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "symfony/psr-http-message-bridge",
+                        "version": "v7.4.8",
+                        "link": "require",
+                        "target": "symfony/http-foundation",
+                        "constraint": "^6.4|^7.0|^8.0",
+                        "holder": {
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.4",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -18633,9 +19534,14 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
-                    "crosses_major",
-                    "transitive"
+                    "holders",
+                    "crosses_major"
                 ],
                 "commands": [],
                 "through": [
@@ -18652,7 +19558,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move symfony/psr-http-message-bridge to ^7.4 through sentry/sentry-symfony \u2014 clears left-behind; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of sentry/sentry-symfony (5.13.0) still requires it"
+                "text": "move symfony/psr-http-message-bridge to ^7.4 through sentry/sentry-symfony \u2014 clears left-behind; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires sentry/sentry-symfony ^5.2.0) and composer.json (requires symfony/http-foundation ^5.4.48) and sentry/sentry-symfony 5.12.0 (requires ^1.2||^2.0||^6.4||^7.0||^8.0) and symfony/psr-http-message-bridge v7.4.8 (requires symfony/http-foundation ^6.4|^7.0|^8.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -18924,10 +19830,46 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "scheb/2fa-google-authenticator",
+                        "constraint": "^5.13.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-google-authenticator",
+                        "version": "v5.13.2",
+                        "link": "require",
+                        "target": "spomky-labs/otphp",
+                        "constraint": "^9.1|^10.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "7.x",
+                                "constraint": "^7.14",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
                         "source": "package",
                         "package": "spomky-labs/otphp",
                         "version": "v10.0.3",
                         "link": "require",
+                        "target": null,
                         "constraint": "^0.1.14|^1.0|^2.0",
                         "holder": {
                             "verdict": "high",
@@ -18940,7 +19882,12 @@
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "11.x",
-                                "constraint": "^11.5"
+                                "constraint": "^11.5",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
                             }
                         }
                     }
@@ -18967,6 +19914,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -18986,7 +19938,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-google-authenticator ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp ^9.1|^10.0; itself left-behind) and spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -19281,6 +20233,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -19618,10 +20571,20 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "phpunit/phpunit",
+                        "constraint": "^9.6.22",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.1.1",
                         "holder": {
                             "verdict": "ok",
@@ -19659,6 +20622,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -19678,7 +20646,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move phpunit/php-invoker to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/phpunit 9.6.33 (requires ^3.1.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move phpunit/php-invoker to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/phpunit 9.6.33 (requires ^3.1.1); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -20041,10 +21009,20 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "phpunit/phpunit",
+                        "constraint": "^9.6.22",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.32",
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0.4",
                         "holder": {
                             "verdict": "ok",
@@ -20059,6 +21037,7 @@
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0.4",
                         "holder": {
                             "verdict": "ok",
@@ -20096,6 +21075,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -20115,7 +21099,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move phpunit/php-text-template to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^2.0.4) and phpunit/phpunit 9.6.33 (requires ^2.0.4); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move phpunit/php-text-template to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/php-code-coverage 9.2.32 (requires ^2.0.4) and phpunit/phpunit 9.6.33 (requires ^2.0.4); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -20478,10 +21462,20 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "phpunit/phpunit",
+                        "constraint": "^9.6.22",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.0.3",
                         "holder": {
                             "verdict": "ok",
@@ -20519,6 +21513,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -20538,7 +21537,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move phpunit/php-timer to ^7.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/phpunit 9.6.33 (requires ^5.0.3); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move phpunit/php-timer to ^7.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/phpunit 9.6.33 (requires ^5.0.3); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -20901,10 +21900,20 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "phpunit/phpunit",
+                        "constraint": "^9.6.22",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.0.8",
                         "holder": {
                             "verdict": "ok",
@@ -20942,6 +21951,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -20968,7 +21982,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/code-unit to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/phpunit 9.6.33 (requires ^1.0.8); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move sebastian/code-unit to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/phpunit 9.6.33 (requires ^1.0.8); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -21331,11 +22345,36 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "phpunit/phpunit",
+                        "constraint": "^9.6.22",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.32",
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0.3",
+                        "holder": {
+                            "verdict": "ok",
+                            "lead": null,
+                            "flag_ids": [],
+                            "replacement": null,
+                            "next_step": null
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "phpunit/phpunit",
+                        "version": "9.6.33",
+                        "link": "require",
+                        "target": "phpunit/php-code-coverage",
+                        "constraint": "^9.2.32",
                         "holder": {
                             "verdict": "ok",
                             "lead": null,
@@ -21372,6 +22411,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -21391,7 +22435,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/code-unit-reverse-lookup to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^2.0.3); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move sebastian/code-unit-reverse-lookup to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/php-code-coverage 9.2.32 (requires ^2.0.3) and phpunit/phpunit 9.6.33 (requires phpunit/php-code-coverage ^9.2.32); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -21755,10 +22799,20 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "phpunit/phpunit",
+                        "constraint": "^9.6.22",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
                         "link": "require",
+                        "target": null,
                         "constraint": "^4.0.4",
                         "holder": {
                             "verdict": "ok",
@@ -21766,6 +22820,60 @@
                             "flag_ids": [],
                             "replacement": null,
                             "next_step": null
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "sebastian/object-enumerator",
+                        "version": "6.0.0",
+                        "link": "require",
+                        "target": "sebastian/object-reflector",
+                        "constraint": "^4.0",
+                        "holder": {
+                            "verdict": "low",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "6.x",
+                                "constraint": "^6.0",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "sebastian/object-enumerator",
+                        "version": "6.0.0",
+                        "link": "require",
+                        "target": "sebastian/recursion-context",
+                        "constraint": "^6.0",
+                        "holder": {
+                            "verdict": "low",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "6.x",
+                                "constraint": "^6.0",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
+                            }
                         }
                     }
                 ],
@@ -21796,6 +22904,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -21815,7 +22928,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/object-enumerator to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/phpunit 9.6.33 (requires ^4.0.4); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move sebastian/object-enumerator to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/phpunit 9.6.33 (requires ^4.0.4) and sebastian/object-enumerator 6.0.0 (requires sebastian/object-reflector ^4.0; itself left-behind) and sebastian/object-enumerator 6.0.0 (requires sebastian/recursion-context ^6.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -22178,10 +23291,35 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "phpunit/phpunit",
+                        "constraint": "^9.6.22",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "phpunit/phpunit",
+                        "version": "9.6.33",
+                        "link": "require",
+                        "target": "sebastian/global-state",
+                        "constraint": "^5.0.8",
+                        "holder": {
+                            "verdict": "ok",
+                            "lead": null,
+                            "flag_ids": [],
+                            "replacement": null,
+                            "next_step": null
+                        }
+                    },
+                    {
                         "source": "package",
                         "package": "sebastian/global-state",
                         "version": "5.0.8",
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0",
                         "holder": {
                             "verdict": "ok",
@@ -22196,6 +23334,7 @@
                         "package": "sebastian/object-enumerator",
                         "version": "4.0.4",
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0",
                         "holder": {
                             "verdict": "low",
@@ -22208,7 +23347,12 @@
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "6.x",
-                                "constraint": "^6.0"
+                                "constraint": "^6.0",
+                                "check": {
+                                    "result": "refused",
+                                    "form": null,
+                                    "reason": null
+                                }
                             }
                         }
                     }
@@ -22240,6 +23384,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -22259,7 +23408,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/object-reflector to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/global-state 5.0.8 (requires ^2.0) and sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move sebastian/object-reflector to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/phpunit 9.6.33 (requires sebastian/global-state ^5.0.8) and sebastian/global-state 5.0.8 (requires ^2.0) and sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -22623,10 +23772,20 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "phpunit/phpunit",
+                        "constraint": "^9.6.22",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.32",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.0.2",
                         "holder": {
                             "verdict": "ok",
@@ -22641,6 +23800,7 @@
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.0.2",
                         "holder": {
                             "verdict": "ok",
@@ -22678,6 +23838,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -22697,7 +23862,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/version to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^3.0.2) and phpunit/phpunit 9.6.33 (requires ^3.0.2); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move sebastian/version to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/php-code-coverage 9.2.32 (requires ^3.0.2) and phpunit/phpunit 9.6.33 (requires ^3.0.2); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -23007,6 +24172,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -23284,6 +24450,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -23574,6 +24741,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -23866,10 +25034,20 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "phpunit/phpunit",
+                        "constraint": "^9.6.22",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.32",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.0.6",
                         "holder": {
                             "verdict": "ok",
@@ -23884,6 +25062,7 @@
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.0.6",
                         "holder": {
                             "verdict": "ok",
@@ -23916,6 +25095,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -23935,7 +25119,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move phpunit/php-file-iterator to ^5.1 through phpunit/phpunit \u2014 clears left-behind; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^3.0.6) and phpunit/phpunit 9.6.33 (requires ^3.0.6); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move phpunit/php-file-iterator to ^5.1 through phpunit/phpunit \u2014 clears left-behind; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/php-code-coverage 9.2.32 (requires ^3.0.6) and phpunit/phpunit 9.6.33 (requires ^3.0.6); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -24214,10 +25398,20 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "phpunit/phpunit",
+                        "constraint": "^9.6.22",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.32",
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.1.5",
                         "holder": {
                             "verdict": "ok",
@@ -24232,6 +25426,7 @@
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.1.5",
                         "holder": {
                             "verdict": "ok",
@@ -24264,6 +25459,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -24283,7 +25483,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/environment to ^7.2 through phpunit/phpunit \u2014 clears left-behind; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^5.1.5) and phpunit/phpunit 9.6.33 (requires ^5.1.5); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move sebastian/environment to ^7.2 through phpunit/phpunit \u2014 clears left-behind; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/php-code-coverage 9.2.32 (requires ^5.1.5) and phpunit/phpunit 9.6.33 (requires ^5.1.5); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -24562,10 +25762,20 @@
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "phpunit/phpunit",
+                        "constraint": "^9.6.22",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.2.1",
                         "holder": {
                             "verdict": "ok",
@@ -24598,6 +25808,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "refused",
+                    "form": null,
+                    "reason": null
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -24617,7 +25832,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/type to ^5.1 through phpunit/phpunit \u2014 clears left-behind; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/phpunit 9.6.33 (requires ^3.2.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move sebastian/type to ^5.1 through phpunit/phpunit \u2014 clears left-behind; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/phpunit 9.6.33 (requires ^3.2.1); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -24896,6 +26111,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -25215,6 +26431,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -25510,6 +26727,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -25792,6 +27010,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -26075,6 +27294,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -26357,6 +27577,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [

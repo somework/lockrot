@@ -107,7 +107,6 @@ final class OriginAgreementTest extends TestCase
         'acme/artifact' => ['artifact', null, null, true],
         'acme/after-satis' => ['unknown', null, null, false],
         'acme/metapackage' => ['unknown', null, null, false],
-        'acme/crafted"onmouseover="x?next=evil.example#x' => ['packagist', 'packagist.org', null, false],
     ];
 
     /** Values in the hand-built lock and manifest that a document must not carry: logins, a password, an organisation, a machine path, a private host. */

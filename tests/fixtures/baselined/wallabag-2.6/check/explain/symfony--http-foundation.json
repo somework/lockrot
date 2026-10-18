@@ -180,6 +180,7 @@
                     "package": null,
                     "version": null,
                     "link": "require",
+                    "target": null,
                     "constraint": "^4.4.49",
                     "holder": null
                 }
@@ -216,6 +217,11 @@
                     "composer_resolves"
                 ]
             },
+            "check": {
+                "result": "not_checked",
+                "form": null,
+                "reason": "baseline_refused"
+            },
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -228,7 +234,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/http-foundation ^5.4.50 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve"
+            "text": "require symfony/http-foundation ^5.4.50 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
         },
         "security": {
             "status": "vulnerable",
@@ -264,7 +270,8 @@
                 "lowest": null,
                 "newest": "v4.4.49",
                 "held_by": [],
-                "if_applied": null
+                "if_applied": null,
+                "check": null
             },
             "move_in": "next_step",
             "gets": null,
@@ -413,6 +420,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^4.4.49",
                                         "holder": null
                                     }
@@ -450,6 +458,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^4.4.49",
                                         "holder": null
                                     }
@@ -620,6 +629,7 @@
                             "package": null,
                             "version": null,
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4.49",
                             "holder": null
                         },
@@ -628,6 +638,7 @@
                             "package": "babdev/pagerfanta-bundle",
                             "version": "v3.8.0",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4 || ^5.4 || ^6.0",
                             "holder": {
                                 "verdict": "high",
@@ -639,7 +650,12 @@
                                 "next_step": {
                                     "kind": "raise-php",
                                     "to_branch": "4.x",
-                                    "constraint": "^4.6"
+                                    "constraint": "^4.6",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -648,6 +664,7 @@
                             "package": "craue/config-bundle",
                             "version": "2.7.0",
                             "link": "require",
+                            "target": null,
                             "constraint": "~4.4|~5.4|^6.3",
                             "holder": {
                                 "verdict": "medium",
@@ -659,7 +676,8 @@
                                 "next_step": {
                                     "kind": "no-move",
                                     "to_branch": null,
-                                    "constraint": null
+                                    "constraint": null,
+                                    "check": null
                                 }
                             }
                         },
@@ -668,6 +686,7 @@
                             "package": "friendsofsymfony/oauth2-php",
                             "version": "1.3.1",
                             "link": "require",
+                            "target": null,
                             "constraint": "~3.0|~4.0|~5.0",
                             "holder": {
                                 "verdict": "low",
@@ -679,7 +698,8 @@
                                 "next_step": {
                                     "kind": "no-move",
                                     "to_branch": null,
-                                    "constraint": null
+                                    "constraint": null,
+                                    "check": null
                                 }
                             }
                         },
@@ -688,6 +708,7 @@
                             "package": "friendsofsymfony/rest-bundle",
                             "version": "3.5.0",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4|^5.3|^6.0",
                             "holder": {
                                 "verdict": "ok",
@@ -702,6 +723,7 @@
                             "package": "friendsofsymfony/user-bundle",
                             "version": "v3.4.0",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4 || ^5.0 || ^6.0",
                             "holder": {
                                 "verdict": "ok",
@@ -716,6 +738,7 @@
                             "package": "nelmio/api-doc-bundle",
                             "version": "v4.11.1",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4|^5.0|^6.0",
                             "holder": {
                                 "verdict": "ok",
@@ -730,6 +753,7 @@
                             "package": "scheb/2fa-bundle",
                             "version": "v5.13.2",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4|^5.0",
                             "holder": {
                                 "verdict": "high",
@@ -741,7 +765,12 @@
                                 "next_step": {
                                     "kind": "raise-php",
                                     "to_branch": "6.x",
-                                    "constraint": "^6.13"
+                                    "constraint": "^6.13",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -750,6 +779,7 @@
                             "package": "symfony/framework-bundle",
                             "version": "v4.4.51",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4|^5.0",
                             "holder": {
                                 "verdict": "high",
@@ -761,7 +791,12 @@
                                 "next_step": {
                                     "kind": "require",
                                     "to_branch": "5.x",
-                                    "constraint": "^5.4.4"
+                                    "constraint": "^5.4.4",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -770,6 +805,7 @@
                             "package": "symfony/http-kernel",
                             "version": "v4.4.51",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4.30|^5.3.7",
                             "holder": {
                                 "verdict": "ok",
@@ -784,6 +820,7 @@
                             "package": "symfony/psr-http-message-bridge",
                             "version": "v2.1.4",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4 || ^5.0 || ^6.0",
                             "holder": {
                                 "verdict": "medium",
@@ -795,7 +832,12 @@
                                 "next_step": {
                                     "kind": "raise-php",
                                     "to_branch": "6.x",
-                                    "constraint": "^6.4"
+                                    "constraint": "^6.4",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -804,6 +846,7 @@
                             "package": "symfony/security-http",
                             "version": "v4.4.50",
                             "link": "require",
+                            "target": null,
                             "constraint": "^3.4.40|^4.4.7|^5.0.7",
                             "holder": {
                                 "verdict": "critical",
@@ -816,7 +859,12 @@
                                 "next_step": {
                                     "kind": "require",
                                     "to_branch": "5.x",
-                                    "constraint": "^5.4.53"
+                                    "constraint": "^5.4.53",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -825,6 +873,7 @@
                             "package": "symfony/twig-bundle",
                             "version": "v4.4.41",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.3|^5.0",
                             "holder": {
                                 "verdict": "high",
@@ -836,7 +885,12 @@
                                 "next_step": {
                                     "kind": "require",
                                     "to_branch": "5.x",
-                                    "constraint": "^5.4"
+                                    "constraint": "^5.4",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         }
@@ -849,6 +903,11 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 }
             },
@@ -885,6 +944,7 @@
                             "package": null,
                             "version": null,
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4.49",
                             "holder": null
                         },
@@ -893,6 +953,7 @@
                             "package": "babdev/pagerfanta-bundle",
                             "version": "v3.8.0",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4 || ^5.4 || ^6.0",
                             "holder": {
                                 "verdict": "high",
@@ -904,7 +965,12 @@
                                 "next_step": {
                                     "kind": "raise-php",
                                     "to_branch": "4.x",
-                                    "constraint": "^4.6"
+                                    "constraint": "^4.6",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -913,6 +979,7 @@
                             "package": "craue/config-bundle",
                             "version": "2.7.0",
                             "link": "require",
+                            "target": null,
                             "constraint": "~4.4|~5.4|^6.3",
                             "holder": {
                                 "verdict": "medium",
@@ -924,7 +991,8 @@
                                 "next_step": {
                                     "kind": "no-move",
                                     "to_branch": null,
-                                    "constraint": null
+                                    "constraint": null,
+                                    "check": null
                                 }
                             }
                         },
@@ -933,6 +1001,7 @@
                             "package": "friendsofsymfony/oauth2-php",
                             "version": "1.3.1",
                             "link": "require",
+                            "target": null,
                             "constraint": "~3.0|~4.0|~5.0",
                             "holder": {
                                 "verdict": "low",
@@ -944,7 +1013,8 @@
                                 "next_step": {
                                     "kind": "no-move",
                                     "to_branch": null,
-                                    "constraint": null
+                                    "constraint": null,
+                                    "check": null
                                 }
                             }
                         },
@@ -953,6 +1023,7 @@
                             "package": "friendsofsymfony/rest-bundle",
                             "version": "3.5.0",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4|^5.3|^6.0",
                             "holder": {
                                 "verdict": "ok",
@@ -967,6 +1038,7 @@
                             "package": "friendsofsymfony/user-bundle",
                             "version": "v3.4.0",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4 || ^5.0 || ^6.0",
                             "holder": {
                                 "verdict": "ok",
@@ -981,6 +1053,7 @@
                             "package": "nelmio/api-doc-bundle",
                             "version": "v4.11.1",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4|^5.0|^6.0",
                             "holder": {
                                 "verdict": "ok",
@@ -995,6 +1068,7 @@
                             "package": "scheb/2fa-bundle",
                             "version": "v5.13.2",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4|^5.0",
                             "holder": {
                                 "verdict": "high",
@@ -1006,7 +1080,12 @@
                                 "next_step": {
                                     "kind": "raise-php",
                                     "to_branch": "6.x",
-                                    "constraint": "^6.13"
+                                    "constraint": "^6.13",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -1015,6 +1094,7 @@
                             "package": "symfony/framework-bundle",
                             "version": "v4.4.51",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4|^5.0",
                             "holder": {
                                 "verdict": "high",
@@ -1026,7 +1106,12 @@
                                 "next_step": {
                                     "kind": "require",
                                     "to_branch": "5.x",
-                                    "constraint": "^5.4.4"
+                                    "constraint": "^5.4.4",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -1035,6 +1120,7 @@
                             "package": "symfony/http-kernel",
                             "version": "v4.4.51",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4.30|^5.3.7",
                             "holder": {
                                 "verdict": "ok",
@@ -1049,6 +1135,7 @@
                             "package": "symfony/psr-http-message-bridge",
                             "version": "v2.1.4",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4 || ^5.0 || ^6.0",
                             "holder": {
                                 "verdict": "medium",
@@ -1060,7 +1147,12 @@
                                 "next_step": {
                                     "kind": "raise-php",
                                     "to_branch": "6.x",
-                                    "constraint": "^6.4"
+                                    "constraint": "^6.4",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -1069,6 +1161,7 @@
                             "package": "symfony/security-http",
                             "version": "v4.4.50",
                             "link": "require",
+                            "target": null,
                             "constraint": "^3.4.40|^4.4.7|^5.0.7",
                             "holder": {
                                 "verdict": "critical",
@@ -1081,7 +1174,12 @@
                                 "next_step": {
                                     "kind": "require",
                                     "to_branch": "5.x",
-                                    "constraint": "^5.4.53"
+                                    "constraint": "^5.4.53",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -1090,6 +1188,7 @@
                             "package": "symfony/twig-bundle",
                             "version": "v4.4.41",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.3|^5.0",
                             "holder": {
                                 "verdict": "high",
@@ -1101,7 +1200,12 @@
                                 "next_step": {
                                     "kind": "require",
                                     "to_branch": "5.x",
-                                    "constraint": "^5.4"
+                                    "constraint": "^5.4",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         }
@@ -1114,6 +1218,11 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 }
             },
@@ -1150,6 +1259,7 @@
                             "package": null,
                             "version": null,
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4.49",
                             "holder": null
                         },
@@ -1158,6 +1268,7 @@
                             "package": "friendsofsymfony/oauth2-php",
                             "version": "1.3.1",
                             "link": "require",
+                            "target": null,
                             "constraint": "~3.0|~4.0|~5.0",
                             "holder": {
                                 "verdict": "low",
@@ -1169,7 +1280,8 @@
                                 "next_step": {
                                     "kind": "no-move",
                                     "to_branch": null,
-                                    "constraint": null
+                                    "constraint": null,
+                                    "check": null
                                 }
                             }
                         },
@@ -1178,6 +1290,7 @@
                             "package": "scheb/2fa-bundle",
                             "version": "v5.13.2",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4|^5.0",
                             "holder": {
                                 "verdict": "high",
@@ -1189,7 +1302,12 @@
                                 "next_step": {
                                     "kind": "raise-php",
                                     "to_branch": "6.x",
-                                    "constraint": "^6.13"
+                                    "constraint": "^6.13",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -1198,6 +1316,7 @@
                             "package": "symfony/framework-bundle",
                             "version": "v4.4.51",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4|^5.0",
                             "holder": {
                                 "verdict": "high",
@@ -1209,7 +1328,12 @@
                                 "next_step": {
                                     "kind": "require",
                                     "to_branch": "5.x",
-                                    "constraint": "^5.4.4"
+                                    "constraint": "^5.4.4",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -1218,6 +1342,7 @@
                             "package": "symfony/http-kernel",
                             "version": "v4.4.51",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4.30|^5.3.7",
                             "holder": {
                                 "verdict": "ok",
@@ -1232,6 +1357,7 @@
                             "package": "symfony/security-http",
                             "version": "v4.4.50",
                             "link": "require",
+                            "target": null,
                             "constraint": "^3.4.40|^4.4.7|^5.0.7",
                             "holder": {
                                 "verdict": "critical",
@@ -1244,7 +1370,12 @@
                                 "next_step": {
                                     "kind": "require",
                                     "to_branch": "5.x",
-                                    "constraint": "^5.4.53"
+                                    "constraint": "^5.4.53",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         },
@@ -1253,6 +1384,7 @@
                             "package": "symfony/twig-bundle",
                             "version": "v4.4.41",
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.3|^5.0",
                             "holder": {
                                 "verdict": "high",
@@ -1264,7 +1396,12 @@
                                 "next_step": {
                                     "kind": "require",
                                     "to_branch": "5.x",
-                                    "constraint": "^5.4"
+                                    "constraint": "^5.4",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
                                 }
                             }
                         }
@@ -1277,6 +1414,11 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 }
             },
@@ -1313,6 +1455,7 @@
                             "package": null,
                             "version": null,
                             "link": "require",
+                            "target": null,
                             "constraint": "^4.4.49",
                             "holder": null
                         }
@@ -1325,6 +1468,11 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 }
             },
@@ -1356,7 +1504,8 @@
                     "lowest": null,
                     "newest": "v4.4.49",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -1387,7 +1536,8 @@
                     "lowest": null,
                     "newest": "v3.4.47",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -1418,7 +1568,8 @@
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             }
         ],
@@ -2173,9 +2324,30 @@
                     "records": 193
                 }
             ]
+        },
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": true,
+            "ignores_extensions": true,
+            "baseline": "refused",
+            "reason": null
         }
     },
     "generated_at": "2026-10-14T00:00:00+00:00",
-    "notes": [],
-    "note_details": []
+    "notes": [
+        "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested."
+    ],
+    "note_details": [
+        {
+            "code": "moves_not_checked",
+            "text": "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested.",
+            "docs_url": "https://lockrot.dev/notes/#moves_not_checked",
+            "sets_network_failures": false,
+            "data": {
+                "reason": "baseline_refused",
+                "php": "8.4.99",
+                "problem": "Problem 1\n    - laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested.\n    - laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement.\n  Problem 2\n    - php-http/guzzle5-adapter is locked to version 2.0.0 and an update of this package was not requested.\n    - php-http/guzzle5-adapter 2.0.0 requires php ^7.0 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement.\n  Problem 3\n    - friendsoftwig/twigcs is locked to version v6.1.0 and an update of this package was not requested.\n    - friendsoftwig/twigcs v6.1.0 requires php ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement.\n  Problem 4\n    - friendsofphp/proxy-manager-lts is locked to version v1.0.18 and an update of this package was not requested.\n    - friendsofphp/proxy-manager-lts v1.0.18 requires laminas/laminas-code ~3.4.1|^4.0 -> satisfiable by laminas/laminas-code[4.7.1].\n    - laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement."
+            }
+        }
+    ]
 }

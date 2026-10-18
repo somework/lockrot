@@ -760,6 +760,7 @@
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -1196,6 +1197,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.38",
                         "holder": null
                     },
@@ -1204,6 +1206,7 @@
                         "package": "csa/guzzle-bundle",
                         "version": "dev-compat-php",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.34|^2.4",
                         "holder": {
                             "verdict": "high",
@@ -1215,7 +1218,8 @@
                             "next_step": {
                                 "kind": "no-move",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     },
@@ -1224,6 +1228,7 @@
                         "package": "symfony/symfony",
                         "version": "v3.4.49",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.41|^2.10",
                         "holder": {
                             "verdict": "critical",
@@ -1236,7 +1241,8 @@
                             "next_step": {
                                 "kind": "raise-php",
                                 "to_branch": "5.x",
-                                "constraint": "^5.4.53"
+                                "constraint": "^5.4.53",
+                                "check": null
                             }
                         }
                     }
@@ -1344,6 +1350,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -1406,7 +1413,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -1530,6 +1538,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -1538,6 +1547,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -1549,7 +1559,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -1558,6 +1569,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -1570,7 +1582,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -1604,6 +1617,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -1612,6 +1626,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -1623,7 +1638,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -1632,6 +1648,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -1644,7 +1661,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -1678,6 +1696,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -1686,6 +1705,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -1697,7 +1717,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -1706,6 +1727,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -1718,7 +1740,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -1752,6 +1775,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         }
@@ -1785,6 +1809,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -1793,6 +1818,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -1804,7 +1830,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -1813,6 +1840,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -1825,7 +1853,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -1859,6 +1888,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -1867,6 +1897,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -1878,7 +1909,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -1887,6 +1919,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -1899,7 +1932,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -1933,6 +1967,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         }
@@ -1966,6 +2001,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -1974,6 +2010,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -1985,7 +2022,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -1994,6 +2032,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2006,7 +2045,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2040,6 +2080,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -2048,6 +2089,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -2059,7 +2101,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -2068,6 +2111,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2080,7 +2124,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2114,6 +2159,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -2122,6 +2168,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -2133,7 +2180,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -2142,6 +2190,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2154,7 +2203,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2188,6 +2238,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -2196,6 +2247,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -2207,7 +2259,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -2216,6 +2269,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2228,7 +2282,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2262,6 +2317,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -2270,6 +2326,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -2281,7 +2338,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -2290,6 +2348,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2302,7 +2361,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2336,6 +2396,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -2344,6 +2405,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -2355,7 +2417,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -2364,6 +2427,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2376,7 +2440,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2410,6 +2475,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -2418,6 +2484,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -2429,7 +2496,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -2438,6 +2506,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2450,7 +2519,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2484,6 +2554,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -2492,6 +2563,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -2503,7 +2575,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -2512,6 +2585,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2524,7 +2598,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2558,6 +2633,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -2566,6 +2642,7 @@
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -2577,7 +2654,8 @@
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -2586,6 +2664,7 @@
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2598,7 +2677,8 @@
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }

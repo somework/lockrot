@@ -162,6 +162,7 @@
      "clears_hold"
     ]
    },
+   "check": null,
    "composer_moves_because": [],
    "commands": [
     [
@@ -249,7 +250,8 @@
      "assumes": [
       "clears_hold"
      ]
-    }
+    },
+    "check": null
    },
    "move_in": "next_step",
    "gets": {
@@ -529,7 +531,8 @@
       "assumes": [
        "clears_hold"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -560,7 +563,8 @@
      "lowest": null,
      "newest": "1.6.7",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -591,7 +595,8 @@
      "lowest": null,
      "newest": "0.19.3",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -622,7 +627,8 @@
      "lowest": null,
      "newest": "0.18.5",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -653,7 +659,8 @@
      "lowest": null,
      "newest": "0.17.5",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -684,7 +691,8 @@
      "lowest": null,
      "newest": "0.16.0",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -715,7 +723,8 @@
      "lowest": null,
      "newest": "0.15.7",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -746,7 +755,8 @@
      "lowest": null,
      "newest": "0.14.0",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -777,7 +787,8 @@
      "lowest": null,
      "newest": "0.13.4",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -808,7 +819,8 @@
      "lowest": null,
      "newest": "0.12.0",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -839,7 +851,8 @@
      "lowest": null,
      "newest": "0.11.3",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -870,7 +883,8 @@
      "lowest": null,
      "newest": "0.10.0",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -901,7 +915,8 @@
      "lowest": null,
      "newest": "0.9.0",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -932,7 +947,8 @@
      "lowest": null,
      "newest": "0.8.0",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -963,7 +979,8 @@
      "lowest": null,
      "newest": "0.7.2",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -994,7 +1011,8 @@
      "lowest": null,
      "newest": "0.6.1",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -1025,7 +1043,8 @@
      "lowest": null,
      "newest": "0.5.1",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -1056,7 +1075,8 @@
      "lowest": null,
      "newest": "0.4.0",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -1087,7 +1107,8 @@
      "lowest": null,
      "newest": "0.3.0",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -1118,7 +1139,8 @@
      "lowest": null,
      "newest": "0.2.1",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -1149,7 +1171,8 @@
      "lowest": null,
      "newest": "0.1.2",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    }
   ]
@@ -1903,7 +1926,8 @@
      "records": 18
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "ok",

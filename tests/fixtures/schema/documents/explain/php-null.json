@@ -135,6 +135,7 @@
      "composer_resolves"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "crosses_major",
     "transitive"
@@ -1276,7 +1277,8 @@
      "records": 0
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "left-behind",

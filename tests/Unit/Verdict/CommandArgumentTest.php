@@ -68,6 +68,27 @@ final class CommandArgumentTest extends TestCase
         }
     }
 
+    /** D4: the form of a move that resolves only with its dependencies is lockrot's own option. */
+    public function testTheDependencyOptionsPassOnUpdateAndRequireOnly(): void
+    {
+        foreach (['--with-dependencies', '--with-all-dependencies'] as $option) {
+            self::assertTrue(CommandArgument::allPass(['composer', 'update', 'a/b:^1.2', $option]), $option);
+            self::assertTrue(CommandArgument::allPass(['composer', 'require', 'a/b:^1.2', $option]), $option);
+            self::assertFalse(CommandArgument::allPass(['composer', 'why-not', 'a/b', $option]), $option);
+        }
+        self::assertFalse(CommandArgument::allPass(['composer', 'update', 'a/b', '--no-update']));
+        self::assertFalse(CommandArgument::allPass(['composer', 'update', 'a/b', '-w']));
+    }
+
+    /** A lock package named like an option cannot add it: lockrot's options follow every package argument. */
+    public function testAnOptionPassesOnlyAfterEveryPackageArgument(): void
+    {
+        self::assertTrue(CommandArgument::allPass(['composer', 'update', 'a/b:^1.2', 'c/d:^2.0', '--with-all-dependencies']));
+        foreach ([['composer', 'update', '--with-all-dependencies'], ['composer', 'update', '--with-all-dependencies', 'a/b'], ['composer', 'require', 'a/b:^1', '--with-dependencies', 'c/d:^2'], ['composer', 'require', '--no-update']] as $argv) {
+            self::assertFalse(CommandArgument::allPass($argv), implode(' ', $argv));
+        }
+    }
+
     public function testAnEmptyArgumentFails(): void
     {
         self::assertFalse(CommandArgument::passes(''));

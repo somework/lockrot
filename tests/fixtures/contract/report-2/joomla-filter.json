@@ -760,6 +760,7 @@
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -1137,6 +1138,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -1191,7 +1193,8 @@
                     "lowest": "2.0.6",
                     "newest": "2.0.6",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {

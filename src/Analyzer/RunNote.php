@@ -10,6 +10,7 @@ use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Signal\Rule\NotCheckedRule;
+use Lockrot\Solver\MoveCheck;
 
 /**
  * Each code has one named constructor, which derives the sentence from the facts, so the text and
@@ -20,6 +21,7 @@ use Lockrot\Signal\Rule\NotCheckedRule;
  */
 final class RunNote
 {
+    public const PACKAGE_NAME_INVALID = 'package_name_invalid';
     public const OFFLINE = 'offline';
     public const METADATA_UNAVAILABLE = 'metadata_unavailable';
     public const MONOREPO_PARENT_UNAVAILABLE = 'monorepo_parent_unavailable';
@@ -40,11 +42,17 @@ final class RunNote
     public const BASELINE_TARGET_DIFFERS = 'baseline_target_differs';
     public const BASELINE_FIX_MODEL_DIFFERS = 'baseline_fix_model_differs';
     public const IGNORE_DOES_NOT_COVER_ADVISORIES = 'ignore_does_not_cover_advisories';
+    public const MOVES_NOT_CHECKED = 'moves_not_checked';
+    public const UPDATE_NOW_REDUCED = 'update_now_reduced';
+    public const UPDATE_NOW_REFUSED = 'update_now_refused';
+    public const UPDATE_NOW_NOT_CHECKED = 'update_now_not_checked';
+    public const MOVE_CHECK_FAILED = 'move_check_failed';
     /**
      * The codes that lockrot writes, as the schemas list them in `x-known-values`, in the order of
      * the analyzer's passes. In a report, the notes of two repository hosts can interleave.
      */
     public const CODES = [
+        self::PACKAGE_NAME_INVALID,
         self::OFFLINE,
         self::METADATA_UNAVAILABLE,
         self::MONOREPO_PARENT_UNAVAILABLE,
@@ -65,6 +73,11 @@ final class RunNote
         self::ABANDONED_MARKINGS_IGNORED,
         self::ABANDONED_NOT_AUDITED_BY_COMPOSER,
         self::ABANDONED_IGNORE_UNREADABLE,
+        self::MOVES_NOT_CHECKED,
+        self::UPDATE_NOW_REDUCED,
+        self::UPDATE_NOW_REFUSED,
+        self::UPDATE_NOW_NOT_CHECKED,
+        self::MOVE_CHECK_FAILED,
     ];
 
     /** Each code has a section on the site at its own id. Never move one without a stub. */
@@ -122,6 +135,21 @@ final class RunNote
     private static function of(string $code, string $text, bool $setsNetworkFailures, array $data = []): self
     {
         return new self($code, $text, self::DOCS_URL.$code, $setsNetworkFailures, $data);
+    }
+
+    /**
+     * The lock entries whose name is no Composer package name. The text names none of them: a name
+     * from data can carry anything.
+     *
+     * @param list<string> $names in lock order
+     */
+    public static function packageNameInvalid(array $names): self
+    {
+        if ($names === []) {
+            throw new \InvalidArgumentException('A note about invalid package names names at least one.');
+        }
+
+        return self::of(self::PACKAGE_NAME_INVALID, \sprintf('lock: lockrot skips %d %s whose name is no Composer package name', \count($names), \count($names) === 1 ? 'entry' : 'entries'), false, ['packages' => $names]);
     }
 
     public static function offline(): self
@@ -445,6 +473,90 @@ final class RunNote
         }
 
         return self::of(self::IGNORE_DOES_NOT_COVER_ADVISORIES, "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: ".implode('; ', $items)."; accept them in Composer's audit policy if that is the decision", false, ['entries' => $entries]);
+    }
+
+    /**
+     * D5: Composer refuses a partial update of a name outside the lock, so it would refuse every
+     * move for the same reason. The text names the first problem line, and `data.problem` holds
+     * Composer's whole problem text.
+     *
+     * @param string $targetPhp the php version that the solve ran at
+     */
+    public static function movesNotChecked(string $targetPhp, string $problem): self
+    {
+        return self::of(self::MOVES_NOT_CHECKED, \sprintf(
+            "moves not checked: Composer's solver refuses the lock itself at php %s, so it would refuse every move: %s",
+            $targetPhp,
+            self::firstProblem($problem)
+        ), false, ['reason' => MoveCheck::BASELINE_REFUSED, 'php' => $targetPhp, 'problem' => $problem]);
+    }
+
+    /**
+     * D9: the members of `security.update_now` that the combined command leaves out, because
+     * Composer refuses them together with the others.
+     *
+     * @param list<string> $leftOut in report order
+     */
+    public static function updateNowReduced(array $leftOut, string $problem): self
+    {
+        if ($leftOut === []) {
+            throw new \InvalidArgumentException('A note about the update now command names at least one package that it leaves out.');
+        }
+
+        return self::of(self::UPDATE_NOW_REDUCED, \sprintf(
+            "update now: the command leaves out %s, because Composer's solver refuses %s together with the others: %s",
+            implode(', ', $leftOut),
+            \count($leftOut) === 1 ? 'it' : 'them',
+            self::firstProblem($problem)
+        ), false, ['left_out' => $leftOut, 'problem' => $problem]);
+    }
+
+    /** D9: Composer refuses the members of `security.update_now` together, so the report writes no command. */
+    public static function updateNowRefused(string $problem): self
+    {
+        return self::of(self::UPDATE_NOW_REFUSED, \sprintf(
+            "update now: no command, because Composer's solver refuses these packages together; run each package's own command: %s",
+            self::firstProblem($problem)
+        ), false, ['problem' => $problem]);
+    }
+
+    /**
+     * D9: Composer's solver did not check the combined update, so `update now` names no package.
+     *
+     * @param list<string> $packages the candidates, in report order
+     */
+    public static function updateNowNotChecked(string $reason, array $packages): self
+    {
+        return self::of(self::UPDATE_NOW_NOT_CHECKED, \sprintf(
+            "update now: not checked with Composer's solver (%s), so lockrot writes no command for %s",
+            MoveCheck::reasonWords($reason),
+            implode(', ', $packages)
+        ), false, ['reason' => $reason, 'packages' => $packages]);
+    }
+
+    /**
+     * Composer's solver failed on a request: the run's first such failure, by exception class and
+     * the first line of its message. A message can carry a repository URL with credentials:
+     * {@see RepositoryUrl::inText()}.
+     */
+    public static function moveCheckFailed(string $class, string $message): self
+    {
+        $message = RepositoryUrl::inText((string) strtok($message, "\r\n"));
+
+        return self::of(self::MOVE_CHECK_FAILED, \sprintf("moves: Composer's solver failed on a request (%s: %s), so lockrot did not check that move", $class, $message), false, ['class' => $class, 'message' => $message]);
+    }
+
+    /** The first line of Composer's problem text that names a rule, without its list marker. */
+    private static function firstProblem(string $problem): string
+    {
+        foreach (preg_split('/\R/', $problem) ?: [] as $line) {
+            $line = trim($line);
+            if (strpos($line, '- ') === 0) {
+                return substr($line, 2);
+            }
+        }
+
+        return trim($problem);
     }
 
     /**

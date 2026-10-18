@@ -369,6 +369,7 @@ final class RunNoteTest extends TestCase
     public function testTheCodesAreListedInTheOrderTheAnalyzersPassesRun(): void
     {
         self::assertSame([
+            'package_name_invalid',
             'offline',
             'metadata_unavailable',
             'monorepo_parent_unavailable',
@@ -389,6 +390,11 @@ final class RunNoteTest extends TestCase
             'abandoned_markings_ignored',
             'abandoned_not_audited_by_composer',
             'abandoned_ignore_unreadable',
+            'moves_not_checked',
+            'update_now_reduced',
+            'update_now_refused',
+            'update_now_not_checked',
+            'move_check_failed',
         ], RunNote::CODES);
         self::assertSame(['offline', 'composer_too_old', 'install_time_budget'], RunNote::ADVISORIES_NOT_CHECKED_REASONS);
         self::assertSame(['install_time_budget'], RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS);

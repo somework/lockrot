@@ -970,7 +970,8 @@
                     "records": 1
                 }
             ]
-        }
+        },
+        "move_check": null
     },
     "generated_at": "2026-10-01T17:41:20+00:00",
     "notes": [

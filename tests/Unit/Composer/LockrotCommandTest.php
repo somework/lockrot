@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Composer;
 
+use Composer\Command\BaseCommand;
 use Composer\Composer;
 use Composer\Config;
 use Composer\Console\Application;
@@ -27,10 +28,12 @@ use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
+use Lockrot\Deadline;
 use Lockrot\Json\JsonReader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
@@ -39,6 +42,7 @@ use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Tests\Support\RecordingOutput;
 use Lockrot\Tests\Support\SplitStreamOutput;
 use Lockrot\Tests\Support\SplitStreamTester;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -134,6 +138,12 @@ final class LockrotCommandTest extends TestCase
         };
 
         return $this->buildCommand($factory);
+    }
+
+    /** @param (\Closure(): MoveChecks)|null $checks the run's move check, as LockrotCommand hands it to the factory */
+    private static function withChecks(Analyzer $analyzer, ?\Closure $checks): Analyzer
+    {
+        return $checks === null ? $analyzer : $analyzer->withMoveChecks($checks());
     }
 
     /** The analyzer every test factory in this class builds: fixture metadata and recorded GitHub envelopes, never the network. */
@@ -1212,35 +1222,59 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * A package name is the lock's text. The table and `--explain` are written past Symfony's tag
-     * formatter, rendered by lockrot, so a name that looks like markup prints as written, on a
-     * decorated stdout too, and the formatter, which throws on `<<fg=red>>` in some symfony/console 5.4 releases,
-     * is not even asked.
+     * A composer.json that Composer refuses to load, here for a requirement name that is no package
+     * name, gives Composer no root package to solve for. The move check is not run, and its reason
+     * says that the file is there.
+     */
+    public function testAComposerJsonThatComposerCannotLoadLeavesEveryMoveUncheckedForThatReason(): void
+    {
+        // @phpstan-ignore function.alreadyNarrowedType (the guard is for Composer 2.2 LTS)
+        if (!method_exists(BaseCommand::class, 'tryComposer')) {
+            self::markTestSkipped('Composer 2.2 has no BaseCommand::tryComposer(): it stops the run on such a composer.json');
+        }
+        $project = $this->tempDir('lockrot-invalid-manifest-');
+        file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/invalid-manifest-test', 'require' => ['acme/<<fg=red>>' => '1.0.0']]));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
+        chdir($project);
+        $loader = $this->emptyLoader();
+        $command = $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer => self::withChecks(self::testAnalyzer($loader, $lockrot, $clock), $checks));
+
+        $this->withComposerEnv($this->tempDir('lockrot-invalid-manifest-cache-'), $this->tempDir('lockrot-invalid-manifest-home-'), function () use ($command): void {
+            [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command, ['--format' => 'json', '--target-php' => '8.4']);
+
+            self::assertSame(0, $code, $stderr);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json);
+            self::assertSame(['not_checked', MoveCheck::COMPOSER_JSON_INVALID], [JsonPath::stringAt($json, ['run', 'move_check', 'baseline']), JsonPath::stringAt($json, ['run', 'move_check', 'reason'])]);
+        });
+    }
+
+    /**
+     * A lock name that looks like markup is no Composer package name: lockrot skips the entry and
+     * says so in a run note whose text names no package. lockrot writes the table past Symfony's
+     * tag formatter, on a decorated stdout too, and the formatter, which throws on `<<fg=red>>` in
+     * some symfony/console 5.4 releases, is not even asked.
      *
      * @dataProvider namesThatLookLikeMarkup
      */
     #[DataProvider('namesThatLookLikeMarkup')]
-    public function testAPackageNameThatLooksLikeMarkupPrintsAsWrittenInTheTableAndTheExplanation(string $name): void
+    public function testALockNameThatLooksLikeMarkupIsSkippedWithARunNote(string $name): void
     {
         $project = $this->tempDir('lockrot-markup-name-');
         file_put_contents($project.'/composer.json', (string) json_encode([
             'name' => 'lockrot/markup-name-test',
             'extra' => ['lockrot' => ['target-php' => '8.4']],
         ]));
-        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => $name, 'version' => '1.0.0']], 'packages-dev' => []]));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => $name, 'version' => '1.0.0'], ['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
         chdir($project);
 
         foreach ([false, true] as $decorated) {
             $formatter = new MarkupRefusingFormatter('1.0.0', $decorated);
             [$code, $stdout] = $this->runWithErrorOutput(['--all' => true], new BufferedOutput(), $formatter);
             self::assertSame(0, $code, $stdout);
-            // Unrequired: composer.json cannot name it, Composer 2.2 rejects such a name in `require`.
-            self::assertStringContainsString('  '.$name.' 1.0.0  unreached  ·  unknown', $stdout);
-            self::assertStringStartsWith($decorated ? "\033[1mnot flagged (1)\033[22m\n" : "not flagged (1)\n", $stdout);
-
-            [$code, $stdout] = $this->runWithErrorOutput(['--explain' => $name], new BufferedOutput(), $formatter);
-            self::assertSame(0, $code, $stdout);
-            self::assertStringStartsWith($decorated ? "\033[1m".$name." 1.0.0\033[22m — unknown" : $name.' 1.0.0 — unknown', $stdout);
+            self::assertStringNotContainsString($name, $stdout);
+            self::assertStringContainsString('lock: lockrot skips 1 entry whose name is no Composer package name', $stdout);
+            self::assertStringContainsString('  acme/kept 1.0.0  unreached', $stdout);
         }
     }
 

@@ -89,7 +89,7 @@ final class FindingDetailsTest extends TestCase
         $security = $details->toSecurityArray($rows, '1.x');
 
         self::assertSame(
-            ['fixed' => 0, 'unknown' => 1, 'of' => 1, 'fix_kind' => null, 'lowest' => null, 'newest' => null, 'held_by' => [], 'if_applied' => null],
+            ['fixed' => 0, 'unknown' => 1, 'of' => 1, 'fix_kind' => null, 'lowest' => null, 'newest' => null, 'held_by' => [], 'if_applied' => null, 'check' => null],
             JsonPath::decoded($security['installed_branch_fixes'])
         );
         self::assertStringContainsString(' — fix not known on 1.x;', $details->vulnerableSummary([$rows[0]->withDeciding(true)], '1.x', 'high'));
@@ -166,7 +166,7 @@ final class FindingDetailsTest extends TestCase
         self::assertSame('medium', $security['worst']);
         self::assertSame(['critical' => 0, 'high' => 0, 'medium' => 1, 'unrated' => 0, 'low' => 1], $security['counts']);
         self::assertSame('upgrade', $security['fix_kind']);
-        self::assertSame(['fixed' => 1, 'unknown' => 0, 'of' => 2, 'fix_kind' => 'upgrade', 'lowest' => '1.2.0', 'newest' => '1.3.0', 'held_by' => [JsonPath::decoded($holder)], 'if_applied' => null], JsonPath::decoded($security['installed_branch_fixes']));
+        self::assertSame(['fixed' => 1, 'unknown' => 0, 'of' => 2, 'fix_kind' => 'upgrade', 'lowest' => '1.2.0', 'newest' => '1.3.0', 'held_by' => [JsonPath::decoded($holder)], 'if_applied' => null, 'check' => null], JsonPath::decoded($security['installed_branch_fixes']));
         self::assertSame([
             'version' => '1.3.0',
             'php_check' => ['requires' => '>=8.1', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null],

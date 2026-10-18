@@ -188,6 +188,7 @@
    ],
    "clears_all": false,
    "if_applied": null,
+   "check": null,
    "composer_moves_because": [],
    "commands": [],
    "through": [],
@@ -228,7 +229,8 @@
     "lowest": null,
     "newest": "v2.16.1",
     "held_by": [],
-    "if_applied": null
+    "if_applied": null,
+    "check": null
    },
    "move_in": "next_step",
    "gets": null,
@@ -762,7 +764,8 @@
      "lowest": "v3.27.0",
      "newest": "v3.30.0",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -793,7 +796,8 @@
      "lowest": null,
      "newest": "v2.16.1",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -824,7 +828,8 @@
      "lowest": null,
      "newest": "v1.44.8",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    }
   ]
@@ -1578,7 +1583,8 @@
      "records": 26
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "ok",

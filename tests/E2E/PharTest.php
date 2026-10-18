@@ -309,33 +309,37 @@ final class PharTest extends TestCase
     }
 
     /**
-     * The same console, handed a package name like `<<fg=red>>` in the table or `--explain`, leaves
-     * the second `<` live after OutputFormatter::escape(). lockrot renders both itself, so the name
-     * prints as written, in a `table` file too.
+     * The same console, handed a package name like `<<fg=red>>`, leaves the second `<` live after
+     * OutputFormatter::escape(). Such a lock name is no Composer package name: the archive skips it
+     * with a run note whose text names no package, in a `table` file too. `--explain` of it fails
+     * with exit 2 and quotes the name as written.
      */
-    public function testAPackageNameThatLooksLikeMarkupPrintsAsWrittenFromThePhar(): void
+    public function testALockNameThatLooksLikeMarkupIsSkippedByThePhar(): void
     {
         $dir = $this->freshDir();
         $names = ['acme/<<fg=red>>', 'acme/<<href=https://example.com>>', 'acme/a\\<b'];
         $packages = [];
-        foreach ($names as $name) {
+        foreach (array_merge($names, ['acme/kept']) as $name) {
             $packages[] = ['name' => $name, 'version' => '1.0.0'];
         }
-        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/markup-name', 'require' => array_fill_keys($names, '1.0.0')]));
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/markup-name', 'require' => ['acme/kept' => '1.0.0']]));
         file_put_contents($dir.'/composer.lock', (string) json_encode(['packages' => $packages, 'packages-dev' => []]));
 
         $process = $this->runPhar(['--offline', '--all', '--output=table:r.txt'], $dir);
 
         self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
-        foreach ($names as $name) {
-            self::assertStringContainsString('  '.$name.' 1.0.0  direct  ·  unknown', $process->getOutput());
-            self::assertStringContainsString('  '.$name.' 1.0.0  direct  ·  unknown', (string) file_get_contents($dir.'/r.txt'));
+        foreach ([$process->getOutput(), (string) file_get_contents($dir.'/r.txt')] as $table) {
+            self::assertStringContainsString('  acme/kept 1.0.0  direct  ·  unknown', $table);
+            foreach ($names as $name) {
+                self::assertStringNotContainsString($name, $table);
+            }
         }
+        self::assertStringContainsString('note: lock: lockrot skips 3 entries whose name is no Composer package name', $process->getOutput());
 
         $explained = $this->runPhar(['--offline', '--explain=acme/<<fg=red>>'], $dir);
 
-        self::assertSame(0, $explained->getExitCode(), $explained->getErrorOutput());
-        self::assertStringStartsWith('acme/<<fg=red>> 1.0.0 — unknown', $explained->getOutput());
+        self::assertSame(2, $explained->getExitCode(), $explained->getErrorOutput());
+        self::assertStringContainsString('lockrot: acme/<<fg=red>> is not in composer.lock', $explained->getErrorOutput());
     }
 
     /**

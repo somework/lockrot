@@ -336,7 +336,7 @@ final class FixtureRepositoryServer
 
     public function config(): Config
     {
-        $config = Factory::createConfig(new NullIO());
+        $config = HermeticComposerConfig::create($this->cacheDir.'/home');
         $config->merge([
             'config' => ['cache-dir' => $this->cacheDir, 'secure-http' => false],
             'repositories' => ['packagist.org' => false, 'fixture' => ['type' => 'composer', 'url' => $this->url()]],

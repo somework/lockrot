@@ -760,6 +760,13 @@
                 }
             ]
         },
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": true,
+            "ignores_extensions": true,
+            "baseline": "refused",
+            "reason": null
+        },
         "score_rules_used": {
             "counted": 6,
             "lead-first": 56,
@@ -1187,53 +1194,27 @@
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "symfony/http-foundation",
-            "symfony/mime",
-            "symfony/process",
-            "symfony/security-http",
-            "tecnickcom/tcpdf",
-            "phpseclib/phpseclib",
-            "symfony/monolog-bridge",
-            "guzzlehttp/psr7",
-            "phpunit/phpunit",
-            "symfony/http-client",
-            "symfony/mailer",
-            "symfony/routing",
-            "symfony/cache",
-            "j0k3r/graby",
-            "symfony/dom-crawler",
-            "symfony/validator",
-            "symfony/polyfill-intl-idn",
-            "symfony/yaml"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "symfony/http-foundation",
-            "symfony/mime",
-            "symfony/process",
-            "symfony/security-http",
-            "tecnickcom/tcpdf",
-            "phpseclib/phpseclib",
-            "symfony/monolog-bridge",
-            "guzzlehttp/psr7",
-            "phpunit/phpunit",
-            "symfony/http-client",
-            "symfony/mailer",
-            "symfony/routing",
-            "symfony/cache",
-            "j0k3r/graby",
-            "symfony/dom-crawler",
-            "symfony/validator",
-            "symfony/polyfill-intl-idn",
-            "symfony/yaml"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2024-05-17T00:00:00+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested."
+    ],
+    "note_details": [
+        {
+            "code": "moves_not_checked",
+            "text": "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested.",
+            "docs_url": "https://lockrot.dev/notes/#moves_not_checked",
+            "sets_network_failures": false,
+            "data": {
+                "reason": "baseline_refused",
+                "php": "8.4.99",
+                "problem": "Problem 1\n    - laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested.\n    - laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement.\n  Problem 2\n    - php-http/guzzle5-adapter is locked to version 2.0.0 and an update of this package was not requested.\n    - php-http/guzzle5-adapter 2.0.0 requires php ^7.0 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement.\n  Problem 3\n    - ergebnis/composer-normalize is locked to version 2.42.0 and an update of this package was not requested.\n    - ergebnis/composer-normalize 2.42.0 requires php ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement.\n  Problem 4\n    - friendsoftwig/twigcs is locked to version v6.1.0 and an update of this package was not requested.\n    - friendsoftwig/twigcs v6.1.0 requires php ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement.\n  Problem 5\n    - friendsofphp/proxy-manager-lts is locked to version v1.0.18 and an update of this package was not requested.\n    - friendsofphp/proxy-manager-lts v1.0.18 requires laminas/laminas-code ~3.4.1|^4.0 -> satisfiable by laminas/laminas-code[4.7.1].\n    - laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement."
+            }
+        }
+    ],
     "findings": [
         {
             "package": "twig/twig",
@@ -1456,6 +1437,11 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -1472,7 +1458,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 18 advisories; 3.x needs php >=8.1.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
+                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 18 advisories; 3.x needs php >=8.1.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -1515,6 +1501,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -2384,6 +2375,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.3.4",
                         "holder": null
                     },
@@ -2392,6 +2384,7 @@
                         "package": "php-http/guzzle5-adapter",
                         "version": "2.0.0",
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.1",
                         "holder": {
                             "verdict": "critical",
@@ -2403,7 +2396,8 @@
                             "next_step": {
                                 "kind": "replace",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     }
@@ -2505,6 +2499,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -2518,7 +2517,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -2554,7 +2553,8 @@
                     "lowest": null,
                     "newest": "5.3.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -2708,6 +2708,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -2716,6 +2717,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2727,7 +2729,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2761,6 +2764,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -2769,6 +2773,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2780,7 +2785,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2814,6 +2820,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -2822,6 +2829,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2833,7 +2841,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2867,6 +2876,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -2875,6 +2885,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2886,7 +2897,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2920,6 +2932,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -2928,6 +2941,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2939,7 +2953,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2973,6 +2988,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -2981,6 +2997,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2992,7 +3009,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3026,6 +3044,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3034,6 +3053,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3045,7 +3065,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3079,6 +3100,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3087,6 +3109,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3098,7 +3121,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3132,6 +3156,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3140,6 +3165,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3151,7 +3177,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3185,6 +3212,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3193,6 +3221,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3204,7 +3233,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3238,6 +3268,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3246,6 +3277,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3257,7 +3289,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3291,6 +3324,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3299,6 +3333,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3310,7 +3345,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3344,6 +3380,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3352,6 +3389,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3363,7 +3401,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3397,6 +3436,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3405,6 +3445,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3416,7 +3457,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3645,6 +3687,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -3982,6 +4025,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -4254,6 +4298,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -4538,6 +4583,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -4814,6 +4860,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -5114,17 +5161,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/http-foundation"
+                        "symfony/http-foundation:^5.4.50"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update symfony/http-foundation (gets v5.4.50) \u2014 clears 2 advisories"
+                "text": "composer update 'symfony/http-foundation:^5.4.50' (gets v5.4.50) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -5167,6 +5219,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -5526,17 +5583,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/mime"
+                        "symfony/mime:^5.4.52"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update symfony/mime (gets v5.4.52) \u2014 clears 2 advisories"
+                "text": "composer update 'symfony/mime:^5.4.52' (gets v5.4.52) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -5579,6 +5641,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -5924,17 +5991,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/process"
+                        "symfony/process:^5.4.51"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update symfony/process (gets v5.4.51) \u2014 clears 2 advisories"
+                "text": "composer update 'symfony/process:^5.4.51' (gets v5.4.51) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -5977,6 +6049,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -6348,17 +6425,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/security-http"
+                        "symfony/security-http:^5.4.53"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update symfony/security-http (gets v5.4.53) \u2014 clears 3 advisories"
+                "text": "composer update 'symfony/security-http:^5.4.53' (gets v5.4.53) \u2014 clears 3 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -6401,6 +6483,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -6778,17 +6865,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "tecnickcom/tcpdf"
+                        "tecnickcom/tcpdf:^6.8.0"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update tecnickcom/tcpdf (gets 6.11.4) \u2014 clears 5 advisories"
+                "text": "composer update 'tecnickcom/tcpdf:^6.8.0' (gets 6.11.4) \u2014 clears 5 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -6831,6 +6923,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -7264,12 +7361,17 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "phpseclib/phpseclib"
+                        "phpseclib/phpseclib:^3.0.57"
                     ]
                 ],
                 "through": [
@@ -7297,7 +7399,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update phpseclib/phpseclib (gets 3.0.57) \u2014 clears 5 advisories"
+                "text": "composer update 'phpseclib/phpseclib:^3.0.57' (gets 3.0.57) \u2014 clears 5 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -7340,6 +7442,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -7735,6 +7842,7 @@
                         "package": "scheb/2fa-google-authenticator",
                         "version": "v5.13.2",
                         "link": "require",
+                        "target": null,
                         "constraint": "^9.1|^10.0",
                         "holder": {
                             "verdict": "ok",
@@ -7772,6 +7880,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -7798,7 +7911,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears 2 advisories; 11.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears 2 advisories; 11.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -7834,7 +7947,8 @@
                     "lowest": null,
                     "newest": "v10.0.3",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -7919,6 +8033,7 @@
                                             "package": "scheb/2fa-google-authenticator",
                                             "version": "v5.13.2",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^9.1|^10.0",
                                             "holder": {
                                                 "verdict": "ok",
@@ -7958,6 +8073,7 @@
                                             "package": "scheb/2fa-google-authenticator",
                                             "version": "v5.13.2",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^9.1|^10.0",
                                             "holder": {
                                                 "verdict": "ok",
@@ -8152,12 +8268,17 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/monolog-bridge"
+                        "symfony/monolog-bridge:^5.4.52"
                     ]
                 ],
                 "through": [
@@ -8174,7 +8295,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update symfony/monolog-bridge (gets v5.4.52) \u2014 clears the advisory"
+                "text": "composer update 'symfony/monolog-bridge:^5.4.52' (gets v5.4.52) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -8217,6 +8338,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -8566,6 +8692,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -9101,6 +9228,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -9429,6 +9557,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -9736,6 +9865,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -10058,6 +10188,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -10394,6 +10525,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -10729,6 +10861,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -11076,6 +11209,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -11473,6 +11607,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -11843,6 +11978,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12178,6 +12314,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12523,6 +12660,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12816,6 +12954,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -13057,6 +13196,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -13487,6 +13627,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -13956,6 +14097,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14224,6 +14366,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14505,6 +14648,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14896,6 +15040,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15207,6 +15352,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15519,6 +15665,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15830,6 +15977,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16141,6 +16289,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16453,6 +16602,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16765,6 +16915,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -17076,6 +17227,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -17387,6 +17539,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -17683,6 +17836,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -17982,6 +18136,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -18295,6 +18450,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -18606,6 +18762,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -18923,6 +19080,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -19216,6 +19374,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -19576,6 +19735,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^0.18",
                         "holder": null
                     }
@@ -19602,6 +19762,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -19614,7 +19779,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require enshrined/svg-sanitize ^0.22.0 \u2014 clears the advisory; 0.22.x needs php ^7.1 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^0.18); a new 0.x line (Composer treats 0.x minors as breaking) brings its own requirements, which lockrot does not solve"
+                "text": "require enshrined/svg-sanitize ^0.22.0 \u2014 clears the advisory; 0.22.x needs php ^7.1 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^0.18); a new 0.x line (Composer treats 0.x minors as breaking) brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -19650,7 +19815,8 @@
                     "lowest": null,
                     "newest": "0.18.0",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -19736,6 +19902,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^0.18",
                                             "holder": null
                                         }
@@ -19948,17 +20115,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "guzzlehttp/psr7"
+                        "guzzlehttp/psr7:^2.12.3"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update guzzlehttp/psr7 (gets 2.13.1) \u2014 clears 4 advisories"
+                "text": "composer update 'guzzlehttp/psr7:^2.12.3' (gets 2.13.1) \u2014 clears 4 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -20001,6 +20173,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -20374,17 +20551,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "phpunit/phpunit"
+                        "phpunit/phpunit:^9.6.33"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update phpunit/phpunit (gets 9.6.38) \u2014 clears the advisory"
+                "text": "composer update 'phpunit/phpunit:^9.6.33' (gets 9.6.38) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -20427,6 +20609,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -20847,17 +21034,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/http-client"
+                        "symfony/http-client:^5.4.53"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update symfony/http-client (gets v5.4.53) \u2014 clears 2 advisories"
+                "text": "composer update 'symfony/http-client:^5.4.53' (gets v5.4.53) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -20900,6 +21092,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -21205,17 +21402,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/mailer"
+                        "symfony/mailer:^5.4.52"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update symfony/mailer (gets v5.4.52) \u2014 clears the advisory"
+                "text": "composer update 'symfony/mailer:^5.4.52' (gets v5.4.52) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -21258,6 +21460,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -21576,17 +21783,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/routing"
+                        "symfony/routing:^5.4.53"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update symfony/routing (gets v5.4.53) \u2014 clears 2 advisories"
+                "text": "composer update 'symfony/routing:^5.4.53' (gets v5.4.53) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -21629,6 +21841,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -21968,12 +22185,17 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/cache"
+                        "symfony/cache:^5.4.52"
                     ]
                 ],
                 "through": [
@@ -22306,7 +22528,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update symfony/cache (gets v5.4.53) \u2014 clears the advisory"
+                "text": "composer update 'symfony/cache:^5.4.52' (gets v5.4.53) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -22349,6 +22571,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -22689,6 +22916,7 @@
                         "package": "j0k3r/graby",
                         "version": "2.4.5",
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0",
                         "holder": {
                             "verdict": "low",
@@ -22700,7 +22928,12 @@
                             "next_step": {
                                 "kind": "update",
                                 "to_branch": "2.x",
-                                "constraint": null
+                                "constraint": null,
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -22732,6 +22965,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -22751,7 +22989,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move j0k3r/httplug-ssrf-plugin to ^3.0 through j0k3r/graby \u2014 clears left-behind and old-promise; 3.x needs php >=7.4, which require.php allows; the target php 8.4 runs it; held by j0k3r/graby 2.4.5 (requires ^2.0; itself low: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move j0k3r/httplug-ssrf-plugin to ^3.0 through j0k3r/graby \u2014 clears left-behind and old-promise; 3.x needs php >=7.4, which require.php allows; the target php 8.4 runs it; held by j0k3r/graby 2.4.5 (requires ^2.0; itself low: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -23089,6 +23327,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
@@ -23115,7 +23358,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.0, then move thecodingmachine/safe to ^2.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and old-promise; 2.x needs php ^8.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
+                "text": "raise require.php to >=8.0, then move thecodingmachine/safe to ^2.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and old-promise; 2.x needs php ^8.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -23429,6 +23672,7 @@
                         "package": "friendsofsymfony/jsrouting-bundle",
                         "version": "2.8.0",
                         "link": "require",
+                        "target": null,
                         "constraint": "~1.1",
                         "holder": {
                             "verdict": "ok",
@@ -23466,6 +23710,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -23496,7 +23745,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move willdurand/jsonp-callback-validator to ^2.0 through friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle \u2014 clears left-behind and old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; held by friendsofsymfony/jsrouting-bundle 2.8.0 (requires ~1.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move willdurand/jsonp-callback-validator to ^2.0 through friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle \u2014 clears left-behind and old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; held by friendsofsymfony/jsrouting-bundle 2.8.0 (requires ~1.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -23826,6 +24075,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -24105,6 +24355,7 @@
                         "package": "scheb/2fa-qr-code",
                         "version": "v5.13.2",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.0",
                         "holder": {
                             "verdict": "critical",
@@ -24116,7 +24367,8 @@
                             "next_step": {
                                 "kind": "find-alternative",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     }
@@ -24142,6 +24394,11 @@
                         "clears_hold",
                         "composer_resolves"
                     ]
+                },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
                 },
                 "composer_moves_because": [
                     "holders",
@@ -24169,7 +24426,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.0, then move endroid/qr-code to ^4.8 through scheb/2fa-qr-code \u2014 clears left-behind; 4.x needs php ^8.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-qr-code v5.13.2 (requires ^3.0; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.0, then move endroid/qr-code to ^4.8 through scheb/2fa-qr-code \u2014 clears left-behind; 4.x needs php ^8.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-qr-code v5.13.2 (requires ^3.0; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -24432,6 +24689,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -24691,6 +24949,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -24946,17 +25205,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "j0k3r/graby"
+                        "j0k3r/graby:^2.5.1"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update j0k3r/graby (gets 2.5.3) \u2014 clears the advisory"
+                "text": "composer update 'j0k3r/graby:^2.5.1' (gets 2.5.3) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -24999,6 +25263,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -25322,17 +25591,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/dom-crawler"
+                        "symfony/dom-crawler:^5.4.52"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update symfony/dom-crawler (gets v5.4.52) \u2014 clears the advisory"
+                "text": "composer update 'symfony/dom-crawler:^5.4.52' (gets v5.4.52) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -25375,6 +25649,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -25650,17 +25929,22 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/validator"
+                        "symfony/validator:^5.4.43"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update symfony/validator (gets v5.4.48) \u2014 clears the advisory"
+                "text": "composer update 'symfony/validator:^5.4.43' (gets v5.4.48) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -25703,6 +25987,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -25988,12 +26277,17 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/polyfill-intl-idn"
+                        "symfony/polyfill-intl-idn:^1.38.1"
                     ]
                 ],
                 "through": [
@@ -26043,7 +26337,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update symfony/polyfill-intl-idn (gets v1.42.0) \u2014 clears the advisory"
+                "text": "composer update 'symfony/polyfill-intl-idn:^1.38.1' (gets v1.42.0) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -26086,6 +26380,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -26410,12 +26709,17 @@
                         "clears_hold"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/yaml"
+                        "symfony/yaml:^5.4.52"
                     ]
                 ],
                 "through": [
@@ -26454,7 +26758,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update symfony/yaml (gets v5.4.53) \u2014 clears 3 advisories"
+                "text": "composer update 'symfony/yaml:^5.4.52' (gets v5.4.53) \u2014 clears 3 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -26497,6 +26801,11 @@
                         "assumes": [
                             "clears_hold"
                         ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
                     }
                 },
                 "move_in": "next_step",
@@ -26875,6 +27184,7 @@
                         "package": "phpunit/phpunit",
                         "version": "9.6.19",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.1.1",
                         "holder": {
                             "verdict": "medium",
@@ -26886,7 +27196,12 @@
                             "next_step": {
                                 "kind": "update",
                                 "to_branch": "9.x",
-                                "constraint": null
+                                "constraint": null,
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -26918,6 +27233,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -26944,7 +27264,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move phpunit/php-invoker to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^3.1.1; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move phpunit/php-invoker to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^3.1.1; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -27264,6 +27584,7 @@
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.31",
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0.2",
                         "holder": {
                             "verdict": "ok",
@@ -27278,6 +27599,7 @@
                         "package": "phpunit/phpunit",
                         "version": "9.6.19",
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0.3",
                         "holder": {
                             "verdict": "medium",
@@ -27289,7 +27611,12 @@
                             "next_step": {
                                 "kind": "update",
                                 "to_branch": "9.x",
-                                "constraint": null
+                                "constraint": null,
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -27321,6 +27648,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -27347,7 +27679,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move phpunit/php-text-template to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.31 (requires ^2.0.2) and phpunit/phpunit 9.6.19 (requires ^2.0.3; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move phpunit/php-text-template to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.31 (requires ^2.0.2) and phpunit/phpunit 9.6.19 (requires ^2.0.3; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -27667,6 +27999,7 @@
                         "package": "phpunit/phpunit",
                         "version": "9.6.19",
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.0.2",
                         "holder": {
                             "verdict": "medium",
@@ -27678,7 +28011,12 @@
                             "next_step": {
                                 "kind": "update",
                                 "to_branch": "9.x",
-                                "constraint": null
+                                "constraint": null,
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -27710,6 +28048,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -27736,7 +28079,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move phpunit/php-timer to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^5.0.2; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move phpunit/php-timer to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^5.0.2; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -28056,6 +28399,7 @@
                         "package": "phpunit/phpunit",
                         "version": "9.6.19",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.0.6",
                         "holder": {
                             "verdict": "medium",
@@ -28067,7 +28411,12 @@
                             "next_step": {
                                 "kind": "update",
                                 "to_branch": "9.x",
-                                "constraint": null
+                                "constraint": null,
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -28099,6 +28448,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -28125,7 +28479,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move sebastian/code-unit to ^2.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^1.0.6; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move sebastian/code-unit to ^2.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^1.0.6; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -28445,6 +28799,7 @@
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.31",
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0.2",
                         "holder": {
                             "verdict": "ok",
@@ -28482,6 +28837,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -28508,7 +28868,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move sebastian/code-unit-reverse-lookup to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.31 (requires ^2.0.2); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move sebastian/code-unit-reverse-lookup to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.31 (requires ^2.0.2); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -28829,6 +29189,7 @@
                         "package": "phpunit/phpunit",
                         "version": "9.6.19",
                         "link": "require",
+                        "target": null,
                         "constraint": "^4.0.3",
                         "holder": {
                             "verdict": "medium",
@@ -28840,7 +29201,12 @@
                             "next_step": {
                                 "kind": "update",
                                 "to_branch": "9.x",
-                                "constraint": null
+                                "constraint": null,
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -28872,6 +29238,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -28898,7 +29269,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move sebastian/object-enumerator to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^4.0.3; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move sebastian/object-enumerator to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^4.0.3; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -29218,6 +29589,7 @@
                         "package": "sebastian/global-state",
                         "version": "5.0.7",
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0",
                         "holder": {
                             "verdict": "ok",
@@ -29232,6 +29604,7 @@
                         "package": "sebastian/object-enumerator",
                         "version": "4.0.4",
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0",
                         "holder": {
                             "verdict": "low",
@@ -29244,7 +29617,12 @@
                             "next_step": {
                                 "kind": "raise-php",
                                 "to_branch": "5.x",
-                                "constraint": "^5.0"
+                                "constraint": "^5.0",
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -29276,6 +29654,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -29302,7 +29685,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move sebastian/object-reflector to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by sebastian/global-state 5.0.7 (requires ^2.0) and sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move sebastian/object-reflector to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by sebastian/global-state 5.0.7 (requires ^2.0) and sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -29623,6 +30006,7 @@
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.31",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.0.1",
                         "holder": {
                             "verdict": "ok",
@@ -29637,6 +30021,7 @@
                         "package": "phpunit/phpunit",
                         "version": "9.6.19",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.0.2",
                         "holder": {
                             "verdict": "medium",
@@ -29648,7 +30033,12 @@
                             "next_step": {
                                 "kind": "update",
                                 "to_branch": "9.x",
-                                "constraint": null
+                                "constraint": null,
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -29680,6 +30070,11 @@
                         "composer_resolves"
                     ]
                 },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -29706,7 +30101,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move sebastian/version to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.31 (requires ^3.0.1) and phpunit/phpunit 9.6.19 (requires ^3.0.2; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move sebastian/version to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.31 (requires ^3.0.1) and phpunit/phpunit 9.6.19 (requires ^3.0.2; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -29972,6 +30367,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -30225,6 +30621,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [

@@ -1216,19 +1216,20 @@
       "multipleOf": 0.5
     },
     "heldBy": {
-      "description": "One link that excludes the move or the fix: the root's or a locked package's `require`, `require-dev` or `conflict`.",
+      "description": "One link that excludes the move or the fix: the root's or a locked package's `require`, `require-dev`, `conflict` or `replace`, and on a move that Composer's solver refuses, each hold that the refusal names. The entries are distinct, the root first, then by `package`, then by `link` in the order of its enum, then by `target`.",
       "type": "object",
       "required": [
         "source",
         "package",
         "version",
         "link",
+        "target",
         "constraint",
         "holder"
       ],
       "properties": {
         "source": {
-          "description": "Who holds it: `root` (composer.json) or `package` (a locked package). Closed.",
+          "description": "Who holds it: `root` (composer.json) or `package` (a locked package, or the moved package at its target release). Closed.",
           "type": "string",
           "enum": [
             "root",
@@ -1236,7 +1237,7 @@
           ]
         },
         "package": {
-          "description": "The locked package that holds it; null for `source: root`.",
+          "description": "The package that holds it; null for `source: root`.",
           "oneOf": [
             {
               "$ref": "#/definitions/packageName"
@@ -1247,20 +1248,31 @@
           ]
         },
         "version": {
-          "description": "That package's locked version; null for `source: root`.",
+          "description": "That package's version: the locked one, or the target release's; null for `source: root`.",
           "type": [
             "string",
             "null"
           ]
         },
         "link": {
-          "description": "The link that excludes it. Closed.",
+          "description": "The link that excludes it: `require`, `require-dev` and `conflict` of the lock or the root, `replace` (the package replaces `target`, or the moved package when `target` is null, so Composer installs one of the two, not both), `root-require` (a root requirement on `target`, a package that the move needs at another version; with `target` null, the move's own constraint, which no release in Composer's pool meets), `platform` (a requirement on the platform package `target`, such as `php`). Closed.",
           "type": "string",
           "enum": [
             "require",
             "require-dev",
-            "conflict"
+            "conflict",
+            "replace",
+            "root-require",
+            "platform"
           ]
+        },
+        "target": {
+          "description": "The package that the link points to when it is not the moved package; null when it is.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
         },
         "constraint": {
           "description": "The constraint as the link writes it, quoted and never interpreted (\"requires ^2.0\").",
@@ -1360,12 +1372,13 @@
               "description": "The holder's own move; null when the holder's finding has no move (score 0).",
               "oneOf": [
                 {
-                  "description": "The holder's own move, `{kind, to_branch, constraint}` of its `next_step`, so a sentence writes \"its own move, require ^4.4.51\" without reading another finding.",
+                  "description": "The holder's own move, `{kind, to_branch, constraint, check}` of its `next_step`, so a sentence writes \"its own move, require ^4.4.51\" without reading another finding.",
                   "type": "object",
                   "required": [
                     "kind",
                     "to_branch",
-                    "constraint"
+                    "constraint",
+                    "check"
                   ],
                   "properties": {
                     "kind": {
@@ -1404,6 +1417,9 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "check": {
+                      "$ref": "#/definitions/moveCheck"
                     }
                   }
                 },
@@ -1574,6 +1590,126 @@
         "left-behind",
         "old-promise",
         "stale"
+      ]
+    },
+    "moveCheck": {
+      "description": "Composer's solver on the move: whether the move's `composer update` or `composer require` installs from the lock. It names the form that resolves, or why lockrot did not ask. Null on a kind that runs no Composer request, and in a run that checks no move.",
+      "oneOf": [
+        {
+          "description": "The check of one move.",
+          "type": "object",
+          "required": [
+            "result",
+            "form",
+            "reason"
+          ],
+          "properties": {
+            "result": {
+              "description": "`resolves`: the solver installs the move in `form`; `refused`: no form installs it, and `held_by` names the holds; `not_checked`: lockrot did not ask, `reason` says why. Closed.",
+              "type": "string",
+              "enum": [
+                "resolves",
+                "refused",
+                "not_checked"
+              ]
+            },
+            "form": {
+              "description": "The first form that resolves: `inline` (`composer update vendor/pkg:^1.2`, or `composer require` for a root requirement), `with-dependencies` (adds `--with-dependencies`) or `with-all-dependencies` (adds `--with-all-dependencies`); null unless `result` is `resolves`. Closed.",
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "inline",
+                    "with-dependencies",
+                    "with-all-dependencies"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "reason": {
+              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]*$",
+                  "x-known-values": [
+                    "baseline_refused",
+                    "unloaded_name",
+                    "offline",
+                    "install_time_budget",
+                    "not_from_composer_repository",
+                    "no_composer_json",
+                    "composer_json_invalid",
+                    "no_release_read",
+                    "pass_cap",
+                    "solver_error"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "description": "`form` is set exactly on `resolves`, and `reason` exactly on `not_checked`.",
+              "anyOf": [
+                {
+                  "properties": {
+                    "result": {
+                      "enum": [
+                        "resolves"
+                      ]
+                    },
+                    "form": {
+                      "type": "string"
+                    },
+                    "reason": {
+                      "type": "null"
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "result": {
+                      "enum": [
+                        "refused"
+                      ]
+                    },
+                    "form": {
+                      "type": "null"
+                    },
+                    "reason": {
+                      "type": "null"
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "result": {
+                      "enum": [
+                        "not_checked"
+                      ]
+                    },
+                    "form": {
+                      "type": "null"
+                    },
+                    "reason": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "packageName": {

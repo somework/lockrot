@@ -777,7 +777,8 @@
      "records": 86
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "activity_cache_oldest_at": "2026-10-01T16:05:47+00:00",
  "activity_cache_age_hours": 1.6,
@@ -1361,6 +1362,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -1415,7 +1417,8 @@
      "lowest": null,
      "newest": "v2.16.1",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "next_step",
     "gets": null,
@@ -2135,6 +2138,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -2189,7 +2193,8 @@
      "lowest": null,
      "newest": "v3.4.47",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "next_step",
     "gets": null,
@@ -2641,6 +2646,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -2695,7 +2701,8 @@
      "lowest": null,
      "newest": "v3.4.47",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "next_step",
     "gets": null,
@@ -3140,6 +3147,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -3194,7 +3202,8 @@
      "lowest": null,
      "newest": "6.5.8",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "next_step",
     "gets": null,
@@ -3786,6 +3795,7 @@
     ],
     "clears_all": false,
     "if_applied": null,
+    "check": null,
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -4080,6 +4090,7 @@
     ],
     "clears_all": false,
     "if_applied": null,
+    "check": null,
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -4345,6 +4356,7 @@
     ],
     "clears_all": false,
     "if_applied": null,
+    "check": null,
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -4758,6 +4770,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -4812,7 +4825,8 @@
      "lowest": null,
      "newest": "v3.4.47",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "next_step",
     "gets": null,
@@ -5231,6 +5245,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -5279,7 +5294,8 @@
      "lowest": null,
      "newest": "v3.4.47",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "next_step",
     "gets": null,
@@ -5636,6 +5652,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -5684,7 +5701,8 @@
      "lowest": null,
      "newest": "v3.4.49",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "next_step",
     "gets": null,
@@ -6067,6 +6085,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major",
      "transitive"
@@ -6129,7 +6148,8 @@
      "lowest": null,
      "newest": "1.9.1",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "next_step",
     "gets": null,
@@ -6608,6 +6628,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -6662,7 +6683,8 @@
      "lowest": null,
      "newest": "v3.4.47",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "next_step",
     "gets": null,
@@ -7060,6 +7082,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -7407,6 +7430,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -7754,6 +7778,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -8102,6 +8127,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -8450,6 +8476,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -8798,6 +8825,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -9145,6 +9173,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -9486,6 +9515,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -9757,6 +9787,7 @@
     ],
     "clears_all": false,
     "if_applied": null,
+    "check": null,
     "composer_moves_because": [
      "transitive"
     ],
@@ -10059,6 +10090,7 @@
     ],
     "clears_all": false,
     "if_applied": null,
+    "check": null,
     "composer_moves_because": [
      "transitive"
     ],
@@ -10364,6 +10396,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major",
      "transitive"
@@ -10660,6 +10693,7 @@
       "clears_hold"
      ]
     },
+    "check": null,
     "composer_moves_because": [],
     "commands": [
      [
@@ -10731,7 +10765,8 @@
       "assumes": [
        "clears_hold"
       ]
-     }
+     },
+     "check": null
     },
     "move_in": "next_step",
     "gets": {
@@ -11005,6 +11040,7 @@
     ],
     "clears_all": false,
     "if_applied": null,
+    "check": null,
     "composer_moves_because": [],
     "commands": [
      [
@@ -11265,6 +11301,7 @@
     ],
     "clears_all": false,
     "if_applied": null,
+    "check": null,
     "composer_moves_because": [],
     "commands": [],
     "through": [

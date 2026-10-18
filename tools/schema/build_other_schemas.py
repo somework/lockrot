@@ -605,7 +605,7 @@ def add_relations(D):
 
 
 EXPLAIN_RUN_KEYS = ['target_php', 'target_php_source', 'project_php', 'project_php_lowest', 'include_dev', 'thresholds', 'flag_ids', 'verdicts', 'graded_verdicts',
-                    'signal_ids', 'fail_on', 'fail_on_source', 'gates', 'fix_model', 'text_grammar', 'score_model', 'advisory_lookup']
+                    'signal_ids', 'fail_on', 'fail_on_source', 'gates', 'fix_model', 'text_grammar', 'score_model', 'advisory_lookup', 'move_check']
 EXPLAIN_ONLY = ['lock', 'repositoryMetadata', 'explainRun']
 
 

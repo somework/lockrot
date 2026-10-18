@@ -146,6 +146,7 @@ final class TableFormatter implements FormatterInterface
             $report->libyears()->line(),
             RunFooter::exposure($report, $name),
             RunFooter::advisories($report),
+            RunFooter::moveCheck($report),
             $baseline === null ? null : $baseline->summaryLine(),
         ];
         $wrap = max(self::MIN_WRAP_WIDTH, $this->context->terminalWidth());

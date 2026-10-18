@@ -66,7 +66,7 @@ final class GradedPackage implements \JsonSerializable
         return $this->flagIds;
     }
 
-    /** @return array{verdict: string, lead: ?string, flag_ids: list<string>, replacement?: ?string, next_step?: ?array{kind: string, to_branch: ?string, constraint: ?string}} */
+    /** @return array{verdict: string, lead: ?string, flag_ids: list<string>, replacement?: ?string, next_step?: ?array{kind: string, to_branch: ?string, constraint: ?string, check: ?\Lockrot\Solver\MoveCheck}} */
     public function jsonSerialize(): array
     {
         $out = ['verdict' => $this->verdict, 'lead' => $this->lead, 'flag_ids' => $this->flagIds];
@@ -77,7 +77,7 @@ final class GradedPackage implements \JsonSerializable
 
         return $out + [
             'replacement' => $this->replacement,
-            'next_step' => $move === null ? null : ['kind' => $move->kind(), 'to_branch' => $move->toBranch(), 'constraint' => $move->constraint()],
+            'next_step' => $move === null ? null : ['kind' => $move->kind(), 'to_branch' => $move->toBranch(), 'constraint' => $move->constraint(), 'check' => $move->check()],
         ];
     }
 }

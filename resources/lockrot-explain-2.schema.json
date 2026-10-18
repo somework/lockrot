@@ -1403,6 +1403,7 @@
                 "leaves",
                 "clears_all",
                 "if_applied",
+                "check",
                 "composer_moves_because",
                 "commands",
                 "text"
@@ -1583,6 +1584,9 @@
                 "if_applied": {
                     "$ref": "#/definitions/ifApplied"
                 },
+                "check": {
+                    "$ref": "#/definitions/moveCheck"
+                },
                 "composer_moves_because": {
                     "description": "Why the move needs more than the project's own command, one clause each: `holders` (`held_by` names a package), `crosses_major` (a `require`, `raise-php` or `tag` move to a new major), `transitive` (not direct, `direct_dependents` not empty, and `held_by` names none of them), `unreached` (not direct and no direct dependent: lockrot found no path from the requirements it walked). `transitive` and `unreached` are set on every kind that names an action on the package (`require raise-php tag replace find-alternative test`): the packages that require it act, or the project replaces them. Closed.",
                     "type": "array",
@@ -1598,7 +1602,7 @@
                     "uniqueItems": true
                 },
                 "commands": {
-                    "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell); `[]` for a transitive `require` and for the kinds without a command; a transitive `raise-php` holds only its php step (`composer require php:>=8.1 --no-update`). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only `--no-update`, the Composer option that lockrot writes in a `require` step, starts with `-`. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
+                    "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell); `[]` for a transitive `require` and for the kinds without a command; a transitive `raise-php` holds only its php step (`composer require php:>=8.1 --no-update`). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. Only lockrot's own options start with `-`: `--no-update` in a `require` step, and `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
                     "type": "array",
                     "items": {
                         "description": "One command as its argument list (`[\"composer\", \"require\", \"php:>=8.1\", \"--no-update\"]`).",
@@ -2697,7 +2701,8 @@
                 "lowest",
                 "newest",
                 "held_by",
-                "if_applied"
+                "if_applied",
+                "check"
             ],
             "properties": {
                 "fixed": {
@@ -2833,6 +2838,9 @@
                             "type": "null"
                         }
                     ]
+                },
+                "check": {
+                    "$ref": "#/definitions/moveCheck"
                 }
             },
             "allOf": [
@@ -3215,7 +3223,8 @@
                 "fix_model",
                 "text_grammar",
                 "score_model",
-                "advisory_lookup"
+                "advisory_lookup",
+                "move_check"
             ],
             "properties": {
                 "target_php": {
@@ -3362,6 +3371,105 @@
                 },
                 "advisory_lookup": {
                     "$ref": "#/definitions/advisoryLookup"
+                },
+                "move_check": {
+                    "description": "How Composer's solver checked the run's moves; null when the run checked no move.",
+                    "oneOf": [
+                        {
+                            "description": "The move check of the run.",
+                            "type": "object",
+                            "required": [
+                                "composer",
+                                "blocks_advisories",
+                                "ignores_extensions",
+                                "baseline",
+                                "reason"
+                            ],
+                            "properties": {
+                                "composer": {
+                                    "description": "The version of the Composer that solved; null when nothing solved.",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "minLength": 1
+                                },
+                                "blocks_advisories": {
+                                    "description": "Whether the solve removed the versions that an advisory affects, as Composer 2.9 and later do in an update.",
+                                    "type": "boolean"
+                                },
+                                "ignores_extensions": {
+                                    "description": "Always true: the solve ignores every `ext-*` requirement, as `--ignore-platform-req=ext-*` does, so the extensions of the machine that runs lockrot decide no move.",
+                                    "type": "boolean",
+                                    "enum": [
+                                        true
+                                    ]
+                                },
+                                "baseline": {
+                                    "description": "The partial update of a name outside the lock: `refused` means Composer refuses the lock itself, so no move is checked (the `moves_not_checked` note). Closed.",
+                                    "type": "string",
+                                    "enum": [
+                                        "resolves",
+                                        "refused",
+                                        "not_checked"
+                                    ]
+                                },
+                                "reason": {
+                                    "description": "Why the baseline was not checked; null unless `baseline` is `not_checked`. An open set, with the values of `check.reason` that a whole run can have.",
+                                    "oneOf": [
+                                        {
+                                            "type": "string",
+                                            "pattern": "^[a-z][a-z0-9_]*$",
+                                            "x-known-values": [
+                                                "install_time_budget",
+                                                "no_composer_json",
+                                                "composer_json_invalid",
+                                                "solver_error"
+                                            ]
+                                        },
+                                        {
+                                            "type": "null"
+                                        }
+                                    ]
+                                }
+                            },
+                            "allOf": [
+                                {
+                                    "description": "`reason` is set exactly on a `baseline` of `not_checked`.",
+                                    "anyOf": [
+                                        {
+                                            "properties": {
+                                                "baseline": {
+                                                    "enum": [
+                                                        "resolves",
+                                                        "refused"
+                                                    ]
+                                                },
+                                                "reason": {
+                                                    "type": "null"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "properties": {
+                                                "baseline": {
+                                                    "enum": [
+                                                        "not_checked"
+                                                    ]
+                                                },
+                                                "reason": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 }
             },
             "allOf": [
@@ -12445,19 +12553,20 @@
             ]
         },
         "heldBy": {
-            "description": "One link that excludes the move or the fix: the root's or a locked package's `require`, `require-dev` or `conflict`.",
+            "description": "One link that excludes the move or the fix: the root's or a locked package's `require`, `require-dev`, `conflict` or `replace`, and on a move that Composer's solver refuses, each hold that the refusal names. The entries are distinct, the root first, then by `package`, then by `link` in the order of its enum, then by `target`.",
             "type": "object",
             "required": [
                 "source",
                 "package",
                 "version",
                 "link",
+                "target",
                 "constraint",
                 "holder"
             ],
             "properties": {
                 "source": {
-                    "description": "Who holds it: `root` (composer.json) or `package` (a locked package). Closed.",
+                    "description": "Who holds it: `root` (composer.json) or `package` (a locked package, or the moved package at its target release). Closed.",
                     "type": "string",
                     "enum": [
                         "root",
@@ -12465,7 +12574,7 @@
                     ]
                 },
                 "package": {
-                    "description": "The locked package that holds it; null for `source: root`.",
+                    "description": "The package that holds it; null for `source: root`.",
                     "oneOf": [
                         {
                             "$ref": "#/definitions/packageName"
@@ -12476,20 +12585,31 @@
                     ]
                 },
                 "version": {
-                    "description": "That package's locked version; null for `source: root`.",
+                    "description": "That package's version: the locked one, or the target release's; null for `source: root`.",
                     "type": [
                         "string",
                         "null"
                     ]
                 },
                 "link": {
-                    "description": "The link that excludes it. Closed.",
+                    "description": "The link that excludes it: `require`, `require-dev` and `conflict` of the lock or the root, `replace` (the package replaces `target`, or the moved package when `target` is null, so Composer installs one of the two, not both), `root-require` (a root requirement on `target`, a package that the move needs at another version; with `target` null, the move's own constraint, which no release in Composer's pool meets), `platform` (a requirement on the platform package `target`, such as `php`). Closed.",
                     "type": "string",
                     "enum": [
                         "require",
                         "require-dev",
-                        "conflict"
+                        "conflict",
+                        "replace",
+                        "root-require",
+                        "platform"
                     ]
+                },
+                "target": {
+                    "description": "The package that the link points to when it is not the moved package; null when it is.",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "minLength": 1
                 },
                 "constraint": {
                     "description": "The constraint as the link writes it, quoted and never interpreted (\"requires ^2.0\").",
@@ -12589,12 +12709,13 @@
                             "description": "The holder's own move; null when the holder's finding has no move (score 0).",
                             "oneOf": [
                                 {
-                                    "description": "The holder's own move, `{kind, to_branch, constraint}` of its `next_step`, so a sentence writes \"its own move, require ^4.4.51\" without reading another finding.",
+                                    "description": "The holder's own move, `{kind, to_branch, constraint, check}` of its `next_step`, so a sentence writes \"its own move, require ^4.4.51\" without reading another finding.",
                                     "type": "object",
                                     "required": [
                                         "kind",
                                         "to_branch",
-                                        "constraint"
+                                        "constraint",
+                                        "check"
                                     ],
                                     "properties": {
                                         "kind": {
@@ -12633,6 +12754,9 @@
                                                 "string",
                                                 "null"
                                             ]
+                                        },
+                                        "check": {
+                                            "$ref": "#/definitions/moveCheck"
                                         }
                                     }
                                 },
@@ -12698,7 +12822,7 @@
                             "type": "boolean"
                         },
                         "assumes": {
-                            "description": "The conditions the rerun takes as given: `clears_hold` always, `composer_resolves` when `held_by` or `composer_moves_because` is not empty, `no_new_advisories` when the batched lookup of the move's own versions did not run.",
+                            "description": "The conditions the rerun takes as given: `clears_hold` always, `composer_resolves` when `held_by` or `composer_moves_because` is not empty, `no_new_advisories` when the batched lookup of the move's own versions did not run. A move that `check` resolves does not assume `composer_resolves`.",
                             "type": "array",
                             "items": {
                                 "description": "An assumption; an open set.",
@@ -13207,6 +13331,7 @@
                 "leaves",
                 "clears_all",
                 "if_applied",
+                "check",
                 "composer_moves_because",
                 "commands",
                 "through",
@@ -13389,6 +13514,9 @@
                 "if_applied": {
                     "$ref": "#/definitions/ifApplied"
                 },
+                "check": {
+                    "$ref": "#/definitions/moveCheck"
+                },
                 "composer_moves_because": {
                     "description": "Why the move needs more than the project's own command, one clause each: `holders` (`held_by` names a package), `crosses_major` (a `require`, `raise-php` or `tag` move to a new major), `transitive` (not direct, `direct_dependents` not empty, and `held_by` names none of them), `unreached` (not direct and no direct dependent: lockrot found no path from the requirements it walked). `transitive` and `unreached` are set on every kind that names an action on the package (`require raise-php tag replace find-alternative test`): the packages that require it act, or the project replaces them. Closed.",
                     "type": "array",
@@ -13404,7 +13532,7 @@
                     "uniqueItems": true
                 },
                 "commands": {
-                    "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell); `[]` for a transitive `require` and for the kinds without a command; a transitive `raise-php` holds only its php step (`composer require php:>=8.1 --no-update`). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only `--no-update`, the Composer option that lockrot writes in a `require` step, starts with `-`. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
+                    "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell); `[]` for a transitive `require` and for the kinds without a command; a transitive `raise-php` holds only its php step (`composer require php:>=8.1 --no-update`). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. Only lockrot's own options start with `-`: `--no-update` in a `require` step, and `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
                     "type": "array",
                     "items": {
                         "description": "One command as its argument list (`[\"composer\", \"require\", \"php:>=8.1\", \"--no-update\"]`).",
@@ -14371,6 +14499,126 @@
                 }
             ]
         },
+        "moveCheck": {
+            "description": "Composer's solver on the move: whether the move's `composer update` or `composer require` installs from the lock. It names the form that resolves, or why lockrot did not ask. Null on a kind that runs no Composer request, and in a run that checks no move.",
+            "oneOf": [
+                {
+                    "description": "The check of one move.",
+                    "type": "object",
+                    "required": [
+                        "result",
+                        "form",
+                        "reason"
+                    ],
+                    "properties": {
+                        "result": {
+                            "description": "`resolves`: the solver installs the move in `form`; `refused`: no form installs it, and `held_by` names the holds; `not_checked`: lockrot did not ask, `reason` says why. Closed.",
+                            "type": "string",
+                            "enum": [
+                                "resolves",
+                                "refused",
+                                "not_checked"
+                            ]
+                        },
+                        "form": {
+                            "description": "The first form that resolves: `inline` (`composer update vendor/pkg:^1.2`, or `composer require` for a root requirement), `with-dependencies` (adds `--with-dependencies`) or `with-all-dependencies` (adds `--with-all-dependencies`); null unless `result` is `resolves`. Closed.",
+                            "oneOf": [
+                                {
+                                    "type": "string",
+                                    "enum": [
+                                        "inline",
+                                        "with-dependencies",
+                                        "with-all-dependencies"
+                                    ]
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        },
+                        "reason": {
+                            "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
+                            "oneOf": [
+                                {
+                                    "type": "string",
+                                    "pattern": "^[a-z][a-z0-9_]*$",
+                                    "x-known-values": [
+                                        "baseline_refused",
+                                        "unloaded_name",
+                                        "offline",
+                                        "install_time_budget",
+                                        "not_from_composer_repository",
+                                        "no_composer_json",
+                                        "composer_json_invalid",
+                                        "no_release_read",
+                                        "pass_cap",
+                                        "solver_error"
+                                    ]
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    "allOf": [
+                        {
+                            "description": "`form` is set exactly on `resolves`, and `reason` exactly on `not_checked`.",
+                            "anyOf": [
+                                {
+                                    "properties": {
+                                        "result": {
+                                            "enum": [
+                                                "resolves"
+                                            ]
+                                        },
+                                        "form": {
+                                            "type": "string"
+                                        },
+                                        "reason": {
+                                            "type": "null"
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "result": {
+                                            "enum": [
+                                                "refused"
+                                            ]
+                                        },
+                                        "form": {
+                                            "type": "null"
+                                        },
+                                        "reason": {
+                                            "type": "null"
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "result": {
+                                            "enum": [
+                                                "not_checked"
+                                            ]
+                                        },
+                                        "form": {
+                                            "type": "null"
+                                        },
+                                        "reason": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
         "noteAbandonedIgnoreUnreadable": {
             "description": "`abandoned_ignore_unreadable`: Composer rejected the abandoned ignore list, so every abandoned marking counts.",
             "type": "object",
@@ -14632,7 +14880,13 @@
                 "abandoned_markings_ignored",
                 "abandoned_not_audited_by_composer",
                 "abandoned_ignore_unreadable",
-                "repository_activity_host_not_supported"
+                "repository_activity_host_not_supported",
+                "moves_not_checked",
+                "update_now_reduced",
+                "update_now_refused",
+                "update_now_not_checked",
+                "move_check_failed",
+                "package_name_invalid"
             ]
         },
         "noteDetail": {
@@ -14914,6 +15168,78 @@
                     }
                 },
                 {
+                    "properties": {
+                        "code": {
+                            "enum": [
+                                "moves_not_checked"
+                            ]
+                        },
+                        "data": {
+                            "$ref": "#/definitions/noteMovesNotChecked"
+                        }
+                    }
+                },
+                {
+                    "properties": {
+                        "code": {
+                            "enum": [
+                                "update_now_reduced"
+                            ]
+                        },
+                        "data": {
+                            "$ref": "#/definitions/noteUpdateNowReduced"
+                        }
+                    }
+                },
+                {
+                    "properties": {
+                        "code": {
+                            "enum": [
+                                "update_now_refused"
+                            ]
+                        },
+                        "data": {
+                            "$ref": "#/definitions/noteUpdateNowRefused"
+                        }
+                    }
+                },
+                {
+                    "properties": {
+                        "code": {
+                            "enum": [
+                                "update_now_not_checked"
+                            ]
+                        },
+                        "data": {
+                            "$ref": "#/definitions/noteUpdateNowNotChecked"
+                        }
+                    }
+                },
+                {
+                    "properties": {
+                        "code": {
+                            "enum": [
+                                "move_check_failed"
+                            ]
+                        },
+                        "data": {
+                            "$ref": "#/definitions/noteMoveCheckFailed"
+                        }
+                    }
+                },
+                {
+                    "properties": {
+                        "code": {
+                            "enum": [
+                                "package_name_invalid"
+                            ]
+                        },
+                        "data": {
+                            "$ref": "#/definitions/notePackageNameInvalid"
+                        }
+                    }
+                },
+                {
                     "description": "A note whose code this schema does not list, from a later release or not from lockrot: its data is any object.",
                     "not": {
                         "properties": {
@@ -14938,7 +15264,13 @@
                                     "abandoned_markings_ignored",
                                     "abandoned_not_audited_by_composer",
                                     "abandoned_ignore_unreadable",
-                                    "repository_activity_host_not_supported"
+                                    "repository_activity_host_not_supported",
+                                    "moves_not_checked",
+                                    "update_now_reduced",
+                                    "update_now_refused",
+                                    "update_now_not_checked",
+                                    "move_check_failed",
+                                    "package_name_invalid"
                                 ]
                             }
                         }
@@ -15049,6 +15381,54 @@
                 }
             }
         },
+        "noteMoveCheckFailed": {
+            "description": "`move_check_failed`: Composer's solver failed on a request with an exception other than a refusal. That move's `check` reads `not_checked` with `reason` `solver_error`. The note names the run's first such failure.",
+            "type": "object",
+            "required": [
+                "class",
+                "message"
+            ],
+            "properties": {
+                "class": {
+                    "description": "The exception's class, as PHP names it. Foreign text, not contract.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "message": {
+                    "description": "The exception's message. Foreign text, not contract.",
+                    "type": "string"
+                }
+            }
+        },
+        "noteMovesNotChecked": {
+            "description": "`moves_not_checked`: Composer's solver refuses a partial update of a name outside the lock, so it would refuse every move. Each move's `check` reads `not_checked` with `reason` `baseline_refused`.",
+            "type": "object",
+            "required": [
+                "reason",
+                "php",
+                "problem"
+            ],
+            "properties": {
+                "reason": {
+                    "description": "Why no move is checked. An open set.",
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*$",
+                    "x-known-values": [
+                        "baseline_refused"
+                    ]
+                },
+                "php": {
+                    "description": "The php version that the solve ran at: `config.platform.php` in the target minor, else the target minor at its newest patch (`8.4.99`).",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "problem": {
+                    "description": "Composer's problem text as a `--dry-run` prints it, without colour. Foreign text, not contract.",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
         "noteNotFromComposerRepository": {
             "description": "`not_from_composer_repository`: `package_count` packages carry no Composer notification-url, so lockrot read no release metadata and no repository activity for them. It asked their advisories by name exactly when `advisories_asked` is true. Equal to the report's `not_from_composer_repository`.",
             "type": "object",
@@ -15072,6 +15452,23 @@
             "description": "`offline`: the run was `--offline`, so repository metadata came from Composer's cache. No parameters.",
             "type": "object",
             "properties": {}
+        },
+        "notePackageNameInvalid": {
+            "description": "`package_name_invalid`: lock entries whose name is no Composer package name. lockrot skips them, so they have no finding and no command names them. The text names none of them.",
+            "type": "object",
+            "required": [
+                "packages"
+            ],
+            "properties": {
+                "packages": {
+                    "description": "The names as the lock writes them, in lock order. Foreign text, not contract.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1
+                }
+            }
         },
         "noteRepositoryActivityAnonymousCap": {
             "description": "`repository_activity_anonymous_cap`: without credentials for the host the run asked only about candidate packages, and at most a budget of them: `checked` were asked, `skipped_no_token` were not candidates (S10 `no_token` on their findings) and `skipped_budget` were candidates beyond the budget (S10 `anonymous_budget`). The text prints the two skipped counts as one sum. GitLab has no cap.",
@@ -15225,6 +15622,80 @@
                     "items": {
                         "$ref": "#/definitions/failedForgeRepository"
                     }
+                }
+            }
+        },
+        "noteUpdateNowNotChecked": {
+            "description": "`update_now_not_checked`: Composer's solver did not check the combined update of the candidates, so `security.update_now` is empty and `update_now_command` is null.",
+            "type": "object",
+            "required": [
+                "reason",
+                "packages"
+            ],
+            "properties": {
+                "reason": {
+                    "description": "Why it was not checked: a value of `check.reason`. An open set.",
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*$",
+                    "x-known-values": [
+                        "baseline_refused",
+                        "unloaded_name",
+                        "offline",
+                        "install_time_budget",
+                        "not_from_composer_repository",
+                        "no_composer_json",
+                        "composer_json_invalid",
+                        "no_release_read",
+                        "pass_cap",
+                        "solver_error"
+                    ]
+                },
+                "packages": {
+                    "description": "The candidates: the vulnerable findings whose lead `update` Composer resolves inline, in report order.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/packageName"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                }
+            }
+        },
+        "noteUpdateNowReduced": {
+            "description": "`update_now_reduced`: Composer refuses the members of `security.update_now` together, so the command leaves out the members that the refusal names.",
+            "type": "object",
+            "required": [
+                "left_out",
+                "problem"
+            ],
+            "properties": {
+                "left_out": {
+                    "description": "The members that `update_now_command` leaves out, in report order.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/packageName"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                },
+                "problem": {
+                    "description": "Composer's problem text as a `--dry-run` prints it, without colour. Foreign text, not contract.",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "noteUpdateNowRefused": {
+            "description": "`update_now_refused`: Composer refuses the members of `security.update_now` together, even without the members its refusal names.",
+            "type": "object",
+            "required": [
+                "problem"
+            ],
+            "properties": {
+                "problem": {
+                    "description": "Composer's problem text as a `--dry-run` prints it, without colour. Foreign text, not contract.",
+                    "type": "string",
+                    "minLength": 1
                 }
             }
         },

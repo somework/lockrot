@@ -781,7 +781,8 @@
      "records": 2
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "activity_cache_oldest_at": "2026-10-01T16:04:36+00:00",
  "activity_cache_age_hours": 1.6,
@@ -1262,6 +1263,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -1323,7 +1325,8 @@
       "assumes": [
        "clears_hold"
       ]
-     }
+     },
+     "check": null
     },
     "move_in": "next_step",
     "gets": {

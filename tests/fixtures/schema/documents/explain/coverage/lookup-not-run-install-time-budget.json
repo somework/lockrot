@@ -932,7 +932,8 @@
      "records": null
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "ok",

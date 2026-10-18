@@ -184,10 +184,20 @@
             "crosses_major": true,
             "held_by": [
                 {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "root-require",
+                    "target": "scheb/2fa-google-authenticator",
+                    "constraint": "^5.13.2",
+                    "holder": null
+                },
+                {
                     "source": "package",
                     "package": "scheb/2fa-google-authenticator",
                     "version": "v5.13.2",
                     "link": "require",
+                    "target": null,
                     "constraint": "^9.1|^10.0",
                     "holder": {
                         "verdict": "high",
@@ -199,7 +209,12 @@
                         "next_step": {
                             "kind": "require",
                             "to_branch": "7.x",
-                            "constraint": "^7.14"
+                            "constraint": "^7.14",
+                            "check": {
+                                "result": "refused",
+                                "form": null,
+                                "reason": null
+                            }
                         }
                     }
                 }
@@ -236,6 +251,11 @@
                     "composer_resolves"
                 ]
             },
+            "check": {
+                "result": "refused",
+                "form": null,
+                "reason": null
+            },
             "composer_moves_because": [
                 "holders",
                 "crosses_major"
@@ -255,7 +275,7 @@
                 }
             ],
             "also": [],
-            "text": "move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-google-authenticator ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
         },
         "security": {
             "status": "vulnerable",
@@ -291,7 +311,8 @@
                 "lowest": null,
                 "newest": "v10.0.3",
                 "held_by": [],
-                "if_applied": null
+                "if_applied": null,
+                "check": null
             },
             "move_in": "next_step",
             "gets": null,
@@ -402,10 +423,20 @@
                                 "php": ">=8.1",
                                 "held_by": [
                                     {
+                                        "source": "root",
+                                        "package": null,
+                                        "version": null,
+                                        "link": "root-require",
+                                        "target": "scheb/2fa-google-authenticator",
+                                        "constraint": "^5.13.2",
+                                        "holder": null
+                                    },
+                                    {
                                         "source": "package",
                                         "package": "scheb/2fa-google-authenticator",
                                         "version": "v5.13.2",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^9.1|^10.0",
                                         "holder": {
                                             "verdict": "high",
@@ -417,7 +448,12 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "7.x",
-                                                "constraint": "^7.14"
+                                                "constraint": "^7.14",
+                                                "check": {
+                                                    "result": "refused",
+                                                    "form": null,
+                                                    "reason": null
+                                                }
                                             }
                                         }
                                     }
@@ -451,10 +487,20 @@
                                 "php": ">=8.1",
                                 "held_by": [
                                     {
+                                        "source": "root",
+                                        "package": null,
+                                        "version": null,
+                                        "link": "root-require",
+                                        "target": "scheb/2fa-google-authenticator",
+                                        "constraint": "^5.13.2",
+                                        "holder": null
+                                    },
+                                    {
                                         "source": "package",
                                         "package": "scheb/2fa-google-authenticator",
                                         "version": "v5.13.2",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^9.1|^10.0",
                                         "holder": {
                                             "verdict": "high",
@@ -466,7 +512,12 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "7.x",
-                                                "constraint": "^7.14"
+                                                "constraint": "^7.14",
+                                                "check": {
+                                                    "result": "refused",
+                                                    "form": null,
+                                                    "reason": null
+                                                }
                                             }
                                         }
                                     }
@@ -633,10 +684,20 @@
                     "newest": "11.5.0",
                     "held_by": [
                         {
+                            "source": "root",
+                            "package": null,
+                            "version": null,
+                            "link": "root-require",
+                            "target": "scheb/2fa-google-authenticator",
+                            "constraint": "^5.13.2",
+                            "holder": null
+                        },
+                        {
                             "source": "package",
                             "package": "scheb/2fa-google-authenticator",
                             "version": "v5.13.2",
                             "link": "require",
+                            "target": null,
                             "constraint": "^9.1|^10.0",
                             "holder": {
                                 "verdict": "high",
@@ -648,7 +709,12 @@
                                 "next_step": {
                                     "kind": "require",
                                     "to_branch": "7.x",
-                                    "constraint": "^7.14"
+                                    "constraint": "^7.14",
+                                    "check": {
+                                        "result": "refused",
+                                        "form": null,
+                                        "reason": null
+                                    }
                                 }
                             }
                         }
@@ -661,6 +727,11 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
+                    },
+                    "check": {
+                        "result": "refused",
+                        "form": null,
+                        "reason": null
                     }
                 }
             },
@@ -692,7 +763,8 @@
                     "lowest": null,
                     "newest": "v10.0.3",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -723,7 +795,8 @@
                     "lowest": null,
                     "newest": "v9.1.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -754,7 +827,8 @@
                     "lowest": null,
                     "newest": "v8.3.3",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -785,7 +859,8 @@
                     "lowest": null,
                     "newest": "v7.0.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -816,7 +891,8 @@
                     "lowest": null,
                     "newest": "v6.0.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -847,7 +923,8 @@
                     "lowest": null,
                     "newest": "v5.0.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -878,7 +955,8 @@
                     "lowest": null,
                     "newest": "v4.0.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -909,7 +987,8 @@
                     "lowest": null,
                     "newest": "v3.1.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -940,7 +1019,8 @@
                     "lowest": null,
                     "newest": "v2.0.2-stable",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -971,7 +1051,8 @@
                     "lowest": null,
                     "newest": "1.0.1-stable",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             }
         ],
@@ -1726,6 +1807,13 @@
                     "records": 187
                 }
             ]
+        },
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": true,
+            "ignores_extensions": true,
+            "baseline": "resolves",
+            "reason": null
         }
     },
     "generated_at": "2026-10-14T00:00:00+00:00",

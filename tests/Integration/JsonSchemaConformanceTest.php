@@ -923,8 +923,15 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::abandonedMarkingsIgnored('policy.abandoned', ['doctrine/cache' => ['doctrine/*']]),
             RunNote::abandonedNotAuditedByComposer('policy.abandoned.audit', 'ignore'),
             RunNote::abandonedIgnoreUnreadable(''),
+            RunNote::movesNotChecked('8.4.99', "Problem 1\n    - Root composer.json requires acme/a ^2.0, found acme/a[2.0.0] but it does not match your php version."),
+            RunNote::updateNowReduced(['acme/b'], "Problem 1\n    - acme/a 2.1.0 conflicts with acme/b <3.0."),
+            RunNote::updateNowRefused("Problem 1\n    - acme/a 2.1.0 conflicts with acme/b <3.0."),
+            RunNote::updateNowNotChecked('install_time_budget', ['acme/a', 'acme/b']),
+            RunNote::moveCheckFailed('Seld\\JsonLint\\ParsingException', 'does not contain valid JSON'),
+            // Last, so that the indexes of the vocabularies below stay those of the analyser's order.
+            RunNote::packageNameInvalid(['--with-all-dependencies']),
         ];
-        self::assertSame(RunNote::CODES, array_map(static fn (RunNote $note): string => $note->code(), $notes), 'one of each');
+        self::assertEqualsCanonicalizing(RunNote::CODES, array_map(static fn (RunNote $note): string => $note->code(), $notes), 'one of each');
         $decoded['notes'] = array_map(static fn (RunNote $note): string => $note->text(), $notes);
         $details = self::decoded((string) json_encode(array_map(static fn (RunNote $note): array => $note->toArray(), $notes)));
         // Decoded to arrays, the offline note's `{}` comes back as a list.
