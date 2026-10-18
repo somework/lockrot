@@ -1553,7 +1553,8 @@
     }
    ],
    "docs": "https://lockrot.dev/verdicts/model-1/"
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "left-behind",

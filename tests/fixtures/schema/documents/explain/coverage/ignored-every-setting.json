@@ -1230,7 +1230,8 @@
      "records": 7
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "ok",

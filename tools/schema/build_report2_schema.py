@@ -208,6 +208,8 @@ defs['factBaseline'] = nul("A fact's state against the baseline entry (§6.4 \"P
 
 # holders and php checks
 MOVE_CHECK_REASONS = ['baseline_refused', 'unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'composer_too_old', 'no_composer_json']
+# The reasons that leave the baseline itself unchecked: the budget, or a run that cannot solve at all.
+BASELINE_CHECK_REASONS = ['install_time_budget', 'composer_too_old', 'no_composer_json']
 defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether `composer update --dry-run` or `composer require --dry-run` installs it from the lock, in which form, "
                          "or why lockrot did not ask. Null on a kind that runs no Composer request (`replace find-alternative test blocked` and the `no-*` kinds), "
                          "and in a run that checks no move."),
@@ -1352,8 +1354,8 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
                                 {'type': 'boolean', 'enum': [True]}),
         'baseline': closed(['resolves', 'refused', 'not_checked'], ("The partial update of a name outside the lock: `refused` means Composer refuses the lock "
                                                                    "itself, so no move is checked (the `moves_not_checked` note). Closed.")),
-        'reason': nul("Why the baseline was not checked; null unless `baseline` is `not_checked`. The open set of `check.reason`.",
-                      {'type': 'string', 'pattern': SNAKE, 'x-known-values': MOVE_CHECK_REASONS}),
+        'reason': nul("Why the baseline was not checked; null unless `baseline` is `not_checked`. An open set, with the values of `check.reason` that a whole run can have.",
+                      {'type': 'string', 'pattern': SNAKE, 'x-known-values': BASELINE_CHECK_REASONS}),
     })),
     'score_rules_used': {'description': ("Rule id → the number of findings on which the rule changed or decided a number (each count's predicate is a field test: "
                                          "graded findings; score-0 findings for `zero-verdicts`; every finding with a non-empty `score.accepted[]` for `counted`), null only for "

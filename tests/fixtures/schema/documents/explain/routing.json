@@ -1773,7 +1773,8 @@
      "records": 4
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "left-behind",

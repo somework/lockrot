@@ -1125,7 +1125,8 @@
      "records": 0
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "left-behind",

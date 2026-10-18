@@ -1756,7 +1756,8 @@
      "records": 26
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "ok",

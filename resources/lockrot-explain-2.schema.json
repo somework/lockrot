@@ -3415,17 +3415,13 @@
                                     ]
                                 },
                                 "reason": {
-                                    "description": "Why the baseline was not checked; null unless `baseline` is `not_checked`. The open set of `check.reason`.",
+                                    "description": "Why the baseline was not checked; null unless `baseline` is `not_checked`. An open set, with the values of `check.reason` that a whole run can have.",
                                     "oneOf": [
                                         {
                                             "type": "string",
                                             "pattern": "^[a-z][a-z0-9_]*$",
                                             "x-known-values": [
-                                                "baseline_refused",
-                                                "unloaded_name",
-                                                "offline",
                                                 "install_time_budget",
-                                                "not_from_composer_repository",
                                                 "composer_too_old",
                                                 "no_composer_json"
                                             ]

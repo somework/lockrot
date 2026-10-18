@@ -2019,7 +2019,8 @@
      "records": 28
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "ok",

@@ -1164,7 +1164,8 @@
      "records": 0
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "abandoned",

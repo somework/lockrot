@@ -923,6 +923,9 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::abandonedMarkingsIgnored('policy.abandoned', ['doctrine/cache' => ['doctrine/*']]),
             RunNote::abandonedNotAuditedByComposer('policy.abandoned.audit', 'ignore'),
             RunNote::abandonedIgnoreUnreadable(''),
+            RunNote::movesNotChecked('8.4.99', "Problem 1\n    - Root composer.json requires acme/a ^2.0, found acme/a[2.0.0] but it does not match your php version."),
+            RunNote::updateNowReduced(['acme/b'], "Problem 1\n    - acme/a 2.1.0 conflicts with acme/b <3.0."),
+            RunNote::updateNowRefused("Problem 1\n    - acme/a 2.1.0 conflicts with acme/b <3.0."),
         ];
         self::assertSame(RunNote::CODES, array_map(static fn (RunNote $note): string => $note->code(), $notes), 'one of each');
         $decoded['notes'] = array_map(static fn (RunNote $note): string => $note->text(), $notes);

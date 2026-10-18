@@ -949,7 +949,8 @@
      "records": 112
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "unknown",
