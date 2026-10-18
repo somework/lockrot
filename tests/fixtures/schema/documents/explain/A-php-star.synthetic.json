@@ -114,7 +114,7 @@
    "latest": null,
    "php_check": {
     "requires": ">=8.1.0",
-    "project_allows": null,
+    "project_allows": true,
     "target_runs": true,
     "raise_to": null,
     "raise_size": null
@@ -261,7 +261,7 @@
    ],
    "through": [],
    "also": [],
-   "text": "require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0; the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+   "text": "require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
   },
   "security": {
    "status": "vulnerable",
