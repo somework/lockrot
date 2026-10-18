@@ -86,7 +86,8 @@ final class HostileCommandArgumentsTest extends TestCase
             self::assertNotContains($name, array_column(JsonPath::arrayAt($report, ['findings']), 'package'), $class);
             self::assertCount(1, $notes, $class);
             self::assertSame([$name], JsonPath::arrayAt($notes[0], ['data', 'packages']), $class);
-            self::assertStringNotContainsString($name, (string) json_encode([$report['notes'], JsonPath::arrayAt($report, ['findings'])]), $class.': no text or command names it');
+            // Both sides go through json_encode(), which escapes `/` and quotes alike.
+            self::assertStringNotContainsString(substr((string) json_encode($name), 1, -1), (string) json_encode([$report['notes'], JsonPath::arrayAt($report, ['findings'])]), $class.': no text or command names it');
             self::assertSame([], RootRecount::mismatches($report), $class.': the independent recount of the root blocks');
         }
     }

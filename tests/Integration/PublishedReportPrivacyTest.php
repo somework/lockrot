@@ -68,6 +68,10 @@ final class PublishedReportPrivacyTest extends TestCase
 
     protected function tearDown(): void
     {
+        // A setup that failed before the directory was made leaves nothing to remove.
+        if ($this->dir === '') {
+            return;
+        }
         foreach (['composer.json', 'composer.lock'] as $file) {
             @unlink($this->dir.'/'.$file);
         }
