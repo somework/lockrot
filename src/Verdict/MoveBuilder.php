@@ -76,6 +76,9 @@ final class MoveBuilder
         $query = $checks === null ? null : self::query($kind, $subject, $constraint, $version, $phpCheck);
         $outcome = $query === null || $checks === null ? null : $checks->check($query);
         $check = $outcome === null ? null : $outcome->check();
+        if ($check === null && $checks !== null && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
+            $check = MoveCheck::notChecked(MoveCheck::NO_RELEASE_READ);
+        }
         $heldBy = $lower !== null && $kind !== Move::TAG ? $lower->heldBy() : [];
         if ($outcome !== null && $outcome->check()->isRefused()) {
             $heldBy = Holder::distinct(array_merge($heldBy, $outcome->holds()));

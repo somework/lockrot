@@ -32,29 +32,34 @@ final class FindingRelations
             }
         }
 
-        return array_merge($out, self::root($document, $findings, $gates), self::checksWithoutARunCheck($document, $findings));
+        return array_merge($out, self::root($document, $findings, $gates), self::moveCheckRelation($document, $findings));
     }
 
     /**
-     * SPEC §7.6.4: a move carries a `check` only in a run whose `run.move_check` says how Composer's
-     * solver checked it.
+     * SPEC §7.6.4: a move carries a `check` exactly in a run whose `run.move_check` says how
+     * Composer's solver checked it, and there every move that runs a Composer request has one.
      *
      * @param array<mixed, mixed>       $document
      * @param list<array<mixed, mixed>> $findings
      *
      * @return list<string>
      */
-    public static function checksWithoutARunCheck(array $document, array $findings): array
+    public static function moveCheckRelation(array $document, array $findings): array
     {
-        if (JsonPath::has($document, ['run', 'move_check']) && \is_array(JsonPath::arrayAt($document, ['run'])['move_check'])) {
-            return [];
-        }
+        $checked = JsonPath::has($document, ['run', 'move_check']) && \is_array(JsonPath::arrayAt($document, ['run'])['move_check']);
         $out = [];
         foreach ($findings as $finding) {
             $move = \is_array($finding['next_step'] ?? null) ? $finding['next_step'] : [];
             foreach (array_merge([$move], \is_array($move['also'] ?? null) ? $move['also'] : []) as $each) {
-                if (\is_array($each) && \is_array($each['check'] ?? null)) {
+                if (!\is_array($each)) {
+                    continue;
+                }
+                $hasCheck = \is_array($each['check'] ?? null);
+                if (!$checked && $hasCheck) {
                     $out[] = JsonPath::stringAt($finding, ['package']).': a move check needs run.move_check';
+                }
+                if ($checked && !$hasCheck && \in_array($each['kind'] ?? null, ['update', 'require', 'raise-php', 'tag'], true)) {
+                    $out[] = JsonPath::stringAt($finding, ['package']).': a move that runs a Composer request in a checked run has a check';
                 }
             }
         }

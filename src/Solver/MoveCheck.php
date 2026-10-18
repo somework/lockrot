@@ -31,14 +31,14 @@ final class MoveCheck implements \JsonSerializable
     public const OFFLINE = 'offline';
     public const INSTALL_TIME_BUDGET = 'install_time_budget';
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
-    public const COMPOSER_TOO_OLD = 'composer_too_old';
     public const NO_COMPOSER_JSON = 'no_composer_json';
+    public const NO_RELEASE_READ = 'no_release_read';
 
     /** The reasons that lockrot writes, in the order that the schema lists them. */
-    public const REASONS = [self::BASELINE_REFUSED, self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NOT_FROM_COMPOSER_REPOSITORY, self::COMPOSER_TOO_OLD, self::NO_COMPOSER_JSON];
+    public const REASONS = [self::BASELINE_REFUSED, self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NOT_FROM_COMPOSER_REPOSITORY, self::NO_COMPOSER_JSON, self::NO_RELEASE_READ];
 
     /** The reasons that leave the baseline itself unchecked (`run.move_check.reason`), in the schema's order. */
-    public const BASELINE_REASONS = [self::INSTALL_TIME_BUDGET, self::COMPOSER_TOO_OLD, self::NO_COMPOSER_JSON];
+    public const BASELINE_REASONS = [self::INSTALL_TIME_BUDGET, self::NO_COMPOSER_JSON];
 
     /** Why lockrot did not ask Composer's solver about the move, by `check.reason`. */
     private const REASON_WORDS = [
@@ -47,8 +47,8 @@ final class MoveCheck implements \JsonSerializable
         self::OFFLINE => "a package it needs is not in Composer's cache",
         self::INSTALL_TIME_BUDGET => 'the install-time budget ran out',
         self::NOT_FROM_COMPOSER_REPOSITORY => 'no Composer repository serves it',
-        self::COMPOSER_TOO_OLD => 'this Composer has no solver that lockrot can use',
         self::NO_COMPOSER_JSON => 'the project has no composer.json',
+        self::NO_RELEASE_READ => 'no release of the row was read',
     ];
 
     /** @var self::RESOLVES|self::REFUSED|self::NOT_CHECKED */

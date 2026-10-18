@@ -38,12 +38,7 @@ final class NextStep
         $mainRow = $main->row();
         $otherRow = $other === null ? null : $other->row();
         if ($other !== null && $main->isRowMove() && $other->isRowMove() && $mainRow !== null && $otherRow !== null && $mainRow->branch() === $otherRow->branch()) {
-            if (version_compare((string) self::lowerOf($other), (string) self::lowerOf($main), '>')) {
-                $lower = $other->lower();
-                $kind = $lower === null ? $main->kind() : MaintenanceMove::kindOf($lower, $mainRow);
-                $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $other->constraint() : null;
-                $main = MoveDraft::of($kind, $main->source())->to($mainRow, $lower, $constraint)->withFixKind($main->fixKind());
-            }
+            $main = self::merge($main, $other);
             $merged = [$other->source()];
             $other = null;
         }
@@ -203,6 +198,21 @@ final class NextStep
         }
 
         return $byPart >= 0 ? [$security, $maintenance] : [$maintenance, $security];
+    }
+
+    /** Two moves to one branch as one move: the higher lower bound of the two, in the lead's source. */
+    public static function merge(MoveDraft $main, MoveDraft $other): MoveDraft
+    {
+        $row = $main->row();
+        $lower = $other->lower();
+        // A move with no release names no version, so the merge keeps the lead's release.
+        if ($row === null || $lower === null || !version_compare((string) self::lowerOf($other), (string) self::lowerOf($main), '>')) {
+            return $main;
+        }
+        $kind = MaintenanceMove::kindOf($lower, $row);
+        $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $other->constraint() : null;
+
+        return MoveDraft::of($kind, $main->source())->to($row, $lower, $constraint)->withFixKind($main->fixKind());
     }
 
     /** The normalized lower bound of a move: its constraint's, else the release it names. */
