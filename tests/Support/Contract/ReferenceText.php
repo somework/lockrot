@@ -400,6 +400,10 @@ final class ReferenceText
                 $latest = Fields::nullableObject($move, 'latest');
                 $pinned = Fields::string($move, 'source') === 'pinned';
                 $where = $pinned && $latest !== null ? 'the newest tag, '.Fields::string($latest, 'version').',' : (Fields::nullableString($move, 'to_branch') ?? 'the fix');
+                $solve = Fields::nullableObject($move, 'check');
+                if ($solve !== null && Fields::string($solve, 'result') === 'refused' && ($check === null || ($check['target_runs'] ?? null) !== false)) {
+                    return 'no move installs '.$where.': Composer names no hold';
+                }
                 $text = $check !== null && \is_string($check['requires'] ?? null)
                     ? 'no move runs on the target: '.$where.' needs php '.Fields::string($check, 'requires').' and the target php '.$target.' does not run it'
                     : 'no move runs on the target: the target php '.$target.' does not run '.$where;
@@ -528,7 +532,11 @@ final class ReferenceText
     {
         $constraint = \is_string($holder['constraint'] ?? null) ? $holder['constraint'] : null;
         $target = \is_string($holder['target'] ?? null) ? $holder['target'].' ' : '';
-        $link = (($holder['link'] ?? null) === 'conflict' ? 'conflicts with ' : 'requires ').$target.$constraint;
+        $kind = Fields::string($holder, 'link');
+        $link = (['conflict' => 'conflicts with ', 'replace' => 'replaces '][$kind] ?? 'requires ').$target.$constraint;
+        if ($target === '' && \in_array($kind, ['root-require', 'replace'], true)) {
+            $link = $kind === 'replace' ? 'replaces it' : 'no release of '.$constraint.' can install';
+        }
         if (Fields::string($holder, 'source') === 'root') {
             return 'composer.json'.($constraint === null ? '' : ' ('.$link.')');
         }

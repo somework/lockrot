@@ -1558,7 +1558,7 @@
               ]
             },
             "reason": {
-              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `composer_too_old`, `no_composer_json`. An open set.",
+              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
               "oneOf": [
                 {
                   "type": "string",
@@ -1569,8 +1569,10 @@
                     "offline",
                     "install_time_budget",
                     "not_from_composer_repository",
-                    "composer_too_old",
-                    "no_composer_json"
+                    "no_composer_json",
+                    "no_release_read",
+                    "pass_cap",
+                    "solver_error"
                   ]
                 },
                 {
@@ -1752,7 +1754,7 @@
       ]
     },
     "heldBy": {
-      "description": "One link that excludes the move or the fix: the root's or a locked package's `require`, `require-dev` or `conflict`, and on a move that Composer's solver refuses, each hold that the refusal names. The entries are distinct, the root first, then by `package`, then by `link` in the order of its enum, then by `target`.",
+      "description": "One link that excludes the move or the fix: the root's or a locked package's `require`, `require-dev`, `conflict` or `replace`, and on a move that Composer's solver refuses, each hold that the refusal names. The entries are distinct, the root first, then by `package`, then by `link` in the order of its enum, then by `target`.",
       "type": "object",
       "required": [
         "source",
@@ -1791,12 +1793,13 @@
           ]
         },
         "link": {
-          "description": "The link that excludes it: `require`, `require-dev` and `conflict` of the lock, `root-require` (a root requirement on `target`, a package that the move needs at another version), `platform` (a requirement on the platform package `target`, such as `php`). Closed.",
+          "description": "The link that excludes it: `require`, `require-dev` and `conflict` of the lock or the root, `replace` (the package replaces `target`, or the moved package when `target` is null, so Composer installs one of the two, not both), `root-require` (a root requirement on `target`, a package that the move needs at another version; with `target` null, the move's own constraint, which no release in Composer's pool meets), `platform` (a requirement on the platform package `target`, such as `php`). Closed.",
           "type": "string",
           "enum": [
             "require",
             "require-dev",
             "conflict",
+            "replace",
             "root-require",
             "platform"
           ]
@@ -20979,8 +20982,8 @@
                       "pattern": "^[a-z][a-z0-9_]*$",
                       "x-known-values": [
                         "install_time_budget",
-                        "composer_too_old",
-                        "no_composer_json"
+                        "no_composer_json",
+                        "solver_error"
                       ]
                     },
                     {
@@ -21941,6 +21944,77 @@
         }
       }
     },
+    "noteUpdateNowNotChecked": {
+      "description": "`update_now_not_checked`: Composer's solver did not check the combined update of the candidates, so `security.update_now` is empty and `update_now_command` is null.",
+      "type": "object",
+      "required": [
+        "reason",
+        "packages"
+      ],
+      "properties": {
+        "reason": {
+          "description": "Why it was not checked: a value of `check.reason`. An open set.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "baseline_refused",
+            "unloaded_name",
+            "offline",
+            "install_time_budget",
+            "not_from_composer_repository",
+            "no_composer_json",
+            "no_release_read",
+            "pass_cap",
+            "solver_error"
+          ]
+        },
+        "packages": {
+          "description": "The candidates: the vulnerable findings whose lead `update` Composer resolves inline, in report order.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "noteMoveCheckFailed": {
+      "description": "`move_check_failed`: Composer's solver failed on a request with an exception other than a refusal. That move's `check` reads `not_checked` with `reason` `solver_error`. The note names the run's first such failure.",
+      "type": "object",
+      "required": [
+        "class",
+        "message"
+      ],
+      "properties": {
+        "class": {
+          "description": "The exception's class, as PHP names it. Foreign text, not contract.",
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "description": "The exception's message. Foreign text, not contract.",
+          "type": "string"
+        }
+      }
+    },
+    "notePackageNameInvalid": {
+      "description": "`package_name_invalid`: lock entries whose name is no Composer package name. lockrot skips them, so they have no finding and no command names them. The text names none of them.",
+      "type": "object",
+      "required": [
+        "packages"
+      ],
+      "properties": {
+        "packages": {
+          "description": "The names as the lock writes them, in lock order. Foreign text, not contract.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      }
+    },
     "noteCode": {
       "description": "What a run note is about. lockrot's codes are lower-case words; `<vendor>:<name>` is reserved for a note that does not come from lockrot, as it is for a signal id. A kind, not an identifier: a run writes one code once per forge, per Composer repository or per monorepo parent it concerns. A code keeps its meaning (a new meaning gets a new code) and is retired, never removed or reused. An open set: a later minor release can add a code; read one you do not know as another thing the run could not see.",
       "type": "string",
@@ -21968,7 +22042,10 @@
         "repository_activity_host_not_supported",
         "moves_not_checked",
         "update_now_reduced",
-        "update_now_refused"
+        "update_now_refused",
+        "update_now_not_checked",
+        "move_check_failed",
+        "package_name_invalid"
       ]
     },
     "noteDetail": {
@@ -22286,6 +22363,42 @@
           }
         },
         {
+          "properties": {
+            "code": {
+              "enum": [
+                "update_now_not_checked"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteUpdateNowNotChecked"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "move_check_failed"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteMoveCheckFailed"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "package_name_invalid"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/notePackageNameInvalid"
+            }
+          }
+        },
+        {
           "description": "A note whose code this schema does not list, from a later release or not from lockrot: its data is any object.",
           "not": {
             "properties": {
@@ -22313,7 +22426,10 @@
                   "repository_activity_host_not_supported",
                   "moves_not_checked",
                   "update_now_reduced",
-                  "update_now_refused"
+                  "update_now_refused",
+                  "update_now_not_checked",
+                  "move_check_failed",
+                  "package_name_invalid"
                 ]
               }
             }

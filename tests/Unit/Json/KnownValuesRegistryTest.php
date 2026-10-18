@@ -77,6 +77,7 @@ final class KnownValuesRegistryTest extends TestCase
             '#/definitions/noteCode' => [RunNote::CODES, 'RunNote'],
             '#/definitions/moveCheck/oneOf/0/properties/reason/oneOf/0' => [MoveCheck::REASONS, 'MoveCheck'],
             '#/definitions/run/properties/move_check/oneOf/0/properties/reason/oneOf/0' => [MoveCheck::BASELINE_REASONS, 'MoveCheck'],
+            '#/definitions/noteUpdateNowNotChecked/properties/reason' => [MoveCheck::REASONS, 'MoveCheck'],
             '#/definitions/explainRun/properties/move_check/oneOf/0/properties/reason/oneOf/0' => [MoveCheck::BASELINE_REASONS, 'MoveCheck'],
             '#/definitions/noteMovesNotChecked/properties/reason' => [[MoveCheck::BASELINE_REFUSED], 'RunNote::movesNotChecked()'],
             '#/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key' => [['policy', 'policy.advisories', 'policy.advisories.audit', 'COMPOSER_POLICY'], 'RunNote::advisoriesDisabledByPolicy()'],

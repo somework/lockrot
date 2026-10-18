@@ -1216,7 +1216,7 @@
       "multipleOf": 0.5
     },
     "heldBy": {
-      "description": "One link that excludes the move or the fix: the root's or a locked package's `require`, `require-dev` or `conflict`, and on a move that Composer's solver refuses, each hold that the refusal names. The entries are distinct, the root first, then by `package`, then by `link` in the order of its enum, then by `target`.",
+      "description": "One link that excludes the move or the fix: the root's or a locked package's `require`, `require-dev`, `conflict` or `replace`, and on a move that Composer's solver refuses, each hold that the refusal names. The entries are distinct, the root first, then by `package`, then by `link` in the order of its enum, then by `target`.",
       "type": "object",
       "required": [
         "source",
@@ -1255,12 +1255,13 @@
           ]
         },
         "link": {
-          "description": "The link that excludes it: `require`, `require-dev` and `conflict` of the lock, `root-require` (a root requirement on `target`, a package that the move needs at another version), `platform` (a requirement on the platform package `target`, such as `php`). Closed.",
+          "description": "The link that excludes it: `require`, `require-dev` and `conflict` of the lock or the root, `replace` (the package replaces `target`, or the moved package when `target` is null, so Composer installs only one of the two), `root-require` (a root requirement on `target`, a package that the move needs at another version; with `target` null, the move's own constraint, which no release in Composer's pool meets), `platform` (a requirement on the platform package `target`, such as `php`). Closed.",
           "type": "string",
           "enum": [
             "require",
             "require-dev",
             "conflict",
+            "replace",
             "root-require",
             "platform"
           ]
@@ -1629,7 +1630,7 @@
               ]
             },
             "reason": {
-              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `composer_too_old`, `no_composer_json`. An open set.",
+              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
               "oneOf": [
                 {
                   "type": "string",
@@ -1640,8 +1641,10 @@
                     "offline",
                     "install_time_budget",
                     "not_from_composer_repository",
-                    "composer_too_old",
-                    "no_composer_json"
+                    "no_composer_json",
+                    "no_release_read",
+                    "pass_cap",
+                    "solver_error"
                   ]
                 },
                 {

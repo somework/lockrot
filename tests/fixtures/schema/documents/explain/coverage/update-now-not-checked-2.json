@@ -4,21 +4,21 @@
   "version": "0.14.0",
   "schema": 2
  },
- "package": "laravel/framework",
- "version": "v12.68.0",
+ "package": "livewire/livewire",
+ "version": "v4.3.3",
  "finding": {
-  "package": "laravel/framework",
-  "version": "v12.68.0",
-  "branch": "12.x",
+  "package": "livewire/livewire",
+  "version": "v4.3.3",
+  "branch": "4.x",
   "installed_php": {
-   "requires": "^8.2",
+   "requires": "^8.1",
    "target_runs": true,
    "project_allows": true
   },
-  "verdict": "low",
-  "priority": "low",
+  "verdict": "medium",
+  "priority": "medium",
   "lead": null,
-  "rank": 1,
+  "rank": 2,
   "flags": [
    {
     "id": "vulnerable",
@@ -33,18 +33,18 @@
      "value": 1,
      "source": null
     },
-    "summary": "1 advisory: 1 low — all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information"
+    "summary": "1 advisory: 1 medium — all fixed on 4.x; advisory: CVE-2026-81887 Livewire DOM-based cross-site scripting during client-side state handling"
    }
   ],
   "score": {
    "model": 1,
-   "total": 2,
-   "exact": 2,
+   "total": 8,
+   "exact": 8,
    "rounded_down": false,
    "band": {
-    "floor": 1,
-    "next": "medium",
-    "to_next": 6
+    "floor": 8,
+    "next": "high",
+    "to_next": 8
    },
    "decided_by": "security",
    "parts": {
@@ -58,10 +58,10 @@
     },
     "security": {
      "status": "counted",
-     "contribution": 2,
+     "contribution": 8,
      "alone": {
-      "total": 2,
-      "verdict": "low"
+      "total": 8,
+      "verdict": "medium"
      },
      "of": 1,
      "tied": []
@@ -72,19 +72,19 @@
      "part": "security",
      "flag": "vulnerable",
      "role": "security",
-     "advisory": "PKSA-d5tc-s1qs-h781",
-     "severity": "low",
+     "advisory": "PKSA-bgw4-5zmg-2njg",
+     "severity": "medium",
      "fix_kind": "update",
-     "weight": 2,
+     "weight": 8,
      "multiplier": 1,
-     "points": 2,
-     "contribution": 2
+     "points": 8,
+     "contribution": 8
     }
    ],
    "modifiers": [],
    "accepted": [],
    "without": [],
-   "text": "2 = vulnerable 2 [low advisory]"
+   "text": "8 = vulnerable 8 [medium advisory]"
   },
   "next_step": {
    "kind": "update",
@@ -94,13 +94,13 @@
    "reason": null,
    "replacement": null,
    "quiet_years": null,
-   "to_branch": "12.x",
-   "version": "v12.69.0",
-   "newest": "v12.69.3",
+   "to_branch": "4.x",
+   "version": "v4.4.7",
+   "newest": "v4.4.7",
    "constraint": null,
    "latest": null,
    "php_check": {
-    "requires": "^8.2",
+    "requires": "^8.1",
     "project_allows": true,
     "target_runs": true,
     "raise_to": null,
@@ -111,7 +111,7 @@
    "clears": [
     {
      "kind": "advisory",
-     "id": "PKSA-d5tc-s1qs-h781",
+     "id": "PKSA-bgw4-5zmg-2njg",
      "basis": "outside_range"
     }
    ],
@@ -130,44 +130,44 @@
     ]
    },
    "check": {
-    "result": "not_checked",
-    "form": null,
-    "reason": "composer_too_old"
+    "result": "resolves",
+    "form": "inline",
+    "reason": null
    },
    "composer_moves_because": [],
    "commands": [
     [
      "composer",
      "update",
-     "laravel/framework:^12.69.0"
+     "livewire/livewire:^4.4.7"
     ]
    ],
    "through": [],
    "also": [],
-   "text": "composer update 'laravel/framework:^12.69.0' (gets v12.69.3) — clears the advisory; not checked with Composer's solver (this Composer has no solver that lockrot can use), so it holds only if Composer resolves it"
+   "text": "composer update 'livewire/livewire:^4.4.7' (gets v4.4.7) — clears the advisory; Composer's solver checked it against the lock"
   },
   "security": {
    "status": "vulnerable",
    "check": "complete",
    "complete": true,
    "unchecked_reason": null,
-   "records": 28,
+   "records": 5,
    "feeds": [
     {
      "composer_repository": "composer repo (https://repo.packagist.org)",
      "registry": "packagist.org",
      "answer": "answered",
-     "records": 28,
+     "records": 5,
      "reason": null
     }
    ],
-   "worst": "low",
+   "worst": "medium",
    "counts": {
     "critical": 0,
     "high": 0,
-    "medium": 0,
+    "medium": 1,
     "unrated": 0,
-    "low": 1
+    "low": 0
    },
    "ignored": [],
    "ignored_count": 0,
@@ -177,8 +177,8 @@
     "unknown": 0,
     "of": 1,
     "fix_kind": "update",
-    "lowest": "v12.69.0",
-    "newest": "v12.69.3",
+    "lowest": "v4.4.7",
+    "newest": "v4.4.7",
     "held_by": [],
     "if_applied": {
      "total": 0,
@@ -189,16 +189,16 @@
      ]
     },
     "check": {
-     "result": "not_checked",
-     "form": null,
-     "reason": "composer_too_old"
+     "result": "resolves",
+     "form": "inline",
+     "reason": null
     }
    },
    "move_in": "next_step",
    "gets": {
-    "version": "v12.69.3",
+    "version": "v4.4.7",
     "php_check": {
-     "requires": "^8.2",
+     "requires": "^8.1",
      "project_allows": true,
      "target_runs": true,
      "raise_to": null,
@@ -207,7 +207,7 @@
     "clears": [
      {
       "kind": "advisory",
-      "id": "PKSA-d5tc-s1qs-h781",
+      "id": "PKSA-bgw4-5zmg-2njg",
       "basis": "outside_range"
      }
     ],
@@ -229,11 +229,11 @@
    "reason": null,
    "forge": "github",
    "host": "github.com",
-   "repo": "laravel/framework",
+   "repo": "livewire/livewire",
    "event": "push",
    "archived": false,
-   "fetched_at": "2026-10-01T16:03:35+00:00",
-   "cached_at": "2026-10-01T16:03:35+00:00"
+   "fetched_at": "2026-10-01T16:04:04+00:00",
+   "cached_at": "2026-10-01T16:04:04+00:00"
   },
   "allowlist": null,
   "abandoned_ignored": null,
@@ -241,7 +241,7 @@
   "origin": {
    "kind": "packagist",
    "registry": "packagist.org",
-   "package_url": "https://packagist.org/packages/laravel/framework",
+   "package_url": "https://packagist.org/packages/livewire/livewire",
    "local": false
   },
   "replacement": null,
@@ -253,7 +253,7 @@
   "dev": false,
   "reach": "direct",
   "chain": [
-   "laravel/framework"
+   "livewire/livewire"
   ],
   "depth": 0,
   "depth_unmeasured": null,
@@ -261,59 +261,34 @@
    "require"
   ],
   "direct_dependents": [
-   "laravel/framework",
-   "pragmarx/google2fa-laravel",
-   "tabuna/breadcrumbs"
+   "livewire/livewire"
   ],
   "signals": [
    {
-    "id": "S7",
-    "level": "info",
-    "summary": "pulls in 1 flagged package: league/config (stale)",
-    "data": {
-     "flagged": 1,
-     "packages": [
-      {
-       "package": "league/config",
-       "chain": [
-        "laravel/framework",
-        "league/commonmark",
-        "league/config"
-       ],
-       "verdict": "low",
-       "lead": "stale",
-       "flag_ids": [
-        "stale"
-       ]
-      }
-     ]
-    }
-   },
-   {
     "id": "S9",
     "level": "warn",
-    "summary": "1 advisory: 1 low — all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information",
+    "summary": "1 advisory: 1 medium — all fixed on 4.x; advisory: CVE-2026-81887 Livewire DOM-based cross-site scripting during client-side state handling",
     "data": {
      "advisories": [
       {
-       "id": "PKSA-d5tc-s1qs-h781",
-       "cve": "CVE-2026-102279",
-       "title": "Laravel: XSS in Debug Page Information",
-       "link": "https://github.com/advisories/GHSA-jh5r-qr3c-85q8",
-       "reported_at": "2026-09-29T18:24:25+00:00",
-       "severity": "low",
-       "severity_published": "low",
-       "affected_versions": ">=13.0.0,<13.30.0|<12.69.0",
+       "id": "PKSA-bgw4-5zmg-2njg",
+       "cve": "CVE-2026-81887",
+       "title": "Livewire DOM-based cross-site scripting during client-side state handling",
+       "link": "https://github.com/advisories/GHSA-g3hc-697w-wm82",
+       "reported_at": "2026-09-02T14:38:58+00:00",
+       "severity": "medium",
+       "severity_published": "medium",
+       "affected_versions": ">=4.0.0-beta.1,<=4.3.3|>=3.0.0-beta.1,<=3.8.2",
        "counted": true,
-       "points": 2,
+       "points": 8,
        "deciding": true,
        "fix": {
         "kind": "update",
-        "to_branch": "12.x",
-        "version": "v12.69.0",
-        "newest": "v12.69.3",
+        "to_branch": "4.x",
+        "version": null,
+        "newest": "v4.4.7",
         "on_installed_branch": true,
-        "php": "^8.2",
+        "php": "^8.1",
         "held_by": [],
         "reason": null
        },
@@ -325,35 +300,35 @@
     }
    }
   ],
-  "evidence": "vulnerable: 1 advisory: 1 low — all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information",
+  "evidence": "vulnerable: 1 advisory: 1 medium — all fixed on 4.x; advisory: CVE-2026-81887 Livewire DOM-based cross-site scripting during client-side state handling",
   "allowlist_reason": null,
   "data_date": "2026-10-01T17:39:50+00:00",
-  "libyears": 0.1,
+  "libyears": 0.26,
   "age": {
    "installed": {
-    "at": "2026-08-25T14:18:36+00:00",
-    "years": 0.1,
+    "at": "2026-06-27T03:16:11+00:00",
+    "years": 0.3,
     "dated_by": null
    },
    "installed_unmeasured": null,
    "release": {
-    "version": "v11.57.0",
-    "at": "2026-09-29T15:33:27+00:00",
+    "version": "v4.4.7",
+    "at": "2026-09-28T18:12:51+00:00",
     "years": 0,
     "level": null,
     "dated_by": null
    },
    "release_unmeasured": null,
    "branch_release": {
-    "version": "v12.69.3",
-    "at": "2026-09-29T12:53:25+00:00",
+    "version": "v4.4.7",
+    "at": "2026-09-28T18:12:51+00:00",
     "years": 0,
     "level": null,
     "dated_by": null
    },
    "branch_release_unmeasured": null,
    "push": {
-    "at": "2026-09-30T21:54:48+00:00",
+    "at": "2026-09-29T09:38:21+00:00",
     "years": 0,
     "level": null
    },
@@ -369,9 +344,9 @@
   }
  },
  "lock": {
-  "php": "^8.2",
-  "released": "2026-08-25T14:18:36+00:00",
-  "repository": "https://github.com/laravel/framework.git",
+  "php": "^8.1",
+  "released": "2026-06-27T03:16:11+00:00",
+  "repository": "https://github.com/livewire/livewire.git",
   "from_composer_repository": true,
   "dev": false,
   "branch_snapshot": false,
@@ -380,17 +355,17 @@
  "metadata": {
   "abandoned": false,
   "replacement": null,
-  "releases_listed": 1297,
+  "releases_listed": 320,
   "has_stable_release": true,
-  "last_stable_release": "2026-09-29T15:33:27+00:00",
-  "last_stable_version": "v11.57.0",
+  "last_stable_release": "2026-09-28T18:12:51+00:00",
+  "last_stable_version": "v4.4.7",
   "last_stable_dated_by": null,
-  "installed_release": "2026-08-25T14:18:36+00:00",
+  "installed_release": "2026-06-27T03:16:11+00:00",
   "installed_release_dated_by": null,
-  "repository": "https://github.com/laravel/framework.git",
+  "repository": "https://github.com/livewire/livewire.git",
   "type": "library",
   "data_date": "2026-10-01T17:39:50+00:00",
-  "installed_branch": "12.x",
+  "installed_branch": "4.x",
   "branches": []
  },
  "run": {
@@ -1128,7 +1103,7 @@
   "advisory_lookup": {
    "scope": "all",
    "scope_source": "default",
-   "packages_asked": 1,
+   "packages_asked": 2,
    "packages_not_asked": 0,
    "other_repositories": 0,
    "repositories": [
@@ -1138,17 +1113,17 @@
      "outcome": "answered",
      "reason": null,
      "message": null,
-     "packages_with_records": 1,
-     "records": 28
+     "packages_with_records": 2,
+     "records": 33
     }
    ]
   },
   "move_check": {
-   "composer": "2.1.14",
-   "blocks_advisories": false,
+   "composer": "2.10.3",
+   "blocks_advisories": true,
    "ignores_extensions": true,
-   "baseline": "not_checked",
-   "reason": "composer_too_old"
+   "baseline": "resolves",
+   "reason": null
   }
  },
  "legacy": {

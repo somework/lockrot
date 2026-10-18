@@ -109,10 +109,50 @@
      "source": "root",
      "package": null,
      "version": null,
+     "link": "conflict",
+     "target": null,
+     "constraint": ">=3.12",
+     "holder": null
+    },
+    {
+     "source": "root",
+     "package": null,
+     "version": null,
+     "link": "root-require",
+     "target": null,
+     "constraint": "^3.11",
+     "holder": null
+    },
+    {
+     "source": "root",
+     "package": null,
+     "version": null,
      "link": "root-require",
      "target": "laravel/framework",
      "constraint": "^11.0",
      "holder": null
+    },
+    {
+     "source": "package",
+     "package": "intervention/image",
+     "version": "3.11.0",
+     "link": "replace",
+     "target": "intervention/gif",
+     "constraint": "self.version",
+     "holder": {
+      "verdict": "high",
+      "lead": "left-behind",
+      "flag_ids": [
+       "left-behind"
+      ],
+      "replacement": null,
+      "next_step": {
+       "kind": "require",
+       "to_branch": "3.x",
+       "constraint": "^3.11",
+       "check": null
+      }
+     }
     },
     {
      "source": "package",
@@ -171,7 +211,7 @@
    "commands": [],
    "through": [],
    "also": [],
-   "text": "require intervention/image ^3.11 — clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires laravel/framework ^11.0) and intervention/image 3.11.0 (requires php >=8.4.5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+   "text": "require intervention/image ^3.11 — clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (conflicts with >=3.12) and composer.json (no release of ^3.11 can install) and composer.json (requires laravel/framework ^11.0) and intervention/image 3.11.0 (replaces intervention/gif self.version; itself left-behind) and intervention/image 3.11.0 (requires php >=8.4.5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
   },
   "security": {
    "status": "clear",

@@ -81,8 +81,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   each move carries `check` (`resolves`, `refused` or `not_checked`). A refused move names its holds
   and prints no `update` or `require` step. An `update` step names its constraint inline, and a move
   that needs its dependencies adds `--with-dependencies` or `--with-all-dependencies`. `held_by[]`
-  gains the links `root-require` and `platform` and the field `target`, and `run.move_check` names
-  the Composer that solved. ([The move check](docs/verdicts.md#the-move-check))
+  gains the links `root-require`, `platform` and `replace` and the field `target`, and
+  `run.move_check` names the Composer that solved. ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** the run notes `update_now_not_checked`, `move_check_failed` and
+  `package_name_invalid`. lockrot skips a lock entry whose name is no Composer package name.
+  ([Run notes](docs/notes.md#package_name_invalid))
 - **CLI, Config:** `--fail-on` takes a list, one value per kind: a grade, a flag (at or above in
   flag order), `vulnerable` or `vulnerable-medium|high|critical`, and `unchecked`. ([In
   CI](docs/ci.md))

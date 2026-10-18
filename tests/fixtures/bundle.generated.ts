@@ -99692,7 +99692,13 @@ export const d_move_check_dagger = {
                 }
             ]
         },
-        "move_check": null,
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": false,
+            "ignores_extensions": true,
+            "baseline": "resolves",
+            "reason": null
+        },
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -99938,14 +99944,8 @@ export const d_move_check_dagger = {
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "typo3/html-sanitizer"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "typo3/html-sanitizer"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",

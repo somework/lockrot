@@ -207,9 +207,10 @@ defs['factBaseline'] = nul("A fact's state against the baseline entry (§6.4 \"P
     }))
 
 # holders and php checks
-MOVE_CHECK_REASONS = ['baseline_refused', 'unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'composer_too_old', 'no_composer_json']
-# The reasons that leave the baseline itself unchecked: the budget, or a run that cannot solve at all.
-BASELINE_CHECK_REASONS = ['install_time_budget', 'composer_too_old', 'no_composer_json']
+MOVE_CHECK_REASONS = ['baseline_refused', 'unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'no_composer_json',
+                      'no_release_read', 'pass_cap', 'solver_error']
+# The reasons that leave the baseline itself unchecked: the budget, a run that cannot solve at all, or a solve that Composer failed on.
+BASELINE_CHECK_REASONS = ['install_time_budget', 'no_composer_json', 'solver_error']
 defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether `composer update --dry-run` or `composer require --dry-run` installs it from the lock, in which form, "
                          "or why lockrot did not ask. Null on a kind that runs no Composer request (`replace find-alternative test blocked` and the `no-*` kinds), "
                          "and in a run that checks no move."),
@@ -221,7 +222,9 @@ defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether `compos
                     closed(['inline', 'with-dependencies', 'with-all-dependencies'])),
         'reason': nul(("Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the "
                        "`moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), "
-                       "`install_time_budget`, `not_from_composer_repository`, `composer_too_old`, `no_composer_json`. An open set (§8.2)."),
+                       "`install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `no_release_read` (no release of the row was read, so the move names no version), "
+                       "`pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: "
+                       "the `move_check_failed` note). An open set (§8.2)."),
                       {'type': 'string', 'pattern': SNAKE, 'x-known-values': MOVE_CHECK_REASONS}),
     }, allOf=[{'description': '`form` is set exactly on `resolves`, and `reason` exactly on `not_checked`.',
                'anyOf': [{'properties': {'result': {'enum': ['resolves']}, 'form': {'type': 'string'}, 'reason': {'type': 'null'}}},
@@ -243,15 +246,16 @@ defs['holder'] = nul(("The holder's own finding in this report, for display only
         'replacement': nul("The holder's `replacement` (a Composer package name), so an abandoned holder reads \"held by abandoned symfony/x (replacement: …)\".", ref('packageName')),
         'next_step': nul("The holder's own move; null when the holder's finding has no move (score 0).", HOLDER_MOVE),
     }))
-defs['heldBy'] = obj(("One link that excludes the move or the fix (§5.3): the root's or a locked package's `require`, `require-dev` or `conflict`, "
+defs['heldBy'] = obj(("One link that excludes the move or the fix (§5.3): the root's or a locked package's `require`, `require-dev`, `conflict` or `replace`, "
                       "and on a move that Composer's solver refuses, each hold that the refusal names. The entries are distinct, the root first, then by `package`, "
                       "then by `link` in the order of its enum, then by `target`."), {
     'source': closed(['root', 'package'], 'Who holds it: `root` (composer.json) or `package` (a locked package, or the moved package at its target release). Closed (§8.2).'),
     'package': nul('The package that holds it; null for `source: root`.', ref('packageName')),
     'version': nul("That package's version: the locked one, or the target release's; null for `source: root`.", {'type': 'string'}),
-    'link': closed(['require', 'require-dev', 'conflict', 'root-require', 'platform'], ("The link that excludes it: `require`, `require-dev` and `conflict` of the lock, "
-                   "`root-require` (a root requirement on `target`, a package that the move needs at another version), `platform` (a requirement on the platform "
-                   "package `target`, such as `php`). Closed (§8.2).")),
+    'link': closed(['require', 'require-dev', 'conflict', 'replace', 'root-require', 'platform'], ("The link that excludes it: `require`, `require-dev` and `conflict` of the lock "
+                   "or the root, `replace` (the package replaces `target`, or the moved package when `target` is null, so Composer installs one of the two, not both), "
+                   "`root-require` (a root requirement on `target`, a package that the move needs at another version; with `target` null, the move's own constraint, "
+                   "which no release in Composer's pool meets), `platform` (a requirement on the platform package `target`, such as `php`). Closed (§8.2).")),
     'target': nul("The package that the link points to when it is not the moved package; null when it is.", {'type': 'string', 'minLength': 1}),
     'constraint': d('The constraint as the link writes it, quoted and never interpreted ("requires ^2.0").', {'type': 'string', 'minLength': 1}),
     'holder': ref('holder'),
@@ -1393,12 +1397,12 @@ NOTE_CODES = ['offline', 'metadata_unavailable', 'monorepo_parent_unavailable', 
               'repository_activity_not_found', 'not_from_composer_repository', 'baseline_target_differs',
               'baseline_fix_model_differs', 'ignore_does_not_cover_advisories', 'advisories_disabled_by_policy',
               'abandoned_markings_ignored', 'abandoned_not_audited_by_composer', 'abandoned_ignore_unreadable', 'repository_activity_host_not_supported',
-              'moves_not_checked', 'update_now_reduced', 'update_now_refused']
+              'moves_not_checked', 'update_now_reduced', 'update_now_refused', 'update_now_not_checked', 'move_check_failed', 'package_name_invalid']
 NOTE_DEFS = {c: 'note' + ''.join(w.capitalize() for w in c.split('_')) for c in NOTE_CODES}
 for c in NOTE_CODES:
     if c in ('advisories_disabled_by_policy', 'repository_activity_host_not_supported', 'abandoned_markings_ignored', 'abandoned_not_audited_by_composer',
              'abandoned_ignore_unreadable', 'baseline_target_differs', 'baseline_fix_model_differs', 'ignore_does_not_cover_advisories',
-             'moves_not_checked', 'update_now_reduced', 'update_now_refused'):
+             'moves_not_checked', 'update_now_reduced', 'update_now_refused', 'update_now_not_checked', 'move_check_failed', 'package_name_invalid'):
         continue
     defs[NOTE_DEFS[c]] = copy.deepcopy(R1['definitions'][NOTE_DEFS[c]])
 defs['noteAdvisoriesNotChecked']['description'] = ("`advisories_not_checked` (0.13's code and data, reworded, §6.2): no advisory was looked up, so no finding is graded "
@@ -1464,6 +1468,20 @@ defs['noteUpdateNowReduced'] = obj(("`update_now_reduced`: Composer refuses the 
 })
 defs['noteUpdateNowRefused'] = obj("`update_now_refused`: Composer refuses the members of `security.update_now` together, even without the members its refusal names.", {
     'problem': PROBLEM,
+})
+defs['noteUpdateNowNotChecked'] = obj(("`update_now_not_checked`: Composer's solver did not check the combined update of the candidates, so `security.update_now` "
+                                       "is empty and `update_now_command` is null."), {
+    'reason': {'description': 'Why it was not checked: a value of `check.reason` (§5.6). An open set.', 'type': 'string', 'pattern': SNAKE, 'x-known-values': MOVE_CHECK_REASONS},
+    'packages': arr('The candidates: the vulnerable findings whose lead `update` Composer resolves inline, in report order.', ref('packageName'), minItems=1, uniqueItems=True),
+})
+defs['noteMoveCheckFailed'] = obj(("`move_check_failed`: Composer's solver failed on a request with an exception other than a refusal. That move's `check` "
+                                   "reads `not_checked` with `reason` `solver_error`. The note names the run's first such failure."), {
+    'class': d("The exception's class, as PHP names it. Foreign text, not contract.", {'type': 'string', 'minLength': 1}),
+    'message': d("The exception's message. Foreign text, not contract.", {'type': 'string'}),
+})
+defs['notePackageNameInvalid'] = obj(("`package_name_invalid`: lock entries whose name is no Composer package name. lockrot skips them, so they have no finding "
+                                      "and no command names them. The text names none of them."), {
+    'packages': arr('The names as the lock writes them, in lock order. Foreign text, not contract.', {'type': 'string'}, minItems=1),
 })
 defs['noteCode'] = copy.deepcopy(R1['definitions']['noteCode'])
 defs['noteCode']['x-known-values'] = NOTE_CODES

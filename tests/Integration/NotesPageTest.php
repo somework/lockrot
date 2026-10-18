@@ -42,6 +42,9 @@ final class NotesPageTest extends TestCase
         'https://lockrot.dev/notes/#moves_not_checked',
         'https://lockrot.dev/notes/#update_now_reduced',
         'https://lockrot.dev/notes/#update_now_refused',
+        'https://lockrot.dev/notes/#update_now_not_checked',
+        'https://lockrot.dev/notes/#move_check_failed',
+        'https://lockrot.dev/notes/#package_name_invalid',
     ];
 
     public function testEveryCodeLinksToAUrlAlreadyPublished(): void

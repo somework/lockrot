@@ -348,8 +348,10 @@
    "offline",
    "install_time_budget",
    "not_from_composer_repository",
-   "composer_too_old",
-   "no_composer_json"
+   "no_composer_json",
+   "no_release_read",
+   "pass_cap",
+   "solver_error"
   ],
   "open": true,
   "integer": false
@@ -402,6 +404,7 @@
    "require",
    "require-dev",
    "conflict",
+   "replace",
    "root-require",
    "platform"
   ],
@@ -2873,8 +2876,8 @@
   ],
   "values": [
    "install_time_budget",
-   "composer_too_old",
-   "no_composer_json"
+   "no_composer_json",
+   "solver_error"
   ],
   "open": true,
   "integer": false
@@ -2969,6 +2972,26 @@
   "integer": false
  },
  {
+  "name": "NoteUpdateNowNotCheckedReason",
+  "pointer": "#/definitions/noteUpdateNowNotChecked/properties/reason",
+  "pointers": [
+   "#/definitions/noteUpdateNowNotChecked/properties/reason"
+  ],
+  "values": [
+   "baseline_refused",
+   "unloaded_name",
+   "offline",
+   "install_time_budget",
+   "not_from_composer_repository",
+   "no_composer_json",
+   "no_release_read",
+   "pass_cap",
+   "solver_error"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
   "name": "NoteCode",
   "pointer": "#/definitions/noteCode",
   "pointers": [
@@ -2997,7 +3020,10 @@
    "repository_activity_host_not_supported",
    "moves_not_checked",
    "update_now_reduced",
-   "update_now_refused"
+   "update_now_refused",
+   "update_now_not_checked",
+   "move_check_failed",
+   "package_name_invalid"
   ],
   "open": true,
   "integer": false
@@ -3274,6 +3300,42 @@
   ],
   "values": [
    "update_now_refused"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode24",
+  "pointer": "#/definitions/noteDetail/anyOf/23/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/23/properties/code"
+  ],
+  "values": [
+   "update_now_not_checked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode25",
+  "pointer": "#/definitions/noteDetail/anyOf/24/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/24/properties/code"
+  ],
+  "values": [
+   "move_check_failed"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode26",
+  "pointer": "#/definitions/noteDetail/anyOf/25/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/25/properties/code"
+  ],
+  "values": [
+   "package_name_invalid"
   ],
   "open": false,
   "integer": false
