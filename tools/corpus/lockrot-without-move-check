@@ -1,0 +1,80 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+// The lockrot command of bin/lockrot with an Analyzer that checks no move, so that `run.move_check` is null: the model
+// records no Composer check. tools/corpus/differential.php runs it. It registers only the lockrot command, and it hides the
+// project's composer.json from Composer's preamble as bin/lockrot does.
+require __DIR__.'/../../vendor/autoload.php';
+
+use Composer\Config;
+use Composer\Console\Application;
+use Composer\IO\IOInterface;
+use Composer\Util\Platform;
+use Lockrot\Analyzer\Analyzer;
+use Lockrot\Clock;
+use Lockrot\Composer\LockrotCommand;
+use Lockrot\Composer\ServiceFactory;
+use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Forge\Tokens;
+use Lockrot\Deadline;
+use Lockrot\Version;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+putenv('COMPOSER_DISABLE_XDEBUG_WARN=1');
+@ini_set('memory_limit', '1536M');
+if (!in_array('--no-plugins', $_SERVER['argv'], true)) {
+    array_splice($_SERVER['argv'], 1, 0, ['--no-plugins']);
+    $_SERVER['argc'] = count($_SERVER['argv']);
+}
+
+$application = new class () extends Application {
+    /** @var string|false */
+    private $previousComposerEnv = false;
+
+    /** @return list<Command> */
+    protected function getDefaultCommands(): array
+    {
+        return [new LockrotCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null): Analyzer => ServiceFactory::createAnalyzer($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline, $projectPhp))];
+    }
+
+    public function add(Command $command): ?Command
+    {
+        return $this->addCommand($command);
+    }
+
+    public function addCommand(Command $command): ?Command
+    {
+        if ($command->getName() !== 'lockrot') {
+            return null;
+        }
+
+        // As in bin/lockrot: before symfony/console 7.4 the parent has no addCommand().
+        return method_exists(Application::class, 'addCommand') ? parent::addCommand($command) : parent::add($command);
+    }
+
+    public function doRun(InputInterface $input, OutputInterface $output): int
+    {
+        $this->previousComposerEnv = Platform::getEnv('COMPOSER');
+        Platform::putEnv('COMPOSER', '/dev/null');
+
+        return parent::doRun($input, $output);
+    }
+
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
+    {
+        if ($this->previousComposerEnv === false) {
+            Platform::clearEnv('COMPOSER');
+        } else {
+            Platform::putEnv('COMPOSER', $this->previousComposerEnv);
+        }
+
+        return parent::doRunCommand($command, $input, $output);
+    }
+};
+$application->setName('lockrot');
+$application->setVersion(Version::STRING);
+$application->setDefaultCommand('lockrot', false);
+exit($application->run());

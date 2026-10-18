@@ -3,9 +3,9 @@
 
 declare(strict_types=1);
 // The corpus differential: lockrot's report-2 on the apps of tests/fixtures/apps against the model's report-2 for the same
-// locks.
+// locks. It compares lockrot without the move check, because the model records no Composer check: ENTRY runs no check.
 //
-//   php tools/corpus/differential.php                         runs bin/lockrot on each run of runs() and diffs it against the
+//   php tools/corpus/differential.php                         runs ENTRY on each run of runs() and diffs it against the
 //                                                            model
 //   php tools/corpus/differential.php --write <dir>           also writes lockrot's documents into <dir>, with the masks of
 //                                                            tools/report/record (the tool version, the server port)
@@ -35,6 +35,8 @@ const APPS = ROOT.'/tests/fixtures/apps';
 const CACHE = ROOT.'/tests/fixtures/corpus/cache';
 const MODEL = ROOT.'/tests/fixtures/corpus/model-report-2';
 const DIVERGENCES = ROOT.'/tests/fixtures/corpus/model-divergences.json';
+/** bin/lockrot's command with an Analyzer that checks no move, so that `run.move_check` is null as in the model. */
+const ENTRY = __DIR__.'/lockrot-without-move-check';
 const OPTIONS = ['--target-php=8.4', '--all'];
 const CLOCK = '2026-10-14T00:00:00+00:00';
 /** The release that writes the model's input. Its sha256 is the one that `gh attestation verify --repo somework/lockrot` accepted. */
@@ -55,6 +57,8 @@ const FIELDS = [
     'security.status', 'security.check', 'security.complete', 'security.unchecked_reason',
     'security.fix_kind', 'security.gets', 'security.partial', 'security.move_in', 'security.installed_branch_fixes',
 ];
+/** The move check's key inside a compared object, by path: the model records no check, so a null one is not compared. */
+const CHECK_KEYS = ['security.installed_branch_fixes' => 'check'];
 /** The fields of each flag, by flag id. */
 const FLAG_FIELDS = ['role', 'headline', 'degree'];
 const JSON_FLAGS = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
@@ -115,7 +119,7 @@ $byPath = [];
 $reads = [];
 $counts = ['lockrot' => ['vulnerable' => 0, 'critical' => 0], 'model' => ['vulnerable' => 0, 'critical' => 0]];
 foreach (runs() as $id => [$app, $mirrors]) {
-    [$json, $read] = run(ROOT.'/bin/lockrot', $app, $mirrors, array_merge(OPTIONS, ['--format=json', '--fail-on=high']));
+    [$json, $read] = run(ENTRY, $app, $mirrors, array_merge(OPTIONS, ['--format=json', '--fail-on=high']));
     $reads = array_merge($reads, $read);
     if ($write !== null) {
         @mkdir($write, 0777, true);
@@ -464,6 +468,9 @@ function values(array $finding): array
         $value = $finding;
         foreach (explode('.', $path) as $key) {
             $value = is_array($value) && array_key_exists($key, $value) ? $value[$key] : ABSENT;
+        }
+        if (isset(CHECK_KEYS[$path]) && is_array($value) && array_key_exists(CHECK_KEYS[$path], $value) && $value[CHECK_KEYS[$path]] === null) {
+            unset($value[CHECK_KEYS[$path]]);
         }
         $values[$path] = canonical($value);
     }
