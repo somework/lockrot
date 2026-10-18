@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
-use Composer\Semver\Constraint\ConstraintInterface;
+use Composer\Advisory\PartialSecurityAdvisory;
 use Lockrot\Security\RefusedMoves;
 use Lockrot\Solver\CheckOutcome;
 use Lockrot\Solver\ComposerFeatures;
@@ -49,11 +49,12 @@ final class MoveChecks
     }
 
     /**
-     * @param array<string, list<ConstraintInterface>> $ranges by package name
+     * @param array<string, list<PartialSecurityAdvisory>> $records every record of each name
+     * @param list<string>                                 $covered the names that the run's lookup asked
      */
-    public function withBlockedAdvisories(array $ranges): self
+    public function withAdvisories(array $records, array $covered): self
     {
-        return new self($this->checker->withBlockedAdvisories($ranges), $this->inlineOnAnyPackage);
+        return new self($this->checker->withAdvisories($records, $covered), $this->inlineOnAnyPackage);
     }
 
     /** A copy that answers only the requests asked so far, and leaves every other one not checked. */

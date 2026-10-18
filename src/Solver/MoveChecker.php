@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
-use Composer\Semver\Constraint\ConstraintInterface;
+use Composer\Advisory\PartialSecurityAdvisory;
 
 /**
  * What the engine asks about moves (docs/verdicts.md#the-move-check). The same lock, metadata and
@@ -42,10 +42,11 @@ interface MoveChecker
     public function blocksAdvisories(): bool;
 
     /**
-     * The same check with the advisory ranges that the run's lookup found, which the solve blocks
-     * when {@see blocksAdvisories()} is true.
+     * The same check with the advisories that the run's lookup found. When {@see blocksAdvisories()}
+     * is true, the solve blocks them as Composer's settings of the `block` operation say.
      *
-     * @param array<string, list<ConstraintInterface>> $ranges by package name
+     * @param array<string, list<PartialSecurityAdvisory>> $records every record of each name
+     * @param list<string>                                 $covered the names that the lookup asked
      */
-    public function withBlockedAdvisories(array $ranges): self;
+    public function withAdvisories(array $records, array $covered): self;
 }

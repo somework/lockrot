@@ -95,7 +95,7 @@ final class RecordedMoveChecker implements MoveChecker
         return ($this->run['blocks_advisories'] ?? false) === true;
     }
 
-    public function withBlockedAdvisories(array $ranges): MoveChecker
+    public function withAdvisories(array $records, array $covered): MoveChecker
     {
         return $this;
     }

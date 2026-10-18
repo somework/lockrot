@@ -33,6 +33,7 @@ final class SolverChecker implements MoveChecker
     private string $platformPhp;
     private bool $blocksAdvisories;
     private Deadline $deadline;
+    private ?PoolAdvisories $advisories;
     private ?CheckOutcome $baseline = null;
     /** @var array<string, CheckOutcome> */
     private array $checked = [];
@@ -43,8 +44,9 @@ final class SolverChecker implements MoveChecker
      * @param list<string> $notFromComposerRepository the locked names that no Composer repository serves
      * @param string       $platformPhp              the php version that the solve runs at, as config.platform writes it
      */
-    public function __construct(ComposerSolver $solver, array $notFromComposerRepository, string $platformPhp, bool $blocksAdvisories, Deadline $deadline)
+    public function __construct(ComposerSolver $solver, array $notFromComposerRepository, string $platformPhp, bool $blocksAdvisories, Deadline $deadline, ?PoolAdvisories $advisories = null)
     {
+        $this->advisories = $advisories;
         $this->solver = $solver;
         $this->scan = new HoldScan($solver->root(), $solver->locked());
         $this->notFromComposerRepository = $notFromComposerRepository;
@@ -120,13 +122,13 @@ final class SolverChecker implements MoveChecker
         return $this->blocksAdvisories;
     }
 
-    public function withBlockedAdvisories(array $ranges): MoveChecker
+    public function withAdvisories(array $records, array $covered): MoveChecker
     {
-        if (!$this->blocksAdvisories) {
+        if (!$this->blocksAdvisories || $this->advisories === null) {
             return $this;
         }
         $clone = clone $this;
-        $clone->solver = $this->solver->withBlocked($ranges);
+        $clone->solver = $this->solver->withAdvisories($this->advisories->withRecords($records, $covered));
         $clone->baseline = null;
         $clone->checked = [];
 

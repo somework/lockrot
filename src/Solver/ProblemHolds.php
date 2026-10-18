@@ -129,7 +129,9 @@ final class ProblemHolds
 
                 return;
             case Rule::RULE_PACKAGE_SAME_NAME:
-                /** @var string $data */
+                if (!\is_string($data)) {
+                    return;
+                }
                 foreach ($rule->getLiterals() as $literal) {
                     $package = $pool->literalToPackage($literal);
                     $package = $package instanceof AliasPackage ? $package->getAliasOf() : $package;

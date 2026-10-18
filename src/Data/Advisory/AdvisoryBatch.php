@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Advisory;
 
+use Composer\Advisory\PartialSecurityAdvisory;
 use Lockrot\Analyzer\RunNote;
 
 /** @internal */
@@ -19,6 +20,10 @@ final class AdvisoryBatch
     private array $every;
     private AdvisoryCoverage $coverage;
     private bool $complete;
+    /** @var array<string, list<PartialSecurityAdvisory>> */
+    private array $records = [];
+    /** @var list<string> */
+    private array $asked = [];
 
     /**
      * @param array<string, list<Advisory>>        $byName  package name => the counted advisories that affect its installed version
@@ -34,6 +39,33 @@ final class AdvisoryBatch
         $this->every = $every;
         $this->coverage = $coverage ?? AdvisoryCoverage::none();
         $this->complete = $complete;
+    }
+
+    /**
+     * A copy with the lookup's records as Composer returned them, for the move check's blocking.
+     *
+     * @param array<string, list<PartialSecurityAdvisory>> $records every record of each name, ignored ones included
+     * @param list<string>                                 $asked   the names that the lookup asked
+     */
+    public function withRecords(array $records, array $asked): self
+    {
+        $clone = clone $this;
+        $clone->records = $records;
+        $clone->asked = $asked;
+
+        return $clone;
+    }
+
+    /** @return array<string, list<PartialSecurityAdvisory>> */
+    public function records(): array
+    {
+        return $this->records;
+    }
+
+    /** @return list<string> */
+    public function asked(): array
+    {
+        return $this->asked;
     }
 
     public static function empty(): self

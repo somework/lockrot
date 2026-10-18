@@ -6,10 +6,9 @@ namespace Lockrot\Solver;
 
 use Composer\Config;
 use Composer\Package\RootPackageInterface;
-use Composer\Policy\ListPolicyConfig;
-use Composer\Policy\PolicyConfig;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
+use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
@@ -53,7 +52,10 @@ final class MoveCheckers
         $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline);
         $solver = new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], $overrides), $source, []);
 
-        return new SolverChecker($solver, $notFromComposerRepository, $php, self::blocksAdvisories($config), $deadline);
+        $blocking = AdvisoryBlocking::fromConfig($config);
+        $lookup = new RepositoryAdvisoryLoader($repositories, $offline, $deadline);
+
+        return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): array => $lookup->records($names, $complete)));
     }
 
     /**
@@ -68,25 +70,5 @@ final class MoveCheckers
         }
 
         return $targetMinor.'.'.self::NEWEST_PATCH;
-    }
-
-    /** As Composer 2.9 and later decide for an update: the project's policy can turn the blocking off. */
-    private static function blocksAdvisories(Config $config): bool
-    {
-        if (!ComposerFeatures::blocksAdvisories()) {
-            return false;
-        }
-        if (class_exists(PolicyConfig::class)) {
-            try {
-                $policy = PolicyConfig::fromConfig($config);
-            } catch (\Throwable $e) {
-                return true;
-            }
-
-            return $policy->enabled && $policy->advisories->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE);
-        }
-        $audit = $config->get('audit');
-
-        return !\is_array($audit) || ($audit['block-insecure'] ?? true) !== false;
     }
 }

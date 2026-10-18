@@ -54,7 +54,7 @@ final class UncheckedMoves implements MoveChecker
         return false;
     }
 
-    public function withBlockedAdvisories(array $ranges): MoveChecker
+    public function withAdvisories(array $records, array $covered): MoveChecker
     {
         return $this;
     }

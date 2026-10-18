@@ -47,6 +47,7 @@ final class ComposerSolver
     /** @var array<string, list<ConstraintInterface>> */
     private array $blocked;
     private PlatformRequirementFilterInterface $filter;
+    private ?PoolAdvisories $advisories = null;
 
     /**
      * @param array<string, list<ConstraintInterface>> $blocked the advisory ranges by name that Composer 2.9 and later block in an update, none to block nothing
@@ -66,6 +67,15 @@ final class ComposerSolver
     {
         $clone = clone $this;
         $clone->blocked = $blocked;
+
+        return $clone;
+    }
+
+    /** A copy that blocks what Composer 2.9 and later block in an update, for every name that the pool holds. */
+    public function withAdvisories(PoolAdvisories $advisories): self
+    {
+        $clone = clone $this;
+        $clone->advisories = $advisories;
 
         return $clone;
     }
@@ -187,7 +197,8 @@ final class ComposerSolver
         $allow = $request->allow();
         $composerRequest->setUpdateAllowList(array_combine($allow, $allow), $request->transitive());
 
-        if ($this->blocked === []) {
+        $blocking = $this->advisories === null ? null : $this->advisories->blocking();
+        if ($this->blocked === [] && ($blocking === null || !$blocking->blocks())) {
             return [$set, $composerRequest, $set->createPool($composerRequest, new NullIO(), null, new PoolOptimizer($policy))];
         }
         // Composer 2.9 and later filter the built pool, then optimize it: the builder marks the packages that stay locked.
@@ -198,7 +209,19 @@ final class ComposerSolver
             $base = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
             $stayLocked[$base->getName().' '.$base->getVersion()] = true;
         }
-        $kept = array_values(array_filter($pool->getPackages(), $this->keeps($stayLocked)));
+        // Composer looks up the advisories of every pool package that can move: packages-dev and new dependencies too.
+        $names = [];
+        foreach ($pool->getPackages() as $package) {
+            $base = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
+            if (!$base instanceof RootPackageInterface && !PlatformRepository::isPlatformPackage($base->getName()) && !isset($stayLocked[$base->getName().' '.$base->getVersion()])) {
+                $names[$base->getName()] = true;
+            }
+        }
+        $blocked = $this->blocked;
+        foreach ($this->advisories === null ? [] : $this->advisories->ranges(array_keys($names)) as $name => $ranges) {
+            $blocked[$name] = array_merge($blocked[$name] ?? [], $ranges);
+        }
+        $kept = array_values(array_filter($pool->getPackages(), self::keeps($blocked, $stayLocked, $blocking)));
         if (\count($kept) < \count($pool->getPackages())) {
             $pool = new Pool($kept, $pool->getUnacceptableFixedOrLockedPackages(), $pool->getAllRemovedVersions(), $pool->getAllRemovedVersionsByPackage());
         }
@@ -207,27 +230,34 @@ final class ComposerSolver
     }
 
     /**
-     * Whether the pool may offer a version with advisories to block: a dev version, the locked
-     * version of a name that stays locked, and a version outside every range, as
-     * SecurityAdvisoryPoolFilter keeps them.
+     * Whether the pool may offer a version, as SecurityAdvisoryPoolFilter keeps them: not an
+     * abandoned package that the config blocks, then a dev version, the locked version of a name
+     * that stays locked, and a version outside every blocked range of each of its names.
      *
-     * @param array<string, true> $stayLocked by `name version`
+     * @param array<string, list<ConstraintInterface>> $blocked
+     * @param array<string, true>                      $stayLocked by `name version`
      *
      * @return \Closure(BasePackage): bool
      */
-    private function keeps(array $stayLocked): \Closure
+    private static function keeps(array $blocked, array $stayLocked, ?AdvisoryBlocking $blocking): \Closure
     {
-        $blocked = $this->blocked;
-
-        return static function (BasePackage $package) use ($blocked, $stayLocked): bool {
+        return static function (BasePackage $package) use ($blocked, $stayLocked, $blocking): bool {
             $base = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
+            if ($base instanceof RootPackageInterface) {
+                return true;
+            }
+            if ($blocking !== null && $blocking->blocksAbandoned($base)) {
+                return false;
+            }
             if ($base->isDev() || isset($stayLocked[$base->getName().' '.$base->getVersion()])) {
                 return true;
             }
             $exact = new Constraint('==', $base->getVersion());
-            foreach ($blocked[$base->getName()] ?? [] as $range) {
-                if ($range->matches($exact)) {
-                    return false;
+            foreach ($base->getNames(false) as $name) {
+                foreach ($blocked[$name] ?? [] as $range) {
+                    if ($range->matches($exact)) {
+                        return false;
+                    }
                 }
             }
 

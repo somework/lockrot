@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Solver;
 
+use Composer\Advisory\PartialSecurityAdvisory;
+use Composer\Config;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
@@ -12,9 +14,12 @@ use Composer\Semver\VersionParser;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Security\Holder;
+use Lockrot\Solver\AdvisoryBlocking;
+use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveQuery;
+use Lockrot\Solver\PoolAdvisories;
 use Lockrot\Solver\SolverChecker;
 use Lockrot\Solver\VersionSource;
 use Lockrot\Tests\Support\ArrayVersionSource;
@@ -270,6 +275,46 @@ final class SolverCheckerTest extends TestCase
 
         self::assertTrue($solver->solve(\Lockrot\Solver\SolveRequest::baseline())->resolves(), 'the locked 1.2.3 stays');
         self::assertTrue($solver->solve(\Lockrot\Solver\SolveRequest::update(['acme/other' => '^1.1.0']))->resolves());
+    }
+
+    /**
+     * D8: Composer looks up the advisories of every pool name that the update can move, so a new
+     * dependency that the run never analysed is blocked too. One lookup asks the names that the
+     * run's own lookup did not cover, and its answer is kept.
+     */
+    public function testAnAdvisoryOfANewDependencyThatTheRunDidNotLookUpBlocksTheMove(): void
+    {
+        $asked = [];
+        $lookup = static function (array $names, bool $complete) use (&$asked): array {
+            $asked[] = $names;
+
+            return ['acme/new-dependency' => [PartialSecurityAdvisory::create('acme/new-dependency', ['advisoryId' => 'PKSA-1111-2222-3333', 'affectedVersions' => '<2.0'], new VersionParser())]];
+        };
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/new-dependency' => '^1.0']]], 'acme/new-dependency' => [['version' => '1.0.0']]]);
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, []);
+        $checker = (new SolverChecker($solver, [], '8.4.99', true, Deadline::never(), new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), $lookup)))->withAdvisories(['acme/lib' => []], ['acme/lib']);
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertSame([['acme/new-dependency']], $asked, 'one lookup of the name that the run did not cover');
+    }
+
+    /** Composer's `block-abandoned` removes an abandoned release from the pool of an update. */
+    public function testAMoveToAnAbandonedReleaseIsRefusedWhenTheConfigBlocksAbandonedPackages(): void
+    {
+        if (!ComposerFeatures::blocksAdvisories()) {
+            self::markTestSkipped('this Composer blocks nothing in an update');
+        }
+        $config = new Config(false);
+        $config->merge(['config' => ['audit' => ['block-abandoned' => true]]]);
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'abandoned' => true]]]);
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, []);
+        $advisories = new PoolAdvisories(AdvisoryBlocking::fromConfig($config), static fn (array $names, bool $complete): array => []);
+        $checker = (new SolverChecker($solver, [], '8.4.99', true, Deadline::never(), $advisories))->withAdvisories([], ['acme/lib']);
+
+        self::assertSame(MoveCheck::REFUSED, $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->result());
     }
 
     public function testTheCombinedUpdateOfTwoMovesThatExcludeEachOtherIsRefused(): void

@@ -189,7 +189,7 @@ final class FindingRelationsTest extends TestCase
         $findings = array_values(array_filter(JsonPath::arrayAt($document, ['findings']), 'is_array'));
         self::assertSame([], FindingRelations::moveCheckRelation($document, $findings));
 
-        $findings[0]['next_step']['check'] = null;
+        $findings[0] = self::edit($findings[0], ['next_step', 'check'], static fn (): ?array => null);
 
         self::assertSame([JsonPath::stringAt($findings[0], ['package']).': a move that runs a Composer request in a checked run has a check'], FindingRelations::moveCheckRelation($document, $findings));
     }

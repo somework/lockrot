@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
-use Composer\Semver\Constraint\ConstraintInterface;
 use Lockrot\Allowlist\AcceptedCheck;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
@@ -228,7 +227,7 @@ final class Analyzer
         $activity = $activityBatch->activity();
 
         $finder = new FixFinder($this->signals->phpFloor(), LinkIndex::of($lock, $project));
-        $checks = $this->checks === null ? null : $this->checks->withBlockedAdvisories(self::blockedRanges($packages, $advisories));
+        $checks = $this->checks === null ? null : $this->checks->withAdvisories($advisories->records(), $advisories->asked());
         $baseline = $checks === null ? null : $checks->checker()->baseline();
         if ($baseline !== null && $baseline->check()->isRefused()) {
             $notes[] = RunNote::movesNotChecked((string) $checks->checker()->platformPhp(), (string) $baseline->problem());
@@ -284,30 +283,6 @@ final class Analyzer
         }
 
         return new Analysis($report, $factsByPackage);
-    }
-
-    /**
-     * The ranges that Composer 2.9 and later block in an update: every advisory of a package on any
-     * version, except those that the project's audit ignore list covers.
-     *
-     * @param list<LockedPackage> $packages
-     *
-     * @return array<string, list<ConstraintInterface>>
-     */
-    private static function blockedRanges(array $packages, AdvisoryBatch $advisories): array
-    {
-        $ranges = [];
-        foreach ($packages as $package) {
-            $ignored = array_map(static fn (IgnoredAdvisory $ignored): string => $ignored->advisory()->id(), $advisories->ignored($package->name()));
-            foreach ($advisories->every($package->name()) as $advisory) {
-                $range = $advisory->affectedRange();
-                if ($range !== null && !\in_array($advisory->id(), $ignored, true)) {
-                    $ranges[$package->name()][] = $range;
-                }
-            }
-        }
-
-        return $ranges;
     }
 
     /**

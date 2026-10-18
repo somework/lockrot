@@ -1212,35 +1212,31 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * A package name is the lock's text. The table and `--explain` are written past Symfony's tag
-     * formatter, rendered by lockrot, so a name that looks like markup prints as written, on a
-     * decorated stdout too, and the formatter, which throws on `<<fg=red>>` in some symfony/console 5.4 releases,
-     * is not even asked.
+     * A lock name that looks like markup is no Composer package name: lockrot skips the entry and
+     * says so in a run note that names no package. The table is written past Symfony's tag
+     * formatter, on a decorated stdout too, and the formatter, which throws on `<<fg=red>>` in some
+     * symfony/console 5.4 releases, is not even asked.
      *
      * @dataProvider namesThatLookLikeMarkup
      */
     #[DataProvider('namesThatLookLikeMarkup')]
-    public function testAPackageNameThatLooksLikeMarkupPrintsAsWrittenInTheTableAndTheExplanation(string $name): void
+    public function testALockNameThatLooksLikeMarkupIsSkippedWithARunNote(string $name): void
     {
         $project = $this->tempDir('lockrot-markup-name-');
         file_put_contents($project.'/composer.json', (string) json_encode([
             'name' => 'lockrot/markup-name-test',
             'extra' => ['lockrot' => ['target-php' => '8.4']],
         ]));
-        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => $name, 'version' => '1.0.0']], 'packages-dev' => []]));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => $name, 'version' => '1.0.0'], ['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
         chdir($project);
 
         foreach ([false, true] as $decorated) {
             $formatter = new MarkupRefusingFormatter('1.0.0', $decorated);
             [$code, $stdout] = $this->runWithErrorOutput(['--all' => true], new BufferedOutput(), $formatter);
             self::assertSame(0, $code, $stdout);
-            // Unrequired: composer.json cannot name it, Composer 2.2 rejects such a name in `require`.
-            self::assertStringContainsString('  '.$name.' 1.0.0  unreached  ·  unknown', $stdout);
-            self::assertStringStartsWith($decorated ? "\033[1mnot flagged (1)\033[22m\n" : "not flagged (1)\n", $stdout);
-
-            [$code, $stdout] = $this->runWithErrorOutput(['--explain' => $name], new BufferedOutput(), $formatter);
-            self::assertSame(0, $code, $stdout);
-            self::assertStringStartsWith($decorated ? "\033[1m".$name." 1.0.0\033[22m — unknown" : $name.' 1.0.0 — unknown', $stdout);
+            self::assertStringNotContainsString($name, $stdout);
+            self::assertStringContainsString('lock: lockrot skips 1 entry whose name is no Composer package name', $stdout);
+            self::assertStringContainsString('  acme/kept 1.0.0  unreached', $stdout);
         }
     }
 
