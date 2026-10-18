@@ -32,7 +32,34 @@ final class FindingRelations
             }
         }
 
-        return array_merge($out, self::root($document, $findings, $gates));
+        return array_merge($out, self::root($document, $findings, $gates), self::checksWithoutARunCheck($document, $findings));
+    }
+
+    /**
+     * SPEC §7.6.4: a move carries a `check` only in a run whose `run.move_check` says how Composer's
+     * solver checked it.
+     *
+     * @param array<mixed, mixed>       $document
+     * @param list<array<mixed, mixed>> $findings
+     *
+     * @return list<string>
+     */
+    public static function checksWithoutARunCheck(array $document, array $findings): array
+    {
+        if (JsonPath::has($document, ['run', 'move_check']) && \is_array(JsonPath::arrayAt($document, ['run'])['move_check'])) {
+            return [];
+        }
+        $out = [];
+        foreach ($findings as $finding) {
+            $move = \is_array($finding['next_step'] ?? null) ? $finding['next_step'] : [];
+            foreach (array_merge([$move], \is_array($move['also'] ?? null) ? $move['also'] : []) as $each) {
+                if (\is_array($each) && \is_array($each['check'] ?? null)) {
+                    $out[] = JsonPath::stringAt($finding, ['package']).': a move check needs run.move_check';
+                }
+            }
+        }
+
+        return $out;
     }
 
     /**

@@ -171,6 +171,20 @@ final class FindingRelationsTest extends TestCase
      * I34, coverage variant `not-applied-mixed`: the gap is one entry per reason, so one merged
      * entry named by the most frequent reason breaks the root check.
      */
+    public function testEveryRecordedReportWithAMoveCheckSaysHowTheRunChecked(): void
+    {
+        $broken = [];
+        foreach (glob(__DIR__.'/../fixtures/contract/report-2/*.json') ?: [] as $path) {
+            $document = JsonPath::decodeFile($path);
+            $findings = array_values(array_filter(JsonPath::arrayAt($document, ['findings']), 'is_array'));
+            foreach (FindingRelations::checksWithoutARunCheck($document, $findings) as $violation) {
+                $broken[] = basename($path).' '.$violation;
+            }
+        }
+
+        self::assertSame([], $broken);
+    }
+
     public function testAMergedNotAppliedEntryBreaksTheRootCheck(): void
     {
         $mixed = self::read(self::DOCUMENTS.'coverage/variants/not-applied-mixed.json.gz');
