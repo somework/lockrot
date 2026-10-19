@@ -16,16 +16,17 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   # A style or type error stops the run before the rows take runners. On a push the rows still end
-  # before the mutation shards, so the wait costs no time there. Measurements: https://github.com/somework/lockrot/pull/110
+  # before the mutation shards, so the wait costs no time there.
+  # Measurements: https://github.com/somework/lockrot/pull/110
   tests:
     needs: quality
     runs-on: ubuntu-latest
     name: tests (${{ matrix.php }}, ${{ matrix.composer }})
     strategy:
       fail-fast: false
-      # A pull request into a branch other than main runs four rows: both PHPUnit configurations,
-      # both ends of the PHP range and the middle of composer/composer. main's ruleset requires the
-      # name of every row, so a pull request into main and a push run them all.
+      # A pull request into a branch other than main runs four rows. They hold both PHPUnit
+      # configurations, both ends of the PHP range and the middle of composer/composer. main's
+      # ruleset requires the name of every row, so a pull request into main and a push run them all.
       # The move check solves with the classes of composer/composer, which change at 2.4, 2.6 and
       # 2.9 (src/Solver). The 2.2 and latest rows cover the ends, and the 2.6 row the middle.
       # The covers-nothing tests pin their target PHP, so they run on the two covers_nothing rows,
@@ -64,15 +65,25 @@ jobs:
           config=phpunit.xml.dist
           if [ "${{ matrix.php }}" = "7.4" ] || [ "${{ matrix.php }}" = "8.0" ]; then config=phpunit9.xml.dist; fi
           # An --exclude-group option replaces the configuration's list, so it repeats e2e, network and sweep.
-          groups=()
-          if [ "${{ matrix.covers_nothing }}" != "true" ]; then groups=(--exclude-group=e2e --exclude-group=network --exclude-group=sweep --exclude-group=covers-nothing); fi
+          slow=(--exclude-group=e2e --exclude-group=network --exclude-group=sweep)
           # Composer 2.4 to 2.6 write no advisory severity, which the advisory tests read. This row tests the move check.
           if [ "${{ matrix.composer }}" = "2.6" ]; then
-            vendor/bin/phpunit -c "$config" "${groups[@]}" tests/Unit/Solver tests/Unit/Verdict tests/Unit/Analyzer
+            vendor/bin/phpunit -c "$config" "${slow[@]}" --exclude-group=covers-nothing tests/Unit/Solver tests/Unit/Verdict tests/Unit/Analyzer
           else
-            vendor/bin/phpunit -c "$config" "${groups[@]}"
-            # A runtime-php test reads the running PHP, so a row without covers-nothing still runs it.
-            if [ ${#groups[@]} -gt 0 ]; then vendor/bin/phpunit -c "$config" --group runtime-php; fi
+            # A runtime-php test reads the PHP that runs it, so a row without covers-nothing still runs it.
+            group=covers-nothing
+            if [ "${{ matrix.covers_nothing }}" != "true" ]; then group=runtime-php; fi
+            # Two processes side by side halve the row. Each writes its own log, and the step checks both exit codes.
+            mkdir -p build
+            vendor/bin/phpunit -c "$config" "${slow[@]}" --exclude-group=covers-nothing > build/phpunit-rest.log 2>&1 &
+            rest=$!
+            vendor/bin/phpunit -c "$config" "${slow[@]}" --group "$group" > build/phpunit-group.log 2>&1 &
+            grouped=$!
+            rest_status=0; wait "$rest" || rest_status=$?
+            group_status=0; wait "$grouped" || group_status=$?
+            echo "=== phpunit without covers-nothing: exit $rest_status"; cat build/phpunit-rest.log
+            echo "=== phpunit --group $group: exit $group_status"; cat build/phpunit-group.log
+            if [ "$rest_status" -ne 0 ] || [ "$group_status" -ne 0 ]; then exit 1; fi
           fi
       # Composer 2.2 LTS bundles symfony/console 2.8, older than the version that require-dev resolves.
       # This step runs the plugin e2e test through the real 2.2 binary, so it exercises the bundled 2.8 API.
@@ -90,7 +101,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
-        with: {php-version: '8.4', coverage: pcov}
+        with: {php-version: '8.4', coverage: none}
       - run: composer install --no-interaction
       - run: vendor/bin/php-cs-fixer fix --dry-run --diff
       - run: vendor/bin/phpstan analyse --memory-limit=1G
@@ -117,6 +128,15 @@ jobs:
       # tests/fixtures/corpus/model-divergences.json holds each reviewed difference.
       - name: The corpus differential
         run: php tools/corpus/differential.php
+  # A job of its own, beside quality: the test rows wait for quality, and this phpunit run is most of
+  # quality's time. Measurements: https://github.com/somework/lockrot/pull/110
+  core-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with: {php-version: '8.4', coverage: pcov}
+      - run: composer install --no-interaction
       # coverage-check reads the clover "elements" metric (methods, statements and conditionals),
       # not PHPUnit's line percentage. Keep the gate about three points below the measured value, so
       # that a new file does not fail it.
@@ -146,9 +166,10 @@ jobs:
       - if: steps.scope.outputs.mutate == 'true'
         uses: ./.github/actions/mutation-coverage
   mutation:
-    # The coverage run and quality run side by side, and the shards wait for both: a style or type
-    # error stops them before they take runners. A coverage run that waited for quality would put
-    # quality's time on the longest path of every run. Measurements: https://github.com/somework/lockrot/pull/110
+    # The shards wait for the coverage run and for quality, which run side by side. A style or
+    # type error then stops the shards before they take runners. A coverage run after quality
+    # puts quality's time on the longest path of every run.
+    # Measurements: https://github.com/somework/lockrot/pull/110
     needs: [mutation-coverage, quality]
     runs-on: ubuntu-latest
     # Keep the cap far above a shard's run time: a slow runner cancels a green shard. The cap only

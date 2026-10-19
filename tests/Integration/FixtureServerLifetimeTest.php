@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\PhpBuiltinServer;
 use Lockrot\Tests\Support\StaticFileServer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -22,6 +23,7 @@ final class FixtureServerLifetimeTest extends TestCase
     private const OWNER_START_TIMEOUT_SECONDS = 10.0;
     private const ORPHAN_GRACE_SECONDS = 5.0;
     private const POLL_INTERVAL_MICROSECONDS = 50000;
+    private const PORTS_PER_PROCESS = 500;
 
     /** @var list<string> */
     private array $tempDirs = [];
@@ -99,6 +101,37 @@ final class FixtureServerLifetimeTest extends TestCase
         }
     }
 
+    /**
+     * Two test processes on one machine, as when phpunit runs in two processes side by side. The OS
+     * can hand a port that one process holds closed to the other, which then reaches or blocks the
+     * wrong server.
+     */
+    public function testTwoTestProcessesNeverHoldTheSamePort(): void
+    {
+        $code = \sprintf(
+            'require %s; $ports = []; for ($i = 0; $i < %d; ++$i) { $ports[] = \\%s::closedPort(); } echo json_encode($ports), "\n"; sleep(60);',
+            var_export(\dirname(__DIR__, 2).'/vendor/autoload.php', true),
+            self::PORTS_PER_PROCESS,
+            PhpBuiltinServer::class
+        );
+        $holders = [new Process([\PHP_BINARY, '-r', $code]), new Process([\PHP_BINARY, '-r', $code])];
+        foreach ($holders as $holder) {
+            $holder->setTimeout(null);
+            $holder->start();
+        }
+        try {
+            $first = self::heldPorts($holders[0]);
+            $second = self::heldPorts($holders[1]);
+        } finally {
+            foreach ($holders as $holder) {
+                $holder->stop(0);
+            }
+        }
+
+        self::assertCount(self::PORTS_PER_PROCESS, array_unique($first));
+        self::assertSame([], array_values(array_intersect($first, $second)), 'a port held by one process went to the other');
+    }
+
     private function tempDir(): string
     {
         $dir = sys_get_temp_dir().'/lockrot-server-lifetime-'.bin2hex(random_bytes(8));
@@ -108,6 +141,25 @@ final class FixtureServerLifetimeTest extends TestCase
         $this->tempDirs[] = $dir;
 
         return $dir;
+    }
+
+    /** @return list<int> */
+    private static function heldPorts(Process $holder): array
+    {
+        $ports = json_decode(self::firstLine($holder), true);
+        if (!\is_array($ports)) {
+            throw new \RuntimeException('the holding process reported no port list: '.$holder->getOutput());
+        }
+
+        $held = [];
+        foreach ($ports as $port) {
+            if (!\is_int($port)) {
+                throw new \RuntimeException('the holding process reported a port that is no number: '.$holder->getOutput());
+            }
+            $held[] = $port;
+        }
+
+        return $held;
     }
 
     private static function firstLine(Process $owner): string

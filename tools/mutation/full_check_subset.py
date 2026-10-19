@@ -26,9 +26,9 @@ def selected(ref: str, shards: List[str]) -> List[str]:
     if SEPARATOR not in ref:
         return list(shards)
     known = {shard.replace(' ', '-'): shard for shard in shards}
-    tokens = [token for token in ref.split(SEPARATOR, 1)[1].split(',') if token != '']
-    if not tokens:
-        raise ValueError('the branch names no shard after "{}": {}'.format(SEPARATOR, ref))
+    tokens = ref.split(SEPARATOR, 1)[1].split(',')
+    if '' in tokens:
+        raise ValueError('the branch names an empty shard after "{}": {}'.format(SEPARATOR, ref))
     unknown = [token for token in tokens if token not in known]
     if unknown:
         raise ValueError('no shard is named {}. The shards: {}'.format(', '.join(unknown), ', '.join(known)))

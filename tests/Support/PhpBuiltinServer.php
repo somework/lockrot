@@ -43,11 +43,13 @@ final class PhpBuiltinServer
     private const PORT_ATTEMPTS = 100;
 
     /**
-     * Each port that freePort() handed out in this process and that a live server still holds. A
-     * test uses a server that it never starts as an unreachable repository, so the next server must
-     * not get that port: the OS can hand out a closed port again at once.
+     * Each port that freePort() handed out in this process and that a live server still holds, with
+     * the lock that reserves it. A test uses a server that it never starts as an unreachable
+     * repository, so the next server must not get that port: the OS can hand out a closed port again
+     * at once. The lock file under sys_get_temp_dir() keeps the port from another test process on
+     * the same machine. The OS drops the lock when the process dies.
      *
-     * @var array<int, true>
+     * @var array<int, resource>
      */
     private static array $taken = [];
 
@@ -150,7 +152,11 @@ final class PhpBuiltinServer
     public function __destruct()
     {
         $this->stop();
-        unset(self::$taken[$this->port]);
+        if (isset(self::$taken[$this->port])) {
+            flock(self::$taken[$this->port], \LOCK_UN);
+            fclose(self::$taken[$this->port]);
+            unset(self::$taken[$this->port]);
+        }
     }
 
     /** A port that nothing listens on, and that no server of this process gets while the process runs. */
@@ -173,13 +179,37 @@ final class PhpBuiltinServer
             if ($port <= 0) {
                 throw new \RuntimeException('cannot determine a free port from address: '.$name);
             }
-            if (!isset(self::$taken[$port])) {
-                self::$taken[$port] = true;
+            if (isset(self::$taken[$port])) {
+                continue;
+            }
+            $lock = self::lock($port);
+            if ($lock !== null) {
+                self::$taken[$port] = $lock;
 
                 return $port;
             }
         }
 
-        throw new \RuntimeException('cannot find a port that no server of this process holds');
+        throw new \RuntimeException('cannot find a port that no server of this or another test process holds');
+    }
+
+    /** @return resource|null null when another process holds the port */
+    private static function lock(int $port)
+    {
+        $dir = sys_get_temp_dir().'/lockrot-test-ports';
+        if (!is_dir($dir) && !@mkdir($dir, 0777, true) && !is_dir($dir)) {
+            throw new \RuntimeException('cannot create the port lock directory '.$dir);
+        }
+        $lock = fopen($dir.'/'.$port.'.lock', 'c');
+        if ($lock === false) {
+            throw new \RuntimeException('cannot open the lock file of port '.$port);
+        }
+        if (!flock($lock, \LOCK_EX | \LOCK_NB)) {
+            fclose($lock);
+
+            return null;
+        }
+
+        return $lock;
     }
 }

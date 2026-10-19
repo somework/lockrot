@@ -35,8 +35,8 @@ class TheFullCheckSubset(unittest.TestCase):
         self.assertIn('verdict', str(raised.exception))
         self.assertIn('signals-and-analyzer', str(raised.exception))
 
-    def test_an_empty_subset_is_refused(self):
-        for ref in ('release/full-check-1ca57573--', 'release/full-check-1ca57573--,'):
+    def test_an_empty_name_is_refused(self):
+        for ref in ('release/full-check-1ca57573--', 'release/full-check-1ca57573--,', 'release/full-check-1ca57573--verdicts,', 'release/full-check-1ca57573--verdicts,,score'):
             with self.subTest(ref=ref), self.assertRaises(ValueError):
                 full_check_subset.selected(ref, SHARDS)
 
