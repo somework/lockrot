@@ -341,10 +341,8 @@ final class FindingDetails
         }
         // With no move, `fix_kind` is the hardest kind of its advisories: FIX_KINDS runs easiest first.
         $fixKind = $this->moves()->fixKind();
-        $hardest = 0;
-        foreach ($rows as $row) {
-            $hardest = max($hardest, (int) array_search($row->fix()->kind(), ScoreModel::FIX_KINDS, true));
-        }
+        $order = array_flip(ScoreModel::FIX_KINDS);
+        $hardest = max(array_map(static fn (AdvisoryRow $row): int => $order[$row->fix()->kind()], $rows));
 
         return SecurityStanding::vulnerable($this->check, \count($this->ignored), self::counts($rows), $fixKind ?? ScoreModel::FIX_KINDS[$hardest]);
     }
