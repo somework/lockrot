@@ -77,7 +77,7 @@ final class FlagSentence
         $n = \count($rows);
         $listed = [];
         foreach (Severity::DISPLAY_ORDER as $severity) {
-            if (($counts[$severity] ?? 0) > 0) {
+            if (!empty($counts[$severity])) {
                 $listed[] = $counts[$severity].' '.$severity;
             }
         }
@@ -107,7 +107,7 @@ final class FlagSentence
         if ($unknown === $of) {
             return ' — fix not known on '.$branch;
         }
-        $label = $fixed > 0 && $kind !== null && $kind !== Fix::UPDATE ? ' ('.self::FIX_LABEL[$kind].')' : '';
+        $label = $kind !== null && $kind !== Fix::UPDATE ? ' ('.self::FIX_LABEL[$kind].')' : '';
         if ($fixed === 0) {
             $tail = ' — none fixed on '.$branch;
         } elseif ($fixed === $of) {

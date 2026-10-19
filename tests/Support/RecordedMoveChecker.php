@@ -14,8 +14,10 @@ use Lockrot\Solver\MoveQuery;
  * The move checks that a case records (`inputs.checks`, keyed by {@see MoveQuery::key()}), as
  * Composer's solver answered them. lockrot also asks about moves that it does not publish, so a
  * request that the case does not record is `not_checked`: a published one then differs from the
- * case's move. A test can record `*`: the answer to every request that it does not record, and
- * `combined`: the answer to the combined update, which resolves when the case records none.
+ * case's move. A test can record `*`: the answer to every request that it does not record,
+ * `combined`: the answer to the combined update, and `baseline`: the answer to the lock itself. Both
+ * resolve when the case records none. `combined <name> <name>` answers the combined update of
+ * exactly those names, in the order of the request.
  */
 final class RecordedMoveChecker implements MoveChecker
 {
@@ -36,7 +38,9 @@ final class RecordedMoveChecker implements MoveChecker
 
     public function baseline(): CheckOutcome
     {
-        return new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE));
+        $check = $this->checks['baseline'] ?? null;
+
+        return $check === null ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : self::outcome($check);
     }
 
     public function check(MoveQuery $query): CheckOutcome
@@ -67,7 +71,7 @@ final class RecordedMoveChecker implements MoveChecker
 
     public function combined(array $inline): CheckOutcome
     {
-        $check = $this->checks['combined'] ?? null;
+        $check = $this->checks['combined '.implode(' ', array_keys($inline))] ?? $this->checks['combined'] ?? null;
 
         return $check === null ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : self::outcome($check);
     }

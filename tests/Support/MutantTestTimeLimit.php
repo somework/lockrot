@@ -4,23 +4,29 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
+use PHPUnit\Event\Test\DataProviderMethodCalled;
+use PHPUnit\Event\Test\DataProviderMethodCalledSubscriber;
+use PHPUnit\Event\Test\DataProviderMethodFinished;
+use PHPUnit\Event\Test\DataProviderMethodFinishedSubscriber;
 use PHPUnit\Event\Test\Finished;
 use PHPUnit\Event\Test\FinishedSubscriber;
 use PHPUnit\Event\Test\PreparationStarted;
 use PHPUnit\Event\Test\PreparationStartedSubscriber;
 use PHPUnit\Event\TestRunner\Finished as TestRunnerFinished;
 use PHPUnit\Event\TestRunner\FinishedSubscriber as TestRunnerFinishedSubscriber;
+use PHPUnit\Event\TestSuite\Started as TestSuiteStarted;
+use PHPUnit\Event\TestSuite\StartedSubscriber as TestSuiteStartedSubscriber;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 
 /**
- * Fails a test that still runs after {@see self::SECONDS} in an Infection mutant process (INFECTION=1).
- *
- * PHPUnit's own time limit throws a \RuntimeException subclass. Product code that catches
- * \RuntimeException swallows it, and a loop mutant there never ends. An exit from the signal handler
- * cannot be caught. Without pcntl the extension does nothing. Reasons and measurements: https://github.com/somework/lockrot/pull/65.
+ * PHPUnit's own time limit throws a \RuntimeException subclass, which product code can catch, so a
+ * loop mutant there never ends. The signal handler exits instead, and nothing can catch an exit.
+ * PHPUnit runs setUpBeforeClass() and the data providers outside a test, so the suite start and each
+ * provider call set the alarm too. Without pcntl the extension does nothing.
+ * Reasons and measurements: https://github.com/somework/lockrot/pull/65.
  */
 final class MutantTestTimeLimit implements Extension
 {
@@ -32,41 +38,111 @@ final class MutantTestTimeLimit implements Extension
             return;
         }
 
-        $running = new \ArrayObject(['test' => '']);
+        $seconds = $parameters->has('seconds') ? max(1, (int) $parameters->get('seconds')) : self::SECONDS;
+        $running = new \ArrayObject(['what' => '']);
+        $start = static function (string $what) use ($running, $seconds): void {
+            $running['what'] = $what;
+            pcntl_alarm($seconds);
+        };
+        $stop = static function (): void {
+            pcntl_alarm(0);
+        };
         pcntl_async_signals(true);
-        pcntl_signal(\SIGALRM, static function () use ($running): void {
-            fwrite(\STDERR, \sprintf("\n%s ran past %d seconds: stopped as a test that never ends.\n", $running['test'], self::SECONDS));
+        pcntl_signal(\SIGALRM, static function () use ($running, $seconds): void {
+            fwrite(\STDERR, \sprintf("\n%s ran past %d seconds: stopped as a test that never ends.\n", $running['what'], $seconds));
 
             exit(1);
         });
 
         $facade->registerSubscribers(
-            new class ($running) implements PreparationStartedSubscriber {
-                /** @var \ArrayObject<string, string> */
-                private \ArrayObject $running;
+            new class ($start) implements TestSuiteStartedSubscriber {
+                /** @var \Closure(string): void */
+                private \Closure $start;
 
-                /** @param \ArrayObject<string, string> $running */
-                public function __construct(\ArrayObject $running)
+                /** @param \Closure(string): void $start */
+                public function __construct(\Closure $start)
                 {
-                    $this->running = $running;
+                    $this->start = $start;
+                }
+
+                public function notify(TestSuiteStarted $event): void
+                {
+                    ($this->start)($event->testSuite()->name());
+                }
+            },
+            new class ($start) implements DataProviderMethodCalledSubscriber {
+                /** @var \Closure(string): void */
+                private \Closure $start;
+
+                /** @param \Closure(string): void $start */
+                public function __construct(\Closure $start)
+                {
+                    $this->start = $start;
+                }
+
+                public function notify(DataProviderMethodCalled $event): void
+                {
+                    ($this->start)($event->dataProviderMethod()->className().'::'.$event->dataProviderMethod()->methodName());
+                }
+            },
+            new class ($start) implements PreparationStartedSubscriber {
+                /** @var \Closure(string): void */
+                private \Closure $start;
+
+                /** @param \Closure(string): void $start */
+                public function __construct(\Closure $start)
+                {
+                    $this->start = $start;
                 }
 
                 public function notify(PreparationStarted $event): void
                 {
-                    $this->running['test'] = $event->test()->id();
-                    pcntl_alarm(MutantTestTimeLimit::SECONDS);
+                    ($this->start)($event->test()->id());
                 }
             },
-            new class () implements FinishedSubscriber {
+            new class ($stop) implements DataProviderMethodFinishedSubscriber {
+                /** @var \Closure(): void */
+                private \Closure $stop;
+
+                /** @param \Closure(): void $stop */
+                public function __construct(\Closure $stop)
+                {
+                    $this->stop = $stop;
+                }
+
+                public function notify(DataProviderMethodFinished $event): void
+                {
+                    ($this->stop)();
+                }
+            },
+            new class ($stop) implements FinishedSubscriber {
+                /** @var \Closure(): void */
+                private \Closure $stop;
+
+                /** @param \Closure(): void $stop */
+                public function __construct(\Closure $stop)
+                {
+                    $this->stop = $stop;
+                }
+
                 public function notify(Finished $event): void
                 {
-                    pcntl_alarm(0);
+                    ($this->stop)();
                 }
             },
-            new class () implements TestRunnerFinishedSubscriber {
+            new class ($stop) implements TestRunnerFinishedSubscriber {
+                /** @var \Closure(): void */
+                private \Closure $stop;
+
+                /** @param \Closure(): void $stop */
+                public function __construct(\Closure $stop)
+                {
+                    $this->stop = $stop;
+                }
+
                 public function notify(TestRunnerFinished $event): void
                 {
-                    pcntl_alarm(0);
+                    ($this->stop)();
                 }
             }
         );

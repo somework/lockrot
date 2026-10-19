@@ -47,6 +47,33 @@ final class MoveCheckFailureTest extends TestCase
         self::assertSame('solver_error', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'check', 'reason']));
     }
 
+    /** Case `move-check‡`, where Composer's solver refuses the lock itself, so it refuses every move. */
+    public function testALockThatComposerRefusesWritesOneNoteAndTheRunNamesTheRefusal(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = [
+            'baseline' => ['result' => 'refused', 'form' => null, 'reason' => null, 'holds' => []],
+            '*' => ['result' => 'not_checked', 'form' => null, 'reason' => 'baseline_refused', 'holds' => []],
+        ];
+        $case['inputs'] = $inputs;
+
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+        $notes = self::notes($document, 'moves_not_checked');
+
+        self::assertCount(1, $notes);
+        self::assertSame('baseline_refused', JsonPath::stringAt($notes[0], ['data', 'reason']));
+        self::assertSame('refused', JsonPath::stringAt($document, ['run', 'move_check', 'baseline']));
+    }
+
+    public function testALockThatComposerResolvesWritesNoMovesNotCheckedNote(): void
+    {
+        $document = JsonPath::decoded(CaseHydrator::report(CaseHydrator::case('move-check‡'))->toArray());
+
+        self::assertSame([], self::notes($document, 'moves_not_checked'));
+        self::assertSame('resolves', JsonPath::stringAt($document, ['run', 'move_check', 'baseline']));
+    }
+
     /** A transport message can name a repository URL with credentials: the note keeps its first line, without them. */
     public function testTheNoteOfASolverFailureNamesNoCredential(): void
     {
@@ -61,5 +88,15 @@ final class MoveCheckFailureTest extends TestCase
         self::assertStringNotContainsString('s3cr3t', $document);
         self::assertStringNotContainsString('second line', $document);
         self::assertStringContainsString('repo.example.org', $document);
+    }
+
+    /**
+     * @param array<mixed, mixed> $document
+     *
+     * @return list<array<mixed, mixed>>
+     */
+    private static function notes(array $document, string $code): array
+    {
+        return array_values(array_filter(JsonPath::arrayAt($document, ['note_details']), static fn ($note): bool => \is_array($note) && $note['code'] === $code));
     }
 }

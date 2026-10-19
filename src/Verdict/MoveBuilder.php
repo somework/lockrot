@@ -349,7 +349,8 @@ final class MoveBuilder
         if ($check !== null && $check->isRefused()) {
             return [];
         }
-        $option = $check === null ? [] : array_values(array_intersect_key(MoveCheck::OPTIONS, [(string) $check->form() => true]));
+        $form = $check === null ? null : $check->form();
+        $option = $form !== null && isset(MoveCheck::OPTIONS[$form]) ? [MoveCheck::OPTIONS[$form]] : [];
         $package = $subject->package();
         switch ($kind) {
             case Move::UPDATE:

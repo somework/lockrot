@@ -241,19 +241,17 @@ final class Analyzer
             $every = $advisories->every($package->name());
             $refused = RefusedMoves::none();
             $pass = 0;
+            // The pass after the cap takes the refusals of the pass before it for the class and the verdict. Its new moves are not asked.
             do {
                 $scan = $finder->withRefused($refused);
                 $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $advisories->byName() === [] ? null : $scan, $advisories->ignored($package->name()), $every);
-                $moves = $this->moves($finding, $facts, $scan, $lock, $metadata, $every, $checks);
+                $moves = $this->moves($finding, $facts, $scan, $lock, $metadata, $every, $checks === null || $pass < $this->checkPasses ? $checks : $checks->answeredOnly());
                 $known = $refused->count();
                 $refused = $checks === null ? $refused : $checks->refused($package->name());
-            } while ($refused->count() > $known && ++$pass < $this->checkPasses);
-            if ($checks !== null && $refused->count() > $known) {
-                // The refusals of the last pass set the class and the verdict. Its new moves are not asked.
-                $scan = $finder->withRefused($refused);
-                $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $advisories->byName() === [] ? null : $scan, $advisories->ignored($package->name()), $every);
-                $moves = $this->moves($finding, $facts, $scan, $lock, $metadata, $every, $checks->answeredOnly());
-            }
+                if ($refused->count() === $known) {
+                    break;
+                }
+            } while (++$pass <= $this->checkPasses);
             $findings[] = $finding->withMoves($moves);
             if (!$package->isFromComposerRepository()) {
                 ++$notInRepository;
@@ -264,7 +262,7 @@ final class Analyzer
         }
         $uncovered = UncoveredAdvisories::of($findings);
         $notes = array_merge($notes, $uncovered === [] ? [] : [RunNote::ignoreDoesNotCoverAdvisories($uncovered)], $this->abandonedNotes($findings));
-        if ($checks !== null && $baseline !== null && $baseline->check()->isRefused()) {
+        if ($baseline !== null && $baseline->check()->isRefused() && $checks !== null) {
             $notes[] = RunNote::movesNotChecked((string) $checks->checker()->platformPhp(), (string) $baseline->problem());
         }
         $findings = TransitiveExposure::attach($findings, $graph);
@@ -274,8 +272,8 @@ final class Analyzer
         }
         $findings = array_map(static fn (Finding $finding): Finding => $finding->withHolders($graded), $findings);
         $report = new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev, $advisories->coverage());
-        if ($checks !== null && $baseline !== null) {
-            $report = $report->withMoveChecks(new MoveCheckRun($checks->checker()->composerVersion(), $checks->checker()->blocksAdvisories(), $baseline->check()), UpdateNow::of($report->sorted(), $checks));
+        if ($checks !== null) {
+            $report = $report->withMoveChecks(new MoveCheckRun($checks->checker()->composerVersion(), $checks->checker()->blocksAdvisories(), $checks->checker()->baseline()->check()), UpdateNow::of($report->sorted(), $checks));
             $error = $checks->checker()->solverError();
             if ($error !== null) {
                 $report = $report->withNote(RunNote::moveCheckFailed($error['class'], $error['message']));

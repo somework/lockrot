@@ -86,7 +86,7 @@ final class NotCheckedRule implements SignalRule
         if ($reason === self::NOT_FROM_COMPOSER_REPOSITORY && \in_array($origin, self::ORIGIN_GAPS, true)) {
             $unchecked[] = new Check('release_metadata', $reason, [Signal::S2, Signal::S8]);
             $unchecked[] = new Check('repository_activity', $reason, [Signal::S3, Signal::S4]);
-        } elseif ($reason === self::HOST_NOT_SUPPORTED || isset(self::ACTIVITY_WORDS[(string) $reason])) {
+        } elseif ($reason === self::HOST_NOT_SUPPORTED || isset(self::ACTIVITY_WORDS[$reason ?? ''])) {
             $unchecked[] = new Check('repository_activity', (string) $reason, [Signal::S3, Signal::S4]);
         }
 
@@ -207,7 +207,7 @@ final class NotCheckedRule implements SignalRule
         if ($entry->reason() === self::HOST_NOT_SUPPORTED) {
             $cause = 'lockrot cannot ask '.($host ?? 'its host');
         } elseif ($entry->reason() === self::NOT_FROM_COMPOSER_REPOSITORY) {
-            $cause = self::ORIGIN_CAUSE[(string) $origin] ?? 'not installed from a Composer repository';
+            $cause = self::ORIGIN_CAUSE[$origin ?? ''] ?? 'not installed from a Composer repository';
         }
         if ($entry->check() === 'release_metadata') {
             return 'release metadata not checked ('.$cause.'), so S2 and S8 could not be read';
