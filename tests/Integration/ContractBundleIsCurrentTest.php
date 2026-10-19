@@ -30,7 +30,11 @@ final class ContractBundleIsCurrentTest extends TestCase
     public function testAFreshRecordingEqualsTheCommittedBundle(): void
     {
         $recorded = ContractBundle::record();
-        $committed = array_diff_key(ContractBundle::tree(ContractBundle::DIRECTORY), array_flip(ContractBundle::NOT_RECORDED));
+        $committed = array_filter(
+            array_diff_key(ContractBundle::tree(ContractBundle::DIRECTORY), array_flip(ContractBundle::NOT_RECORDED)),
+            static fn (string $path): bool => strpos($path, ContractBundle::ENGINE_PAGES) !== 0,
+            \ARRAY_FILTER_USE_KEY
+        );
 
         self::assertSame(array_keys($committed), array_keys($recorded['files']), 're-record with tools/report/record: the file sets differ');
         foreach ($recorded['files'] as $path => $contents) {

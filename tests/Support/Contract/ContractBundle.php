@@ -28,8 +28,10 @@ use Lockrot\Version;
 final class ContractBundle
 {
     public const DIRECTORY = __DIR__.'/../../fixtures/contract';
-    /** The files of DIRECTORY that no recording writes: the recorder's own, a table of PhpFloorTest, and the model's page goldens (PageGoldensTest). */
+    /** The files of DIRECTORY that record() does not write: the recorder's own, a table of PhpFloorTest, and the model's page goldens (PageGoldensTest). */
     public const NOT_RECORDED = ['bundle_sha256', 'provenance.json', 'en/php-versions.json', 'page-goldens.json'];
+    /** The directory of DIRECTORY that {@see EnginePage} writes. */
+    public const ENGINE_PAGES = 'page/';
     private const FIXTURES = __DIR__.'/../../fixtures/';
 
     /** The text formats, by the suffix of the file each one is written to below `text/`. */

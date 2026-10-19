@@ -3885,6 +3885,3027 @@
       ],
       "advisory_groups": []
     },
+    "new-slim-baselined": {
+      "document": "coverage/baselined/new-slim.json",
+      "title": "lockrot: 2 of 16 packages flagged",
+      "description": "lockrot flagged 2 of 16 packages in composer.lock: 2 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for slim/slim-skeleton · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "2 of 16 packages flagged (13%): 2 graded high. Flags: silent 1, left-behind 1, old-promise 1.",
+        "All 2 in production · 1 required directly, 1 pulled in · no security advisory · 5.3 libyears behind."
+      ],
+      "grade_line": "Project grade: high · 2 high findings · 2 of 16 packages high or worse · 1 known to the baseline",
+      "figure_line": "2 of 16 packages flagged · 6 ok · 8 allowlisted",
+      "load_line": "34 points on 2 flagged packages · 34 (100 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 1,
+      "state_lines": [
+        "Against lockrot-baseline.json: 1 new · 0 worsened · 1 known · 1 entry for packages that left the lock: lockrot-fixture/left-the-lock."
+      ],
+      "waffle_caption": "2 of 16 packages flagged · 6 ok · 8 allowlisted",
+      "lead_scope": "all 2 in production · 1 required directly, 1 pulled in",
+      "grade_chips": [
+        "high 2"
+      ],
+      "waffle": [
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 2
+        },
+        {
+          "verdict": "finished",
+          "word": "allowlisted",
+          "mark": "ring-dot",
+          "count": 8
+        },
+        {
+          "verdict": "ok",
+          "word": "ok",
+          "mark": "soft",
+          "count": 6
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": "1 needs another way out: 1 not checked: the run checked no move",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 1,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": null,
+        "unit": "no security advisory",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "high",
+            "package": "php-di/phpdoc-reader",
+            "link": "#view=findings&pkg=php-di%2Fphpdoc-reader",
+            "reach": "transitive",
+            "total": 18,
+            "terms": "silent 16 · old-promise 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "php-di/php-di",
+            "link": "#view=findings&pkg=php-di%2Fphp-di",
+            "reach": "",
+            "total": 16,
+            "terms": "left-behind 16",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "1 carry more than one flag · score model 1",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 2"
+        ],
+        "rows": [
+          {
+            "package": "php-di/php-di",
+            "flagged": 1,
+            "link": "#view=radius&pkg=php-di%2Fphp-di"
+          }
+        ],
+        "count": null,
+        "overlap": null,
+        "more": null,
+        "shared": null
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 1",
+          "1 hop away 1"
+        ],
+        "sentence": "1 of 2 flagged packages is named by no line of composer.json; the deepest, php-di/phpdoc-reader, sits 1 hop from the nearest line."
+      },
+      "libyears": {
+        "figure": "5.28",
+        "bound": "",
+        "sub": "over 16 packages · 3.43 from direct requirements",
+        "unmeasured": null,
+        "top": [
+          [
+            "php-di/php-di 6.4.0",
+            "3.4",
+            "7.1.1 (2025-08-16)"
+          ],
+          [
+            "laravel/serializable-closure v1.3.7",
+            "1.9",
+            "v2.1.0 (2026-09-22)"
+          ],
+          [
+            "monolog/monolog 2.11.1",
+            "0.1",
+            "3.12.1 (2026-09-29)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "high",
+          "count": "2 packages",
+          "gate": "1 fail the gate",
+          "major": "1 of 1 moves cross a major"
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "php-di/phpdoc-reader",
+          "fails_gate": false,
+          "reach": "via php-di/php-di",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "php-di/php-di",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'php:>=8.0' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 0,
+        "wayout": 1
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S2 release age",
+        "S4 repository activity",
+        "S5 PHP promise",
+        "S7 pulled-in packages",
+        "S8 release branch"
+      ],
+      "advisory_groups": []
+    },
+    "composite-generate-baseline": {
+      "document": "cases/composite-generate-baseline.json",
+      "title": "lockrot: 9 of 9 packages flagged",
+      "description": "lockrot flagged 9 of 9 packages in composer.lock: 4 critical, 2 high, 3 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for lockrot/composite · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · baseline run passes · --fail-on not applied",
+        "9 of 9 packages flagged (100%): 4 graded critical, 2 high, 3 low. Flags: abandoned 1, pinned 1, left-behind 2, old-promise 3, stale 3, vulnerable 5.",
+        "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": null,
+      "gate_link_rows": null,
+      "state_lines": [],
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
+      "grade_chips": [
+        "critical 4",
+        "high 2",
+        "low 3"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 4
+        },
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 2
+        },
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 3
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": null,
+        "way_out_link": null,
+        "way_out_link_rows": null,
+        "none": "No move is ready to run: no flagged package has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": "29",
+        "unit": "advisories on 5 packages",
+        "lookup_complete": true,
+        "counted_as": [
+          "unrated, counted as medium"
+        ]
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "symfony/monolog-bridge",
+            "link": "#view=findings&pkg=symfony%2Fmonolog-bridge",
+            "reach": "",
+            "total": 36,
+            "terms": "left-behind 16 · old-promise 4 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "symfony/debug",
+            "link": "#view=findings&pkg=symfony%2Fdebug",
+            "reach": "",
+            "total": 36,
+            "terms": "abandoned 32 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "twig/twig",
+            "link": "#view=findings&pkg=twig%2Ftwig",
+            "reach": "",
+            "total": 32,
+            "terms": "vulnerable 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "guzzlehttp/guzzle",
+            "link": "#view=findings&pkg=guzzlehttp%2Fguzzle",
+            "reach": "",
+            "total": 32,
+            "terms": "left-behind 16 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "link": "#view=findings&pkg=friendsofsymfony%2Foauth-server-bundle",
+            "reach": "",
+            "total": 18,
+            "terms": "pinned 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "tubalmartin/cssmin",
+            "link": "#view=findings&pkg=tubalmartin%2Fcssmin",
+            "reach": "",
+            "total": 18,
+            "terms": "old-promise 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "friendsofsymfony/oauth2-php",
+            "link": "#view=findings&pkg=friendsofsymfony%2Foauth2-php",
+            "reach": "transitive",
+            "total": 4,
+            "terms": "stale 4",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "symfony/yaml",
+            "link": "#view=findings&pkg=symfony%2Fyaml",
+            "reach": "",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "symfony/polyfill-intl-idn",
+            "link": "#view=findings&pkg=symfony%2Fpolyfill-intl-idn",
+            "reach": "transitive",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "5 carry more than one flag · score model 1",
+        "1 abandoned package, 1 with a replacement",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 9"
+        ],
+        "rows": [
+          {
+            "package": "guzzlehttp/guzzle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
+          },
+          {
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=friendsofsymfony%2Foauth-server-bundle"
+          }
+        ],
+        "count": "2 direct requirements pull in flagged packages.",
+        "overlap": "A flagged package counts under each direct requirement it is reached from, up to 8, so the rows overlap.",
+        "more": null,
+        "shared": null
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 7",
+          "1 hop away 2"
+        ],
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+      },
+      "libyears": {
+        "figure": "22.06",
+        "bound": "",
+        "sub": "over 7 packages · 22.06 from direct requirements",
+        "unmeasured": "Not measured: 1 a branch snapshot has no release branch · 1 dated only by a commit its tags share",
+        "top": [
+          [
+            "symfony/monolog-bridge v2.6.13",
+            "10.6",
+            "v6.4.45 (2026-08-30)"
+          ],
+          [
+            "guzzlehttp/guzzle 6.5.8",
+            "4.2",
+            "8.2.0 (2026-09-06)"
+          ],
+          [
+            "symfony/yaml v5.4.23",
+            "3.4",
+            "v8.1.8 (2026-09-26)"
+          ],
+          [
+            "twig/twig v2.16.1",
+            "2.0",
+            "v3.30.0 (2026-09-25)"
+          ],
+          [
+            "symfony/debug v3.4.47",
+            "1.8",
+            "v4.4.44 (2022-07-28)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "4 packages",
+          "gate": null,
+          "major": "3 of 3 moves cross a major"
+        },
+        {
+          "grade": "high",
+          "count": "2 packages",
+          "gate": null,
+          "major": null
+        },
+        {
+          "grade": "low",
+          "count": "3 packages",
+          "gate": null,
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "twig/twig",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": "held by symfony/twig-bridge",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/monolog-bridge:^5.4.52'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'php:>=7.2.5' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/debug",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth-server-bundle",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tubalmartin/cssmin",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/yaml",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update symfony/yaml",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "fails_gate": false,
+          "reach": "via guzzlehttp/guzzle",
+          "held": null,
+          "command": "composer update symfony/polyfill-intl-idn",
+          "after": "after it: 0, finished",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth2-php",
+          "fails_gate": false,
+          "reach": "via friendsofsymfony/oauth-server-bundle",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": null,
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S1 marked abandoned",
+        "S2 release age",
+        "S3 archived repository",
+        "S4 repository activity",
+        "S5 PHP promise",
+        "S6 pinned version",
+        "S7 pulled-in packages",
+        "S8 release branch",
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "twig/twig",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by symfony/twig-bridge"
+          ]
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/yaml",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ]
+    },
+    "guzzle-mixed": {
+      "document": "cases/guzzle-mixed.json",
+      "title": "lockrot: 1 of 1 package flagged",
+      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 critical. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for prestashop/prestashop · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "1 of 1 package flagged (100%): 1 graded critical. Flags: left-behind 1, old-promise 1, vulnerable 1.",
+        "In production · required directly · 14 security advisories on 1 package (severity: 6 high, 8 medium) · fix by package: 1 php floor raise · 6.8 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 1 critical finding · 1 of 1 package high or worse",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "load_line": "36 points on 1 flagged package · 36 (100 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 1,
+      "state_lines": [],
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "1 in production · 1 required directly",
+      "grade_chips": [
+        "critical 1"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 1
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": "1 of 1 finding that fails the gate is held by other packages. Their holders are in each sheet's Held by.",
+        "held_link": "#view=findings&gate=fails%2Cheld",
+        "held_link_rows": 1,
+        "way_out": null,
+        "way_out_link": null,
+        "way_out_link_rows": null,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": "14",
+        "unit": "advisories on 1 package",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "guzzlehttp/guzzle",
+            "link": "#view=findings&pkg=guzzlehttp%2Fguzzle",
+            "reach": "",
+            "total": 36,
+            "terms": "left-behind 16 · old-promise 4 · vulnerable 16",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "1 carry more than one flag · score model 1",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 1"
+        ],
+        "rows": [
+          {
+            "package": "guzzlehttp/guzzle",
+            "flagged": 2,
+            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
+          }
+        ],
+        "count": null,
+        "overlap": null,
+        "more": null,
+        "shared": null
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 1"
+        ],
+        "sentence": "The flagged package is named by a line of composer.json."
+      },
+      "libyears": {
+        "figure": "6.85",
+        "bound": "",
+        "sub": "over 1 package · 6.85 from direct requirements",
+        "unmeasured": null,
+        "top": [
+          [
+            "guzzlehttp/guzzle 5.3.4",
+            "6.8",
+            "8.2.0 (2026-09-06)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "1 package",
+          "gate": "all fail the gate",
+          "major": "1 of 1 moves cross a major"
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "guzzlehttp/guzzle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by guzzlehttp/cache-subscriber and 3 more",
+          "command": "composer require 'php:>=7.2.5' --no-update",
+          "after": "after it: at most 16, high, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 1,
+        "wayout": 0
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S5 PHP promise",
+        "S7 pulled-in packages",
+        "S8 release branch",
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "guzzlehttp/guzzle",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by guzzlehttp/cache-subscriber and 3 more",
+            "needs PHP ^7.2.5 || ^8.0 · held by guzzlehttp/cache-subscriber and 3 more"
+          ]
+        }
+      ]
+    },
+    "matomo": {
+      "document": "report-2/matomo.json",
+      "title": "lockrot: 14 of 55 packages flagged",
+      "description": "lockrot flagged 14 of 55 packages in composer.lock: 2 critical, 10 high, 2 medium. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for matomo/matomo · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "14 of 55 packages flagged (25%): 2 graded critical, 10 high, 2 medium. Flags: abandoned 1, silent 4, pinned 3, left-behind 6, old-promise 4, stale 2.",
+        "All 14 in production · 10 required directly, 4 pulled in · no security advisory · 64.6 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 2 critical findings · 12 of 55 packages high or worse",
+      "figure_line": "14 of 55 packages flagged · 30 ok · 11 allowlisted",
+      "load_line": "260 points on 14 flagged packages · 244 (93 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 12,
+      "state_lines": [],
+      "waffle_caption": "14 of 55 packages flagged · 30 ok · 11 allowlisted",
+      "lead_scope": "all 14 in production · 10 required directly, 4 pulled in",
+      "grade_chips": [
+        "critical 2",
+        "high 10",
+        "medium 2"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 2
+        },
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 10
+        },
+        {
+          "verdict": "medium",
+          "word": "medium",
+          "mark": "fill",
+          "count": 2
+        },
+        {
+          "verdict": "finished",
+          "word": "allowlisted",
+          "mark": "ring-dot",
+          "count": 11
+        },
+        {
+          "verdict": "ok",
+          "word": "ok",
+          "mark": "soft",
+          "count": 30
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": "12 need another way out: 5 find an alternative, 7 not checked: the run checked no move",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 12,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": null,
+        "unit": "no security advisory",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "lox/xhprof",
+            "link": "#view=findings&pkg=lox%2Fxhprof",
+            "reach": "",
+            "total": 40,
+            "terms": "abandoned 32 · pinned 4 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "mustangostang/spyc",
+            "link": "#view=findings&pkg=mustangostang%2Fspyc",
+            "reach": "",
+            "total": 36,
+            "terms": "silent 32 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "matomo/decompress",
+            "link": "#view=findings&pkg=matomo%2Fdecompress",
+            "reach": "",
+            "total": 20,
+            "terms": "left-behind 16 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "matomo/searchengine-and-social-list",
+            "link": "#view=findings&pkg=matomo%2Fsearchengine-and-social-list",
+            "reach": "",
+            "total": 18,
+            "terms": "pinned 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "php-di/phpdoc-reader",
+            "link": "#view=findings&pkg=php-di%2Fphpdoc-reader",
+            "reach": "transitive",
+            "total": 18,
+            "terms": "silent 16 · old-promise 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "geoip2/geoip2",
+            "link": "#view=findings&pkg=geoip2%2Fgeoip2",
+            "reach": "",
+            "total": 16,
+            "terms": "left-behind 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "matomo/referrer-spam-list",
+            "link": "#view=findings&pkg=matomo%2Freferrer-spam-list",
+            "reach": "",
+            "total": 16,
+            "terms": "pinned 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "monolog/monolog",
+            "link": "#view=findings&pkg=monolog%2Fmonolog",
+            "reach": "",
+            "total": 16,
+            "terms": "left-behind 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "php-di/php-di",
+            "link": "#view=findings&pkg=php-di%2Fphp-di",
+            "reach": "",
+            "total": 16,
+            "terms": "left-behind 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "wikimedia/less.php",
+            "link": "#view=findings&pkg=wikimedia%2Fless.php",
+            "reach": "",
+            "total": 16,
+            "terms": "left-behind 16",
+            "terms_total": null
+          }
+        ],
+        "rest": "4 more flagged packages hold 48 points",
+        "rest_link": "#view=findings"
+      },
+      "flags_notes": [
+        "5 carry more than one flag · score model 1",
+        "1 abandoned package, 0 with a replacement",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 14"
+        ],
+        "rows": [
+          {
+            "package": "geoip2/geoip2",
+            "flagged": 1,
+            "link": "#view=radius&pkg=geoip2%2Fgeoip2"
+          },
+          {
+            "package": "matomo/cache",
+            "flagged": 1,
+            "link": "#view=radius&pkg=matomo%2Fcache"
+          },
+          {
+            "package": "matomo/decompress",
+            "flagged": 1,
+            "link": "#view=radius&pkg=matomo%2Fdecompress"
+          },
+          {
+            "package": "php-di/php-di",
+            "flagged": 1,
+            "link": "#view=radius&pkg=php-di%2Fphp-di"
+          }
+        ],
+        "count": "4 direct requirements pull in flagged packages.",
+        "overlap": "A flagged package counts under each direct requirement it is reached from, up to 8, so the rows overlap.",
+        "more": null,
+        "shared": null
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 10",
+          "1 hop away 3",
+          "2 hops away 0",
+          "3 hops away 1"
+        ],
+        "sentence": "4 of 14 flagged packages are named by no line of composer.json; the deepest, pear/console_getopt, sits 3 hops from the nearest line."
+      },
+      "libyears": {
+        "figure": "64.63",
+        "bound": "",
+        "sub": "over 48 packages · 36.71 from direct requirements",
+        "unmeasured": "Not measured: 3 a branch snapshot has no release branch · 4 dated only by a commit its tags share",
+        "top": [
+          [
+            "php-di/invoker 2.0.0",
+            "8.4",
+            "2.3.7 (2025-08-30)"
+          ],
+          [
+            "matomo/decompress 2.1.0",
+            "4.9",
+            "3.0.0 (2024-11-21)"
+          ],
+          [
+            "monolog/monolog 1.27.1",
+            "4.3",
+            "3.12.1 (2026-09-29)"
+          ],
+          [
+            "geoip2/geoip2 v2.13.0",
+            "4.0",
+            "v3.4.0 (2026-07-16)"
+          ],
+          [
+            "php-di/php-di 6.3.5",
+            "4.0",
+            "7.1.1 (2025-08-16)"
+          ],
+          [
+            "maxmind/web-service-common v0.9.0",
+            "3.8",
+            "v0.11.1 (2026-01-13)"
+          ],
+          [
+            "psr/log 1.1.4",
+            "3.4",
+            "3.0.2 (2024-09-11)"
+          ],
+          [
+            "wikimedia/less.php v3.2.1",
+            "3.0",
+            "v5.5.1 (2026-02-14)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "2 packages",
+          "gate": "all fail the gate",
+          "major": null
+        },
+        {
+          "grade": "high",
+          "count": "10 packages",
+          "gate": "all fail the gate",
+          "major": "5 of 5 moves cross a major"
+        },
+        {
+          "grade": "medium",
+          "count": "2 packages",
+          "gate": null,
+          "major": "1 of 1 moves cross a major"
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "lox/xhprof",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "mustangostang/spyc",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "matomo/decompress",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'matomo/decompress:^3.0'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "matomo/searchengine-and-social-list",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'matomo/searchengine-and-social-list:^3.14.0'",
+          "after": "after it: 8, medium",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "php-di/phpdoc-reader",
+          "fails_gate": true,
+          "reach": "via php-di/php-di",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "geoip2/geoip2",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "matomo/referrer-spam-list",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'matomo/referrer-spam-list:^4.0.5'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "monolog/monolog",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'monolog/monolog:^2.11'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "php-di/php-di",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'php:>=8.0' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "wikimedia/less.php",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'php:>=7.4.3' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "matomo/doctrine-cache-fork",
+          "fails_gate": true,
+          "reach": "via matomo/cache",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "pear/console_getopt",
+          "fails_gate": true,
+          "reach": "via matomo/decompress",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "pear/pear_exception",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "maxmind/web-service-common",
+          "fails_gate": false,
+          "reach": "via geoip2/geoip2",
+          "held": null,
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new 0.x line",
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 0,
+        "wayout": 12
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S1 marked abandoned",
+        "S2 release age",
+        "S3 archived repository",
+        "S4 repository activity",
+        "S5 PHP promise",
+        "S6 pinned version",
+        "S7 pulled-in packages",
+        "S8 release branch"
+      ],
+      "advisory_groups": []
+    },
+    "E-ignored-whole‡": {
+      "document": "cases/E-ignored-whole-dagger.json",
+      "title": "lockrot: 1 of 1 package flagged",
+      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for joomla/joomla-cms · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run passes · --fail-on=high",
+        "1 of 1 package flagged (100%): 1 graded low. Flags: vulnerable 1.",
+        "In production · required directly · 3 security advisories on 1 package (severity: 3 low) · fix by package: 1 composer update · 3.4 libyears behind."
+      ],
+      "grade_line": "Project grade: low · 1 low finding · 0 of 1 package high or worse",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "load_line": "2 points on 1 flagged package · 0 (0 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": null,
+      "gate_link_rows": null,
+      "state_lines": [
+        "extra.lockrot.ignore accepts maintenance flags, not advisories · 1 package it lists still counts for advisories. The run note"
+      ],
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "1 in production · 1 required directly",
+      "grade_chips": [
+        "low 1"
+      ],
+      "waffle": [
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 1
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": null,
+        "way_out_link": null,
+        "way_out_link_rows": null,
+        "none": "No move is ready to run: no flagged package has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": "3",
+        "unit": "advisories on 1 package",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "low",
+            "package": "symfony/yaml",
+            "link": "#view=findings&pkg=symfony%2Fyaml",
+            "reach": "",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "0 carry more than one flag · score model 1",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": null,
+      "depth": {
+        "rows": [
+          "in composer.json 1"
+        ],
+        "sentence": "The flagged package is named by a line of composer.json."
+      },
+      "libyears": {
+        "figure": "3.43",
+        "bound": "",
+        "sub": "over 1 package · 3.43 from direct requirements",
+        "unmeasured": null,
+        "top": [
+          [
+            "symfony/yaml v5.4.23",
+            "3.4",
+            "v8.1.8 (2026-09-26)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "low",
+          "count": "1 package",
+          "gate": null,
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "symfony/yaml",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update symfony/yaml",
+          "after": "after it: 0, finished",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": null,
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "symfony/yaml",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ]
+    },
+    "rounded-dev‡": {
+      "document": "cases/rounded-dev-dagger.json",
+      "title": "lockrot: 1 of 1 package flagged",
+      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for joomla/joomla-cms · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run passes · --fail-on=high",
+        "1 of 1 package flagged (100%): 1 graded low. Flags: old-promise 1, stale 1.",
+        "Dev-only · pulled in · no security advisory · 1.0 libyears behind."
+      ],
+      "grade_line": "Project grade: low · 1 low finding · 0 of 1 package high or worse",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "load_line": "4 points on 1 flagged package · 0 (0 %) from high or worse · score model 1 · 4 from packages-dev",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": null,
+      "gate_link_rows": null,
+      "state_lines": [],
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "1 dev-only · 1 pulled in",
+      "grade_chips": [
+        "low 1"
+      ],
+      "waffle": [
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 1
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": null,
+        "way_out_link": null,
+        "way_out_link_rows": null,
+        "none": "No move is ready to run: no flagged package has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": null,
+        "unit": "no security advisory",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "low",
+            "package": "jfcherng/php-color-output",
+            "link": "#view=findings&pkg=jfcherng%2Fphp-color-output",
+            "reach": "transitive · dev",
+            "total": 4,
+            "terms": "old-promise 4 · stale 0.5",
+            "terms_total": "(score 4)"
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "1 carry more than one flag · score model 1",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": null,
+      "depth": {
+        "rows": [
+          "in composer.json 0",
+          "1 hop away 1"
+        ],
+        "sentence": "1 of 1 flagged package is named by no line of composer.json; the deepest, jfcherng/php-color-output, sits 1 hop from the nearest line."
+      },
+      "libyears": {
+        "figure": "1.00",
+        "bound": "",
+        "sub": "over 1 package · 0.00 from direct requirements",
+        "unmeasured": null,
+        "top": [
+          [
+            "jfcherng/php-color-output 2.0.2",
+            "1.0",
+            "3.0.0 (2021-05-27)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "low",
+          "count": "1 package",
+          "gate": null,
+          "major": "1 of 1 moves cross a major"
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "jfcherng/php-color-output",
+          "fails_gate": false,
+          "reach": "via jfcherng/php-diff · dev",
+          "held": null,
+          "command": null,
+          "after": "after it: 2, low, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": null,
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S2 release age",
+        "S5 PHP promise"
+      ],
+      "advisory_groups": []
+    },
+    "unreached": {
+      "document": "cases/unreached.json",
+      "title": "lockrot: 1 of 1 package flagged",
+      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for phpmyadmin/phpmyadmin · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "1 of 1 package flagged (100%): 1 graded high. Flags: abandoned 1.",
+        "In production · 1 unreached · no security advisory · 0.0 libyears behind."
+      ],
+      "grade_line": "Project grade: high · 1 high finding · 1 of 1 package high or worse",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "load_line": "16 points on 1 flagged package · 16 (100 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 1,
+      "state_lines": [],
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "1 in production",
+      "grade_chips": [
+        "high 1"
+      ],
+      "waffle": [
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 1
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": "1 needs another way out: 1 find an alternative",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 1,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": null,
+        "unit": "no security advisory",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "high",
+            "package": "fgrosse/phpasn1",
+            "link": "#view=findings&pkg=fgrosse%2Fphpasn1",
+            "reach": "unreached",
+            "total": 16,
+            "terms": "abandoned 16",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "0 carry more than one flag · score model 1",
+        "1 abandoned package, 0 with a replacement",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": null,
+      "depth": {
+        "rows": [
+          "not reached 1"
+        ],
+        "sentence": "1 of 1 flagged package is named by no line of composer.json."
+      },
+      "libyears": {
+        "figure": "0.00",
+        "bound": "",
+        "sub": "over 1 package · 0.00 from direct requirements",
+        "unmeasured": null,
+        "top": [],
+        "none": "Every measured package rounds to 0.0 libyears."
+      },
+      "findings_groups": [
+        {
+          "grade": "high",
+          "count": "1 package",
+          "gate": "all fail the gate",
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "fgrosse/phpasn1",
+          "fails_gate": true,
+          "reach": "unreached",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 0,
+        "wayout": 1
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S1 marked abandoned",
+        "S2 release age",
+        "S3 archived repository",
+        "S4 repository activity"
+      ],
+      "advisory_groups": []
+    },
+    "B-gate-none": {
+      "document": "cases/B-gate-none.json",
+      "title": "lockrot: 1 of 1 package flagged",
+      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 critical. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for matomo/matomo · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · no gate",
+        "1 of 1 package flagged (100%): 1 graded critical. Flags: left-behind 1, old-promise 1, vulnerable 1.",
+        "In production · required directly · 1 security advisory on 1 package (severity: 1 high) · fix by package: 1 upgrade · 10.6 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 1 critical finding · 1 of 1 package high or worse",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "load_line": "36 points on 1 flagged package · 36 (100 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": null,
+      "gate_link_rows": null,
+      "state_lines": [],
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "1 in production · 1 required directly",
+      "grade_chips": [
+        "critical 1"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 1
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": null,
+        "way_out_link": null,
+        "way_out_link_rows": null,
+        "none": "No move is ready to run: no flagged package has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": "1",
+        "unit": "advisory on 1 package",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "symfony/monolog-bridge",
+            "link": "#view=findings&pkg=symfony%2Fmonolog-bridge",
+            "reach": "",
+            "total": 36,
+            "terms": "left-behind 16 · old-promise 4 · vulnerable 16",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "1 carry more than one flag · score model 1",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": null,
+      "depth": {
+        "rows": [
+          "in composer.json 1"
+        ],
+        "sentence": "The flagged package is named by a line of composer.json."
+      },
+      "libyears": {
+        "figure": "10.62",
+        "bound": "",
+        "sub": "over 1 package · 10.62 from direct requirements",
+        "unmeasured": null,
+        "top": [
+          [
+            "symfony/monolog-bridge v2.6.13",
+            "10.6",
+            "v6.4.45 (2026-08-30)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "1 package",
+          "gate": null,
+          "major": "1 of 1 moves cross a major"
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "symfony/monolog-bridge",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/monolog-bridge:^5.4.52'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": null,
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S5 PHP promise",
+        "S8 release branch",
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "symfony/monolog-bridge",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        }
+      ]
+    },
+    "composite.other-day-same-cve‡": {
+      "document": "page/composite.other-day-same-cve-dagger.json",
+      "title": "lockrot: 9 of 9 packages flagged",
+      "description": "lockrot flagged 9 of 9 packages in composer.lock: 4 critical, 2 high, 3 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for lockrot/composite · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "9 of 9 packages flagged (100%): 4 graded critical, 2 high, 3 low. Flags: abandoned 1, pinned 1, left-behind 2, old-promise 3, stale 3, vulnerable 5.",
+        "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 6,
+      "state_lines": [],
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
+      "grade_chips": [
+        "critical 4",
+        "high 2",
+        "low 3"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 4
+        },
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 2
+        },
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 3
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": "1 of 6 findings that fail the gate is held by other packages. Their holders are in each sheet's Held by.",
+        "held_link": "#view=findings&gate=fails%2Cheld",
+        "held_link_rows": 1,
+        "way_out": "5 need another way out: 1 replace, 1 test, 1 blocked, 2 not checked: the run checked no move",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 5,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": "29",
+        "unit": "advisories on 5 packages",
+        "lookup_complete": true,
+        "counted_as": [
+          "unrated, counted as medium"
+        ]
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "symfony/monolog-bridge",
+            "link": "#view=findings&pkg=symfony%2Fmonolog-bridge",
+            "reach": "",
+            "total": 36,
+            "terms": "left-behind 16 · old-promise 4 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "symfony/debug",
+            "link": "#view=findings&pkg=symfony%2Fdebug",
+            "reach": "",
+            "total": 36,
+            "terms": "abandoned 32 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "twig/twig",
+            "link": "#view=findings&pkg=twig%2Ftwig",
+            "reach": "",
+            "total": 32,
+            "terms": "vulnerable 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "guzzlehttp/guzzle",
+            "link": "#view=findings&pkg=guzzlehttp%2Fguzzle",
+            "reach": "",
+            "total": 32,
+            "terms": "left-behind 16 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "link": "#view=findings&pkg=friendsofsymfony%2Foauth-server-bundle",
+            "reach": "",
+            "total": 18,
+            "terms": "pinned 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "tubalmartin/cssmin",
+            "link": "#view=findings&pkg=tubalmartin%2Fcssmin",
+            "reach": "",
+            "total": 18,
+            "terms": "old-promise 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "friendsofsymfony/oauth2-php",
+            "link": "#view=findings&pkg=friendsofsymfony%2Foauth2-php",
+            "reach": "transitive",
+            "total": 4,
+            "terms": "stale 4",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "symfony/yaml",
+            "link": "#view=findings&pkg=symfony%2Fyaml",
+            "reach": "",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "symfony/polyfill-intl-idn",
+            "link": "#view=findings&pkg=symfony%2Fpolyfill-intl-idn",
+            "reach": "transitive",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "5 carry more than one flag · score model 1",
+        "1 abandoned package, 1 with a replacement",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 9"
+        ],
+        "rows": [
+          {
+            "package": "guzzlehttp/guzzle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
+          },
+          {
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=friendsofsymfony%2Foauth-server-bundle"
+          }
+        ],
+        "count": "2 direct requirements pull in flagged packages.",
+        "overlap": "A flagged package counts under each direct requirement it is reached from, up to 8, so the rows overlap.",
+        "more": null,
+        "shared": null
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 7",
+          "1 hop away 2"
+        ],
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+      },
+      "libyears": {
+        "figure": "22.06",
+        "bound": "",
+        "sub": "over 7 packages · 22.06 from direct requirements",
+        "unmeasured": "Not measured: 1 a branch snapshot has no release branch · 1 dated only by a commit its tags share",
+        "top": [
+          [
+            "symfony/monolog-bridge v2.6.13",
+            "10.6",
+            "v6.4.45 (2026-08-30)"
+          ],
+          [
+            "guzzlehttp/guzzle 6.5.8",
+            "4.2",
+            "8.2.0 (2026-09-06)"
+          ],
+          [
+            "symfony/yaml v5.4.23",
+            "3.4",
+            "v8.1.8 (2026-09-26)"
+          ],
+          [
+            "twig/twig v2.16.1",
+            "2.0",
+            "v3.30.0 (2026-09-25)"
+          ],
+          [
+            "symfony/debug v3.4.47",
+            "1.8",
+            "v4.4.44 (2022-07-28)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "4 packages",
+          "gate": "all fail the gate",
+          "major": "3 of 3 moves cross a major"
+        },
+        {
+          "grade": "high",
+          "count": "2 packages",
+          "gate": "all fail the gate",
+          "major": null
+        },
+        {
+          "grade": "low",
+          "count": "3 packages",
+          "gate": null,
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "twig/twig",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/twig-bridge",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/monolog-bridge:^5.4.52'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'php:>=7.2.5' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/debug",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth-server-bundle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tubalmartin/cssmin",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/yaml",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update symfony/yaml",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "fails_gate": false,
+          "reach": "via guzzlehttp/guzzle",
+          "held": null,
+          "command": "composer update symfony/polyfill-intl-idn",
+          "after": "after it: 0, finished",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth2-php",
+          "fails_gate": false,
+          "reach": "via friendsofsymfony/oauth-server-bundle",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 1,
+        "wayout": 5
+      },
+      "data_caption": null,
+      "data_column": true,
+      "signals_key": [
+        "S1 marked abandoned",
+        "S2 release age",
+        "S3 archived repository",
+        "S4 repository activity",
+        "S5 PHP promise",
+        "S6 pinned version",
+        "S7 pulled-in packages",
+        "S8 release branch",
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "twig/twig",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by symfony/twig-bridge"
+          ]
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/yaml",
+          "same_cve_as": [
+            "PKSA-ft77-7h5f-p3r6: same CVE as PKSA-b14r-zh1d-vdrc"
+          ],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ]
+    },
+    "B-also.checked‡": {
+      "document": "page/B-also.checked-dagger.json",
+      "title": "lockrot: 1 of 1 package flagged",
+      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 critical. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for matomo/matomo · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "1 of 1 package flagged (100%): 1 graded critical. Flags: left-behind 1, old-promise 1, vulnerable 1.",
+        "In production · required directly · 1 security advisory on 1 package (severity: 1 high) · fix by package: 1 composer update · 10.6 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 1 critical finding · 1 of 1 package high or worse",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "load_line": "36 points on 1 flagged package · 36 (100 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 1,
+      "state_lines": [],
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "1 in production · 1 required directly",
+      "grade_chips": [
+        "critical 1"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 1
+        }
+      ],
+      "ready": {
+        "note": "for findings that fail the gate, in lockrot's rank order",
+        "moves": [
+          {
+            "package": "symfony/monolog-bridge",
+            "link": "#view=findings&pkg=symfony%2Fmonolog-bridge",
+            "grade": "critical",
+            "new_major": false,
+            "command": "composer update symfony/monolog-bridge",
+            "clears": "the advisory",
+            "after": {
+              "result": "20, high",
+              "conditions": []
+            },
+            "also_holds": null
+          }
+        ],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": null,
+        "way_out_link": null,
+        "way_out_link_rows": null,
+        "none": null
+      },
+      "security": {
+        "figure": "1",
+        "unit": "advisory on 1 package",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "symfony/monolog-bridge",
+            "link": "#view=findings&pkg=symfony%2Fmonolog-bridge",
+            "reach": "",
+            "total": 36,
+            "terms": "left-behind 16 · old-promise 4 · vulnerable 16",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "1 carry more than one flag · score model 1",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": null,
+      "depth": {
+        "rows": [
+          "in composer.json 1"
+        ],
+        "sentence": "The flagged package is named by a line of composer.json."
+      },
+      "libyears": {
+        "figure": "10.62",
+        "bound": "",
+        "sub": "over 1 package · 10.62 from direct requirements",
+        "unmeasured": null,
+        "top": [
+          [
+            "symfony/monolog-bridge v2.6.13",
+            "10.6",
+            "v6.4.45 (2026-08-30)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "1 package",
+          "gate": "all fail the gate",
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "symfony/monolog-bridge",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer update symfony/monolog-bridge",
+          "after": "after it: 20, high",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 1,
+      "gate_partition": {
+        "ready": 1,
+        "held": 0,
+        "wayout": 0
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S5 PHP promise",
+        "S8 release branch",
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "symfony/monolog-bridge",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ]
+    },
+    "unknown.offline‡": {
+      "document": "page/unknown.offline-dagger.json",
+      "title": "lockrot: nothing flagged in 1 package",
+      "description": "lockrot checked 1 package in composer.lock and flagged none.",
+      "copy_summary": [
+        "lockrot report for drupal/drupal · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run passes · --fail-on=high",
+        "Nothing flagged in 1 package.",
+        "No security advisory."
+      ],
+      "grade_line": "Project grade: nothing flagged · 1 not judged",
+      "figure_line": "0 of 1 package flagged · 0 ok · 0 allowlisted",
+      "load_line": null,
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": null,
+      "gate_link_rows": null,
+      "state_lines": [
+        "Offline run: 1 of 1 package has no grade, because lockrot read no metadata for it. What this run could not see"
+      ],
+      "waffle_caption": "0 of 1 package flagged · 1 not judged · 0 ok · 0 allowlisted",
+      "lead_scope": null,
+      "grade_chips": [],
+      "waffle": [
+        {
+          "verdict": "unknown",
+          "word": "not judged",
+          "mark": "hatch",
+          "count": 1
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": null,
+        "way_out_link": null,
+        "way_out_link_rows": null,
+        "none": "Nothing to run: no package is flagged."
+      },
+      "security": {
+        "figure": null,
+        "unit": "no security advisory",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": null,
+      "flags_notes": [],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 0"
+        ],
+        "rows": [
+          {
+            "package": "drupal/core",
+            "flagged": 3,
+            "link": "#view=radius&pkg=drupal%2Fcore"
+          }
+        ],
+        "count": null,
+        "overlap": null,
+        "more": null,
+        "shared": null
+      },
+      "depth": {
+        "rows": [],
+        "sentence": null
+      },
+      "libyears": {
+        "figure": null,
+        "bound": "",
+        "sub": "no package measured",
+        "unmeasured": "Not measured: 1 not from a Composer repository",
+        "top": [],
+        "none": null
+      },
+      "findings_groups": [],
+      "findings_rows": [],
+      "ready_count": 0,
+      "gate_partition": null,
+      "data_caption": "No row has repository data",
+      "data_column": false,
+      "signals_key": [
+        "S7 pulled-in packages"
+      ],
+      "advisory_groups": []
+    },
+    "snipe-it": {
+      "document": "contract/page/snipe-it.json",
+      "title": "lockrot: 25 of 167 packages flagged",
+      "description": "lockrot flagged 25 of 167 packages in composer.lock: 5 critical, 9 high, 6 medium, 5 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for grokability/snipe-it · data as of 2026-10-14 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "25 of 167 packages flagged (15%): 5 graded critical, 9 high, 6 medium, 5 low. Flags: abandoned 1, silent 5, pinned 1, left-behind 5, old-promise 6, stale 6, vulnerable 7.",
+        "All 25 in production · 16 required directly, 9 pulled in · 11 security advisories on 7 packages (severity: 1 critical, 1 high, 7 medium, 1 unrated, 1 low) · fix by package: 6 composer update, 1 upgrade · 79.7 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 5 critical findings · 14 of 167 packages high or worse",
+      "figure_line": "25 of 167 packages flagged · 121 ok · 21 allowlisted",
+      "load_line": "386 points on 25 flagged packages · 318 (82 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 14,
+      "state_lines": [],
+      "waffle_caption": "25 of 167 packages flagged · 121 ok · 21 allowlisted",
+      "lead_scope": "all 25 in production · 16 required directly, 9 pulled in",
+      "grade_chips": [
+        "critical 5",
+        "high 9",
+        "medium 6",
+        "low 5"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 5
+        },
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 9
+        },
+        {
+          "verdict": "medium",
+          "word": "medium",
+          "mark": "fill",
+          "count": 6
+        },
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 5
+        },
+        {
+          "verdict": "finished",
+          "word": "allowlisted",
+          "mark": "ring-dot",
+          "count": 21
+        },
+        {
+          "verdict": "ok",
+          "word": "ok",
+          "mark": "soft",
+          "count": 121
+        }
+      ],
+      "ready": {
+        "note": "for findings that fail the gate, in lockrot's rank order",
+        "moves": [
+          {
+            "package": "mtdowling/jmespath.php",
+            "link": "#view=findings&pkg=mtdowling%2Fjmespath.php",
+            "grade": "critical",
+            "new_major": false,
+            "command": "composer update 'mtdowling/jmespath.php:^2.9.1'",
+            "clears": "the advisory",
+            "after": {
+              "result": "0, ok",
+              "conditions": []
+            },
+            "also_holds": null
+          },
+          {
+            "package": "league/commonmark",
+            "link": "#view=findings&pkg=league%2Fcommonmark",
+            "grade": "high",
+            "new_major": false,
+            "command": "composer update 'league/commonmark:^2.10.2'",
+            "clears": "both advisories",
+            "after": {
+              "result": "0, ok",
+              "conditions": []
+            },
+            "also_holds": null
+          },
+          {
+            "package": "pragmarx/google2fa-laravel",
+            "link": "#view=findings&pkg=pragmarx%2Fgoogle2fa-laravel",
+            "grade": "high",
+            "new_major": true,
+            "command": "composer require 'pragmarx/google2fa-laravel:^2.3'",
+            "clears": "both",
+            "after": {
+              "result": "0, ok",
+              "conditions": []
+            },
+            "also_holds": "Also holds: bacon/bacon-qr-code (high), pragmarx/google2fa-qrcode (medium)"
+          }
+        ],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": "2 of 14 findings that fail the gate are held by other packages. Their holders are in each sheet's Held by.",
+        "held_link": "#view=findings&gate=fails%2Cheld",
+        "held_link_rows": 2,
+        "way_out": "9 need another way out: 6 find an alternative, 1 raise PHP >=8.4, 1 test, 1 no move",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 9,
+        "none": null
+      },
+      "security": {
+        "figure": "11",
+        "unit": "advisories on 7 packages",
+        "lookup_complete": true,
+        "counted_as": [
+          "unrated, counted as medium"
+        ]
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "javiereguiluz/easyslugger",
+            "link": "#view=findings&pkg=javiereguiluz%2Feasyslugger",
+            "reach": "",
+            "total": 36,
+            "terms": "silent 32 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "mtdowling/jmespath.php",
+            "link": "#view=findings&pkg=mtdowling%2Fjmespath.php",
+            "reach": "transitive",
+            "total": 32,
+            "terms": "vulnerable 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "doctrine/cache",
+            "link": "#view=findings&pkg=doctrine%2Fcache",
+            "reach": "",
+            "total": 32,
+            "terms": "abandoned 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "onnov/detect-encoding",
+            "link": "#view=findings&pkg=onnov%2Fdetect-encoding",
+            "reach": "",
+            "total": 32,
+            "terms": "silent 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "unicodeveloper/laravel-password",
+            "link": "#view=findings&pkg=unicodeveloper%2Flaravel-password",
+            "reach": "",
+            "total": 32,
+            "terms": "silent 32",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "pragmarx/google2fa-laravel",
+            "link": "#view=findings&pkg=pragmarx%2Fgoogle2fa-laravel",
+            "reach": "",
+            "total": 20,
+            "terms": "left-behind 16 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "neitanod/forceutf8",
+            "link": "#view=findings&pkg=neitanod%2Fforceutf8",
+            "reach": "",
+            "total": 18,
+            "terms": "old-promise 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "tmilos/lexer",
+            "link": "#view=findings&pkg=tmilos%2Flexer",
+            "reach": "transitive",
+            "total": 18,
+            "terms": "silent 16 · old-promise 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "tmilos/value",
+            "link": "#view=findings&pkg=tmilos%2Fvalue",
+            "reach": "transitive",
+            "total": 18,
+            "terms": "silent 16 · old-promise 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "league/commonmark",
+            "link": "#view=findings&pkg=league%2Fcommonmark",
+            "reach": "",
+            "total": 16,
+            "terms": "vulnerable 16",
+            "terms_total": null
+          }
+        ],
+        "rest": "15 more flagged packages hold 132 points",
+        "rest_link": "#view=findings"
+      },
+      "flags_notes": [
+        "6 carry more than one flag · score model 1",
+        "1 abandoned package, 0 with a replacement",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 25"
+        ],
+        "rows": [
+          {
+            "package": "arietimmerman/laravel-scim-server",
+            "flagged": 4,
+            "link": "#view=radius&pkg=arietimmerman%2Flaravel-scim-server"
+          },
+          {
+            "package": "laravel/passport",
+            "flagged": 2,
+            "link": "#view=radius&pkg=laravel%2Fpassport"
+          },
+          {
+            "package": "laravel/socialite",
+            "flagged": 1,
+            "link": "#view=radius&pkg=laravel%2Fsocialite"
+          },
+          {
+            "package": "league/flysystem-aws-s3-v3",
+            "flagged": 1,
+            "link": "#view=radius&pkg=league%2Fflysystem-aws-s3-v3"
+          },
+          {
+            "package": "pragmarx/google2fa-laravel",
+            "flagged": 1,
+            "link": "#view=radius&pkg=pragmarx%2Fgoogle2fa-laravel"
+          }
+        ],
+        "count": "5 direct requirements pull in flagged packages.",
+        "overlap": "A flagged package counts under each direct requirement it is reached from, up to 8, so the rows overlap.",
+        "more": null,
+        "shared": "1 flagged package shared by too many requirements to list under one: league/config."
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 16",
+          "1 hop away 5",
+          "2 hops away 4"
+        ],
+        "sentence": "9 of 25 flagged packages are named by no line of composer.json; the deepest, defuse/php-encryption, mtdowling/jmespath.php, tmilos/lexer and 1 more, sit 2 hops from the nearest line."
+      },
+      "libyears": {
+        "figure": "79.74",
+        "bound": "",
+        "sub": "over 163 packages · 30.01 from direct requirements",
+        "unmeasured": "Not measured: 1 not from a Composer repository · 3 dated only by a commit its tags share",
+        "top": [
+          [
+            "pragmarx/google2fa-qrcode v1.0.3",
+            "7.1",
+            "v4.0.0 (2026-05-08)"
+          ],
+          [
+            "pragmarx/google2fa-laravel v1.4.1",
+            "5.5",
+            "v2.3.1 (2026-03-17)"
+          ],
+          [
+            "phpdocumentor/reflection-common 2.2.0",
+            "5.4",
+            "2.2.1 (2025-11-10)"
+          ],
+          [
+            "intervention/image 2.7.2",
+            "4.4",
+            "4.3.5 (2026-10-10)"
+          ],
+          [
+            "bacon/bacon-qr-code 2.0.8",
+            "3.3",
+            "v3.1.1 (2026-04-05)"
+          ],
+          [
+            "doctrine/instantiator 1.5.0",
+            "3.0",
+            "2.1.0 (2026-01-05)"
+          ],
+          [
+            "tecnickcom/tc-lib-barcode 1.18.4",
+            "3.0",
+            "2.17.1 (2026-10-10)"
+          ],
+          [
+            "tecnickcom/tc-lib-color 1.14.39",
+            "3.0",
+            "3.0.12 (2026-10-10)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "5 packages",
+          "gate": "all fail the gate",
+          "major": null
+        },
+        {
+          "grade": "high",
+          "count": "9 packages",
+          "gate": "all fail the gate",
+          "major": "4 of 5 moves cross a major"
+        },
+        {
+          "grade": "medium",
+          "count": "6 packages",
+          "gate": null,
+          "major": "2 of 5 moves cross a major"
+        },
+        {
+          "grade": "low",
+          "count": "5 packages",
+          "gate": null,
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "mtdowling/jmespath.php",
+          "fails_gate": true,
+          "reach": "via league/flysystem-aws-s3-v3",
+          "held": null,
+          "command": "composer update 'mtdowling/jmespath.php:^2.9.1'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "javiereguiluz/easyslugger",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "doctrine/cache",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "onnov/detect-encoding",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "unicodeveloper/laravel-password",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "league/commonmark",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'league/commonmark:^2.10.2'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "pragmarx/google2fa-laravel",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'pragmarx/google2fa-laravel:^2.3'",
+          "after": "after it: 0, ok",
+          "major": "a new major",
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "neitanod/forceutf8",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tmilos/lexer",
+          "fails_gate": true,
+          "reach": "via arietimmerman/laravel-scim-server",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tmilos/value",
+          "fails_gate": true,
+          "reach": "via arietimmerman/laravel-scim-server",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "arietimmerman/laravel-scim-server",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "bacon/bacon-qr-code",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by pragmarx/google2fa-laravel and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "doctrine/instantiator",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'php:>=8.4' --no-update",
+          "after": "after it: 0, ok",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "intervention/image",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by intervention/image",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "enshrined/svg-sanitize",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'enshrined/svg-sanitize:^1.0.0'",
+          "after": "after it: 0, ok",
+          "major": "a new major",
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "livewire/livewire",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'livewire/livewire:^4.3.4'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "paragonie/sodium_compat",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'paragonie/sodium_compat:^1.24.1'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "phpseclib/phpseclib",
+          "fails_gate": false,
+          "reach": "via laravel/passport and 1 more",
+          "held": null,
+          "command": "composer update 'phpseclib/phpseclib:^3.0.57'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "pragmarx/google2fa-qrcode",
+          "fails_gate": false,
+          "reach": "via pragmarx/google2fa-laravel",
+          "held": "held by pragmarx/google2fa-laravel",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "okvpn/clock-lts",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "laravel/framework",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'laravel/framework:^12.69.0'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "defuse/php-encryption",
+          "fails_gate": false,
+          "reach": "via laravel/passport",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "league/config",
+          "fails_gate": false,
+          "reach": "via league/commonmark and 20 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tmilos/scim-filter-parser",
+          "fails_gate": false,
+          "reach": "via arietimmerman/laravel-scim-server",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tmilos/scim-schema",
+          "fails_gate": false,
+          "reach": "via arietimmerman/laravel-scim-server",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 8,
+      "gate_partition": {
+        "ready": 3,
+        "held": 2,
+        "wayout": 9
+      },
+      "data_caption": "Every row has data as of 2026-10-14 (1 read no repository data)",
+      "data_column": false,
+      "signals_key": [
+        "S1 marked abandoned",
+        "S2 release age",
+        "S4 repository activity",
+        "S5 PHP promise",
+        "S6 pinned version",
+        "S7 pulled-in packages",
+        "S8 release branch",
+        "S9 advisories",
+        "S10 unchecked"
+      ],
+      "advisory_groups": [
+        {
+          "package": "mtdowling/jmespath.php",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "league/commonmark",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "enshrined/svg-sanitize",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "livewire/livewire",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "paragonie/sodium_compat",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "phpseclib/phpseclib",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "laravel/framework",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ]
+    },
     "empty-lock": {
       "document": "report-2/moodle-v3.json",
       "title": "lockrot: composer.lock holds no package",
