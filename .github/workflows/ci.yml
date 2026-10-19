@@ -70,20 +70,29 @@ jobs:
           if [ "${{ matrix.composer }}" = "2.6" ]; then
             vendor/bin/phpunit -c "$config" "${slow[@]}" --exclude-group=covers-nothing tests/Unit/Solver tests/Unit/Verdict tests/Unit/Analyzer
           else
+            # Processes side by side shorten the row. Each writes its own log, and the step checks every exit code.
             # A runtime-php test reads the PHP that runs it, so a row without covers-nothing still runs it.
-            group=covers-nothing
-            if [ "${{ matrix.covers_nothing }}" != "true" ]; then group=runtime-php; fi
-            # Two processes side by side halve the row. Each writes its own log, and the step checks both exit codes.
+            # On a covers_nothing row, schema-sweep holds the longest covers-nothing class and gets a process of its own.
+            runs=("--exclude-group=covers-nothing")
+            if [ "${{ matrix.covers_nothing }}" = "true" ]; then
+              runs+=("--group=covers-nothing --exclude-group=schema-sweep" "--group=schema-sweep")
+            else
+              runs+=("--group=runtime-php")
+            fi
             mkdir -p build
-            vendor/bin/phpunit -c "$config" "${slow[@]}" --exclude-group=covers-nothing > build/phpunit-rest.log 2>&1 &
-            rest=$!
-            vendor/bin/phpunit -c "$config" "${slow[@]}" --group "$group" > build/phpunit-group.log 2>&1 &
-            grouped=$!
-            rest_status=0; wait "$rest" || rest_status=$?
-            group_status=0; wait "$grouped" || group_status=$?
-            echo "=== phpunit without covers-nothing: exit $rest_status"; cat build/phpunit-rest.log
-            echo "=== phpunit --group $group: exit $group_status"; cat build/phpunit-group.log
-            if [ "$rest_status" -ne 0 ] || [ "$group_status" -ne 0 ]; then exit 1; fi
+            pids=()
+            for i in "${!runs[@]}"; do
+              # shellcheck disable=SC2086 # each entry holds the options of one process
+              vendor/bin/phpunit -c "$config" "${slow[@]}" ${runs[$i]} > "build/phpunit-$i.log" 2>&1 &
+              pids+=($!)
+            done
+            failed=0
+            for i in "${!runs[@]}"; do
+              status=0; wait "${pids[$i]}" || status=$?
+              echo "=== phpunit ${runs[$i]}: exit $status"; cat "build/phpunit-$i.log"
+              if [ "$status" -ne 0 ]; then failed=1; fi
+            done
+            if [ "$failed" -ne 0 ]; then exit 1; fi
           fi
       # Composer 2.2 LTS bundles symfony/console 2.8, older than the version that require-dev resolves.
       # This step runs the plugin e2e test through the real 2.2 binary, so it exercises the bundled 2.8 API.

@@ -80,13 +80,17 @@ use PHPUnit\Framework\TestCase;
  * It covers nothing: Infection skips a mutant whose covering tests together outlast its timeout, and
  * the report-2 validations of this sweep push every line of the analyzer and the writers past it.
  * The unit tests of the writers and ScoreFactsConsistencyTest kill those mutants.
+ * The group schema-sweep lets ci.yml run this class, the longest of covers-nothing, in a process
+ * of its own.
  *
  * @coversNothing
  *
  * @group covers-nothing
+ * @group schema-sweep
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
+#[Group('schema-sweep')]
 final class JsonSchemaConformanceTest extends TestCase
 {
     use AssertsNoteDetails;
