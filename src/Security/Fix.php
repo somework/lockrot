@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Lockrot\Security;
 
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Verdict\GradedPackage;
 
 /**
  * The fix of one advisory: an S9 row's `fix`. A fix of kind `unknown` or `none`
- * names no release, so its branch, versions, php and {@see onInstalledBranch()} are null together
+ * names no release, so its branch, versions, php, the floor answers on that php and {@see onInstalledBranch()} are null together
  * and {@see reason()} says why.
  *
  * @internal
@@ -34,6 +35,8 @@ final class Fix implements \JsonSerializable
     private ?Candidate $candidate;
     private ?string $newest;
     private ?bool $onInstalledBranch;
+    private ?bool $admitsTargetPhp = null;
+    private ?bool $admitsProjectPhp = null;
     private ?string $reason;
 
     /** @param self::UPDATE|self::UPGRADE|self::RAISE_PHP|self::BLOCKED|self::UNKNOWN|self::NONE $kind */
@@ -50,9 +53,13 @@ final class Fix implements \JsonSerializable
      * @param string  $newest          the newest release of the candidate's branch
      * @param ?string $installedBranch the installed branch key, null for a branch snapshot
      */
-    public static function to(Candidate $candidate, string $newest, ?string $installedBranch): self
+    public static function to(Candidate $candidate, string $newest, ?string $installedBranch, PhpFloor $floor): self
     {
-        return new self($candidate->kind(), $candidate, $newest, $candidate->branchKey() === $installedBranch, null);
+        $fix = new self($candidate->kind(), $candidate, $newest, $candidate->branchKey() === $installedBranch, null);
+        $fix->admitsTargetPhp = $floor->admitsTarget($candidate->php());
+        $fix->admitsProjectPhp = $floor->admitsProject($candidate->php());
+
+        return $fix;
     }
 
     /** @param self::RELEASES_UNKNOWN|self::NOT_FROM_COMPOSER_REPOSITORY|self::AFFECTED_RANGE_UNKNOWN $reason */
@@ -134,6 +141,17 @@ final class Fix implements \JsonSerializable
         return $this->candidate === null ? null : $this->candidate->php();
     }
 
+    /** {@see PhpFloor::admitsTarget()} of {@see php()}, as a branch row's `admits_target_php` asks it. */
+    public function admitsTargetPhp(): ?bool
+    {
+        return $this->admitsTargetPhp;
+    }
+
+    public function admitsProjectPhp(): ?bool
+    {
+        return $this->admitsProjectPhp;
+    }
+
     /** @return list<Holder> */
     public function heldBy(): array
     {
@@ -151,7 +169,7 @@ final class Fix implements \JsonSerializable
         return $this->reason;
     }
 
-    /** @return array{kind: string, to_branch: ?string, version: ?string, newest: ?string, on_installed_branch: ?bool, php: ?string, held_by: list<Holder>, reason: ?string} */
+    /** @return array{kind: string, to_branch: ?string, version: ?string, newest: ?string, on_installed_branch: ?bool, php: ?string, admits_target_php: ?bool, admits_project_php: ?bool, held_by: list<Holder>, reason: ?string} */
     public function jsonSerialize(): array
     {
         return [
@@ -161,6 +179,8 @@ final class Fix implements \JsonSerializable
             'newest' => $this->newest,
             'on_installed_branch' => $this->onInstalledBranch,
             'php' => $this->php(),
+            'admits_target_php' => $this->admitsTargetPhp,
+            'admits_project_php' => $this->admitsProjectPhp,
             'held_by' => $this->heldBy(),
             'reason' => $this->reason,
         ];

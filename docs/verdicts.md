@@ -462,6 +462,9 @@ every `conflict`.
   advisory's range. S9's `fix.version` is the lowest such release, and `fix.newest` is the
   branch's newest release.
 
+- `fix.admits_target_php` and `fix.admits_project_php` are the floor answers of a branch row,
+  asked of `fix.php` ([The PHP test](#the-php-test-in-explain)). Null is no answer, never admitted.
+
 - `held_by` names each holder with its constraint and, when the holder is a finding of this
   report, its own verdict and move. An abandoned holder reads
   `held by abandoned symfony/x (replacement: …)`.

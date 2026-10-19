@@ -414,6 +414,8 @@
                                 "newest": "v5.4.50",
                                 "on_installed_branch": false,
                                 "php": ">=7.2.5",
+                                "admits_target_php": true,
+                                "admits_project_php": true,
                                 "held_by": [
                                     {
                                         "source": "root",
@@ -452,6 +454,8 @@
                                 "newest": "v5.4.50",
                                 "on_installed_branch": false,
                                 "php": ">=7.2.5",
+                                "admits_target_php": true,
+                                "admits_project_php": true,
                                 "held_by": [
                                     {
                                         "source": "root",
@@ -2335,12 +2339,12 @@
     },
     "generated_at": "2026-10-14T00:00:00+00:00",
     "notes": [
-        "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested."
+        "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code 4.7.1 requires php >=7.4, <8.2."
     ],
     "note_details": [
         {
             "code": "moves_not_checked",
-            "text": "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested.",
+            "text": "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code 4.7.1 requires php >=7.4, <8.2.",
             "docs_url": "https://lockrot.dev/notes/#moves_not_checked",
             "sets_network_failures": false,
             "data": {

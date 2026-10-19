@@ -486,6 +486,8 @@
         "newest": "v4.4.44",
         "on_installed_branch": false,
         "php": ">=7.1.3",
+        "admits_target_php": true,
+        "admits_project_php": true,
         "held_by": [
          {
           "source": "root",

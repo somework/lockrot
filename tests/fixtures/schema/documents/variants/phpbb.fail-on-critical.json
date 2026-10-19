@@ -1503,6 +1503,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1527,6 +1529,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1551,6 +1555,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1575,6 +1581,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1599,6 +1607,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1623,6 +1633,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1647,6 +1659,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1671,6 +1685,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1695,6 +1711,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1719,6 +1737,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1743,6 +1763,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1767,6 +1789,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1791,6 +1815,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1815,6 +1841,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1839,6 +1867,8 @@
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -2319,6 +2349,8 @@
          "newest": "v5.4.50",
          "on_installed_branch": false,
          "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -2343,6 +2375,8 @@
          "newest": "v5.4.50",
          "on_installed_branch": false,
          "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -2826,6 +2860,8 @@
          "newest": "v5.4.51",
          "on_installed_branch": false,
          "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -2850,6 +2886,8 @@
          "newest": "v5.4.51",
          "on_installed_branch": false,
          "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -3361,6 +3399,8 @@
          "newest": "7.15.5",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -3385,6 +3425,8 @@
          "newest": "7.15.5",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -3409,6 +3451,8 @@
          "newest": "7.15.5",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -3433,6 +3477,8 @@
          "newest": "7.15.5",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -3457,6 +3503,8 @@
          "newest": "7.15.5",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -3481,6 +3529,8 @@
          "newest": "7.15.5",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -3505,6 +3555,8 @@
          "newest": "7.15.5",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -3529,6 +3581,8 @@
          "newest": "7.15.5",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -3553,6 +3607,8 @@
          "newest": "7.15.5",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -4950,6 +5006,8 @@
          "newest": "v5.4.53",
          "on_installed_branch": false,
          "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -4974,6 +5032,8 @@
          "newest": "v5.4.53",
          "on_installed_branch": false,
          "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -5422,6 +5482,8 @@
          "newest": "v4.4.51",
          "on_installed_branch": false,
          "php": ">=7.1.3",
+         "admits_target_php": true,
+         "admits_project_php": true,
          "held_by": [],
          "reason": null
         },
@@ -5816,6 +5878,8 @@
          "newest": "v4.4.51",
          "on_installed_branch": false,
          "php": ">=7.1.3",
+         "admits_target_php": true,
+         "admits_project_php": true,
          "held_by": [],
          "reason": null
         },
@@ -6259,6 +6323,8 @@
          "newest": "2.13.1",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -6283,6 +6349,8 @@
          "newest": "2.13.1",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -6307,6 +6375,8 @@
          "newest": "2.13.1",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -6331,6 +6401,8 @@
          "newest": "2.13.1",
          "on_installed_branch": false,
          "php": "^7.2.5 || ^8.0",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -6808,6 +6880,8 @@
          "newest": "v5.4.53",
          "on_installed_branch": false,
          "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -6832,6 +6906,8 @@
          "newest": "v5.4.53",
          "on_installed_branch": false,
          "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -6856,6 +6932,8 @@
          "newest": "v5.4.53",
          "on_installed_branch": false,
          "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -10884,6 +10962,8 @@
          "newest": "v1.43.0",
          "on_installed_branch": true,
          "php": ">=7.2",
+         "admits_target_php": true,
+         "admits_project_php": true,
          "held_by": [],
          "reason": null
         },

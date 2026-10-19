@@ -1425,6 +1425,8 @@
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -1449,6 +1451,8 @@
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -1473,6 +1477,8 @@
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -1497,6 +1503,8 @@
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -1521,6 +1529,8 @@
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -1955,6 +1965,8 @@
                                     "newest": "3.1.5",
                                     "on_installed_branch": true,
                                     "php": ">= 5.4",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1979,6 +1991,8 @@
                                     "newest": "3.1.5",
                                     "on_installed_branch": true,
                                     "php": ">= 5.4",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": null
                                 },

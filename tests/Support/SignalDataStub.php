@@ -24,6 +24,7 @@ use Lockrot\Signal\Data\OldPromiseData;
 use Lockrot\Signal\Data\PinnedData;
 use Lockrot\Signal\Data\ReachableBranch;
 use Lockrot\Signal\Data\SignalData;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Assert;
@@ -184,7 +185,7 @@ final class SignalDataStub
         /** @var Fix::UPDATE|Fix::UPGRADE|Fix::RAISE_PHP|Fix::BLOCKED $kind */
         $candidate = new Candidate(new StableRelease($version.'.0', $version, null, self::opt($d, 'php'), false), $branch, $kind, $holders);
 
-        return Fix::to($candidate, self::str($d, 'newest', $version), ($d['on_installed_branch'] ?? false) === true ? $branch : null);
+        return Fix::to($candidate, self::str($d, 'newest', $version), ($d['on_installed_branch'] ?? false) === true ? $branch : null, new PhpFloor(null));
     }
 
     /** @param array<mixed, mixed> $d */

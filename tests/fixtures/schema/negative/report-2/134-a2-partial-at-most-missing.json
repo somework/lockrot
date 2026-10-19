@@ -1508,6 +1508,8 @@
          "newest": "v3.4.0",
          "on_installed_branch": false,
          "php": ">=8.1",
+         "admits_target_php": true,
+         "admits_project_php": false,
          "held_by": [],
          "reason": null
         },
@@ -1532,6 +1534,8 @@
          "newest": "v2.13.0",
          "on_installed_branch": true,
          "php": ">=7.2",
+         "admits_target_php": true,
+         "admits_project_php": true,
          "held_by": [],
          "reason": null
         },

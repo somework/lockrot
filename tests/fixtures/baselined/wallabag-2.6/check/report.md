@@ -126,7 +126,7 @@ advisories: 210 packages asked · composer repo (http://127.0.0.1) answered (193
 moves: not checked, because Composer's solver refuses the lock itself (see the moves\_not\_checked note)
 baseline: 47 known · 61 new · 6 worsened · 2 stale (lockrot-baseline.json)
 
-- note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested.
+- note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code 4.7.1 requires php \>=7.4, \<8.2.
 - note: baseline lists 2 packages no longer in composer.lock: behat/transliterator, true/punycode
 
 <sub>210 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

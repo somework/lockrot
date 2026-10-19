@@ -2667,6 +2667,8 @@
                                     "newest": "11.5.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -2731,6 +2733,8 @@
                                     "newest": "11.5.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -17394,6 +17398,8 @@
                                     "newest": "3.0.57",
                                     "on_installed_branch": true,
                                     "php": ">=5.6.1",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },

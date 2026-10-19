@@ -1369,6 +1369,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1397,6 +1399,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1425,6 +1429,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1453,6 +1459,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1481,6 +1489,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1509,6 +1519,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1537,6 +1549,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1565,6 +1579,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1593,6 +1609,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1621,6 +1639,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1649,6 +1669,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1677,6 +1699,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1705,6 +1729,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1733,6 +1759,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -1761,6 +1789,8 @@ export const d_A_baselined_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3222,6 +3252,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3246,6 +3278,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3270,6 +3304,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3294,6 +3330,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3318,6 +3356,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3342,6 +3382,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3366,6 +3408,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3390,6 +3434,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3414,6 +3460,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3438,6 +3486,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3462,6 +3512,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3486,6 +3538,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3510,6 +3564,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3534,6 +3590,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -3558,6 +3616,8 @@ export const d_A_blocked_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": false,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -5023,6 +5083,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5081,6 +5143,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5139,6 +5203,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5197,6 +5263,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5255,6 +5323,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5313,6 +5383,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5371,6 +5443,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5429,6 +5503,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5487,6 +5563,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5545,6 +5623,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5603,6 +5683,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5661,6 +5743,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5719,6 +5803,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5777,6 +5863,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -5835,6 +5923,8 @@ export const d_A_gate_critical = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -7334,6 +7424,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -7392,6 +7484,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -7450,6 +7544,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -7508,6 +7604,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -7566,6 +7664,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -7624,6 +7724,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -7682,6 +7784,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -7740,6 +7844,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -7798,6 +7904,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -7856,6 +7964,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -7914,6 +8024,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -7972,6 +8084,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -8030,6 +8144,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -8088,6 +8204,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -8146,6 +8264,8 @@ export const d_A_gate_vulnerable = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -9651,6 +9771,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -9709,6 +9831,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -9767,6 +9891,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -9825,6 +9951,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -9883,6 +10011,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -9941,6 +10071,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -9999,6 +10131,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -10057,6 +10191,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -10115,6 +10251,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -10173,6 +10311,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -10231,6 +10371,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -10289,6 +10431,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -10347,6 +10491,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -10405,6 +10551,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -10463,6 +10611,8 @@ export const d_A_php_star_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -11962,6 +12112,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12020,6 +12172,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12078,6 +12232,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12136,6 +12292,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12194,6 +12352,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12252,6 +12412,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12310,6 +12472,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12368,6 +12532,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12426,6 +12592,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12484,6 +12652,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12542,6 +12712,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12600,6 +12772,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12658,6 +12832,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12716,6 +12892,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -12774,6 +12952,8 @@ export const d_A = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -14297,6 +14477,8 @@ export const d_B_accepted_dagger = {
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -15890,6 +16072,8 @@ export const d_B_also_dagger = {
                                     "newest": "v2.8.52",
                                     "on_installed_branch": true,
                                     "php": ">=5.3.9",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -17409,6 +17593,8 @@ export const d_B_baselined_dagger = {
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -18989,6 +19175,8 @@ export const d_B_dev_dagger = {
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -20504,6 +20692,8 @@ export const d_B_gate_flag = {
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -22028,6 +22218,8 @@ export const d_B_gate_list = {
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -23536,6 +23728,8 @@ export const d_B_gate_none = {
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -27855,6 +28049,8 @@ export const d_B = {
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -40309,6 +40505,8 @@ export const d_E_ignored_dagger = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -40333,6 +40531,8 @@ export const d_E_ignored_dagger = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -40357,6 +40557,8 @@ export const d_E_ignored_dagger = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -41787,6 +41989,8 @@ export const d_E_ignored_whole_dagger = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -41811,6 +42015,8 @@ export const d_E_ignored_whole_dagger = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -41835,6 +42041,8 @@ export const d_E_ignored_whole_dagger = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -43221,6 +43429,8 @@ export const d_E = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -43245,6 +43455,8 @@ export const d_E = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -43269,6 +43481,8 @@ export const d_E = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -44678,6 +44892,8 @@ export const d_F = {
                                     "newest": "v1.43.0",
                                     "on_installed_branch": true,
                                     "php": ">=7.2",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -51558,6 +51774,8 @@ export const d_affected_range_unknown_dagger = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "affected_range_unknown"
                                 },
@@ -54423,6 +54641,8 @@ export const d_commonmark = {
                                     "newest": "2.10.3",
                                     "on_installed_branch": true,
                                     "php": "^7.4 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -54447,6 +54667,8 @@ export const d_commonmark = {
                                     "newest": "2.10.3",
                                     "on_installed_branch": true,
                                     "php": "^7.4 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -54471,6 +54693,8 @@ export const d_commonmark = {
                                     "newest": "2.10.3",
                                     "on_installed_branch": true,
                                     "php": "^7.4 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -54833,6 +55057,8 @@ export const d_commonmark = {
                                     "newest": "v12.69.3",
                                     "on_installed_branch": true,
                                     "php": "^8.2",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -56633,6 +56859,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -56691,6 +56919,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -56749,6 +56979,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -56807,6 +57039,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -56865,6 +57099,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -56923,6 +57159,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -56981,6 +57219,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -57039,6 +57279,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -57097,6 +57339,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -57155,6 +57399,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -57213,6 +57459,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -57271,6 +57519,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -57329,6 +57579,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -57387,6 +57639,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -57445,6 +57699,8 @@ export const d_composite = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -57959,6 +58215,8 @@ export const d_composite = {
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -58455,6 +58713,8 @@ export const d_composite = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -58479,6 +58739,8 @@ export const d_composite = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -58503,6 +58765,8 @@ export const d_composite = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -58527,6 +58791,8 @@ export const d_composite = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -58551,6 +58817,8 @@ export const d_composite = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -58575,6 +58843,8 @@ export const d_composite = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -58599,6 +58869,8 @@ export const d_composite = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -58623,6 +58895,8 @@ export const d_composite = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -58647,6 +58921,8 @@ export const d_composite = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -60056,6 +60332,8 @@ export const d_composite = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -60080,6 +60358,8 @@ export const d_composite = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -60104,6 +60384,8 @@ export const d_composite = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -60476,6 +60758,8 @@ export const d_composite = {
                                     "newest": "v1.43.0",
                                     "on_installed_branch": true,
                                     "php": ">=7.2",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -62277,6 +62561,8 @@ export const d_either_critical_dagger = {
                                     "newest": "v4.4.44",
                                     "on_installed_branch": false,
                                     "php": ">=7.1.3",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -63722,6 +64008,8 @@ export const d_either_low_dev_dagger = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "no_release_outside_range"
                                 },
@@ -65212,6 +65500,8 @@ export const d_fail_on_config_dagger = {
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -66714,6 +67004,8 @@ export const d_fail_on_default_dagger = {
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -68143,6 +68435,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68167,6 +68461,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68191,6 +68487,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68215,6 +68513,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68239,6 +68539,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68263,6 +68565,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68287,6 +68591,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68311,6 +68617,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68335,6 +68643,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68359,6 +68669,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68383,6 +68695,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68407,6 +68721,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68431,6 +68747,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68455,6 +68773,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -68479,6 +68799,8 @@ export const d_feeds_drupal_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -70007,6 +70329,8 @@ export const d_flysystem = {
                                     "newest": "3.36.0",
                                     "on_installed_branch": false,
                                     "php": "^8.0.2",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "package",
@@ -73115,6 +73439,8 @@ export const d_guzzle_5 = {
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -73193,6 +73519,8 @@ export const d_guzzle_5 = {
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -73271,6 +73599,8 @@ export const d_guzzle_5 = {
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -73349,6 +73679,8 @@ export const d_guzzle_5 = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -73427,6 +73759,8 @@ export const d_guzzle_5 = {
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -73505,6 +73839,8 @@ export const d_guzzle_5 = {
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -73583,6 +73919,8 @@ export const d_guzzle_5 = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -73661,6 +73999,8 @@ export const d_guzzle_5 = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -73739,6 +74079,8 @@ export const d_guzzle_5 = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -73817,6 +74159,8 @@ export const d_guzzle_5 = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -73895,6 +74239,8 @@ export const d_guzzle_5 = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -73973,6 +74319,8 @@ export const d_guzzle_5 = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -74051,6 +74399,8 @@ export const d_guzzle_5 = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -74129,6 +74479,8 @@ export const d_guzzle_5 = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -75909,6 +76261,8 @@ export const d_guzzle_mixed = {
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -76034,6 +76388,8 @@ export const d_guzzle_mixed = {
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -76159,6 +76515,8 @@ export const d_guzzle_mixed = {
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -76284,6 +76642,8 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -76409,6 +76769,8 @@ export const d_guzzle_mixed = {
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -76534,6 +76896,8 @@ export const d_guzzle_mixed = {
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -76659,6 +77023,8 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -76784,6 +77150,8 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -76909,6 +77277,8 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -77034,6 +77404,8 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -77159,6 +77531,8 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -77284,6 +77658,8 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -77409,6 +77785,8 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -77534,6 +77912,8 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -79167,6 +79547,8 @@ export const d_guzzle = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -79191,6 +79573,8 @@ export const d_guzzle = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -79215,6 +79599,8 @@ export const d_guzzle = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -79239,6 +79625,8 @@ export const d_guzzle = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -79263,6 +79651,8 @@ export const d_guzzle = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -79287,6 +79677,8 @@ export const d_guzzle = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -79311,6 +79703,8 @@ export const d_guzzle = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -79335,6 +79729,8 @@ export const d_guzzle = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -79359,6 +79755,8 @@ export const d_guzzle = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -92886,6 +93284,8 @@ export const d_joomla_filter = {
                                     "newest": "3.0.7",
                                     "on_installed_branch": false,
                                     "php": "^8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -95828,6 +96228,8 @@ export const d_local_path_advisory = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -95852,6 +96254,8 @@ export const d_local_path_advisory = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -95876,6 +96280,8 @@ export const d_local_path_advisory = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -95900,6 +96306,8 @@ export const d_local_path_advisory = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -95924,6 +96332,8 @@ export const d_local_path_advisory = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -98711,6 +99121,8 @@ export const d_long_range_dagger = {
                                     "newest": "v1.43.0",
                                     "on_installed_branch": true,
                                     "php": ">=7.2",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -101865,6 +102277,8 @@ export const d_move_check_dagger = {
                                     "newest": "v2.3.2",
                                     "on_installed_branch": true,
                                     "php": "^7.2 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -101889,6 +102303,8 @@ export const d_move_check_dagger = {
                                     "newest": "v2.3.2",
                                     "on_installed_branch": true,
                                     "php": "^7.2 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -108697,6 +109113,8 @@ export const d_partial_op_dagger = {
                                     "newest": "v3.4.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -108721,6 +109139,8 @@ export const d_partial_op_dagger = {
                                     "newest": "v2.13.0",
                                     "on_installed_branch": true,
                                     "php": ">=7.2",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -110325,6 +110745,8 @@ export const d_partial = {
                                     "newest": "v12.69.3",
                                     "on_installed_branch": false,
                                     "php": "^8.2",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -110374,6 +110796,8 @@ export const d_partial = {
                                     "newest": "v9.52.22",
                                     "on_installed_branch": true,
                                     "php": "^8.0.2",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -110398,6 +110822,8 @@ export const d_partial = {
                                     "newest": "v10.50.3",
                                     "on_installed_branch": false,
                                     "php": "^8.1",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -110432,6 +110858,8 @@ export const d_partial = {
                                     "newest": "v12.69.3",
                                     "on_installed_branch": false,
                                     "php": "^8.2",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -110481,6 +110909,8 @@ export const d_partial = {
                                     "newest": "v12.69.3",
                                     "on_installed_branch": false,
                                     "php": "^8.2",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -110530,6 +110960,8 @@ export const d_partial = {
                                     "newest": "v12.69.3",
                                     "on_installed_branch": false,
                                     "php": "^8.2",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -114561,6 +114993,8 @@ export const d_policy_off_dagger = {
                                     "newest": "3.0.7",
                                     "on_installed_branch": false,
                                     "php": "^8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -116066,6 +116500,8 @@ export const d_psr7 = {
                                     "newest": "2.13.1",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "package",
@@ -116114,6 +116550,8 @@ export const d_psr7 = {
                                     "newest": "2.13.1",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "package",
@@ -116162,6 +116600,8 @@ export const d_psr7 = {
                                     "newest": "2.13.1",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "package",
@@ -116210,6 +116650,8 @@ export const d_psr7 = {
                                     "newest": "2.13.1",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "package",
@@ -123508,6 +123950,8 @@ export const d_routing = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "package",
@@ -123556,6 +124000,8 @@ export const d_routing = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [
                                         {
                                             "source": "package",
@@ -132940,6 +133386,8 @@ export const d_tie_dagger = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "no_release_outside_range"
                                 },
@@ -134546,6 +134994,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -134625,6 +135075,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -134704,6 +135156,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -134783,6 +135237,8 @@ export const d_twig_1 = {
                                     "newest": "v2.16.1",
                                     "on_installed_branch": false,
                                     "php": ">=7.1.3",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -134817,6 +135273,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -134896,6 +135354,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -134975,6 +135435,8 @@ export const d_twig_1 = {
                                     "newest": "v2.16.1",
                                     "on_installed_branch": false,
                                     "php": ">=7.1.3",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -135009,6 +135471,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -135088,6 +135552,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -135167,6 +135633,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -135246,6 +135714,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -135325,6 +135795,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -135404,6 +135876,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -135483,6 +135957,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -135562,6 +136038,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -135641,6 +136119,8 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -137138,6 +137618,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137162,6 +137644,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137186,6 +137670,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137210,6 +137696,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137234,6 +137722,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137258,6 +137748,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137282,6 +137774,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137306,6 +137800,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137330,6 +137826,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137354,6 +137852,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137378,6 +137878,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137402,6 +137904,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137426,6 +137930,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137450,6 +137956,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -137474,6 +137982,8 @@ export const d_twig_dev_dagger = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -141287,6 +141797,8 @@ export const d_unrated_dagger = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "no_release_outside_range"
                                 },
@@ -141311,6 +141823,8 @@ export const d_unrated_dagger = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -141335,6 +141849,8 @@ export const d_unrated_dagger = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": true,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -148056,6 +148572,8 @@ export const d_xmlseclibs = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -148080,6 +148598,8 @@ export const d_xmlseclibs = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -148104,6 +148624,8 @@ export const d_xmlseclibs = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -148128,6 +148650,8 @@ export const d_xmlseclibs = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -148152,6 +148676,8 @@ export const d_xmlseclibs = {
                                     "newest": null,
                                     "on_installed_branch": null,
                                     "php": null,
+                                    "admits_target_php": null,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": "not_from_composer_repository"
                                 },
@@ -148586,6 +149112,8 @@ export const d_xmlseclibs = {
                                     "newest": "3.1.5",
                                     "on_installed_branch": true,
                                     "php": ">= 5.4",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -148610,6 +149138,8 @@ export const d_xmlseclibs = {
                                     "newest": "3.1.5",
                                     "on_installed_branch": true,
                                     "php": ">= 5.4",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -150123,6 +150653,8 @@ export const d_yaml_3_4 = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -150147,6 +150679,8 @@ export const d_yaml_3_4 = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
@@ -150171,6 +150705,8 @@ export const d_yaml_3_4 = {
                                     "newest": "v5.4.53",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": false,
                                     "held_by": [],
                                     "reason": null
                                 },
