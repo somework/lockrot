@@ -30,7 +30,7 @@ final class ContractBundle
     public const DIRECTORY = __DIR__.'/../../fixtures/contract';
     /** The files of DIRECTORY that record() does not write: the recorder's own, a table of PhpFloorTest, and the model's page goldens (PageGoldensTest). */
     public const NOT_RECORDED = ['bundle_sha256', 'provenance.json', 'en/php-versions.json', 'page-goldens.json'];
-    /** The directory of DIRECTORY that {@see EnginePage} writes. */
+    /** The directory of DIRECTORY that holds the {@see EnginePage} cases, which tools/report/record --engine-pages writes. */
     public const ENGINE_PAGES = 'page/';
     private const FIXTURES = __DIR__.'/../../fixtures/';
 

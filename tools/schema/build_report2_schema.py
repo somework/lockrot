@@ -498,8 +498,8 @@ def move_props(with_also):
                                        "are set on every kind that names an action on the package (`require raise-php tag replace find-alternative test`): the packages that "
                                        "require it act, or the project replaces them. Closed."),
                                       closed(['holders', 'crosses_major', 'transitive', 'unreached']), uniqueItems=True),
-        'commands': arr(("The ordered commands a user runs, each an argv list (round 4), rendered per shell by §5.6's quoting (POSIX, cmd.exe, PowerShell); `[]` for the kinds without a command. "
-                         "A transitive `require`, `raise-php` or `tag` move has no step for its package unless `check` resolves it: then the step is `composer update vendor/pkg:<constraint>` with the form's option, on a Composer that takes an inline constraint there. "
+        'commands': arr(("The ordered commands a user runs, each an argv list (round 4), rendered per shell by §5.6's quoting (POSIX, cmd.exe, PowerShell). The kinds without a command have `[]`. "
+                         "A transitive `require`, `raise-php` or `tag` move has no step for its package unless `check` resolves it. Then the step is `composer update vendor/pkg:<constraint>` with the form's option, on a Composer that takes an inline constraint there. "
                          "A `raise-php` move starts with its php step (`composer require php:>=8.1 --no-update`, attack round 1). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. "
                          "The command argument rule (§5.6): each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. "
                          "An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. "

@@ -157,10 +157,10 @@ final class CaseHydrator
     }
 
     /**
-     * The composite of tests/fixtures/flags/composite.json: the case finding of each of the cases A
-     * to G and every other finding that the composite holds, each from the lock of the case that
-     * reaches it, in one report, its advisory lookup summed per repository, at `--fail-on=high`
-     * against target PHP 8.4 (`--target-php`).
+     * The composite of tests/fixtures/flags/composite.json in one report, at `--fail-on=high` against
+     * target PHP 8.4 (`--target-php`). It holds the case finding of each of the cases A to G and every
+     * other finding of the composite. Each finding comes from the lock of the first case that reaches
+     * it. The advisory lookup sums the records of each repository.
      */
     public static function composite(): Report
     {
@@ -225,9 +225,6 @@ final class CaseHydrator
             $case = self::case($id);
             $report = self::report($case);
             $package = JsonPath::stringAt($case, ['finding', 'package']);
-            if (isset($findings[$package])) {
-                continue;
-            }
             $held = [];
             foreach ($report->findings() as $finding) {
                 $name = $finding->package();
@@ -235,6 +232,9 @@ final class CaseHydrator
                     $findings[$name] = $finding;
                     $held[] = $finding;
                 }
+            }
+            if ($held === []) {
+                continue;
             }
             // The report counts the records of the findings it holds, not those of the case lock's other packages.
             foreach ($held as $finding) {

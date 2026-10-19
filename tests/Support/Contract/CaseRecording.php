@@ -26,8 +26,8 @@ use Lockrot\Verdict\ShellCommand;
 
 /**
  * One case of tests/fixtures/flags/cases.json as lockrot writes it. The report holds the case
- * package's finding with the case's own run, and the findings of the case's `parents`: a case with
- * them is a whole report, which I25 holds over. The recording gives every format, the explain-2
+ * package's finding with the case's own run, and the findings of the case's `parents`. A case with
+ * parents is a whole report, and I25 holds over it. The recording gives every format, the explain-2
  * document and the strings that the PHP grammars own. The report keeps the run notes and the
  * advisory lookup of the case's hydrated lock.
  */
@@ -79,7 +79,7 @@ final class CaseRecording
         $full = $analysis->report();
         $lookup = $full->advisoryLookup();
         $coverage = new AdvisoryCoverage($lookup->scope(), JsonPath::stringAt(JsonPath::decoded($lookup), ['scope_source']), $lookup->repositories(), $lookup->otherRepositories(), []);
-        // A whole report checks the packages it holds; a case finding alone keeps the count of its lock.
+        // A whole report checks the packages it holds. A case finding alone keeps the count of its lock.
         $checked = isset($case['parents']) ? \count($findings) : $full->packagesChecked();
         $report = (new Report($findings, $full->runNotes(), $full->generatedAt(), $checked, $full->notFromComposerRepository(), null, $full->activityCacheOldestAt(), $full->includesDev(), $coverage))
             ->withRun(self::run(JsonPath::arrayAt($case, ['run'])));

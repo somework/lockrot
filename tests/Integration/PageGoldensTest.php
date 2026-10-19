@@ -132,7 +132,8 @@ final class PageGoldensTest extends TestCase
 
         self::assertArrayHasKey('gate_partition', $golden, $id.': re-record page-goldens.json from the model');
         $partition = $golden['gate_partition'];
-        self::assertSame($failing === 0 ? null : $failing, \is_array($partition) ? array_sum($partition) : $partition, $id.': the partition against gate.failing');
+        self::assertSame($failing === 0 ? null : ['ready', 'held', 'wayout'], \is_array($partition) ? array_keys($partition) : $partition, $id.': the partition\'s parts');
+        self::assertSame($failing, \is_array($partition) ? array_sum($partition) : 0, $id.': the partition against gate.failing');
     }
 
     /**

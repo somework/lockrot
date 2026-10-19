@@ -8,10 +8,10 @@ use Lockrot\Tests\Support\FixtureCliRun;
 use Lockrot\Tests\Support\VersionMask;
 
 /**
- * The page cases whose moves Composer's solver checked (SPEC-0.14.md §7.9.7): bin/lockrot's report-2
- * of an app of tests/fixtures/apps on the recorded answers of tests/fixtures/corpus/cache/. A model
- * case document holds no move check, so only these cases show a ready move. tools/report/record
- * --engine-pages writes them to tests/fixtures/contract/page/.
+ * The page cases whose moves Composer's solver checked (SPEC-0.14.md §7.9.7). Each is bin/lockrot's
+ * report-2 of an app of tests/fixtures/apps, on the recorded answers of tests/fixtures/corpus/cache/.
+ * A model case document holds no move check, so only these cases show a ready move.
+ * tools/report/record --engine-pages writes them to tests/fixtures/contract/page/.
  */
 final class EnginePage
 {

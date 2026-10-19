@@ -28,7 +28,7 @@ final class FindingRelationsTest extends TestCase
     private const DOCUMENTS = __DIR__.'/../fixtures/schema/documents/';
     private const COMPOSITE = __DIR__.'/../fixtures/flags/composite.json';
     private const WALLABAG = __DIR__.'/../fixtures/schema/documents/corpus/wallabag.json.gz';
-    /** The sets that hold whole reports. A case or a coverage variant holds part of one, so I25 cannot read it. */
+    /** The sets that hold whole reports. A case outside WHOLE_CASES or a coverage variant holds part of one, so I25 cannot read it. */
     private const WHOLE = ['corpus/', 'variants/', 'coverage/baselined/'];
     /** The case documents that hold a whole report: the composite, and each case whose finding comes with its `parents`. */
     private const WHOLE_CASES = ['cases/commonmark.json', 'cases/composite.json', 'cases/many-dependents.json', 'cases/xmlseclibs.json'];
