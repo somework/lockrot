@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Solver;
 
+use Composer\Config;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\PlatformRepository;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveCheckers;
@@ -43,6 +45,33 @@ final class MoveCheckersTest extends TestCase
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '7.4.29'));
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.41.0'));
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.4-dev'));
+    }
+
+    /** The regular expression reads the target minor literally: its dot matches only a dot. */
+    public function testAPlatformPhpThatMatchesTheTargetMinorOnlyAsAPatternIsNotInIt(): void
+    {
+        self::assertSame('8.1.99', MoveCheckers::platformPhp('8.1', '801.2'));
+    }
+
+    public function testTheProjectsMoveCheckSolvesAtTheConfiguredPlatformPhpOfTheTargetMinor(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['platform' => ['php' => '8.4.3', 'ext-lockrot-test' => false]]]);
+
+        $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
+
+        self::assertSame('8.4.3', $checker->platformPhp());
+    }
+
+    /** A locked package without a Composer repository's notification-url keeps its locked version only, in packages-dev too. */
+    public function testTheProjectsMoveCheckChecksNoMoveOfALockedPackageThatNoComposerRepositoryServes(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']], 'packages-dev' => [['name' => 'acme/own', 'version' => '1.0.0']]]);
+
+        $checker = MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), new Config(false), [], '8.4', false, Deadline::never());
+
+        self::assertSame(MoveCheck::NOT_FROM_COMPOSER_REPOSITORY, $checker->check(MoveQuery::update('acme/own', '^1.1', '1.1.0'))->check()->reason());
+        self::assertNotSame(MoveCheck::NOT_FROM_COMPOSER_REPOSITORY, $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->reason());
     }
 
     private static function root(): RootPackageInterface

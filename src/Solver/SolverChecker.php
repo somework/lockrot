@@ -81,9 +81,9 @@ final class SolverChecker implements MoveChecker
 
     public function combined(array $inline): CheckOutcome
     {
-        $baseline = $this->baseline();
-        if (!$baseline->check()->isResolved()) {
-            return new CheckOutcome(MoveCheck::notChecked($baseline->check()->isRefused() ? MoveCheck::BASELINE_REFUSED : (string) $baseline->check()->reason()));
+        $unchecked = $this->unchecked();
+        if ($unchecked !== null) {
+            return $unchecked;
         }
         if ($this->deadline->isPast()) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::INSTALL_TIME_BUDGET));
@@ -137,9 +137,9 @@ final class SolverChecker implements MoveChecker
 
     private function solve(MoveQuery $query): CheckOutcome
     {
-        $baseline = $this->baseline();
-        if (!$baseline->check()->isResolved()) {
-            return new CheckOutcome(MoveCheck::notChecked($baseline->check()->isRefused() ? MoveCheck::BASELINE_REFUSED : (string) $baseline->check()->reason()));
+        $unchecked = $this->unchecked();
+        if ($unchecked !== null) {
+            return $unchecked;
         }
         if (\in_array($query->package(), $this->notFromComposerRepository, true)) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::NOT_FROM_COMPOSER_REPOSITORY));
@@ -160,6 +160,17 @@ final class SolverChecker implements MoveChecker
         }
 
         return $this->refusal($inline, $query);
+    }
+
+    /** A move is not checked while the baseline does not resolve: for the baseline's reason, or because it is refused. */
+    private function unchecked(): ?CheckOutcome
+    {
+        $baseline = $this->baseline()->check();
+        if ($baseline->isResolved()) {
+            return null;
+        }
+
+        return new CheckOutcome($baseline->isRefused() ? MoveCheck::notChecked(MoveCheck::BASELINE_REFUSED) : $baseline);
     }
 
     /**
@@ -209,7 +220,7 @@ final class SolverChecker implements MoveChecker
     /** The reason of a refusal that needs a name the source could not load, the moved names included, null for a real refusal. */
     private function notLoaded(Solution $solution, string ...$moved): ?string
     {
-        $failures = array_values($solution->unloaded());
+        $failures = $solution->unloaded();
         foreach ($moved as $name) {
             $failures[] = $this->solver->source()->failure($name);
         }

@@ -24,7 +24,7 @@ final class SolveRequest
     /** `-W`: every dependency, the root requirements included. */
     public const WITH_ALL_DEPENDENCIES = Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS;
 
-    /** @var list<string> */
+    /** @var array<string, string> */
     private array $allow;
     /** @var array<string, string> */
     private array $inline;
@@ -34,7 +34,7 @@ final class SolveRequest
     private int $transitive;
 
     /**
-     * @param list<string>                                                $allow       the update allow list
+     * @param array<string, string>                                       $allow       the update allow list, name => name
      * @param array<string, string>                                       $inline      name => constraint, as `update name:constraint`
      * @param array<string, string>                                       $rootChanges name => constraint, as `require name:constraint`
      * @param self::LISTED|self::WITH_DEPENDENCIES|self::WITH_ALL_DEPENDENCIES $transitive
@@ -49,13 +49,18 @@ final class SolveRequest
 
     public static function baseline(): self
     {
-        return new self([self::BASELINE_NAME], [], [], self::LISTED);
+        return new self([self::BASELINE_NAME => self::BASELINE_NAME], [], [], self::LISTED);
     }
 
     /** @param array<string, string> $inline name => constraint, each name on the allow list */
     public static function update(array $inline): self
     {
-        return new self(array_keys($inline), $inline, [], self::LISTED);
+        $allow = [];
+        foreach (array_keys($inline) as $name) {
+            $allow[$name] = $name;
+        }
+
+        return new self($allow, $inline, [], self::LISTED);
     }
 
     /**
@@ -64,7 +69,7 @@ final class SolveRequest
      */
     public static function require(string $package, array $rootChanges): self
     {
-        return new self([$package], [], $rootChanges, self::LISTED);
+        return new self([$package => $package], [], $rootChanges, self::LISTED);
     }
 
     /** @param array<string, string> $rootChanges name => constraint, beside the inline constraints */
@@ -85,7 +90,7 @@ final class SolveRequest
         return $clone;
     }
 
-    /** @return list<string> */
+    /** @return array<string, string> name => name: Composer before 2.6 reads the allow list's keys, later versions its values */
     public function allow(): array
     {
         return $this->allow;
