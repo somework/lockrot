@@ -730,19 +730,17 @@ final class Finding
         $fired = array_map(static fn (Signal $signal): string => $signal->id(), $signals);
         $out = [];
         foreach ($flags->fired() as $flag) {
-            if ($flag === FlagSet::VULNERABLE) {
-                $out[] = ['id' => $flag, 'role' => SecurityTerm::ROLE, 'baseline' => null, 'signal_ids' => [Signal::S9], 'degree' => null, 'headline' => ['unit' => 'advisories', 'value' => $advisories, 'source' => null], 'summary' => $summaries[$flag]];
-                continue;
-            }
-            $out[] = [
-                'id' => $flag,
-                'role' => $roles[$flag] ?? 'accepted',
-                'baseline' => $standing === null ? null : $standing->flagState($flag),
-                'signal_ids' => array_values(array_intersect(FlagSentence::SIGNALS[$flag], $fired)),
-                'degree' => $flag === FlagSet::ABANDONED ? ['reasons' => $flags->reasons(), 'liveness_complete' => $livenessComplete] : (\in_array($flag, [FlagSet::SILENT, FlagSet::STALE], true) ? ['liveness_complete' => $livenessComplete] : null),
-                'headline' => self::headline($flag, $flags, $signals),
-                'summary' => $summaries[$flag],
-            ];
+            $out[] = $flag === FlagSet::VULNERABLE
+                ? ['id' => $flag, 'role' => SecurityTerm::ROLE, 'baseline' => null, 'signal_ids' => [Signal::S9], 'degree' => null, 'headline' => ['unit' => 'advisories', 'value' => $advisories, 'source' => null], 'summary' => $summaries[$flag]]
+                : [
+                    'id' => $flag,
+                    'role' => $roles[$flag] ?? 'accepted',
+                    'baseline' => $standing === null ? null : $standing->flagState($flag),
+                    'signal_ids' => array_values(array_intersect(FlagSentence::SIGNALS[$flag], $fired)),
+                    'degree' => $flag === FlagSet::ABANDONED ? ['reasons' => $flags->reasons(), 'liveness_complete' => $livenessComplete] : (\in_array($flag, [FlagSet::SILENT, FlagSet::STALE], true) ? ['liveness_complete' => $livenessComplete] : null),
+                    'headline' => self::headline($flag, $flags, $signals),
+                    'summary' => $summaries[$flag],
+                ];
         }
 
         return $out;

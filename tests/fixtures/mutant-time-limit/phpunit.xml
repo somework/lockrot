@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Read by tests/Unit/Support/MutantTestTimeLimitTest.php only: a limit of one second. -->
+<phpunit bootstrap="../../../vendor/autoload.php" colors="false" cacheResult="false" failOnWarning="true">
+    <extensions>
+        <bootstrap class="Lockrot\Tests\Support\MutantTestTimeLimit">
+            <parameter name="seconds" value="1"/>
+        </bootstrap>
+    </extensions>
+</phpunit>

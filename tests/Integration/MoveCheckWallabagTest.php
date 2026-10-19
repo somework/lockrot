@@ -11,7 +11,9 @@ use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\RepositoryFactory;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\MoveCheckRun;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Clock;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Forge\ActivityClient;
@@ -24,14 +26,20 @@ use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Security\Holder;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Solver\HoldScan;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveCheckers;
+use Lockrot\Solver\ProblemHolds;
+use Lockrot\Solver\SolverChecker;
 use Lockrot\Tests\Support\FakeHttpClient;
 use Lockrot\Tests\Support\FindingRelations;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\MoveChecks;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -39,7 +47,27 @@ use PHPUnit\Framework\TestCase;
  * recorded answers (tests/fixtures/sites/wallabag-2.6.14, provenance.json). Composer refuses the
  * moves of symfony/monolog-bridge and symfony/yaml, and on 2.9 or later the plain
  * `composer update` of each installs a dev snapshot.
+ *
+ * The coverage names the move check only: the tests read a report that setUpBeforeClass() solves
+ * once, and Infection runs that solve for each mutant of a line that the tests cover.
+ *
+ * @covers \Lockrot\Analyzer\MoveCheckRun
+ * @covers \Lockrot\Analyzer\UpdateNow
+ * @covers \Lockrot\Security\Holder
+ * @covers \Lockrot\Solver\HoldScan
+ * @covers \Lockrot\Solver\MoveCheck
+ * @covers \Lockrot\Solver\MoveCheckers
+ * @covers \Lockrot\Solver\ProblemHolds
+ * @covers \Lockrot\Solver\SolverChecker
  */
+#[CoversClass(MoveCheckRun::class)]
+#[CoversClass(UpdateNow::class)]
+#[CoversClass(Holder::class)]
+#[CoversClass(HoldScan::class)]
+#[CoversClass(MoveCheck::class)]
+#[CoversClass(MoveCheckers::class)]
+#[CoversClass(ProblemHolds::class)]
+#[CoversClass(SolverChecker::class)]
 final class MoveCheckWallabagTest extends TestCase
 {
     private const SITE = __DIR__.'/../fixtures/sites/wallabag-2.6.14/';

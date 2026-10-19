@@ -34,21 +34,21 @@ final class CommandArgument
         if (($argv[0] ?? null) !== 'composer' || !isset(self::SUBCOMMANDS[$subcommand])) {
             return false;
         }
-        $packages = 0;
-        $options = 0;
+        $package = false;
+        $option = false;
         foreach (\array_slice($argv, 2) as $argument) {
             if (!self::passes($argument)) {
                 return false;
             }
             $isOption = $argument[0] === '-';
             // An option before a package, or a package after an option, came from data.
-            if ($isOption ? !isset(self::OPTIONS[$subcommand][$argument]) || $packages === 0 : $options > 0) {
+            if ($isOption ? !isset(self::OPTIONS[$subcommand][$argument]) || !$package : $option) {
                 return false;
             }
             if ($isOption) {
-                ++$options;
+                $option = true;
             } else {
-                ++$packages;
+                $package = true;
             }
         }
 

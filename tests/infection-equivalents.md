@@ -24,6 +24,7 @@ start the reason with `in method():`.
 
 - `src/Analyzer/Analyzer.php` ReturnRemoval `return Moves::none();` — in moves(): a speed guard that skips the release scan and the move rules for a finding that is not graded. Without it, `NextStep::plan()` finds no lead and no counted advisory, and names no move either.
 - `src/Analyzer/Analyzer.php` ReturnRemoval `return [$metadata, []];` — in dateSplitPackages(): with no package to date, the rest of the method finds no candidate and makes no request.
+- `src/Analyzer/Analyzer.php` Break_ `break;` — a pass that adds no refusal asks only requests that the passes before it asked, so each pass that `continue` adds up to the cap writes the same finding and the same moves.
 - `src/Analyzer/Libyears.php` GreaterThan `if ($newest === null || $release['at'] > $newest) {` — on a tie the two dates are the same instant, and nothing reads which release gave it.
 - `src/Analyzer/Libyears.php` LessThan `if ($behind > 0.0 && ($worst === null || $behind > $worst[1] || ($behind === $worst[1] && strcmp($finding->package(), $worst[0]->package()) < 0))) {` — two findings of one report never share a package name, so `strcmp()` never returns 0 here.
 - `src/Analyzer/Report.php` UnwrapArrayValues `return array_values(array_filter($this->sorted(), static fn (Finding $f): bool => $f->isGraded()));` — `sorted()` puts every graded finding first, so the filter leaves the keys `0..n-1`.
@@ -138,19 +139,10 @@ start the reason with `in method():`.
 
 ## src/Signal
 
-- `src/Signal/ConstraintOpenness.php` CastInt `$targetMajor = (int) explode('.', PhpReleaseDates::minorOf($targetPhp))[0];` — numeric strings compare as numbers.
-- `src/Signal/ConstraintOpenness.php` CastInt, DecrementInteger, IncrementInteger `$lowerMajor = $lower->isZero() ? 0 : (int) explode('.', $lower->getVersion())[0];` — numeric strings compare as numbers, and 0 moved by 1 stays below every PHP major.
-- `src/Signal/ConstraintOpenness.php` ConcatOperandRemoval `$target = new Constraint('==', $this->parser->normalize(PhpReleaseDates::minorOf($targetPhp).'.0'));` — `normalize('8.4')` equals `normalize('8.4.0')`.
 - `src/Signal/PhpFloor.php` CastString `return ($kind === self::PROJECT ? 'the project\'s php ' : 'the target PHP ').(string) $this->php($kind);` — `php($kind)` is null only for an absent floor, and no caller describes one.
 - `src/Signal/PhpFloor.php` ReturnRemoval `return null;` — in parse(): composer/semver reads null as `""` and throws, and the `catch` returns the same value.
 - `src/Signal/Rule/LeftBehindRule.php` LessThanOrEqualTo `if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {` — a higher branch released at the instant of the installed branch cannot be alive while the installed branch is old enough for S8.
-- `src/Signal/Rule/NotCheckedRule.php` CastString `} elseif ($reason === self::HOST_NOT_SUPPORTED || isset(self::ACTIVITY_WORDS[(string) $reason])) {` — PHP reads a null key as `""`, and `ACTIVITY_WORDS` holds no such key.
-- `src/Signal/Rule/NotCheckedRule.php` CastString `$cause = self::ORIGIN_CAUSE[(string) $origin] ?? 'not installed from a Composer repository';` — PHP reads a null key as `""`, and `ORIGIN_CAUSE` holds no such key.
 
 ## src/Verdict
 
-- `src/Verdict/Finding.php` Continue_ `continue;` — in flagsOut(): `vulnerable` is the last flag of the fired order, so `break` also ends the loop after it.
 - `src/Verdict/FindingDetails.php` CastString `$skipped[] = new Check('advisories', (string) $advisoryReason, [Signal::S9]);` — the `in_array()` guard admits two strings only.
-- `src/Verdict/FindingDetails.php` DecrementInteger `$hardest = 0;` — `standing()` returns before the loop when no row counts, and every kind has an index of 0 or more, so the maximum is the same.
-- `src/Verdict/FlagSentence.php` DecrementInteger `if (($counts[$severity] ?? 0) > 0) {` — a missing severity reads as -1, which is not above 0 either.
-- `src/Verdict/FlagSentence.php` GreaterThan `$label = $fixed > 0 && $kind !== null && $kind !== Fix::UPDATE ? ' ('.self::FIX_LABEL[$kind].')' : '';` — with no advisory fixed, the "none fixed" clause carries no label.

@@ -115,13 +115,12 @@ final class UpdateNow
      */
     private static function argv(array $inline, MoveChecks $checks, array $findings): ?array
     {
-        $direct = [];
-        foreach ($findings as $finding) {
-            $direct[$finding->package()] = $finding->isDirect();
-        }
         $argv = ['composer', 'update'];
-        foreach ($inline as $package => $constraint) {
-            $argv[] = $checks->writesInline($direct[$package] ?? false) ? $package.':'.$constraint : $package;
+        foreach ($findings as $finding) {
+            $package = $finding->package();
+            if (isset($inline[$package])) {
+                $argv[] = $checks->writesInline($finding->isDirect()) ? $package.':'.$inline[$package] : $package;
+            }
         }
 
         return CommandArgument::allPass($argv) ? $argv : null;

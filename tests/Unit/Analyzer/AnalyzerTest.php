@@ -39,8 +39,10 @@ use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\RecordedMoveChecker;
 use Lockrot\Tests\Support\Summaries;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -640,6 +642,17 @@ final class AnalyzerTest extends TestCase
         self::assertNotSame($analyzer, $withReplacement);
         self::assertSame($replacement, $withReplacement->allowlist());
         self::assertSame($original, $analyzer->allowlist());
+    }
+
+    public function testWithMoveChecksReturnsAClonedInstanceLeavingOriginalWithoutChecks(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [self::locked('vendor/pkg')]]);
+        $analyzer = $this->analyzer($this->loader(['vendor/pkg' => $this->ancient()]), $this->http([]), true, new Allowlist([]));
+
+        $checked = $analyzer->withMoveChecks(new MoveChecks(new RecordedMoveChecker([], []), true));
+
+        self::assertNull($analyzer->analyze($lock, ProjectConfig::empty(), false)->moveCheck());
+        self::assertNotNull($checked->analyze($lock, ProjectConfig::empty(), false)->moveCheck());
     }
 
     /** @return array<string, mixed> a lock entry that a Composer repository serves, with the lock's own source URL and support.source when given */

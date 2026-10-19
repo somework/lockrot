@@ -403,6 +403,21 @@ final class FindingTest extends TestCase
         self::assertSame(['vendor/other'], $finding->otherDirectDependents());
     }
 
+    public function testTheOtherDirectDependentsAreAListWhenTheChainRootComesFirst(): void
+    {
+        $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->withChain(['vendor/a-root', 'vendor/pkg'])->withDirectDependents(['vendor/a-root', 'vendor/b-other'])->build();
+
+        self::assertSame(['vendor/b-other'], $finding->otherDirectDependents());
+    }
+
+    /** Composer reads a package name without case: a successor that names the package itself is none. */
+    public function testASuccessorIsAnotherPackageWhateverTheCaseOfItsName(): void
+    {
+        self::assertNull(Finding::successorOf('acme/old', 'ACME/Old'));
+        self::assertSame('acme/new', Finding::successorOf('acme/old', 'acme/new'));
+        self::assertSame('aaa/first', Finding::successorOf('acme/old', 'aaa/first'));
+    }
+
     public function testWithSignalsReturnsANewFindingWithTheVerdictAndEverythingElseKept(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T10:00:00+00:00');

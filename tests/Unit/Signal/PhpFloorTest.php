@@ -33,6 +33,13 @@ final class PhpFloorTest extends TestCase
     }
 
     /** symfony 8.x requires `>=8.4.1`: a target of 8.4 is a minor, and 8.4.1 is inside it. */
+    public function testAReleaseWithoutAPhpRequirementGetsNoAnswer(): void
+    {
+        $floor = new PhpFloor('8.4', '>=7.2.5');
+
+        self::assertSame([null, null, null, null], [$floor->admitsTarget(null), $floor->missesTarget(null), $floor->missesProject(null), $floor->blocking(null)]);
+    }
+
     public function testTheTargetIsAWholeMinorNotItsFirstPatch(): void
     {
         self::assertNull((new PhpFloor('8.4'))->blocking('>=8.4.1'));

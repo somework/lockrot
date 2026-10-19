@@ -35,7 +35,7 @@ jobs:
     needs: [subset, mutation-coverage]
     runs-on: ubuntu-latest
     # The mutation job of ci.yml gives the reasons for the cap and for the shards.
-    timeout-minutes: 50
+    timeout-minutes: 80
     strategy:
       fail-fast: false
       matrix:

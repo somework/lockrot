@@ -291,6 +291,62 @@ final class RunNoteTest extends TestCase
             false,
             ['message' => 'Invalid constraint "nope"'],
         ];
+        yield 'one lock entry whose name is no package name' => [
+            static fn (): RunNote => RunNote::packageNameInvalid(['--with-all-dependencies']),
+            'package_name_invalid',
+            'lock: lockrot skips 1 entry whose name is no Composer package name',
+            false,
+            ['packages' => ['--with-all-dependencies']],
+        ];
+        yield 'two lock entries whose names are no package names' => [
+            static fn (): RunNote => RunNote::packageNameInvalid(['-x', 'a b']),
+            'package_name_invalid',
+            'lock: lockrot skips 2 entries whose name is no Composer package name',
+            false,
+            ['packages' => ['-x', 'a b']],
+        ];
+        yield 'a lock that Composer refuses' => [
+            static fn (): RunNote => RunNote::movesNotChecked('7.4.33', self::CONFLICT),
+            'moves_not_checked',
+            "moves not checked: Composer's solver refuses the lock itself at php 7.4.33, so it would refuse every move: acme/a 2.1.0 conflicts with acme/b <3.0.",
+            false,
+            ['reason' => 'baseline_refused', 'php' => '7.4.33', 'problem' => self::CONFLICT],
+        ];
+        yield 'update now without one package' => [
+            static fn (): RunNote => RunNote::updateNowReduced(['acme/b'], self::CONFLICT),
+            'update_now_reduced',
+            "update now: the command leaves out acme/b, because Composer's solver refuses it together with the others: acme/a 2.1.0 conflicts with acme/b <3.0.",
+            false,
+            ['left_out' => ['acme/b'], 'problem' => self::CONFLICT],
+        ];
+        yield 'update now without two packages' => [
+            static fn (): RunNote => RunNote::updateNowReduced(['acme/b', 'acme/c'], self::CONFLICT),
+            'update_now_reduced',
+            "update now: the command leaves out acme/b, acme/c, because Composer's solver refuses them together with the others: acme/a 2.1.0 conflicts with acme/b <3.0.",
+            false,
+            ['left_out' => ['acme/b', 'acme/c'], 'problem' => self::CONFLICT],
+        ];
+        yield 'update now refused' => [
+            static fn (): RunNote => RunNote::updateNowRefused(self::CONFLICT),
+            'update_now_refused',
+            "update now: no command, because Composer's solver refuses these packages together; run each package's own command: acme/a 2.1.0 conflicts with acme/b <3.0.",
+            false,
+            ['problem' => self::CONFLICT],
+        ];
+        yield 'update now not checked' => [
+            static fn (): RunNote => RunNote::updateNowNotChecked('install_time_budget', ['acme/a', 'acme/b']),
+            'update_now_not_checked',
+            "update now: not checked with Composer's solver (the install-time budget ran out), so lockrot writes no command for acme/a, acme/b",
+            false,
+            ['reason' => 'install_time_budget', 'packages' => ['acme/a', 'acme/b']],
+        ];
+        yield 'a failure of the solver' => [
+            static fn (): RunNote => RunNote::moveCheckFailed('RuntimeException', 'boom'),
+            'move_check_failed',
+            "moves: Composer's solver failed on a request (RuntimeException: boom), so lockrot did not check that move",
+            false,
+            ['class' => 'RuntimeException', 'message' => 'boom'],
+        ];
     }
 
     /**
@@ -400,6 +456,8 @@ final class RunNoteTest extends TestCase
         self::assertSame(['install_time_budget'], RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS);
     }
 
+    private const CONFLICT = "Problem 1\n    - acme/a 2.1.0 conflicts with acme/b <3.0.";
+
     /** Every constructor refuses what no run can produce: a note about nothing, or a reason it does not know. */
     private const DRUPAL_PROBLEM = "Problem 1\n"
         ."    - drupal/core-recommended is locked to version 9.3.14 and an update of this package was not requested.\n"
@@ -431,6 +489,26 @@ final class RunNoteTest extends TestCase
     {
         self::assertStringEndsWith(': acme/a 2.1.0 conflicts with acme/b <3.0.', RunNote::updateNowRefused("Problem 1\n    - acme/a 2.1.0 conflicts with acme/b <3.0.")->text());
         self::assertStringEndsWith(': Your requirements could not be resolved.', RunNote::updateNowRefused('Your requirements could not be resolved.')->text());
+    }
+
+    /** Only a line that is `Problem <n>` whole ends the first problem, and only a line that starts with the list marker is a rule. */
+    public function testTheCauseIsTheLastMarkedLineBeforeTheNextProblemLine(): void
+    {
+        $problem = "Problem 1\n"
+            ."    - acme/a 2.1.0 requires acme/b ^3.0 -> found acme/b[3.0.0].\n"
+            ."    See Problem 9\n"
+            ."    Problem 2 follows\n"
+            ."    - acme/b 3.0.0 requires php >=8.2 -> your php version (7.4) does not satisfy that requirement.\n"
+            ."    the rule above - and this line - name no rule\n"
+            ."  Problem 2\n"
+            ."    - acme/c 1.0.0 conflicts with acme/a.";
+
+        self::assertStringEndsWith(': acme/b 3.0.0 requires php >=8.2.', RunNote::updateNowRefused($problem)->text());
+    }
+
+    public function testAProblemWithoutAMarkerIsQuotedWithoutItsOuterWhitespace(): void
+    {
+        self::assertStringEndsWith('own command: Your requirements could not be resolved.', RunNote::updateNowRefused("  Your requirements could not be resolved.\n")->text());
     }
 
     public function testANoteAboutNothingIsRefused(): void

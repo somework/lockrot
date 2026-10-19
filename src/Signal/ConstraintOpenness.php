@@ -45,11 +45,7 @@ final class ConstraintOpenness
         if (!$parsedConstraint->matches($target) || !$parsedConstraint->getUpperBound()->isPositiveInfinity()) {
             return false;
         }
-        $targetMajor = (int) explode('.', PhpReleaseDates::minorOf($targetPhp))[0];
-        $lower = $parsedConstraint->getLowerBound();
-        $lowerMajor = $lower->isZero() ? 0 : (int) explode('.', $lower->getVersion())[0];
-
-        return $lowerMajor < $targetMajor;
+        return $this->lowerMajor($constraint) < $this->lowerMajor(PhpReleaseDates::minorOf($targetPhp));
     }
 
     /**
@@ -74,7 +70,7 @@ final class ConstraintOpenness
     {
         try {
             $parsed = $this->parser->parseConstraints($constraint);
-            $target = new Constraint('==', $this->parser->normalize(PhpReleaseDates::minorOf($targetPhp).'.0'));
+            $target = new Constraint('==', $this->parser->normalize(PhpReleaseDates::minorOf($targetPhp)));
         } catch (\UnexpectedValueException $e) {
             return null;
         }
