@@ -53,10 +53,11 @@ final class MoveCheckersTest extends TestCase
         self::assertSame('8.1.99', MoveCheckers::platformPhp('8.1', '801.2'));
     }
 
+    /** Composer refuses a platform version that is no string and not false: the move check leaves it out. */
     public function testTheProjectsMoveCheckSolvesAtTheConfiguredPlatformPhpOfTheTargetMinor(): void
     {
         $config = new Config(false);
-        $config->merge(['config' => ['platform' => ['php' => '8.4.3', 'ext-lockrot-test' => false]]]);
+        $config->merge(['config' => ['platform' => ['php' => '8.4.3', 'ext-lockrot-test' => false, 'lib-lockrot-test' => 1]]]);
 
         $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
 

@@ -71,10 +71,10 @@ final class ProblemHolds
         return $this->holds;
     }
 
-    /** @return list<string> the names that a requirement wants and that the pool holds no version of */
+    /** @return array<string, string> name => name, for each name that a requirement wants and that the pool holds no version of */
     public function wanted(): array
     {
-        return array_keys($this->wanted);
+        return $this->wanted;
     }
 
     /**

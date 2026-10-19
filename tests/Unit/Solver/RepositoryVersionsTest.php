@@ -44,6 +44,34 @@ final class RepositoryVersionsTest extends TestCase
         self::assertNull($versions->failure('acme/lib'));
     }
 
+    /** A Composer repository can answer with other names too, such as a package that provides or replaces the name. */
+    public function testOnlyTheVersionsOfTheAskedNameAreKept(): void
+    {
+        $repository = new class ([self::package('acme/other', '1.0.0'), self::package('acme/lib', '1.0.0'), self::package('acme/lib', '1.1.0')]) extends ComposerRepository {
+            /** @var list<BasePackage> */
+            private array $answer;
+            public int $loads = 0;
+
+            /** @param list<BasePackage> $answer */
+            public function __construct(array $answer)
+            {
+                $this->answer = $answer;
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                ++$this->loads;
+
+                return ['namesFound' => ['acme/lib', 'acme/other'], 'packages' => $this->answer];
+            }
+        };
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::never());
+
+        self::assertSame(['1.0.0', '1.1.0'], self::pretty($versions->versions('acme/lib')));
+        self::assertSame([0, 1], array_keys($versions->versions('acme/lib')));
+        self::assertSame(1, $repository->loads, 'a name loads once');
+    }
+
     public function testANameWithNoTaggedReleaseLoadsItsDevVersions(): void
     {
         $versions = new RepositoryVersions([self::repository(['acme/lib' => ['dev-main']])], [], false, Deadline::never());

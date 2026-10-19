@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Solver;
 
 use Composer\Advisory\PartialSecurityAdvisory;
+use Composer\Config;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
@@ -181,6 +182,40 @@ final class ComposerSolverTest extends TestCase
 
         self::assertSame([true, false], [$required->resolves(), $updated->resolves()]);
         self::assertSame('^1.0', $solver->root()->getRequires()['acme/lib']->getPrettyConstraint());
+    }
+
+    /**
+     * @dataProvider rootLinks
+     *
+     * @param array<string, mixed> $links
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('rootLinks')]
+    public function testARequirementOfTheTargetThatTheRootProvidesOrReplacesIsMet(array $links): void
+    {
+        $solver = self::solver(['require' => ['acme/user' => '^1.0']] + $links, [['name' => 'acme/user', 'version' => '1.0.0']], ['acme/user' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/virtual' => '^1.0']]]]);
+
+        self::assertSame(['acme/user' => '1.1.0'], $solver->solve(SolveRequest::update(['acme/user' => '^1.1']))->installs());
+    }
+
+    /** @return iterable<string, array{array<string, mixed>}> */
+    public static function rootLinks(): iterable
+    {
+        yield 'provide' => [['provide' => ['acme/virtual' => '1.0.0']]];
+        yield 'replace' => [['replace' => ['acme/virtual' => '1.0.0']]];
+    }
+
+    /** The project itself can be an abandoned package: `block-abandoned` removes no root. */
+    public function testAnAbandonedRootStaysWhenTheConfigBlocksAbandonedPackages(): void
+    {
+        if (!ComposerFeatures::blocksAdvisories()) {
+            self::markTestSkipped('Composer below 2.9 has no SecurityAdvisoryPoolFilter: it blocks nothing in an update');
+        }
+        $config = new Config(false);
+        $config->merge(['config' => ['audit' => ['block-abandoned' => true]]]);
+        $solver = self::solver(['require' => ['acme/user' => '^1.0'], 'provide' => ['acme/virtual' => '1.0.0'], 'abandoned' => true], [['name' => 'acme/user', 'version' => '1.0.0']], ['acme/user' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/virtual' => '^1.0']]]])
+            ->withAdvisories(new PoolAdvisories(AdvisoryBlocking::fromConfig($config), static fn (array $names, bool $complete): array => []));
+
+        self::assertSame(['acme/user' => '1.1.0'], $solver->solve(SolveRequest::update(['acme/user' => '^1.1']))->installs());
     }
 
     /** A package that only provides a blocked name is no version of it: Composer blocks by the names a package has and replaces. */

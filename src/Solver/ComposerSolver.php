@@ -206,7 +206,7 @@ final class ComposerSolver
         }
         $blocking = $this->advisories === null ? null : $this->advisories->blocking();
         $blocked = $this->blocked;
-        foreach ($this->advisories === null ? [] : $this->advisories->ranges(array_keys($names)) as $name => $ranges) {
+        foreach ($this->advisories === null ? [] : $this->advisories->ranges($names) as $name => $ranges) {
             $blocked[$name] = array_merge($blocked[$name] ?? [], $ranges);
         }
         $kept = new Pool(array_filter($pool->getPackages(), self::keeps($blocked, $stayLocked, $blocking)), $pool->getUnacceptableFixedOrLockedPackages());

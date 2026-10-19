@@ -28,6 +28,13 @@ final class MoveQueryTest extends TestCase
         self::assertSame([], MoveQuery::update('acme/lib', '^2.0', '2.0.0')->request()->rootChanges());
     }
 
+    /** The recorded move checks of the tests are keyed by this text. */
+    public function testTheKeyNamesTheCommandThePackageTheConstraintAndThePhpRequirement(): void
+    {
+        self::assertSame('update acme/lib ^2.0 ', MoveQuery::update('acme/lib', '^2.0', '2.0.0')->key());
+        self::assertSame('require acme/lib ^2.0 >=8.1', MoveQuery::require('acme/lib', '^2.0', '2.0.0', '>=8.1')->key());
+    }
+
     public function testTwoMovesShareAKeyOnlyWhenTheyAskTheSameComposerRequest(): void
     {
         $key = MoveQuery::update('acme/lib', '^2.0', '2.0.0')->key();
