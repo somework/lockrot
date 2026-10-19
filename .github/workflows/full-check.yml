@@ -4,18 +4,35 @@ name: full-check
 # else: the pull request's own run has checked every other job on that commit. ci.yml ignores these
 # branches. The two workflows share .github/actions/mutation-coverage and
 # .github/actions/mutation-shard, and tools/mutation/tests/test_full_check_matrix.py keeps the shard
-# matrix equal to the one in ci.yml.
+# matrix equal to the one in ci.yml. A branch named release/full-check-<sha>--solver,verdicts runs only
+# those shards, so a check of one shard's MSI does not hold a runner per shard for the whole cap.
+# tools/mutation/full_check_subset.py gives the naming rule.
 on:
   push:
     branches: ['release/full-check-**']
 jobs:
+  subset:
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.subset.outputs.shards }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: subset
+        env: {REF: '${{ github.ref_name }}'}
+        # An assignment, not `echo "shards=$(...)"`: bash -e stops on the script's failure only there.
+        run: |
+          shards=$(python3 tools/mutation/full_check_subset.py "$REF" .github/workflows/full-check.yml)
+          echo "shards=$shards" >> "$GITHUB_OUTPUT"
+          echo "This full check mutates the shards $shards." >> "$GITHUB_STEP_SUMMARY"
+  # A misspelt shard name fails the subset job before this job takes a runner for the coverage run.
   mutation-coverage:
+    needs: subset
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/mutation-coverage
   mutation:
-    needs: mutation-coverage
+    needs: [subset, mutation-coverage]
     runs-on: ubuntu-latest
     # The mutation job of ci.yml gives the reasons for the cap and for the shards.
     timeout-minutes: 50
@@ -32,10 +49,15 @@ jobs:
           - {name: repository data, filter: 'src/Data/Repository', min_msi: 96}
           - {name: data and the rest, filter: 'src/Data/Forge src/Data/Http src/Data/Cache src/Data/Php src/Data/Advisory src/Data/Abandoned src/Graph src/Baseline src/Filesystem src/Allowlist src/Lock src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php', min_msi: 96}
     name: mutation (${{ matrix.shard.name }})
+    # A job's `if` cannot read the matrix, so a shard outside the subset still starts, and its steps skip.
     steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/mutation-shard
+      - if: "!contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)"
+        run: echo "The branch name leaves this shard out of the full check, so it mutates nothing." >> "$GITHUB_STEP_SUMMARY"
+      - if: contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)
+        uses: actions/checkout@v7
+      - if: contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)
+        uses: ./.github/actions/mutation-shard
         with: {filter: '${{ matrix.shard.filter }}', min-msi: '${{ matrix.shard.min_msi }}', full: 'true'}
-      - if: always()
+      - if: always() && contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)
         uses: actions/upload-artifact@v7
         with: {name: 'infection (${{ matrix.shard.name }})', path: 'build/infection*.log', if-no-files-found: ignore}
