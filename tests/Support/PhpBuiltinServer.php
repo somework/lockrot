@@ -43,11 +43,11 @@ final class PhpBuiltinServer
     private const PORT_ATTEMPTS = 100;
 
     /**
-     * Each port that freePort() handed out in this process and that a live server still holds, with
-     * the lock that reserves it. A test uses a server that it never starts as an unreachable
-     * repository, so the next server must not get that port: the OS can hand out a closed port again
-     * at once. The lock file under sys_get_temp_dir() keeps the port from another test process on
-     * the same machine. The OS drops the lock when the process dies.
+     * Each port that freePort() handed out in this process, with the lock that reserves it. A server
+     * keeps its port until its destructor runs, and a closedPort() port stays until the process ends.
+     * The reservation keeps a test's unreachable repository unreachable, because the OS can hand out
+     * a closed port again at once. The lock file under sys_get_temp_dir() keeps the port from another
+     * test process on the same machine, and the OS drops the lock when the process dies.
      *
      * @var array<int, resource>
      */
