@@ -2228,6 +2228,8 @@
                   "newest": "3.0.57",
                   "on_installed_branch": true,
                   "php": ">=5.6.1",
+                  "admits_target_php": true,
+                  "admits_project_php": true,
                   "held_by": [],
                   "reason": null
                 },
@@ -3255,6 +3257,8 @@
                   "newest": "5.3.9",
                   "on_installed_branch": false,
                   "php": ">=8.2",
+                  "admits_target_php": true,
+                  "admits_project_php": true,
                   "held_by": [],
                   "reason": null
                 },

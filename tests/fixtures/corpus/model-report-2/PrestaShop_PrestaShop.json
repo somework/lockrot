@@ -4744,6 +4744,8 @@
                   "newest": "v4.4.4",
                   "on_installed_branch": false,
                   "php": ">=8.2",
+                  "admits_target_php": true,
+                  "admits_project_php": false,
                   "held_by": [],
                   "reason": null
                 },
@@ -4768,6 +4770,8 @@
                   "newest": "v4.4.4",
                   "on_installed_branch": false,
                   "php": ">=8.2",
+                  "admits_target_php": true,
+                  "admits_project_php": false,
                   "held_by": [],
                   "reason": null
                 },
