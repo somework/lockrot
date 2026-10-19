@@ -27,7 +27,7 @@ final class RepositoryVersions implements VersionSource
     ];
     private const DEV = ['dev' => BasePackage::STABILITY_DEV];
 
-    /** @var list<ComposerRepository> */
+    /** @var array<ComposerRepository> */
     private array $repositories;
     /** @var array<string, true> */
     private array $notFromComposerRepository;
@@ -44,7 +44,7 @@ final class RepositoryVersions implements VersionSource
      */
     public function __construct(array $repositories, array $notFromComposerRepository, bool $offline, Deadline $deadline)
     {
-        $this->repositories = array_values(array_filter($repositories, static fn (RepositoryInterface $repository): bool => $repository instanceof ComposerRepository));
+        $this->repositories = array_filter($repositories, static fn (RepositoryInterface $repository): bool => $repository instanceof ComposerRepository);
         $this->notFromComposerRepository = array_fill_keys($notFromComposerRepository, true);
         $this->offline = $offline;
         $this->deadline = $deadline;
@@ -81,7 +81,7 @@ final class RepositoryVersions implements VersionSource
                 } catch (\Exception $e) {
                     // A transport failure or an answer that does not parse (Seld\JsonLint\ParsingException).
                     $failed = true;
-                    continue 2;
+                    break;
                 }
                 $versions = array_values(array_filter($result['packages'], static fn ($package): bool => $package instanceof BasePackage && $package->getName() === $name));
                 if ($versions !== []) {

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Solver;
 
+use Composer\Downloader\TransportException;
+use Composer\Package\BasePackage;
+use Composer\Package\Loader\ArrayLoader;
+use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
 use Lockrot\Deadline;
 use Lockrot\Solver\RepositoryVersions;
@@ -30,5 +34,121 @@ final class RepositoryVersionsTest extends TestCase
 
         self::assertSame([], $versions->versions('acme/lib'));
         self::assertSame(VersionSource::FAILED, $versions->failure('acme/lib'));
+    }
+
+    public function testTheFirstComposerRepositoryThatListsATaggedReleaseOfTheNameWins(): void
+    {
+        $versions = new RepositoryVersions([new ArrayRepository([self::package('acme/lib', '9.0.0')]), self::repository(['acme/other' => ['1.0.0']]), self::repository(['acme/lib' => ['1.0.0', 'dev-main']]), self::repository(['acme/lib' => ['2.0.0']])], [], false, Deadline::never());
+
+        self::assertSame(['1.0.0'], self::pretty($versions->versions('acme/lib')));
+        self::assertNull($versions->failure('acme/lib'));
+    }
+
+    /** A Composer repository can answer with other names too, such as a package that provides or replaces the name. */
+    public function testOnlyTheVersionsOfTheAskedNameAreKept(): void
+    {
+        $repository = new class ([self::package('acme/other', '1.0.0'), self::package('acme/lib', '1.0.0'), self::package('acme/lib', '1.1.0')]) extends ComposerRepository {
+            /** @var list<BasePackage> */
+            private array $answer;
+            public int $loads = 0;
+
+            /** @param list<BasePackage> $answer */
+            public function __construct(array $answer)
+            {
+                $this->answer = $answer;
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                ++$this->loads;
+
+                return ['namesFound' => ['acme/lib', 'acme/other'], 'packages' => $this->answer];
+            }
+        };
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::never());
+
+        self::assertSame(['1.0.0', '1.1.0'], self::pretty($versions->versions('acme/lib')));
+        self::assertSame([0, 1], array_keys($versions->versions('acme/lib')));
+        self::assertSame(1, $repository->loads, 'a name loads once');
+    }
+
+    public function testANameWithNoTaggedReleaseLoadsItsDevVersions(): void
+    {
+        $versions = new RepositoryVersions([self::repository(['acme/lib' => ['dev-main']])], [], false, Deadline::never());
+
+        self::assertSame(['dev-main'], self::pretty($versions->versions('acme/lib')));
+    }
+
+    /** A repository that fails is skipped whole: its dev versions are not read in place of the tagged ones. */
+    public function testARepositoryWhoseLoadFailsIsSkippedForTheNextOne(): void
+    {
+        $versions = new RepositoryVersions([self::repository(['acme/lib' => ['dev-main']], true), self::repository(['acme/lib' => ['1.0.0']])], [], false, Deadline::never());
+
+        self::assertSame(['1.0.0'], self::pretty($versions->versions('acme/lib')));
+    }
+
+    public function testANameThatNoRepositoryListsHasNoFailureOnlineAndIsOfflineOffline(): void
+    {
+        $online = new RepositoryVersions([self::repository([])], [], false, Deadline::never());
+        $offline = new RepositoryVersions([self::repository([])], [], true, Deadline::never());
+
+        self::assertSame([[], null], [$online->versions('acme/lib'), $online->failure('acme/lib')]);
+        self::assertSame([[], VersionSource::OFFLINE], [$offline->versions('acme/lib'), $offline->failure('acme/lib')]);
+    }
+
+    /**
+     * A fake repository that serves each name's versions by stability, as a Composer repository does.
+     *
+     * @param array<string, list<string>> $versions name => its pretty versions
+     */
+    private static function repository(array $versions, bool $failsTagged = false): ComposerRepository
+    {
+        $packages = [];
+        foreach ($versions as $name => $list) {
+            foreach ($list as $version) {
+                $packages[] = self::package($name, $version);
+            }
+        }
+
+        return new class ($packages, $failsTagged) extends ComposerRepository {
+            /** @var list<BasePackage> */
+            private array $served;
+            private bool $failsTagged;
+
+            /** @param list<BasePackage> $served */
+            public function __construct(array $served, bool $failsTagged)
+            {
+                $this->served = $served;
+                $this->failsTagged = $failsTagged;
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                if ($this->failsTagged && isset($acceptableStabilities['stable'])) {
+                    throw new TransportException('The "https://repo.example.org/p2/acme/lib.json" file could not be downloaded');
+                }
+                $packages = array_values(array_filter($this->served, static fn (BasePackage $package): bool => \array_key_exists($package->getName(), $packageNameMap) && isset($acceptableStabilities[$package->getStability()])));
+
+                return ['namesFound' => array_map(static fn (BasePackage $package): string => $package->getName(), $packages), 'packages' => $packages];
+            }
+        };
+    }
+
+    private static function package(string $name, string $version): BasePackage
+    {
+        $package = (new ArrayLoader())->load(['name' => $name, 'version' => $version]);
+        self::assertInstanceOf(BasePackage::class, $package);
+
+        return $package;
+    }
+
+    /**
+     * @param list<BasePackage> $packages
+     *
+     * @return list<string>
+     */
+    private static function pretty(array $packages): array
+    {
+        return array_map(static fn (BasePackage $package): string => $package->getPrettyVersion(), $packages);
     }
 }

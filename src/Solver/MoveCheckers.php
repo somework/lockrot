@@ -37,8 +37,8 @@ final class MoveCheckers
         $overrides = [];
         $configured = $config->get('platform');
         foreach (\is_array($configured) ? $configured : [] as $name => $version) {
-            if (\is_string($version) || $version === false) {
-                $overrides[(string) $name] = $version;
+            if (\is_string($name) && (\is_string($version) || $version === false)) {
+                $overrides[$name] = $version;
             }
         }
         $php = self::platformPhp($targetPhp, \is_string($overrides['php'] ?? null) ? $overrides['php'] : null);

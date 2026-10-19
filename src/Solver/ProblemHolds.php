@@ -35,13 +35,13 @@ final class ProblemHolds
 {
     /** @var list<Holder> */
     private array $holds = [];
-    /** @var array<string, true> */
+    /** @var array<string, string> */
     private array $wanted = [];
     /** The request's own requirement when the pool holds no release of it. */
     private ?Holder $noRelease = null;
 
     /**
-     * @param list<string>          $moved     the names on the allow list: a link to one of them has no target
+     * @param array<string, string> $moved     the names on the allow list: a link to one of them has no target
      * @param array<string, string> $requested the root requirements that the request writes: a refusal of one names the request, not a hold
      */
     public static function of(SolverProblemsException $e, Pool $pool, RootPackageInterface $root, array $moved, array $requested = []): self
@@ -50,7 +50,7 @@ final class ProblemHolds
         $rootRequires = array_merge($root->getDevRequires(), $root->getRequires());
         foreach ($e->getProblems() as $problem) {
             foreach ($problem->getReasons() as $section) {
-                foreach ((array) $section as $rule) {
+                foreach ($section as $rule) {
                     if ($rule instanceof Rule) {
                         $out->add($rule, $pool, $root->getName(), $rootRequires, $moved, $requested);
                     }
@@ -71,84 +71,93 @@ final class ProblemHolds
         return $this->holds;
     }
 
-    /** @return list<string> the names that a requirement wants and that the pool holds no version of */
+    /** @return array<string, string> name => name, for each name that a requirement wants and that the pool holds no version of */
     public function wanted(): array
     {
-        return array_keys($this->wanted);
+        return $this->wanted;
     }
 
     /**
      * @param array<string, Link>   $rootRequires
-     * @param list<string>          $moved
+     * @param array<string, string> $moved
      * @param array<string, string> $requested
      */
     private function add(Rule $rule, Pool $pool, string $rootName, array $rootRequires, array $moved, array $requested): void
     {
+        $reason = $rule->getReason();
         $data = $rule->getReasonData();
-        switch ($rule->getReason()) {
-            case Rule::RULE_ROOT_REQUIRE:
-                /** @var array{packageName: string, constraint: ConstraintInterface} $data */
-                $name = $data['packageName'];
-                if (isset($requested[$name])) {
-                    if ($rule->getLiterals() === []) {
-                        $this->noRelease = new Holder(Holder::ROOT, $rootName, null, Holder::ROOT_REQUIRE, $data['constraint']->getPrettyString());
-                    }
-
-                    return;
-                }
-                $this->holds[] = self::rootHold($rootName, $name, $data['constraint']->getPrettyString(), $moved);
-
-                return;
-            case Rule::RULE_PACKAGE_REQUIRES:
-            case Rule::RULE_PACKAGE_CONFLICT:
-                if (!$data instanceof Link) {
-                    return;
-                }
-                $isRequire = $rule->getReason() === Rule::RULE_PACKAGE_REQUIRES;
-                $literals = $rule->getLiterals();
-                $source = $isRequire || \count($literals) < 2 ? $pool->literalToPackage($literals[0]) : $rule->getSourcePackage($pool);
-                if ($source instanceof AliasPackage) {
-                    $source = $source->getAliasOf();
-                }
-                $target = $data->getTarget();
-                $platform = PlatformRepository::isPlatformPackage($target);
-                $link = $platform ? Holder::PLATFORM : ($isRequire ? Holder::REQUIRE : Holder::CONFLICT);
-                // A conflict rule can name the moved package as either side: the target is the other one.
-                $declarer = $data->getSource();
-                $other = \in_array($target, $moved, true) ? null : $target;
-                $this->holds[] = $declarer === $rootName
-                    ? new Holder(Holder::ROOT, $rootName, null, $link, $data->getPrettyConstraint(), $other)
-                    : new Holder(Holder::PACKAGE, $declarer, $source->getPrettyVersion(), $link, $data->getPrettyConstraint(), $other);
-                if ($isRequire && \count($literals) === 1 && !$platform) {
-                    $this->wanted[$target] = true;
-                    $byRoot = $rootRequires[$target] ?? null;
-                    if ($byRoot !== null && $other !== null) {
-                        $this->holds[] = new Holder(Holder::ROOT, $rootName, null, Holder::ROOT_REQUIRE, $byRoot->getPrettyConstraint(), $target);
-                    }
-                }
-
-                return;
-            case Rule::RULE_PACKAGE_SAME_NAME:
-                if (!\is_string($data)) {
-                    return;
-                }
-                foreach ($rule->getLiterals() as $literal) {
-                    $package = $pool->literalToPackage($literal);
-                    $package = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
-                    $replace = $package->getReplaces()[$data] ?? null;
-                    if ($replace !== null) {
-                        $target = \in_array($data, $moved, true) ? null : $data;
-                        $this->holds[] = $package->getName() === $rootName
-                            ? new Holder(Holder::ROOT, $rootName, null, Holder::REPLACE, $replace->getPrettyConstraint(), $target)
-                            : new Holder(Holder::PACKAGE, $package->getName(), $package->getPrettyVersion(), Holder::REPLACE, $replace->getPrettyConstraint(), $target);
-                    }
-                }
-
-                return;
+        if ($reason === Rule::RULE_ROOT_REQUIRE) {
+            /** @var array{packageName: string, constraint: ConstraintInterface} $data */
+            $this->addRootRequire($rule, $data['packageName'], $data['constraint']->getPrettyString(), $rootName, $moved, $requested);
+        } elseif ($reason === Rule::RULE_PACKAGE_REQUIRES || $reason === Rule::RULE_PACKAGE_CONFLICT) {
+            /** @var Link $data */
+            $this->addLink($rule, $data, $pool, $rootName, $rootRequires, $moved);
+        } elseif ($reason === Rule::RULE_PACKAGE_SAME_NAME) {
+            /** @var string $data */
+            $this->addReplaces($rule, $data, $pool, $rootName, $moved);
         }
     }
 
-    /** @param list<string> $moved */
+    /**
+     * @param array<string, string> $moved
+     * @param array<string, string> $requested
+     */
+    private function addRootRequire(Rule $rule, string $name, string $constraint, string $rootName, array $moved, array $requested): void
+    {
+        if (!isset($requested[$name])) {
+            $this->holds[] = self::rootHold($rootName, $name, $constraint, $moved);
+        } elseif ($rule->getLiterals() === []) {
+            $this->noRelease = new Holder(Holder::ROOT, $rootName, null, Holder::ROOT_REQUIRE, $constraint);
+        }
+    }
+
+    /**
+     * @param array<string, Link> $rootRequires
+     * @param array<string, string> $moved
+     */
+    private function addLink(Rule $rule, Link $data, Pool $pool, string $rootName, array $rootRequires, array $moved): void
+    {
+        $isRequire = $rule->getReason() === Rule::RULE_PACKAGE_REQUIRES;
+        $source = $rule->getSourcePackage($pool);
+        if ($source instanceof AliasPackage) {
+            $source = $source->getAliasOf();
+        }
+        $target = $data->getTarget();
+        $platform = PlatformRepository::isPlatformPackage($target);
+        $link = $platform ? Holder::PLATFORM : ($isRequire ? Holder::REQUIRE : Holder::CONFLICT);
+        // A conflict rule can name the moved package as either side: the target is the other one.
+        $declarer = $data->getSource();
+        $other = \in_array($target, $moved, true) ? null : $target;
+        $this->holds[] = $declarer === $rootName
+            ? new Holder(Holder::ROOT, $rootName, null, $link, $data->getPrettyConstraint(), $other)
+            : new Holder(Holder::PACKAGE, $declarer, $source->getPrettyVersion(), $link, $data->getPrettyConstraint(), $other);
+        // One literal is a requirement with no candidate left: a conflict rule has two.
+        if (\count($rule->getLiterals()) === 1 && !$platform) {
+            $this->wanted[$target] = $target;
+            $byRoot = $rootRequires[$target] ?? null;
+            if ($byRoot !== null && $other !== null) {
+                $this->holds[] = new Holder(Holder::ROOT, $rootName, null, Holder::ROOT_REQUIRE, $byRoot->getPrettyConstraint(), $target);
+            }
+        }
+    }
+
+    /** @param array<string, string> $moved */
+    private function addReplaces(Rule $rule, string $name, Pool $pool, string $rootName, array $moved): void
+    {
+        foreach ($rule->getLiterals() as $literal) {
+            $package = $pool->literalToPackage($literal);
+            $package = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
+            $replace = $package->getReplaces()[$name] ?? null;
+            if ($replace !== null) {
+                $target = \in_array($name, $moved, true) ? null : $name;
+                $this->holds[] = $package->getName() === $rootName
+                    ? new Holder(Holder::ROOT, $rootName, null, Holder::REPLACE, $replace->getPrettyConstraint(), $target)
+                    : new Holder(Holder::PACKAGE, $package->getName(), $package->getPrettyVersion(), Holder::REPLACE, $replace->getPrettyConstraint(), $target);
+            }
+        }
+    }
+
+    /** @param array<string, string> $moved */
     private static function rootHold(string $rootName, string $name, string $constraint, array $moved): Holder
     {
         if (PlatformRepository::isPlatformPackage($name)) {

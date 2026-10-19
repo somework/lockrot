@@ -48,7 +48,7 @@ final class AdvisoryBlocking
         $this->abandonedIgnore = $abandonedIgnore;
     }
 
-    public static function none(): self
+    private static function none(): self
     {
         return new self(false, [], [], false, []);
     }
@@ -118,7 +118,7 @@ final class AdvisoryBlocking
         if ($this->list === [] && $this->severities === []) {
             foreach ($records as $name => $advisories) {
                 foreach ($advisories as $advisory) {
-                    $ranges[(string) $name][] = $advisory->affectedVersions;
+                    $ranges[$name][] = $advisory->affectedVersions;
                 }
             }
 
@@ -127,7 +127,7 @@ final class AdvisoryBlocking
         // @phpstan-ignore argument.type (the list keeps the shape that this Composer's Auditor reads)
         foreach ((new Auditor())->processAdvisories($records, $this->list, $this->severities)['advisories'] as $name => $advisories) {
             foreach ($advisories as $advisory) {
-                $ranges[(string) $name][] = $advisory->affectedVersions;
+                $ranges[$name][] = $advisory->affectedVersions;
             }
         }
 
@@ -149,7 +149,7 @@ final class AdvisoryBlocking
     public function blocksAbandoned(PackageInterface $package): bool
     {
         // @phpstan-ignore argument.type (the list keeps the shape that this Composer's Auditor reads)
-        return $this->blocks && $this->abandoned && (new Auditor())->filterAbandonedPackages([$package], $this->abandonedIgnore) !== [];
+        return $this->abandoned && (new Auditor())->filterAbandonedPackages([$package], $this->abandonedIgnore) !== [];
     }
 
     /**

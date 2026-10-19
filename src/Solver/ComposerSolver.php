@@ -110,12 +110,8 @@ final class ComposerSolver
         $root = $this->rootWith($request->rootChanges());
         $links = array_merge($root->getRequires(), $root->getDevRequires());
         $requires = [];
-        $rootRequires = [];
         foreach ($links as $name => $link) {
             $requires[$name] = $link->getConstraint();
-            if (!$this->filter->isIgnored($name)) {
-                $rootRequires[$name] = $link->getConstraint();
-            }
         }
         $parser = new VersionParser();
         $requested = $request->rootChanges();
@@ -127,13 +123,12 @@ final class ComposerSolver
             // Composer 2.2 and 2.3 have no temporary constraints: the inline constraint joins the root requirement.
             foreach ($temporary as $name => $constraint) {
                 $requires[$name] = isset($requires[$name]) ? MultiConstraint::create([$requires[$name], $constraint], true) : $constraint;
-                $rootRequires[$name] = $requires[$name];
             }
             $requested += $request->inline();
             $temporary = [];
         }
         $policy = new DefaultPolicy($root->getPreferStable(), false);
-        [$set, $composerRequest, $pool] = $this->pool($root, $requires, $rootRequires, $temporary, $request, $policy);
+        [$set, $composerRequest, $pool] = $this->pool($root, $requires, $temporary, $request, $policy);
 
         try {
             $transaction = (new Solver($policy, $pool, new NullIO()))->solve($composerRequest, $this->filter);
@@ -154,17 +149,16 @@ final class ComposerSolver
     }
 
     /**
-     * @param array<string, ConstraintInterface> $requires
-     * @param array<string, ConstraintInterface> $rootRequires
+     * @param array<string, ConstraintInterface> $requires  the root requirements: RepositorySet leaves out the platform ones
      * @param array<string, ConstraintInterface> $temporary
      *
      * @return array{0: RepositorySet, 1: Request, 2: Pool}
      */
-    private function pool(RootPackageInterface $root, array $requires, array $rootRequires, array $temporary, SolveRequest $request, DefaultPolicy $policy): array
+    private function pool(RootPackageInterface $root, array $requires, array $temporary, SolveRequest $request, DefaultPolicy $policy): array
     {
         $flags = $root->getStabilityFlags();
         $flags[$root->getName()] = BasePackage::$stabilities[VersionParser::parseStability($root->getVersion())];
-        $arguments = [$root->getMinimumStability(), $flags, $root->getAliases(), $root->getReferences(), $rootRequires];
+        $arguments = [$root->getMinimumStability(), $flags, $root->getAliases(), $root->getReferences(), $requires];
         if (ComposerFeatures::hasTemporaryConstraints()) {
             $arguments[] = $temporary;
         }
@@ -175,9 +169,7 @@ final class ComposerSolver
             throw new \LogicException('the root package is no BasePackage: '.\get_class($fixedRoot));
         }
         $fixedRoot->setRequires([]);
-        $fixedRoot->setDevRequires([]);
         $set->addRepository(new RootPackageRepository($fixedRoot));
-        $set->addRepository($this->platform);
         $set->addRepository(new LoadedVersions($this->source));
         $set->addRepository($this->locked);
 
@@ -193,43 +185,33 @@ final class ComposerSolver
         foreach ($requires as $name => $constraint) {
             $composerRequest->requireName($name, $constraint);
         }
-        // Composer before 2.6 reads the names from the keys, and later versions from the values.
-        $allow = $request->allow();
-        $composerRequest->setUpdateAllowList(array_combine($allow, $allow), $request->transitive());
+        $composerRequest->setUpdateAllowList($request->allow(), $request->transitive());
 
-        $blocking = $this->advisories === null ? null : $this->advisories->blocking();
-        if ($this->blocked === [] && ($blocking === null || !$blocking->blocks())) {
-            return [$set, $composerRequest, $set->createPool($composerRequest, new NullIO(), null, new PoolOptimizer($policy))];
-        }
         // Composer 2.9 and later filter the built pool, then optimize it: the builder marks the packages that stay locked.
         $pool = $set->createPool($composerRequest, new NullIO());
         // By name and version, as Composer's isLockedPackage() reads it: a root alias of a locked release keeps the release.
         $stayLocked = [];
         foreach ($composerRequest->getLockedPackages() as $package) {
             $base = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
-            $stayLocked[$base->getName().' '.$base->getVersion()] = true;
+            $key = $base->getName().' '.$base->getVersion();
+            $stayLocked[$key] = $key;
         }
         // Composer looks up the advisories of every pool package that can move: packages-dev and new dependencies too.
         $names = [];
         foreach ($pool->getPackages() as $package) {
             $base = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
             if (!$base instanceof RootPackageInterface && !PlatformRepository::isPlatformPackage($base->getName()) && !isset($stayLocked[$base->getName().' '.$base->getVersion()])) {
-                $names[$base->getName()] = true;
+                $names[$base->getName()] = $base->getName();
             }
         }
+        $blocking = $this->advisories === null ? null : $this->advisories->blocking();
         $blocked = $this->blocked;
-        foreach ($this->advisories === null ? [] : $this->advisories->ranges(array_keys($names)) as $name => $ranges) {
+        foreach ($this->advisories === null ? [] : $this->advisories->ranges($names) as $name => $ranges) {
             $blocked[$name] = array_merge($blocked[$name] ?? [], $ranges);
         }
-        $kept = array_values(array_filter($pool->getPackages(), self::keeps($blocked, $stayLocked, $blocking)));
-        if (\count($kept) < \count($pool->getPackages())) {
-            // Composer before 2.9 keeps the removed versions private: they only word the problem text.
-            // @phpstan-ignore function.alreadyNarrowedType (Composer before 2.9 has no getAllRemovedVersions())
-            $removed = method_exists($pool, 'getAllRemovedVersions') ? [$pool->getAllRemovedVersions(), $pool->getAllRemovedVersionsByPackage()] : [[], []];
-            $pool = new Pool($kept, $pool->getUnacceptableFixedOrLockedPackages(), ...$removed);
-        }
+        $kept = new Pool(array_filter($pool->getPackages(), self::keeps($blocked, $stayLocked, $blocking)), $pool->getUnacceptableFixedOrLockedPackages());
 
-        return [$set, $composerRequest, (new PoolOptimizer($policy))->optimize($composerRequest, $pool)];
+        return [$set, $composerRequest, (new PoolOptimizer($policy))->optimize($composerRequest, $kept)];
     }
 
     /**
@@ -238,7 +220,7 @@ final class ComposerSolver
      * that stays locked, and a version outside every blocked range of each of its names.
      *
      * @param array<string, list<ConstraintInterface>> $blocked
-     * @param array<string, true>                      $stayLocked by `name version`
+     * @param array<string, string>                    $stayLocked by `name version`
      *
      * @return \Closure(BasePackage): bool
      */
@@ -268,23 +250,19 @@ final class ComposerSolver
         };
     }
 
-    /** @param array<string, string> $changes name => constraint, as `require name:constraint` */
+    /**
+     * @param array<string, string> $changes name => constraint, as `require name:constraint` without
+     *                                       `--dev` writes it: in `require`, and out of `require-dev`
+     */
     private function rootWith(array $changes): RootPackageInterface
     {
-        if ($changes === []) {
-            return $this->root;
-        }
         $root = clone $this->root;
         $parser = new VersionParser();
         $requires = $root->getRequires();
         $devRequires = $root->getDevRequires();
         foreach ($changes as $name => $constraint) {
-            $parsed = $parser->parseConstraints($constraint);
-            if (isset($devRequires[$name]) && !isset($requires[$name])) {
-                $devRequires[$name] = new Link($root->getName(), $name, $parsed, Link::TYPE_DEV_REQUIRE, $constraint);
-                continue;
-            }
-            $requires[$name] = new Link($root->getName(), $name, $parsed, Link::TYPE_REQUIRE, $constraint);
+            $requires[$name] = new Link($root->getName(), $name, $parser->parseConstraints($constraint), Link::TYPE_REQUIRE, $constraint);
+            unset($devRequires[$name]);
         }
         $root->setRequires($requires);
         $root->setDevRequires($devRequires);
