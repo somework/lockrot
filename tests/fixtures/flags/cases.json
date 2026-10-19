@@ -2269,7 +2269,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -4606,7 +4606,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -9278,7 +9278,9 @@
       },
       "after": {
        "result": "0, ok",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -10948,7 +10950,9 @@
       },
       "after": {
        "result": "0, finished",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -17179,7 +17183,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -19537,7 +19541,7 @@
       "after": {
        "result": "at most 16, high",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -21623,7 +21627,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -24899,7 +24903,7 @@
       "after": {
        "result": "at most 16, high",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -27401,7 +27405,9 @@
       },
       "after": {
        "result": "0, ok",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -29924,7 +29930,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -36243,7 +36249,9 @@
       },
       "after": {
        "result": "0, ok",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -41397,7 +41405,7 @@
       "after": {
        "result": "at most 8, medium",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -43270,7 +43278,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -46925,7 +46933,9 @@
       },
       "after": {
        "result": "0, ok",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -49592,7 +49602,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -52812,7 +52822,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -58989,7 +58999,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -62194,7 +62204,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -67605,7 +67615,7 @@
       "after": {
        "result": "at most 16, high",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -69878,7 +69888,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -71916,7 +71926,9 @@
       },
       "after": {
        "result": "20, high",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      },
@@ -71947,7 +71959,7 @@
       "after": {
        "result": "at most 16, high",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -73574,7 +73586,9 @@
       },
       "after": {
        "result": "0, finished",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -79600,7 +79614,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -82107,7 +82121,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -85866,7 +85880,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -89184,7 +89198,7 @@
       "after": {
        "result": "16, high",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -90993,7 +91007,9 @@
       },
       "after": {
        "result": "0, ok",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -93956,7 +93972,9 @@
       },
       "after": {
        "result": "0, finished",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -98933,7 +98951,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -101007,7 +101025,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -104138,7 +104156,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -111027,7 +111045,8 @@
       "after": {
        "result": "18, high",
        "conditions": [
-        "adds old-promise"
+        "adds old-promise",
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": []
@@ -112572,7 +112591,7 @@
       "after": {
        "result": "at most, from the facts it checked, 16, high",
        "conditions": [
-        "if Composer resolves it",
+        "if Composer resolves it (not checked: the run checked no move)",
         "advisories on its new versions not checked"
        ]
       },
@@ -114093,7 +114112,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -115758,7 +115777,9 @@
       },
       "after": {
        "result": "0, ok",
-       "conditions": []
+       "conditions": [
+        "checked with Composer"
+       ]
       },
       "composer": []
      }
@@ -117238,7 +117259,7 @@
       "after": {
        "result": "2, low",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -121766,7 +121787,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -125403,7 +125424,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -127491,7 +127512,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -130352,7 +130373,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -131790,7 +131811,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -133299,7 +133320,7 @@
        "result": "8, medium",
        "conditions": [
         "adds left-behind",
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -134806,7 +134827,7 @@
        "conditions": [
         "left-behind not checked",
         "old-promise not checked",
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -138106,7 +138127,7 @@
       "after": {
        "result": "at most 36, critical",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -151772,7 +151793,7 @@
       "after": {
        "result": "8, medium",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -157832,7 +157853,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -180191,7 +180212,7 @@
       "after": {
        "result": "at most, from the facts it checked, 16, high",
        "conditions": [
-        "if Composer resolves it",
+        "if Composer resolves it (not checked: the run checked no move)",
         "advisories on its new versions not checked"
        ]
       },
@@ -182089,7 +182110,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -184083,7 +184104,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -186171,7 +186192,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -190193,7 +190214,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -192846,7 +192867,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -195193,7 +195214,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -197186,7 +197207,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -199827,7 +199848,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [

@@ -5901,7 +5901,9 @@
             "clears": "the advisory",
             "after": {
               "result": "0, ok",
-              "conditions": []
+              "conditions": [
+                "checked with Composer"
+              ]
             },
             "also_holds": null
           },
@@ -5914,7 +5916,9 @@
             "clears": "both advisories",
             "after": {
               "result": "0, ok",
-              "conditions": []
+              "conditions": [
+                "checked with Composer"
+              ]
             },
             "also_holds": null
           }
@@ -8646,7 +8650,9 @@
             "clears": "the advisory",
             "after": {
               "result": "20, high",
-              "conditions": []
+              "conditions": [
+                "checked with Composer"
+              ]
             },
             "also_holds": null
           }
@@ -8922,7 +8928,9 @@
             "clears": "the advisory",
             "after": {
               "result": "0, ok",
-              "conditions": []
+              "conditions": [
+                "checked with Composer"
+              ]
             },
             "also_holds": null
           },
@@ -8935,7 +8943,9 @@
             "clears": "both advisories",
             "after": {
               "result": "0, ok",
-              "conditions": []
+              "conditions": [
+                "checked with Composer"
+              ]
             },
             "also_holds": null
           },
@@ -8948,7 +8958,9 @@
             "clears": "both",
             "after": {
               "result": "0, ok",
-              "conditions": []
+              "conditions": [
+                "checked with Composer"
+              ]
             },
             "also_holds": "Also holds: bacon/bacon-qr-code (high), pragmarx/google2fa-qrcode (medium)"
           }

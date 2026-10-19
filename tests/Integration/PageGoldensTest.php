@@ -194,9 +194,9 @@ final class PageGoldensTest extends TestCase
     }
 
     /**
-     * SPEC-0.14.md §7.9.4 and §7.9.9: a page case shows the allowlist line with a count per flag, and
-     * the check words of `release_dates` on the way-out line. No valid document reaches the words of
-     * `releases`: its S10 entry stands beside a counted advisory (I35), and such a finding has a move.
+     * SPEC-0.14.md §7.9.4 and §7.9.9: the page cases show the allowlist counts and the `release_dates`
+     * check words. No valid document reaches the words of `releases`. Its S10 entry stands beside a
+     * counted advisory (I35), and such a finding has a move.
      */
     public function testThePageCasesShowTheAcceptedCountsAndTheReleaseDatesCheckWords(): void
     {

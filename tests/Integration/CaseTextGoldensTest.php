@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Output\AgeText;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\CommandArgument;
@@ -134,6 +135,48 @@ final class CaseTextGoldensTest extends TestCase
 
         self::assertSame([], $differ);
         self::assertGreaterThan(0, $compared, 'no case golden shows a command box');
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.21 "The move" and G104: the After block of a move that runs a Composer request
+     * holds one check line. The move's check and the run's move check give its words. Another kind holds none.
+     */
+    public function testTheAfterBlockOfAMoveCardHoldsItsCheckLine(): void
+    {
+        $differ = [];
+        $lines = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(__DIR__.'/../fixtures/flags/cases.json'), ['cases']) as $case) {
+            $case = JsonPath::decoded($case);
+            $id = JsonPath::stringAt($case, ['id']);
+            $cards = JsonPath::has($case, ['golden', 'moves']) ? JsonPath::arrayAt($case, ['golden', 'moves']) : [];
+            $runChecked = JsonPath::has($case, ['run', 'move_check', 'baseline']);
+            $lead = JsonPath::has($case, ['finding', 'next_step', 'kind']) ? JsonPath::arrayAt($case, ['finding', 'next_step']) : null;
+            foreach (array_values($lead === null ? [] : array_merge([$lead], JsonPath::arrayAt($lead, ['also']))) as $i => $move) {
+                $move = JsonPath::decoded($move);
+                $result = JsonPath::has($move, ['check', 'result']) ? JsonPath::stringAt($move, ['check', 'result']) : null;
+                $reason = $result === MoveCheck::NOT_CHECKED ? JsonPath::stringAt($move, ['check', 'reason']) : '';
+                $assumes = JsonPath::has($move, ['if_applied', 'assumes']) ? JsonPath::arrayAt($move, ['if_applied', 'assumes']) : [];
+                $expected = null;
+                if (\in_array($move['kind'] ?? null, ['update', 'require', 'raise-php', 'tag'], true)) {
+                    $expected = [
+                        'resolves' => 'checked with Composer',
+                        'refused' => 'Composer refuses the move',
+                        'not_checked' => 'if Composer resolves it (not checked: '.MoveCheck::reasonWords($reason).')',
+                    ][(string) $result] ?? ($runChecked ? (\in_array('composer_resolves', $assumes, true) ? 'if Composer resolves it' : null) : 'if Composer resolves it (not checked: the run checked no move)');
+                }
+                $after = JsonPath::decoded($cards[$i] ?? [])['after'] ?? null;
+                $conditions = \is_array($after) && \is_array($after['conditions'] ?? null) ? $after['conditions'] : [];
+                $actual = array_values(preg_grep('/^(checked with Composer|Composer refuses the move|if Composer resolves it)/', array_filter($conditions, 'is_string')) ?: []);
+                $lines[] = $expected;
+                if ($actual !== ($expected === null ? [] : [$expected]) || ($expected !== null && ($move['if_applied'] ?? null) === null && $after !== ['result' => null, 'conditions' => [$expected]])) {
+                    $differ[$id.' card '.$i] = ['expected' => $expected, 'after' => $after];
+                }
+            }
+        }
+
+        self::assertSame([], $differ);
+        self::assertContains('checked with Composer', $lines, 'no case golden shows a move that Composer resolves');
+        self::assertContains('if Composer resolves it (not checked: the run checked no move)', $lines, 'no case golden shows a run that checked no move');
     }
 
     /**
