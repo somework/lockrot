@@ -2248,7 +2248,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -2269,7 +2269,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -4606,7 +4606,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -9278,7 +9278,9 @@
       },
       "after": {
        "result": "0, ok",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -10928,7 +10930,7 @@
        "composer update symfony/polyfill-intl-idn",
        "composer why-not guzzlehttp/guzzle 8.2.0"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -10948,7 +10950,9 @@
       },
       "after": {
        "result": "0, finished",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -17158,7 +17162,7 @@
        "composer require 'php:>=7.2.5' --no-update",
        "composer require 'guzzlehttp/guzzle:^7.15.2'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "left-behind and all 9 advisories",
       "stays": null,
       "not_checked": null,
@@ -17179,7 +17183,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -19516,7 +19520,7 @@
        "composer require 'php:>=7.2.5' --no-update",
        "composer require 'symfony/yaml:^5.4.52'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "left-behind and all 3 advisories",
       "stays": null,
       "not_checked": "old-promise",
@@ -19537,7 +19541,7 @@
       "after": {
        "result": "at most 16, high",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -21623,7 +21627,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -24878,7 +24882,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 16 advisories",
       "stays": null,
       "not_checked": "old-promise",
@@ -24899,7 +24903,7 @@
       "after": {
        "result": "at most 16, high",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -27401,7 +27405,9 @@
       },
       "after": {
        "result": "0, ok",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -29924,7 +29930,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -36243,7 +36249,9 @@
       },
       "after": {
        "result": "0, ok",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -41397,7 +41405,7 @@
       "after": {
        "result": "at most 8, medium",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -43270,7 +43278,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -46925,7 +46933,9 @@
       },
       "after": {
        "result": "0, ok",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -49571,7 +49581,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'pagerfanta/twig:^4.9'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "left-behind",
       "stays": null,
       "not_checked": null,
@@ -49592,7 +49602,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -52812,7 +52822,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -58989,7 +58999,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -62194,7 +62204,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -67584,7 +67594,7 @@
        "composer require 'php:>=7.2.5' --no-update",
        "composer require 'guzzlehttp/guzzle:^7.15.2'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "left-behind and all 14 advisories",
       "stays": null,
       "not_checked": "old-promise",
@@ -67605,7 +67615,7 @@
       "after": {
        "result": "at most 16, high",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -69853,7 +69863,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'joomla/filter:^3.0.5'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -69878,7 +69888,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -71916,7 +71926,9 @@
       },
       "after": {
        "result": "20, high",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      },
@@ -71947,7 +71959,7 @@
       "after": {
        "result": "at most 16, high",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -73554,7 +73566,7 @@
        "composer update symfony/polyfill-intl-idn",
        "composer why-not guzzlehttp/guzzle 8.2.0"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -73574,7 +73586,9 @@
       },
       "after": {
        "result": "0, finished",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -79600,7 +79614,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -82086,7 +82100,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -82107,7 +82121,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -85866,7 +85880,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -89184,7 +89198,7 @@
       "after": {
        "result": "16, high",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -90993,7 +91007,9 @@
       },
       "after": {
        "result": "0, ok",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -93956,7 +93972,9 @@
       },
       "after": {
        "result": "0, finished",
-       "conditions": []
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)"
+       ]
       },
       "composer": []
      }
@@ -98933,7 +98951,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -100986,7 +101004,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -101007,7 +101025,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -104113,7 +104131,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'joomla/filter:^3.0.5'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -104138,7 +104156,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -111027,7 +111045,8 @@
       "after": {
        "result": "18, high",
        "conditions": [
-        "adds old-promise"
+        "adds old-promise",
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": []
@@ -112572,7 +112591,7 @@
       "after": {
        "result": "at most, from the facts it checked, 16, high",
        "conditions": [
-        "if Composer resolves it",
+        "if Composer resolves it (not checked: the run checked no move)",
         "advisories on its new versions not checked"
        ]
       },
@@ -114068,7 +114087,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'joomla/string:^3.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "left-behind",
       "stays": null,
       "not_checked": null,
@@ -114093,7 +114112,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -115736,7 +115755,7 @@
       "heading": "The move",
       "action": "Update to v2.3.2 on 2.x",
       "commands": [
-       "This command holds characters the page does not print."
+       "composer update 'typo3/html-sanitizer:^2.3.2' --with-dependencies"
       ],
       "commands_label": "Command",
       "clears": "both advisories",
@@ -115758,7 +115777,9 @@
       },
       "after": {
        "result": "0, ok",
-       "conditions": []
+       "conditions": [
+        "checked with Composer"
+       ]
       },
       "composer": []
      }
@@ -117238,7 +117259,7 @@
       "after": {
        "result": "2, low",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -121745,7 +121766,7 @@
        "composer require 'php:>=8.2' --no-update",
        "composer require 'laravel/framework:^12.69.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 6 advisories",
       "stays": null,
       "not_checked": null,
@@ -121766,7 +121787,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -125382,7 +125403,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'geoip2/geoip2:^3.4'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "left-behind, old-promise and both advisories",
       "stays": null,
       "not_checked": null,
@@ -125403,7 +125424,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -127491,7 +127512,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -130352,7 +130373,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -131790,7 +131811,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -133299,7 +133320,7 @@
        "result": "8, medium",
        "conditions": [
         "adds left-behind",
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -134806,7 +134827,7 @@
        "conditions": [
         "left-behind not checked",
         "old-promise not checked",
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -138106,7 +138127,7 @@
       "after": {
        "result": "at most 36, critical",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -151772,7 +151793,7 @@
       "after": {
        "result": "8, medium",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -157811,7 +157832,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -157832,7 +157853,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -180191,7 +180212,7 @@
       "after": {
        "result": "at most, from the facts it checked, 16, high",
        "conditions": [
-        "if Composer resolves it",
+        "if Composer resolves it (not checked: the run checked no move)",
         "advisories on its new versions not checked"
        ]
       },
@@ -182089,7 +182110,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -184083,7 +184104,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -186171,7 +186192,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -190193,7 +190214,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -192825,7 +192846,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -192846,7 +192867,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -195193,7 +195214,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -197186,7 +197207,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
@@ -199806,7 +199827,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -199827,7 +199848,7 @@
       "after": {
        "result": "0, ok",
        "conditions": [
-        "if Composer resolves it"
+        "if Composer resolves it (not checked: the run checked no move)"
        ]
       },
       "composer": [
