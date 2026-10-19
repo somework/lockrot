@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Html\PageHeading;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -215,6 +216,47 @@ final class PageGoldensTest extends TestCase
 
         self::assertNotSame([], $accepted, 'no page case shows the allowlist line with two flags and their counts');
         self::assertNotSame([], $releaseDates, 'no page case shows the release_dates check words on the way-out line');
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.21 "The move": the sheet's move cards of a page case hold the check line of
+     * each move. The page cases show a resolved, a refused and two unchecked moves.
+     */
+    public function testTheSheetMoveCardsHoldTheCheckLineOfEachMove(): void
+    {
+        $differ = [];
+        $lines = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']) as $id => $golden) {
+            $golden = JsonPath::decoded($golden);
+            self::assertArrayHasKey('sheet_moves', $golden, $id.': re-record page-goldens.json from the model');
+            $findings = [];
+            foreach (JsonPath::arrayAt(self::modelDocument(JsonPath::stringAt($golden, ['document'])), ['findings']) as $finding) {
+                $finding = JsonPath::decoded($finding);
+                $findings[JsonPath::stringAt($finding, ['package'])] = $finding;
+            }
+            foreach (JsonPath::arrayAt($golden, ['sheet_moves']) as $package => $cards) {
+                $lead = JsonPath::arrayAt($findings[$package], ['next_step']);
+                foreach (array_values(array_merge([$lead], JsonPath::arrayAt($lead, ['also']))) as $i => $move) {
+                    $move = JsonPath::decoded($move);
+                    $result = JsonPath::stringAt($move, ['check', 'result']);
+                    $expected = [
+                        'resolves' => 'checked with Composer',
+                        'refused' => 'Composer refuses the move',
+                        'not_checked' => 'if Composer resolves it (not checked: '.($result === MoveCheck::NOT_CHECKED ? MoveCheck::reasonWords(JsonPath::stringAt($move, ['check', 'reason'])) : '').')',
+                    ][$result];
+                    $conditions = JsonPath::arrayAt(JsonPath::decoded($cards), [$i, 'after', 'conditions']);
+                    $lines[] = $expected;
+                    if (!\in_array($expected, $conditions, true)) {
+                        $differ[$id.' '.$package.' card '.$i] = ['expected' => $expected, 'conditions' => $conditions];
+                    }
+                }
+            }
+        }
+
+        self::assertSame([], $differ);
+        foreach (['checked with Composer', 'Composer refuses the move', 'if Composer resolves it (not checked: '.MoveCheck::reasonWords(MoveCheck::UNLOADED_NAME).')', 'if Composer resolves it (not checked: '.MoveCheck::reasonWords(MoveCheck::BASELINE_REFUSED).')'] as $line) {
+            self::assertContains($line, $lines, 'no sheet move card of a page case reads: '.$line);
+        }
     }
 
     /**
