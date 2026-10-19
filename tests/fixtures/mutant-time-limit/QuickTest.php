@@ -10,12 +10,12 @@ final class QuickTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
-        usleep(600000);
+        usleep(550000);
     }
 
     public function testEndsBeforeTheLimit(): void
     {
-        usleep(600000);
+        usleep(550000);
         $this->addToAssertionCount(1);
     }
 }

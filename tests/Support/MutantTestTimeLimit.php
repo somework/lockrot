@@ -22,13 +22,10 @@ use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 
 /**
- * Stops an Infection mutant process (INFECTION=1) whose test, setUpBeforeClass() or data provider
- * still runs after {@see self::SECONDS}, or after the `seconds` parameter.
- *
- * PHPUnit's own time limit throws a \RuntimeException subclass. Product code that catches
- * \RuntimeException swallows it, and a loop mutant there never ends. An exit from the signal handler
- * cannot be caught. PHPUnit runs setUpBeforeClass() and the data providers outside a test, so the
- * suite start and each provider call set the alarm too. Without pcntl the extension does nothing.
+ * PHPUnit's own time limit throws a \RuntimeException subclass, which product code can catch, so a
+ * loop mutant there never ends. The signal handler exits instead, and nothing can catch an exit.
+ * PHPUnit runs setUpBeforeClass() and the data providers outside a test, so the suite start and each
+ * provider call set the alarm too. Without pcntl the extension does nothing.
  * Reasons and measurements: https://github.com/somework/lockrot/pull/65.
  */
 final class MutantTestTimeLimit implements Extension
@@ -41,7 +38,7 @@ final class MutantTestTimeLimit implements Extension
             return;
         }
 
-        $seconds = $parameters->has('seconds') ? (int) $parameters->get('seconds') : self::SECONDS;
+        $seconds = $parameters->has('seconds') ? max(1, (int) $parameters->get('seconds')) : self::SECONDS;
         $running = new \ArrayObject(['what' => '']);
         $start = static function (string $what) use ($running, $seconds): void {
             $running['what'] = $what;
