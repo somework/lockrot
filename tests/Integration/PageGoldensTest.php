@@ -14,7 +14,9 @@ use PHPUnit\Framework\TestCase;
  * and every golden holds the Overview lines that lockrot-report renders.
  * Where the contract bundle holds lockrot's own report-2 of a golden's document, the title reads its
  * root fields, which must equal the model's. Else lockrot cannot rebuild the document (a corpus run
- * of 0.13, a case with no inputs), and the title reads the model's root fields.
+ * of 0.13, a case with no inputs), and the title reads the model's root fields. A golden of a
+ * `contract/` document is the model's rendering of lockrot's own report-2 (EnginePage). A golden of a
+ * `baselined/` document reads the `report` of a baselined scenario's recorded bundle.
  */
 final class PageGoldensTest extends TestCase
 {
@@ -22,13 +24,18 @@ final class PageGoldensTest extends TestCase
     private const DOCUMENTS = __DIR__.'/../fixtures/schema/documents/';
     private const GRADES = ['critical', 'high', 'medium', 'low'];
 
-    /** The Overview lines of SPEC §7.9.4 that lockrot-report computes from report-2 fields. An empty lock shows none of them. */
+    /**
+     * The Overview lines of SPEC §7.9.4 that lockrot-report computes from report-2 fields. An empty lock
+     * shows none of them, and a lock with nothing graded shows no load line.
+     */
     private const OVERVIEW_LINES = ['grade_line', 'figure_line', 'load_line'];
 
     /** The goldens whose PHP inputs differ from the model's, with the reason. */
     private const PINNED = [
         'policy-off' => 'the hydrated lock holds joomla/filter and the three packages that require it, and the model\'s case document counts its one finding',
         'pagerfanta' => 'the hydrated lock holds pagerfanta/twig and the packages that its finding names, and the model\'s case document counts its one finding',
+        'guzzle-mixed' => 'the hydrated lock holds guzzlehttp/guzzle and the packages that hold its moves, and the model\'s case document counts its one finding',
+        'rounded-dev‡' => 'the hydrated lock holds jfcherng/php-color-output and the packages that its finding names, and the model\'s case document counts its one finding',
     ];
 
     /** @return iterable<string, array{string}> */
@@ -98,16 +105,91 @@ final class PageGoldensTest extends TestCase
     public function testEveryGoldenHoldsTheOverviewLines(string $id): void
     {
         $golden = JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens', $id]);
-        $empty = JsonPath::intAt(self::modelDocument(JsonPath::stringAt($golden, ['document'])), ['packages_checked']) === 0;
+        $model = self::modelDocument(JsonPath::stringAt($golden, ['document']));
+        $empty = JsonPath::intAt($model, ['packages_checked']) === 0;
+        $graded = JsonPath::intAt($model, ['packages_flagged']) > 0;
 
         foreach (self::OVERVIEW_LINES as $line) {
             self::assertArrayHasKey($line, $golden, $id.': re-record page-goldens.json from the model');
-            if ($empty) {
+            if ($empty || ($line === 'load_line' && !$graded)) {
                 self::assertNull($golden[$line], $id.': '.$line);
             } else {
                 self::assertNotSame('', JsonPath::stringAt($golden, [$line]), $id.': '.$line);
             }
         }
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.7: the gate partition is null when no finding fails the gate, and its three
+     * counts sum to the root `gate.failing`.
+     *
+     * @dataProvider provideEveryGolden
+     */
+    #[DataProvider('provideEveryGolden')]
+    public function testTheGatePartitionSumsToTheFindingsThatFailTheGate(string $id): void
+    {
+        $golden = JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens', $id]);
+        $failing = JsonPath::intAt(self::modelDocument(JsonPath::stringAt($golden, ['document'])), ['gate', 'failing']);
+
+        self::assertArrayHasKey('gate_partition', $golden, $id.': re-record page-goldens.json from the model');
+        $partition = $golden['gate_partition'];
+        self::assertSame($failing === 0 ? null : ['ready', 'held', 'wayout'], \is_array($partition) ? array_keys($partition) : $partition, $id.': the partition\'s parts');
+        self::assertSame($failing, \is_array($partition) ? array_sum($partition) : 0, $id.': the partition against gate.failing');
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.7: a page case shows a ready move, a ready move that also holds other findings,
+     * and a failing gate whose findings split into ready, held and another way out.
+     */
+    public function testThePageCasesShowAReadyMoveAndEveryPartOfTheGatePartition(): void
+    {
+        $goldens = JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']);
+        $alsoHolds = [];
+        $partitions = [];
+        foreach ($goldens as $id => $golden) {
+            $golden = JsonPath::decoded($golden);
+            foreach (JsonPath::has($golden, ['ready', 'moves']) ? JsonPath::arrayAt($golden, ['ready', 'moves']) : [] as $move) {
+                if (\is_array($move) && \is_string($move['also_holds'] ?? null)) {
+                    $alsoHolds[] = $id;
+                }
+            }
+            $partition = $golden['gate_partition'] ?? null;
+            if (\is_array($partition) && $partition !== [] && min($partition) > 0) {
+                $partitions[] = $id;
+            }
+        }
+
+        self::assertNotSame([], $alsoHolds, 'no page case shows a ready move whose package holds other findings');
+        self::assertNotSame([], $partitions, 'no page case splits its failing findings into ready, held and another way out, each above 0');
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.21: page cases show a `not_checked` move beside `resolves` moves, and a run whose
+     * baseline Composer refuses, so that no move is ready and the moves_not_checked note prints.
+     */
+    public function testThePageCasesShowAMoveThatWasNotCheckedAndARefusedBaseline(): void
+    {
+        $beside = [];
+        $refusedBaseline = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']) as $id => $golden) {
+            $golden = JsonPath::decoded($golden);
+            $document = self::modelDocument(JsonPath::stringAt($golden, ['document']));
+            $results = [];
+            foreach (JsonPath::arrayAt($document, ['findings']) as $finding) {
+                $results[] = \is_array($finding) ? self::textAt($finding, ['next_step', 'check', 'result']) : null;
+            }
+            $wayOut = (string) self::textAt($golden, ['ready', 'way_out']);
+            if (\in_array('not_checked', $results, true) && \in_array('resolves', $results, true) && strpos($wayOut, 'not checked: ') !== false) {
+                $beside[] = $id;
+            }
+            $notes = JsonPath::has($golden, ['run_notes']) ? JsonPath::arrayAt($golden, ['run_notes']) : [];
+            if (self::textAt($document, ['run', 'move_check', 'baseline']) === 'refused' && ($golden['ready_count'] ?? null) === 0 && preg_grep('/^moves not checked: /', array_filter($notes, 'is_string')) !== []) {
+                $refusedBaseline[] = $id;
+            }
+        }
+
+        self::assertNotSame([], $beside, 'no page case shows a not_checked move beside resolves moves');
+        self::assertNotSame([], $refusedBaseline, 'no page case shows a refused baseline with its moves_not_checked note');
     }
 
     /**
@@ -126,11 +208,37 @@ final class PageGoldensTest extends TestCase
         ];
     }
 
+    /**
+     * @param array<mixed, mixed> $data
+     * @param list<string>        $path
+     */
+    private static function textAt(array $data, array $path): ?string
+    {
+        foreach ($path as $key) {
+            if (!\is_array($data) || !\array_key_exists($key, $data)) {
+                return null;
+            }
+            $data = $data[$key];
+        }
+
+        return \is_string($data) ? $data : null;
+    }
+
     /** @return array<mixed, mixed> */
     private static function modelDocument(string $document): array
     {
+        if (strpos($document, 'baselined/') === 0) {
+            return JsonPath::arrayAt(JsonPath::decodeFile(__DIR__.'/../fixtures/'.$document), ['report']);
+        }
+        if (strpos($document, 'contract/') === 0) {
+            return JsonPath::decodeFile(self::CONTRACT.substr($document, \strlen('contract/')));
+        }
         if (strpos($document, 'report-2/') === 0) {
             return JsonPath::decoded(json_decode((string) file_get_contents('compress.zlib://'.self::DOCUMENTS.'corpus/'.basename($document).'.gz'), true));
+        }
+
+        if (!is_file(self::DOCUMENTS.$document)) {
+            return JsonPath::decoded(json_decode((string) file_get_contents('compress.zlib://'.self::DOCUMENTS.$document.'.gz'), true));
         }
 
         return JsonPath::decodeFile(self::DOCUMENTS.$document);

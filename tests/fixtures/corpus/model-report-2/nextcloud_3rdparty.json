@@ -777,7 +777,8 @@
           "records": 81
         }
       ]
-    }
+    },
+    "move_check": null
   },
   "activity_cache_oldest_at": "2026-10-14T00:00:00+00:00",
   "activity_cache_age_hours": 0,
@@ -1050,20 +1051,22 @@
       "low": 1
     },
     "fixes": {
-      "update": 1,
-      "upgrade": 1,
+      "update": 2,
+      "upgrade": 0,
       "raise-php": 0,
       "unknown": 0,
       "blocked": 0,
       "none": 0
     },
     "update_now": [
-      "phpseclib/phpseclib"
+      "phpseclib/phpseclib",
+      "web-auth/webauthn-lib"
     ],
     "update_now_command": [
       "composer",
       "update",
-      "phpseclib/phpseclib"
+      "phpseclib/phpseclib",
+      "web-auth/webauthn-lib"
     ],
     "fix_unknown": 0
   },
@@ -1196,6 +1199,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1461,6 +1465,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1770,6 +1775,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -2070,6 +2076,7 @@
             "clears_hold"
           ]
         },
+        "check": null,
         "composer_moves_because": [],
         "commands": [
           [
@@ -2123,7 +2130,8 @@
             "assumes": [
               "clears_hold"
             ]
-          }
+          },
+          "check": null
         },
         "move_in": "next_step",
         "gets": {
@@ -2380,6 +2388,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2614,6 +2623,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2849,6 +2859,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -3058,7 +3069,7 @@
             "role": "security",
             "advisory": "PKSA-zk1n-qbm6-d3rq",
             "severity": "low",
-            "fix_kind": "upgrade",
+            "fix_kind": "update",
             "weight": 2,
             "multiplier": 1,
             "points": 2,
@@ -3074,7 +3085,7 @@
         "kind": "require",
         "source": "vulnerable",
         "merged": [],
-        "fix_kind": "upgrade",
+        "fix_kind": "update",
         "reason": null,
         "replacement": null,
         "quiet_years": null,
@@ -3114,6 +3125,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -3153,7 +3165,7 @@
         },
         "ignored": [],
         "ignored_count": 0,
-        "fix_kind": "upgrade",
+        "fix_kind": "update",
         "installed_branch_fixes": {
           "fixed": 0,
           "unknown": 0,
@@ -3162,7 +3174,8 @@
           "lowest": null,
           "newest": "4.9.3",
           "held_by": [],
-          "if_applied": null
+          "if_applied": null,
+          "check": null
         },
         "move_in": "next_step",
         "gets": null,
@@ -3236,7 +3249,7 @@
                 "points": 2,
                 "deciding": true,
                 "fix": {
-                  "kind": "upgrade",
+                  "kind": "update",
                   "to_branch": "5.x",
                   "version": "5.3.5",
                   "newest": "5.3.9",
@@ -3410,6 +3423,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -3664,6 +3678,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -3930,6 +3945,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [

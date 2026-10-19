@@ -782,7 +782,7 @@
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 39,
+    "packages_checked": 1,
     "packages_flagged": 1,
     "packages_multi_flag": 0,
     "include_dev": false,

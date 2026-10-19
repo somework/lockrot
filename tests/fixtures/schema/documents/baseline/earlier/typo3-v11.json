@@ -80,7 +80,7 @@
     "PKSA-4g5g-4rkv-myqs": {
      "known_since": "2026-09-24",
      "severity": "medium",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     }
    }
   },

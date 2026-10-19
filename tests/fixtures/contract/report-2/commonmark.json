@@ -745,7 +745,7 @@
         "advisory_lookup": {
             "scope": "all",
             "scope_source": "default",
-            "packages_asked": 1,
+            "packages_asked": 4,
             "packages_not_asked": 0,
             "other_repositories": 0,
             "repositories": [
@@ -755,8 +755,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 18
+                    "packages_with_records": 2,
+                    "records": 46
                 }
             ]
         },
@@ -765,7 +765,7 @@
             "counted": 0,
             "lead-first": 0,
             "corroborating-share": 0,
-            "advisory-points": 1,
+            "advisory-points": 2,
             "no-reachable-fix-multiplier": 0,
             "security-max": 1,
             "divide-reach": 0,
@@ -773,8 +773,8 @@
             "sum": 0,
             "divide-dev": 0,
             "floor-once": 0,
-            "band-floors": 1,
-            "zero-verdicts": 0,
+            "band-floors": 2,
+            "zero-verdicts": 2,
             "sort": null,
             "gate-bounded-new": 0,
             "baseline-cover": 0
@@ -783,7 +783,7 @@
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
     "packages_checked": 4,
-    "packages_flagged": 1,
+    "packages_flagged": 2,
     "packages_multi_flag": 0,
     "include_dev": false,
     "not_from_composer_repository": 0,
@@ -793,10 +793,10 @@
         "critical": 0,
         "high": 1,
         "medium": 0,
-        "low": 0,
+        "low": 1,
         "unknown": 0,
         "finished": 0,
-        "ok": 0
+        "ok": 2
     },
     "abandoned": {
         "total": 0,
@@ -807,8 +807,8 @@
         "critical": 0,
         "high": 1,
         "medium": 0,
-        "low": 0,
-        "none": 0
+        "low": 1,
+        "none": 2
     },
     "flags": {
         "abandoned": {
@@ -896,14 +896,14 @@
             }
         },
         "vulnerable": {
-            "carrying": 1,
+            "carrying": 2,
             "leading": null,
             "accepted": null,
             "by_verdict": {
                 "critical": 0,
                 "high": 1,
                 "medium": 0,
-                "low": 0
+                "low": 1
             }
         }
     },
@@ -926,25 +926,25 @@
     },
     "unattributed": [],
     "rot_depth": {
-        "flagged": 1,
-        "measured": 1,
+        "flagged": 2,
+        "measured": 2,
         "unmeasured": {
             "unreached": 0,
             "no_composer_json": 0
         },
         "by_reach": {
-            "direct": 0,
+            "direct": 1,
             "transitive": 1,
             "unreached": 0
         },
         "not_in_composer_json": 1,
         "require_dev_not_walked": 0,
-        "production": 1,
+        "production": 2,
         "development": 0,
         "by_depth": [
             {
                 "depth": 0,
-                "flagged": 0
+                "flagged": 1
             },
             {
                 "depth": 1,
@@ -963,9 +963,9 @@
         ]
     },
     "libyears": {
-        "total": 0.12,
-        "direct_requirements": 0,
-        "measured": 1,
+        "total": 0.38,
+        "direct_requirements": 0.26,
+        "measured": 4,
         "at_least_count": 0,
         "unmeasured": {
             "not_from_composer_repository": 0,
@@ -978,12 +978,12 @@
             "undated_releases": 0
         },
         "furthest_behind": {
-            "package": "league/commonmark",
-            "version": "2.9.1",
-            "libyears": 0.12,
+            "package": "laravel/framework",
+            "version": "v12.65.0",
+            "libyears": 0.15,
             "at_least": false
         },
-        "packages": 1
+        "packages": 4
     },
     "baseline": null,
     "gate": {
@@ -1009,13 +1009,13 @@
     "security": {
         "check": "complete",
         "packages": {
-            "vulnerable": 1,
+            "vulnerable": 2,
             "unchecked": 0,
             "ignored": 0,
-            "clear": 0
+            "clear": 2
         },
         "advisories": {
-            "counted": 3,
+            "counted": 4,
             "ignored": 0
         },
         "severities": {
@@ -1023,10 +1023,10 @@
             "high": 2,
             "medium": 1,
             "unrated": 0,
-            "low": 0
+            "low": 1
         },
         "fixes": {
-            "update": 1,
+            "update": 2,
             "upgrade": 0,
             "raise-php": 0,
             "unknown": 0,
@@ -1034,12 +1034,14 @@
             "none": 0
         },
         "update_now": [
-            "league/commonmark"
+            "league/commonmark",
+            "laravel/framework"
         ],
         "update_now_command": [
             "composer",
             "update",
-            "league/commonmark"
+            "league/commonmark",
+            "laravel/framework"
         ],
         "fix_unknown": 0
     },
@@ -1510,6 +1512,667 @@
                         ]
                     }
                 ],
+                "basis": null
+            }
+        },
+        {
+            "package": "laravel/framework",
+            "version": "v12.65.0",
+            "branch": "12.x",
+            "installed_php": {
+                "requires": "^8.2",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "low",
+            "priority": "low",
+            "lead": null,
+            "rank": 2,
+            "flags": [
+                {
+                    "id": "vulnerable",
+                    "role": "security",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S9"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "advisories",
+                        "value": 1,
+                        "source": null
+                    },
+                    "summary": "1 advisory: 1 low \u2014 all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 2,
+                "exact": 2,
+                "rounded_down": false,
+                "band": {
+                    "floor": 1,
+                    "next": "medium",
+                    "to_next": 6
+                },
+                "decided_by": "security",
+                "parts": {
+                    "maintenance": {
+                        "status": "none",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        }
+                    },
+                    "security": {
+                        "status": "counted",
+                        "contribution": 2,
+                        "alone": {
+                            "total": 2,
+                            "verdict": "low"
+                        },
+                        "of": 1,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "security",
+                        "flag": "vulnerable",
+                        "role": "security",
+                        "advisory": "PKSA-d5tc-s1qs-h781",
+                        "severity": "low",
+                        "fix_kind": "update",
+                        "weight": 2,
+                        "multiplier": 1,
+                        "points": 2,
+                        "contribution": 2
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [],
+                "text": "2 = vulnerable 2 [low advisory]"
+            },
+            "next_step": {
+                "kind": "update",
+                "source": "vulnerable",
+                "merged": [],
+                "fix_kind": "update",
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "12.x",
+                "version": "v12.69.0",
+                "newest": "v12.69.3",
+                "constraint": null,
+                "latest": null,
+                "php_check": {
+                    "requires": "^8.2",
+                    "project_allows": true,
+                    "target_runs": true,
+                    "raise_to": null,
+                    "raise_size": null
+                },
+                "crosses_major": false,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-d5tc-s1qs-h781",
+                        "basis": "outside_range"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold"
+                    ]
+                },
+                "check": null,
+                "composer_moves_because": [],
+                "commands": [
+                    [
+                        "composer",
+                        "update",
+                        "laravel/framework"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "composer update laravel/framework (gets v12.69.3) \u2014 clears the advisory"
+            },
+            "security": {
+                "status": "vulnerable",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 28,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 28,
+                        "reason": null
+                    }
+                ],
+                "worst": "low",
+                "counts": {
+                    "critical": 0,
+                    "high": 0,
+                    "medium": 0,
+                    "unrated": 0,
+                    "low": 1
+                },
+                "ignored": [],
+                "ignored_count": 0,
+                "fix_kind": "update",
+                "installed_branch_fixes": {
+                    "fixed": 1,
+                    "unknown": 0,
+                    "of": 1,
+                    "fix_kind": "update",
+                    "lowest": "v12.69.0",
+                    "newest": "v12.69.3",
+                    "held_by": [],
+                    "if_applied": {
+                        "total": 0,
+                        "verdict": "ok",
+                        "at_most": false,
+                        "assumes": [
+                            "clears_hold"
+                        ]
+                    },
+                    "check": null
+                },
+                "move_in": "next_step",
+                "gets": {
+                    "version": "v12.69.3",
+                    "php_check": {
+                        "requires": "^8.2",
+                        "project_allows": true,
+                        "target_runs": true,
+                        "raise_to": null,
+                        "raise_size": null
+                    },
+                    "clears": [
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-d5tc-s1qs-h781",
+                            "basis": "outside_range"
+                        }
+                    ],
+                    "clears_all": true
+                },
+                "partial": null
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "laravel/framework",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/laravel/framework",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "laravel/framework"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "laravel/framework"
+            ],
+            "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: league/commonmark (vulnerable)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "league/commonmark",
+                                "chain": [
+                                    "laravel/framework",
+                                    "league/commonmark"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "S9",
+                    "level": "warn",
+                    "summary": "1 security advisory affects v12.65.0 (CVE-2026-102279); fixed in v12.69.0",
+                    "data": {
+                        "advisories": [
+                            {
+                                "id": "PKSA-d5tc-s1qs-h781",
+                                "cve": "CVE-2026-102279",
+                                "title": "Laravel: XSS in Debug Page Information",
+                                "link": "https://github.com/advisories/GHSA-jh5r-qr3c-85q8",
+                                "reported_at": "2026-09-29T18:24:25+00:00",
+                                "severity": "low",
+                                "severity_published": "low",
+                                "affected_versions": ">=13.0.0,<13.30.0|<12.69.0",
+                                "counted": true,
+                                "points": 2,
+                                "deciding": true,
+                                "fix": {
+                                    "kind": "update",
+                                    "to_branch": "12.x",
+                                    "version": "v12.69.0",
+                                    "newest": "v12.69.3",
+                                    "on_installed_branch": true,
+                                    "php": "^8.2",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            }
+                        ],
+                        "releases_read": true,
+                        "complete": true
+                    }
+                }
+            ],
+            "evidence": "vulnerable: 1 advisory: 1 low \u2014 all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0.15,
+            "age": {
+                "installed": {
+                    "at": "2026-08-05T15:33:16+00:00",
+                    "years": 0.2,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "v11.57.0",
+                    "at": "2026-09-29T15:33:27+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "v12.69.3",
+                    "at": "2026-09-29T12:53:25+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-30T21:54:48+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
+            "package": "laravel/nightwatch",
+            "version": "v1.28.6",
+            "branch": "1.x",
+            "installed_php": {
+                "requires": null,
+                "target_runs": null,
+                "project_allows": null
+            },
+            "verdict": "ok",
+            "priority": "none",
+            "lead": null,
+            "rank": 3,
+            "flags": [],
+            "score": {
+                "model": 1,
+                "total": 0,
+                "exact": 0,
+                "accepted": [],
+                "text": "0"
+            },
+            "next_step": null,
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "laravel/nightwatch",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/laravel/nightwatch",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "laravel/nightwatch"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "laravel/nightwatch"
+            ],
+            "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: league/commonmark (vulnerable)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "league/commonmark",
+                                "chain": [
+                                    "laravel/nightwatch",
+                                    "league/commonmark"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "evidence": "",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0.11,
+            "age": {
+                "installed": {
+                    "at": "2026-08-07T01:18:48+00:00",
+                    "years": 0.2,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "v1.30.2",
+                    "at": "2026-09-18T00:37:28+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "v1.30.2",
+                    "at": "2026-09-18T00:37:28+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-30T03:25:25+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
+            "package": "spatie/laravel-markdown",
+            "version": "2.8.0",
+            "branch": "2.x",
+            "installed_php": {
+                "requires": null,
+                "target_runs": null,
+                "project_allows": null
+            },
+            "verdict": "ok",
+            "priority": "none",
+            "lead": null,
+            "rank": 4,
+            "flags": [],
+            "score": {
+                "model": 1,
+                "total": 0,
+                "exact": 0,
+                "accepted": [],
+                "text": "0"
+            },
+            "next_step": null,
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "spatie/laravel-markdown",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/spatie/laravel-markdown",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "spatie/laravel-markdown"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "spatie/laravel-markdown"
+            ],
+            "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: league/commonmark (vulnerable)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "league/commonmark",
+                                "chain": [
+                                    "spatie/laravel-markdown",
+                                    "league/commonmark"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "evidence": "",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0,
+            "age": {
+                "installed": {
+                    "at": "2026-02-22T18:53:36+00:00",
+                    "years": 0.6,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "2.8.0",
+                    "at": "2026-02-22T18:53:36+00:00",
+                    "years": 0.6,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "2.8.0",
+                    "at": "2026-02-22T18:53:36+00:00",
+                    "years": 0.6,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-06-15T14:28:41+00:00",
+                    "years": 0.3,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
                 "basis": null
             }
         }

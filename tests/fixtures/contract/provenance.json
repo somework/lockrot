@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "00f14d677fb4b84c011e006923064581825d79fe2db75882fa588822fc96fb0b",
-        "tests/fixtures/flags/composite.json": "bcd6072b172aa8c362b497f216fbd5f11e78d00e2b6c1de66d43e2b83e4b51b8",
-        "tests/fixtures/flags/provenance.json": "e88c2d99216fbeb05bd9f05ea1782e9c5fff1f228b0b2efcbe32e3eb1b2822da"
+        "tests/fixtures/flags/cases.json": "28da86cc7bc8373b0319dd50c8b154515de5d9a351b39653aeaf2d556394b5c2",
+        "tests/fixtures/flags/composite.json": "df49916334a4db63b484677a8a343685df333e76f11fa30a98e65fb4ac96a6c8",
+        "tests/fixtures/flags/provenance.json": "9903adcf1f19c2c5fde02755061b5d7928dc835a42f143d51f41cc06cecd8148"
     },
     "version_mask": {
         "paths": [
@@ -69,8 +69,9 @@
     "page_goldens": {
         "file": "page-goldens.json",
         "source": "the model's page goldens (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded",
-        "sha256": "562527baf073860c4d3aade4c1cb7694ebe062203a5e8046015a14cac3a3f972",
-        "read_by": "tests/Integration/PageGoldensTest.php reads title and description and requires grade_line, figure_line and load_line; the other keys are the renderer's"
+        "sha256": "9b5d09dfd29d863f01ac16448c302598def2b6bf97699007dc76628ec02ec454",
+        "read_by": "tests/Integration/PageGoldensTest.php reads title, description, grade_line, figure_line, load_line, gate_partition and ready. The other keys are the renderer's"
     },
+    "engine_pages": "page/ holds the report-2 that bin/lockrot writes for each case of Lockrot\\Tests\\Support\\Contract\\EnginePage::CASES. tools/report/record --engine-pages records them",
     "bundle_sha256": "sha256 of the lines \"<sha256>  <path>\", one per bundle file sorted by path below tests/fixtures/: every file of contract/ but cache/, provenance.json and bundle_sha256, and each baselined/*/check/report.bundle.json"
 }

@@ -911,7 +911,17 @@
  "exposure_rule": {
   "max_fan_in": 8
  },
- "unattributed": [],
+ "unattributed": [
+  {
+   "package": "symfony/event-dispatcher-contracts",
+   "verdict": "medium",
+   "lead": "left-behind",
+   "flag_ids": [
+    "left-behind"
+   ],
+   "fan_in": 38
+  }
+ ],
  "rot_depth": {
   "flagged": 1,
   "measured": 1,

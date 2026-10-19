@@ -122,7 +122,7 @@
      "role": "security",
      "advisory": "PKSA-4wjj-gy1p-ft3r",
      "severity": "high",
-     "fix_kind": "upgrade",
+     "fix_kind": "update",
      "weight": 16,
      "multiplier": 1,
      "points": 16,
@@ -177,7 +177,7 @@
    "merged": [
     "vulnerable"
    ],
-   "fix_kind": "upgrade",
+   "fix_kind": "update",
    "reason": null,
    "replacement": null,
    "quiet_years": null,
@@ -278,7 +278,7 @@
    },
    "ignored": [],
    "ignored_count": 0,
-   "fix_kind": "upgrade",
+   "fix_kind": "update",
    "installed_branch_fixes": {
     "fixed": 0,
     "unknown": 0,
@@ -416,7 +416,7 @@
        "points": 16,
        "deciding": true,
        "fix": {
-        "kind": "upgrade",
+        "kind": "update",
         "to_branch": "5.x",
         "version": "v5.4.52",
         "newest": "v5.4.52",

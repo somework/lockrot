@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Lockrot\Tests\Support\CaseHydrator;
+use Lockrot\Tests\Support\Contract\CaseRecording;
 use Lockrot\Tests\Support\Contract\ContractBundle;
 use Lockrot\Tests\Support\Contract\Fields;
 use Lockrot\Tests\Support\Contract\MissingField;
@@ -71,7 +73,7 @@ final class StringsAreRenderingsOfFieldsTest extends TestCase
         $years = self::words('years-phrases.json');
         foreach (self::documents('goldens') as $name => $goldens) {
             $report = JsonPath::decodeFile(ContractBundle::DIRECTORY.'/report-2/'.$name.'.json');
-            $in = JsonPath::arrayAt($report, ['findings', 0]) + ['run' => JsonPath::arrayAt($report, ['run'])];
+            $in = ContractBundle::findingOf($report, self::packageOf($name)) + ['run' => JsonPath::arrayAt($report, ['run'])];
             self::check($differ, $rendered, $name.' gate_line', $goldens['gate_line'], static fn (): ?string => ReferenceText::gateLine(Fields::only($in, ReferenceText::INPUTS['gate_line'])));
             self::check($differ, $rendered, $name.' age_line', $goldens['age_line'], static fn (): ?string => ReferenceText::ageLine(Fields::only($in, ReferenceText::INPUTS['age_line']), $reasons, $years));
             self::check($differ, $rendered, $name.' explain_age', $goldens['explain_age'], static fn (): array => ReferenceText::explainAge(Fields::only($in, ReferenceText::INPUTS['explain_age']), self::words('age-words.json'), $reasons, $years));
@@ -147,6 +149,17 @@ final class StringsAreRenderingsOfFieldsTest extends TestCase
         }
 
         return $documents;
+    }
+
+    /** The case package of a recorded case document, by its file name. */
+    private static function packageOf(string $name): string
+    {
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(CaseHydrator::CASES), ['cases']) as $case) {
+            if (\is_array($case) && CaseRecording::fileName(JsonPath::stringAt($case, ['id'])) === $name) {
+                return JsonPath::stringAt($case, ['finding', 'package']);
+            }
+        }
+        throw new \UnexpectedValueException('no case is recorded as '.$name);
     }
 
     /** @return array<mixed, mixed> */

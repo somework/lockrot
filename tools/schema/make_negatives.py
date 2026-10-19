@@ -593,8 +593,8 @@ def _(d): d['findings'][0]['next_step']['commands'] = [['composer', 'require', '
 def _(d): d['findings'][0]['next_step']['if_applied']['at_most'] = True
 @case('relation-move-10', 'stale-only', 'findings[0].next_step.crosses_major')
 def _(d): d['findings'][0]['next_step']['crosses_major'] = True
-@case('relation-branchfixes-if-applied-0-0', 'composite', 'findings[6].security.installed_branch_fixes.if_applied.total')
-def _(d): d['findings'][6]['security']['installed_branch_fixes']['if_applied']['total'] = 1
+@case('relation-branchfixes-if-applied-0-0', 'composite', 'findings[%d].security.installed_branch_fixes.if_applied.total' % POLY)
+def _(d): d['findings'][POLY]['security']['installed_branch_fixes']['if_applied']['total'] = 1
 @case('relation-branchfixes-0', 'A-blocked-dagger', 'findings[0].security.installed_branch_fixes.lowest')
 def _(d): d['findings'][0]['security']['installed_branch_fixes']['lowest'] = 'x'
 @case('relation-securityvulnerable-partial-0-if-applied-0', 'partial-op-dagger', 'findings[0].security.partial.if_applied.total')
@@ -615,24 +615,24 @@ def _(d): d['findings'][0]['signals'][0]['data']['advisories'][0]['fix']['reason
 def _(d): d['findings'][0]['signals'][0]['data']['advisories'][0]['fix']['on_installed_branch'] = None
 @case('relation-run-3', 'baseline-read-score0', 'run.graded_verdicts')
 def _(d): d['run']['graded_verdicts'] = ['high', 'medium', 'low']
-@case('relation-s6-0', 'composite-generate-baseline', 'findings[3].signals[1].data.last_stable_version')
-def _(d): d['findings'][3]['signals'][1]['data']['last_stable_version'] = None
+@case('relation-s6-0', 'composite-generate-baseline', 'findings[%d].signals[1].data.last_stable_version' % OAUTH)
+def _(d): d['findings'][OAUTH]['signals'][1]['data']['last_stable_version'] = None
 @case('relation-finding-3', 'E-ignored-dagger', 'findings[0].security.installed_branch_fixes')
 def _(d): d['findings'][0]['security']['installed_branch_fixes'] = None
-@case('relation-branchfixes-1', 'composite', 'findings[6].security.installed_branch_fixes')
-def _(d): d['findings'][6]['security']['installed_branch_fixes']['fix_kind'] = 'blocked'
+@case('relation-branchfixes-1', 'composite', 'findings[%d].security.installed_branch_fixes' % POLY)
+def _(d): d['findings'][POLY]['security']['installed_branch_fixes']['fix_kind'] = 'blocked'
 @case('relation-finding-23', 'partial-op-dagger', 'findings[0].security.partial.if_applied.verdict')
 def _(d): d['findings'][0]['security']['partial']['if_applied']['verdict'] = 'high'
 @case('relation-finding-26', 'B-baselined-dagger', 'findings[0].gate.basis.new.terms[0].weight')
 def _(d): d['findings'][0]['gate']['basis']['new']['terms'][0]['weight'] = 5
 @case('relation-finding-42', 'stale-only', 'findings[0].flags[0]')
 def _(d): d['findings'][0]['flags'][0]['degree']['liveness_complete'] = False
-@case('relation-move-4', 'composite', 'findings[4].next_step.if_applied')
-def _(d): d['findings'][4]['next_step']['if_applied'] = {'total': 2, 'verdict': 'low', 'lead': 'stale', 'deciding_advisory': None, 'at_most': False, 'assumes': ['clears_hold', 'composer_resolves']}
+@case('relation-move-4', 'composite', 'findings[%d].next_step.if_applied' % CSSMIN)
+def _(d): d['findings'][CSSMIN]['next_step']['if_applied'] = {'total': 2, 'verdict': 'low', 'lead': 'stale', 'deciding_advisory': None, 'at_most': False, 'assumes': ['clears_hold', 'composer_resolves']}
 @case('relation-finding-43', 'stale-only', 'findings[0].checks_missing')
 def _(d): d['findings'][0]['checks_missing'] = [{'check': 'release_dates', 'reason': 'undated_releases', 'blocks': ['S2', 'S8']}]
-@case('relation-s9fix-2', 'composite', 'findings[6].signals[0].data.advisories[0].fix')
-def _(d): d['findings'][6]['signals'][0]['data']['advisories'][0]['fix'] = {'kind': 'none', 'to_branch': None, 'version': 'v5.4.52', 'newest': 'v5.4.53', 'on_installed_branch': True, 'php': '>=7.2.5', 'held_by': [], 'reason': 'no_release_outside_range'}
+@case('relation-s9fix-2', 'composite', 'findings[%d].signals[0].data.advisories[0].fix' % POLY)
+def _(d): d['findings'][POLY]['signals'][0]['data']['advisories'][0]['fix'] = {'kind': 'none', 'to_branch': None, 'version': 'v5.4.52', 'newest': 'v5.4.53', 'on_installed_branch': True, 'php': '>=7.2.5', 'held_by': [], 'reason': 'no_release_outside_range'}
 
 # P1: Composer's policy never stops the advisory lookup, so the strict twin knows no check value that says it did
 @case('strict-p1-security-check-disabled', 'ok-unchecked', 'findings[0].security.check', strict=True)

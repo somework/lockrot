@@ -1594,11 +1594,66 @@
         "fix": {
          "kind": "raise-php",
          "to_branch": "3.x",
-         "version": null,
+         "version": "v3.27.0",
          "newest": "v3.30.0",
          "on_installed_branch": false,
          "php": ">=8.1.0",
-         "held_by": [],
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "target": null,
+           "constraint": "^1.38",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "csa/guzzle-bundle",
+           "version": "dev-compat-php",
+           "link": "require",
+           "target": null,
+           "constraint": "^1.34|^2.4",
+           "holder": {
+            "verdict": "high",
+            "lead": "pinned",
+            "flag_ids": [
+             "pinned"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "no-move",
+             "to_branch": null,
+             "constraint": null,
+             "check": null
+            }
+           }
+          },
+          {
+           "source": "package",
+           "package": "symfony/symfony",
+           "version": "v3.4.49",
+           "link": "require",
+           "target": null,
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "critical",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "raise-php",
+             "to_branch": "5.x",
+             "constraint": "^5.4.53",
+             "check": null
+            }
+           }
+          }
+         ],
          "reason": null
         },
         "baseline": null

@@ -415,7 +415,7 @@ final class GitlabFormatterTest extends TestCase
             $byKey[JsonPath::stringAt($issue, ['check_name']).' '.explode(' ', JsonPath::stringAt($issue, ['description']))[0]] = $issue;
         }
 
-        self::assertCount(12, $issues);
+        self::assertCount(15, $issues);
         self::assertSame(hash('sha256', 'lockrot|symfony/debug|abandoned'), $byKey['lockrot/abandoned symfony/debug']['fingerprint']);
         self::assertStringStartsWith('2df5056e8311a7fe', JsonPath::stringAt($byKey['lockrot/abandoned symfony/debug'], ['fingerprint']));
         self::assertStringStartsWith('24be27cc46819fdc', JsonPath::stringAt($byKey['lockrot/vulnerable symfony/yaml'], ['fingerprint']));
@@ -437,7 +437,7 @@ final class GitlabFormatterTest extends TestCase
         $high = $severity('high');
         $leftBehind = $severity('left-behind');
 
-        self::assertSame(['major' => 6, 'minor' => 6], array_count_values($high));
+        self::assertSame(['major' => 8, 'minor' => 7], array_count_values($high));
         self::assertSame('major', $high['symfony/monolog-bridge lockrot/vulnerable']);
         self::assertSame('minor', $high['symfony/monolog-bridge lockrot/old-promise']);
         self::assertSame('major', $leftBehind['symfony/monolog-bridge lockrot/left-behind']);

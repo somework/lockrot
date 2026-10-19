@@ -777,7 +777,8 @@
           "records": 215
         }
       ]
-    }
+    },
+    "move_check": null
   },
   "activity_cache_oldest_at": "2026-10-14T00:00:00+00:00",
   "activity_cache_age_hours": 0,
@@ -1185,6 +1186,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1506,6 +1508,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1777,6 +1780,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2048,6 +2052,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2330,6 +2335,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -2633,6 +2639,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -2911,6 +2918,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [
