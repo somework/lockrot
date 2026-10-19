@@ -139,14 +139,9 @@ start the reason with `in method():`.
 
 ## src/Signal
 
-- `src/Signal/ConstraintOpenness.php` CastInt `$targetMajor = (int) explode('.', PhpReleaseDates::minorOf($targetPhp))[0];` — numeric strings compare as numbers.
-- `src/Signal/ConstraintOpenness.php` CastInt, DecrementInteger, IncrementInteger `$lowerMajor = $lower->isZero() ? 0 : (int) explode('.', $lower->getVersion())[0];` — numeric strings compare as numbers, and 0 moved by 1 stays below every PHP major.
-- `src/Signal/ConstraintOpenness.php` ConcatOperandRemoval `$target = new Constraint('==', $this->parser->normalize(PhpReleaseDates::minorOf($targetPhp).'.0'));` — `normalize('8.4')` equals `normalize('8.4.0')`.
 - `src/Signal/PhpFloor.php` CastString `return ($kind === self::PROJECT ? 'the project\'s php ' : 'the target PHP ').(string) $this->php($kind);` — `php($kind)` is null only for an absent floor, and no caller describes one.
 - `src/Signal/PhpFloor.php` ReturnRemoval `return null;` — in parse(): composer/semver reads null as `""` and throws, and the `catch` returns the same value.
 - `src/Signal/Rule/LeftBehindRule.php` LessThanOrEqualTo `if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {` — a higher branch released at the instant of the installed branch cannot be alive while the installed branch is old enough for S8.
-- `src/Signal/Rule/NotCheckedRule.php` CastString `} elseif ($reason === self::HOST_NOT_SUPPORTED || isset(self::ACTIVITY_WORDS[(string) $reason])) {` — PHP reads a null key as `""`, and `ACTIVITY_WORDS` holds no such key.
-- `src/Signal/Rule/NotCheckedRule.php` CastString `$cause = self::ORIGIN_CAUSE[(string) $origin] ?? 'not installed from a Composer repository';` — PHP reads a null key as `""`, and `ORIGIN_CAUSE` holds no such key.
 
 ## src/Verdict
 
