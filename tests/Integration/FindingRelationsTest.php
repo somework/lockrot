@@ -28,8 +28,12 @@ final class FindingRelationsTest extends TestCase
     private const DOCUMENTS = __DIR__.'/../fixtures/schema/documents/';
     private const COMPOSITE = __DIR__.'/../fixtures/flags/composite.json';
     private const WALLABAG = __DIR__.'/../fixtures/schema/documents/corpus/wallabag.json.gz';
-    /** The sets that hold whole reports. A case or a coverage variant holds part of one, so I25 cannot read it. */
+    /** The sets that hold whole reports. A case outside WHOLE_CASES or a coverage variant holds part of one, so I25 cannot read it. */
     private const WHOLE = ['corpus/', 'variants/', 'coverage/baselined/'];
+    /** The case documents that hold a whole report: the composite, and each case whose finding comes with its `parents`. */
+    private const WHOLE_CASES = ['cases/commonmark.json', 'cases/composite.json', 'cases/many-dependents.json', 'cases/xmlseclibs.json'];
+    private const CASES = __DIR__.'/../fixtures/flags/cases.json';
+    private const CONTRACT = __DIR__.'/../fixtures/contract/';
 
     public function testEveryFixtureDocumentHoldsEveryRelation(): void
     {
@@ -39,7 +43,7 @@ final class FindingRelationsTest extends TestCase
         foreach (array_merge($paths, [self::COMPOSITE]) as $path) {
             $document = self::read($path);
             $set = substr($path, \strlen(self::DOCUMENTS));
-            $whole = array_filter(self::WHOLE, static fn (string $prefix): bool => strpos($set, $prefix) === 0) !== [];
+            $whole = $path === self::COMPOSITE || \in_array($set, self::WHOLE_CASES, true) || array_filter(self::WHOLE, static fn (string $prefix): bool => strpos($set, $prefix) === 0) !== [];
             foreach (array_merge(FindingRelations::violations($document), ItemRelations::violations($document, $whole)) as $violation) {
                 $broken[] = basename($path).' '.$violation;
             }
@@ -167,9 +171,53 @@ final class FindingRelationsTest extends TestCase
         return $node;
     }
 
+    public function testTheWholeCaseDocumentsAreTheCompositeAndTheCasesWithParents(): void
+    {
+        $withParents = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CASES), ['cases']) as $case) {
+            if (\is_array($case) && isset($case['parents'])) {
+                $withParents[] = 'cases/'.JsonPath::stringAt($case, ['id']).'.json';
+            }
+        }
+        $withParents[] = 'cases/composite.json';
+        sort($withParents);
+
+        self::assertSame(self::WHOLE_CASES, $withParents);
+    }
+
+    /** lockrot's own report of a whole case document holds I25 too: its hydrated lock holds the same findings. */
+    public function testLockrotsReportOfAWholeCaseHoldsTheExposureRelation(): void
+    {
+        $broken = [];
+        foreach (self::WHOLE_CASES as $case) {
+            foreach (ItemRelations::violations(JsonPath::decodeFile(self::CONTRACT.'report-2/'.basename($case)), true) as $violation) {
+                $broken[] = basename($case).' '.$violation;
+            }
+        }
+
+        self::assertSame([], $broken);
+    }
+
+    /** The page documents of lockrot's own runs, and the ‡ documents derived from them, hold every relation. */
+    public function testTheEnginePageDocumentsHoldEveryRelation(): void
+    {
+        $paths = array_merge(glob(self::CONTRACT.'page/*.json') ?: [], glob(self::DOCUMENTS.'page/snipe-it.*.json') ?: []);
+        self::assertCount(2, $paths);
+        $broken = [];
+        foreach ($paths as $path) {
+            $document = JsonPath::decodeFile($path);
+            $findings = array_values(array_filter(JsonPath::arrayAt($document, ['findings']), 'is_array'));
+            foreach (array_merge(FindingRelations::violations($document), ItemRelations::violations($document, true), FindingRelations::moveCheckRelation($document, $findings)) as $violation) {
+                $broken[] = basename($path).' '.$violation;
+            }
+        }
+
+        self::assertSame([], $broken);
+    }
+
     public function testEveryRecordedReportWithAMoveCheckSaysHowTheRunChecked(): void
     {
-        $paths = glob(__DIR__.'/../fixtures/contract/report-2/*.json') ?: [];
+        $paths = array_merge(glob(self::CONTRACT.'report-2/*.json') ?: [], glob(self::CONTRACT.'page/*.json') ?: []);
         self::assertNotSame([], $paths);
         $broken = [];
         foreach ($paths as $path) {

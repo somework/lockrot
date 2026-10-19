@@ -1217,7 +1217,7 @@
          "fix": {
           "kind": "raise-php",
           "to_branch": "3.x",
-          "version": null,
+          "version": "v3.27.0",
           "newest": "v3.30.0",
           "on_installed_branch": false,
           "php": ">=8.1.0",
@@ -2248,6 +2248,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
+      "commands_label": "Command",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -2373,7 +2374,7 @@
        "source": "PKSA-8zx5-v2nz-58pb",
        "deciding": false,
        "severity": "high",
-       "fix": "fix not known",
+       "fix": "fix v3.27.0 on 3.x (php floor raise)",
        "affects": "affects <=3.26.0",
        "ranges": null,
        "same_as": null
@@ -2620,7 +2621,7 @@
       "value": "v2.16.1 · 2024-09-09 · 2.1 years ago · the newest on 2.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v3.30.0 · 2026-09-25 · less than three weeks ago"
      },
      {
@@ -2639,7 +2640,7 @@
     ],
     "why": [
      "32 · critical from 32",
-     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (php floor raise on 3.x) is reachable: no × 2",
+     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (php floor raise on 3.x) is reachable, so no × 2",
      "the advisories alone make it critical",
      "without CVE-2026-46633: 16, high"
     ],
@@ -4584,6 +4585,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4.52'"
       ],
+      "commands_label": "Command",
       "clears": "all three",
       "stays": null,
       "not_checked": null,
@@ -4808,7 +4810,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -4838,7 +4840,7 @@
      "36 · critical from 32",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "maintenance (left-behind, 1 corroborating) alone grades it high, the advisory alone grades it high: together critical",
      "without left-behind: 32, critical (old-promise would lead) · without old-promise: 32, critical · without the advisory: 20, high"
@@ -5772,7 +5774,7 @@
     "verdict": "critical",
     "priority": "critical",
     "lead": "abandoned",
-    "rank": 3,
+    "rank": 4,
     "flags": [
      {
       "id": "abandoned",
@@ -6231,6 +6233,7 @@
       "heading": "The move",
       "action": "Replace it with symfony/error-handler ↗, the replacement it names",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -6302,7 +6305,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v4.4.44 · 2022-07-28 · 4.2 years ago"
      },
      {
@@ -7207,7 +7210,7 @@
     "verdict": "high",
     "priority": "high",
     "lead": "old-promise",
-    "rank": 5,
+    "rank": 6,
     "flags": [
      {
       "id": "old-promise",
@@ -7617,6 +7620,7 @@
       "heading": "Next step",
       "action": "v4.1.1 is its newest release: test it on PHP 8.4, or replace it",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -7684,7 +7688,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "v4.1.1 · 2018-01-15 · 8.7 years ago · its newest release"
+      "value": "v4.1.1 · 2018-01-15 · 8.7 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -8564,7 +8568,7 @@
     "verdict": "low",
     "priority": "low",
     "lead": null,
-    "rank": 6,
+    "rank": 7,
     "flags": [
      {
       "id": "vulnerable",
@@ -9254,6 +9258,7 @@
       "commands": [
        "composer update symfony/yaml"
       ],
+      "commands_label": "Command",
       "clears": "all 3 advisories",
       "stays": null,
       "not_checked": null,
@@ -9521,7 +9526,7 @@
       "value": "v5.4.53 · 2026-05-20 · 0.4 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v8.1.8 · 2026-09-26 · less than three weeks ago"
      },
      {
@@ -9549,7 +9554,7 @@
     ],
     "why": [
      "2 · low from 1 · 6 points short of medium",
-     "vulnerable 2: low advisory CVE-2026-45133, the worst of 3 (tied with CVE-2026-45305, CVE-2026-45304); its own fix (composer update on 5.x) is reachable: no × 2",
+     "vulnerable 2: low advisory CVE-2026-45133, the worst of 3 (tied with CVE-2026-45305, CVE-2026-45304); its own fix (composer update on 5.x) is reachable, so no × 2",
      "the advisories alone make it low",
      "without CVE-2026-45133: 2, low (tied: the others weigh the same)"
     ],
@@ -10491,7 +10496,7 @@
     "verdict": "low",
     "priority": "low",
     "lead": null,
-    "rank": 7,
+    "rank": 8,
     "flags": [
      {
       "id": "vulnerable",
@@ -10923,6 +10928,7 @@
        "composer update symfony/polyfill-intl-idn",
        "composer why-not guzzlehttp/guzzle 8.2.0"
       ],
+      "commands_label": "Command",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -11003,7 +11009,7 @@
      },
      {
       "label": "1.x last",
-      "value": "v1.43.0 · 2026-09-23 · less than three weeks ago · its newest release"
+      "value": "v1.43.0 · 2026-09-23 · less than three weeks ago · its most recent release"
      },
      {
       "label": null,
@@ -11025,7 +11031,7 @@
     ],
     "why": [
      "2 · low from 1 · 6 points short of medium",
-     "vulnerable 2: low advisory CVE-2026-46644; its own fix (composer update on 1.x) is reachable: no × 2",
+     "vulnerable 2: low advisory CVE-2026-46644; its own fix (composer update on 1.x) is reachable, so no × 2",
      "transitive: no maintenance to halve; security is never halved for reach",
      "the advisory alone makes it low",
      "checks not run: its repository activity (allowlisted)"
@@ -11134,6 +11140,189 @@
      "fail_on": "high",
      "include_dev": false,
      "advisories_unchecked": null
+    },
+    "packages": {
+     "guzzlehttp/guzzle": {
+      "lock": {
+       "name": "guzzlehttp/guzzle",
+       "version": "6.5.8",
+       "time": "2022-06-20T22:16:07+00:00",
+       "php": ">=5.5",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "4.2.4",
+        "time": "2016-07-15T17:44:18+00:00",
+        "php": ">=5.4.0"
+       },
+       {
+        "version": "5.3.4",
+        "time": "2019-10-30T09:32:00+00:00",
+        "php": ">=5.4.0"
+       },
+       {
+        "version": "6.5.8",
+        "time": "2022-06-20T22:16:07+00:00",
+        "php": ">=5.5"
+       },
+       {
+        "version": "7.12.1",
+        "time": null,
+        "php": "^7.2.5 || ^8.0"
+       },
+       {
+        "version": "7.12.3",
+        "time": null,
+        "php": "^7.2.5 || ^8.0"
+       },
+       {
+        "version": "7.14.2",
+        "time": null,
+        "php": "^7.2.5 || ^8.0"
+       },
+       {
+        "version": "7.15.1",
+        "time": null,
+        "php": "^7.2.5 || ^8.0"
+       },
+       {
+        "version": "7.15.2",
+        "time": null,
+        "php": "^7.2.5 || ^8.0"
+       },
+       {
+        "version": "7.15.5",
+        "time": "2026-08-24T09:21:06+00:00",
+        "php": "^7.2.5 || ^8.0"
+       },
+       {
+        "version": "8.0.1",
+        "time": null,
+        "php": "^7.4 || ^8.0"
+       },
+       {
+        "version": "8.2.0",
+        "time": "2026-09-06T13:55:09+00:00",
+        "php": "^7.4 || ^8.0"
+       },
+       {
+        "version": "v1.0.4",
+        "time": "2011-12-31T21:30:12+00:00",
+        "php": ">=5.3.2"
+       },
+       {
+        "version": "v2.8.8",
+        "time": "2012-10-16T00:42:47+00:00",
+        "php": ">=5.3.2"
+       },
+       {
+        "version": "v3.8.1",
+        "time": "2014-01-28T22:29:15+00:00",
+        "php": ">=5.3.3"
+       }
+      ],
+      "advisories": [
+       {
+        "id": "PKSA-gcrk-3vtt-1r14",
+        "cve": "CVE-2026-69246",
+        "title": "Guzzle: Noncanonical host can bypass host-based checks",
+        "link": "https://github.com/advisories/GHSA-v5mv-p594-2x33",
+        "reported_at": "2026-08-03T21:07:26+00:00",
+        "severity": "high",
+        "affected_versions": ">=8.0.0,<8.0.1|<7.15.2"
+       },
+       {
+        "id": "PKSA-93qv-9n9h-6k6p",
+        "cve": "CVE-2026-55767",
+        "title": "Dot-only cookie domains match all hosts",
+        "link": "https://github.com/guzzle/guzzle/security/advisories/GHSA-cwxw-98qj-8qjx",
+        "reported_at": "2026-06-18T14:12:49+00:00",
+        "severity": "medium",
+        "affected_versions": "<7.12.1"
+       },
+       {
+        "id": "PKSA-bbs6-q5q9-f3t4",
+        "cve": "CVE-2026-67353",
+        "title": "Guzzle: Unbounded response cookies risk denial of service",
+        "link": "https://github.com/advisories/GHSA-f283-ghqc-fg79",
+        "reported_at": "2026-07-20T23:27:02+00:00",
+        "severity": "medium",
+        "affected_versions": "<7.15.1"
+       },
+       {
+        "id": "PKSA-bcdd-5xc7-gwfb",
+        "cve": "CVE-2026-59883",
+        "title": "Guzzle: Cookie Disclosure and Injection via IP-Address Domains",
+        "link": "https://github.com/advisories/GHSA-g446-98w2-8p5w",
+        "reported_at": "2026-07-20T22:00:09+00:00",
+        "severity": "medium",
+        "affected_versions": "<7.12.3"
+       },
+       {
+        "id": "PKSA-cnw1-2ytm-cgr8",
+        "cve": "CVE-2026-69245",
+        "title": "Guzzle: Noncanonical cookie domain keeps subdomain scope",
+        "link": "https://github.com/advisories/GHSA-f7vp-7xgx-4w4r",
+        "reported_at": "2026-08-03T21:05:26+00:00",
+        "severity": "medium",
+        "affected_versions": ">=8.0.0,<8.0.1|<7.15.2"
+       },
+       {
+        "id": "PKSA-fy2t-3c5f-827y",
+        "cve": "CVE-2026-67354",
+        "title": "Guzzle: URI fragments disclosed in redirect Referer headers",
+        "link": "https://github.com/advisories/GHSA-h95v-h523-3mw8",
+        "reported_at": "2026-07-20T23:28:36+00:00",
+        "severity": "medium",
+        "affected_versions": "<7.15.1"
+       },
+       {
+        "id": "PKSA-k22t-f949-t9g6",
+        "cve": "CVE-2026-55568",
+        "title": "Silent HTTPS proxy downgrade to cleartext",
+        "link": "https://github.com/guzzle/guzzle/security/advisories/GHSA-wpwq-4j6v-78m3",
+        "reported_at": "2026-06-18T14:12:49+00:00",
+        "severity": "medium",
+        "affected_versions": "<7.12.1"
+       },
+       {
+        "id": "PKSA-pwsk-hy21-4gby",
+        "cve": "CVE-2026-67339",
+        "title": "Guzzle: Proxy-Authorization headers can be sent to origin servers",
+        "link": "https://github.com/advisories/GHSA-94pj-82f3-465w",
+        "reported_at": "2026-07-20T21:46:02+00:00",
+        "severity": "medium",
+        "affected_versions": "<7.14.2"
+       },
+       {
+        "id": "PKSA-qxvb-2bpp-dnk6",
+        "cve": "CVE-2026-67355",
+        "title": "Guzzle: Host-only cookie scope is not preserved",
+        "link": "https://github.com/advisories/GHSA-wm3w-8rrp-j577",
+        "reported_at": "2026-07-20T23:27:49+00:00",
+        "severity": "medium",
+        "affected_versions": "<7.15.1"
+       }
+      ],
+      "records": 15,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "guzzle/guzzle",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-09-06T13:55:34+00:00",
+       "archived": false
+      },
+      "chain": [
+       "guzzlehttp/guzzle"
+      ],
+      "below": null
+     }
     }
    }
   },
@@ -11931,7 +12120,7 @@
     "verdict": "high",
     "priority": "high",
     "lead": "pinned",
-    "rank": 4,
+    "rank": 5,
     "flags": [
      {
       "id": "pinned",
@@ -12325,6 +12514,7 @@
       "heading": "Next step",
       "action": "Its newest tag, 1.6.2, needs php ^5.5|^7.0, which your target, 8.4, does not run: replace it",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -12369,7 +12559,7 @@
     "branch_rows": [],
     "age_rows": [
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "1.6.2 · 2019-01-23 · 7.7 years ago"
      },
      {
@@ -13589,6 +13779,7 @@
       "heading": "Next step",
       "action": "Test it on PHP 8.4",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -13626,7 +13817,7 @@
       "value": "1.0.0 · 2018-08-10 · 8.1 years ago · the newest on 1.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v2.0.0-beta.1 · 2026-03-21 · 0.5 years ago"
      },
      {
@@ -14972,6 +15163,7 @@
       "heading": "Next step",
       "action": "Find a replacement; none is named",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -15048,7 +15240,7 @@
       "value": "1.17.05.02 · 2017-05-02 · 9.4 years ago · the newest on 1.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "2.17.08.29 · 2017-08-29 · 9.1 years ago"
      },
      {
@@ -16966,6 +17158,7 @@
        "composer require 'php:>=7.2.5' --no-update",
        "composer require 'guzzlehttp/guzzle:^7.15.2'"
       ],
+      "commands_label": "Command",
       "clears": "left-behind and all 9 advisories",
       "stays": null,
       "not_checked": null,
@@ -17243,7 +17436,7 @@
       "value": "6.5.8 · 2022-06-20 · 4.3 years ago · the newest on 6.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "8.2.0 · 2026-09-06 · 0.1 years ago"
      },
      {
@@ -17266,7 +17459,7 @@
     "why": [
      "32 · critical from 32",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
-     "vulnerable 16: high advisory CVE-2026-69246, the worst of 9; its own fix (php floor raise on 7.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-69246, the worst of 9; its own fix (php floor raise on 7.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "left-behind alone grades it high, the advisories alone grade it high: together critical",
      "without left-behind: 16, high · without the advisories: 16, high · without CVE-2026-69246: 24, high"
@@ -19323,6 +19516,7 @@
        "composer require 'php:>=7.2.5' --no-update",
        "composer require 'symfony/yaml:^5.4.52'"
       ],
+      "commands_label": "Command",
       "clears": "left-behind and all 3 advisories",
       "stays": null,
       "not_checked": "old-promise",
@@ -19594,7 +19788,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v8.1.8 · 2026-09-26 · less than three weeks ago"
      },
      {
@@ -19624,7 +19818,7 @@
      "22 · high from 16 · 10 points short of critical",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 2: low advisory CVE-2026-45133, the worst of 3 (tied with CVE-2026-45305, CVE-2026-45304); its own fix (php floor raise on 5.x) is reachable: no × 2",
+     "vulnerable 2: low advisory CVE-2026-45133, the worst of 3 (tied with CVE-2026-45305, CVE-2026-45304); its own fix (php floor raise on 5.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "maintenance alone makes it high",
      "without left-behind: 18, high (old-promise would lead) · without old-promise: 18, high · without the advisories: 20, high · without CVE-2026-45133: 22, high (tied: the others weigh the same)"
@@ -21232,7 +21426,7 @@
         "unknown": 0,
         "of": 4,
         "fix_kind": "raise-php",
-        "lowest": null,
+        "lowest": "3.1.0",
         "newest": "3.1.0",
         "held_by": [
          {
@@ -21408,6 +21602,7 @@
       "commands": [
        "composer require 'php:>=7.2.5' --no-update"
       ],
+      "commands_label": "Command",
       "clears": "left-behind and all 4 advisories",
       "stays": null,
       "not_checked": null,
@@ -21531,7 +21726,7 @@
        "branch": "3.x",
        "marks": [],
        "lines": [
-        "3.x clears 4 of 4",
+        "3.x clears 4 of 4 from 3.1.0",
         "php floor raise · held by guzzlehttp/guzzle",
         "after it: 0, ok, if Composer resolves it"
        ]
@@ -21586,7 +21781,7 @@
       "value": "1.9.1 · 2023-04-17 · 3.5 years ago · the newest on 1.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "3.1.0 · 2026-08-24 · 0.1 years ago"
      },
      {
@@ -21602,14 +21797,14 @@
      "2.x the move clears 4 of 4 from 2.12.3",
      "php floor raise · held by guzzlehttp/guzzle",
      "after it: 0, ok, if Composer resolves it",
-     "3.x clears 4 of 4",
+     "3.x clears 4 of 4 from 3.1.0",
      "php floor raise · held by guzzlehttp/guzzle",
      "after it: 0, ok, if Composer resolves it"
     ],
     "why": [
      "16 · high from 16 · 16 points short of critical",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
-     "vulnerable 8: medium advisory CVE-2026-55766, the worst of 4 (tied with CVE-2026-49214, CVE-2026-48998, CVE-2026-59882); its own fix (php floor raise on 2.x) is reachable: no × 2",
+     "vulnerable 8: medium advisory CVE-2026-55766, the worst of 4 (tied with CVE-2026-49214, CVE-2026-48998, CVE-2026-59882); its own fix (php floor raise on 2.x) is reachable, so no × 2",
      "transitive: maintenance 16 ÷ 2 = 8",
      "maintenance (left-behind, halved for reach) alone grades it medium, the advisories alone grade it medium: together high",
      "without left-behind: 8, medium · without the advisories: 8, medium · without CVE-2026-55766: 16, high (tied: the others weigh the same)"
@@ -23311,11 +23506,66 @@
          "fix": {
           "kind": "raise-php",
           "to_branch": "3.x",
-          "version": null,
+          "version": "v3.27.0",
           "newest": "v3.30.0",
           "on_installed_branch": false,
           "php": ">=8.1.0",
-          "held_by": [],
+          "held_by": [
+           {
+            "source": "root",
+            "package": null,
+            "version": null,
+            "link": "require",
+            "target": null,
+            "constraint": "^1.38",
+            "holder": null
+           },
+           {
+            "source": "package",
+            "package": "csa/guzzle-bundle",
+            "version": "dev-compat-php",
+            "link": "require",
+            "target": null,
+            "constraint": "^1.34|^2.4",
+            "holder": {
+             "verdict": "high",
+             "lead": "pinned",
+             "flag_ids": [
+              "pinned"
+             ],
+             "replacement": null,
+             "next_step": {
+              "kind": "no-move",
+              "to_branch": null,
+              "constraint": null,
+              "check": null
+             }
+            }
+           },
+           {
+            "source": "package",
+            "package": "symfony/symfony",
+            "version": "v3.4.49",
+            "link": "require",
+            "target": null,
+            "constraint": "^1.41|^2.10",
+            "holder": {
+             "verdict": "critical",
+             "lead": "left-behind",
+             "flag_ids": [
+              "left-behind",
+              "vulnerable"
+             ],
+             "replacement": null,
+             "next_step": {
+              "kind": "raise-php",
+              "to_branch": "5.x",
+              "constraint": "^5.4.53",
+              "check": null
+             }
+            }
+           }
+          ],
           "reason": null
          },
          "baseline": null
@@ -24628,6 +24878,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
+      "commands_label": "Command",
       "clears": "all 16 advisories",
       "stays": null,
       "not_checked": "old-promise",
@@ -24759,7 +25010,7 @@
        "source": "PKSA-8zx5-v2nz-58pb",
        "deciding": false,
        "severity": "high",
-       "fix": "fix not known",
+       "fix": "fix v3.27.0 on 3.x (php floor raise)",
        "affects": "affects <=3.26.0",
        "ranges": null,
        "same_as": null
@@ -25049,7 +25300,7 @@
       "value": "v1.44.8 · 2024-09-09 · 2.1 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v3.30.0 · 2026-09-25 · less than three weeks ago"
      },
      {
@@ -25075,7 +25326,7 @@
     "why": [
      "48 · critical from 32",
      "old-promise 16 leads: the strongest maintenance fact counts in full",
-     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 16; its own fix (php floor raise on 3.x) is reachable: no × 2",
+     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 16; its own fix (php floor raise on 3.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "the advisories alone make it critical",
      "without old-promise: 32, critical · without the advisories: 16, high · without CVE-2026-46633: 32, critical"
@@ -26433,17 +26684,17 @@
     },
     "score_rules_used": {
      "counted": 0,
-     "lead-first": 1,
+     "lead-first": 2,
      "corroborating-share": 0,
-     "advisory-points": 1,
+     "advisory-points": 2,
      "no-reachable-fix-multiplier": 0,
-     "security-max": 1,
+     "security-max": 2,
      "divide-reach": 1,
      "security-exempt-from-reach": 1,
-     "sum": 1,
+     "sum": 2,
      "divide-dev": 0,
      "floor-once": 0,
-     "band-floors": 1,
+     "band-floors": 2,
      "zero-verdicts": 0,
      "sort": null,
      "gate-bounded-new": 0,
@@ -26452,9 +26703,9 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
-     "other_repositories": 0,
+     "other_repositories": 1,
      "repositories": [
       {
        "composer_repository": "composer repo (https://repo.packagist.org)",
@@ -26462,8 +26713,8 @@
        "outcome": "answered",
        "reason": null,
        "message": null,
-       "packages_with_records": 1,
-       "records": 4
+       "packages_with_records": 2,
+       "records": 9
       }
      ]
     },
@@ -26877,7 +27128,7 @@
          "fix": {
           "kind": "update",
           "to_branch": "3.x",
-          "version": null,
+          "version": "3.1.5",
           "newest": "3.1.5",
           "on_installed_branch": true,
           "php": ">= 5.4",
@@ -26978,8 +27229,8 @@
         "fixed": 2,
         "unknown": 0,
         "of": 2,
-        "fix_kind": "upgrade",
-        "lowest": null,
+        "fix_kind": "update",
+        "lowest": "4.0.0",
         "newest": "4.0.0",
         "held_by": [],
         "if_applied": {
@@ -27134,6 +27385,7 @@
       "commands": [
        "composer update robrichards/xmlseclibs"
       ],
+      "commands_label": "Command",
       "clears": "old-promise and both advisories",
       "stays": null,
       "not_checked": null,
@@ -27189,7 +27441,7 @@
        "source": "PKSA-pcdf-qvqm-w4tv",
        "deciding": false,
        "severity": "medium",
-       "fix": "fix not known",
+       "fix": "fix 3.1.5 on 3.x, your branch (composer update)",
        "affects": "affects <=3.1.3",
        "ranges": null,
        "same_as": null
@@ -27213,8 +27465,8 @@
        "branch": "4.x",
        "marks": [],
        "lines": [
-        "4.x clears 2 of 2",
-        "upgrade",
+        "4.x clears 2 of 2 from 4.0.0",
+        "composer update",
         "after it: 0, ok, if Composer resolves it"
        ]
       }
@@ -27280,7 +27532,7 @@
       "value": "3.1.5 · 2026-03-13 · 0.6 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "4.0.0 · 2026-08-22 · 0.1 years ago"
      },
      {
@@ -27296,14 +27548,14 @@
      "3.x your branch the move clears 2 of 2 from 3.1.5",
      "composer update",
      "after it: 0, ok",
-     "4.x clears 2 of 2",
-     "upgrade",
+     "4.x clears 2 of 2 from 4.0.0",
+     "composer update",
      "after it: 0, ok, if Composer resolves it"
     ],
     "why": [
      "24 · high from 16 · 8 points short of critical",
      "old-promise 16 leads: the strongest maintenance fact counts in full",
-     "vulnerable 16: high advisory CVE-2026-32313, the worst of 2; its own fix (composer update on 3.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-32313, the worst of 2; its own fix (composer update on 3.x) is reachable, so no × 2",
      "transitive: maintenance 16 ÷ 2 = 8",
      "the advisories alone make it high",
      "without old-promise: 16, high · without the advisories: 8, medium · without CVE-2026-32313: 16, high"
@@ -27317,9 +27569,515 @@
     "commands_cmd": [
      "composer update robrichards/xmlseclibs"
     ],
-    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "run_gate_line": "gate: fails · --fail-on=high · 2 findings fail it · target php 8.4 (--target-php)",
     "age_line": "age: installed 3.1.1 released 2020-09-05 (6.1 years ago); 3.x last released 3.1.5 2026-03-13 (0.6 years ago); newest release 4.0.0 2026-08-22 (0.1 years ago); last push 2026-08-22 (0.1 years ago)"
    },
+   "unattributed": [],
+   "parents": [
+    {
+     "package": "mautic/core-lib",
+     "version": "4.3.x-dev",
+     "branch": null,
+     "installed_php": {
+      "requires": ">=7.4.0 <8.1",
+      "target_runs": false,
+      "project_allows": null
+     },
+     "verdict": "critical",
+     "priority": "critical",
+     "lead": "pinned",
+     "rank": 1,
+     "flags": [
+      {
+       "id": "pinned",
+       "role": "lead",
+       "baseline": null,
+       "signal_ids": [
+        "S6"
+       ],
+       "degree": null,
+       "headline": {
+        "unit": "reason",
+        "value": "branch_snapshot",
+        "source": null
+       },
+       "summary": "pinned to branch snapshot 4.3.x-dev"
+      },
+      {
+       "id": "vulnerable",
+       "role": "security",
+       "baseline": null,
+       "signal_ids": [
+        "S9"
+       ],
+       "degree": null,
+       "headline": {
+        "unit": "advisories",
+        "value": 5,
+        "source": null
+       },
+       "summary": "5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process"
+      }
+     ],
+     "score": {
+      "model": 1,
+      "total": 32,
+      "exact": 32,
+      "rounded_down": false,
+      "band": {
+       "floor": 32,
+       "next": null,
+       "to_next": null
+      },
+      "decided_by": "combination",
+      "parts": {
+       "maintenance": {
+        "status": "counted",
+        "contribution": 16,
+        "alone": {
+         "total": 16,
+         "verdict": "high"
+        }
+       },
+       "security": {
+        "status": "counted",
+        "contribution": 16,
+        "alone": {
+         "total": 16,
+         "verdict": "high"
+        },
+        "of": 5,
+        "tied": []
+       }
+      },
+      "terms": [
+       {
+        "part": "maintenance",
+        "flag": "pinned",
+        "role": "lead",
+        "weight": 16,
+        "divisor": 1,
+        "points": 16,
+        "contribution": 16
+       },
+       {
+        "part": "security",
+        "flag": "vulnerable",
+        "role": "security",
+        "advisory": "PKSA-j4xy-fb9q-x9h7",
+        "severity": "high",
+        "fix_kind": "unknown",
+        "weight": 16,
+        "multiplier": 1,
+        "points": 16,
+        "contribution": 16
+       }
+      ],
+      "modifiers": [],
+      "accepted": [],
+      "without": [
+       {
+        "remove": {
+         "kind": "flag",
+         "id": "pinned"
+        },
+        "revealed": [],
+        "total": 16,
+        "verdict": "high",
+        "lead": null,
+        "deciding_advisory": "PKSA-j4xy-fb9q-x9h7",
+        "at_least": true
+       },
+       {
+        "remove": {
+         "kind": "flag",
+         "id": "vulnerable"
+        },
+        "revealed": [],
+        "total": 16,
+        "verdict": "high",
+        "lead": "pinned",
+        "deciding_advisory": null,
+        "at_least": false
+       },
+       {
+        "remove": {
+         "kind": "advisory",
+         "id": "PKSA-j4xy-fb9q-x9h7"
+        },
+        "revealed": [],
+        "total": 24,
+        "verdict": "high",
+        "lead": "pinned",
+        "deciding_advisory": "PKSA-81ww-1p5d-6c6k",
+        "at_least": false
+       }
+      ],
+      "text": "32 = pinned 16 + vulnerable 16 [high advisory]"
+     },
+     "next_step": {
+      "kind": "no-move",
+      "source": "vulnerable",
+      "merged": [],
+      "fix_kind": "unknown",
+      "reason": "local_package",
+      "replacement": null,
+      "quiet_years": null,
+      "to_branch": null,
+      "version": null,
+      "newest": null,
+      "constraint": null,
+      "latest": null,
+      "php_check": null,
+      "crosses_major": null,
+      "held_by": [],
+      "clears": [],
+      "unverified": [],
+      "adds": [],
+      "leaves": [
+       {
+        "kind": "flag",
+        "id": "pinned"
+       },
+       {
+        "kind": "advisory",
+        "id": "PKSA-j4xy-fb9q-x9h7"
+       },
+       {
+        "kind": "advisory",
+        "id": "PKSA-81ww-1p5d-6c6k"
+       },
+       {
+        "kind": "advisory",
+        "id": "PKSA-bxhd-1cmh-djg9"
+       },
+       {
+        "kind": "advisory",
+        "id": "PKSA-krjy-6tb4-skgg"
+       },
+       {
+        "kind": "advisory",
+        "id": "PKSA-ydwx-2n98-5dyf"
+       }
+      ],
+      "clears_all": false,
+      "if_applied": null,
+      "check": null,
+      "composer_moves_because": [],
+      "commands": [],
+      "through": [],
+      "also": [],
+      "text": "no move: it is installed from a local path (your own package)"
+     },
+     "security": {
+      "status": "vulnerable",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 5,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 5,
+        "reason": null
+       }
+      ],
+      "worst": "high",
+      "counts": {
+       "critical": 0,
+       "high": 1,
+       "medium": 4,
+       "unrated": 0,
+       "low": 0
+      },
+      "ignored": [],
+      "ignored_count": 0,
+      "fix_kind": "unknown",
+      "installed_branch_fixes": null,
+      "move_in": "next_step",
+      "gets": null,
+      "partial": null
+     },
+     "checks_missing": [],
+     "checks_skipped": [
+      {
+       "check": "repository_activity",
+       "reason": "not_from_composer_repository",
+       "blocks": [
+        "S3",
+        "S4"
+       ]
+      },
+      {
+       "check": "release_metadata",
+       "reason": "not_from_composer_repository",
+       "blocks": [
+        "S2",
+        "S8"
+       ]
+      }
+     ],
+     "unchecked_accepted": [],
+     "maintenance_judged": false,
+     "metadata": {
+      "status": "not_from_composer_repository",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "not_read",
+      "reason": "not_from_composer_repository",
+      "forge": null,
+      "host": null,
+      "repo": null,
+      "event": null,
+      "archived": null,
+      "fetched_at": null,
+      "cached_at": null
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": false,
+     "origin": {
+      "kind": "path",
+      "registry": null,
+      "package_url": null,
+      "local": true
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": "not from a Composer repository, not checked",
+     "libyears_unmeasured": "not_from_composer_repository",
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "mautic/core-lib"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "mautic/core-lib"
+     ],
+     "signals": [
+      {
+       "id": "S6",
+       "level": "warn",
+       "summary": "pinned to branch snapshot 4.3.x-dev",
+       "data": {
+        "version": "4.3.x-dev",
+        "reason": "branch_snapshot",
+        "has_stable_release": null,
+        "last_stable_release": null,
+        "last_stable_version": null,
+        "last_stable_dated_by": null,
+        "snapshot_time": null,
+        "tag_relation": null
+       }
+      },
+      {
+       "id": "S7",
+       "level": "info",
+       "summary": "pulls in 1 flagged package: robrichards/xmlseclibs (old-promise · vulnerable)",
+       "data": {
+        "flagged": 1,
+        "packages": [
+         {
+          "package": "robrichards/xmlseclibs",
+          "chain": [
+           "mautic/core-lib",
+           "lightsaml/sp-bundle",
+           "lightsaml/symfony-bridge",
+           "lightsaml/lightsaml",
+           "robrichards/xmlseclibs"
+          ],
+          "verdict": "high",
+          "lead": "old-promise",
+          "flag_ids": [
+           "old-promise",
+           "vulnerable"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "id": "S9",
+       "level": "high",
+       "summary": "5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process",
+       "data": {
+        "advisories": [
+         {
+          "id": "PKSA-j4xy-fb9q-x9h7",
+          "cve": "CVE-2022-25768",
+          "title": "Mautic vulnerable to Improper Access Control in UI upgrade process",
+          "link": "https://github.com/advisories/GHSA-x3jx-5w6m-q2fc",
+          "reported_at": "2024-09-18T17:43:36+00:00",
+          "severity": "high",
+          "severity_published": "high",
+          "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.1.3,<4.4.13",
+          "counted": true,
+          "points": 16,
+          "deciding": true,
+          "fix": {
+           "kind": "unknown",
+           "to_branch": null,
+           "version": null,
+           "newest": null,
+           "on_installed_branch": null,
+           "php": null,
+           "held_by": [],
+           "reason": "not_from_composer_repository"
+          },
+          "baseline": null
+         },
+         {
+          "id": "PKSA-81ww-1p5d-6c6k",
+          "cve": "CVE-2024-47058",
+          "title": "Mautic vulnerable to Cross-site Scripting (XSS) - stored (edit form HTML field)",
+          "link": "https://github.com/advisories/GHSA-xv68-rrmw-9xwf",
+          "reported_at": "2024-09-18T22:05:00+00:00",
+          "severity": "medium",
+          "severity_published": "medium",
+          "affected_versions": ">=1.0.0-beta,<4.4.13|>=5.0.0-alpha,<5.1.1",
+          "counted": true,
+          "points": 8,
+          "deciding": false,
+          "fix": {
+           "kind": "unknown",
+           "to_branch": null,
+           "version": null,
+           "newest": null,
+           "on_installed_branch": null,
+           "php": null,
+           "held_by": [],
+           "reason": "not_from_composer_repository"
+          },
+          "baseline": null
+         },
+         {
+          "id": "PKSA-bxhd-1cmh-djg9",
+          "cve": "CVE-2024-47050",
+          "title": "Mautic vulnerable to XSS in contact/company tracking (no authentication)",
+          "link": "https://github.com/advisories/GHSA-73gr-32wg-qhh7",
+          "reported_at": "2024-09-18T22:05:30+00:00",
+          "severity": "medium",
+          "severity_published": "medium",
+          "affected_versions": ">=5.0.0-alpha,<5.1.1|>=2.6.0,<4.4.13",
+          "counted": true,
+          "points": 8,
+          "deciding": false,
+          "fix": {
+           "kind": "unknown",
+           "to_branch": null,
+           "version": null,
+           "newest": null,
+           "on_installed_branch": null,
+           "php": null,
+           "held_by": [],
+           "reason": "not_from_composer_repository"
+          },
+          "baseline": null
+         },
+         {
+          "id": "PKSA-krjy-6tb4-skgg",
+          "cve": "CVE-2021-27917",
+          "title": "Mautic has an XSS in contact tracking and page hits report",
+          "link": "https://github.com/advisories/GHSA-xpc5-rr39-v8v2",
+          "reported_at": "2024-09-18T22:05:59+00:00",
+          "severity": "medium",
+          "severity_published": "medium",
+          "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.0.0-beta4,<4.4.13",
+          "counted": true,
+          "points": 8,
+          "deciding": false,
+          "fix": {
+           "kind": "unknown",
+           "to_branch": null,
+           "version": null,
+           "newest": null,
+           "on_installed_branch": null,
+           "php": null,
+           "held_by": [],
+           "reason": "not_from_composer_repository"
+          },
+          "baseline": null
+         },
+         {
+          "id": "PKSA-ydwx-2n98-5dyf",
+          "cve": "CVE-2022-25770",
+          "title": "Mautic has insufficient authentication in upgrade flow",
+          "link": "https://github.com/advisories/GHSA-qf6m-6m4g-rmrc",
+          "reported_at": "2024-09-18T22:06:13+00:00",
+          "severity": "medium",
+          "severity_published": "medium",
+          "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.0.0-beta3,<4.4.13",
+          "counted": true,
+          "points": 8,
+          "deciding": false,
+          "fix": {
+           "kind": "unknown",
+           "to_branch": null,
+           "version": null,
+           "newest": null,
+           "on_installed_branch": null,
+           "php": null,
+           "held_by": [],
+           "reason": "not_from_composer_repository"
+          },
+          "baseline": null
+         }
+        ],
+        "releases_read": false,
+        "complete": true
+       }
+      }
+     ],
+     "evidence": "pinned: pinned to branch snapshot 4.3.x-dev; vulnerable: 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process",
+     "allowlist_reason": null,
+     "data_date": null,
+     "libyears": null,
+     "age": {
+      "installed": null,
+      "installed_unmeasured": "branch_snapshot",
+      "release": null,
+      "release_unmeasured": "not_from_composer_repository",
+      "branch_release": null,
+      "branch_release_unmeasured": "not_from_composer_repository",
+      "push": null,
+      "push_unmeasured": "not_from_composer_repository"
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": true,
+      "fails": true,
+      "exempt_by": null,
+      "by": [
+       {
+        "value": "high",
+        "kind": "grade",
+        "facts": [
+         {
+          "kind": "flag",
+          "id": "pinned"
+         },
+         {
+          "kind": "advisory",
+          "id": "PKSA-j4xy-fb9q-x9h7"
+         }
+        ]
+       }
+      ],
+      "basis": null
+     }
+    }
+   ],
    "inputs": {
     "root": {
      "name": "mautic/mautic",
@@ -27439,6 +28197,73 @@
      "fail_on": "high",
      "include_dev": false,
      "advisories_unchecked": null
+    },
+    "packages": {
+     "mautic/core-lib": {
+      "lock": {
+       "name": "mautic/core-lib",
+       "version": "4.3.x-dev",
+       "time": null,
+       "php": ">=7.4.0 <8.1",
+       "dev": false,
+       "origin": "path"
+      },
+      "advisories": [
+       {
+        "id": "PKSA-j4xy-fb9q-x9h7",
+        "cve": "CVE-2022-25768",
+        "title": "Mautic vulnerable to Improper Access Control in UI upgrade process",
+        "link": "https://github.com/advisories/GHSA-x3jx-5w6m-q2fc",
+        "reported_at": "2024-09-18T17:43:36+00:00",
+        "severity": "high",
+        "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.1.3,<4.4.13"
+       },
+       {
+        "id": "PKSA-81ww-1p5d-6c6k",
+        "cve": "CVE-2024-47058",
+        "title": "Mautic vulnerable to Cross-site Scripting (XSS) - stored (edit form HTML field)",
+        "link": "https://github.com/advisories/GHSA-xv68-rrmw-9xwf",
+        "reported_at": "2024-09-18T22:05:00+00:00",
+        "severity": "medium",
+        "affected_versions": ">=1.0.0-beta,<4.4.13|>=5.0.0-alpha,<5.1.1"
+       },
+       {
+        "id": "PKSA-bxhd-1cmh-djg9",
+        "cve": "CVE-2024-47050",
+        "title": "Mautic vulnerable to XSS in contact/company tracking (no authentication)",
+        "link": "https://github.com/advisories/GHSA-73gr-32wg-qhh7",
+        "reported_at": "2024-09-18T22:05:30+00:00",
+        "severity": "medium",
+        "affected_versions": ">=5.0.0-alpha,<5.1.1|>=2.6.0,<4.4.13"
+       },
+       {
+        "id": "PKSA-krjy-6tb4-skgg",
+        "cve": "CVE-2021-27917",
+        "title": "Mautic has an XSS in contact tracking and page hits report",
+        "link": "https://github.com/advisories/GHSA-xpc5-rr39-v8v2",
+        "reported_at": "2024-09-18T22:05:59+00:00",
+        "severity": "medium",
+        "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.0.0-beta4,<4.4.13"
+       },
+       {
+        "id": "PKSA-ydwx-2n98-5dyf",
+        "cve": "CVE-2022-25770",
+        "title": "Mautic has insufficient authentication in upgrade flow",
+        "link": "https://github.com/advisories/GHSA-qf6m-6m4g-rmrc",
+        "reported_at": "2024-09-18T22:06:13+00:00",
+        "severity": "medium",
+        "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.0.0-beta3,<4.4.13"
+       }
+      ],
+      "records": 5,
+      "ignored": [],
+      "abandoned": null,
+      "activity": null,
+      "chain": [
+       "mautic/core-lib"
+      ],
+      "below": null
+     }
     }
    }
   },
@@ -28630,11 +29455,57 @@
          "fix": {
           "kind": "upgrade",
           "to_branch": "3.x",
-          "version": null,
+          "version": "3.36.0",
           "newest": "3.36.0",
           "on_installed_branch": false,
           "php": "^8.0.2",
-          "held_by": [],
+          "held_by": [
+           {
+            "source": "package",
+            "package": "barryvdh/elfinder-flysystem-driver",
+            "version": "v0.2.1",
+            "link": "require",
+            "target": null,
+            "constraint": "^1.0",
+            "holder": {
+             "verdict": "medium",
+             "lead": "left-behind",
+             "flag_ids": [
+              "left-behind",
+              "old-promise"
+             ],
+             "replacement": null,
+             "next_step": {
+              "kind": "require",
+              "to_branch": "0.6.x",
+              "constraint": "^0.6.0",
+              "check": null
+             }
+            }
+           },
+           {
+            "source": "package",
+            "package": "league/flysystem-cached-adapter",
+            "version": "1.1.0",
+            "link": "require",
+            "target": null,
+            "constraint": "~1.0",
+            "holder": {
+             "verdict": "low",
+             "lead": "stale",
+             "flag_ids": [
+              "stale"
+             ],
+             "replacement": null,
+             "next_step": {
+              "kind": "no-move",
+              "to_branch": null,
+              "constraint": null,
+              "check": null
+             }
+            }
+           }
+          ],
           "reason": null
          },
          "baseline": null
@@ -29036,6 +29907,7 @@
       "heading": "The move",
       "action": "Move it to ^3.36 through mautic/core-lib",
       "commands": [],
+      "commands_label": null,
       "clears": "both",
       "stays": null,
       "not_checked": null,
@@ -29106,7 +29978,7 @@
        "source": "PKSA-w9tt-7782-78jx",
        "deciding": true,
        "severity": "low",
-       "fix": "fix not known",
+       "fix": "fix 3.36.0 on 3.x (upgrade)",
        "affects": "affects <=3.35.2",
        "ranges": null,
        "same_as": null
@@ -29228,7 +30100,7 @@
       "value": "1.1.10 · 2022-10-04 · 4.0 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "3.36.0 · 2026-09-02 · 0.1 years ago"
      },
      {
@@ -29248,7 +30120,7 @@
     "why": [
      "10 · medium from 8 · 6 points short of high",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
-     "vulnerable 2: low advisory CVE-2026-102601; its own fix (upgrade on 3.x) is reachable: no × 2",
+     "vulnerable 2: low advisory CVE-2026-102601; its own fix (upgrade on 3.x) is reachable, so no × 2",
      "transitive: maintenance 16 ÷ 2 = 8",
      "maintenance alone makes it medium",
      "without left-behind: 2, low · without the advisory: 8, medium"
@@ -30528,7 +31400,7 @@
       "value": "1.1.4 · 2021-05-03 · 5.4 years ago · the newest on 1.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "3.0.2 · 2024-09-11 · 2.1 years ago"
      },
      {
@@ -31727,6 +32599,7 @@
       "heading": "Next step",
       "action": "Find a replacement; none is named",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -31799,7 +32672,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "v2.5.0 · 2022-12-19 · 3.8 years ago · its newest release"
+      "value": "v2.5.0 · 2022-12-19 · 3.8 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -33145,6 +34018,7 @@
       "heading": "Next step",
       "action": "Find a replacement; none is named",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -33202,7 +34076,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "0.2.0 · 2019-09-16 · 7.0 years ago · its newest release"
+      "value": "0.2.0 · 2019-09-16 · 7.0 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -34129,7 +35003,7 @@
      "counted": 0,
      "lead-first": 0,
      "corroborating-share": 0,
-     "advisory-points": 1,
+     "advisory-points": 2,
      "no-reachable-fix-multiplier": 0,
      "security-max": 1,
      "divide-reach": 0,
@@ -34137,8 +35011,8 @@
      "sum": 0,
      "divide-dev": 0,
      "floor-once": 0,
-     "band-floors": 1,
-     "zero-verdicts": 0,
+     "band-floors": 2,
+     "zero-verdicts": 2,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -34146,7 +35020,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 4,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -34156,8 +35030,8 @@
        "outcome": "answered",
        "reason": null,
        "message": null,
-       "packages_with_records": 1,
-       "records": 18
+       "packages_with_records": 2,
+       "records": 46
       }
      ]
     },
@@ -34515,7 +35389,7 @@
          "fix": {
           "kind": "update",
           "to_branch": "2.x",
-          "version": null,
+          "version": "2.10.3",
           "newest": "2.10.3",
           "on_installed_branch": true,
           "php": "^7.4 || ^8.0",
@@ -34563,7 +35437,7 @@
          "fix": {
           "kind": "update",
           "to_branch": "2.x",
-          "version": null,
+          "version": "2.10.3",
           "newest": "2.10.3",
           "on_installed_branch": true,
           "php": "^7.4 || ^8.0",
@@ -35349,6 +36223,7 @@
       "commands": [
        "composer update league/commonmark"
       ],
+      "commands_label": "Command",
       "clears": "all 3 advisories",
       "stays": null,
       "not_checked": null,
@@ -35398,7 +36273,7 @@
        "source": null,
        "deciding": true,
        "severity": "high",
-       "fix": "fix not known",
+       "fix": "fix 2.10.3 on 2.x, your branch (composer update)",
        "affects": "affects >=2.0.0,<=2.10.1",
        "ranges": null,
        "same_as": null
@@ -35418,7 +36293,7 @@
        "source": null,
        "deciding": false,
        "severity": "medium",
-       "fix": "fix not known",
+       "fix": "fix 2.10.3 on 2.x, your branch (composer update)",
        "affects": "affects >=1.3.0,<=2.10.1",
        "ranges": null,
        "same_as": null
@@ -35666,7 +36541,7 @@
      },
      {
       "label": "2.x last",
-      "value": "2.10.3 · 2026-09-21 · less than three weeks ago · its newest release"
+      "value": "2.10.3 · 2026-09-21 · less than three weeks ago · its most recent release"
      },
      {
       "label": "last push",
@@ -35684,7 +36559,7 @@
     ],
     "why": [
      "16 · high from 16 · 16 points short of critical",
-     "vulnerable 16: high advisory PKSA-m4t9-vsgq-8khn, the worst of 3 (tied with PKSA-zyf5-hrxv-hrd7); its own fix (composer update on 2.x) is reachable: no × 2",
+     "vulnerable 16: high advisory PKSA-m4t9-vsgq-8khn, the worst of 3 (tied with PKSA-zyf5-hrxv-hrd7); its own fix (composer update on 2.x) is reachable, so no × 2",
      "transitive: no maintenance to halve; security is never halved for reach",
      "the advisories alone make it high",
      "without PKSA-m4t9-vsgq-8khn: 16, high (tied: the others weigh the same)"
@@ -35701,6 +36576,672 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 2.9.1 released 2026-08-09 (0.1 years ago); 2.x last released 2.10.3 2026-09-21 (less than three weeks ago), its newest release; last push 2026-10-01 (less than three weeks ago)"
    },
+   "unattributed": [],
+   "parents": [
+    {
+     "package": "laravel/framework",
+     "version": "v12.65.0",
+     "branch": "12.x",
+     "installed_php": {
+      "requires": "^8.2",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "low",
+     "priority": "low",
+     "lead": null,
+     "rank": 2,
+     "flags": [
+      {
+       "id": "vulnerable",
+       "role": "security",
+       "baseline": null,
+       "signal_ids": [
+        "S9"
+       ],
+       "degree": null,
+       "headline": {
+        "unit": "advisories",
+        "value": 1,
+        "source": null
+       },
+       "summary": "1 advisory: 1 low — all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information"
+      }
+     ],
+     "score": {
+      "model": 1,
+      "total": 2,
+      "exact": 2,
+      "rounded_down": false,
+      "band": {
+       "floor": 1,
+       "next": "medium",
+       "to_next": 6
+      },
+      "decided_by": "security",
+      "parts": {
+       "maintenance": {
+        "status": "none",
+        "contribution": 0,
+        "alone": {
+         "total": 0,
+         "verdict": null
+        }
+       },
+       "security": {
+        "status": "counted",
+        "contribution": 2,
+        "alone": {
+         "total": 2,
+         "verdict": "low"
+        },
+        "of": 1,
+        "tied": []
+       }
+      },
+      "terms": [
+       {
+        "part": "security",
+        "flag": "vulnerable",
+        "role": "security",
+        "advisory": "PKSA-d5tc-s1qs-h781",
+        "severity": "low",
+        "fix_kind": "update",
+        "weight": 2,
+        "multiplier": 1,
+        "points": 2,
+        "contribution": 2
+       }
+      ],
+      "modifiers": [],
+      "accepted": [],
+      "without": [],
+      "text": "2 = vulnerable 2 [low advisory]"
+     },
+     "next_step": {
+      "kind": "update",
+      "source": "vulnerable",
+      "merged": [],
+      "fix_kind": "update",
+      "reason": null,
+      "replacement": null,
+      "quiet_years": null,
+      "to_branch": "12.x",
+      "version": "v12.69.0",
+      "newest": "v12.69.3",
+      "constraint": null,
+      "latest": null,
+      "php_check": {
+       "requires": "^8.2",
+       "project_allows": true,
+       "target_runs": true,
+       "raise_to": null,
+       "raise_size": null
+      },
+      "crosses_major": false,
+      "held_by": [],
+      "clears": [
+       {
+        "kind": "advisory",
+        "id": "PKSA-d5tc-s1qs-h781",
+        "basis": "outside_range"
+       }
+      ],
+      "unverified": [],
+      "adds": [],
+      "leaves": [],
+      "clears_all": true,
+      "if_applied": {
+       "total": 0,
+       "verdict": "ok",
+       "lead": null,
+       "deciding_advisory": null,
+       "at_most": false,
+       "assumes": [
+        "clears_hold"
+       ]
+      },
+      "check": null,
+      "composer_moves_because": [],
+      "commands": [
+       [
+        "composer",
+        "update",
+        "laravel/framework"
+       ]
+      ],
+      "through": [],
+      "also": [],
+      "text": "composer update laravel/framework (gets v12.69.3) — clears the advisory"
+     },
+     "security": {
+      "status": "vulnerable",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 28,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 28,
+        "reason": null
+       }
+      ],
+      "worst": "low",
+      "counts": {
+       "critical": 0,
+       "high": 0,
+       "medium": 0,
+       "unrated": 0,
+       "low": 1
+      },
+      "ignored": [],
+      "ignored_count": 0,
+      "fix_kind": "update",
+      "installed_branch_fixes": {
+       "fixed": 1,
+       "unknown": 0,
+       "of": 1,
+       "fix_kind": "update",
+       "lowest": "v12.69.0",
+       "newest": "v12.69.3",
+       "held_by": [],
+       "if_applied": {
+        "total": 0,
+        "verdict": "ok",
+        "at_most": false,
+        "assumes": [
+         "clears_hold"
+        ]
+       },
+       "check": null
+      },
+      "move_in": "next_step",
+      "gets": {
+       "version": "v12.69.3",
+       "php_check": {
+        "requires": "^8.2",
+        "project_allows": true,
+        "target_runs": true,
+        "raise_to": null,
+        "raise_size": null
+       },
+       "clears": [
+        {
+         "kind": "advisory",
+         "id": "PKSA-d5tc-s1qs-h781",
+         "basis": "outside_range"
+        }
+       ],
+       "clears_all": true
+      },
+      "partial": null
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "laravel/framework",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:03:14+00:00",
+      "cached_at": "2026-10-01T16:03:14+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/laravel/framework",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "laravel/framework"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "laravel/framework",
+      "laravel/nightwatch"
+     ],
+     "signals": [
+      {
+       "id": "S7",
+       "level": "info",
+       "summary": "pulls in 1 flagged package: league/commonmark (vulnerable)",
+       "data": {
+        "flagged": 1,
+        "packages": [
+         {
+          "package": "league/commonmark",
+          "chain": [
+           "laravel/framework",
+           "league/commonmark"
+          ],
+          "verdict": "high",
+          "lead": null,
+          "flag_ids": [
+           "vulnerable"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "id": "S9",
+       "level": "warn",
+       "summary": "1 advisory: 1 low — all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information",
+       "data": {
+        "advisories": [
+         {
+          "id": "PKSA-d5tc-s1qs-h781",
+          "cve": "CVE-2026-102279",
+          "title": "Laravel: XSS in Debug Page Information",
+          "link": "https://github.com/advisories/GHSA-jh5r-qr3c-85q8",
+          "reported_at": "2026-09-29T18:24:25+00:00",
+          "severity": "low",
+          "severity_published": "low",
+          "affected_versions": ">=13.0.0,<13.30.0|<12.69.0",
+          "counted": true,
+          "points": 2,
+          "deciding": true,
+          "fix": {
+           "kind": "update",
+           "to_branch": "12.x",
+           "version": "v12.69.0",
+           "newest": "v12.69.3",
+           "on_installed_branch": true,
+           "php": "^8.2",
+           "held_by": [],
+           "reason": null
+          },
+          "baseline": null
+         }
+        ],
+        "releases_read": true,
+        "complete": true
+       }
+      }
+     ],
+     "evidence": "vulnerable: 1 advisory: 1 low — all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:39:09+00:00",
+     "libyears": 0.15,
+     "age": {
+      "installed": {
+       "at": "2026-08-05T15:33:16+00:00",
+       "years": 0.2,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "v11.57.0",
+       "at": "2026-09-29T15:33:27+00:00",
+       "years": 0,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "v12.69.3",
+       "at": "2026-09-29T12:53:25+00:00",
+       "years": 0,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-09-30T21:54:48+00:00",
+       "years": 0,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    },
+    {
+     "package": "laravel/nightwatch",
+     "version": "v1.28.6",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": null,
+      "target_runs": null,
+      "project_allows": null
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 3,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "laravel/nightwatch",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T17:39:09+00:00",
+      "cached_at": null
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/laravel/nightwatch",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "laravel/nightwatch"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "laravel/nightwatch"
+     ],
+     "signals": [
+      {
+       "id": "S7",
+       "level": "info",
+       "summary": "pulls in 1 flagged package: league/commonmark (vulnerable)",
+       "data": {
+        "flagged": 1,
+        "packages": [
+         {
+          "package": "league/commonmark",
+          "chain": [
+           "laravel/nightwatch",
+           "laravel/framework",
+           "league/commonmark"
+          ],
+          "verdict": "high",
+          "lead": null,
+          "flag_ids": [
+           "vulnerable"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:39:09+00:00",
+     "libyears": 0.11,
+     "age": {
+      "installed": {
+       "at": "2026-08-07T01:18:48+00:00",
+       "years": 0.2,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "v1.30.2",
+       "at": "2026-09-18T00:37:28+00:00",
+       "years": 0,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "v1.30.2",
+       "at": "2026-09-18T00:37:28+00:00",
+       "years": 0,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-09-30T03:25:25Z",
+       "years": 0,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    },
+    {
+     "package": "spatie/laravel-markdown",
+     "version": "2.8.0",
+     "branch": "2.x",
+     "installed_php": {
+      "requires": null,
+      "target_runs": null,
+      "project_allows": null
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 4,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "spatie/laravel-markdown",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T17:39:09+00:00",
+      "cached_at": null
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/spatie/laravel-markdown",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "spatie/laravel-markdown"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "spatie/laravel-markdown"
+     ],
+     "signals": [
+      {
+       "id": "S7",
+       "level": "info",
+       "summary": "pulls in 1 flagged package: league/commonmark (vulnerable)",
+       "data": {
+        "flagged": 1,
+        "packages": [
+         {
+          "package": "league/commonmark",
+          "chain": [
+           "spatie/laravel-markdown",
+           "league/commonmark"
+          ],
+          "verdict": "high",
+          "lead": null,
+          "flag_ids": [
+           "vulnerable"
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:39:09+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-02-22T18:53:36+00:00",
+       "years": 0.6,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "2.8.0",
+       "at": "2026-02-22T18:53:36+00:00",
+       "years": 0.6,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "2.8.0",
+       "at": "2026-02-22T18:53:36+00:00",
+       "years": 0.6,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-06-15T14:28:41Z",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "inputs": {
     "root": {
      "name": "coollabsio/coolify",
@@ -35951,6 +37492,190 @@
      "fail_on": "high",
      "include_dev": false,
      "advisories_unchecked": null
+    },
+    "packages": {
+     "laravel/framework": {
+      "lock": {
+       "name": "laravel/framework",
+       "version": "v12.65.0",
+       "time": "2026-08-05T15:33:16+00:00",
+       "php": "^8.2",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v10.50.3",
+        "time": "2026-08-12T03:46:26+00:00",
+        "php": "^8.1"
+       },
+       {
+        "version": "v11.57.0",
+        "time": "2026-09-29T15:33:27+00:00",
+        "php": "^8.2"
+       },
+       {
+        "version": "v12.65.0",
+        "time": "2026-08-05T15:33:16+00:00",
+        "php": "^8.2"
+       },
+       {
+        "version": "v12.69.0",
+        "time": null,
+        "php": "^8.2"
+       },
+       {
+        "version": "v12.69.3",
+        "time": "2026-09-29T12:53:25+00:00",
+        "php": "^8.2"
+       },
+       {
+        "version": "v13.30.0",
+        "time": null,
+        "php": "^8.3"
+       },
+       {
+        "version": "v13.34.0",
+        "time": "2026-09-29T12:46:21+00:00",
+        "php": "^8.3"
+       },
+       {
+        "version": "v4.2.22",
+        "time": "2016-11-12T01:41:37+00:00",
+        "php": ">=5.4.0"
+       },
+       {
+        "version": "v5.5.50",
+        "time": "2020-08-18T13:47:57+00:00",
+        "php": ">=7.0"
+       },
+       {
+        "version": "v5.8.38",
+        "time": "2020-04-14T14:14:36+00:00",
+        "php": "^7.1.3"
+       },
+       {
+        "version": "v6.20.45",
+        "time": "2024-11-12T15:42:46+00:00",
+        "php": "^7.2.5|^8.0"
+       },
+       {
+        "version": "v7.30.7",
+        "time": "2024-11-12T15:42:13+00:00",
+        "php": "^7.2.5|^8.0"
+       },
+       {
+        "version": "v8.83.29",
+        "time": "2024-11-20T15:55:41+00:00",
+        "php": "^7.3|^8.0"
+       },
+       {
+        "version": "v9.52.22",
+        "time": "2026-08-12T03:46:05+00:00",
+        "php": "^8.0.2"
+       }
+      ],
+      "advisories": [
+       {
+        "id": "PKSA-d5tc-s1qs-h781",
+        "cve": "CVE-2026-102279",
+        "title": "Laravel: XSS in Debug Page Information",
+        "link": "https://github.com/advisories/GHSA-jh5r-qr3c-85q8",
+        "reported_at": "2026-09-29T18:24:25+00:00",
+        "severity": "low",
+        "affected_versions": ">=13.0.0,<13.30.0|<12.69.0"
+       }
+      ],
+      "records": 28,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "laravel/framework",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-09-30T21:54:48+00:00",
+       "archived": false
+      },
+      "chain": [
+       "laravel/framework"
+      ],
+      "below": null
+     },
+     "laravel/nightwatch": {
+      "lock": {
+       "name": "laravel/nightwatch",
+       "version": "v1.28.6",
+       "time": "2026-08-07T01:18:48+00:00",
+       "php": null,
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v1.28.6",
+        "time": "2026-08-07T01:18:48+00:00",
+        "php": null
+       },
+       {
+        "version": "v1.30.2",
+        "time": "2026-09-18T00:37:28+00:00",
+        "php": null
+       }
+      ],
+      "advisories": [],
+      "records": 0,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "laravel/nightwatch",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-09-30T03:25:25Z",
+       "archived": false
+      },
+      "chain": [
+       "laravel/nightwatch"
+      ],
+      "below": null
+     },
+     "spatie/laravel-markdown": {
+      "lock": {
+       "name": "spatie/laravel-markdown",
+       "version": "2.8.0",
+       "time": "2026-02-22T18:53:36+00:00",
+       "php": null,
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "2.8.0",
+        "time": "2026-02-22T18:53:36+00:00",
+        "php": null
+       }
+      ],
+      "advisories": [],
+      "records": 0,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "spatie/laravel-markdown",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-06-15T14:28:41Z",
+       "archived": false
+      },
+      "chain": [
+       "spatie/laravel-markdown"
+      ],
+      "below": null
+     }
     }
    }
   },
@@ -37061,6 +38786,7 @@
       "heading": "Next step",
       "action": "It has no recent release to move to",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -37118,7 +38844,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "2.1.1 · 2023-06-02 · 3.3 years ago · its newest release"
+      "value": "2.1.1 · 2023-06-02 · 3.3 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -38284,6 +40010,7 @@
       "heading": "Next step",
       "action": "lockrot did not read its releases (it is not installed from a Composer repository), so it names no move: review the snapshot",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -38319,7 +40046,7 @@
      },
      {
       "label": null,
-      "value": "newest not read (not from a Composer repository)"
+      "value": "most recent not read (not from a Composer repository)"
      },
      {
       "label": null,
@@ -39649,6 +41376,7 @@
       "commands": [
        "composer require 'php:>=8.1' --no-update"
       ],
+      "commands_label": "Command",
       "clears": "left-behind",
       "stays": null,
       "not_checked": "old-promise",
@@ -39762,7 +41490,7 @@
       "value": "6.8.0 · 2022-09-13 · 4.0 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "7.8.1 · 2026-03-15 · 0.5 years ago"
      },
      {
@@ -41521,6 +43249,7 @@
       "heading": "The move",
       "action": "Move it to ^2.5 through the 38 packages in Reach",
       "commands": [],
+      "commands_label": null,
       "clears": "left-behind",
       "stays": null,
       "not_checked": null,
@@ -41629,7 +43358,7 @@
       "value": "v1.10.0 · 2022-07-20 · 4.2 years ago · the newest on 1.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v3.7.1 · 2026-06-05 · 0.3 years ago"
      },
      {
@@ -41656,6 +43385,18 @@
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v1.10.0 released 2022-07-20 (4.2 years ago), the newest on 1.x; newest release v3.7.1 2026-06-05 (0.3 years ago); last push 2026-09-16 (less than three weeks ago)"
    },
+   "unattributed": [
+    {
+     "package": "symfony/event-dispatcher-contracts",
+     "verdict": "medium",
+     "lead": "left-behind",
+     "flag_ids": [
+      "left-behind"
+     ],
+     "fan_in": 38
+    }
+   ],
+   "parents": [],
    "inputs": {
     "root": {
      "name": "wallabag/wallabag",
@@ -43799,6 +45540,7 @@
       "heading": "Next step",
       "action": "Find a maintained alternative",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -43876,7 +45618,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "v1.0.4 · 2018-08-08 · 8.1 years ago · its newest release"
+      "value": "v1.0.4 · 2018-08-08 · 8.1 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -45163,6 +46905,7 @@
       "commands": [
        "composer update matomo/network"
       ],
+      "commands_label": "Command",
       "clears": "old-promise",
       "stays": null,
       "not_checked": null,
@@ -45250,7 +46993,7 @@
      },
      {
       "label": "2.x last",
-      "value": "2.0.3 · 2026-04-17 · 0.5 years ago · its newest release"
+      "value": "2.0.3 · 2026-04-17 · 0.5 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -46175,8 +47918,7 @@
       "check": "release_dates",
       "reason": "undated_releases",
       "blocks": [
-       "S2",
-       "S8"
+       "S2"
       ]
      }
     ],
@@ -46233,21 +47975,19 @@
      {
       "id": "S10",
       "level": "info",
-      "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+      "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
       "data": {
        "unchecked": [
         {
          "check": "release_dates",
          "reason": "undated_releases",
          "blocks": [
-          "S2",
-          "S8"
+          "S2"
          ]
         }
        ],
        "blocks": [
-        "S2",
-        "S8"
+        "S2"
        ]
       }
      }
@@ -46283,10 +48023,6 @@
         {
          "kind": "signal",
          "id": "S2"
-        },
-        {
-         "kind": "signal",
-         "id": "S8"
         }
        ]
       }
@@ -46399,14 +48135,14 @@
      "origin": null,
      "not_judged": null,
      "unchecked": [
-      "Release age (S2) and release branch (S8) not checked (undated releases)"
+      "Release age (S2) not checked (undated releases)"
      ],
      "not_run": [],
      "php": null,
      "accepted": [],
      "gate": [
       "fails the run: a check that did not run",
-      "Tripped by S2 and S8"
+      "Tripped by S2"
      ]
     },
     "moves": [],
@@ -46492,7 +48228,7 @@
      },
      {
       "label": null,
-      "value": "newest not read (undated releases)"
+      "value": "most recent not read (undated releases)"
      }
     ],
     "security_row": [
@@ -46502,10 +48238,10 @@
     ],
     "why": [
      "0 · ok",
-     "checks missing: release age (S2) and release branch (S8) not checked (undated releases)"
+     "checks missing: release age (S2) not checked (undated releases)"
     ],
     "gate_line": null,
-    "checks": "1 fired (S10) · 7 quiet · S2, S8 not checked (undated releases)",
+    "checks": "1 fired (S10) · 8 quiet · S2 not checked (undated releases)",
     "baseline_suffix": null,
     "commands_posix": [],
     "commands_cmd": [],
@@ -47562,8 +49298,7 @@
       "check": "release_dates",
       "reason": "undated_releases",
       "blocks": [
-       "S2",
-       "S8"
+       "S2"
       ]
      }
     ],
@@ -47667,21 +49402,19 @@
      {
       "id": "S10",
       "level": "info",
-      "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+      "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
       "data": {
        "unchecked": [
         {
          "check": "release_dates",
          "reason": "undated_releases",
          "blocks": [
-          "S2",
-          "S8"
+          "S2"
          ]
         }
        ],
        "blocks": [
-        "S2",
-        "S8"
+        "S2"
        ]
       }
      }
@@ -47820,8 +49553,7 @@
      "origin": null,
      "not_judged": null,
      "unchecked": [
-      "Release age (S2) not checked (undated releases)",
-      "Release branch (S8) incomplete (undated releases)"
+      "Release age (S2) not checked (undated releases)"
      ],
      "not_run": [],
      "php": null,
@@ -47839,6 +49571,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'pagerfanta/twig:^4.9'"
       ],
+      "commands_label": "Command",
       "clears": "left-behind",
       "stays": null,
       "not_checked": null,
@@ -47939,7 +49672,7 @@
      },
      {
       "label": null,
-      "value": "newest not read (undated releases)"
+      "value": "most recent not read (undated releases)"
      }
     ],
     "security_row": [
@@ -47952,10 +49685,10 @@
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "direct requirement: maintenance not halved for reach",
      "maintenance alone makes it high",
-     "checks missing: release age (S2) not checked (undated releases); release branch (S8) incomplete (undated releases)"
+     "checks missing: release age (S2) not checked (undated releases)"
     ],
     "gate_line": null,
-    "checks": "3 fired (S7, S8, S10) · 6 quiet · S2 not checked (undated releases) · S8 incomplete (undated releases)",
+    "checks": "3 fired (S7, S8, S10) · 6 quiet · S2 not checked (undated releases)",
     "baseline_suffix": null,
     "commands_posix": [
      "composer require 'php:>=8.1' --no-update",
@@ -51058,6 +52791,7 @@
       "commands": [
        "composer require 'guzzlehttp/guzzle:^8.2'"
       ],
+      "commands_label": "Command",
       "clears": "left-behind, old-promise and all 14 advisories",
       "stays": null,
       "not_checked": null,
@@ -51420,7 +53154,7 @@
       "value": "5.3.4 · 2019-10-30 · 6.9 years ago · the newest on 5.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "8.2.0 · 2026-09-06 · 0.1 years ago"
      },
      {
@@ -51447,7 +53181,7 @@
      "36 · critical from 32",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 16: high advisory CVE-2022-31043, the worst of 14 (tied with CVE-2022-29248, CVE-2022-31042, CVE-2026-69246 and 2 more); its own fix (upgrade on 6.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2022-31043, the worst of 14 (tied with CVE-2022-29248, CVE-2022-31042, CVE-2026-69246 and 2 more); its own fix (upgrade on 6.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "maintenance (left-behind, 1 corroborating) alone grades it high, the advisories alone grade it high: together critical",
      "without left-behind: 32, critical (old-promise would lead) · without old-promise: 32, critical · without the advisories: 20, high · without CVE-2022-31043: 36, critical (tied: the others weigh the same)"
@@ -53284,6 +55018,7 @@
       "heading": "The move",
       "action": "Replace it with web-token/jwt-library ↗, the replacement it names, itself high (vulnerable) in this lock",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -53447,7 +55182,7 @@
      },
      {
       "label": null,
-      "value": "newest not read (undated releases)"
+      "value": "most recent not read (undated releases)"
      }
     ],
     "security_row": [
@@ -55181,6 +56916,7 @@
       "heading": "The move",
       "action": "Find a replacement: the suggestion names no package to require",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -55268,7 +57004,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "v6.2.10 · 2023-02-24 · 3.6 years ago · its newest release"
+      "value": "v6.2.10 · 2023-02-24 · 3.6 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -57236,6 +58972,7 @@
       "heading": "The move",
       "action": "Move it to ^5.4.53 through mautic/core-lib",
       "commands": [],
+      "commands_label": null,
       "clears": "left-behind and both advisories",
       "stays": null,
       "not_checked": null,
@@ -57492,7 +59229,7 @@
       "value": "v4.4.44 · 2022-07-20 · 4.2 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v8.1.8 · 2026-09-28 · less than three weeks ago"
      },
      {
@@ -57521,7 +59258,7 @@
     "why": [
      "16 · high from 16 · 16 points short of critical",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
-     "vulnerable 8: medium advisory CVE-2026-48784, the worst of 2 (tied with CVE-2026-45065); its own fix (upgrade on 5.x) is reachable: no × 2",
+     "vulnerable 8: medium advisory CVE-2026-48784, the worst of 2 (tied with CVE-2026-45065); its own fix (upgrade on 5.x) is reachable, so no × 2",
      "transitive: maintenance 16 ÷ 2 = 8",
      "maintenance (left-behind, halved for reach) alone grades it medium, the advisories alone grade it medium: together high",
      "without left-behind: 8, medium · without the advisories: 8, medium · without CVE-2026-48784: 16, high (tied: the others weigh the same)"
@@ -58878,7 +60615,7 @@
      },
      {
       "label": null,
-      "value": "newest not read (not from a Composer repository)"
+      "value": "most recent not read (not from a Composer repository)"
      },
      {
       "label": null,
@@ -60448,6 +62185,7 @@
       "commands": [
        "composer why-not genealabs/laravel-model-caching 13.1.11"
       ],
+      "commands_label": "Check",
       "clears": "left-behind",
       "stays": null,
       "not_checked": null,
@@ -60600,7 +62338,7 @@
       "value": "10.0.1 · 2023-03-22 · 3.5 years ago · the newest on 10.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "13.1.0 · 2026-02-28 · 0.6 years ago"
      },
      {
@@ -61858,6 +63596,7 @@
       "heading": "Next step",
       "action": "It has no recent release to move to",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -61925,7 +63664,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "0.0.3 · 2023-04-11 · 3.5 years ago · its newest release"
+      "value": "0.0.3 · 2023-04-11 · 3.5 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -65845,6 +67584,7 @@
        "composer require 'php:>=7.2.5' --no-update",
        "composer require 'guzzlehttp/guzzle:^7.15.2'"
       ],
+      "commands_label": "Command",
       "clears": "left-behind and all 14 advisories",
       "stays": null,
       "not_checked": "old-promise",
@@ -66224,7 +67964,7 @@
       "value": "5.3.4 · 2019-10-30 · 6.9 years ago · the newest on 5.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "8.2.0 · 2026-09-06 · 0.1 years ago"
      },
      {
@@ -66251,7 +67991,7 @@
      "36 · critical from 32",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 16: high advisory CVE-2022-31043, the worst of 14 (tied with CVE-2022-29248, CVE-2022-31042, CVE-2026-69246 and 2 more); its own fix (upgrade on 6.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2022-31043, the worst of 14 (tied with CVE-2022-29248, CVE-2022-31042, CVE-2026-69246 and 2 more); its own fix (upgrade on 6.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "maintenance (left-behind, 1 corroborating) alone grades it high, the advisories alone grade it high: together critical",
      "without left-behind: 32, critical (old-promise would lead) · without old-promise: 32, critical · without the advisories: 20, high · without CVE-2022-31043: 36, critical (tied: the others weigh the same)"
@@ -68113,6 +69853,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'joomla/filter:^3.0.5'"
       ],
+      "commands_label": "Command",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -68271,7 +70012,7 @@
       "value": "2.0.6 · 2025-09-30 · 1.0 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "3.0.7 · 2026-09-29 · less than three weeks ago"
      },
      {
@@ -68295,7 +70036,7 @@
     ],
     "why": [
      "8 · medium from 8 · 8 points short of high",
-     "vulnerable 8: medium advisory CVE-2025-54476; its own fix (php floor raise on 3.x) is reachable: no × 2",
+     "vulnerable 8: medium advisory CVE-2025-54476; its own fix (php floor raise on 3.x) is reachable, so no × 2",
      "the advisory alone makes it medium"
     ],
     "gate_line": null,
@@ -69797,7 +71538,7 @@
         "unknown": 0,
         "of": 1,
         "fix_kind": "raise-php",
-        "lowest": null,
+        "lowest": "v8.1.6",
         "newest": "v8.1.6",
         "held_by": [
          {
@@ -69847,7 +71588,7 @@
         "unknown": 0,
         "of": 1,
         "fix_kind": "raise-php",
-        "lowest": null,
+        "lowest": "v7.4.18",
         "newest": "v7.4.18",
         "held_by": [
          {
@@ -69897,7 +71638,7 @@
         "unknown": 0,
         "of": 1,
         "fix_kind": "raise-php",
-        "lowest": null,
+        "lowest": "v6.4.45",
         "newest": "v6.4.45",
         "held_by": [
          {
@@ -69947,7 +71688,7 @@
         "unknown": 0,
         "of": 1,
         "fix_kind": "upgrade",
-        "lowest": null,
+        "lowest": "v5.4.0",
         "newest": "v5.4.52",
         "held_by": [
          {
@@ -69997,7 +71738,7 @@
         "unknown": 0,
         "of": 1,
         "fix_kind": "upgrade",
-        "lowest": null,
+        "lowest": "v4.4.43",
         "newest": "v4.4.43",
         "held_by": [
          {
@@ -70047,7 +71788,7 @@
         "unknown": 0,
         "of": 1,
         "fix_kind": "upgrade",
-        "lowest": null,
+        "lowest": "v3.4.47",
         "newest": "v3.4.47",
         "held_by": [
          {
@@ -70155,6 +71896,7 @@
       "commands": [
        "composer update symfony/monolog-bridge"
       ],
+      "commands_label": "Command",
       "clears": "the advisory",
       "stays": "left-behind, old-promise",
       "not_checked": null,
@@ -70184,6 +71926,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4'"
       ],
+      "commands_label": "Command",
       "clears": "left-behind and the advisory",
       "stays": null,
       "not_checked": "old-promise",
@@ -70273,7 +72016,7 @@
        "branch": "3.x",
        "marks": [],
        "lines": [
-        "3.x clears 1 of 1",
+        "3.x clears 1 of 1 from v3.4.47",
         "upgrade · held by composer.json",
         "after it: at most 20, high, if Composer resolves it"
        ]
@@ -70282,7 +72025,7 @@
        "branch": "4.x",
        "marks": [],
        "lines": [
-        "4.x clears 1 of 1",
+        "4.x clears 1 of 1 from v4.4.43",
         "upgrade · held by composer.json",
         "after it: at most 20, high, if Composer resolves it"
        ]
@@ -70291,7 +72034,7 @@
        "branch": "5.x",
        "marks": [],
        "lines": [
-        "5.x clears 1 of 1",
+        "5.x clears 1 of 1 from v5.4.0",
         "upgrade · held by composer.json",
         "after it: at most 16, high, if Composer resolves it"
        ]
@@ -70300,7 +72043,7 @@
        "branch": "6.x",
        "marks": [],
        "lines": [
-        "6.x clears 1 of 1",
+        "6.x clears 1 of 1 from v6.4.45",
         "php floor raise · held by composer.json",
         "after it: at most 16, high, if Composer resolves it"
        ]
@@ -70309,7 +72052,7 @@
        "branch": "7.x",
        "marks": [],
        "lines": [
-        "7.x clears 1 of 1",
+        "7.x clears 1 of 1 from v7.4.18",
         "php floor raise · held by composer.json",
         "after it: at most 16, high, if Composer resolves it"
        ]
@@ -70318,7 +72061,7 @@
        "branch": "8.x",
        "marks": [],
        "lines": [
-        "8.x clears 1 of 1",
+        "8.x clears 1 of 1 from v8.1.6",
         "php floor raise · held by composer.json",
         "after it: at most 16, high, if Composer resolves it"
        ]
@@ -70416,7 +72159,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -70432,22 +72175,22 @@
      "2.x your branch the move clears 1 of 1 from v2.8.52",
      "composer update",
      "after it: 20, high",
-     "3.x clears 1 of 1",
+     "3.x clears 1 of 1 from v3.4.47",
      "upgrade · held by composer.json",
      "after it: at most 20, high, if Composer resolves it",
-     "4.x clears 1 of 1",
+     "4.x clears 1 of 1 from v4.4.43",
      "upgrade · held by composer.json",
      "after it: at most 20, high, if Composer resolves it",
-     "5.x clears 1 of 1",
+     "5.x clears 1 of 1 from v5.4.0",
      "upgrade · held by composer.json",
      "after it: at most 16, high, if Composer resolves it",
-     "6.x clears 1 of 1",
+     "6.x clears 1 of 1 from v6.4.45",
      "php floor raise · held by composer.json",
      "after it: at most 16, high, if Composer resolves it",
-     "7.x clears 1 of 1",
+     "7.x clears 1 of 1 from v7.4.18",
      "php floor raise · held by composer.json",
      "after it: at most 16, high, if Composer resolves it",
-     "8.x clears 1 of 1",
+     "8.x clears 1 of 1 from v8.1.6",
      "php floor raise · held by composer.json",
      "after it: at most 16, high, if Composer resolves it"
     ],
@@ -70455,7 +72198,7 @@
      "36 · critical from 32",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 16: high advisory CVE-2026-45077; its own fix (composer update on 2.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-45077; its own fix (composer update on 2.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "maintenance (left-behind, 1 corroborating) alone grades it high, the advisory alone grades it high: together critical",
      "without left-behind: 32, critical (old-promise would lead) · without old-promise: 32, critical · without the advisory: 20, high"
@@ -71811,6 +73554,7 @@
        "composer update symfony/polyfill-intl-idn",
        "composer why-not guzzlehttp/guzzle 8.2.0"
       ],
+      "commands_label": "Command",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -71893,7 +73637,7 @@
      },
      {
       "label": "1.x last",
-      "value": "v1.43.0 · 2026-09-23 · less than three weeks ago · its newest release"
+      "value": "v1.43.0 · 2026-09-23 · less than three weeks ago · its most recent release"
      },
      {
       "label": null,
@@ -71915,7 +73659,7 @@
     ],
     "why": [
      "2 · low from 1 · 6 points short of medium",
-     "vulnerable 2: low advisory CVE-2026-46644; its own fix (composer update on 1.x) is reachable: no × 2",
+     "vulnerable 2: low advisory CVE-2026-46644; its own fix (composer update on 1.x) is reachable, so no × 2",
      "transitive: no maintenance to halve; security is never halved for reach",
      "the advisory alone makes it low",
      "checks not run: its repository activity (allowlisted)"
@@ -73211,6 +74955,7 @@
       "commands": [
        "composer why-not guzzlehttp/guzzle 8.2.0"
       ],
+      "commands_label": "Check",
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -73263,7 +75008,7 @@
      },
      {
       "label": "1.x last",
-      "value": "v1.43.0 · 2026-09-23 · less than three weeks ago · its newest release"
+      "value": "v1.43.0 · 2026-09-23 · less than three weeks ago · its most recent release"
      },
      {
       "label": null,
@@ -74494,7 +76239,7 @@
          "fix": {
           "kind": "blocked",
           "to_branch": "3.x",
-          "version": null,
+          "version": "v3.27.0",
           "newest": "v3.30.0",
           "on_installed_branch": false,
           "php": ">=8.1.0",
@@ -75004,6 +76749,7 @@
       "heading": "Next step",
       "action": "3.x fixes it but needs php >=8.1.0, which your target, 8.0, does not run",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -75098,7 +76844,7 @@
        "source": "PKSA-8zx5-v2nz-58pb",
        "deciding": false,
        "severity": "high",
-       "fix": "fix not known",
+       "fix": "fix v3.27.0 on 3.x (needs a PHP your target does not run)",
        "affects": "affects <=3.26.0",
        "ranges": null,
        "same_as": null
@@ -75344,7 +77090,7 @@
       "value": "v2.16.1 · 2024-09-09 · 2.1 years ago · the newest on 2.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v3.30.0 · 2026-09-25 · less than three weeks ago"
      },
      {
@@ -76803,11 +78549,45 @@
          "fix": {
           "kind": "upgrade",
           "to_branch": "3.x",
-          "version": null,
+          "version": "v3.27.0",
           "newest": "v3.30.0",
           "on_installed_branch": false,
           "php": ">=8.1.0",
-          "held_by": [],
+          "held_by": [
+           {
+            "source": "root",
+            "package": null,
+            "version": null,
+            "link": "require",
+            "target": null,
+            "constraint": "^2.0",
+            "holder": null
+           },
+           {
+            "source": "package",
+            "package": "symfony/twig-bridge",
+            "version": "v3.4.47",
+            "link": "require",
+            "target": null,
+            "constraint": "^1.41|^2.10",
+            "holder": {
+             "verdict": "high",
+             "lead": "left-behind",
+             "flag_ids": [
+              "left-behind",
+              "old-promise",
+              "vulnerable"
+             ],
+             "replacement": null,
+             "next_step": {
+              "kind": "require",
+              "to_branch": "4.x",
+              "constraint": "^4.4.51",
+              "check": null
+             }
+            }
+           }
+          ],
           "reason": null
          },
          "baseline": null
@@ -77799,6 +79579,7 @@
       "commands": [
        "composer require 'twig/twig:^3.27.0'"
       ],
+      "commands_label": "Command",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -77924,7 +79705,7 @@
        "source": "PKSA-8zx5-v2nz-58pb",
        "deciding": false,
        "severity": "high",
-       "fix": "fix not known",
+       "fix": "fix v3.27.0 on 3.x (upgrade)",
        "affects": "affects <=3.26.0",
        "ranges": null,
        "same_as": null
@@ -78171,7 +79952,7 @@
       "value": "v2.16.1 · 2024-09-09 · 2.1 years ago · the newest on 2.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v3.30.0 · 2026-09-25 · less than three weeks ago"
      },
      {
@@ -78190,7 +79971,7 @@
     ],
     "why": [
      "32 · critical from 32",
-     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (upgrade on 3.x) is reachable: no × 2",
+     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (upgrade on 3.x) is reachable, so no × 2",
      "the advisories alone make it critical",
      "without CVE-2026-46633: 16, high"
     ],
@@ -79662,7 +81443,7 @@
          "fix": {
           "kind": "raise-php",
           "to_branch": "3.x",
-          "version": null,
+          "version": "v3.27.0",
           "newest": "v3.30.0",
           "on_installed_branch": false,
           "php": ">=8.1.0",
@@ -80305,6 +82086,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
+      "commands_label": "Command",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -80409,7 +82191,7 @@
        "source": "PKSA-8zx5-v2nz-58pb",
        "deciding": false,
        "severity": "high",
-       "fix": "fix not known",
+       "fix": "fix v3.27.0 on 3.x (php floor raise)",
        "affects": "affects <=3.26.0",
        "ranges": null,
        "same_as": null
@@ -80656,7 +82438,7 @@
       "value": "v2.16.1 · 2024-09-09 · 2.1 years ago · the newest on 2.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v3.30.0 · 2026-09-25 · less than three weeks ago"
      },
      {
@@ -80675,7 +82457,7 @@
     ],
     "why": [
      "32 · critical from 32",
-     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (php floor raise on 3.x) is reachable: no × 2",
+     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (php floor raise on 3.x) is reachable, so no × 2",
      "the advisories alone make it critical",
      "without CVE-2026-46633: 16, high"
     ],
@@ -82194,6 +83976,7 @@
       "heading": "The move",
       "action": "Replace it with symfony/error-handler ↗, the replacement it names",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -82265,7 +84048,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v4.4.44 · 2022-07-28 · 4.2 years ago"
      },
      {
@@ -84062,6 +85845,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4.52'"
       ],
+      "commands_label": "Command",
       "clears": "all three",
       "stays": null,
       "not_checked": null,
@@ -84286,7 +86070,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -84316,7 +86100,7 @@
      "36 · critical from 32",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "maintenance (left-behind, 1 corroborating) alone grades it high, the advisory alone grades it high: together critical",
      "without left-behind: 32, critical (old-promise would lead) · without old-promise: 32, critical · without the advisory: 20, high"
@@ -85690,6 +87474,7 @@
       "heading": "The move",
       "action": "Replace it with symfony/error-handler ↗, the replacement it names",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -85761,7 +87546,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v4.4.44 · 2022-07-28 · 4.2 years ago"
      },
      {
@@ -87378,6 +89163,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4'"
       ],
+      "commands_label": "Command",
       "clears": "left-behind",
       "stays": "1 advisory",
       "not_checked": null,
@@ -87412,6 +89198,7 @@
       "heading": "Then",
       "action": "No release fixes it",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -87545,7 +89332,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -89186,6 +90973,7 @@
       "commands": [
        "composer update symfony/yaml"
       ],
+      "commands_label": "Command",
       "clears": "all 3 advisories",
       "stays": null,
       "not_checked": null,
@@ -89456,7 +91244,7 @@
       "value": "v5.4.53 · 2026-05-20 · 0.4 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v8.1.8 · 2026-09-26 · less than three weeks ago"
      },
      {
@@ -89485,7 +91273,7 @@
     ],
     "why": [
      "2 · low from 1 · 6 points short of medium",
-     "vulnerable 2: low advisory CVE-2026-45133, the worst of 3 (tied with CVE-2026-45305, CVE-2026-45304); its own fix (composer update on 5.x) is reachable: no × 2",
+     "vulnerable 2: low advisory CVE-2026-45133, the worst of 3 (tied with CVE-2026-45305, CVE-2026-45304); its own fix (composer update on 5.x) is reachable, so no × 2",
      "the advisories alone make it low",
      "without CVE-2026-45133: 2, low (tied: the others weigh the same)"
     ],
@@ -90617,7 +92405,7 @@
       "value": "1.5.14 · 2026-08-21 · 0.1 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "1.4.15 · 2026-08-21 · 0.1 years ago"
      },
      {
@@ -92148,6 +93936,7 @@
       "commands": [
        "composer update symfony/yaml"
       ],
+      "commands_label": "Command",
       "clears": "all 3 advisories",
       "stays": null,
       "not_checked": null,
@@ -92415,7 +94204,7 @@
       "value": "v5.4.53 · 2026-05-20 · 0.4 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v8.1.8 · 2026-09-26 · less than three weeks ago"
      },
      {
@@ -92443,7 +94232,7 @@
     ],
     "why": [
      "2 · low from 1 · 6 points short of medium",
-     "vulnerable 2: low advisory CVE-2026-45133, the worst of 3 (tied with CVE-2026-45305, CVE-2026-45304); its own fix (composer update on 5.x) is reachable: no × 2",
+     "vulnerable 2: low advisory CVE-2026-45133, the worst of 3 (tied with CVE-2026-45305, CVE-2026-45304); its own fix (composer update on 5.x) is reachable, so no × 2",
      "the advisories alone make it low",
      "without CVE-2026-45133: 2, low (tied: the others weigh the same)",
      "checks not run: its repository activity (allowlisted)"
@@ -93846,6 +95635,7 @@
       "heading": "Next step",
       "action": "Find a replacement; none is named",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -93922,7 +95712,7 @@
       "value": "1.17.05.02 · 2017-05-02 · 9.4 years ago · the newest on 1.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "2.17.08.29 · 2017-08-29 · 9.1 years ago"
      },
      {
@@ -95309,6 +97099,7 @@
       "heading": "The move",
       "action": "Replace it with symfony/error-handler ↗, the replacement it names",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -95379,7 +97170,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v4.4.44 · 2022-07-28 · 4.2 years ago"
      },
      {
@@ -97121,6 +98912,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4.52'"
       ],
+      "commands_label": "Command",
       "clears": "all three",
       "stays": null,
       "not_checked": null,
@@ -97345,7 +99137,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -97375,7 +99167,7 @@
      "18 · high from 16 · 14 points short of critical",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable, so no × 2",
      "packages-dev: total 36 ÷ 2 = 18",
      "direct requirement: maintenance not halved for reach",
      "maintenance (left-behind, 1 corroborating, halved: packages-dev) alone grades it medium, the advisory (halved: packages-dev) alone grades it medium: together high",
@@ -98672,7 +100464,7 @@
          "fix": {
           "kind": "raise-php",
           "to_branch": "3.x",
-          "version": null,
+          "version": "v3.27.0",
           "newest": "v3.30.0",
           "on_installed_branch": false,
           "php": ">=8.1.0",
@@ -99194,6 +100986,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
+      "commands_label": "Command",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -99298,7 +101091,7 @@
        "source": "PKSA-8zx5-v2nz-58pb",
        "deciding": false,
        "severity": "high",
-       "fix": "fix not known",
+       "fix": "fix v3.27.0 on 3.x (php floor raise)",
        "affects": "affects <=3.26.0",
        "ranges": null,
        "same_as": null
@@ -99545,7 +101338,7 @@
       "value": "v2.16.1 · 2024-09-09 · 2.1 years ago · the newest on 2.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v3.30.0 · 2026-09-25 · less than three weeks ago"
      },
      {
@@ -99564,7 +101357,7 @@
     ],
     "why": [
      "16 · high from 16 · 16 points short of critical",
-     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (php floor raise on 3.x) is reachable: no × 2",
+     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (php floor raise on 3.x) is reachable, so no × 2",
      "packages-dev: total 32 ÷ 2 = 16",
      "the advisories (halved: packages-dev) alone make it high",
      "without CVE-2026-46633: 8, medium"
@@ -100939,6 +102732,7 @@
       "heading": "Next step",
       "action": "lockrot could not read its releases, so it names no fix",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -100996,7 +102790,7 @@
      },
      {
       "label": null,
-      "value": "newest not read (metadata unavailable)"
+      "value": "most recent not read (metadata unavailable)"
      }
     ],
     "security_row": [
@@ -102319,6 +104113,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'joomla/filter:^3.0.5'"
       ],
+      "commands_label": "Command",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -102477,7 +104272,7 @@
       "value": "2.0.6 · 2025-09-30 · 1.0 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "3.0.7 · 2026-09-29 · less than three weeks ago"
      },
      {
@@ -102501,7 +104296,7 @@
     ],
     "why": [
      "8 · medium from 8 · 8 points short of high",
-     "vulnerable 8: medium advisory CVE-2025-54476; its own fix (php floor raise on 3.x) is reachable: no × 2",
+     "vulnerable 8: medium advisory CVE-2025-54476; its own fix (php floor raise on 3.x) is reachable, so no × 2",
      "the advisory alone makes it medium"
     ],
     "gate_line": null,
@@ -103644,7 +105439,7 @@
       "value": "1.5.14 · 2026-08-21 · 0.1 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "1.4.15 · 2026-08-21 · 0.1 years ago"
      },
      {
@@ -104727,7 +106522,7 @@
      },
      {
       "label": "1.x last",
-      "value": "1.2.0 · 2021-03-11 · 5.6 years ago · its newest release"
+      "value": "1.2.0 · 2021-03-11 · 5.6 years ago · its most recent release"
      },
      {
       "label": null,
@@ -105941,6 +107736,7 @@
       "heading": "Next step",
       "action": "v4.1.1 is its newest release: test it on PHP 8.4, or replace it",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -106008,7 +107804,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "v4.1.1 · 2018-01-15 · 8.7 years ago · its newest release"
+      "value": "v4.1.1 · 2018-01-15 · 8.7 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -107588,6 +109384,7 @@
       "heading": "Next step",
       "action": "No single release fixes every advisory; see each advisory's fix",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -107820,7 +109617,7 @@
       "value": "v5.4.53 · 2026-05-20 · 0.4 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v8.1.8 · 2026-09-26 · less than three weeks ago"
      },
      {
@@ -109207,6 +111004,7 @@
       "commands": [
        "composer require 'friendsofsymfony/oauth-server-bundle:^1.6.2'"
       ],
+      "commands_label": "Command",
       "clears": "pinned",
       "stays": "stale",
       "not_checked": null,
@@ -109258,7 +111056,7 @@
     "branch_rows": [],
     "age_rows": [
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "1.6.2 · 2019-01-23 · 7.7 years ago"
      },
      {
@@ -110753,6 +112551,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4'"
       ],
+      "commands_label": "Command",
       "clears": "left-behind",
       "stays": null,
       "not_checked": "old-promise",
@@ -110893,7 +112692,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -112269,6 +114068,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'joomla/string:^3.0'"
       ],
+      "commands_label": "Command",
       "clears": "left-behind",
       "stays": null,
       "not_checked": null,
@@ -112394,7 +114194,7 @@
       "value": "2.0.1 · 2022-08-15 · 4.1 years ago · the newest on 2.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "4.0.0 · 2025-07-23 · 1.2 years ago"
      },
      {
@@ -113938,6 +115738,7 @@
       "commands": [
        "This command holds characters the page does not print."
       ],
+      "commands_label": "Command",
       "clears": "both advisories",
       "stays": null,
       "not_checked": null,
@@ -114055,7 +115856,7 @@
      },
      {
       "label": "2.x last",
-      "value": "v2.3.2 · 2026-06-08 · 0.3 years ago · its newest release"
+      "value": "v2.3.2 · 2026-06-08 · 0.3 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -114073,7 +115874,7 @@
     ],
     "why": [
      "8 · medium from 8 · 8 points short of high",
-     "vulnerable 8: medium advisory CVE-2026-47345, the worst of 2; its own fix (composer update on 2.x) is reachable: no × 2",
+     "vulnerable 8: medium advisory CVE-2026-47345, the worst of 2; its own fix (composer update on 2.x) is reachable, so no × 2",
      "the advisories alone make it medium",
      "without CVE-2026-47345: 2, low"
     ],
@@ -115416,6 +117217,7 @@
       "heading": "The move",
       "action": "Move it to ^3.0.0 through jfcherng/php-diff",
       "commands": [],
+      "commands_label": null,
       "clears": "old-promise",
       "stays": "stale",
       "not_checked": null,
@@ -115518,7 +117320,7 @@
       "value": "2.0.2 · 2020-05-27 · 6.3 years ago · the newest on 2.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "3.0.0 · 2021-05-27 · 5.3 years ago"
      },
      {
@@ -116688,6 +118490,7 @@
       "heading": "Next step",
       "action": "It has no tagged release to move to: review the snapshot, or replace it",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -116718,7 +118521,7 @@
     "branch_rows": [],
     "age_rows": [
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "4.0.5 · 2026-04-15 · 0.5 years ago"
      },
      {
@@ -117805,7 +119608,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "1.0.4 · 2021-03-05 · 5.6 years ago · its newest release"
+      "value": "1.0.4 · 2021-03-05 · 5.6 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -119942,6 +121745,7 @@
        "composer require 'php:>=8.2' --no-update",
        "composer require 'laravel/framework:^12.69.0'"
       ],
+      "commands_label": "Command",
       "clears": "all 6 advisories",
       "stays": null,
       "not_checked": null,
@@ -120268,7 +122072,7 @@
       "value": "v9.52.22 · 2026-08-12 · 0.1 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v11.57.0 · 2026-09-29 · less than three weeks ago"
      },
      {
@@ -120300,7 +122104,7 @@
     ],
     "why": [
      "16 · high from 16 · 16 points short of critical",
-     "vulnerable 16: high advisory PKSA-3r5d-mb8f-1qw9, the worst of 6 (tied with CVE-2024-52301); its own fix (php floor raise on 12.x) is reachable: no × 2",
+     "vulnerable 16: high advisory PKSA-3r5d-mb8f-1qw9, the worst of 6 (tied with CVE-2024-52301); its own fix (php floor raise on 12.x) is reachable, so no × 2",
      "the advisories alone make it high",
      "without PKSA-3r5d-mb8f-1qw9: 16, high (tied: the others weigh the same)",
      "composer update alone: 16, high (it clears 1 of its 6 advisories)"
@@ -123578,6 +125382,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'geoip2/geoip2:^3.4'"
       ],
+      "commands_label": "Command",
       "clears": "left-behind, old-promise and both advisories",
       "stays": null,
       "not_checked": null,
@@ -123807,7 +125612,7 @@
       "value": "v2.13.0 · 2022-08-05 · 4.2 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v3.4.0 · 2026-07-16 · 0.2 years ago"
      },
      {
@@ -123832,7 +125637,7 @@
      "36 · critical from 32",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 16: high advisory CVE-2026-00011, the worst of 2; its own fix (php floor raise on 3.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-00011, the worst of 2; its own fix (php floor raise on 3.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "maintenance (left-behind, 1 corroborating) alone grades it high, the advisories alone grade it high: together critical",
      "without left-behind: 32, critical (old-promise would lead) · without old-promise: 32, critical · without the advisories: 20, high · without CVE-2026-00011: 28, high",
@@ -125665,6 +127470,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4.52'"
       ],
+      "commands_label": "Command",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -125889,7 +127695,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -125917,7 +127723,7 @@
     ],
     "why": [
      "16 · high from 16 · 16 points short of critical",
-     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable, so no × 2",
      "the advisory alone makes it high",
      "left-behind accepted by your ignore list: counting it would make this 32, critical",
      "old-promise accepted by your ignore list: counting it would make this 32, critical"
@@ -127259,6 +129065,7 @@
       "heading": "Next step",
       "action": "lockrot did not read its releases (it is not installed from a Composer repository), so it names no move",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -127332,7 +129139,7 @@
      },
      {
       "label": null,
-      "value": "newest not read (not from a Composer repository)"
+      "value": "most recent not read (not from a Composer repository)"
      },
      {
       "label": null,
@@ -128524,6 +130331,7 @@
       "commands": [
        "composer require 'php:>=8.1' --no-update"
       ],
+      "commands_label": "Command",
       "clears": "left-behind",
       "stays": null,
       "not_checked": null,
@@ -128623,7 +130431,7 @@
       "value": "2.0.8 · 2022-12-07 · 3.8 years ago · the newest on 2.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v3.1.1 · 2026-04-05 · 0.5 years ago"
      },
      {
@@ -129965,6 +131773,7 @@
       "heading": "The move",
       "action": "Move it to the newest tag on its own line, v5.4.45, through mautic/core-lib",
       "commands": [],
+      "commands_label": null,
       "clears": "pinned",
       "stays": null,
       "not_checked": null,
@@ -130094,7 +131903,7 @@
       "value": "v5.4.45 · 2024-09-25 · 2.0 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v8.1.5 · 2026-08-21 · 0.1 years ago"
      },
      {
@@ -131470,6 +133279,7 @@
       "heading": "The move",
       "action": "Move it to the newest tag on its own line, v4.4.44, through mautic/core-lib; that tag is older than your snapshot: review it first, or replace the package",
       "commands": [],
+      "commands_label": null,
       "clears": "pinned",
       "stays": null,
       "not_checked": null,
@@ -131602,7 +133412,7 @@
       "value": "v4.4.44 · 2022-07-20 · 4.2 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v8.1.5 · 2026-08-21 · 0.1 years ago"
      },
      {
@@ -132977,6 +134787,7 @@
       "heading": "The move",
       "action": "Move it to the newest tag on its own line, v4.4.44, through mautic/core-lib",
       "commands": [],
+      "commands_label": null,
       "clears": "pinned",
       "stays": null,
       "not_checked": "left-behind, old-promise",
@@ -133104,7 +134915,7 @@
     ],
     "age_rows": [
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v8.1.5 · 2026-08-21 · 0.1 years ago"
      },
      {
@@ -134485,6 +136296,7 @@
       "commands": [
        "composer why-not web-auth/webauthn-lib 5.3.9"
       ],
+      "commands_label": "Check",
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -134574,7 +136386,7 @@
       "value": "v2.1.7 · 2019-09-04 · 7.1 years ago · the newest on 2.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "4.9.1 · 2024-07-11 · 2.2 years ago"
      },
      {
@@ -136258,6 +138070,7 @@
       "heading": "The move",
       "action": "Replace it with symfony/error-handler ↗, the replacement it names",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -136272,6 +138085,7 @@
       "commands": [
        "composer require 'symfony/debug:^4.4.0'"
       ],
+      "commands_label": "Command",
       "clears": "the advisory",
       "stays": "abandoned",
       "not_checked": "old-promise",
@@ -136401,7 +138215,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v4.4.44 · 2022-07-28 · 4.2 years ago"
      },
      {
@@ -136422,7 +138236,7 @@
      "68 · critical from 32",
      "abandoned 32 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside abandoned (correlated evidence)",
-     "vulnerable 32: critical advisory CVE-2026-00003; its own fix (upgrade on 4.x) is reachable: no × 2",
+     "vulnerable 32: critical advisory CVE-2026-00003; its own fix (upgrade on 4.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "critical twice over: each part alone makes it critical",
      "without abandoned: 50, critical (stale would show) · without old-promise: 64, critical · without the advisory: 36, critical"
@@ -137778,6 +139592,7 @@
       "heading": "Next step",
       "action": "No release fixes it",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -137826,7 +139641,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "v1.0.2 · 2023-03-27 · 3.5 years ago · its newest release"
+      "value": "v1.0.2 · 2023-03-27 · 3.5 years ago · its most recent release"
      },
      {
       "label": "last commit",
@@ -139193,6 +141008,7 @@
       "heading": "The move",
       "action": "Replace it with symfony/error-handler ↗, the replacement it names",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -139264,7 +141080,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v4.4.44 · 2022-07-28 · 4.2 years ago"
      },
      {
@@ -140628,6 +142444,7 @@
       "heading": "The move",
       "action": "Replace it with symfony/error-handler ↗, the replacement it names",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -140699,7 +142516,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v4.4.44 · 2022-07-28 · 4.2 years ago"
      },
      {
@@ -141811,7 +143628,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "v2.0.0 · 2025-07-07 · 1.2 years ago · its newest release"
+      "value": "v2.0.0 · 2025-07-07 · 1.2 years ago · its most recent release"
      },
      {
       "label": null,
@@ -143089,6 +144906,7 @@
       "heading": "Next step",
       "action": "Find a replacement; none is named",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -143165,7 +144983,7 @@
       "value": "1.17.05.02 · 2017-05-02 · 9.4 years ago · the newest on 1.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "2.17.08.29 · 2017-08-29 · 9.1 years ago"
      },
      {
@@ -144546,6 +146364,7 @@
       "heading": "Next step",
       "action": "Find a replacement; none is named",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -144622,7 +146441,7 @@
       "value": "1.17.05.02 · 2017-05-02 · 9.4 years ago · the newest on 1.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "2.17.08.29 · 2017-08-29 · 9.1 years ago"
      },
      {
@@ -145781,7 +147600,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "2.0.2 · 2024-09-05 · 2.1 years ago · its newest release"
+      "value": "2.0.2 · 2024-09-05 · 2.1 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -146994,6 +148813,7 @@
       "heading": "Next step",
       "action": "It has no recent release to move to",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -147055,7 +148875,7 @@
      },
      {
       "label": "2.x last",
-      "value": "2.2.0 · 2022-05-20 · 4.4 years ago · its newest release"
+      "value": "2.2.0 · 2022-05-20 · 4.4 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -148444,6 +150264,7 @@
       "heading": "Next step",
       "action": "Find a replacement; none is named",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -148515,7 +150336,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v4.4.44 · 2022-07-28 · 4.2 years ago"
      },
      {
@@ -149930,6 +151751,7 @@
       "commands": [
        "composer require 'symfony/debug:^4.4.44'"
       ],
+      "commands_label": "Command",
       "clears": "old-promise",
       "stays": "stale",
       "not_checked": null,
@@ -150024,7 +151846,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v4.4.44 · 2022-07-28 · 4.2 years ago"
      },
      {
@@ -151266,7 +153088,7 @@
      },
      {
       "label": "2.x last",
-      "value": "2.2.0 · 2022-05-20 · 4.4 years ago · its newest release"
+      "value": "2.2.0 · 2022-05-20 · 4.4 years ago · its most recent release"
      },
      {
       "label": "last push",
@@ -152664,6 +154486,7 @@
       "heading": "The move",
       "action": "Replace it with symfony/error-handler ↗, the replacement it names",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -152735,7 +154558,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v4.4.44 · 2022-07-28 · 4.2 years ago"
      },
      {
@@ -154111,6 +155934,7 @@
       "heading": "The move",
       "action": "Replace it with symfony/error-handler ↗, the replacement it names",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -154182,7 +156006,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v4.4.44 · 2022-07-28 · 4.2 years ago"
      },
      {
@@ -155466,7 +157290,7 @@
          "fix": {
           "kind": "raise-php",
           "to_branch": "3.x",
-          "version": null,
+          "version": "v3.27.0",
           "newest": "v3.30.0",
           "on_installed_branch": false,
           "php": ">=8.1.0",
@@ -155987,6 +157811,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
+      "commands_label": "Command",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -156091,7 +157916,7 @@
        "source": "PKSA-8zx5-v2nz-58pb",
        "deciding": false,
        "severity": "high",
-       "fix": "fix not known",
+       "fix": "fix v3.27.0 on 3.x (php floor raise)",
        "affects": "affects <=3.26.0",
        "ranges": null,
        "same_as": null
@@ -156338,7 +158163,7 @@
       "value": "v2.16.1 · 2024-09-09 · 2.1 years ago · the newest on 2.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v3.30.0 · 2026-09-25 · less than three weeks ago"
      },
      {
@@ -156357,7 +158182,7 @@
     ],
     "why": [
      "32 · critical from 32",
-     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (php floor raise on 3.x) is reachable: no × 2",
+     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (php floor raise on 3.x) is reachable, so no × 2",
      "the advisories alone make it critical",
      "without CVE-2026-46633: 16, high"
     ],
@@ -157597,7 +159422,7 @@
      },
      {
       "label": null,
-      "value": "newest not read (not from a Composer repository)"
+      "value": "most recent not read (not from a Composer repository)"
      },
      {
       "label": null,
@@ -158636,7 +160461,7 @@
       "value": "1.5.14 · 2026-08-21 · 0.1 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "1.4.15 · 2026-08-21 · 0.1 years ago"
      },
      {
@@ -159633,7 +161458,7 @@
       "value": "1.5.14 · 2026-08-21 · 0.1 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "1.4.15 · 2026-08-21 · 0.1 years ago"
      },
      {
@@ -162481,6 +164306,7 @@
       "heading": "Next step",
       "action": "It is installed from a local path, your own package, so lockrot names no move",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -162590,7 +164416,7 @@
      },
      {
       "label": null,
-      "value": "newest not read (not from a Composer repository)"
+      "value": "most recent not read (not from a Composer repository)"
      },
      {
       "label": null,
@@ -172695,7 +174521,7 @@
      },
      {
       "label": null,
-      "value": "newest not read (origin unknown)"
+      "value": "most recent not read (origin unknown)"
      },
      {
       "label": null,
@@ -173770,7 +175596,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "v2.0.0 · 2025-07-07 · 1.2 years ago · its newest release"
+      "value": "v2.0.0 · 2025-07-07 · 1.2 years ago · its most recent release"
      },
      {
       "label": null,
@@ -174799,7 +176625,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "v2.0.0 · 2025-07-07 · 1.2 years ago · its newest release"
+      "value": "v2.0.0 · 2025-07-07 · 1.2 years ago · its most recent release"
      },
      {
       "label": null,
@@ -175808,7 +177634,7 @@
       "value": "1.5.14 · 2026-08-21 · 0.1 years ago"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "1.4.15 · 2026-08-21 · 0.1 years ago"
      },
      {
@@ -176925,6 +178751,7 @@
       "heading": "Next step",
       "action": "lockrot did not read its releases (it is not installed from a Composer repository), so it names no move: review the snapshot",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -176960,7 +178787,7 @@
      },
      {
       "label": null,
-      "value": "newest not read (not from a Composer repository)"
+      "value": "most recent not read (not from a Composer repository)"
      },
      {
       "label": null,
@@ -178343,6 +180170,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4'"
       ],
+      "commands_label": "Command",
       "clears": "left-behind",
       "stays": null,
       "not_checked": "old-promise",
@@ -178483,7 +180311,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -180240,6 +182068,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4.52'"
       ],
+      "commands_label": "Command",
       "clears": "all three",
       "stays": null,
       "not_checked": null,
@@ -180464,7 +182293,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -180494,7 +182323,7 @@
      "36 · critical from 32",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "maintenance (left-behind, 1 corroborating) alone grades it high, the advisory alone grades it high: together critical",
      "without left-behind: 32, critical (old-promise would lead) · without old-promise: 32, critical · without the advisory: 20, high"
@@ -182233,6 +184062,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4.52'"
       ],
+      "commands_label": "Command",
       "clears": "all three",
       "stays": null,
       "not_checked": null,
@@ -182457,7 +184287,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -182487,7 +184317,7 @@
      "36 · critical from 32",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "maintenance (left-behind, 1 corroborating) alone grades it high, the advisory alone grades it high: together critical",
      "without left-behind: 32, critical (old-promise would lead) · without old-promise: 32, critical · without the advisory: 20, high"
@@ -184320,6 +186150,7 @@
       "heading": "The move",
       "action": "Move it to ^5.4 through the 34 packages in Reach",
       "commands": [],
+      "commands_label": null,
       "clears": "left-behind",
       "stays": null,
       "not_checked": null,
@@ -184464,7 +186295,7 @@
       "value": "v4.4.47 · 2022-10-03 · 4.0 years ago · the newest on 4.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v8.1.7 · 2026-09-03 · 0.1 years ago"
      },
      {
@@ -186559,6 +188390,7 @@
       "heading": "The move",
       "action": "Replace it with symfony/error-handler ↗, the replacement it names",
       "commands": [],
+      "commands_label": null,
       "clears": null,
       "stays": null,
       "not_checked": null,
@@ -186635,7 +188467,7 @@
       "value": "v3.4.47 · 2020-10-24 · 5.9 years ago · the newest on 3.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v4.4.44 · 2022-07-28 · 4.2 years ago"
      },
      {
@@ -188340,6 +190172,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4.52'"
       ],
+      "commands_label": "Command",
       "clears": "all three",
       "stays": null,
       "not_checked": null,
@@ -188564,7 +190397,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -188594,7 +190427,7 @@
      "36 · critical from 32",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "maintenance (left-behind, 1 corroborating) alone grades it high, the advisory alone grades it high: together critical",
      "without left-behind: 32, critical (old-promise would lead) · without old-promise: 32, critical · without the advisory: 20, high"
@@ -189949,7 +191782,7 @@
          "fix": {
           "kind": "raise-php",
           "to_branch": "3.x",
-          "version": null,
+          "version": "v3.27.0",
           "newest": "v3.30.0",
           "on_installed_branch": false,
           "php": ">=8.1.0",
@@ -190992,6 +192825,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
+      "commands_label": "Command",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -191117,7 +192951,7 @@
        "source": "PKSA-8zx5-v2nz-58pb",
        "deciding": false,
        "severity": "high",
-       "fix": "fix not known",
+       "fix": "fix v3.27.0 on 3.x (php floor raise)",
        "affects": "affects <=3.26.0",
        "ranges": null,
        "same_as": null
@@ -191364,7 +193198,7 @@
       "value": "v2.16.1 · 2024-09-09 · 2.1 years ago · the newest on 2.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v3.30.0 · 2026-09-25 · less than three weeks ago"
      },
      {
@@ -191383,7 +193217,7 @@
     ],
     "why": [
      "32 · critical from 32",
-     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (php floor raise on 3.x) is reachable: no × 2",
+     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (php floor raise on 3.x) is reachable, so no × 2",
      "the advisories alone make it critical",
      "without CVE-2026-46633: 16, high"
     ],
@@ -193338,6 +195172,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4.52'"
       ],
+      "commands_label": "Command",
       "clears": "all three",
       "stays": null,
       "not_checked": null,
@@ -193562,7 +195397,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -193592,7 +195427,7 @@
      "36 · critical from 32",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "maintenance (left-behind, 1 corroborating) alone grades it high, the advisory alone grades it high: together critical",
      "without left-behind: 32, critical (old-promise would lead) · without old-promise: 32, critical · without the advisory: 20, high"
@@ -195330,6 +197165,7 @@
       "commands": [
        "composer require 'symfony/monolog-bridge:^5.4.52'"
       ],
+      "commands_label": "Command",
       "clears": "all three",
       "stays": null,
       "not_checked": null,
@@ -195554,7 +197390,7 @@
       "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v6.4.45 · 2026-08-30 · 0.1 years ago"
      },
      {
@@ -195584,7 +197420,7 @@
      "36 · critical from 32",
      "left-behind 16 leads: the strongest maintenance fact counts in full",
      "old-promise 4: ¼ of 16, beside left-behind (correlated evidence)",
-     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable: no × 2",
+     "vulnerable 16: high advisory CVE-2026-45077; its own fix (upgrade on 5.x) is reachable, so no × 2",
      "direct requirement: maintenance not halved for reach",
      "maintenance (left-behind, 1 corroborating) alone grades it high, the advisory alone grades it high: together critical",
      "without left-behind: 32, critical (old-promise would lead) · without old-promise: 32, critical · without the advisory: 20, high"
@@ -196939,7 +198775,7 @@
          "fix": {
           "kind": "raise-php",
           "to_branch": "3.x",
-          "version": null,
+          "version": "v3.27.0",
           "newest": "v3.30.0",
           "on_installed_branch": false,
           "php": ">=8.1.0",
@@ -197970,6 +199806,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
+      "commands_label": "Command",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -198095,7 +199932,7 @@
        "source": "PKSA-8zx5-v2nz-58pb",
        "deciding": false,
        "severity": "high",
-       "fix": "fix not known",
+       "fix": "fix v3.27.0 on 3.x (php floor raise)",
        "affects": "affects <=3.26.0",
        "ranges": null,
        "same_as": null
@@ -198342,7 +200179,7 @@
       "value": "v2.16.1 · 2024-09-09 · 2.1 years ago · the newest on 2.x"
      },
      {
-      "label": "newest",
+      "label": "most recent",
       "value": "v3.30.0 · 2026-09-25 · less than three weeks ago"
      },
      {
@@ -198361,7 +200198,7 @@
     ],
     "why": [
      "32 · critical from 32",
-     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (php floor raise on 3.x) is reachable: no × 2",
+     "vulnerable 32: critical advisory CVE-2026-46633, the worst of 15; its own fix (php floor raise on 3.x) is reachable, so no × 2",
      "the advisories alone make it critical",
      "without CVE-2026-46633: 16, high"
     ],

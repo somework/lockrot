@@ -338,6 +338,16 @@
             "argv": [
                 "composer",
                 "update",
+                "laravel/framework"
+            ],
+            "posix": "composer update laravel/framework",
+            "cmd": "composer update laravel/framework",
+            "powershell": "composer --% update laravel/framework"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
                 "league/commonmark"
             ],
             "posix": "composer update league/commonmark",

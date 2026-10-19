@@ -20,10 +20,7 @@ final class MoveContractTest extends TestCase
 {
     private const VERSION = 'the model leaves `version` null on a move whose constraint comes from S8 : lockrot names the lowest admitted release';
     private const DATED = 'the model dates a branch by its newest release only : a lower release leaves old-promise unverified, where lockrot dates it';
-    private const BY_POSITION = 'the model classes a higher branch `upgrade` by its position : no link of the inputs excludes the release, so lockrot classes it `update`';
     private const TIE = 'the model removes S5 from the case to make the tie : the installed release is older than PHP 8.0, so lockrot raises S5 and the move differs';
-    private const S9_VERSION = 'the model leaves this S9 `fix.version` null : SPEC §5.3 names the lowest release that fixes the advisory, and lockrot writes it and the links that hold it';
-    private const LOWEST = 'the model names a row\'s `lowest` only when an S9 fix names it : lockrot names the row\'s candidate (P2b)';
 
     /**
      * The fields of a hydrated finding that differ from the case's, each list with its reason. Every
@@ -33,13 +30,11 @@ final class MoveContractTest extends TestCase
      * packages' findings.
      */
     private const DIFFERENCES = [
-        'psr7' => [[['version'], self::VERSION], [['rows.lowest'], self::LOWEST]],
-        'flysystem' => [[['s9.version', 's9.held_by'], self::S9_VERSION]],
+        'psr7' => [[['version'], self::VERSION]],
         'unreached-move' => [[['version'], self::VERSION]],
         'many-dependents' => [[['version'], self::VERSION]],
         'pagerfanta' => [[['version'], self::VERSION]],
-        'B-also‡' => [[['also'], self::DATED], [['rows.lowest'], self::LOWEST], [['rows.if_applied'], self::DATED]],
-        'A-php-star‡' => [[['s9.version', 's9.held_by'], self::S9_VERSION]],
+        'B-also‡' => [[['also'], self::DATED], [['rows.if_applied'], self::DATED]],
         'tie‡' => [[['version', 'unverified', 'if_applied', 'also'], self::TIE]],
         'B-offline‡' => [[['version'], self::VERSION]],
         'holder-vuln‡' => [[['version'], self::VERSION]],
@@ -47,16 +42,6 @@ final class MoveContractTest extends TestCase
         'unreached-dev‡' => [[['version'], self::VERSION]],
         'B-offline-high‡' => [[['version'], self::VERSION]],
         'require-dev-name‡' => [[['version'], self::VERSION]],
-        'A' => [[['s9.version'], self::S9_VERSION]],
-        'twig-1' => [[['s9.version', 's9.held_by'], self::S9_VERSION]],
-        'xmlseclibs' => [[['rows.fix_kind'], self::BY_POSITION], [['rows.lowest'], self::LOWEST], [['s9.version'], self::S9_VERSION]],
-        'commonmark' => [[['s9.version'], self::S9_VERSION]],
-        'A-blocked‡' => [[['s9.version'], self::S9_VERSION]],
-        'A-baselined‡' => [[['s9.version'], self::S9_VERSION]],
-        'twig-dev‡' => [[['s9.version'], self::S9_VERSION]],
-        'feeds-drupal‡' => [[['s9.version'], self::S9_VERSION]],
-        'A-gate-vulnerable' => [[['s9.version'], self::S9_VERSION]],
-        'A-gate-critical' => [[['s9.version'], self::S9_VERSION]],
     ];
 
     private const NO_SCORE_AFTER = ['replace', 'find-alternative', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'];

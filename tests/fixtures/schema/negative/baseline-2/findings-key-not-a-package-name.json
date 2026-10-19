@@ -208,7 +208,7 @@
     "PKSA-4wjj-gy1p-ft3r": {
      "known_since": "2026-10-01",
      "severity": "high",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     }
    }
   },
@@ -363,7 +363,7 @@
     "PKSA-4wjj-gy1p-ft3r": {
      "known_since": "2026-10-01",
      "severity": "high",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     }
    }
   }

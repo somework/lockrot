@@ -615,7 +615,7 @@
      "unknown": 0,
      "of": 1,
      "fix_kind": "raise-php",
-     "lowest": null,
+     "lowest": "v8.1.6",
      "newest": "v8.1.6",
      "held_by": [
       {
@@ -665,7 +665,7 @@
      "unknown": 0,
      "of": 1,
      "fix_kind": "raise-php",
-     "lowest": null,
+     "lowest": "v7.4.18",
      "newest": "v7.4.18",
      "held_by": [
       {
@@ -715,7 +715,7 @@
      "unknown": 0,
      "of": 1,
      "fix_kind": "raise-php",
-     "lowest": null,
+     "lowest": "v6.4.45",
      "newest": "v6.4.45",
      "held_by": [
       {
@@ -765,7 +765,7 @@
      "unknown": 0,
      "of": 1,
      "fix_kind": "upgrade",
-     "lowest": null,
+     "lowest": "v5.4.0",
      "newest": "v5.4.52",
      "held_by": [
       {
@@ -815,7 +815,7 @@
      "unknown": 0,
      "of": 1,
      "fix_kind": "upgrade",
-     "lowest": null,
+     "lowest": "v4.4.43",
      "newest": "v4.4.43",
      "held_by": [
       {
@@ -865,7 +865,7 @@
      "unknown": 0,
      "of": 1,
      "fix_kind": "upgrade",
-     "lowest": null,
+     "lowest": "v3.4.47",
      "newest": "v3.4.47",
      "held_by": [
       {

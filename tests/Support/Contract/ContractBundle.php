@@ -28,8 +28,10 @@ use Lockrot\Version;
 final class ContractBundle
 {
     public const DIRECTORY = __DIR__.'/../../fixtures/contract';
-    /** The files of DIRECTORY that no recording writes: the recorder's own, a table of PhpFloorTest, and the model's page goldens (PageGoldensTest). */
+    /** The files of DIRECTORY that record() does not write: the recorder's own, a table of PhpFloorTest, and the model's page goldens (PageGoldensTest). */
     public const NOT_RECORDED = ['bundle_sha256', 'provenance.json', 'en/php-versions.json', 'page-goldens.json'];
+    /** The directory of DIRECTORY that holds the {@see EnginePage} cases, which tools/report/record --engine-pages writes. */
+    public const ENGINE_PAGES = 'page/';
     private const FIXTURES = __DIR__.'/../../fixtures/';
 
     /** The text formats, by the suffix of the file each one is written to below `text/`. */
@@ -350,7 +352,8 @@ final class ContractBundle
             if (!\array_key_exists($key, $model)) {
                 continue;
             }
-            if (self::inputsOf($theirs, $inputs) !== self::inputsOf($ours, $inputs)) {
+            $package = JsonPath::stringAt($case, ['finding', 'package']);
+            if (self::inputsOf($theirs, $inputs, $package) !== self::inputsOf($ours, $inputs, $package)) {
                 $this->skipped[$key] = ($this->skipped[$key] ?? 0) + 1;
                 continue;
             }
@@ -363,6 +366,26 @@ final class ContractBundle
     }
 
     /**
+     * The finding of $package in a report-2 document: a case document holds the case finding, alone
+     * or with the findings that I25 needs.
+     *
+     * @param array<mixed, mixed> $document
+     *
+     * @return array<mixed, mixed>
+     *
+     * @throws \UnexpectedValueException when the document holds no finding of $package
+     */
+    public static function findingOf(array $document, string $package): array
+    {
+        foreach (JsonPath::arrayAt($document, ['findings']) as $finding) {
+            if (\is_array($finding) && ($finding['package'] ?? null) === $package) {
+                return $finding;
+            }
+        }
+        throw new \UnexpectedValueException('the document holds no finding of '.$package);
+    }
+
+    /**
      * The fields of $document that the string of $inputs renders from, every `text` key left out:
      * the root for the run's gate line, else the case's finding with `run`.
      *
@@ -370,10 +393,10 @@ final class ContractBundle
      *
      * @return array<mixed, mixed>
      */
-    private static function inputsOf(array $document, string $inputs): array
+    private static function inputsOf(array $document, string $inputs, string $package): array
     {
         $paths = $inputs === 'commands' ? self::COMMANDS : ReferenceText::INPUTS[$inputs];
-        $fields = $inputs === 'gate.text' ? $document : JsonPath::arrayAt($document, ['findings', 0]) + ['run' => JsonPath::arrayAt($document, ['run'])];
+        $fields = $inputs === 'gate.text' ? $document : self::findingOf($document, $package) + ['run' => JsonPath::arrayAt($document, ['run'])];
         $kept = self::withoutText(Fields::only($fields, $paths));
 
         return \is_array($kept) ? $kept : [];

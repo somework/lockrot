@@ -1436,11 +1436,57 @@
         "fix": {
          "kind": "upgrade",
          "to_branch": "3.x",
-         "version": null,
+         "version": "3.36.0",
          "newest": "3.36.0",
          "on_installed_branch": false,
          "php": "^8.0.2",
-         "held_by": [],
+         "held_by": [
+          {
+           "source": "package",
+           "package": "barryvdh/elfinder-flysystem-driver",
+           "version": "v0.2.1",
+           "link": "require",
+           "target": null,
+           "constraint": "^1.0",
+           "holder": {
+            "verdict": "medium",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "0.6.x",
+             "constraint": "^0.6.0",
+             "check": null
+            }
+           }
+          },
+          {
+           "source": "package",
+           "package": "league/flysystem-cached-adapter",
+           "version": "1.1.0",
+           "link": "require",
+           "target": null,
+           "constraint": "~1.0",
+           "holder": {
+            "verdict": "low",
+            "lead": "stale",
+            "flag_ids": [
+             "stale"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "no-move",
+             "to_branch": null,
+             "constraint": null,
+             "check": null
+            }
+           }
+          }
+         ],
          "reason": null
         },
         "baseline": null

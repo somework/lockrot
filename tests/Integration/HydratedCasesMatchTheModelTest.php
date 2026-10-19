@@ -141,11 +141,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
      * @var array<string, array<string, list<array{list<string>, string}>>>
      */
     private const DIFFERENCES = [
-        'A' => [
-            'security' => [
-                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
-            ],
-        ],
         'F' => [
             'age_rows' => [
                 [['age.installed_unmeasured'], self::INSTALLED_COMMIT],
@@ -154,31 +149,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'psr7' => [
             'moves' => [
                 [['next_step.version'], self::MOVE_VERSION],
-            ],
-            'security' => [
-                [['details.metadata.branches[].fixes.lowest'], self::LOWEST],
-            ],
-        ],
-        'twig-1' => [
-            'security' => [
-                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
-            ],
-        ],
-        'xmlseclibs' => [
-            'security' => [
-                [['details.metadata.branches[].fixes.fix_kind'], self::BY_POSITION],
-                [['details.metadata.branches[].fixes.lowest'], self::LOWEST],
-                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
-            ],
-        ],
-        'flysystem' => [
-            'security' => [
-                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
-            ],
-        ],
-        'commonmark' => [
-            'security' => [
-                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
             ],
         ],
         'unreached-move' => [
@@ -191,29 +161,9 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version'], self::MOVE_VERSION],
             ],
         ],
-        'ok-unchecked' => [
-            'qualifiers' => [
-                [['checks_missing[].blocks', 'gate.by[].facts[].id', 'gate.by[].facts[].kind'], self::NO_HIGHER_BRANCH],
-            ],
-            'why' => [
-                [['checks_missing[].blocks'], self::NO_HIGHER_BRANCH],
-            ],
-            'checks' => [
-                [['checks_missing[].blocks'], self::NO_HIGHER_BRANCH],
-            ],
-        ],
         'pagerfanta' => [
             'moves' => [
                 [['next_step.version'], self::MOVE_VERSION],
-            ],
-            'qualifiers' => [
-                [['checks_missing[].blocks'], self::UNDATED_BLOCKS],
-            ],
-            'why' => [
-                [['checks_missing[].blocks'], self::UNDATED_BLOCKS],
-            ],
-            'checks' => [
-                [['checks_missing[].blocks'], self::UNDATED_BLOCKS],
             ],
         ],
         'replace-graded' => [
@@ -226,7 +176,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.also[].version'], self::MOVE_VERSION],
             ],
             'security' => [
-                [['details.metadata.branches[].fixes.lowest'], self::LOWEST],
                 [['details.metadata.branches[].fixes.if_applied.at_most', 'details.metadata.branches[].fixes.if_applied.total', 'details.metadata.branches[].fixes.if_applied.verdict'], self::IF_APPLIED],
             ],
         ],
@@ -240,22 +189,9 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['age.installed_unmeasured'], self::INSTALLED_COMMIT],
             ],
         ],
-        'A-blocked‡' => [
-            'security' => [
-                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
-            ],
-        ],
         'A-php-star‡' => [
             'held_by' => [
                 [['next_step.held_by[].holder.next_step.constraint', 'next_step.held_by[].holder.next_step.to_branch'], self::PHP_STAR],
-            ],
-            'security' => [
-                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
-            ],
-        ],
-        'A-baselined‡' => [
-            'security' => [
-                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
             ],
         ],
         'tie‡' => [
@@ -282,11 +218,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             ],
             'checks' => [
                 [['signals[].id'], self::TIE],
-            ],
-        ],
-        'twig-dev‡' => [
-            'security' => [
-                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
             ],
         ],
         'B-offline‡' => [
@@ -335,11 +266,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['signals[].id'], self::BITBUCKET],
             ],
         ],
-        'feeds-drupal‡' => [
-            'security' => [
-                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
-            ],
-        ],
         'B-offline-high‡' => [
             'moves' => [
                 [['next_step.version'], self::MOVE_VERSION],
@@ -350,37 +276,17 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version'], self::MOVE_VERSION],
             ],
         ],
-        'A-gate-vulnerable' => [
-            'security' => [
-                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
-            ],
-        ],
-        'A-gate-critical' => [
-            'security' => [
-                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
-            ],
-        ],
     ];
 
     private const MOVE_VERSION = 'The model names a move\'s `version` from the advisory ranges, because the reports carry only each branch\'s newest tag. lockrot names the release of the move\'s row (P2b). The move card prints `newest` and reads `version` only when `newest` is null.';
 
-    private const FIX_VERSION = 'The model reads an advisory\'s fix version from its affected range, because the reports carry only each branch\'s newest tag. lockrot reads every release of the branch and names its lowest release outside the range.';
-
     private const PHP_STAR = 'The case sets the project\'s require.php to `*` (‡). The model keeps the holder\'s own step of case A, and lockrot judges the holder under the case\'s require.php, which admits its newest line.';
-
-    private const UNDATED_BLOCKS = 'The model lists S2 and S8 in the blocks of `release_dates` whenever the highest tag is undated. lockrot lists S8 only when an undated release leaves S8 undecided, and S8 fires on this case from dated releases.';
-
-    private const NO_HIGHER_BRANCH = 'The model lists S2 and S8 in the blocks of `release_dates` whenever the highest tag is undated. S8 compares the installed branch with a higher one, and this case has no branch above the installed one, so lockrot lists S2 alone.';
 
     private const INSTALLED_COMMIT = 'The model holds the date of a shared commit only for a branch\'s highest tag, so the hydrated lock gives the installed tag no date. lockrot then reads it as undated, not as dated by a commit its tags share.';
 
     private const BITBUCKET = 'The model marks the repository archived on Bitbucket (S3). Bitbucket\'s repository API has no archived field, so lockrot cannot raise S3 for a Bitbucket repository, and each later signal moves up one place.';
 
     private const TIE = 'The model removes S5 from the case to make the tie. The installed release requires php >=5.3.3 and is older than the PHP 8.0 release, so lockrot raises S5 (old-promise).';
-
-    private const LOWEST = 'The model names a row\'s `fixes.lowest` only when an S9 fix names it. lockrot names the row\'s candidate (P2b).';
-
-    private const BY_POSITION = 'The model classes a branch above the installed one `upgrade` by its position. No link of the hydrated lock holds the package to its installed major, so lockrot classes the row `update` (§5.3).';
 
     private const IF_APPLIED = 'The score after a move to the row follows its `fixes.lowest`. The model judges the row\'s newest tag as an upper bound, and lockrot judges its candidate exactly.';
 

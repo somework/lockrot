@@ -737,7 +737,7 @@ final class SarifFormatterTest extends TestCase
 
         self::assertTrue($failing['executionSuccessful']);
         self::assertSame(1, $failing['exitCode']);
-        self::assertSame('gate: fails · --fail-on=high · 5 findings fail it · target php 8.4 (--target-php)', $failing['exitCodeDescription']);
+        self::assertSame('gate: fails · --fail-on=high · 6 findings fail it · target php 8.4 (--target-php)', $failing['exitCodeDescription']);
         self::assertSame('high', JsonPath::stringAt($failing, ['properties', 'fail_on']));
         self::assertTrue(JsonPath::arrayAt($failing, ['properties', 'gate'])['fails']);
         self::assertSame(0, $passing['exitCode']);
@@ -751,7 +751,7 @@ final class SarifFormatterTest extends TestCase
         self::assertSame(2, $properties['lockrot_schema']);
         self::assertSame(1, $properties['score_text_grammar']);
         self::assertSame(1, $properties['score_model_id']);
-        self::assertSame(7, JsonPath::arrayAt($properties, ['advisory_lookup'])['packages_asked']);
+        self::assertSame(9, JsonPath::arrayAt($properties, ['advisory_lookup'])['packages_asked']);
     }
 
     public function testAnAdvisoryRuleCarriesItsSecuritySeverity(): void

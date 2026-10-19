@@ -10,6 +10,130 @@
                     "informationUri": "https://github.com/somework/lockrot",
                     "rules": [
                         {
+                            "id": "lockrot/pinned",
+                            "name": "pinned",
+                            "shortDescription": {
+                                "text": "pinned: Installed version is a branch snapshot, or the package has no stable release"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version is a branch snapshot (dev-* or #hash), or the package has no stable release at all."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-j4xy-fb9q-x9h7",
+                            "name": "advisory/PKSA-j4xy-fb9q-x9h7",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-j4xy-fb9q-x9h7 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-81ww-1p5d-6c6k",
+                            "name": "advisory/PKSA-81ww-1p5d-6c6k",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-81ww-1p5d-6c6k affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-bxhd-1cmh-djg9",
+                            "name": "advisory/PKSA-bxhd-1cmh-djg9",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-bxhd-1cmh-djg9 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-krjy-6tb4-skgg",
+                            "name": "advisory/PKSA-krjy-6tb4-skgg",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-krjy-6tb4-skgg affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-ydwx-2n98-5dyf",
+                            "name": "advisory/PKSA-ydwx-2n98-5dyf",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-ydwx-2n98-5dyf affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
                             "id": "lockrot/old-promise",
                             "name": "old-promise",
                             "shortDescription": {
@@ -81,8 +205,421 @@
             },
             "results": [
                 {
-                    "ruleId": "lockrot/old-promise",
+                    "ruleId": "lockrot/pinned",
                     "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "mautic/core-lib 4.3.x-dev \u2014 finding critical, 32 = pinned 16 + vulnerable 16 [high advisory] \u2014 pinned: pinned to branch snapshot 4.3.x-dev. Do: no move: it is installed from a local path (your own package)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "mautic/core-lib"
+                    },
+                    "properties": {
+                        "package": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "pinned",
+                        "score_total": 32,
+                        "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "pinned",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": null,
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "mautic/core-lib"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "mautic/core-lib"
+                        ],
+                        "signal_ids": [
+                            "S6",
+                            "S7",
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": null,
+                            "installed_unmeasured": "branch_snapshot",
+                            "release": null,
+                            "release_unmeasured": "not_from_composer_repository",
+                            "branch_release": null,
+                            "branch_release_unmeasured": "not_from_composer_repository",
+                            "push": null,
+                            "push_unmeasured": "not_from_composer_repository"
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "pinned",
+                            "role": "lead",
+                            "weight": 16,
+                            "divisor": 1,
+                            "points": 16,
+                            "contribution": 16
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 28
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-j4xy-fb9q-x9h7",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "mautic/core-lib 4.3.x-dev is affected by CVE-2022-25768 (high advisory): Mautic vulnerable to Improper Access Control in UI upgrade process."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "mautic/core-lib",
+                        "lockrot/advisory": "PKSA-j4xy-fb9q-x9h7"
+                    },
+                    "properties": {
+                        "package": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "pinned",
+                        "score_total": 32,
+                        "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "pinned",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": null,
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "mautic/core-lib"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "mautic/core-lib"
+                        ],
+                        "signal_ids": [
+                            "S6",
+                            "S7",
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": null,
+                            "installed_unmeasured": "branch_snapshot",
+                            "release": null,
+                            "release_unmeasured": "not_from_composer_repository",
+                            "branch_release": null,
+                            "branch_release_unmeasured": "not_from_composer_repository",
+                            "push": null,
+                            "push_unmeasured": "not_from_composer_repository"
+                        },
+                        "advisory": "PKSA-j4xy-fb9q-x9h7",
+                        "cve": "CVE-2022-25768",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "unknown",
+                            "to_branch": null,
+                            "version": null,
+                            "newest": null,
+                            "on_installed_branch": null,
+                            "php": null,
+                            "held_by": [],
+                            "reason": "not_from_composer_repository"
+                        },
+                        "points": 16,
+                        "deciding": true,
+                        "term": {
+                            "part": "security",
+                            "flag": "vulnerable",
+                            "role": "security",
+                            "advisory": "PKSA-j4xy-fb9q-x9h7",
+                            "severity": "high",
+                            "fix_kind": "unknown",
+                            "weight": 16,
+                            "multiplier": 1,
+                            "points": 16,
+                            "contribution": 16
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 28
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-81ww-1p5d-6c6k",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "mautic/core-lib 4.3.x-dev is affected by CVE-2024-47058 (medium advisory): Mautic vulnerable to Cross-site Scripting (XSS) - stored (edit form HTML field)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "mautic/core-lib",
+                        "lockrot/advisory": "PKSA-81ww-1p5d-6c6k"
+                    },
+                    "properties": {
+                        "package": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "pinned",
+                        "score_total": 32,
+                        "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "pinned",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": null,
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-81ww-1p5d-6c6k",
+                        "cve": "CVE-2024-47058",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "unknown",
+                            "to_branch": null,
+                            "version": null,
+                            "newest": null,
+                            "on_installed_branch": null,
+                            "php": null,
+                            "held_by": [],
+                            "reason": "not_from_composer_repository"
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 28
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-bxhd-1cmh-djg9",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "mautic/core-lib 4.3.x-dev is affected by CVE-2024-47050 (medium advisory): Mautic vulnerable to XSS in contact/company tracking (no authentication)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "mautic/core-lib",
+                        "lockrot/advisory": "PKSA-bxhd-1cmh-djg9"
+                    },
+                    "properties": {
+                        "package": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "pinned",
+                        "score_total": 32,
+                        "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "pinned",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": null,
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-bxhd-1cmh-djg9",
+                        "cve": "CVE-2024-47050",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "unknown",
+                            "to_branch": null,
+                            "version": null,
+                            "newest": null,
+                            "on_installed_branch": null,
+                            "php": null,
+                            "held_by": [],
+                            "reason": "not_from_composer_repository"
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 28
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-krjy-6tb4-skgg",
+                    "ruleIndex": 4,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "mautic/core-lib 4.3.x-dev is affected by CVE-2021-27917 (medium advisory): Mautic has an XSS in contact tracking and page hits report."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "mautic/core-lib",
+                        "lockrot/advisory": "PKSA-krjy-6tb4-skgg"
+                    },
+                    "properties": {
+                        "package": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "pinned",
+                        "score_total": 32,
+                        "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "pinned",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": null,
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-krjy-6tb4-skgg",
+                        "cve": "CVE-2021-27917",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "unknown",
+                            "to_branch": null,
+                            "version": null,
+                            "newest": null,
+                            "on_installed_branch": null,
+                            "php": null,
+                            "held_by": [],
+                            "reason": "not_from_composer_repository"
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 28
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-ydwx-2n98-5dyf",
+                    "ruleIndex": 5,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "mautic/core-lib 4.3.x-dev is affected by CVE-2022-25770 (medium advisory): Mautic has insufficient authentication in upgrade flow."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "mautic/core-lib",
+                        "lockrot/advisory": "PKSA-ydwx-2n98-5dyf"
+                    },
+                    "properties": {
+                        "package": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "pinned",
+                        "score_total": 32,
+                        "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "pinned",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": null,
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-ydwx-2n98-5dyf",
+                        "cve": "CVE-2022-25770",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "unknown",
+                            "to_branch": null,
+                            "version": null,
+                            "newest": null,
+                            "on_installed_branch": null,
+                            "php": null,
+                            "held_by": [],
+                            "reason": "not_from_composer_repository"
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 28
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/old-promise",
+                    "ruleIndex": 6,
                     "level": "error",
                     "rank": 50.0,
                     "message": {
@@ -174,7 +711,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 35
+                                    "startLine": 40
                                 }
                             }
                         }
@@ -182,7 +719,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-pr5h-1dpm-9x4k",
-                    "ruleIndex": 1,
+                    "ruleIndex": 7,
                     "level": "error",
                     "rank": 80.0,
                     "message": {
@@ -293,7 +830,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 35
+                                    "startLine": 40
                                 }
                             }
                         }
@@ -301,7 +838,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-pcdf-qvqm-w4tv",
-                    "ruleIndex": 2,
+                    "ruleIndex": 8,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -353,7 +890,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 35
+                                    "startLine": 40
                                 }
                             }
                         }
@@ -364,7 +901,7 @@
                 {
                     "executionSuccessful": true,
                     "exitCode": 1,
-                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 2 findings fail it \u00b7 target php 8.4 (--target-php)",
                     "properties": {
                         "gate": {
                             "fails": true,
@@ -372,19 +909,19 @@
                                 "fail_on"
                             ],
                             "fail_on_applied": true,
-                            "reaching": 1,
-                            "failing": 1,
+                            "reaching": 2,
+                            "failing": 2,
                             "exempt": {
                                 "baseline": 0
                             },
                             "failing_by": [
                                 {
                                     "value": "high",
-                                    "failing": 1
+                                    "failing": 2
                                 }
                             ],
                             "not_applied": [],
-                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 2 findings fail it \u00b7 target php 8.4 (--target-php)"
                         },
                         "fail_on": "high",
                         "fail_on_source": "option",
@@ -417,7 +954,7 @@
                 "advisory_lookup": {
                     "scope": "all",
                     "scope_source": "default",
-                    "packages_asked": 1,
+                    "packages_asked": 2,
                     "packages_not_asked": 0,
                     "other_repositories": 0,
                     "repositories": [
@@ -427,8 +964,8 @@
                             "outcome": "answered",
                             "reason": null,
                             "message": null,
-                            "packages_with_records": 1,
-                            "records": 4
+                            "packages_with_records": 2,
+                            "records": 9
                         }
                     ]
                 }

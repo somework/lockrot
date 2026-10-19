@@ -271,7 +271,7 @@
     "PKSA-hr4y-jwk2-1yb9": {
      "known_since": "2026-10-01",
      "severity": "medium",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     }
    }
   },
@@ -361,7 +361,7 @@
     "PKSA-ztgh-x9c8-k66g": {
      "known_since": "2026-10-01",
      "severity": "medium",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     }
    }
   },

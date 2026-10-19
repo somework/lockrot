@@ -1068,8 +1068,8 @@
    "low": 4
   },
   "fixes": {
-   "update": 3,
-   "upgrade": 1,
+   "update": 4,
+   "upgrade": 0,
    "raise-php": 2,
    "unknown": 0,
    "blocked": 0,
@@ -1077,6 +1077,7 @@
   },
   "update_now": [
    "phpseclib/phpseclib",
+   "enshrined/svg-sanitize",
    "paragonie/sodium_compat",
    "symfony/yaml"
   ],
@@ -1084,6 +1085,7 @@
    "composer",
    "update",
    "phpseclib/phpseclib",
+   "enshrined/svg-sanitize",
    "paragonie/sodium_compat",
    "symfony/yaml"
   ],
@@ -2664,7 +2666,7 @@
       "role": "security",
       "advisory": "PKSA-4g5g-4rkv-myqs",
       "severity": "medium",
-      "fix_kind": "upgrade",
+      "fix_kind": "update",
       "weight": 8,
       "multiplier": 1,
       "points": 8,
@@ -2705,7 +2707,7 @@
     "kind": "require",
     "source": "left-behind",
     "merged": [],
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "reason": null,
     "replacement": null,
     "quiet_years": null,
@@ -2790,7 +2792,7 @@
     },
     "ignored": [],
     "ignored_count": 0,
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 0,
      "unknown": 0,
@@ -2904,7 +2906,7 @@
         "points": 8,
         "deciding": true,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "0.22.x",
          "version": "0.22.0",
          "newest": "0.22.0",

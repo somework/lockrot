@@ -229,7 +229,7 @@
     "PKSA-hr4y-jwk2-1yb9": {
      "known_since": "2026-09-24",
      "severity": "medium",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     }
    }
   },

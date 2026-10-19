@@ -11,7 +11,55 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 20
+                "begin": 33
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "laravel/framework v12.65.0 \u2014 finding low (2 = vulnerable 2 [low advisory]) \u2014 vulnerable: 1 advisory: 1 low \u2014 all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information. Do: composer update laravel/framework (gets v12.69.3) \u2014 clears the advisory.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "d4b0ec0c80996b932f39c1536e7495de9232e41bf2ceb3b9c4de77c0431134f7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "laravel/nightwatch v1.28.6 \u2014 finding ok (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "dc1c30a279d01b9c9f66394c57a8bb21c55e79c086f9f3fca2834c7665785fbf",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 19
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "spatie/laravel-markdown 2.8.0 \u2014 finding ok (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "2942d40cf04cbf9dad3c6259dcb7d5c3e0f3b01e38eb79de3fc02c85dda9758d",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 47
             }
         }
     }

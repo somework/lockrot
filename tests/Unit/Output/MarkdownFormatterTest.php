@@ -85,7 +85,7 @@ final class MarkdownFormatterTest extends TestCase
         $out = self::formatter('high', 100)->format(self::composite());
 
         self::assertStringStartsWith('### lockrot: ', $out);
-        self::assertStringContainsString("\n| … | 7 more findings: see the JSON report | | | | |\n", $out);
+        self::assertStringContainsString("\n| … | 9 more findings: see the JSON report | | | | |\n", $out);
         self::assertStringNotContainsString('`twig/twig`', $out);
         self::assertGreaterThan(100, \strlen($out), 'the skeleton always prints');
     }
@@ -94,8 +94,8 @@ final class MarkdownFormatterTest extends TestCase
     {
         $lines = explode("\n", self::formatter('high')->format(self::composite()));
 
-        self::assertSame('### lockrot: 7 of 7 packages flagged — critical 3 · high 2 · low 2', $lines[0]);
-        self::assertSame('**gate: fails** · --fail-on=high · 5 findings fail it · target php 8.4 (--target-php)', $lines[2]);
+        self::assertSame('### lockrot: 9 of 9 packages flagged — critical 4 · high 2 · low 3', $lines[0]);
+        self::assertSame('**gate: fails** · --fail-on=high · 6 findings fail it · target php 8.4 (--target-php)', $lines[2]);
         self::assertSame('| Verdict | Package | Version | Flags | Why | Via |', $lines[4]);
     }
 
@@ -191,9 +191,9 @@ final class MarkdownFormatterTest extends TestCase
 
         self::assertLessThanOrEqual(\strlen($full) - 1, \strlen($cut));
         self::assertStringContainsString("\n| … | ", $cut);
-        self::assertSame(6, \count($rows));
+        self::assertSame(8, \count($rows));
         self::assertStringContainsString('| … | 1 more finding: see the JSON report | | | | |', $cut);
-        self::assertStringStartsWith('### lockrot: 7 of 7 packages flagged', $cut);
+        self::assertStringStartsWith('### lockrot: 9 of 9 packages flagged', $cut);
         self::assertStringEndsWith("for details.</sub>\n", $cut);
         self::assertSame($full, self::formatter('high', \strlen($full))->format(self::composite()), 'a document that fits is written whole');
     }

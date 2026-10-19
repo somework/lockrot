@@ -8,7 +8,7 @@ These scripts connect lockrot with its report renderer,
 | `update-renderer vX.Y.Z` | Vendors a release of the renderer into `resources/report/`. It verifies the attestation, the page against the sha256 in its manifest, and that the manifest names the requested version |
 | `update-renderer vX.Y.Z-rc.N` | Vendors a pre-release of the renderer, with the same checks |
 | `update-renderer --from-dir DIR` | Vendors a local build for development. It is not attested |
-| `record` | Records the rendering contract bundle into `tests/fixtures/contract/` (`--all-baselined`: the real baselined projects too) |
+| `record` | Records the rendering contract bundle into `tests/fixtures/contract/` (`--all-baselined`: the real baselined projects too, `--engine-pages`: the page cases of real apps) |
 
 ## Which renderer a lockrot release vendors
 
