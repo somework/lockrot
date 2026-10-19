@@ -40,10 +40,12 @@ Every document of `contract/report-2/` is lockrot's output. `contract/model-only
 documents of the cases that the hydrator cannot rebuild (`contract/provenance.json`
 `cases_without_inputs`). They pass the schema checks, but lockrot did not write them.
 
-`contract/page-goldens.json` is the model's page goldens of six documents, copied from the model and
-not recorded (`contract/provenance.json` `page_goldens`). `PageGoldensTest` holds the page title and
-description to it and requires `grade_line`, `figure_line` and `load_line`. The other keys are for
-lockrot-report.
+`contract/page-goldens.json` is the model's page goldens. `tools/schema/project_fixtures.py` copies
+them from the model together with the page documents that they read, and no recording writes them
+(`contract/provenance.json` `page_goldens`). `PageGoldensTest` validates each page document against
+the report-2 schema. It holds the page title and description to the goldens, requires `grade_line`,
+`figure_line` and `load_line`, and checks each golden that it reads against the document fields. The
+other keys are for lockrot-report.
 
 ## Other fixtures
 
