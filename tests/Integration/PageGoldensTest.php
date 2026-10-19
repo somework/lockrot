@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Html\PageHeading;
+use Lockrot\Json\Schemas;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -21,6 +23,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class PageGoldensTest extends TestCase
 {
+    use ValidatesJsonSchemas;
+
     private const CONTRACT = __DIR__.'/../fixtures/contract/';
     private const DOCUMENTS = __DIR__.'/../fixtures/schema/documents/';
     private const GRADES = ['critical', 'high', 'medium', 'low'];
@@ -354,6 +358,124 @@ final class PageGoldensTest extends TestCase
     }
 
     /**
+     * A ‡ page document that lags its source document lacks the fields that the schema added since,
+     * so its goldens read fields that the document does not hold.
+     *
+     * @dataProvider provideEveryGolden
+     */
+    #[DataProvider('provideEveryGolden')]
+    public function testEveryPageDocumentFollowsTheReportSchema(string $id): void
+    {
+        $golden = JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens', $id]);
+
+        $this->assertValid(Schemas::REPORT, self::documentJson(JsonPath::stringAt($golden, ['document'])), $id);
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.19: a fix note starts with "needs PHP {php}" exactly when the fix's `php` is
+     * set and one of its two php answers is false.
+     */
+    public function testTheFixNotesSayNeedsPhpExactlyWhenAPhpAnswerIsFalse(): void
+    {
+        $differ = [];
+        $needs = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']) as $id => $golden) {
+            $golden = JsonPath::decoded($golden);
+            $findings = self::findingsByPackage(self::modelDocument(JsonPath::stringAt($golden, ['document'])));
+            foreach (JsonPath::arrayAt($golden, ['advisory_groups']) as $group) {
+                $group = JsonPath::decoded($group);
+                $package = JsonPath::stringAt($group, ['package']);
+                $expected = [];
+                foreach (JsonPath::arrayAt($findings[$package], ['signals']) as $signal) {
+                    $signal = JsonPath::decoded($signal);
+                    foreach (self::textAt($signal, ['id']) === 'S9' ? JsonPath::arrayAt($signal, ['data', 'advisories']) : [] as $row) {
+                        $fix = JsonPath::arrayAt(JsonPath::decoded($row), ['fix']);
+                        if (\is_string($fix['php'] ?? null) && \in_array(false, [$fix['admits_target_php'] ?? null, $fix['admits_project_php'] ?? null], true)) {
+                            $expected[] = 'needs PHP '.$fix['php'];
+                        }
+                    }
+                }
+                $stated = [];
+                foreach (array_filter(JsonPath::arrayAt($group, ['fix_notes']), 'is_string') as $note) {
+                    if (strpos($note, 'needs PHP ') === 0) {
+                        $stated[] = explode(' · ', $note)[0];
+                    }
+                }
+                $needs = array_merge($needs, $stated);
+                if (array_values(array_unique($expected)) !== array_values(array_unique($stated))) {
+                    $differ[$id.' '.$package] = ['expected' => $expected, 'stated' => $stated];
+                }
+            }
+        }
+
+        self::assertSame([], $differ);
+        self::assertNotSame([], $needs, 'no fix note of a page case says "needs PHP"');
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.21 "Holds": a Held by item names its hold in the words of the link table, with
+     * the target where the table names it.
+     */
+    public function testTheSheetHeldByItemsNameEachHoldByTheLinkTable(): void
+    {
+        $differ = [];
+        $forms = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']) as $id => $golden) {
+            $golden = JsonPath::decoded($golden);
+            $findings = self::findingsByPackage(self::modelDocument(JsonPath::stringAt($golden, ['document'])));
+            foreach (JsonPath::arrayAt($golden, ['sheet_holders']) as $package => $cards) {
+                $lead = JsonPath::arrayAt($findings[$package], ['next_step']);
+                $words = [];
+                foreach (array_merge([$lead], JsonPath::arrayAt($lead, ['also'])) as $move) {
+                    foreach (JsonPath::arrayAt(JsonPath::decoded($move), ['held_by']) as $hold) {
+                        $hold = JsonPath::decoded($hold);
+                        $name = self::textAt($hold, ['source']) === 'root' ? 'your composer.json' : JsonPath::stringAt($hold, ['package']).' '.self::textAt($hold, ['version']);
+                        $words[$name][self::linkWords($hold)] = JsonPath::stringAt($hold, ['link']).(self::textAt($hold, ['target']) === null ? '' : ', a target');
+                    }
+                }
+                foreach (array_filter(JsonPath::decoded($cards), 'is_array') as $card) {
+                    $card = JsonPath::decoded($card);
+                    foreach (array_merge(JsonPath::arrayAt($card, ['shown']), \is_array($card['fold'] ?? null) ? JsonPath::arrayAt($card, ['fold', 'holders']) : []) as $item) {
+                        $item = JsonPath::decoded($item);
+                        $name = JsonPath::stringAt($item, ['name']);
+                        $link = explode(' · ', JsonPath::stringAt($item, ['meta']))[0];
+                        if (!isset($words[$name][$link])) {
+                            $differ[$id.' '.$package.' '.$name.' '.$link] = array_keys($words[$name] ?? []);
+                        } else {
+                            $forms[] = $words[$name][$link];
+                        }
+                    }
+                }
+            }
+        }
+
+        self::assertSame([], $differ);
+        foreach (['require', 'require, a target', 'root-require, a target'] as $form) {
+            self::assertContains($form, $forms, 'no Held by item of a page case names a hold of the form: '.$form);
+        }
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.21, the link words.
+     *
+     * @param array<mixed, mixed> $hold
+     */
+    private static function linkWords(array $hold): string
+    {
+        $target = self::textAt($hold, ['target']);
+        $constraint = JsonPath::stringAt($hold, ['constraint']);
+        $link = JsonPath::stringAt($hold, ['link']);
+        if ($link === 'replace') {
+            return $target === null ? 'replaced by '.JsonPath::stringAt($hold, ['package']) : 'replaces '.$target.' '.$constraint;
+        }
+        if ($link === 'root-require' && $target === null) {
+            return 'no release of '.$constraint.' can install';
+        }
+
+        return ($link === 'conflict' ? 'conflicts with ' : 'requires ').($target === null ? '' : $target.' ').$constraint;
+    }
+
+    /**
      * @param array<mixed, mixed>|null $check
      */
     private static function shortCheckWords(?array $check): ?string
@@ -420,18 +542,32 @@ final class PageGoldensTest extends TestCase
         if (strpos($document, 'baselined/') === 0) {
             return JsonPath::arrayAt(JsonPath::decodeFile(__DIR__.'/../fixtures/'.$document), ['report']);
         }
+        $path = self::documentPath($document);
+
+        return strpos($path, 'compress.zlib://') === 0 ? JsonPath::decoded(json_decode((string) file_get_contents($path), true)) : JsonPath::decodeFile($path);
+    }
+
+    /** The page document as JSON text, whose empty objects the schema reads as objects. */
+    private static function documentJson(string $document): string
+    {
+        if (strpos($document, 'baselined/') === 0) {
+            $bundle = json_decode((string) file_get_contents(__DIR__.'/../fixtures/'.$document));
+            self::assertInstanceOf(\stdClass::class, $bundle);
+
+            return (string) json_encode(get_object_vars($bundle)['report'] ?? null);
+        }
+
+        return (string) file_get_contents(self::documentPath($document));
+    }
+
+    private static function documentPath(string $document): string
+    {
         if (strpos($document, 'contract/') === 0) {
-            return JsonPath::decodeFile(self::CONTRACT.substr($document, \strlen('contract/')));
+            return self::CONTRACT.substr($document, \strlen('contract/'));
         }
-        if (strpos($document, 'report-2/') === 0) {
-            return JsonPath::decoded(json_decode((string) file_get_contents('compress.zlib://'.self::DOCUMENTS.'corpus/'.basename($document).'.gz'), true));
-        }
+        $path = strpos($document, 'report-2/') === 0 ? self::DOCUMENTS.'corpus/'.basename($document) : self::DOCUMENTS.$document;
 
-        if (!is_file(self::DOCUMENTS.$document)) {
-            return JsonPath::decoded(json_decode((string) file_get_contents('compress.zlib://'.self::DOCUMENTS.$document.'.gz'), true));
-        }
-
-        return JsonPath::decodeFile(self::DOCUMENTS.$document);
+        return is_file($path) ? $path : 'compress.zlib://'.$path.'.gz';
     }
 
     /** @return array<mixed, mixed>|null */
