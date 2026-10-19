@@ -15,7 +15,8 @@ use PHPUnit\Framework\TestCase;
  * Where the contract bundle holds lockrot's own report-2 of a golden's document, the title reads its
  * root fields, which must equal the model's. Else lockrot cannot rebuild the document (a corpus run
  * of 0.13, a case with no inputs), and the title reads the model's root fields. A golden of a
- * `contract/` document is the model's rendering of lockrot's own report-2 (EnginePage).
+ * `contract/` document is the model's rendering of lockrot's own report-2 (EnginePage). A golden of a
+ * `baselined/` document reads the `report` of a baselined scenario's recorded bundle.
  */
 final class PageGoldensTest extends TestCase
 {
@@ -163,6 +164,35 @@ final class PageGoldensTest extends TestCase
     }
 
     /**
+     * SPEC-0.14.md §7.9.21: page cases show a `not_checked` move beside `resolves` moves, and a run whose
+     * baseline Composer refuses, so that no move is ready and the moves_not_checked note prints.
+     */
+    public function testThePageCasesShowAMoveThatWasNotCheckedAndARefusedBaseline(): void
+    {
+        $beside = [];
+        $refusedBaseline = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']) as $id => $golden) {
+            $golden = JsonPath::decoded($golden);
+            $document = self::modelDocument(JsonPath::stringAt($golden, ['document']));
+            $results = [];
+            foreach (JsonPath::arrayAt($document, ['findings']) as $finding) {
+                $results[] = \is_array($finding) ? self::textAt($finding, ['next_step', 'check', 'result']) : null;
+            }
+            $wayOut = (string) self::textAt($golden, ['ready', 'way_out']);
+            if (\in_array('not_checked', $results, true) && \in_array('resolves', $results, true) && strpos($wayOut, 'not checked: ') !== false) {
+                $beside[] = $id;
+            }
+            $notes = JsonPath::has($golden, ['run_notes']) ? JsonPath::arrayAt($golden, ['run_notes']) : [];
+            if (self::textAt($document, ['run', 'move_check', 'baseline']) === 'refused' && ($golden['ready_count'] ?? null) === 0 && preg_grep('/^moves not checked: /', array_filter($notes, 'is_string')) !== []) {
+                $refusedBaseline[] = $id;
+            }
+        }
+
+        self::assertNotSame([], $beside, 'no page case shows a not_checked move beside resolves moves');
+        self::assertNotSame([], $refusedBaseline, 'no page case shows a refused baseline with its moves_not_checked note');
+    }
+
+    /**
      * @param array<mixed, mixed> $document
      *
      * @return array<string, mixed>
@@ -178,9 +208,28 @@ final class PageGoldensTest extends TestCase
         ];
     }
 
+    /**
+     * @param array<mixed, mixed> $data
+     * @param list<string>        $path
+     */
+    private static function textAt(array $data, array $path): ?string
+    {
+        foreach ($path as $key) {
+            if (!\is_array($data) || !\array_key_exists($key, $data)) {
+                return null;
+            }
+            $data = $data[$key];
+        }
+
+        return \is_string($data) ? $data : null;
+    }
+
     /** @return array<mixed, mixed> */
     private static function modelDocument(string $document): array
     {
+        if (strpos($document, 'baselined/') === 0) {
+            return JsonPath::arrayAt(JsonPath::decodeFile(__DIR__.'/../fixtures/'.$document), ['report']);
+        }
         if (strpos($document, 'contract/') === 0) {
             return JsonPath::decodeFile(self::CONTRACT.substr($document, \strlen('contract/')));
         }

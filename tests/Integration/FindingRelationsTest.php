@@ -198,6 +198,23 @@ final class FindingRelationsTest extends TestCase
         self::assertSame([], $broken);
     }
 
+    /** The page documents of lockrot's own runs, and the ‡ documents derived from them, hold every relation. */
+    public function testTheEnginePageDocumentsHoldEveryRelation(): void
+    {
+        $paths = array_merge(glob(self::CONTRACT.'page/*.json') ?: [], glob(self::DOCUMENTS.'page/snipe-it.*.json') ?: []);
+        self::assertCount(2, $paths);
+        $broken = [];
+        foreach ($paths as $path) {
+            $document = JsonPath::decodeFile($path);
+            $findings = array_values(array_filter(JsonPath::arrayAt($document, ['findings']), 'is_array'));
+            foreach (array_merge(FindingRelations::violations($document), ItemRelations::violations($document, true), FindingRelations::moveCheckRelation($document, $findings)) as $violation) {
+                $broken[] = basename($path).' '.$violation;
+            }
+        }
+
+        self::assertSame([], $broken);
+    }
+
     public function testEveryRecordedReportWithAMoveCheckSaysHowTheRunChecked(): void
     {
         $paths = array_merge(glob(self::CONTRACT.'report-2/*.json') ?: [], glob(self::CONTRACT.'page/*.json') ?: []);

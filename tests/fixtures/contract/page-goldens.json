@@ -417,7 +417,8 @@
           "same_cve_as": [],
           "fix_notes": []
         }
-      ]
+      ],
+      "run_notes": []
     },
     "new-symfony": {
       "document": "report-2/new-symfony.json",
@@ -513,7 +514,8 @@
       "data_caption": "Every row has data as of 2026-10-01",
       "data_column": false,
       "signals_key": [],
-      "advisory_groups": []
+      "advisory_groups": [],
+      "run_notes": []
     },
     "akaunting": {
       "document": "report-2/akaunting.json",
@@ -1288,7 +1290,8 @@
           "same_cve_as": [],
           "fix_notes": []
         }
-      ]
+      ],
+      "run_notes": []
     },
     "ok-offline": {
       "document": "cases/ok-offline-dagger.json",
@@ -1374,7 +1377,10 @@
       "signals_key": [
         "S10 unchecked"
       ],
-      "advisory_groups": []
+      "advisory_groups": [],
+      "run_notes": [
+        "security advisories not checked (offline): no finding is graded for an advisory, and each next step's score after the move assumes its versions carry none"
+      ]
     },
     "policy-off": {
       "document": "cases/policy-off-dagger.json",
@@ -1503,6 +1509,9 @@
             "needs PHP ^8.1.0"
           ]
         }
+      ],
+      "run_notes": [
+        "Composer is set not to block an install or an update on security advisories (policy.advisories: false); lockrot still checks and counts them."
       ]
     },
     "wallabag": {
@@ -3161,7 +3170,8 @@
           "same_cve_as": [],
           "fix_notes": []
         }
-      ]
+      ],
+      "run_notes": []
     },
     "B-dev‡": {
       "document": "cases/B-dev-dagger.json",
@@ -3320,7 +3330,8 @@
             "held by your composer.json"
           ]
         }
-      ]
+      ],
+      "run_notes": []
     },
     "unknown-rules‡": {
       "document": "page/composite.unknown-rules-dagger.json",
@@ -3740,7 +3751,8 @@
           "same_cve_as": [],
           "fix_notes": []
         }
-      ]
+      ],
+      "run_notes": []
     },
     "pagerfanta": {
       "document": "cases/pagerfanta.json",
@@ -3883,7 +3895,8 @@
         "S8 release branch",
         "S10 unchecked"
       ],
-      "advisory_groups": []
+      "advisory_groups": [],
+      "run_notes": []
     },
     "new-slim-baselined": {
       "document": "coverage/baselined/new-slim.json",
@@ -4073,7 +4086,8 @@
         "S7 pulled-in packages",
         "S8 release branch"
       ],
-      "advisory_groups": []
+      "advisory_groups": [],
+      "run_notes": []
     },
     "composite-generate-baseline": {
       "document": "cases/composite-generate-baseline.json",
@@ -4463,7 +4477,8 @@
           "same_cve_as": [],
           "fix_notes": []
         }
-      ]
+      ],
+      "run_notes": []
     },
     "guzzle-mixed": {
       "document": "cases/guzzle-mixed.json",
@@ -4616,7 +4631,8 @@
             "needs PHP ^7.2.5 || ^8.0 · held by guzzlehttp/cache-subscriber and 3 more"
           ]
         }
-      ]
+      ],
+      "run_notes": []
     },
     "matomo": {
       "document": "report-2/matomo.json",
@@ -5080,7 +5096,8 @@
         "S7 pulled-in packages",
         "S8 release branch"
       ],
-      "advisory_groups": []
+      "advisory_groups": [],
+      "run_notes": []
     },
     "E-ignored-whole‡": {
       "document": "cases/E-ignored-whole-dagger.json",
@@ -5209,6 +5226,9 @@
           "same_cve_as": [],
           "fix_notes": []
         }
+      ],
+      "run_notes": [
+        "extra.lockrot.ignore[] no longer hides advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision"
       ]
     },
     "rounded-dev‡": {
@@ -5332,7 +5352,8 @@
         "S2 release age",
         "S5 PHP promise"
       ],
-      "advisory_groups": []
+      "advisory_groups": [],
+      "run_notes": []
     },
     "unreached": {
       "document": "cases/unreached.json",
@@ -5455,7 +5476,8 @@
         "S3 archived repository",
         "S4 repository activity"
       ],
-      "advisory_groups": []
+      "advisory_groups": [],
+      "run_notes": []
     },
     "B-gate-none": {
       "document": "cases/B-gate-none.json",
@@ -5586,6 +5608,2388 @@
             "held by your composer.json"
           ]
         }
+      ],
+      "run_notes": []
+    },
+    "snipe-it.unloaded‡": {
+      "document": "page/snipe-it.unloaded-dagger.json",
+      "title": "lockrot: 25 of 167 packages flagged",
+      "description": "lockrot flagged 25 of 167 packages in composer.lock: 5 critical, 9 high, 6 medium, 5 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for grokability/snipe-it · data as of 2026-10-14 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "25 of 167 packages flagged (15%): 5 graded critical, 9 high, 6 medium, 5 low. Flags: abandoned 1, silent 5, pinned 1, left-behind 5, old-promise 6, stale 6, vulnerable 7.",
+        "All 25 in production · 16 required directly, 9 pulled in · 11 security advisories on 7 packages (severity: 1 critical, 1 high, 7 medium, 1 unrated, 1 low) · fix by package: 6 composer update, 1 upgrade · 79.7 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 5 critical findings · 14 of 167 packages high or worse",
+      "figure_line": "25 of 167 packages flagged · 121 ok · 21 allowlisted",
+      "load_line": "386 points on 25 flagged packages · 318 (82 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 14,
+      "state_lines": [],
+      "waffle_caption": "25 of 167 packages flagged · 121 ok · 21 allowlisted",
+      "lead_scope": "all 25 in production · 16 required directly, 9 pulled in",
+      "grade_chips": [
+        "critical 5",
+        "high 9",
+        "medium 6",
+        "low 5"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 5
+        },
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 9
+        },
+        {
+          "verdict": "medium",
+          "word": "medium",
+          "mark": "fill",
+          "count": 6
+        },
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 5
+        },
+        {
+          "verdict": "finished",
+          "word": "allowlisted",
+          "mark": "ring-dot",
+          "count": 21
+        },
+        {
+          "verdict": "ok",
+          "word": "ok",
+          "mark": "soft",
+          "count": 121
+        }
+      ],
+      "ready": {
+        "note": "for findings that fail the gate, in lockrot's rank order",
+        "moves": [
+          {
+            "package": "mtdowling/jmespath.php",
+            "link": "#view=findings&pkg=mtdowling%2Fjmespath.php",
+            "grade": "critical",
+            "new_major": false,
+            "command": "composer update 'mtdowling/jmespath.php:^2.9.1'",
+            "clears": "the advisory",
+            "after": {
+              "result": "0, ok",
+              "conditions": []
+            },
+            "also_holds": null
+          },
+          {
+            "package": "league/commonmark",
+            "link": "#view=findings&pkg=league%2Fcommonmark",
+            "grade": "high",
+            "new_major": false,
+            "command": "composer update 'league/commonmark:^2.10.2'",
+            "clears": "both advisories",
+            "after": {
+              "result": "0, ok",
+              "conditions": []
+            },
+            "also_holds": null
+          }
+        ],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": "2 of 14 findings that fail the gate are held by other packages. Their holders are in each sheet's Held by.",
+        "held_link": "#view=findings&gate=fails%2Cheld",
+        "held_link_rows": 2,
+        "way_out": "10 need another way out: 6 find an alternative, 1 raise PHP >=8.4, 1 test, 1 no move, 1 not checked: a package it needs could not be loaded",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 10,
+        "none": null
+      },
+      "security": {
+        "figure": "11",
+        "unit": "advisories on 7 packages",
+        "lookup_complete": true,
+        "counted_as": [
+          "unrated, counted as medium"
+        ]
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "javiereguiluz/easyslugger",
+            "link": "#view=findings&pkg=javiereguiluz%2Feasyslugger",
+            "reach": "",
+            "total": 36,
+            "terms": "silent 32 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "mtdowling/jmespath.php",
+            "link": "#view=findings&pkg=mtdowling%2Fjmespath.php",
+            "reach": "transitive",
+            "total": 32,
+            "terms": "vulnerable 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "doctrine/cache",
+            "link": "#view=findings&pkg=doctrine%2Fcache",
+            "reach": "",
+            "total": 32,
+            "terms": "abandoned 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "onnov/detect-encoding",
+            "link": "#view=findings&pkg=onnov%2Fdetect-encoding",
+            "reach": "",
+            "total": 32,
+            "terms": "silent 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "unicodeveloper/laravel-password",
+            "link": "#view=findings&pkg=unicodeveloper%2Flaravel-password",
+            "reach": "",
+            "total": 32,
+            "terms": "silent 32",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "pragmarx/google2fa-laravel",
+            "link": "#view=findings&pkg=pragmarx%2Fgoogle2fa-laravel",
+            "reach": "",
+            "total": 20,
+            "terms": "left-behind 16 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "neitanod/forceutf8",
+            "link": "#view=findings&pkg=neitanod%2Fforceutf8",
+            "reach": "",
+            "total": 18,
+            "terms": "old-promise 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "tmilos/lexer",
+            "link": "#view=findings&pkg=tmilos%2Flexer",
+            "reach": "transitive",
+            "total": 18,
+            "terms": "silent 16 · old-promise 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "tmilos/value",
+            "link": "#view=findings&pkg=tmilos%2Fvalue",
+            "reach": "transitive",
+            "total": 18,
+            "terms": "silent 16 · old-promise 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "league/commonmark",
+            "link": "#view=findings&pkg=league%2Fcommonmark",
+            "reach": "",
+            "total": 16,
+            "terms": "vulnerable 16",
+            "terms_total": null
+          }
+        ],
+        "rest": "15 more flagged packages hold 132 points",
+        "rest_link": "#view=findings"
+      },
+      "flags_notes": [
+        "6 carry more than one flag · score model 1",
+        "1 abandoned package, 0 with a replacement",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 25"
+        ],
+        "rows": [
+          {
+            "package": "arietimmerman/laravel-scim-server",
+            "flagged": 4,
+            "link": "#view=radius&pkg=arietimmerman%2Flaravel-scim-server"
+          },
+          {
+            "package": "laravel/passport",
+            "flagged": 2,
+            "link": "#view=radius&pkg=laravel%2Fpassport"
+          },
+          {
+            "package": "laravel/socialite",
+            "flagged": 1,
+            "link": "#view=radius&pkg=laravel%2Fsocialite"
+          },
+          {
+            "package": "league/flysystem-aws-s3-v3",
+            "flagged": 1,
+            "link": "#view=radius&pkg=league%2Fflysystem-aws-s3-v3"
+          },
+          {
+            "package": "pragmarx/google2fa-laravel",
+            "flagged": 1,
+            "link": "#view=radius&pkg=pragmarx%2Fgoogle2fa-laravel"
+          }
+        ],
+        "count": "5 direct requirements pull in flagged packages.",
+        "overlap": "A flagged package counts under each direct requirement it is reached from, up to 8, so the rows overlap.",
+        "more": null,
+        "shared": "1 flagged package shared by too many requirements to list under one: league/config."
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 16",
+          "1 hop away 5",
+          "2 hops away 4"
+        ],
+        "sentence": "9 of 25 flagged packages are named by no line of composer.json; the deepest, defuse/php-encryption, mtdowling/jmespath.php, tmilos/lexer and 1 more, sit 2 hops from the nearest line."
+      },
+      "libyears": {
+        "figure": "79.74",
+        "bound": "",
+        "sub": "over 163 packages · 30.01 from direct requirements",
+        "unmeasured": "Not measured: 1 not from a Composer repository · 3 dated only by a commit its tags share",
+        "top": [
+          [
+            "pragmarx/google2fa-qrcode v1.0.3",
+            "7.1",
+            "v4.0.0 (2026-05-08)"
+          ],
+          [
+            "pragmarx/google2fa-laravel v1.4.1",
+            "5.5",
+            "v2.3.1 (2026-03-17)"
+          ],
+          [
+            "phpdocumentor/reflection-common 2.2.0",
+            "5.4",
+            "2.2.1 (2025-11-10)"
+          ],
+          [
+            "intervention/image 2.7.2",
+            "4.4",
+            "4.3.5 (2026-10-10)"
+          ],
+          [
+            "bacon/bacon-qr-code 2.0.8",
+            "3.3",
+            "v3.1.1 (2026-04-05)"
+          ],
+          [
+            "doctrine/instantiator 1.5.0",
+            "3.0",
+            "2.1.0 (2026-01-05)"
+          ],
+          [
+            "tecnickcom/tc-lib-barcode 1.18.4",
+            "3.0",
+            "2.17.1 (2026-10-10)"
+          ],
+          [
+            "tecnickcom/tc-lib-color 1.14.39",
+            "3.0",
+            "3.0.12 (2026-10-10)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "5 packages",
+          "gate": "all fail the gate",
+          "major": null
+        },
+        {
+          "grade": "high",
+          "count": "9 packages",
+          "gate": "all fail the gate",
+          "major": "4 of 5 moves cross a major"
+        },
+        {
+          "grade": "medium",
+          "count": "6 packages",
+          "gate": null,
+          "major": "2 of 5 moves cross a major"
+        },
+        {
+          "grade": "low",
+          "count": "5 packages",
+          "gate": null,
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "mtdowling/jmespath.php",
+          "fails_gate": true,
+          "reach": "via league/flysystem-aws-s3-v3",
+          "held": null,
+          "command": "composer update 'mtdowling/jmespath.php:^2.9.1'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "javiereguiluz/easyslugger",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "doctrine/cache",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "onnov/detect-encoding",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "unicodeveloper/laravel-password",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "league/commonmark",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'league/commonmark:^2.10.2'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "pragmarx/google2fa-laravel",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'pragmarx/google2fa-laravel:^2.3'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "neitanod/forceutf8",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tmilos/lexer",
+          "fails_gate": true,
+          "reach": "via arietimmerman/laravel-scim-server",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tmilos/value",
+          "fails_gate": true,
+          "reach": "via arietimmerman/laravel-scim-server",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "arietimmerman/laravel-scim-server",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "bacon/bacon-qr-code",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by pragmarx/google2fa-laravel and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "doctrine/instantiator",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'php:>=8.4' --no-update",
+          "after": "after it: 0, ok",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "intervention/image",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by intervention/image",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "enshrined/svg-sanitize",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'enshrined/svg-sanitize:^1.0.0'",
+          "after": "after it: 0, ok",
+          "major": "a new major",
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "livewire/livewire",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'livewire/livewire:^4.3.4'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "paragonie/sodium_compat",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'paragonie/sodium_compat:^1.24.1'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "phpseclib/phpseclib",
+          "fails_gate": false,
+          "reach": "via laravel/passport and 1 more",
+          "held": null,
+          "command": "composer update 'phpseclib/phpseclib:^3.0.57'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "pragmarx/google2fa-qrcode",
+          "fails_gate": false,
+          "reach": "via pragmarx/google2fa-laravel",
+          "held": "held by pragmarx/google2fa-laravel",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "okvpn/clock-lts",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "laravel/framework",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'laravel/framework:^12.69.0'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "defuse/php-encryption",
+          "fails_gate": false,
+          "reach": "via laravel/passport",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "league/config",
+          "fails_gate": false,
+          "reach": "via league/commonmark and 20 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tmilos/scim-filter-parser",
+          "fails_gate": false,
+          "reach": "via arietimmerman/laravel-scim-server",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tmilos/scim-schema",
+          "fails_gate": false,
+          "reach": "via arietimmerman/laravel-scim-server",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 7,
+      "gate_partition": {
+        "ready": 2,
+        "held": 2,
+        "wayout": 10
+      },
+      "data_caption": "Every row has data as of 2026-10-14 (1 read no repository data)",
+      "data_column": false,
+      "signals_key": [
+        "S1 marked abandoned",
+        "S2 release age",
+        "S4 repository activity",
+        "S5 PHP promise",
+        "S6 pinned version",
+        "S7 pulled-in packages",
+        "S8 release branch",
+        "S9 advisories",
+        "S10 unchecked"
+      ],
+      "advisory_groups": [
+        {
+          "package": "mtdowling/jmespath.php",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "league/commonmark",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "enshrined/svg-sanitize",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "livewire/livewire",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "paragonie/sodium_compat",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "phpseclib/phpseclib",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "laravel/framework",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ],
+      "run_notes": [
+        "1 package is not from a Composer repository: its release metadata and repository activity were not read · advisories asked"
+      ]
+    },
+    "wallabag-2.6": {
+      "document": "baselined/wallabag-2.6/check/report.bundle.json",
+      "title": "lockrot: 112 of 210 packages flagged",
+      "description": "lockrot flagged 112 of 210 packages in composer.lock: 15 critical, 69 high, 22 medium, 6 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for wallabag/wallabag · data as of 2026-10-14 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "112 of 210 packages flagged (53%): 15 graded critical, 69 high, 22 medium, 6 low. Flags: abandoned 27, silent 10, pinned 1, left-behind 54, old-promise 18, stale 12, vulnerable 20.",
+        "All 112 in production · 60 required directly, 52 pulled in · 64 security advisories on 20 packages (severity: 1 critical, 17 high, 30 medium, 3 unrated, 13 low) · fix by package: 8 composer update, 9 upgrade, 2 php floor raise, 1 no fix · 388.8 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 15 critical findings · 84 of 210 packages high or worse · 45 known to the baseline",
+      "figure_line": "112 of 210 packages flagged · 79 ok · 19 allowlisted",
+      "load_line": "1861 points on 112 flagged packages · 1664 (89 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 46,
+      "state_lines": [
+        "Against lockrot-baseline.json: 61 new · 6 worsened · 47 known · 2 entries for packages that left the lock: behat/transliterator, true/punycode."
+      ],
+      "waffle_caption": "112 of 210 packages flagged · 79 ok · 19 allowlisted",
+      "lead_scope": "all 112 in production · 60 required directly, 52 pulled in",
+      "grade_chips": [
+        "critical 15",
+        "high 69",
+        "medium 22",
+        "low 6"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 15
+        },
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 69
+        },
+        {
+          "verdict": "medium",
+          "word": "medium",
+          "mark": "fill",
+          "count": 22
+        },
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 6
+        },
+        {
+          "verdict": "finished",
+          "word": "allowlisted",
+          "mark": "ring-dot",
+          "count": 19
+        },
+        {
+          "verdict": "ok",
+          "word": "ok",
+          "mark": "soft",
+          "count": 79
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": "15 of 46 findings that fail the gate are held by other packages. Their holders are in each sheet's Held by.",
+        "held_link": "#view=findings&gate=fails%2Cheld",
+        "held_link_rows": 15,
+        "way_out": "31 need another way out: 2 find an alternative, 1 no fix, 28 not checked: Composer refuses the lock itself",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 31,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": "64",
+        "unit": "advisories on 20 packages",
+        "lookup_complete": true,
+        "counted_as": [
+          "unrated, counted as medium"
+        ]
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "guzzlehttp/guzzle",
+            "link": "#view=findings&pkg=guzzlehttp%2Fguzzle",
+            "reach": "",
+            "total": 36,
+            "terms": "left-behind 16 · old-promise 4 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "javibravo/simpleue",
+            "link": "#view=findings&pkg=javibravo%2Fsimpleue",
+            "reach": "",
+            "total": 36,
+            "terms": "silent 32 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "kphoen/rulerz-bundle",
+            "link": "#view=findings&pkg=kphoen%2Frulerz-bundle",
+            "reach": "",
+            "total": 36,
+            "terms": "silent 32 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "mnapoli/piwik-twig-extension",
+            "link": "#view=findings&pkg=mnapoli%2Fpiwik-twig-extension",
+            "reach": "",
+            "total": 36,
+            "terms": "silent 32 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "twig/twig",
+            "link": "#view=findings&pkg=twig%2Ftwig",
+            "reach": "",
+            "total": 32,
+            "terms": "vulnerable 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "symfony/http-foundation",
+            "link": "#view=findings&pkg=symfony%2Fhttp-foundation",
+            "reach": "",
+            "total": 32,
+            "terms": "left-behind 16 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "symfony/mime",
+            "link": "#view=findings&pkg=symfony%2Fmime",
+            "reach": "",
+            "total": 32,
+            "terms": "left-behind 16 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "symfony/security-http",
+            "link": "#view=findings&pkg=symfony%2Fsecurity-http",
+            "reach": "",
+            "total": 32,
+            "terms": "left-behind 16 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "lexik/form-filter-bundle",
+            "link": "#view=findings&pkg=lexik%2Fform-filter-bundle",
+            "reach": "",
+            "total": 32,
+            "terms": "abandoned 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "php-http/guzzle5-adapter",
+            "link": "#view=findings&pkg=php-http%2Fguzzle5-adapter",
+            "reach": "",
+            "total": 32,
+            "terms": "abandoned 32",
+            "terms_total": null
+          }
+        ],
+        "rest": "102 more flagged packages hold 1525 points",
+        "rest_link": "#view=findings"
+      },
+      "flags_notes": [
+        "29 carry more than one flag · score model 1",
+        "27 abandoned packages, 4 with a replacement",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 112"
+        ],
+        "rows": [
+          {
+            "package": "kphoen/rulerz-bundle",
+            "flagged": 15,
+            "link": "#view=radius&pkg=kphoen%2Frulerz-bundle"
+          },
+          {
+            "package": "kphoen/rulerz",
+            "flagged": 14,
+            "link": "#view=radius&pkg=kphoen%2Frulerz"
+          },
+          {
+            "package": "wallabag/phpepub",
+            "flagged": 5,
+            "link": "#view=radius&pkg=wallabag%2Fphpepub"
+          },
+          {
+            "package": "nelmio/api-doc-bundle",
+            "flagged": 3,
+            "link": "#view=radius&pkg=nelmio%2Fapi-doc-bundle"
+          },
+          {
+            "package": "pagerfanta/doctrine-orm-adapter",
+            "flagged": 3,
+            "link": "#view=radius&pkg=pagerfanta%2Fdoctrine-orm-adapter"
+          },
+          {
+            "package": "php-http/httplug-bundle",
+            "flagged": 3,
+            "link": "#view=radius&pkg=php-http%2Fhttplug-bundle"
+          },
+          {
+            "package": "scheb/2fa-qr-code",
+            "flagged": 3,
+            "link": "#view=radius&pkg=scheb%2F2fa-qr-code"
+          },
+          {
+            "package": "bdunogier/guzzle-site-authenticator",
+            "flagged": 2,
+            "link": "#view=radius&pkg=bdunogier%2Fguzzle-site-authenticator"
+          }
+        ],
+        "count": "36 direct requirements pull in flagged packages.",
+        "overlap": "A flagged package counts under each direct requirement it is reached from, up to 8, so the rows overlap.",
+        "more": "28 more in Blast radius",
+        "shared": "7 flagged packages shared by too many requirements to list under one: symfony/security-guard, symfony/inflector, symfony/cache, symfony/event-dispatcher-contracts, symfony/property-access, symfony/var-dumper, symfony/polyfill-intl-idn."
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 60",
+          "1 hop away 31",
+          "2 hops away 14",
+          "3 hops away 5",
+          "4 hops away 2"
+        ],
+        "sentence": "51 of 112 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line."
+      },
+      "libyears": {
+        "figure": "388.83",
+        "bound": "at least",
+        "sub": "over 204 packages · 220.44 from direct requirements",
+        "unmeasured": "Not measured: 1 a branch snapshot has no release branch · 5 dated only by a commit its tags share",
+        "top": [
+          [
+            "willdurand/jsonp-callback-validator v1.1.0",
+            "8.0",
+            "v2.0.0 (2022-01-30)"
+          ],
+          [
+            "guzzlehttp/guzzle 5.3.4",
+            "6.8",
+            "8.2.0 (2026-09-06)"
+          ],
+          [
+            "lcobucci/clock 2.0.0",
+            "5.6",
+            "3.6.0 (2026-04-13)"
+          ],
+          [
+            "thecodingmachine/safe v1.3.3",
+            "5.3",
+            "v3.4.0 (2026-02-04)"
+          ],
+          [
+            "symfony/monolog-bridge v5.2.12",
+            "5.1",
+            "v6.4.45 (2026-08-30)"
+          ],
+          [
+            "symfony/security-csrf v5.2.12",
+            "4.8",
+            "v8.1.0 (2026-05-29)"
+          ],
+          [
+            "endroid/qr-code 3.9.7",
+            "4.8",
+            "6.1.3 (2026-02-05)"
+          ],
+          [
+            "symfony/serializer v5.3.12",
+            "4.8",
+            "v8.1.6 (2026-08-30)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "15 packages",
+          "gate": "6 fail the gate",
+          "major": "4 of 5 moves cross a major"
+        },
+        {
+          "grade": "high",
+          "count": "69 packages",
+          "gate": "40 fail the gate",
+          "major": "36 of 38 moves cross a major"
+        },
+        {
+          "grade": "medium",
+          "count": "22 packages",
+          "gate": null,
+          "major": "14 of 17 moves cross a major"
+        },
+        {
+          "grade": "low",
+          "count": "6 packages",
+          "gate": null,
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "twig/twig",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by php-http/guzzle5-adapter and 1 more",
+          "command": "composer require 'guzzlehttp/guzzle:^8.2'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/http-foundation",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/http-foundation:^5.4.50'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/mime",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/mime:^5.4.52'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/security-http",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/security-bundle and 1 more",
+          "command": "composer require 'symfony/security-http:^5.4.53'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "javibravo/simpleue",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "kphoen/rulerz-bundle",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "mnapoli/piwik-twig-extension",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "lexik/form-filter-bundle",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "php-http/guzzle5-adapter",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "php-http/message-factory",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "scheb/2fa-qr-code",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "sensio/framework-extra-bundle",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/debug",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "wallabag/php-mobi",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "spomky-labs/otphp",
+          "fails_gate": true,
+          "reach": "via scheb/2fa-google-authenticator",
+          "held": "held by scheb/2fa-google-authenticator",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "j0k3r/httplug-ssrf-plugin",
+          "fails_gate": true,
+          "reach": "via j0k3r/graby",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "phpseclib/phpseclib",
+          "fails_gate": true,
+          "reach": "via php-amqplib/php-amqplib and 1 more",
+          "held": null,
+          "command": "composer update 'phpseclib/phpseclib:^3.0.57'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "fails_gate": true,
+          "reach": "via symfony/monolog-bundle",
+          "held": null,
+          "command": "composer update 'symfony/monolog-bridge:^5.4.52'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "enshrined/svg-sanitize",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'enshrined/svg-sanitize:^1.0'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/mailer",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/mailer:^5.4.52'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/routing",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/routing:^5.4.53'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/dom-crawler",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/dom-crawler:^5.4.52'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/validator",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by kphoen/rulerz-bridge",
+          "command": "composer require 'symfony/validator:^5.4.43'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "friendsofsymfony/oauth-server-bundle",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "kphoen/rulerz",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "mgargano/simplehtmldom",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "grandt/binstring",
+          "fails_gate": false,
+          "reach": "via wallabag/phpepub",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "grandt/phpresizegif",
+          "fails_gate": false,
+          "reach": "via wallabag/phpepub",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "grandt/phpzipmerge",
+          "fails_gate": false,
+          "reach": "via wallabag/phpepub",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "grandt/relativepath",
+          "fails_gate": true,
+          "reach": "via wallabag/phpepub",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "guzzlehttp/ringphp",
+          "fails_gate": false,
+          "reach": "via guzzlehttp/guzzle and 3 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "guzzlehttp/streams",
+          "fails_gate": false,
+          "reach": "via guzzlehttp/guzzle and 3 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/consistency",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "kphoen/rulerz-bridge",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz-bundle",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "phpzip/phpzip",
+          "fails_gate": false,
+          "reach": "via wallabag/phpepub",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "pragmarx/random",
+          "fails_gate": false,
+          "reach": "via pragmarx/recovery",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/security-guard",
+          "fails_gate": false,
+          "reach": "via symfony/security-bundle and 8 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "babdev/pagerfanta-bundle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "doctrine/collections",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "doctrine/event-manager",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/doctrine-bridge",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "egulias/email-validator",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/mailer",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "friendsofsymfony/jsrouting-bundle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'php:>=8.0' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "lcobucci/jwt",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by scheb/2fa-trusted-device",
+          "command": "composer require 'php:>=8.2' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "pagerfanta/doctrine-orm-adapter",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "pagerfanta/twig",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "scheb/2fa-backup-code",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'php:>=8.2' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "scheb/2fa-bundle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by scheb/2fa-qr-code and 4 more",
+          "command": "composer require 'php:>=8.2' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "scheb/2fa-email",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'php:>=8.2' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "scheb/2fa-google-authenticator",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'php:>=8.2' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "scheb/2fa-trusted-device",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'php:>=8.2' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/asset",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/asset:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/config",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/dependency-injection",
+          "command": "composer require 'symfony/config:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/console",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/http-kernel",
+          "command": "composer require 'symfony/console:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/dependency-injection",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/dependency-injection:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/doctrine-bridge",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/doctrine-bridge:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/error-handler",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/http-kernel",
+          "command": "composer require 'symfony/error-handler:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/event-dispatcher",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/security-http and 5 more",
+          "command": "composer require 'symfony/event-dispatcher:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/finder",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/finder:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/form",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by kphoen/rulerz-bridge",
+          "command": "composer require 'symfony/form:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/framework-bundle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by kphoen/rulerz-bundle",
+          "command": "composer require 'symfony/framework-bundle:^5.4.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/google-mailer",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/google-mailer:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/options-resolver",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/options-resolver:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/proxy-manager-bridge",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/proxy-manager-bridge:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/security-bundle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/security-bundle:^5.4.20'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/security-core",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/security-http and 1 more",
+          "command": "composer require 'symfony/security-core:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/templating",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/templating:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/twig-bundle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/twig-bundle:^5.4'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "doctrine/annotations",
+          "fails_gate": false,
+          "reach": "via doctrine/doctrine-bundle and 6 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "doctrine/cache",
+          "fails_gate": false,
+          "reach": "via doctrine/doctrine-bundle and 5 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/compiler",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/event",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/exception",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/file",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/iterator",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/math",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/protocol",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/regex",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/ruler",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/stream",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/ustring",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/visitor",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "hoa/zformat",
+          "fails_gate": false,
+          "reach": "via kphoen/rulerz and 1 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/inflector",
+          "fails_gate": false,
+          "reach": "via babdev/pagerfanta-bundle and 16 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "guzzlehttp/psr7",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'guzzlehttp/psr7:^2.12.3'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/cache",
+          "fails_gate": false,
+          "reach": "via craue/config-bundle and 25 more",
+          "held": null,
+          "command": "composer update 'symfony/cache:^5.4.52'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/http-client",
+          "fails_gate": false,
+          "reach": "via php-http/httplug-bundle and 1 more",
+          "held": null,
+          "command": "composer update 'symfony/http-client:^5.4.53'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "thecodingmachine/safe",
+          "fails_gate": false,
+          "reach": "via scheb/2fa-google-authenticator",
+          "held": "held by spomky-labs/otphp",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "willdurand/jsonp-callback-validator",
+          "fails_gate": false,
+          "reach": "via friendsofsymfony/jsrouting-bundle and 1 more",
+          "held": "held by friendsofsymfony/jsrouting-bundle",
+          "command": null,
+          "after": "after it: 4, low, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "bdunogier/guzzle-site-authenticator",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "craue/config-bundle",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "defuse/php-encryption",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "pragmarx/recovery",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "wallabag/phpepub",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "bacon/bacon-qr-code",
+          "fails_gate": false,
+          "reach": "via scheb/2fa-qr-code",
+          "held": "held by endroid/qr-code",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "doctrine/instantiator",
+          "fails_gate": false,
+          "reach": "via doctrine/orm and 6 more",
+          "held": null,
+          "command": "composer require 'php:>=8.4' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "endroid/qr-code",
+          "fails_gate": false,
+          "reach": "via scheb/2fa-qr-code",
+          "held": "held by scheb/2fa-qr-code",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "khanamiryan/qrcode-detector-decoder",
+          "fails_gate": false,
+          "reach": "via scheb/2fa-qr-code",
+          "held": "held by endroid/qr-code",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "lcobucci/clock",
+          "fails_gate": false,
+          "reach": "via lcobucci/jwt and 1 more",
+          "held": "held by lcobucci/jwt",
+          "command": "composer require 'php:>=8.4' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "pagerfanta/core",
+          "fails_gate": false,
+          "reach": "via babdev/pagerfanta-bundle and 2 more",
+          "held": "held by babdev/pagerfanta-bundle and 2 more",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "smalot/pdfparser",
+          "fails_gate": false,
+          "reach": "via j0k3r/graby",
+          "held": "held by j0k3r/graby",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/event-dispatcher-contracts",
+          "fails_gate": false,
+          "reach": "via friendsofsymfony/user-bundle and 37 more",
+          "held": "held by symfony/event-dispatcher",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/property-access",
+          "fails_gate": false,
+          "reach": "via babdev/pagerfanta-bundle and 16 more",
+          "held": "held by kphoen/rulerz",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/psr-http-message-bridge",
+          "fails_gate": false,
+          "reach": "via sentry/sentry-symfony",
+          "held": null,
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/translation",
+          "fails_gate": false,
+          "reach": "via friendsofsymfony/user-bundle",
+          "held": "held by symfony/validator",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/var-dumper",
+          "fails_gate": false,
+          "reach": "via symfony/error-handler and 33 more",
+          "held": "held by your composer.json",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "j0k3r/graby",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'j0k3r/graby:^2.5.1'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "fails_gate": false,
+          "reach": "via egulias/email-validator and 38 more",
+          "held": null,
+          "command": "composer update 'symfony/polyfill-intl-idn:^1.38.1'",
+          "after": "after it: 0, finished",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/yaml",
+          "fails_gate": false,
+          "reach": "via incenteev/composer-parameter-handler and 2 more",
+          "held": null,
+          "command": "composer update 'symfony/yaml:^5.4.52'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth2-php",
+          "fails_gate": false,
+          "reach": "via friendsofsymfony/oauth-server-bundle",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "phpdocumentor/reflection-common",
+          "fails_gate": false,
+          "reach": "via nelmio/api-doc-bundle",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "willdurand/negotiation",
+          "fails_gate": false,
+          "reach": "via friendsofsymfony/rest-bundle",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 15,
+        "wayout": 31
+      },
+      "data_caption": "Every row has data as of 2026-10-14",
+      "data_column": false,
+      "signals_key": [
+        "S1 marked abandoned",
+        "S2 release age",
+        "S3 archived repository",
+        "S4 repository activity",
+        "S5 PHP promise",
+        "S6 pinned version",
+        "S7 pulled-in packages",
+        "S8 release branch",
+        "S9 advisories",
+        "S10 unchecked"
+      ],
+      "advisory_groups": [
+        {
+          "package": "twig/twig",
+          "same_cve_as": [],
+          "fix_notes": [
+            "needs PHP >=8.1.0"
+          ]
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by php-http/guzzle5-adapter and 1 more"
+          ]
+        },
+        {
+          "package": "symfony/http-foundation",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "symfony/mime",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "symfony/security-http",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by symfony/security-bundle and 1 more"
+          ]
+        },
+        {
+          "package": "spomky-labs/otphp",
+          "same_cve_as": [],
+          "fix_notes": [
+            "needs PHP >=8.1 · held by scheb/2fa-google-authenticator"
+          ]
+        },
+        {
+          "package": "j0k3r/httplug-ssrf-plugin",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "phpseclib/phpseclib",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "enshrined/svg-sanitize",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "symfony/mailer",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "symfony/routing",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "symfony/dom-crawler",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "symfony/validator",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by kphoen/rulerz-bridge"
+          ]
+        },
+        {
+          "package": "guzzlehttp/psr7",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/cache",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/http-client",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "j0k3r/graby",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/yaml",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ],
+      "run_notes": [
+        "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested."
       ]
     },
     "composite.other-day-same-cve‡": {
@@ -5982,7 +8386,8 @@
           "same_cve_as": [],
           "fix_notes": []
         }
-      ]
+      ],
+      "run_notes": []
     },
     "B-also.checked‡": {
       "document": "page/B-also.checked-dagger.json",
@@ -6129,7 +8534,8 @@
           "same_cve_as": [],
           "fix_notes": []
         }
-      ]
+      ],
+      "run_notes": []
     },
     "unknown.offline‡": {
       "document": "page/unknown.offline-dagger.json",
@@ -6221,7 +8627,10 @@
       "signals_key": [
         "S7 pulled-in packages"
       ],
-      "advisory_groups": []
+      "advisory_groups": [],
+      "run_notes": [
+        "offline: repository metadata served from Composer's cache"
+      ]
     },
     "snipe-it": {
       "document": "contract/page/snipe-it.json",
@@ -6904,6 +9313,9 @@
           "same_cve_as": [],
           "fix_notes": []
         }
+      ],
+      "run_notes": [
+        "1 package is not from a Composer repository: its release metadata and repository activity were not read · advisories asked"
       ]
     },
     "empty-lock": {
@@ -6944,7 +9356,8 @@
       "data_caption": "No row has repository data",
       "data_column": false,
       "signals_key": [],
-      "advisory_groups": []
+      "advisory_groups": [],
+      "run_notes": []
     }
   }
 }
