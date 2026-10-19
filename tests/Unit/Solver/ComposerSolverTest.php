@@ -94,6 +94,9 @@ final class ComposerSolverTest extends TestCase
     /** A root requirement holds a move only through a requirement that it leaves no candidate. */
     public function testARefusalNamesNoRootRequirementOfARequirementThatKeepsACandidate(): void
     {
+        if (!ComposerFeatures::hasTemporaryConstraints()) {
+            self::markTestSkipped('Composer 2.2 lists the root requirement of each dependency that -W frees as a rule of the problem');
+        }
         $solver = self::solver(
             ['require' => ['acme/lib' => '^1.0', 'acme/dep' => '^1.0', 'acme/y' => '^1.0']],
             [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/dep' => '^1.0']], ['name' => 'acme/dep', 'version' => '1.0.0'], ['name' => 'acme/y', 'version' => '1.0.0']],
