@@ -439,6 +439,68 @@ final class SolverCheckerTest extends TestCase
         $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
     }
 
+    /** The solver stops at its first failing chain: the scan of the target release names the other holds. */
+    public function testARefusalAlsoNamesTheHoldsOfTheTargetThatTheSolversFirstFailingChainLeavesOut(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/x' => '^1.0', 'acme/y' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/x', 'version' => '1.0.0'], ['name' => 'acme/y', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'conflict' => ['acme/x' => '<2.0'], 'require' => ['acme/y' => '^2.0']]], 'acme/x' => [['version' => '1.0.0']], 'acme/y' => [['version' => '1.0.0']]]
+        );
+
+        $holds = self::rows($checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->holds());
+
+        self::assertContains(['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'conflict', 'target' => 'acme/x', 'constraint' => '<2.0'], $holds);
+        self::assertContains(['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'require', 'target' => 'acme/y', 'constraint' => '^2.0'], $holds);
+    }
+
+    public function testACombinedUpdateOfANameThatTheSourceCouldNotLoadIsNotChecked(): void
+    {
+        $checker = self::checker(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], [], ['acme/lib' => VersionSource::FAILED]);
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME], $checker->combined(['acme/lib' => '^1.1.0'])->check()->jsonSerialize());
+    }
+
+    /** The run note names the first failure of Composer's solver, so a later solve that succeeds keeps it. */
+    public function testTheFirstSolverFailureIsKeptAfterALaterSolveSucceeds(): void
+    {
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/new-dependency' => '^1.0']]], 'acme/other' => [['version' => '1.0.0'], ['version' => '1.1.0']]], [], ['acme/new-dependency' => new \UnexpectedValueException('Could not parse version constraint')]);
+        $checker = self::checkerWith(['acme/lib' => '^1.0', 'acme/other' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/other', 'version' => '1.0.0']], $source);
+
+        $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $resolved = $checker->check(MoveQuery::update('acme/other', '^1.1.0', '1.1.0'));
+
+        self::assertSame(MoveCheck::RESOLVES, $resolved->check()->result());
+        self::assertSame(['class' => \UnexpectedValueException::class, 'message' => 'Could not parse version constraint'], $checker->solverError());
+    }
+
+    /**
+     * @dataProvider advisoryCheckers
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('advisoryCheckers')]
+    public function testOnlyACopyOfACheckerThatBlocksAdvisoriesReadsTheRunsRecords(bool $blocksAdvisories, string $result): void
+    {
+        if (!class_exists(PartialSecurityAdvisory::class)) {
+            self::markTestSkipped('Composer below 2.4 has no advisory records');
+        }
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]);
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, []);
+        $checker = new SolverChecker($solver, [], '8.4.99', $blocksAdvisories, Deadline::never(), new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): array => []));
+        $records = ['acme/lib' => [PartialSecurityAdvisory::create('acme/lib', ['advisoryId' => 'PKSA-1111-2222-3333', 'affectedVersions' => '>=1.1.0,<1.2.0'], new VersionParser())]];
+
+        $copy = $checker->withAdvisories($records, ['acme/lib']);
+
+        self::assertSame(MoveCheck::RESOLVES, $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->result(), 'the checker itself reads no records');
+        self::assertSame($result, $copy->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->result());
+    }
+
+    /** @return iterable<string, array{bool, string}> */
+    public static function advisoryCheckers(): iterable
+    {
+        yield 'a checker that blocks advisories' => [true, MoveCheck::REFUSED];
+        yield 'a checker that blocks none' => [false, MoveCheck::RESOLVES];
+    }
+
     /**
      * @param array<string, string>                     $requires
      * @param list<array<string, mixed>>                $locked

@@ -16,30 +16,21 @@ use Composer\Repository\ArrayRepository;
 final class LoadedVersions extends ArrayRepository
 {
     private VersionSource $source;
-    /** @var array<string, true> */
+    /** @var array<string, string> */
     private array $asked = [];
 
     public function __construct(VersionSource $source)
     {
-        parent::__construct();
         $this->source = $source;
-    }
-
-    /** @return list<string> the names that the pool builder asked for, in order */
-    public function asked(): array
-    {
-        return array_keys($this->asked);
     }
 
     public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = [])
     {
-        $this->getPackages();
         foreach (array_keys($packageNameMap) as $name) {
-            $name = (string) $name;
             if (isset($this->asked[$name])) {
                 continue;
             }
-            $this->asked[$name] = true;
+            $this->asked[$name] = $name;
             foreach ($this->source->versions($name) as $package) {
                 $this->packages[] = $package;
             }

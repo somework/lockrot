@@ -53,7 +53,7 @@ final class PoolAdvisories
     }
 
     /**
-     * @param list<string> $names the pool's names that the update can move
+     * @param array<string> $names the pool's names that the update can move
      *
      * @return array<string, list<ConstraintInterface>> the ranges that the update blocks, by name
      */
