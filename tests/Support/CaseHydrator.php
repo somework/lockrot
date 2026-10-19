@@ -166,7 +166,7 @@ final class CaseHydrator
     {
         $packages = [];
         foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::COMPOSITE_FILE), ['findings']) as $finding) {
-            $packages[] = JsonPath::stringAt($finding, ['package']);
+            $packages[] = JsonPath::stringAt(JsonPath::decoded($finding), ['package']);
         }
 
         return self::ofCases(self::COMPOSITE, $packages);

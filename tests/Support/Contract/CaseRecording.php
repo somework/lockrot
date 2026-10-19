@@ -69,7 +69,7 @@ final class CaseRecording
         }
         $findings = [$finding];
         foreach (\is_array($case['parents'] ?? null) ? $case['parents'] : [] as $parent) {
-            $name = JsonPath::stringAt($parent, ['package']);
+            $name = JsonPath::stringAt(JsonPath::decoded($parent), ['package']);
             $found = $analysis->finding($name);
             if ($found === null) {
                 throw new \InvalidArgumentException('the case\'s lock has no finding for '.$name);

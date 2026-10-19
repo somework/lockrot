@@ -152,7 +152,7 @@ final class PageGoldensTest extends TestCase
                 }
             }
             $partition = $golden['gate_partition'] ?? null;
-            if (\is_array($partition) && min($partition) > 0) {
+            if (\is_array($partition) && $partition !== [] && min($partition) > 0) {
                 $partitions[] = $id;
             }
         }
