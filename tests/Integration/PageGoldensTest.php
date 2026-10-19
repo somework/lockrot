@@ -35,6 +35,7 @@ final class PageGoldensTest extends TestCase
         'policy-off' => 'the hydrated lock holds joomla/filter and the three packages that require it, and the model\'s case document counts its one finding',
         'pagerfanta' => 'the hydrated lock holds pagerfanta/twig and the packages that its finding names, and the model\'s case document counts its one finding',
         'guzzle-mixed' => 'the hydrated lock holds guzzlehttp/guzzle and the packages that hold its moves, and the model\'s case document counts its one finding',
+        'ok-unchecked' => 'the hydrated lock holds scheb/2fa-google-authenticator and the packages that its finding names, and the model\'s case document counts its one finding',
         'rounded-dev‡' => 'the hydrated lock holds jfcherng/php-color-output and the packages that its finding names, and the model\'s case document counts its one finding',
     ];
 
@@ -190,6 +191,30 @@ final class PageGoldensTest extends TestCase
 
         self::assertNotSame([], $beside, 'no page case shows a not_checked move beside resolves moves');
         self::assertNotSame([], $refusedBaseline, 'no page case shows a refused baseline with its moves_not_checked note');
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.4 and §7.9.9: a page case shows the allowlist line with a count per flag, and
+     * the check words of `release_dates` on the way-out line. No valid document reaches the words of
+     * `releases`: its S10 entry stands beside a counted advisory (I35), and such a finding has a move.
+     */
+    public function testThePageCasesShowTheAcceptedCountsAndTheReleaseDatesCheckWords(): void
+    {
+        $accepted = [];
+        $releaseDates = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']) as $id => $golden) {
+            $golden = JsonPath::decoded($golden);
+            $notes = JsonPath::has($golden, ['flags_notes']) ? array_filter(JsonPath::arrayAt($golden, ['flags_notes']), 'is_string') : [];
+            if (preg_grep('/^Accepted by the allowlist: [a-z-]+ [1-9]\d*(, [a-z-]+ [1-9]\d*)+$/', $notes) !== []) {
+                $accepted[] = $id;
+            }
+            if (strpos((string) self::textAt($golden, ['ready', 'way_out']), 'fails the gate as unchecked: release dates not checked') !== false) {
+                $releaseDates[] = $id;
+            }
+        }
+
+        self::assertNotSame([], $accepted, 'no page case shows the allowlist line with two flags and their counts');
+        self::assertNotSame([], $releaseDates, 'no page case shows the release_dates check words on the way-out line');
     }
 
     /**

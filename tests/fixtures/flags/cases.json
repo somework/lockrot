@@ -2248,7 +2248,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -10928,7 +10928,7 @@
        "composer update symfony/polyfill-intl-idn",
        "composer why-not guzzlehttp/guzzle 8.2.0"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -17158,7 +17158,7 @@
        "composer require 'php:>=7.2.5' --no-update",
        "composer require 'guzzlehttp/guzzle:^7.15.2'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "left-behind and all 9 advisories",
       "stays": null,
       "not_checked": null,
@@ -19516,7 +19516,7 @@
        "composer require 'php:>=7.2.5' --no-update",
        "composer require 'symfony/yaml:^5.4.52'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "left-behind and all 3 advisories",
       "stays": null,
       "not_checked": "old-promise",
@@ -24878,7 +24878,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 16 advisories",
       "stays": null,
       "not_checked": "old-promise",
@@ -49571,7 +49571,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'pagerfanta/twig:^4.9'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "left-behind",
       "stays": null,
       "not_checked": null,
@@ -67584,7 +67584,7 @@
        "composer require 'php:>=7.2.5' --no-update",
        "composer require 'guzzlehttp/guzzle:^7.15.2'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "left-behind and all 14 advisories",
       "stays": null,
       "not_checked": "old-promise",
@@ -69853,7 +69853,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'joomla/filter:^3.0.5'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -73554,7 +73554,7 @@
        "composer update symfony/polyfill-intl-idn",
        "composer why-not guzzlehttp/guzzle 8.2.0"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -82086,7 +82086,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -100986,7 +100986,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -104113,7 +104113,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'joomla/filter:^3.0.5'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "the advisory",
       "stays": null,
       "not_checked": null,
@@ -114068,7 +114068,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'joomla/string:^3.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "left-behind",
       "stays": null,
       "not_checked": null,
@@ -115736,7 +115736,7 @@
       "heading": "The move",
       "action": "Update to v2.3.2 on 2.x",
       "commands": [
-       "This command holds characters the page does not print."
+       "composer update 'typo3/html-sanitizer:^2.3.2' --with-dependencies"
       ],
       "commands_label": "Command",
       "clears": "both advisories",
@@ -121745,7 +121745,7 @@
        "composer require 'php:>=8.2' --no-update",
        "composer require 'laravel/framework:^12.69.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 6 advisories",
       "stays": null,
       "not_checked": null,
@@ -125382,7 +125382,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'geoip2/geoip2:^3.4'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "left-behind, old-promise and both advisories",
       "stays": null,
       "not_checked": null,
@@ -157811,7 +157811,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -192825,7 +192825,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,
@@ -199806,7 +199806,7 @@
        "composer require 'php:>=8.1' --no-update",
        "composer require 'twig/twig:^3.27.0'"
       ],
-      "commands_label": "Command",
+      "commands_label": "Commands, in order",
       "clears": "all 15 advisories",
       "stays": null,
       "not_checked": null,

@@ -9,6 +9,8 @@ use Lockrot\Baseline\BaselineFile;
 use Lockrot\Json\JsonWriter;
 use Lockrot\Output\AgeText;
 use Lockrot\Output\CauseWords;
+use Lockrot\Output\ConsoleMarkup;
+use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Output\RunGateText;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
@@ -250,6 +252,7 @@ final class ContractBundle
         $failOn = $run === null || $run->failOn() === null ? FailOn::none() : $run->failOn();
         $formats = CaseRecording::formatted($report, $failOn, CaseHydrator::lockJson());
         $this->putFormats('composite', $formats);
+        $this->putRaw('text/composite.install.txt', implode("\n", array_map(static fn (string $line): string => ConsoleMarkup::render($line, false), (new InstallSummaryFormatter())->format($report)))."\n");
         $this->collect($formats['json']);
     }
 
