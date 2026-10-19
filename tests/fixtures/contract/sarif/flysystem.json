@@ -238,6 +238,8 @@
                             "newest": "3.36.0",
                             "on_installed_branch": false,
                             "php": "^8.0.2",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
                             "held_by": [
                                 {
                                     "source": "package",

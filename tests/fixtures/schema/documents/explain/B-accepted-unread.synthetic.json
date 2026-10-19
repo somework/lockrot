@@ -303,6 +303,8 @@
         "newest": null,
         "on_installed_branch": null,
         "php": null,
+        "admits_target_php": null,
+        "admits_project_php": null,
         "held_by": [],
         "reason": "not_from_composer_repository"
        },

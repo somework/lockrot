@@ -401,6 +401,38 @@ final class RunNoteTest extends TestCase
     }
 
     /** Every constructor refuses what no run can produce: a note about nothing, or a reason it does not know. */
+    private const DRUPAL_PROBLEM = "Problem 1\n"
+        ."    - drupal/core-recommended is locked to version 9.3.14 and an update of this package was not requested.\n"
+        ."    - drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros ~2.8.0 -> satisfiable by laminas/laminas-diactoros[2.8.0].\n"
+        ."    - laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0 -> your php version (8.3.99; overridden via config.platform) does not satisfy that requirement.\n"
+        ."  Problem 2\n"
+        ."    - acme/other is locked to version 1.0.0 and an update of this package was not requested.";
+
+    /** The first line of a problem names the locked package. Its last line names the cause, and Composer's reply after " -> " only repeats the php. */
+    public function testARefusedSolveNamesTheLastLineOfTheFirstProblemUpToItsArrow(): void
+    {
+        $note = RunNote::movesNotChecked('8.3.99', self::DRUPAL_PROBLEM);
+
+        self::assertSame(
+            "moves not checked: Composer's solver refuses the lock itself at php 8.3.99, so it would refuse every move: laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0.",
+            $note->text()
+        );
+        self::assertSame(self::DRUPAL_PROBLEM, $note->data()['problem']);
+    }
+
+    public function testTheUpdateNowNotesQuoteTheSameCauseOfARefusal(): void
+    {
+        self::assertStringEndsWith(': laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0.', RunNote::updateNowRefused(self::DRUPAL_PROBLEM)->text());
+        self::assertStringEndsWith(': laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0.', RunNote::updateNowReduced(['acme/b'], self::DRUPAL_PROBLEM)->text());
+    }
+
+    /** A problem of one line keeps that line whole, and a text with no list marker is quoted as Composer wrote it. */
+    public function testAProblemWithoutAnArrowOrAMarkerKeepsItsLine(): void
+    {
+        self::assertStringEndsWith(': acme/a 2.1.0 conflicts with acme/b <3.0.', RunNote::updateNowRefused("Problem 1\n    - acme/a 2.1.0 conflicts with acme/b <3.0.")->text());
+        self::assertStringEndsWith(': Your requirements could not be resolved.', RunNote::updateNowRefused('Your requirements could not be resolved.')->text());
+    }
+
     public function testANoteAboutNothingIsRefused(): void
     {
         $refused = [

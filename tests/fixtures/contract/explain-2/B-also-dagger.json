@@ -497,6 +497,8 @@
                                 "newest": "v2.8.52",
                                 "on_installed_branch": true,
                                 "php": ">=5.3.9",
+                                "admits_target_php": true,
+                                "admits_project_php": true,
                                 "held_by": [],
                                 "reason": null
                             },

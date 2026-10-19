@@ -596,10 +596,10 @@ def add_relations(D):
             P(by=E('type'), reason_by=E('lockrot'), reason_id=STR, flag_ids=NULL, pattern=NULL)])
     fix = D['s9row']['properties']['fix']
     relate(fix, ['A fix of kind `unknown` or `none` has a `reason` and no `to_branch`; a known reachable kind has a branch and no reason; a kind this schema '
-                 'does not list is not constrained.', '`on_installed_branch` and `newest` are null when there is no branch; `on_installed_branch` is set when there is one.'],
+                 'does not list is not constrained.', '`on_installed_branch`, `newest` and the two php answers are null when there is no branch; `on_installed_branch` is set when there is one.'],
            [P(kind=E('unknown', 'none'), reason=STR, to_branch=NULL), P(kind=E('update', 'upgrade', 'raise-php', 'blocked'), reason=NULL, to_branch=STR),
             P(kind=NOT(*FIX_KINDS))],
-           [P(to_branch=NULL, on_installed_branch=NULL, newest=NULL), P(to_branch=STR, on_installed_branch={'type': 'boolean'})])
+           [P(to_branch=NULL, on_installed_branch=NULL, newest=NULL, admits_target_php=NULL, admits_project_php=NULL), P(to_branch=STR, on_installed_branch={'type': 'boolean'})])
     D['s9row']['properties']['counted'] = {'description': 'Always true on an S9 row: ignored advisories live in `security.ignored[]` (round 4).',
                                            'type': 'boolean', 'enum': [True]}
 

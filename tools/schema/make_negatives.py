@@ -632,7 +632,9 @@ def _(d): d['findings'][CSSMIN]['next_step']['if_applied'] = {'total': 2, 'verdi
 @case('relation-finding-43', 'stale-only', 'findings[0].checks_missing')
 def _(d): d['findings'][0]['checks_missing'] = [{'check': 'release_dates', 'reason': 'undated_releases', 'blocks': ['S2', 'S8']}]
 @case('relation-s9fix-2', 'composite', 'findings[%d].signals[0].data.advisories[0].fix' % POLY)
-def _(d): d['findings'][POLY]['signals'][0]['data']['advisories'][0]['fix'] = {'kind': 'none', 'to_branch': None, 'version': 'v5.4.52', 'newest': 'v5.4.53', 'on_installed_branch': True, 'php': '>=7.2.5', 'held_by': [], 'reason': 'no_release_outside_range'}
+def _(d): d['findings'][POLY]['signals'][0]['data']['advisories'][0]['fix'] = {'kind': 'none', 'to_branch': None, 'version': 'v5.4.52', 'newest': 'v5.4.53', 'on_installed_branch': True, 'php': '>=7.2.5', 'admits_target_php': True, 'admits_project_php': True, 'held_by': [], 'reason': 'no_release_outside_range'}
+@case('relation-s9fix-3', 'local-path-advisory', 'findings[0].signals[2].data.advisories[0].fix.admits_target_php')
+def _(d): d['findings'][0]['signals'][2]['data']['advisories'][0]['fix']['admits_target_php'] = True
 
 # P1: Composer's policy never stops the advisory lookup, so the strict twin knows no check value that says it did
 @case('strict-p1-security-check-disabled', 'ok-unchecked', 'findings[0].security.check', strict=True)

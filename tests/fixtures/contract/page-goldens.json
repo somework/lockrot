@@ -392,7 +392,7 @@
           "package": "twig/twig",
           "same_cve_as": [],
           "fix_notes": [
-            "held by symfony/twig-bridge"
+            "needs PHP >=8.1.0 · held by symfony/twig-bridge"
           ]
         },
         {
@@ -405,7 +405,9 @@
         {
           "package": "guzzlehttp/guzzle",
           "same_cve_as": [],
-          "fix_notes": []
+          "fix_notes": [
+            "needs PHP ^7.2.5 || ^8.0"
+          ]
         },
         {
           "package": "symfony/yaml",
@@ -419,7 +421,9 @@
         }
       ],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "new-symfony": {
       "document": "report-2/new-symfony.json",
@@ -517,7 +521,9 @@
       "signals_key": [],
       "advisory_groups": [],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "akaunting": {
       "document": "report-2/akaunting.json",
@@ -1294,7 +1300,9 @@
         }
       ],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "ok-offline": {
       "document": "cases/ok-offline-dagger.json",
@@ -1384,7 +1392,9 @@
       "run_notes": [
         "security advisories not checked (offline): no finding is graded for an advisory, and each next step's score after the move assumes its versions carry none"
       ],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "policy-off": {
       "document": "cases/policy-off-dagger.json",
@@ -1517,7 +1527,9 @@
       "run_notes": [
         "Composer is set not to block an install or an update on security advisories (policy.advisories: false); lockrot still checks and counts them."
       ],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "wallabag": {
       "document": "report-2/wallabag.json",
@@ -3177,7 +3189,9 @@
         }
       ],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "B-dev‡": {
       "document": "cases/B-dev-dagger.json",
@@ -3338,7 +3352,9 @@
         }
       ],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "unknown-rules‡": {
       "document": "page/composite.unknown-rules-dagger.json",
@@ -3733,7 +3749,7 @@
           "package": "twig/twig",
           "same_cve_as": [],
           "fix_notes": [
-            "held by symfony/twig-bridge"
+            "needs PHP >=8.1.0 · held by symfony/twig-bridge"
           ]
         },
         {
@@ -3746,7 +3762,9 @@
         {
           "package": "guzzlehttp/guzzle",
           "same_cve_as": [],
-          "fix_notes": []
+          "fix_notes": [
+            "needs PHP ^7.2.5 || ^8.0"
+          ]
         },
         {
           "package": "symfony/yaml",
@@ -3760,7 +3778,9 @@
         }
       ],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "pagerfanta": {
       "document": "cases/pagerfanta.json",
@@ -3905,7 +3925,9 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "new-slim-baselined": {
       "document": "coverage/baselined/new-slim.json",
@@ -4097,7 +4119,9 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "composite-generate-baseline": {
       "document": "cases/composite-generate-baseline.json",
@@ -4462,7 +4486,7 @@
           "package": "twig/twig",
           "same_cve_as": [],
           "fix_notes": [
-            "held by symfony/twig-bridge"
+            "needs PHP >=8.1.0 · held by symfony/twig-bridge"
           ]
         },
         {
@@ -4475,7 +4499,9 @@
         {
           "package": "guzzlehttp/guzzle",
           "same_cve_as": [],
-          "fix_notes": []
+          "fix_notes": [
+            "needs PHP ^7.2.5 || ^8.0"
+          ]
         },
         {
           "package": "symfony/yaml",
@@ -4489,7 +4515,9 @@
         }
       ],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "guzzle-mixed": {
       "document": "cases/guzzle-mixed.json",
@@ -4644,7 +4672,9 @@
         }
       ],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "matomo": {
       "document": "report-2/matomo.json",
@@ -5110,7 +5140,9 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "E-ignored-whole‡": {
       "document": "cases/E-ignored-whole-dagger.json",
@@ -5243,7 +5275,9 @@
       "run_notes": [
         "extra.lockrot.ignore[] no longer hides advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision"
       ],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "rounded-dev‡": {
       "document": "cases/rounded-dev-dagger.json",
@@ -5368,7 +5402,9 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "unreached": {
       "document": "cases/unreached.json",
@@ -5493,7 +5529,9 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "B-gate-none": {
       "document": "cases/B-gate-none.json",
@@ -5626,7 +5664,9 @@
         }
       ],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "B-accepted‡": {
       "document": "cases/B-accepted-dagger.json",
@@ -5763,7 +5803,9 @@
         }
       ],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "ok-unchecked": {
       "document": "cases/ok-unchecked.json",
@@ -5843,7 +5885,9 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "snipe-it.unloaded‡": {
       "document": "page/snipe-it.unloaded-dagger.json",
@@ -6561,7 +6605,30 @@
             ]
           }
         ]
-      }
+      },
+      "sheet_holders": {
+        "pragmarx/google2fa-qrcode": [
+          {
+            "count": 2,
+            "shown": [
+              {
+                "name": "your composer.json",
+                "grade": null,
+                "meta": "requires ^1.3",
+                "step": null
+              },
+              {
+                "name": "pragmarx/google2fa-laravel v1.4.1",
+                "grade": "high",
+                "meta": "requires ^1.0 · itself left-behind · old-promise",
+                "step": "its own step: require ^2.3 on 2.x · not checked: a package it needs could not be loaded"
+              }
+            ],
+            "fold": null
+          }
+        ]
+      },
+      "sheet_ladder": {}
     },
     "wallabag-2.6": {
       "document": "baselined/wallabag-2.6/check/report.bundle.json",
@@ -8268,7 +8335,7 @@
         }
       ],
       "run_notes": [
-        "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested."
+        "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code 4.7.1 requires php >=7.4, <8.2."
       ],
       "sheet_moves": {
         "twig/twig": [
@@ -8304,6 +8371,91 @@
               ]
             },
             "composer": []
+          }
+        ]
+      },
+      "sheet_holders": {
+        "symfony/security-http": [
+          {
+            "count": 3,
+            "shown": [
+              {
+                "name": "your composer.json",
+                "grade": null,
+                "meta": "requires ^4.4.50",
+                "step": null
+              },
+              {
+                "name": "symfony/security-bundle v4.4.50",
+                "grade": "high",
+                "meta": "requires ^4.4.50 · itself left-behind",
+                "step": "its own step: require ^5.4.20 on 5.x · not checked: Composer refuses the lock itself"
+              },
+              {
+                "name": "symfony/security-guard v4.4.46",
+                "grade": "high",
+                "meta": "requires ^4.4.1 · itself abandoned · left-behind",
+                "step": "its own step: find alternative"
+              }
+            ],
+            "fold": null
+          }
+        ]
+      },
+      "sheet_ladder": {
+        "twig/twig": [
+          {
+            "branch": "3.x",
+            "marks": [
+              "your branch",
+              "the move"
+            ],
+            "lines": [
+              "3.x your branch the move clears 15 of 15 from v3.27.0",
+              "php floor raise",
+              "after it: 0, ok · not checked: Composer refuses the lock itself"
+            ]
+          }
+        ],
+        "symfony/yaml": [
+          {
+            "branch": "5.x",
+            "marks": [
+              "your branch",
+              "the move"
+            ],
+            "lines": [
+              "5.x your branch the move clears 3 of 3 from v5.4.52",
+              "composer update",
+              "after it: 0, ok · not checked: Composer refuses the lock itself"
+            ]
+          },
+          {
+            "branch": "6.x",
+            "marks": [],
+            "lines": [
+              "6.x clears 3 of 3 from v6.4.40",
+              "php floor raise",
+              "after it: 0, ok · not checked: Composer refuses the lock itself"
+            ]
+          },
+          {
+            "branch": "7.x",
+            "marks": [],
+            "lines": [
+              "7.x clears 3 of 3 from v7.4.12",
+              "php floor raise · held by incenteev/composer-parameter-handler",
+              "after it: 0, ok · not checked: Composer refuses the lock itself"
+            ]
+          },
+          {
+            "branch": "8.x",
+            "marks": [],
+            "lines": [
+              "8.x clears 3 of 3 from v8.0.12",
+              "php floor raise · held by incenteev/composer-parameter-handler and php-amqplib/rabbitmq-bundle",
+              "after it: 0, ok · not checked: Composer refuses the lock itself"
+            ]
           }
         ]
       }
@@ -8675,7 +8827,7 @@
           "package": "twig/twig",
           "same_cve_as": [],
           "fix_notes": [
-            "held by symfony/twig-bridge"
+            "needs PHP >=8.1.0 · held by symfony/twig-bridge"
           ]
         },
         {
@@ -8688,7 +8840,9 @@
         {
           "package": "guzzlehttp/guzzle",
           "same_cve_as": [],
-          "fix_notes": []
+          "fix_notes": [
+            "needs PHP ^7.2.5 || ^8.0"
+          ]
         },
         {
           "package": "symfony/yaml",
@@ -8704,7 +8858,9 @@
         }
       ],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "B-also.checked‡": {
       "document": "page/B-also.checked-dagger.json",
@@ -8855,7 +9011,9 @@
         }
       ],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "unknown.offline‡": {
       "document": "page/unknown.offline-dagger.json",
@@ -8951,7 +9109,9 @@
       "run_notes": [
         "offline: repository metadata served from Composer's cache"
       ],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     },
     "snipe-it": {
       "document": "contract/page/snipe-it.json",
@@ -9720,7 +9880,62 @@
             ]
           }
         ]
-      }
+      },
+      "sheet_holders": {
+        "bacon/bacon-qr-code": [
+          {
+            "count": 4,
+            "shown": [
+              {
+                "name": "your composer.json",
+                "grade": null,
+                "meta": "requires ^2.0",
+                "step": null
+              },
+              {
+                "name": "your composer.json",
+                "grade": null,
+                "meta": "requires ^1.3",
+                "step": null
+              },
+              {
+                "name": "pragmarx/google2fa-laravel v1.4.1",
+                "grade": "high",
+                "meta": "requires ^1.0 · itself left-behind · old-promise",
+                "step": "its own step: require ^2.3 on 2.x"
+              },
+              {
+                "name": "pragmarx/google2fa-qrcode v1.0.3",
+                "grade": "medium",
+                "meta": "requires ~1.0|~2.0 · itself left-behind · old-promise",
+                "step": "its own step: require ^4.0 on 4.x · Composer refuses the move"
+              }
+            ],
+            "fold": null
+          }
+        ],
+        "intervention/image": [
+          {
+            "count": 2,
+            "shown": [
+              {
+                "name": "your composer.json",
+                "grade": null,
+                "meta": "requires ^2.5",
+                "step": null
+              },
+              {
+                "name": "intervention/image 3.11.10",
+                "grade": "high",
+                "meta": "requires ^4.2 · itself left-behind",
+                "step": "its own step: require ^3.11 on 3.x · Composer refuses the move"
+              }
+            ],
+            "fold": null
+          }
+        ]
+      },
+      "sheet_ladder": {}
     },
     "empty-lock": {
       "document": "report-2/moodle-v3.json",
@@ -9762,7 +9977,9 @@
       "signals_key": [],
       "advisory_groups": [],
       "run_notes": [],
-      "sheet_moves": {}
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     }
   }
 }

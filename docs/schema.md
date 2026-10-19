@@ -414,7 +414,8 @@ the rest of the line unchanged.
 
 Every shape carries `check` (`complete`, `partial` or `not_run`), `records`, `feeds[]` and
 `ignored[]`, the advisories that Composer's audit policy ignores. Each S9 row carries the
-advisory's `fix`: `{kind, to_branch, version, newest, on_installed_branch, php, held_by, reason}`
+advisory's `fix`: `{kind, to_branch, version, newest, on_installed_branch, php, admits_target_php,
+admits_project_php, held_by, reason}`
 ([Fix](verdicts.md#fix)).
 
 The root `security` holds `update_now`, the packages whose advisories `composer update` fixes, and

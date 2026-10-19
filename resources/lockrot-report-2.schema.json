@@ -10661,6 +10661,8 @@
         "newest",
         "on_installed_branch",
         "php",
+        "admits_target_php",
+        "admits_project_php",
         "held_by",
         "reason"
       ],
@@ -10706,6 +10708,20 @@
           "description": "The fixing release's php requirement; null for `unknown` and `none`, or when it declares none.",
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "admits_target_php": {
+          "description": "A branch row's `admits_target_php` asked of `php`: whether the fixing release's php admits the target PHP. The Fixed by note reads it. Null is no answer, never admitted: `php` is null or cannot be read, or the kind names no fixing release.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "admits_project_php": {
+          "description": "A branch row's `admits_project_php` asked of `php`: whether the fixing release's php admits `run.project_php_lowest`. The Fixed by note reads it. Null is no answer, never admitted: `php` is null or cannot be read, the project names no lowest PHP, or the kind names no fixing release.",
+          "type": [
+            "boolean",
             "null"
           ]
         },
@@ -10792,7 +10808,7 @@
           ]
         },
         {
-          "description": "`on_installed_branch` and `newest` are null when there is no branch; `on_installed_branch` is set when there is one.",
+          "description": "`on_installed_branch`, `newest` and the two php answers are null when there is no branch; `on_installed_branch` is set when there is one.",
           "anyOf": [
             {
               "properties": {
@@ -10803,6 +10819,12 @@
                   "type": "null"
                 },
                 "newest": {
+                  "type": "null"
+                },
+                "admits_target_php": {
+                  "type": "null"
+                },
+                "admits_project_php": {
                   "type": "null"
                 }
               }

@@ -47,6 +47,8 @@ final class SchemaClaimsTest extends TestCase
         'factBaseline/oneOf/0.since' => 'the baseline file is outside the document',
         'heldBy.constraint' => 'PROSE: "never interpreted"',
         'phpCheck.project_allows' => 'the parse of require.php (PhpFloor)',
+        's9fix.admits_target_php' => 'the parse of `php` against the target PHP (PhpFloor); the null of unknown and none is encoded (s9fix relation)',
+        's9fix.admits_project_php' => 'the parse of `php` and require.php (PhpFloor); the null of unknown and none is encoded (s9fix relation)',
         'termSecurity.points' => 'weight x multiplier (scoreGraded model-1 tables hold its values)',
         'modifier.divide_by' => 'encoded under model 1 (scoreGraded: every halving divides by 2); PROSE otherwise',
         'withoutRow.total' => 'a number compared to score.total (arithmetic between two fields)',

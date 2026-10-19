@@ -14,6 +14,7 @@ use Lockrot\Security\Fix;
 use Lockrot\Security\Holder;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\JsonPath;
@@ -69,7 +70,7 @@ final class AdvisoryRuleTest extends TestCase
         self::assertSame([
             'id' => 'PKSA-1', 'cve' => 'CVE-2024-0001', 'title' => 'a title', 'link' => null, 'reported_at' => null,
             'severity' => 'medium', 'severity_published' => 'moderate', 'affected_versions' => null, 'counted' => true, 'points' => 8, 'deciding' => false,
-            'fix' => ['kind' => 'unknown', 'to_branch' => null, 'version' => null, 'newest' => null, 'on_installed_branch' => null, 'php' => null, 'held_by' => [], 'reason' => 'affected_range_unknown'],
+            'fix' => ['kind' => 'unknown', 'to_branch' => null, 'version' => null, 'newest' => null, 'on_installed_branch' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'held_by' => [], 'reason' => 'affected_range_unknown'],
             'baseline' => null,
         ], JsonPath::arrayAt(JsonPath::decoded($signal->data()), ['advisories', 0]));
         self::assertFalse(JsonPath::decoded($signal->data())['complete'], 'no lookup coverage');
@@ -121,7 +122,7 @@ final class AdvisoryRuleTest extends TestCase
     /** @param Fix::UPDATE|Fix::UPGRADE|Fix::RAISE_PHP|Fix::BLOCKED $kind */
     private static function fixIn(string $version, string $branch, string $newest, string $kind = Fix::UPDATE): Fix
     {
-        return Fix::to(new Candidate(new StableRelease((new VersionParser())->normalize($version), $version, null, null, false), $branch, $kind, []), $newest, '10');
+        return Fix::to(new Candidate(new StableRelease((new VersionParser())->normalize($version), $version, null, null, false), $branch, $kind, []), $newest, '10', new PhpFloor(null));
     }
 
     /**
@@ -298,7 +299,7 @@ final class AdvisoryRuleTest extends TestCase
     {
         $range = (new VersionParser())->parseConstraints('<2.0');
         $advisories = [new Advisory('PKSA-a', null, null, null, 'moderate', null, $range), new Advisory('PKSA-b', null, null, null, 'moderate', null, $range)];
-        $update = Fix::to(new Candidate(new StableRelease('2.0.0.0', '2.0.0', null, null, false), '2', Fix::UPDATE, []), '2.0.0', '1');
+        $update = Fix::to(new Candidate(new StableRelease('2.0.0.0', '2.0.0', null, null, false), '2', Fix::UPDATE, []), '2.0.0', '1', new PhpFloor(null));
         $facts = (new PackageFacts(F::package(['version' => '1.0.0']), null, null, $advisories))
             ->withFixes(new PackageFixes(['PKSA-a' => $update, 'PKSA-b' => Fix::none()], [], null, null, null));
 
@@ -311,7 +312,7 @@ final class AdvisoryRuleTest extends TestCase
     public function testAFixHeldByALinkNamesTheHolder(): void
     {
         $holder = new Holder(Holder::PACKAGE, 'acme/b', '2.0.0', Holder::REQUIRE, '^1.0');
-        $upgrade = Fix::to(new Candidate(new StableRelease('2.0.0.0', '2.0.0', null, null, false), '2', Fix::UPGRADE, [$holder]), '2.0.0', '1');
+        $upgrade = Fix::to(new Candidate(new StableRelease('2.0.0.0', '2.0.0', null, null, false), '2', Fix::UPGRADE, [$holder]), '2.0.0', '1', new PhpFloor(null));
         $facts = (new PackageFacts(F::package(['version' => '1.0.0']), null, null, [new Advisory('PKSA-a', null, null, null, 'high', null, (new VersionParser())->parseConstraints('<2.0'))]))
             ->withFixes(new PackageFixes(['PKSA-a' => $upgrade], [], null, null, null));
 
