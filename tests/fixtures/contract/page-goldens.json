@@ -418,7 +418,8 @@
           "fix_notes": []
         }
       ],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "new-symfony": {
       "document": "report-2/new-symfony.json",
@@ -515,7 +516,8 @@
       "data_column": false,
       "signals_key": [],
       "advisory_groups": [],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "akaunting": {
       "document": "report-2/akaunting.json",
@@ -1291,7 +1293,8 @@
           "fix_notes": []
         }
       ],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "ok-offline": {
       "document": "cases/ok-offline-dagger.json",
@@ -1380,7 +1383,8 @@
       "advisory_groups": [],
       "run_notes": [
         "security advisories not checked (offline): no finding is graded for an advisory, and each next step's score after the move assumes its versions carry none"
-      ]
+      ],
+      "sheet_moves": {}
     },
     "policy-off": {
       "document": "cases/policy-off-dagger.json",
@@ -1512,7 +1516,8 @@
       ],
       "run_notes": [
         "Composer is set not to block an install or an update on security advisories (policy.advisories: false); lockrot still checks and counts them."
-      ]
+      ],
+      "sheet_moves": {}
     },
     "wallabag": {
       "document": "report-2/wallabag.json",
@@ -3171,7 +3176,8 @@
           "fix_notes": []
         }
       ],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "B-dev‡": {
       "document": "cases/B-dev-dagger.json",
@@ -3331,7 +3337,8 @@
           ]
         }
       ],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "unknown-rules‡": {
       "document": "page/composite.unknown-rules-dagger.json",
@@ -3752,7 +3759,8 @@
           "fix_notes": []
         }
       ],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "pagerfanta": {
       "document": "cases/pagerfanta.json",
@@ -3896,7 +3904,8 @@
         "S10 unchecked"
       ],
       "advisory_groups": [],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "new-slim-baselined": {
       "document": "coverage/baselined/new-slim.json",
@@ -4087,7 +4096,8 @@
         "S8 release branch"
       ],
       "advisory_groups": [],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "composite-generate-baseline": {
       "document": "cases/composite-generate-baseline.json",
@@ -4478,7 +4488,8 @@
           "fix_notes": []
         }
       ],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "guzzle-mixed": {
       "document": "cases/guzzle-mixed.json",
@@ -4632,7 +4643,8 @@
           ]
         }
       ],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "matomo": {
       "document": "report-2/matomo.json",
@@ -5097,7 +5109,8 @@
         "S8 release branch"
       ],
       "advisory_groups": [],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "E-ignored-whole‡": {
       "document": "cases/E-ignored-whole-dagger.json",
@@ -5229,7 +5242,8 @@
       ],
       "run_notes": [
         "extra.lockrot.ignore[] no longer hides advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision"
-      ]
+      ],
+      "sheet_moves": {}
     },
     "rounded-dev‡": {
       "document": "cases/rounded-dev-dagger.json",
@@ -5353,7 +5367,8 @@
         "S5 PHP promise"
       ],
       "advisory_groups": [],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "unreached": {
       "document": "cases/unreached.json",
@@ -5477,7 +5492,8 @@
         "S4 repository activity"
       ],
       "advisory_groups": [],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "B-gate-none": {
       "document": "cases/B-gate-none.json",
@@ -5609,7 +5625,225 @@
           ]
         }
       ],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
+    },
+    "B-accepted‡": {
+      "document": "cases/B-accepted-dagger.json",
+      "title": "lockrot: 1 of 1 package flagged",
+      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for matomo/matomo · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "1 of 1 package flagged (100%): 1 graded high. Flags: vulnerable 1.",
+        "In production · required directly · 1 security advisory on 1 package (severity: 1 high) · fix by package: 1 upgrade · 10.6 libyears behind."
+      ],
+      "grade_line": "Project grade: high · 1 high finding · 1 of 1 package high or worse",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "load_line": "16 points on 1 flagged package · 16 (100 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 1,
+      "state_lines": [],
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "1 in production · 1 required directly",
+      "grade_chips": [
+        "high 1"
+      ],
+      "waffle": [
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 1
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": "1 needs another way out: 1 not checked: the run checked no move",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 1,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": "1",
+        "unit": "advisory on 1 package",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "high",
+            "package": "symfony/monolog-bridge",
+            "link": "#view=findings&pkg=symfony%2Fmonolog-bridge",
+            "reach": "",
+            "total": 16,
+            "terms": "vulnerable 16",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "0 carry more than one flag · score model 1",
+        "Accepted by the allowlist: left-behind 1, old-promise 1"
+      ],
+      "exposure": null,
+      "depth": {
+        "rows": [
+          "in composer.json 1"
+        ],
+        "sentence": "The flagged package is named by a line of composer.json."
+      },
+      "libyears": {
+        "figure": "10.62",
+        "bound": "",
+        "sub": "over 1 package · 10.62 from direct requirements",
+        "unmeasured": null,
+        "top": [
+          [
+            "symfony/monolog-bridge v2.6.13",
+            "10.6",
+            "v6.4.45 (2026-08-30)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "high",
+          "count": "1 package",
+          "gate": "all fail the gate",
+          "major": "1 of 1 moves cross a major"
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "symfony/monolog-bridge",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/monolog-bridge:^5.4.52'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 0,
+        "wayout": 1
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S5 PHP promise",
+        "S8 release branch",
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "symfony/monolog-bridge",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        }
+      ],
+      "run_notes": [],
+      "sheet_moves": {}
+    },
+    "ok-unchecked": {
+      "document": "cases/ok-unchecked.json",
+      "title": "lockrot: nothing flagged in 1 package",
+      "description": "lockrot checked 1 package in composer.lock and flagged none.",
+      "copy_summary": [
+        "lockrot report for pimcore/skeleton · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high,unchecked",
+        "Nothing flagged in 1 package.",
+        "No security advisory."
+      ],
+      "grade_line": "Project grade: nothing flagged",
+      "figure_line": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "load_line": null,
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=packages&gate=fails",
+      "gate_link_rows": 1,
+      "state_lines": [],
+      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "lead_scope": null,
+      "grade_chips": [],
+      "waffle": [
+        {
+          "verdict": "ok",
+          "word": "ok",
+          "mark": "soft",
+          "count": 1
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": "1 fails the gate as unchecked: release dates not checked.",
+        "way_out_link": "#view=packages&gate=fails%2Cwayout",
+        "way_out_link_rows": 1,
+        "none": "Nothing to run: no package is flagged."
+      },
+      "security": {
+        "figure": null,
+        "unit": "no security advisory",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": null,
+      "flags_notes": [],
+      "exposure": null,
+      "depth": {
+        "rows": [],
+        "sentence": null
+      },
+      "libyears": {
+        "figure": null,
+        "bound": "",
+        "sub": "no package measured",
+        "unmeasured": "Not measured: 1 dated only by a commit its tags share",
+        "top": [],
+        "none": null
+      },
+      "findings_groups": [],
+      "findings_rows": [],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 0,
+        "wayout": 1
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S10 unchecked"
+      ],
+      "advisory_groups": [],
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "snipe-it.unloaded‡": {
       "document": "page/snipe-it.unloaded-dagger.json",
@@ -5686,7 +5920,9 @@
             "clears": "the advisory",
             "after": {
               "result": "0, ok",
-              "conditions": []
+              "conditions": [
+                "checked with Composer"
+              ]
             },
             "also_holds": null
           },
@@ -5699,7 +5935,9 @@
             "clears": "both advisories",
             "after": {
               "result": "0, ok",
-              "conditions": []
+              "conditions": [
+                "checked with Composer"
+              ]
             },
             "also_holds": null
           }
@@ -6282,7 +6520,48 @@
       ],
       "run_notes": [
         "1 package is not from a Composer repository: its release metadata and repository activity were not read · advisories asked"
-      ]
+      ],
+      "sheet_moves": {
+        "pragmarx/google2fa-laravel": [
+          {
+            "heading": "The move",
+            "action": "Require ^2.3",
+            "commands": [
+              "composer require 'pragmarx/google2fa-laravel:^2.3'"
+            ],
+            "commands_label": "Command",
+            "clears": "both",
+            "stays": null,
+            "not_checked": null,
+            "adds": [],
+            "php": {
+              "head": "2.x needs php >=7.0",
+              "lines": [
+                {
+                  "answer": "yes",
+                  "text": "your require.php allows it"
+                },
+                {
+                  "answer": "yes",
+                  "text": "your target, 8.4, runs it"
+                }
+              ]
+            },
+            "after": {
+              "result": "0, ok",
+              "conditions": [
+                "if Composer resolves it (not checked: a package it needs could not be loaded)"
+              ]
+            },
+            "composer": [
+              {
+                "text": "A new major brings its own requirements, which lockrot does not solve",
+                "items": []
+              }
+            ]
+          }
+        ]
+      }
     },
     "wallabag-2.6": {
       "document": "baselined/wallabag-2.6/check/report.bundle.json",
@@ -7990,7 +8269,44 @@
       ],
       "run_notes": [
         "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested."
-      ]
+      ],
+      "sheet_moves": {
+        "twig/twig": [
+          {
+            "heading": "The move",
+            "action": "Raise require.php to >=8.1, then require ^3.27.0",
+            "commands": [
+              "composer require 'php:>=8.1' --no-update",
+              "composer require 'twig/twig:^3.27.0'"
+            ],
+            "commands_label": "Commands, in order",
+            "clears": "all 15 advisories",
+            "stays": null,
+            "not_checked": null,
+            "adds": [],
+            "php": {
+              "head": "3.x needs php >=8.1.0",
+              "lines": [
+                {
+                  "answer": "no",
+                  "text": "your require.php still allows 7.4 (a major raise)"
+                },
+                {
+                  "answer": "yes",
+                  "text": "your target, 8.4, runs it"
+                }
+              ]
+            },
+            "after": {
+              "result": "0, ok",
+              "conditions": [
+                "if Composer resolves it (not checked: Composer refuses the lock itself)"
+              ]
+            },
+            "composer": []
+          }
+        ]
+      }
     },
     "composite.other-day-same-cve‡": {
       "document": "page/composite.other-day-same-cve-dagger.json",
@@ -8387,7 +8703,8 @@
           "fix_notes": []
         }
       ],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "B-also.checked‡": {
       "document": "page/B-also.checked-dagger.json",
@@ -8431,7 +8748,9 @@
             "clears": "the advisory",
             "after": {
               "result": "20, high",
-              "conditions": []
+              "conditions": [
+                "checked with Composer"
+              ]
             },
             "also_holds": null
           }
@@ -8535,7 +8854,8 @@
           "fix_notes": []
         }
       ],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     },
     "unknown.offline‡": {
       "document": "page/unknown.offline-dagger.json",
@@ -8630,7 +8950,8 @@
       "advisory_groups": [],
       "run_notes": [
         "offline: repository metadata served from Composer's cache"
-      ]
+      ],
+      "sheet_moves": {}
     },
     "snipe-it": {
       "document": "contract/page/snipe-it.json",
@@ -8707,7 +9028,9 @@
             "clears": "the advisory",
             "after": {
               "result": "0, ok",
-              "conditions": []
+              "conditions": [
+                "checked with Composer"
+              ]
             },
             "also_holds": null
           },
@@ -8720,7 +9043,9 @@
             "clears": "both advisories",
             "after": {
               "result": "0, ok",
-              "conditions": []
+              "conditions": [
+                "checked with Composer"
+              ]
             },
             "also_holds": null
           },
@@ -8733,7 +9058,9 @@
             "clears": "both",
             "after": {
               "result": "0, ok",
-              "conditions": []
+              "conditions": [
+                "checked with Composer"
+              ]
             },
             "also_holds": "Also holds: bacon/bacon-qr-code (high), pragmarx/google2fa-qrcode (medium)"
           }
@@ -9316,7 +9643,84 @@
       ],
       "run_notes": [
         "1 package is not from a Composer repository: its release metadata and repository activity were not read · advisories asked"
-      ]
+      ],
+      "sheet_moves": {
+        "mtdowling/jmespath.php": [
+          {
+            "heading": "The move",
+            "action": "Update to 2.9.2 on 2.x",
+            "commands": [
+              "composer update 'mtdowling/jmespath.php:^2.9.1'"
+            ],
+            "commands_label": "Command",
+            "clears": "the advisory",
+            "stays": null,
+            "not_checked": null,
+            "adds": [],
+            "php": {
+              "head": "2.x needs php ^7.2.5 || ^8.0",
+              "lines": [
+                {
+                  "answer": "yes",
+                  "text": "your require.php allows it"
+                },
+                {
+                  "answer": "yes",
+                  "text": "your target, 8.4, runs it"
+                }
+              ]
+            },
+            "after": {
+              "result": "0, ok",
+              "conditions": [
+                "checked with Composer"
+              ]
+            },
+            "composer": []
+          }
+        ],
+        "bacon/bacon-qr-code": [
+          {
+            "heading": "The move",
+            "action": "Require ^3.1",
+            "commands": [],
+            "commands_label": null,
+            "clears": "left-behind",
+            "stays": null,
+            "not_checked": null,
+            "adds": [],
+            "php": {
+              "head": "3.x needs php ^8.1",
+              "lines": [
+                {
+                  "answer": "yes",
+                  "text": "your require.php allows it"
+                },
+                {
+                  "answer": "yes",
+                  "text": "your target, 8.4, runs it"
+                }
+              ]
+            },
+            "after": {
+              "result": "0, ok",
+              "conditions": [
+                "Composer refuses the move"
+              ]
+            },
+            "composer": [
+              {
+                "text": "The packages that hold it may need to move too",
+                "items": []
+              },
+              {
+                "text": "A new major brings its own requirements",
+                "items": []
+              }
+            ]
+          }
+        ]
+      }
     },
     "empty-lock": {
       "document": "report-2/moodle-v3.json",
@@ -9357,7 +9761,8 @@
       "data_column": false,
       "signals_key": [],
       "advisory_groups": [],
-      "run_notes": []
+      "run_notes": [],
+      "sheet_moves": {}
     }
   }
 }

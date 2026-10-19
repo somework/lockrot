@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Html\PageHeading;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -35,6 +36,7 @@ final class PageGoldensTest extends TestCase
         'policy-off' => 'the hydrated lock holds joomla/filter and the three packages that require it, and the model\'s case document counts its one finding',
         'pagerfanta' => 'the hydrated lock holds pagerfanta/twig and the packages that its finding names, and the model\'s case document counts its one finding',
         'guzzle-mixed' => 'the hydrated lock holds guzzlehttp/guzzle and the packages that hold its moves, and the model\'s case document counts its one finding',
+        'ok-unchecked' => 'the hydrated lock holds scheb/2fa-google-authenticator and the packages that its finding names, and the model\'s case document counts its one finding',
         'rounded-dev‡' => 'the hydrated lock holds jfcherng/php-color-output and the packages that its finding names, and the model\'s case document counts its one finding',
     ];
 
@@ -190,6 +192,71 @@ final class PageGoldensTest extends TestCase
 
         self::assertNotSame([], $beside, 'no page case shows a not_checked move beside resolves moves');
         self::assertNotSame([], $refusedBaseline, 'no page case shows a refused baseline with its moves_not_checked note');
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.4 and §7.9.9: the page cases show the allowlist counts and the `release_dates`
+     * check words. No valid document reaches the words of `releases`. Its S10 entry stands beside a
+     * counted advisory (I35), and such a finding has a move.
+     */
+    public function testThePageCasesShowTheAcceptedCountsAndTheReleaseDatesCheckWords(): void
+    {
+        $accepted = [];
+        $releaseDates = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']) as $id => $golden) {
+            $golden = JsonPath::decoded($golden);
+            $notes = JsonPath::has($golden, ['flags_notes']) ? array_filter(JsonPath::arrayAt($golden, ['flags_notes']), 'is_string') : [];
+            if (preg_grep('/^Accepted by the allowlist: [a-z-]+ [1-9]\d*(, [a-z-]+ [1-9]\d*)+$/', $notes) !== []) {
+                $accepted[] = $id;
+            }
+            if (strpos((string) self::textAt($golden, ['ready', 'way_out']), 'fails the gate as unchecked: release dates not checked') !== false) {
+                $releaseDates[] = $id;
+            }
+        }
+
+        self::assertNotSame([], $accepted, 'no page case shows the allowlist line with two flags and their counts');
+        self::assertNotSame([], $releaseDates, 'no page case shows the release_dates check words on the way-out line');
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.21 "The move": the sheet's move cards of a page case hold the check line of
+     * each move. The page cases show a resolved, a refused and two unchecked moves.
+     */
+    public function testTheSheetMoveCardsHoldTheCheckLineOfEachMove(): void
+    {
+        $differ = [];
+        $lines = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']) as $id => $golden) {
+            $golden = JsonPath::decoded($golden);
+            self::assertArrayHasKey('sheet_moves', $golden, $id.': re-record page-goldens.json from the model');
+            $findings = [];
+            foreach (JsonPath::arrayAt(self::modelDocument(JsonPath::stringAt($golden, ['document'])), ['findings']) as $finding) {
+                $finding = JsonPath::decoded($finding);
+                $findings[JsonPath::stringAt($finding, ['package'])] = $finding;
+            }
+            foreach (JsonPath::arrayAt($golden, ['sheet_moves']) as $package => $cards) {
+                $lead = JsonPath::arrayAt($findings[$package], ['next_step']);
+                foreach (array_values(array_merge([$lead], JsonPath::arrayAt($lead, ['also']))) as $i => $move) {
+                    $move = JsonPath::decoded($move);
+                    $result = JsonPath::stringAt($move, ['check', 'result']);
+                    $expected = [
+                        'resolves' => 'checked with Composer',
+                        'refused' => 'Composer refuses the move',
+                        'not_checked' => 'if Composer resolves it (not checked: '.($result === MoveCheck::NOT_CHECKED ? MoveCheck::reasonWords(JsonPath::stringAt($move, ['check', 'reason'])) : '').')',
+                    ][$result];
+                    $conditions = JsonPath::arrayAt(JsonPath::decoded($cards), [$i, 'after', 'conditions']);
+                    $lines[] = $expected;
+                    if (!\in_array($expected, $conditions, true)) {
+                        $differ[$id.' '.$package.' card '.$i] = ['expected' => $expected, 'conditions' => $conditions];
+                    }
+                }
+            }
+        }
+
+        self::assertSame([], $differ);
+        foreach (['checked with Composer', 'Composer refuses the move', 'if Composer resolves it (not checked: '.MoveCheck::reasonWords(MoveCheck::UNLOADED_NAME).')', 'if Composer resolves it (not checked: '.MoveCheck::reasonWords(MoveCheck::BASELINE_REFUSED).')'] as $line) {
+            self::assertContains($line, $lines, 'no sheet move card of a page case reads: '.$line);
+        }
     }
 
     /**
