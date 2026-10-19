@@ -358,8 +358,7 @@ final class PageGoldensTest extends TestCase
     }
 
     /**
-     * A ‡ page document that lags its source document fails here, before a golden reads a field that
-     * the document does not hold.
+     * A ‡ page document that lags its source document fails schema validation.
      *
      * @dataProvider provideEveryGolden
      */
@@ -544,7 +543,7 @@ final class PageGoldensTest extends TestCase
         }
         $path = self::documentPath($document);
 
-        return strpos($path, 'compress.zlib://') === 0 ? JsonPath::decoded(json_decode((string) file_get_contents($path), true)) : JsonPath::decodeFile($path);
+        return strpos($path, 'compress.zlib://') === 0 ? JsonPath::decoded(json_decode((string) file_get_contents($path), true, 512, \JSON_THROW_ON_ERROR)) : JsonPath::decodeFile($path);
     }
 
     /** The page document as JSON text, whose empty objects the schema reads as objects. */

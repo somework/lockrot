@@ -604,7 +604,7 @@ def write_documents(source, run_date, suite):
                 dump(os.path.join(DOCS_OUT, out_dir, stem), doc)
         counts[out_dir] = len(paths)
     dump(os.path.join(DOCS_OUT, 'provenance.json'), {'source': 'security-axis/r3/docs', 'model_run_date': run_date, 'suite': suite, 'documents': counts})
-    # The page goldens read the page documents: one projection copies both, so that no golden reads a lagging document.
+    # A page golden must never lag the page document that it reads.
     shutil.copyfile(os.path.join(source, 'page-goldens.json'), PAGE_GOLDENS_OUT)
     return counts
 
