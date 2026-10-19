@@ -1575,6 +1575,8 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                                     "newest": "11.5.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",
@@ -1635,6 +1637,8 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                                     "newest": "11.5.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
                                     "held_by": [
                                         {
                                             "source": "root",

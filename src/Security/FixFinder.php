@@ -87,7 +87,7 @@ final class FixFinder
 
         $fixes = [];
         foreach ($ranges as $id => $range) {
-            $fixes[$id] = $range === null ? Fix::unknown(Fix::AFFECTED_RANGE_UNKNOWN) : self::fixOf($range, $byBranch, $own, $newest, $installedBranch);
+            $fixes[$id] = $range === null ? Fix::unknown(Fix::AFFECTED_RANGE_UNKNOWN) : $this->fixOf($range, $byBranch, $own, $newest, $installedBranch);
         }
         $onInstalled = $installedBranch === null ? [] : ($byBranch[$installedBranch] ?? []);
         $rows = self::branches($newest, $byBranch, $installedBranch, $ranged, $own, \count($advisories));
@@ -171,7 +171,7 @@ final class FixFinder
      * @param list<ConstraintInterface>      $own      the ranges of the advisories the facts do not count
      * @param array<string, string>          $newest   the newest release by branch key
      */
-    private static function fixOf(ConstraintInterface $range, array $byBranch, array $own, array $newest, ?string $installedBranch): Fix
+    private function fixOf(ConstraintInterface $range, array $byBranch, array $own, array $newest, ?string $installedBranch): Fix
     {
         $best = null;
         foreach ($byBranch as $candidates) {
@@ -181,7 +181,7 @@ final class FixFinder
             }
         }
 
-        return $best === null ? Fix::none() : Fix::to($best, $newest[$best->branchKey()], $installedBranch);
+        return $best === null ? Fix::none() : Fix::to($best, $newest[$best->branchKey()], $installedBranch, $this->floor);
     }
 
     /**

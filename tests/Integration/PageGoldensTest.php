@@ -260,6 +260,129 @@ final class PageGoldensTest extends TestCase
     }
 
     /**
+     * SPEC-0.14.md §7.9.21 "Two sheet places": a Held by item adds a stopped check of its holder's own
+     * step in short words. The page cases show a refused step, an unchecked step of each reason, and
+     * a resolved step with no words.
+     */
+    public function testTheSheetHeldByItemsAddTheShortWordsOfAStoppedCheck(): void
+    {
+        $differ = [];
+        $forms = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']) as $id => $golden) {
+            $golden = JsonPath::decoded($golden);
+            self::assertArrayHasKey('sheet_holders', $golden, $id.': re-record page-goldens.json from the model');
+            $findings = self::findingsByPackage(self::modelDocument(JsonPath::stringAt($golden, ['document'])));
+            foreach (JsonPath::arrayAt($golden, ['sheet_holders']) as $package => $cards) {
+                $lead = JsonPath::arrayAt($findings[$package], ['next_step']);
+                $checks = [];
+                foreach (array_merge([$lead], JsonPath::arrayAt($lead, ['also'])) as $move) {
+                    foreach (JsonPath::arrayAt(JsonPath::decoded($move), ['held_by']) as $holder) {
+                        $holder = JsonPath::decoded($holder);
+                        $step = \is_array($holder['holder'] ?? null) ? ($holder['holder']['next_step'] ?? null) : null;
+                        if (\is_array($step)) {
+                            $checks[JsonPath::stringAt($holder, ['package']).' '.self::textAt($holder, ['version'])] = $step['check'] ?? null;
+                        }
+                    }
+                }
+                foreach (array_filter(JsonPath::decoded($cards), 'is_array') as $card) {
+                    $card = JsonPath::decoded($card);
+                    foreach (array_merge(JsonPath::arrayAt($card, ['shown']), \is_array($card['fold'] ?? null) ? JsonPath::arrayAt($card, ['fold', 'holders']) : []) as $item) {
+                        $item = JsonPath::decoded($item);
+                        $step = self::textAt($item, ['step']);
+                        if ($step === null) {
+                            continue;
+                        }
+                        $check = $checks[JsonPath::stringAt($item, ['name'])] ?? null;
+                        $words = self::shortCheckWords(\is_array($check) ? $check : null);
+                        $forms[] = $words ?? 'none';
+                        $at = strpos($step, ' · ');
+                        $stated = $at === false ? null : substr($step, $at + \strlen(' · '));
+                        if ($stated !== $words) {
+                            $differ[$id.' '.$package.' '.JsonPath::stringAt($item, ['name'])] = ['expected' => $words, 'step' => $step];
+                        }
+                    }
+                }
+            }
+        }
+
+        self::assertSame([], $differ);
+        foreach (['none', 'Composer refuses the move', 'not checked: '.MoveCheck::reasonWords(MoveCheck::UNLOADED_NAME), 'not checked: '.MoveCheck::reasonWords(MoveCheck::BASELINE_REFUSED)] as $form) {
+            self::assertContains($form, $forms, 'no Held by item of a page case reads: '.$form);
+        }
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.21 "Two sheet places": a Security ladder row whose check stopped drops ", if
+     * Composer resolves it" and ends with the short words. Only the wallabag-2.6 bundle carries a
+     * details block, so the page cases reach the `baseline_refused` words and no refused row.
+     */
+    public function testTheSheetLadderRowsEndWithTheShortWordsOfAStoppedCheck(): void
+    {
+        $differ = [];
+        $forms = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']) as $id => $golden) {
+            $golden = JsonPath::decoded($golden);
+            self::assertArrayHasKey('sheet_ladder', $golden, $id.': re-record page-goldens.json from the model');
+            $ladders = JsonPath::arrayAt($golden, ['sheet_ladder']);
+            if ($ladders === []) {
+                continue;
+            }
+            $details = JsonPath::arrayAt(JsonPath::decodeFile(__DIR__.'/../fixtures/'.JsonPath::stringAt($golden, ['document'])), ['details']);
+            foreach ($ladders as $package => $rungs) {
+                $checks = [];
+                foreach (JsonPath::arrayAt($details, [(string) $package, 'metadata', 'branches']) as $row) {
+                    $row = JsonPath::decoded($row);
+                    $checks[JsonPath::stringAt($row, ['branch'])] = \is_array($row['fixes'] ?? null) ? ($row['fixes']['check'] ?? null) : null;
+                }
+                foreach (JsonPath::decoded($rungs) as $rung) {
+                    $rung = JsonPath::decoded($rung);
+                    $check = $checks[JsonPath::stringAt($rung, ['branch'])] ?? null;
+                    $words = self::shortCheckWords(\is_array($check) ? $check : null);
+                    $lines = array_values(array_filter(JsonPath::arrayAt($rung, ['lines']), 'is_string'));
+                    $forms[] = $words ?? 'none';
+                    $last = (string) end($lines);
+                    $ends = $words === null || substr($last, -\strlen(' · '.$words)) === ' · '.$words;
+                    if (!$ends || ($words !== null && preg_grep('/, if Composer resolves it/', $lines) !== [])) {
+                        $differ[$id.' '.$package.' '.JsonPath::stringAt($rung, ['branch'])] = ['expected' => $words, 'lines' => $lines];
+                    }
+                }
+            }
+        }
+
+        self::assertSame([], $differ);
+        self::assertContains('not checked: '.MoveCheck::reasonWords(MoveCheck::BASELINE_REFUSED), $forms, 'no Security ladder row of a page case ends with the baseline_refused words');
+    }
+
+    /**
+     * @param array<mixed, mixed>|null $check
+     */
+    private static function shortCheckWords(?array $check): ?string
+    {
+        $result = $check['result'] ?? null;
+        if ($result === MoveCheck::REFUSED) {
+            return 'Composer refuses the move';
+        }
+
+        return $result === MoveCheck::NOT_CHECKED ? 'not checked: '.MoveCheck::reasonWords(self::textAt($check ?? [], ['reason']) ?? '') : null;
+    }
+
+    /**
+     * @param array<mixed, mixed> $document
+     *
+     * @return array<string, array<mixed, mixed>>
+     */
+    private static function findingsByPackage(array $document): array
+    {
+        $findings = [];
+        foreach (JsonPath::arrayAt($document, ['findings']) as $finding) {
+            $finding = JsonPath::decoded($finding);
+            $findings[JsonPath::stringAt($finding, ['package'])] = $finding;
+        }
+
+        return $findings;
+    }
+
+    /**
      * @param array<mixed, mixed> $document
      *
      * @return array<string, mixed>

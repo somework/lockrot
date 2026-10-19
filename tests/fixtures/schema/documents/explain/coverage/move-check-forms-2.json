@@ -338,6 +338,8 @@
         "newest": "2.10.3",
         "on_installed_branch": true,
         "php": "^7.4 || ^8.0",
+        "admits_target_php": true,
+        "admits_project_php": true,
         "held_by": [],
         "reason": null
        },
@@ -362,6 +364,8 @@
         "newest": "2.10.3",
         "on_installed_branch": true,
         "php": "^7.4 || ^8.0",
+        "admits_target_php": true,
+        "admits_project_php": true,
         "held_by": [],
         "reason": null
        },

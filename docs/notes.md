@@ -296,6 +296,10 @@ install at the target PHP. Every move would be refused for the same reason, so l
 and each move's `check.reason` reads `baseline_refused`. Run lockrot with the PHP that the project
 runs on (`--target-php` or `config.platform.php`), or update the lock.
 
+The text quotes the last line of Composer's first problem, cut before ` -> `. The first line names
+only the locked package, and the last line names the cause. The two `update now` notes below quote a
+refusal in the same way.
+
 - `data`: `reason` (`baseline_refused`), `php` (the version that the solve ran at), `problem`
   (Composer's problem text).
 - `sets_network_failures`: no.

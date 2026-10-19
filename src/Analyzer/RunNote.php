@@ -477,7 +477,7 @@ final class RunNote
 
     /**
      * D5: Composer refuses a partial update of a name outside the lock, so it would refuse every
-     * move for the same reason. The text names the first problem line, and `data.problem` holds
+     * move for the same reason. The text names the cause of the first problem, and `data.problem` holds
      * Composer's whole problem text.
      *
      * @param string $targetPhp the php version that the solve ran at
@@ -487,7 +487,7 @@ final class RunNote
         return self::of(self::MOVES_NOT_CHECKED, \sprintf(
             "moves not checked: Composer's solver refuses the lock itself at php %s, so it would refuse every move: %s",
             $targetPhp,
-            self::firstProblem($problem)
+            self::causeOfFirstProblem($problem)
         ), false, ['reason' => MoveCheck::BASELINE_REFUSED, 'php' => $targetPhp, 'problem' => $problem]);
     }
 
@@ -507,7 +507,7 @@ final class RunNote
             "update now: the command leaves out %s, because Composer's solver refuses %s together with the others: %s",
             implode(', ', $leftOut),
             \count($leftOut) === 1 ? 'it' : 'them',
-            self::firstProblem($problem)
+            self::causeOfFirstProblem($problem)
         ), false, ['left_out' => $leftOut, 'problem' => $problem]);
     }
 
@@ -516,7 +516,7 @@ final class RunNote
     {
         return self::of(self::UPDATE_NOW_REFUSED, \sprintf(
             "update now: no command, because Composer's solver refuses these packages together; run each package's own command: %s",
-            self::firstProblem($problem)
+            self::causeOfFirstProblem($problem)
         ), false, ['problem' => $problem]);
     }
 
@@ -546,17 +546,28 @@ final class RunNote
         return self::of(self::MOVE_CHECK_FAILED, \sprintf("moves: Composer's solver failed on a request (%s: %s), so lockrot did not check that move", $class, $message), false, ['class' => $class, 'message' => $message]);
     }
 
-    /** The first line of Composer's problem text that names a rule, without its list marker. */
-    private static function firstProblem(string $problem): string
+    /**
+     * The last rule line of Composer's first problem, without its list marker and cut before " -> ":
+     * the first line names only the locked package, and the last names the cause.
+     */
+    private static function causeOfFirstProblem(string $problem): string
     {
+        $cause = null;
         foreach (preg_split('/\R/', $problem) ?: [] as $line) {
             $line = trim($line);
-            if (strpos($line, '- ') === 0) {
-                return substr($line, 2);
+            if ($cause !== null && preg_match('/^Problem \d+$/', $line) === 1) {
+                break;
+            }
+            if (preg_match('/^- (.+)$/', $line, $marked) === 1) {
+                $cause = $marked[1];
             }
         }
+        if ($cause === null) {
+            return trim($problem);
+        }
+        $arrow = strpos($cause, ' -> ');
 
-        return trim($problem);
+        return $arrow === false ? $cause : substr($cause, 0, $arrow).'.';
     }
 
     /**

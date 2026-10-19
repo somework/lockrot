@@ -1393,6 +1393,8 @@
                   "newest": "2.10.3",
                   "on_installed_branch": true,
                   "php": "^7.4 || ^8.0",
+                  "admits_target_php": true,
+                  "admits_project_php": true,
                   "held_by": [],
                   "reason": null
                 },
@@ -1417,6 +1419,8 @@
                   "newest": "2.10.3",
                   "on_installed_branch": true,
                   "php": "^7.4 || ^8.0",
+                  "admits_target_php": true,
+                  "admits_project_php": true,
                   "held_by": [],
                   "reason": null
                 },
@@ -2123,6 +2127,8 @@
                   "newest": "3.0.57",
                   "on_installed_branch": true,
                   "php": ">=5.6.1",
+                  "admits_target_php": true,
+                  "admits_project_php": true,
                   "held_by": [],
                   "reason": null
                 },
@@ -3245,6 +3251,8 @@
                   "newest": "v13.36.0",
                   "on_installed_branch": true,
                   "php": "^8.3",
+                  "admits_target_php": true,
+                  "admits_project_php": true,
                   "held_by": [],
                   "reason": null
                 },
@@ -3617,6 +3625,8 @@
                   "newest": "3.36.0",
                   "on_installed_branch": true,
                   "php": "^8.0.2",
+                  "admits_target_php": true,
+                  "admits_project_php": true,
                   "held_by": [],
                   "reason": null
                 },

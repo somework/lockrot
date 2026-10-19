@@ -133,6 +133,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `highest_php`, the php of the branch's highest tag, beside `php`, with its own floor answers
   (`highest_admits_target_php`, `highest_admits_project_php`, `highest_misses_project_php`).
   ([The PHP test](docs/verdicts.md#the-php-test-in-explain))
+- **json:** each S9 row's `fix` writes `admits_target_php` and `admits_project_php`, the floor
+  answers of a branch row asked of `fix.php`. ([Fix](docs/verdicts.md#fix))
 
 ### Changed
 

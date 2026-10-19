@@ -10,10 +10,12 @@ use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Data\Repository\StableRelease;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\BranchFixes;
+use Lockrot\Security\Candidate;
 use Lockrot\Security\Fix;
 use Lockrot\Security\FixFinder;
 use Lockrot\Security\Holder;
@@ -141,6 +143,48 @@ final class FixFinderTest extends TestCase
         self::assertNotNull($one);
         self::assertSame(['1.x', 2, 'v1.44.8', Fix::RAISE_PHP], [$one->branch(), $one->fixed(), $one->lowest(), $one->fixKind()]);
         self::assertNull($fixes->partial(), 'the installed branch\'s newest release is raise-php, not update');
+    }
+
+    /** The fix carries the branch rows' two floor answers, asked of its own php, so a page parses no constraint (SPEC §7.9.19). */
+    public function testTheFixSaysWhetherTheTargetAndTheProjectFloorAdmitItsPhp(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', '>=7.1'], ['1.1.0', '>=7.1.3'], ['2.0.0', '>=8.1'], ['3.0.0', '~8.0.0']],
+            ['free' => '<1.1.0', 'raise' => '<2.0.0', 'blocked' => '<3.0.0'],
+            new PhpFloor('8.4', '>=7.1.3')
+        );
+
+        $answers = static function (Fix $fix): array {
+            $json = $fix->jsonSerialize();
+
+            return [$fix->php(), $json['admits_target_php'], $json['admits_project_php']];
+        };
+        self::assertSame(['>=7.1.3', true, true], $answers($fixes->forAdvisory('free')));
+        self::assertSame(['>=8.1', true, false], $answers($fixes->forAdvisory('raise')));
+        self::assertSame(['~8.0.0', false, false], $answers($fixes->forAdvisory('blocked')));
+        self::assertSame(
+            ['kind', 'to_branch', 'version', 'newest', 'on_installed_branch', 'php', 'admits_target_php', 'admits_project_php', 'held_by', 'reason'],
+            array_keys($fixes->forAdvisory('free')->jsonSerialize())
+        );
+    }
+
+    /** Null is no answer, never admitted: no php on the release, no project floor, or a php Composer cannot parse. */
+    public function testAFixWithoutAComparablePhpOrFloorAnswersNull(): void
+    {
+        $answers = static function (Fix $fix): array {
+            $json = $fix->jsonSerialize();
+
+            return [$json['admits_target_php'], $json['admits_project_php']];
+        };
+        $declaresNone = $this->find(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', null], ['1.1.0', null]], ['A' => '<1.1.0'], new PhpFloor('8.4', '>=7.4'));
+        self::assertSame([null, null], $answers($declaresNone->forAdvisory('A')));
+
+        $noFloor = $this->find(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=8.1']], ['A' => '<1.1.0'], new PhpFloor('8.4', null));
+        self::assertSame([true, null], $answers($noFloor->forAdvisory('A')));
+
+        $unparsable = Fix::to(new Candidate(new StableRelease('1.1.0.0', '1.1.0', null, '>=7.4 <<', false), '1', Fix::UPDATE, []), '1.1.0', '1', new PhpFloor('8.4', '>=7.4'));
+        self::assertSame([null, null], $answers($unparsable));
     }
 
     /** joomla/filter 2.0.6 and laminas-diactoros 2.26.0 need a php the target does not run. */
@@ -401,6 +445,7 @@ final class FixFinderTest extends TestCase
         foreach (['PKSA-norange', 'A'] as $id) {
             $fix = $fixes->forAdvisory($id);
             self::assertSame([null, null, null, null, null], [$fix->toBranch(), $fix->version(), $fix->newest(), $fix->php(), $fix->onInstalledBranch()]);
+            self::assertSame([null, null], [$fix->jsonSerialize()['admits_target_php'], $fix->jsonSerialize()['admits_project_php']]);
             self::assertSame([], $fix->heldBy());
         }
         $row = $fixes->installedBranch();

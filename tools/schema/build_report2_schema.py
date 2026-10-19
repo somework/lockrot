@@ -902,6 +902,10 @@ defs['s9fix'] = obj("The advisory's fix (§5.3 \"Per advisory\"): `fix` is alway
     'newest': nul("`to_branch`'s newest tag; null for `unknown` and `none`.", {'type': 'string', 'minLength': 1}),
     'on_installed_branch': nul("Whether the easiest fix is on the installed branch; null for `unknown` and `none`.", {'type': 'boolean'}),
     'php': nul("The fixing release's php requirement; null for `unknown` and `none`, or when it declares none.", {'type': 'string'}),
+    'admits_target_php': nul(("A branch row's `admits_target_php` asked of `php`: whether the fixing release's php admits the target PHP. The Fixed by note reads it. "
+                              'Null is no answer, never admitted: `php` is null or cannot be read, or the kind names no fixing release.'), {'type': 'boolean'}),
+    'admits_project_php': nul(("A branch row's `admits_project_php` asked of `php`: whether the fixing release's php admits `run.project_php_lowest`. The Fixed by note reads it. "
+                               'Null is no answer, never admitted: `php` is null or cannot be read, the project names no lowest PHP, or the kind names no fixing release.'), {'type': 'boolean'}),
     'held_by': arr('The links that exclude the fixing release (§5.3); `upgrade` ⇒ not empty where lockrot read the links.', ref('heldBy')),
     'reason': nul(("Set for `unknown` (`releases_unknown`, `affected_range_unknown`, `not_from_composer_repository`) and `none` (`no_release_outside_range`), else null. An open set "
                    "(round 3). The corpus model's `branch_table_missing` (‡, no details block) is a model-only value lockrot never writes, so it is not listed."),
