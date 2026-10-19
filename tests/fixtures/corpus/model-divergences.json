@@ -1066,7 +1066,7 @@
       "path": "S9.fix.kind[PKSA-6j95-1jtb-x6wc]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "grokability_snipe-it",
@@ -1074,7 +1074,7 @@
       "path": "S9.fix.kind[PKSA-8j6w-3kr7-s9xk]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "grokability_snipe-it",
@@ -1082,7 +1082,7 @@
       "path": "S9.fix.kind[PKSA-cbx2-m9db-bmzd]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "grokability_snipe-it",
@@ -1194,7 +1194,7 @@
           "weight": 8
         }
       ],
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "grokability_snipe-it",
@@ -1202,7 +1202,7 @@
       "path": "security.fix_kind",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "grokability_snipe-it",
@@ -1847,7 +1847,7 @@
       "path": "S9.fix.kind[PKSA-6j95-1jtb-x6wc]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "koel_koel",
@@ -1855,7 +1855,7 @@
       "path": "S9.fix.kind[PKSA-8j6w-3kr7-s9xk]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "koel_koel",
@@ -1863,7 +1863,7 @@
       "path": "S9.fix.kind[PKSA-cbx2-m9db-bmzd]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "koel_koel",
@@ -1975,7 +1975,7 @@
           "weight": 8
         }
       ],
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "koel_koel",
@@ -1983,7 +1983,7 @@
       "path": "security.fix_kind",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "koel_koel",
@@ -3833,7 +3833,7 @@
       "path": "S9.fix.kind[PKSA-y2cr-5h3j-g3ys]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "monicahq_monica",
@@ -3905,7 +3905,7 @@
           "weight": 2
         }
       ],
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "monicahq_monica",
@@ -3913,7 +3913,7 @@
       "path": "security.fix_kind",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "monicahq_monica",
@@ -7783,7 +7783,7 @@
       "path": "S9.fix.kind[PKSA-zk1n-qbm6-d3rq]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "nextcloud_3rdparty",
@@ -7835,7 +7835,7 @@
           "weight": 2
         }
       ],
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "nextcloud_3rdparty",
@@ -7843,7 +7843,7 @@
       "path": "security.fix_kind",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
@@ -7977,7 +7977,7 @@
       "path": "S9.fix.kind[PKSA-6j95-1jtb-x6wc]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
@@ -7985,7 +7985,7 @@
       "path": "S9.fix.kind[PKSA-8j6w-3kr7-s9xk]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
@@ -7993,7 +7993,7 @@
       "path": "S9.fix.kind[PKSA-cbx2-m9db-bmzd]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
@@ -8105,7 +8105,7 @@
           "weight": 8
         }
       ],
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
@@ -8113,7 +8113,7 @@
       "path": "security.fix_kind",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
@@ -9085,7 +9085,7 @@
       "path": "S9.fix.kind[PKSA-kbc7-dq62-pt7d]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
@@ -9093,7 +9093,7 @@
       "path": "S9.fix.kind[PKSA-qv5y-crcz-9nxw]",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
@@ -9190,7 +9190,7 @@
           "weight": 16
         }
       ],
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
@@ -9198,7 +9198,7 @@
       "path": "security.fix_kind",
       "lockrot": "upgrade",
       "model": "update",
-      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+      "reason": "The model reads no lock link, so it classes a higher branch `update`. SPEC §5.3 gives `upgrade` only with a hold. lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
