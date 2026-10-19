@@ -64,6 +64,27 @@ final class RefusedMoveTest extends TestCase
         self::assertSame([], FindingRelations::violations($document));
     }
 
+    /**
+     * Two passes: the refusal of the first sets the class, so the move becomes a `require`, and the
+     * second pass asks its new request, which resolves.
+     */
+    public function testBelowThePassCapTheNextPassAsksTheNewRequest(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = [
+            self::MOVE => ['result' => 'refused', 'form' => null, 'reason' => null, 'holds' => [['source' => 'root', 'package' => null, 'version' => null, 'link' => 'conflict', 'target' => null, 'constraint' => '>=2.3']]],
+            '*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []],
+        ];
+        $inputs['check_passes'] = 2;
+        $case['inputs'] = $inputs;
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+        $finding = self::finding($document);
+
+        self::assertSame(['require', 'resolves', 'inline'], [JsonPath::stringAt($finding, ['next_step', 'kind']), JsonPath::stringAt($finding, ['next_step', 'check', 'result']), JsonPath::stringAt($finding, ['next_step', 'check', 'form'])]);
+        self::assertSame([], FindingRelations::violations($document));
+    }
+
     /** @return iterable<string, array{array<string, ?string>, string}> */
     public static function holds(): iterable
     {

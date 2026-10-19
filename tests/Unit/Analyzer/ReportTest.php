@@ -7,22 +7,27 @@ namespace Lockrot\Tests\Unit\Analyzer;
 use Composer\Downloader\TransportException;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
+use Lockrot\Analyzer\MoveCheckRun;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Analyzer\TransitiveExposure;
+use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
 use Lockrot\Output\RunFooter;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -367,6 +372,20 @@ final class ReportTest extends TestCase
             self::assertSame($failing, $copy->runNotes());
             self::assertTrue($copy->hadNetworkFailures());
         }
+    }
+
+    public function testWithMoveChecksAndWithNoteLeaveTheOriginalReportUntouched(): void
+    {
+        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
+        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::OFFLINE), true);
+
+        $checked = $report->withMoveChecks(new MoveCheckRun(null, false, MoveCheck::notChecked(MoveCheck::OFFLINE)), UpdateNow::of([], $checks));
+        $noted = $report->withNote(RunNote::offline());
+
+        self::assertNull($report->moveCheck());
+        self::assertSame([], $report->notes());
+        self::assertNotNull($checked->moveCheck());
+        self::assertSame([RunNote::offline()->text()], $noted->notes());
     }
 
     public function testWithBaselineLeavesTheOriginalReportUntouched(): void

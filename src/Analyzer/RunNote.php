@@ -558,7 +558,7 @@ final class RunNote
             if ($cause !== null && preg_match('/^Problem \d+$/', $line) === 1) {
                 break;
             }
-            if (preg_match('/^- (.+)$/', $line, $marked) === 1) {
+            if (preg_match('/^- (.+)/', $line, $marked) === 1) {
                 $cause = $marked[1];
             }
         }

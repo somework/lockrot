@@ -140,6 +140,17 @@ final class Report2RootTest extends TestCase
         self::assertSame(['total' => 0, 'with_replacement' => 0, 'with_suggestion' => 0], Report2Root::toAbandonedArray([]));
     }
 
+    public function testAbandonedCountsAnAbandonedFindingAfterOneThatIsNot(): void
+    {
+        $findings = [
+            (new FindingBuilder())->withPackage('acme/fresh')->withVerdict(Verdict::STALE)->build(),
+            (new FindingBuilder())->withPackage('acme/old')->withVerdict(Verdict::ABANDONED)->withChain(['acme/old'])
+                ->withSignals([new Signal('high', 'marked abandoned', SignalDataStub::of('S1', ['replacement' => null]))])->build(),
+        ];
+
+        self::assertSame(['total' => 1, 'with_replacement' => 0, 'with_suggestion' => 0], Report2Root::toAbandonedArray($findings));
+    }
+
     public function testPrioritiesCountTheGradesAndNone(): void
     {
         $findings = [
