@@ -358,8 +358,8 @@ final class PageGoldensTest extends TestCase
     }
 
     /**
-     * A ‡ page document that lags its source document lacks the fields that the schema added since,
-     * so its goldens read fields that the document does not hold.
+     * A ‡ page document that lags its source document fails here, before a golden reads a field that
+     * the document does not hold.
      *
      * @dataProvider provideEveryGolden
      */

@@ -31,7 +31,7 @@ python3 tools/schema/make_negatives_other.py config-2
 | `make_negatives_other.py baseline-2` | `tests/fixtures/schema/documents/baseline/corpus/matomo-v4.json` | `tests/fixtures/schema/negative/baseline-2/` |
 | `make_negatives_other.py config-2` | none: each fixture is written whole | `tests/fixtures/schema/negative/config-2/` |
 | `ts/emit_dts.py` | `resources/lockrot-report-2.schema.json` | `types/` |
-| `project_fixtures.py` | the reference model's `cases.json` and `docs/` | `tests/fixtures/flags/`, `tests/fixtures/schema/documents/` |
+| `project_fixtures.py` | the reference model's `cases.json`, `docs/` and `page-goldens.json` | `tests/fixtures/flags/`, `tests/fixtures/schema/documents/`, `tests/fixtures/contract/page-goldens.json` |
 
 `ship_text.py` is the shipping pass that both builders apply to every description: it removes the
 references a published description must not hold. A unit test applies its expression `SHIP_BANNED`

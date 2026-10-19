@@ -19,9 +19,10 @@ documents). The script writes, relative to the repository root:
     tests/fixtures/schema/documents/cases/<base>.json   the base documents of make_negatives.py
     tests/fixtures/schema/documents/explain/B.json      the base document of make_negatives_other.py
 At the last pull request of the train it also writes every model document, unprojected:
-    tests/fixtures/schema/documents/{cases,variants,explain,explain/coverage,baseline/*,config/*}/   plain JSON
+    tests/fixtures/schema/documents/{cases,variants,explain,explain/coverage,baseline/*,config/*,page}/   plain JSON
     tests/fixtures/schema/documents/{corpus,coverage/baselined,coverage/variants}/   gzipped (`.json.gz`)
     tests/fixtures/schema/documents/provenance.json      the source, its run date and suite, the count of each set
+    tests/fixtures/contract/page-goldens.json            the model's page goldens, byte for byte
 """
 import argparse
 import copy
@@ -31,12 +32,14 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(HERE, '..', '..'))
 FLAGS_OUT = os.path.join(REPO, 'tests', 'fixtures', 'flags')
 DOCS_OUT = os.path.join(REPO, 'tests', 'fixtures', 'schema', 'documents')
+PAGE_GOLDENS_OUT = os.path.join(REPO, 'tests', 'fixtures', 'contract', 'page-goldens.json')
 
 # The pull requests of the 0.14 train that change report-2, in merge order.
 TRAIN = ['4b', '4c', '4d', '4e', '4f', '5', '6a', '6b']
@@ -601,6 +604,8 @@ def write_documents(source, run_date, suite):
                 dump(os.path.join(DOCS_OUT, out_dir, stem), doc)
         counts[out_dir] = len(paths)
     dump(os.path.join(DOCS_OUT, 'provenance.json'), {'source': 'security-axis/r3/docs', 'model_run_date': run_date, 'suite': suite, 'documents': counts})
+    # The page goldens read the page documents: one projection copies both, so that no golden reads a lagging document.
+    shutil.copyfile(os.path.join(source, 'page-goldens.json'), PAGE_GOLDENS_OUT)
     return counts
 
 

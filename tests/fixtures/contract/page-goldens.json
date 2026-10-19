@@ -6614,7 +6614,7 @@
               {
                 "name": "your composer.json",
                 "grade": null,
-                "meta": "requires ^1.3",
+                "meta": "requires pragmarx/google2fa-laravel ^1.3",
                 "step": null
               },
               {
@@ -9895,13 +9895,13 @@
               {
                 "name": "your composer.json",
                 "grade": null,
-                "meta": "requires ^1.3",
+                "meta": "requires pragmarx/google2fa-laravel ^1.3",
                 "step": null
               },
               {
                 "name": "pragmarx/google2fa-laravel v1.4.1",
                 "grade": "high",
-                "meta": "requires ^1.0 · itself left-behind · old-promise",
+                "meta": "requires pragmarx/google2fa-qrcode ^1.0 · itself left-behind · old-promise",
                 "step": "its own step: require ^2.3 on 2.x"
               },
               {
@@ -9927,7 +9927,7 @@
               {
                 "name": "intervention/image 3.11.10",
                 "grade": "high",
-                "meta": "requires ^4.2 · itself left-behind",
+                "meta": "requires intervention/gif ^4.2 · itself left-behind",
                 "step": "its own step: require ^3.11 on 3.x · Composer refuses the move"
               }
             ],
