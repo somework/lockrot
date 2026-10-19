@@ -82,9 +82,16 @@ final class GateAgreementTest extends TestCase
      * its own: that much metadata fills Composer's static caches, which stay for every later test of
      * a shared process.
      *
+     * The reports have no run, so BaselineComparison judges the recorded wallabag baseline against
+     * the running PHP: it compares fixes only on the target PHP that the baseline records. ci.yml runs
+     * the group runtime-php on every PHP row, and the rest of covers-nothing on two.
+     *
      * @runInSeparateProcess
+     *
+     * @group runtime-php
      */
     #[RunInSeparateProcess]
+    #[Group('runtime-php')]
     public function testEveryDocumentsGateAgreesWithTheExitCodeAndTheAnnotationLevels(): void
     {
         $dirs = ['mini', 'mini-split'];
