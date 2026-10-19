@@ -3254,7 +3254,7 @@
         "rest_link": null
       },
       "flags_notes": [
-        "1 carry more than one flag · score model 1",
+        "1 carries more than one flag · score model 1",
         "Accepted by the allowlist: none in flagged packages"
       ],
       "exposure": null,
@@ -3975,7 +3975,7 @@
         "rest_link": null
       },
       "flags_notes": [
-        "1 carry more than one flag · score model 1",
+        "1 carries more than one flag · score model 1",
         "Accepted by the allowlist: none in flagged packages"
       ],
       "exposure": {
@@ -4532,7 +4532,7 @@
         "rest_link": null
       },
       "flags_notes": [
-        "1 carry more than one flag · score model 1",
+        "1 carries more than one flag · score model 1",
         "Accepted by the allowlist: none in flagged packages"
       ],
       "exposure": {
@@ -5278,7 +5278,7 @@
         "rest_link": null
       },
       "flags_notes": [
-        "1 carry more than one flag · score model 1",
+        "1 carries more than one flag · score model 1",
         "Accepted by the allowlist: none in flagged packages"
       ],
       "exposure": null,
@@ -5524,7 +5524,7 @@
         "rest_link": null
       },
       "flags_notes": [
-        "1 carry more than one flag · score model 1",
+        "1 carries more than one flag · score model 1",
         "Accepted by the allowlist: none in flagged packages"
       ],
       "exposure": null,
@@ -6065,7 +6065,7 @@
         "rest_link": null
       },
       "flags_notes": [
-        "1 carry more than one flag · score model 1",
+        "1 carries more than one flag · score model 1",
         "Accepted by the allowlist: none in flagged packages"
       ],
       "exposure": null,
@@ -6923,30 +6923,12 @@
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [],
-      "waffle_caption": "0 of 0 packages flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": null,
       "lead_scope": null,
       "grade_chips": [],
       "waffle": [],
-      "ready": {
-        "note": null,
-        "moves": [],
-        "more": null,
-        "more_link": null,
-        "more_link_rows": null,
-        "held_line": null,
-        "held_link": null,
-        "held_link_rows": null,
-        "way_out": null,
-        "way_out_link": null,
-        "way_out_link_rows": null,
-        "none": "Nothing to run: no package is flagged."
-      },
-      "security": {
-        "figure": null,
-        "unit": "no security advisory",
-        "lookup_complete": true,
-        "counted_as": []
-      },
+      "ready": null,
+      "security": null,
       "weighs_most": null,
       "flags_notes": [],
       "exposure": null,
@@ -6954,14 +6936,7 @@
         "rows": [],
         "sentence": null
       },
-      "libyears": {
-        "figure": null,
-        "bound": "",
-        "sub": "no package measured",
-        "unmeasured": null,
-        "top": [],
-        "none": null
-      },
+      "libyears": null,
       "findings_groups": [],
       "findings_rows": [],
       "ready_count": 0,

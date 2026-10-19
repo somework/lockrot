@@ -69,7 +69,7 @@
     "page_goldens": {
         "file": "page-goldens.json",
         "source": "the model's page goldens (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded",
-        "sha256": "531661eef9c9e4c216e4cfb92a3fdce562c18642580630dda7497c6e9284be83",
+        "sha256": "34f68c8bf35c99ececa1b3caf8a2ba641e21f7d3a10b569f5b30973b7b78e2ff",
         "read_by": "tests/Integration/PageGoldensTest.php reads title, description, grade_line, figure_line, load_line, gate_partition and ready; the other keys are the renderer's"
     },
     "engine_pages": "page/ holds the report-2 that bin/lockrot writes for each case of Lockrot\\Tests\\Support\\Contract\\EnginePage::CASES, recorded by tools/report/record --engine-pages",
