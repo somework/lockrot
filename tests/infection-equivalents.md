@@ -11,6 +11,8 @@ Write an entry as
 `tools/mutation/pr_gate.py` reads the file, the mutators and the code span. Put several mutators of
 one line before one code span. Quote a line that holds a backtick in a double-backtick span. Write "Mutator x2" for a mutant that escapes twice. If the line occurs more than once in its file,
 start the reason with `in method():`.
+`tools/mutation/tests/test_pr_gate.py` fails on an entry whose line is not in src. Rewrite or remove the
+entry in the commit that changes the line.
 
 ## src/Allowlist
 
@@ -53,7 +55,6 @@ start the reason with `in method():`.
 - `src/Composer/LockrotCommand.php` CastString `$cwd = (string) getcwd();` — `getcwd()` returns false only when the working directory is gone, and then PHPUnit cannot start.
 - `src/Composer/LockrotCommand.php` LogicalOr `if ($finding === null || $facts === null) {` — in explain(): one loop fills both, so one is null exactly when the other is.
 - `src/Composer/LockrotCommand.php` CastArray `foreach ((array) $input->getOption('output') as $spec) {` — `--output` is `VALUE_IS_ARRAY`, so symfony/console always returns an array. The cast is for PHPStan.
-- `src/Composer/LockrotCommand.php` UnwrapArrayValues `return [$config, array_values(RepositoryFactory::defaultRepos($io, $config, $manager))];` — nothing reads the keys of the repository list.
 - `src/Composer/LockrotCommand.php` ReturnRemoval `return null;` — in resolveComposer(): without a composer.json, `tryComposer()` returns null too.
 - `src/Composer/LockrotCommand.php` Ternary, FalseValue `$composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);` — the vendored Composer has `tryComposer()`, and its `getComposer(false)` calls `tryComposer()`.
 - `src/Composer/SelfUpdateCommand.php` FalseValue `$phar = $this->runningPhar ?? \Phar::running(false);` — the two calls differ only inside a running PHAR. Infection does not run the e2e `PharTest`.
@@ -88,7 +89,6 @@ start the reason with `in method():`.
 - `src/Data/Repository/RepositoryMetadataLoader.php` TrueValue `$seen[$id] = true;` — a set. Only `isset()` reads it.
 - `src/Data/Repository/RepositoryUrl.php` DecrementInteger `return strncmp($shown, '...', 3) === 0;` — nothing that `shown()` returns starts with `..` and no third dot.
 - `src/Data/Repository/RepositoryUrl.php` LessThan `return $at !== null && ($line === null || $at < $line) ? $at : null;` — in closer(): one pattern finds both offsets, each at its own character, so they are never equal.
-- `src/Data/Abandoned/ComposerAbandonedPolicyReader.php` CastString `$rules[] = ['pattern' => (string) $pattern, 'reason' => $reason, 'constraints' => $constraints];` — Composer's `Config::merge()` renumbers an integer key, so no pattern reaches the reader as an integer.
 - `src/Data/Abandoned/ComposerAbandonedPolicyReader.php` UnwrapArrayFilter `return array_filter($config, 'is_string', \ARRAY_FILTER_USE_KEY);` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
 - `src/Data/Advisory/AdvisoryIgnore.php` FalseValue `return new self([], [], false);` — the flag sets only the `by` of a match, and an empty list matches nothing.
 - `src/Data/Advisory/AdvisoryIgnore.php` FalseValue `return new self([], [], false, $why);` — the flag sets only the `by` of a match, and an empty list matches nothing.
@@ -99,7 +99,6 @@ start the reason with `in method():`.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in attribute(): a package name holds a `/`, so PHP never stores it as an integer key.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in coverage(): a package name holds a `/`, so PHP never stores it as an integer key.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` UnwrapArrayValues `return array_values(array_filter($copies, static function (PartialSecurityAdvisory $advisory) use ($versions): bool {` — the caller only iterates the result with `foreach`.
-- `src/Data/Advisory/RepositoryAdvisoryLoader.php` UnwrapArrayUnique `$feeds[] = ['composer_repository' => $repository['composer_repository'], 'answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'message' => null, 'records' => \count(array_unique($records))];` — Composer's answer lists an advisory once per name and repository.
 
 ## src/Filesystem, src/Graph, src/Html, src/Json, src/Lock
 

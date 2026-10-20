@@ -151,5 +151,33 @@ class TheVerdict(Gate):
         self.assertEqual(2, code)
 
 
+class StaleEntries(Gate):
+    def test_an_entry_whose_line_left_the_source_is_stale(self):
+        ledger = ('- `src/Signal/Openness.php` Plus `return (int) $parts[0] + 0;` — equivalent.\n'
+                  '- `src/Signal/Openness.php` Plus `return (int) $parts[0] + 1;` — the line was rewritten.\n'
+                  '- `src/Signal/Gone.php` Plus `return 1;` — the file was removed.\n')
+
+        found = pr_gate.stale(ledger, pr_gate.Source(self.root))
+
+        self.assertEqual(['- `src/Signal/Openness.php` Plus `return (int) $parts[0] + 1;` — the line was rewritten.',
+                          '- `src/Signal/Gone.php` Plus `return 1;` — the file was removed.'], found)
+
+    def test_a_repeated_line_is_stale_without_the_method_its_reason_names(self):
+        ledger = ('- `src/Signal/Openness.php` TrueValue `return 1;` — in minor(): equivalent.\n'
+                  '- `src/Signal/Openness.php` TrueValue `return 1;` — equivalent, but which line?\n')
+
+        self.assertEqual(['- `src/Signal/Openness.php` TrueValue `return 1;` — equivalent, but which line?'], pr_gate.stale(ledger, pr_gate.Source(self.root)))
+
+
+class TheLedger(unittest.TestCase):
+    def test_every_entry_names_a_line_of_src(self):
+        root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..')
+        with open(os.path.join(root, 'tests', 'infection-equivalents.md'), encoding='utf-8') as handle:
+            ledger = handle.read()
+
+        self.assertNotEqual([], pr_gate.entries(ledger))
+        self.assertEqual([], pr_gate.stale(ledger, pr_gate.Source(root)), 'rewrite or remove each entry whose line left src')
+
+
 if __name__ == '__main__':
     unittest.main()
