@@ -2483,7 +2483,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "2 advisories: 1 high, 1 medium — none fixed on 10.x; worst: PKSA-kbc7-dq62-pt7d Unbounded digits parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation",
+          "summary": "2 security advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed in 11.4.3",
           "data": {
             "advisories": [
               {
@@ -2828,7 +2828,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 unrated — none fixed on 3.x; advisory: PKSA-px1b-j2dd-31r6 Server-side Request Forgery (SSRF)",
+          "summary": "1 security advisory affects v3.0.1 (PKSA-px1b-j2dd-31r6)",
           "data": {
             "advisories": [
               {
@@ -15460,7 +15460,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "3 advisories: 3 medium — none fixed on 0.22.x; worst: CVE-2026-107381 svg-sanitizer: Mixed-case xlink:HrEf skips the `<use>` nesting-DoS check in Resolver::processReferences",
+          "summary": "3 security advisories affect 0.22.0 (CVE-2026-107381, CVE-2026-107380, CVE-2026-107379)",
           "data": {
             "advisories": [
               {
@@ -15874,7 +15874,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 medium — all fixed on 3.x; advisory: CVE-2026-84308 phpseclib — non-constant-time X25519 scalar multiplication permits full private-key recovery",
+          "summary": "1 security advisory affects 3.0.55 (CVE-2026-84308); fixed in 3.0.57",
           "data": {
             "advisories": [
               {

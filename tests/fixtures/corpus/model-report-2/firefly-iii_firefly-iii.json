@@ -1371,7 +1371,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "2 advisories: 1 high, 1 medium — all fixed on 2.x; worst: PKSA-m4t9-vsgq-8khn league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan",
+          "summary": "2 security advisories affect 2.10.0 (PKSA-m4t9-vsgq-8khn, PKSA-m2dq-1fhr-29b1)",
           "data": {
             "advisories": [
               {
@@ -2105,7 +2105,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 medium — all fixed on 3.x; advisory: CVE-2026-84308 phpseclib — non-constant-time X25519 scalar multiplication permits full private-key recovery",
+          "summary": "1 security advisory affects 3.0.55 (CVE-2026-84308); fixed in 3.0.57",
           "data": {
             "advisories": [
               {
@@ -3229,7 +3229,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 low — all fixed on 13.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information",
+          "summary": "1 security advisory affects v13.18.0 (CVE-2026-102279); fixed in v13.30.0",
           "data": {
             "advisories": [
               {
@@ -3603,7 +3603,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 low — all fixed on 3.x; advisory: CVE-2026-102601 Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter",
+          "summary": "1 security advisory affects 3.35.1 (CVE-2026-102601)",
           "data": {
             "advisories": [
               {

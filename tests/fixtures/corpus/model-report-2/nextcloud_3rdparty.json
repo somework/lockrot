@@ -2206,7 +2206,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 medium — all fixed on 3.x; advisory: CVE-2026-84308 phpseclib — non-constant-time X25519 scalar multiplication permits full private-key recovery",
+          "summary": "1 security advisory affects 3.0.55 (CVE-2026-84308); fixed in 3.0.57",
           "data": {
             "advisories": [
               {
@@ -3235,7 +3235,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 low — none fixed on 4.x; advisory: PKSA-zk1n-qbm6-d3rq Webauthn: SimpleFakeCredentialGenerator with an empty secret produces predictable fake credentials, weakening username enumeration protection",
+          "summary": "1 security advisory affects 4.9.3 (PKSA-zk1n-qbm6-d3rq); fixed in 5.3.5",
           "data": {
             "advisories": [
               {
