@@ -25,10 +25,11 @@ jobs:
     strategy:
       fail-fast: false
       # A pull request into a branch other than main runs five rows. They hold each PHPUnit major
-      # that composer.json allows, because the majors read options and events differently: 9.6 on
-      # 7.4 and 8.0, 10.5 on 8.1 only, 11.5 on 8.2 and later. They also hold both PHPUnit
-      # configurations, both ends of the PHP range and the middle of composer/composer. main's
-      # ruleset requires the name of every row, so a pull request into main and a push run them all.
+      # that composer.json allows, because the majors read options and events differently. The
+      # rows resolve 9.6 on 7.4 and 8.0, 10.5 on 8.1 only, and 11.5 on 8.2 and later. They also
+      # hold both PHPUnit configurations, both ends of the PHP range and the middle of
+      # composer/composer. main's ruleset requires the name of every row, so a pull request into
+      # main and a push run them all.
       # The move check solves with the classes of composer/composer, which change at 2.4, 2.6 and
       # 2.9 (src/Solver). The 2.2 and latest rows cover the ends, and the 2.6 row the middle.
       # The covers-nothing tests pin their target PHP, so they run on the two covers_nothing rows,
