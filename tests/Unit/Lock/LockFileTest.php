@@ -385,14 +385,14 @@ final class LockFileTest extends TestCase
 
         $versions = [];
         foreach ($lock->lockedRepository()->getPackages() as $package) {
-            $versions[] = $package->getName().' '.$package->getPrettyVersion().($package instanceof AliasPackage && $package->isRootPackageAlias() ? ' (root alias)' : '');
+            $versions[] = [$package->getName(), $package->getPrettyVersion(), $package instanceof AliasPackage && $package->isRootPackageAlias()];
             if ($package->getPrettyVersion() === 'dev-main') {
                 self::assertSame(['ssl' => ['verify_peer' => false]], $package->getTransportOptions(), 'loaded as Composer\'s Locker loads the lock for an update');
             }
         }
         sort($versions);
 
-        self::assertSame(['vendor/a 1.0.x-dev (root alias)', 'vendor/a dev-main', 'vendor/b 2.0.0'], $versions, 'an aliases entry that is not an array, or names no locked package, adds nothing');
+        self::assertSame([['vendor/a', '1.0.x-dev', true], ['vendor/a', 'dev-main', false], ['vendor/b', '2.0.0', false]], $versions, 'an aliases entry that is not an array, or names no locked package, adds nothing');
         self::assertCount(0, LockFile::empty()->lockedRepository()->getPackages());
     }
 }

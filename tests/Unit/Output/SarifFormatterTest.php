@@ -654,7 +654,6 @@ final class SarifFormatterTest extends TestCase
         return [];
     }
 
-    /** An offline finding with S10 for its advisories, and a package outside every Composer repository, which is skipped. */
     /** SPEC §7.11: `unchecked` marks the first record of a graded finding with S10, a flag's or else an advisory's. */
     public function testTheUncheckedValueMarksTheFirstRecordOfAGradedFinding(): void
     {
@@ -677,6 +676,7 @@ final class SarifFormatterTest extends TestCase
         ], $records);
     }
 
+    /** An offline finding with S10 for its advisories, and a package outside every Composer repository, which is skipped. */
     private static function uncheckedReport(): Report
     {
         $at = new \DateTimeImmutable(self::AT);

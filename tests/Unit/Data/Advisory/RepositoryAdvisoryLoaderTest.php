@@ -8,7 +8,6 @@ use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\FilterRepository;
-use Composer\Semver\VersionParser;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
@@ -323,54 +322,19 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
     /** The move check's blocking reads every record of each name from every repository, and the names asked. */
     public function testTheBatchKeepsTheRecordsOfEveryRepositoryAndTheNamesItAsked(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
-        $record = static fn (string $name, string $id): PartialSecurityAdvisory => PartialSecurityAdvisory::create($name, ['advisoryId' => $id, 'affectedVersions' => '<2.0'], new VersionParser());
+        $first = $this->api([
+            'acme/lib' => [self::record('PKSA-1', '<2.0', ['packageName' => 'acme/lib'])],
+            'acme/other' => [self::record('PKSA-2', '<2.0', ['packageName' => 'acme/other'])],
+        ]);
+        $second = $this->api(['acme/lib' => [self::record('PKSA-3', '<2.0', ['packageName' => 'acme/lib'])]]);
 
-        $batch = (new RepositoryAdvisoryLoader([
-            self::answering('first', ['acme/lib' => [$record('acme/lib', 'PKSA-1')], 'acme/other' => [$record('acme/other', 'PKSA-2')]]),
-            self::answering('second', ['acme/lib' => [$record('acme/lib', 'PKSA-3')]]),
-        ]))->load(['acme/lib' => '1.0.0', 'acme/other' => '1.0.0']);
+        $batch = (new RepositoryAdvisoryLoader(array_merge($first->repositories(), $second->repositories())))->load(['acme/lib' => '1.0.0', 'acme/other' => '1.0.0']);
 
         self::assertSame(
             ['acme/lib' => ['PKSA-1', 'PKSA-3'], 'acme/other' => ['PKSA-2']],
             array_map(static fn (array $records): array => array_map(static fn (PartialSecurityAdvisory $advisory): string => $advisory->advisoryId, $records), $batch->records())
         );
         self::assertSame(['acme/lib', 'acme/other'], $batch->asked());
-    }
-
-    /** @param array<string, list<PartialSecurityAdvisory>> $advisories */
-    private static function answering(string $name, array $advisories): ArrayRepository
-    {
-        return new class ($name, $advisories) extends ArrayRepository implements AdvisoryProviderInterface {
-            private string $name;
-            /** @var array<string, list<PartialSecurityAdvisory>> */
-            private array $advisories;
-
-            /** @param array<string, list<PartialSecurityAdvisory>> $advisories */
-            public function __construct(string $name, array $advisories)
-            {
-                parent::__construct();
-                $this->name = $name;
-                $this->advisories = $advisories;
-            }
-
-            public function getRepoName(): string
-            {
-                return $this->name;
-            }
-
-            public function hasSecurityAdvisories(): bool
-            {
-                return true;
-            }
-
-            public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array
-            {
-                return ['namesFound' => array_keys($this->advisories), 'advisories' => $this->advisories];
-            }
-        };
     }
 
     public function testOfflineAsksNothing(): void
