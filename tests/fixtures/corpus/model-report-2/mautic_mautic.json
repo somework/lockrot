@@ -6859,7 +6859,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 low — all fixed on 3.x; advisory: CVE-2026-102601 Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter",
+          "summary": "1 security advisory affects 3.30.0 (CVE-2026-102601)",
           "data": {
             "advisories": [
               {

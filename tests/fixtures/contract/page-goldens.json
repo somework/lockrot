@@ -191,14 +191,14 @@
         ],
         "rows": [
           {
-            "package": "guzzlehttp/guzzle",
-            "flagged": 1,
-            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
-          },
-          {
             "package": "friendsofsymfony/oauth-server-bundle",
             "flagged": 1,
             "link": "#view=radius&pkg=friendsofsymfony%2Foauth-server-bundle"
+          },
+          {
+            "package": "guzzlehttp/guzzle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
           }
         ],
         "count": "2 direct requirements pull in flagged packages.",
@@ -3548,14 +3548,14 @@
         ],
         "rows": [
           {
-            "package": "guzzlehttp/guzzle",
-            "flagged": 1,
-            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
-          },
-          {
             "package": "friendsofsymfony/oauth-server-bundle",
             "flagged": 1,
             "link": "#view=radius&pkg=friendsofsymfony%2Foauth-server-bundle"
+          },
+          {
+            "package": "guzzlehttp/guzzle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
           }
         ],
         "count": "2 direct requirements pull in flagged packages.",
@@ -4289,14 +4289,14 @@
         ],
         "rows": [
           {
-            "package": "guzzlehttp/guzzle",
-            "flagged": 1,
-            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
-          },
-          {
             "package": "friendsofsymfony/oauth-server-bundle",
             "flagged": 1,
             "link": "#view=radius&pkg=friendsofsymfony%2Foauth-server-bundle"
+          },
+          {
+            "package": "guzzlehttp/guzzle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
           }
         ],
         "count": "2 direct requirements pull in flagged packages.",
@@ -8626,14 +8626,14 @@
         ],
         "rows": [
           {
-            "package": "guzzlehttp/guzzle",
-            "flagged": 1,
-            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
-          },
-          {
             "package": "friendsofsymfony/oauth-server-bundle",
             "flagged": 1,
             "link": "#view=radius&pkg=friendsofsymfony%2Foauth-server-bundle"
+          },
+          {
+            "package": "guzzlehttp/guzzle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
           }
         ],
         "count": "2 direct requirements pull in flagged packages.",

@@ -397,7 +397,7 @@
    {
     "id": "S9",
     "level": "warn",
-    "summary": "4 advisories: 4 medium — none fixed on 1.x; worst: CVE-2026-55766 CRLF injection in HTTP start-line serialization",
+    "summary": "4 security advisories affect 1.9.1 (CVE-2026-55766, CVE-2026-49214, CVE-2026-48998 and 1 more); 1 fixed in 2.12.1, 2 fixed in 2.10.2, 1 fixed in 2.12.3",
     "data": {
      "advisories": [
       {
@@ -1601,25 +1601,6 @@
    ]
   },
   "move_check": null
- },
- "legacy": {
-  "verdict": "left-behind",
-  "priority": "high",
-  "basis": {
-   "base": "high",
-   "steps": [
-    {
-     "reason": "transitive",
-     "from": "high",
-     "to": "medium"
-    },
-    {
-     "reason": "no_fix_expected",
-     "from": "medium",
-     "to": "high"
-    }
-   ]
-  }
  },
  "generated_at": "2026-10-01T17:41:20+00:00",
  "notes": [],

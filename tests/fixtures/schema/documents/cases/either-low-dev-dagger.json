@@ -1334,7 +1334,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 low — none fixed on 1.x; advisory: CVE-2026-00004 an advisory added to show the either opening (‡)",
+     "summary": "1 security advisory affects v1.0.2 (CVE-2026-00004)",
      "data": {
       "advisories": [
        {

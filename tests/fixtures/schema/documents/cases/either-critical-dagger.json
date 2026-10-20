@@ -1474,7 +1474,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "1 advisory: 1 critical — none fixed on 3.x; advisory: CVE-2026-00003 an advisory added to show the either opening (‡)",
+     "summary": "1 security advisory affects v3.4.47 (CVE-2026-00003); fixed in v4.4.0",
      "data": {
       "advisories": [
        {

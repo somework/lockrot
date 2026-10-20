@@ -1294,127 +1294,8 @@
   "fix_unknown": 0
  },
  "data_date": "2026-10-01T17:39:46+00:00",
- "notes": [
-  "5 findings reached --fail-on=critical under 0.13's rules and no longer do: enshrined/svg-sanitize 0.15.4 (24 = left-behind 16 + vulnerable 8 [medium advisory]), symfony/dom-crawler v4.4.45 (18 = left-behind 16 + vulnerable 2 [low advisory]), symfony/mailer v4.4.49 (24 = left-behind 16 + vulnerable 8 [medium advisory]), symfony/routing v4.4.44 (24 = left-behind 16 + vulnerable 8 [medium advisory]), symfony/validator v4.4.48 (18 = left-behind 16 + vulnerable 2 [low advisory]). 0.13 raised each one for any advisory not fixed on its branch; an advisory now adds its own severity."
- ],
- "note_details": [
-  {
-   "code": "verdict_rules_changed",
-   "text": "5 findings reached --fail-on=critical under 0.13's rules and no longer do: enshrined/svg-sanitize 0.15.4 (24 = left-behind 16 + vulnerable 8 [medium advisory]), symfony/dom-crawler v4.4.45 (18 = left-behind 16 + vulnerable 2 [low advisory]), symfony/mailer v4.4.49 (24 = left-behind 16 + vulnerable 8 [medium advisory]), symfony/routing v4.4.44 (24 = left-behind 16 + vulnerable 8 [medium advisory]), symfony/validator v4.4.48 (18 = left-behind 16 + vulnerable 2 [low advisory]). 0.13 raised each one for any advisory not fixed on its branch; an advisory now adds its own severity.",
-   "docs_url": "https://lockrot.dev/notes/#verdict_rules_changed",
-   "sets_network_failures": false,
-   "data": {
-    "fail_on": "critical",
-    "findings": [
-     {
-      "package": "enshrined/svg-sanitize",
-      "version": "0.15.4",
-      "legacy": {
-       "verdict": "left-behind",
-       "priority": "critical",
-       "basis": {
-        "base": "high",
-        "steps": [
-         {
-          "reason": "no_fix_expected",
-          "from": "high",
-          "to": "critical"
-         }
-        ]
-       }
-      },
-      "verdict": "high",
-      "score_total": 24,
-      "score_text": "24 = left-behind 16 + vulnerable 8 [medium advisory]"
-     },
-     {
-      "package": "symfony/dom-crawler",
-      "version": "v4.4.45",
-      "legacy": {
-       "verdict": "left-behind",
-       "priority": "critical",
-       "basis": {
-        "base": "high",
-        "steps": [
-         {
-          "reason": "no_fix_expected",
-          "from": "high",
-          "to": "critical"
-         }
-        ]
-       }
-      },
-      "verdict": "high",
-      "score_total": 18,
-      "score_text": "18 = left-behind 16 + vulnerable 2 [low advisory]"
-     },
-     {
-      "package": "symfony/mailer",
-      "version": "v4.4.49",
-      "legacy": {
-       "verdict": "left-behind",
-       "priority": "critical",
-       "basis": {
-        "base": "high",
-        "steps": [
-         {
-          "reason": "no_fix_expected",
-          "from": "high",
-          "to": "critical"
-         }
-        ]
-       }
-      },
-      "verdict": "high",
-      "score_total": 24,
-      "score_text": "24 = left-behind 16 + vulnerable 8 [medium advisory]"
-     },
-     {
-      "package": "symfony/routing",
-      "version": "v4.4.44",
-      "legacy": {
-       "verdict": "left-behind",
-       "priority": "critical",
-       "basis": {
-        "base": "high",
-        "steps": [
-         {
-          "reason": "no_fix_expected",
-          "from": "high",
-          "to": "critical"
-         }
-        ]
-       }
-      },
-      "verdict": "high",
-      "score_total": 24,
-      "score_text": "24 = left-behind 16 + vulnerable 8 [medium advisory]"
-     },
-     {
-      "package": "symfony/validator",
-      "version": "v4.4.48",
-      "legacy": {
-       "verdict": "left-behind",
-       "priority": "critical",
-       "basis": {
-        "base": "high",
-        "steps": [
-         {
-          "reason": "no_fix_expected",
-          "from": "high",
-          "to": "critical"
-         }
-        ]
-       }
-      },
-      "verdict": "high",
-      "score_total": 18,
-      "score_text": "18 = left-behind 16 + vulnerable 2 [low advisory]"
-     }
-    ]
-   }
-  }
- ],
+ "notes": [],
+ "note_details": [],
  "findings": [
   {
    "package": "twig/twig",
@@ -1841,7 +1722,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "15 advisories: 1 critical, 3 high, 5 medium, 2 unrated, 4 low — all fixed on 3.x (php floor raise); worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+     "summary": "15 security advisories affect v3.11.3 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 9 fixed in v3.26.0, 5 fixed in v3.27.0",
      "data": {
       "advisories": [
        {
@@ -2786,7 +2667,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "14 advisories: 6 high, 8 medium — none fixed on 5.x; worst: CVE-2022-31043 Fix failure to strip Authorization header on HTTP downgrade",
+     "summary": "14 security advisories affect 5.3.4 (CVE-2022-31043, CVE-2022-29248, CVE-2022-31042 and 11 more); 2 fixed in 6.5.7, 1 fixed in 6.5.6, 2 fixed in 7.15.2, 2 fixed in 6.5.8, 2 fixed in 7.12.1, 3 fixed in 7.15.1, 1 fixed in 7.12.3, 1 fixed in 7.14.2",
      "data": {
       "advisories": [
        {
@@ -3585,7 +3466,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "2 advisories: 1 high, 1 low — none fixed on 4.x; worst: CVE-2025-64500 Incorrect parsing of PATH_INFO can lead to limited authorization bypass",
+     "summary": "2 security advisories affect v4.4.49 (CVE-2025-64500, CVE-2024-50345); 1 fixed in v5.4.50, 1 fixed in v5.4.46",
      "data": {
       "advisories": [
        {
@@ -4075,7 +3956,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "2 advisories: 1 high, 1 medium — none fixed on 4.x; worst: CVE-2026-45067 Email Header / SMTP Command Injection via CRLF in Symfony\\Component\\Mime\\Address",
+     "summary": "2 security advisories affect v4.4.47 (CVE-2026-45067, CVE-2026-45070); fixed in v5.4.52",
      "data": {
       "advisories": [
        {
@@ -4541,7 +4422,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "2 advisories: 2 high — none fixed on 4.x; worst: CVE-2026-48489 Security Firewall Bypass via failure_forward Subrequest: Unauthenticated Access to access_control-Protected GET Routes",
+     "summary": "2 security advisories affect v4.4.50 (CVE-2026-48489, CVE-2026-45063); 1 fixed in v5.4.53, 1 fixed in v5.4.52",
      "data": {
       "advisories": [
        {
@@ -8396,7 +8277,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "2 advisories: 1 high, 1 medium — none fixed on 10.x; worst: PKSA-kbc7-dq62-pt7d Unbounded digits parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation",
+     "summary": "2 security advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed in 11.4.3",
      "data": {
       "advisories": [
        {
@@ -8839,7 +8720,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "5 advisories: 2 high, 2 medium, 1 low — all fixed on 3.x; worst: CVE-2026-32935 phpseclib's AES-CBC unpadding susceptible to padding oracle timing attack",
+     "summary": "5 security advisories affect 3.0.46 (CVE-2026-32935, CVE-2026-44167, CVE-2026-84308 and 2 more); 1 fixed in 3.0.57, 1 fixed in 3.0.51",
      "data": {
       "advisories": [
        {
@@ -9293,7 +9174,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "1 advisory: 1 high — all fixed on 5.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+     "summary": "1 security advisory affects v5.2.12 (CVE-2026-45077); fixed in v5.4.52",
      "data": {
       "advisories": [
        {
@@ -9687,7 +9568,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 medium — none fixed on 0.15.x; advisory: CVE-2025-55166 svg-sanitizer Bypasses Attribute Sanitization",
+     "summary": "1 security advisory affects 0.15.4 (CVE-2025-55166); fixed in 0.22.0",
      "data": {
       "advisories": [
        {
@@ -10084,7 +9965,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 medium — none fixed on 4.x; advisory: CVE-2026-45068 Argument Injection in SendmailTransport via Dash-Prefixed Recipient Address",
+     "summary": "1 security advisory affects v4.4.49 (CVE-2026-45068); fixed in v5.4.52",
      "data": {
       "advisories": [
        {
@@ -10523,7 +10404,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "2 advisories: 2 medium — none fixed on 4.x; worst: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+     "summary": "2 security advisories affect v4.4.44 (CVE-2026-48784, CVE-2026-45065); 1 fixed in v5.4.53, 1 fixed in v5.4.52",
      "data": {
       "advisories": [
        {
@@ -10945,7 +10826,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 low — none fixed on 4.x; advisory: CVE-2026-45071 XXE (Local File Disclosure) in DomCrawler::addXmlContent() via validateOnParse = true",
+     "summary": "1 security advisory affects v4.4.45 (CVE-2026-45071); fixed in v5.4.52",
      "data": {
       "advisories": [
        {
@@ -11344,7 +11225,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 low — none fixed on 4.x; advisory: CVE-2024-50343 Incorrect response from Validator when input ends with ` `",
+     "summary": "1 security advisory affects v4.4.48 (CVE-2024-50343); fixed in v5.4.43",
      "data": {
       "advisories": [
        {
@@ -31273,7 +31154,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "4 advisories: 4 medium — all fixed on 2.x; worst: CVE-2026-55766 CRLF injection in HTTP start-line serialization",
+     "summary": "4 security advisories affect 2.8.0 (CVE-2026-55766, CVE-2026-49214, CVE-2026-48998 and 1 more); 1 fixed in 2.12.1, 2 fixed in 2.10.2, 1 fixed in 2.12.3",
      "data": {
       "advisories": [
        {
@@ -32001,7 +31882,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 medium — all fixed on 5.x; advisory: CVE-2026-45073 SQL Injection in PdoAdapter::doClear() via Unsanitized $prefix",
+     "summary": "1 security advisory affects v5.4.46 (CVE-2026-45073); fixed in v5.4.52",
      "data": {
       "advisories": [
        {
@@ -32352,7 +32233,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 medium — all fixed on 5.x; advisory: CVE-2026-48736 IpUtils::PRIVATE_SUBNETS Omits IPv6 Transition Forms (6to4, NAT64, Teredo, IPv4-compatible): SSRF Bypass in NoPrivateNetworkHttpClient",
+     "summary": "1 security advisory affects v5.4.49 (CVE-2026-48736); fixed in v5.4.53",
      "data": {
       "advisories": [
        {
@@ -39196,7 +39077,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 low — all fixed on 2.x; advisory: PKSA-j5hk-b83d-1p4h Graby has stored XSS via iframe srcdoc Attribute in htmLawed Sanitization Config",
+     "summary": "1 security advisory affects v2.5.0 (PKSA-j5hk-b83d-1p4h)",
      "data": {
       "advisories": [
        {
@@ -40020,7 +39901,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+     "summary": "1 security advisory affects v1.33.0 (CVE-2026-46644); fixed in v1.38.1",
      "data": {
       "advisories": [
        {
@@ -40422,7 +40303,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+     "summary": "3 security advisories affect v5.3.14 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
      "data": {
       "advisories": [
        {

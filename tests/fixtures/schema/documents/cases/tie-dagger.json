@@ -1380,7 +1380,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 medium — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+     "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077)",
      "data": {
       "advisories": [
        {

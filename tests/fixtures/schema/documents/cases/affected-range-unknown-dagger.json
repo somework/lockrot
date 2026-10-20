@@ -1283,7 +1283,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 low — fix not known on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+     "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644)",
      "data": {
       "advisories": [
        {

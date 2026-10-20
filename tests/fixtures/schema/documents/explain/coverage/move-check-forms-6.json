@@ -287,7 +287,7 @@
    {
     "id": "S9",
     "level": "high",
-    "summary": "1 advisory: 1 critical — all fixed on 2.x; advisory: CVE-2026-54133 CompilerRuntime code injection via unescaped function names",
+    "summary": "1 security advisory affects 2.8.0 (CVE-2026-54133); fixed in 2.9.1",
     "data": {
      "advisories": [
       {
@@ -1157,14 +1157,6 @@
    "ignores_extensions": true,
    "baseline": "resolves",
    "reason": null
-  }
- },
- "legacy": {
-  "verdict": "ok",
-  "priority": "none",
-  "basis": {
-   "base": "none",
-   "steps": []
   }
  },
  "generated_at": "2026-10-01T17:39:50+00:00",

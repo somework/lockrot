@@ -291,7 +291,7 @@
    {
     "id": "S9",
     "level": "warn",
-    "summary": "2 advisories: 1 medium, 1 low — all fixed on 2.x; worst: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
+    "summary": "2 security advisories affect v2.2.0 (CVE-2026-47345, CVE-2026-47344); fixed in v2.3.2",
     "data": {
      "advisories": [
       {
@@ -1252,14 +1252,6 @@
    "ignores_extensions": true,
    "baseline": "resolves",
    "reason": null
-  }
- },
- "legacy": {
-  "verdict": "ok",
-  "priority": "none",
-  "basis": {
-   "base": "none",
-   "steps": []
   }
  },
  "generated_at": "2026-10-01T17:41:59+00:00",
