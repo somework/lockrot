@@ -25,7 +25,8 @@ use PHPUnit\TextUI\Configuration\Configuration;
  * PHPUnit's own time limit throws a \RuntimeException subclass, which product code can catch, so a
  * loop mutant there never ends. The signal handler exits instead, and nothing can catch an exit.
  * PHPUnit runs setUpBeforeClass() and the data providers outside a test, so the suite start and each
- * provider call set the alarm too. Without pcntl the extension does nothing.
+ * provider call set the alarm too. PHPUnit 10 calls the providers before it boots the extensions,
+ * so there the limit misses a provider. Without pcntl the extension does nothing.
  * Reasons and measurements: https://github.com/somework/lockrot/pull/65.
  */
 final class MutantTestTimeLimit implements Extension

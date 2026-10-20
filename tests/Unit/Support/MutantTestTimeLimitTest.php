@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Support;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Extension\Extension;
+use PHPUnit\Runner\Version;
 use Symfony\Component\Process\Process;
 
 /**
@@ -39,6 +40,10 @@ final class MutantTestTimeLimitTest extends TestCase
     #[DataProvider('loops')]
     public function testAMutantProcessStopsALoopAtTheLimit(string $class, string $message): void
     {
+        if ($class === 'LoopInDataProviderTest' && Version::majorVersionNumber() === 10) {
+            self::markTestSkipped('PHPUnit 10 calls the data providers before it boots the extensions, so no event can set the alarm there');
+        }
+
         $process = self::phpunitOn($class);
 
         self::assertSame(1, $process->getExitCode());
