@@ -8,6 +8,7 @@
 /build/junit*.xml
 /.phpunit.cache
 /.phpunit.result.cache
+/phpunit-ci*.xml
 /.php-cs-fixer.cache
 /composer.lock
 /.superpowers/

@@ -24,9 +24,12 @@ jobs:
     name: tests (${{ matrix.php }}, ${{ matrix.composer }})
     strategy:
       fail-fast: false
-      # A pull request into a branch other than main runs four rows. They hold both PHPUnit
-      # configurations, both ends of the PHP range and the middle of composer/composer. main's
-      # ruleset requires the name of every row, so a pull request into main and a push run them all.
+      # A pull request into a branch other than main runs the rows below. They hold each PHPUnit major
+      # that composer.json allows, because the majors read options and events differently. The
+      # rows resolve 9.6 on 7.4 and 8.0, 10.5 on 8.1 only, and 11.5 on 8.2 and later. They also
+      # hold both PHPUnit configurations, both ends of the PHP range and the middle of
+      # composer/composer. main's ruleset requires the name of every row, so a pull request into
+      # main and a push run them all.
       # The move check solves with the classes of composer/composer, which change at 2.4, 2.6 and
       # 2.9 (src/Solver). The 2.2 and latest rows cover the ends, and the 2.6 row the middle.
       # The covers-nothing tests pin their target PHP, so they run on the two covers_nothing rows,
@@ -36,6 +39,7 @@ jobs:
         "include": [
         {"php": "7.4", "composer": "2.2", "covers_nothing": true},
         {"php": "8.0", "composer": "latest"},
+        {"php": "8.1", "composer": "latest"},
         {"php": "8.3", "composer": "2.6"},
         {"php": "8.5", "composer": "latest", "covers_nothing": true}]}' || '{
         "php": ["7.4", "8.0", "8.1", "8.2", "8.3", "8.4", "8.5"],
@@ -64,26 +68,38 @@ jobs:
           composer -V
           config=phpunit.xml.dist
           if [ "${{ matrix.php }}" = "7.4" ] || [ "${{ matrix.php }}" = "8.0" ]; then config=phpunit9.xml.dist; fi
-          # An --exclude-group option replaces the configuration's list, so it repeats e2e, network and sweep.
-          slow=(--exclude-group=e2e --exclude-group=network --exclude-group=sweep)
+          # PHPUnit 9.6 and 10.5 apply only the last --exclude-group, and 10.5 warns on a second one.
+          # 11.5 warns on a comma list. So a process reads a copy of the configuration with its own
+          # <groups>, which each major reads alike. A group list replaces the configuration's list,
+          # so each one repeats e2e, network and sweep.
+          slow='<group>e2e</group><group>network</group><group>sweep</group>'
+          groups_config() {
+            sed "s#<groups>.*</groups>#<groups>$2</groups>#" "$config" > "$1"
+            # A configuration whose <groups> element the sed does not match runs the wrong groups.
+            grep -qF "<groups>$2</groups>" "$1" || { echo "::error::$1 does not hold the <groups> of its process"; return 1; }
+          }
           # Composer 2.4 to 2.6 write no advisory severity, which the advisory tests read. This row tests the move check.
           if [ "${{ matrix.composer }}" = "2.6" ]; then
-            vendor/bin/phpunit -c "$config" "${slow[@]}" --exclude-group=covers-nothing tests/Unit/Solver tests/Unit/Verdict tests/Unit/Analyzer
+            groups_config phpunit-ci.xml "<exclude>$slow<group>covers-nothing</group></exclude>"
+            vendor/bin/phpunit -c phpunit-ci.xml tests/Unit/Solver tests/Unit/Verdict tests/Unit/Analyzer
           else
             # Processes side by side shorten the row. Each writes its own log, and the step checks every exit code.
             # A runtime-php test reads the PHP that runs it, so a row without covers-nothing still runs it.
             # On a covers_nothing row, schema-sweep holds the longest covers-nothing class and gets a process of its own.
-            runs=("--exclude-group=covers-nothing")
+            runs=("<exclude>$slow<group>covers-nothing</group></exclude>")
             if [ "${{ matrix.covers_nothing }}" = "true" ]; then
-              runs+=("--group=covers-nothing --exclude-group=schema-sweep" "--group=schema-sweep")
+              runs+=("<include><group>covers-nothing</group></include><exclude>$slow<group>schema-sweep</group></exclude>")
+              runs+=("<include><group>schema-sweep</group></include><exclude>$slow</exclude>")
             else
-              runs+=("--group=runtime-php")
+              runs+=("<include><group>runtime-php</group></include><exclude>$slow</exclude>")
             fi
             mkdir -p build
+            # The copies stay beside the configuration, because PHPUnit resolves its paths from there.
+            # All of them exist before a process starts, so a failed copy leaves no process running.
+            for i in "${!runs[@]}"; do groups_config "phpunit-ci-$i.xml" "${runs[$i]}"; done
             pids=()
             for i in "${!runs[@]}"; do
-              # shellcheck disable=SC2086 # each entry holds the options of one process
-              vendor/bin/phpunit -c "$config" "${slow[@]}" ${runs[$i]} > "build/phpunit-$i.log" 2>&1 &
+              vendor/bin/phpunit -c "phpunit-ci-$i.xml" > "build/phpunit-$i.log" 2>&1 &
               pids+=($!)
             done
             failed=0
