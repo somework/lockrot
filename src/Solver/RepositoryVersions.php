@@ -52,12 +52,21 @@ final class RepositoryVersions implements VersionSource
 
     public function versions(string $name): array
     {
-        if (isset($this->loaded[$name])) {
-            return $this->loaded[$name];
-        }
-        $this->loaded[$name] = isset($this->notFromComposerRepository[$name]) ? [] : $this->load($name);
+        return $this->versionsOf([$name])[$name];
+    }
 
-        return $this->loaded[$name];
+    public function versionsOf(array $names): array
+    {
+        $missing = array_filter($names, fn (string $name): bool => !isset($this->loaded[$name]));
+        if ($missing !== []) {
+            $this->load($missing);
+        }
+        $versions = [];
+        foreach ($names as $name) {
+            $versions[$name] = $this->loaded[$name];
+        }
+
+        return $versions;
     }
 
     public function failure(string $name): ?string
@@ -65,8 +74,58 @@ final class RepositoryVersions implements VersionSource
         return $this->failures[$name] ?? null;
     }
 
+    /**
+     * Asks each repository for the names together, so Composer sends the requests side by side.
+     * One failed request fails them all: the names that it leaves are loaded one by one.
+     *
+     * @param array<string> $names
+     */
+    private function load(array $names): void
+    {
+        $pending = array_diff_key(array_fill_keys($names, null), $this->notFromComposerRepository);
+        $this->loaded += array_fill_keys($names, []);
+
+        try {
+            $this->loadTogether($pending);
+        } catch (\Exception $e) {
+            // A transport failure or an answer that does not parse (Seld\JsonLint\ParsingException).
+            foreach (array_keys($pending) as $name) {
+                if ($this->loaded[$name] === []) {
+                    $this->loaded[$name] = $this->loadOne($name);
+                }
+            }
+        }
+    }
+
+    /** @param array<string, null> $pending */
+    private function loadTogether(array $pending): void
+    {
+        if ($this->deadline->isPast()) {
+            $this->failures += array_fill_keys(array_keys($pending), self::BUDGET);
+
+            return;
+        }
+        foreach ($this->repositories as $repository) {
+            foreach ([self::STABLE, self::DEV] as $stabilities) {
+                if ($pending === []) {
+                    return;
+                }
+                $result = $repository->loadPackages($pending, $stabilities, []);
+                foreach ($result['packages'] as $package) {
+                    if ($package instanceof BasePackage && \array_key_exists($package->getName(), $pending)) {
+                        $this->loaded[$package->getName()][] = $package;
+                    }
+                }
+                $pending = array_diff_key($pending, array_filter($this->loaded));
+            }
+        }
+        if ($this->offline) {
+            $this->failures += array_fill_keys(array_keys($pending), self::OFFLINE);
+        }
+    }
+
     /** @return list<BasePackage> */
-    private function load(string $name): array
+    private function loadOne(string $name): array
     {
         if ($this->deadline->isPast()) {
             $this->failures[$name] = self::BUDGET;
@@ -79,7 +138,6 @@ final class RepositoryVersions implements VersionSource
                 try {
                     $result = $repository->loadPackages([$name => null], $stabilities, []);
                 } catch (\Exception $e) {
-                    // A transport failure or an answer that does not parse (Seld\JsonLint\ParsingException).
                     $failed = true;
                     break;
                 }

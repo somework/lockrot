@@ -48,6 +48,16 @@ final class ArrayVersionSource implements VersionSource
         return $this->loaded[$name];
     }
 
+    public function versionsOf(array $names): array
+    {
+        $versions = [];
+        foreach ($names as $name) {
+            $versions[$name] = $this->versions($name);
+        }
+
+        return $versions;
+    }
+
     public function failure(string $name): ?string
     {
         return \in_array($name, $this->asked, true) ? ($this->failures[$name] ?? null) : null;

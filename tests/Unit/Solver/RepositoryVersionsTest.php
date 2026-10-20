@@ -12,6 +12,7 @@ use Composer\Repository\ComposerRepository;
 use Lockrot\Deadline;
 use Lockrot\Solver\RepositoryVersions;
 use Lockrot\Solver\VersionSource;
+use Lockrot\Tests\Support\RecordingComposerRepository;
 use PHPUnit\Framework\TestCase;
 use Seld\JsonLint\ParsingException;
 
@@ -70,6 +71,8 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame(['1.0.0', '1.1.0'], self::pretty($versions->versions('acme/lib')));
         self::assertSame([0, 1], array_keys($versions->versions('acme/lib')));
         self::assertSame(1, $repository->loads, 'a name loads once');
+        self::assertSame(['1.0.0'], self::pretty($versions->versions('acme/other')));
+        self::assertSame(2, $repository->loads, 'another name in an answer is not loaded with the asked name');
     }
 
     public function testANameWithNoTaggedReleaseLoadsItsDevVersions(): void
@@ -94,6 +97,114 @@ final class RepositoryVersionsTest extends TestCase
 
         self::assertSame([[], null], [$online->versions('acme/lib'), $online->failure('acme/lib')]);
         self::assertSame([[], VersionSource::OFFLINE], [$offline->versions('acme/lib'), $offline->failure('acme/lib')]);
+    }
+
+    public function testEachRepositoryIsAskedForTheNamesTogetherOncePerStability(): void
+    {
+        $first = self::recording(['acme/tagged' => ['1.0.0'], 'acme/branch' => ['dev-main']]);
+        $second = self::recording(['acme/elsewhere' => ['2.0.0'], 'acme/tagged' => ['9.0.0']]);
+        $versions = new RepositoryVersions([$first, $second], [], false, Deadline::never());
+
+        $loaded = $versions->versionsOf(['acme/tagged', 'acme/branch', 'acme/elsewhere', 'acme/none']);
+
+        self::assertSame(['acme/tagged' => ['1.0.0'], 'acme/branch' => ['dev-main'], 'acme/elsewhere' => ['2.0.0'], 'acme/none' => []], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+        self::assertSame([[['acme/tagged', 'acme/branch', 'acme/elsewhere', 'acme/none'], 'stable'], [['acme/branch', 'acme/elsewhere', 'acme/none'], 'dev']], $first->asked);
+        self::assertSame([[['acme/elsewhere', 'acme/none'], 'stable'], [['acme/none'], 'dev']], $second->asked);
+        self::assertNull($versions->failure('acme/none'));
+    }
+
+    public function testANameLoadsOnceAndALaterAskNamesOnlyTheNewNames(): void
+    {
+        $repository = self::recording(['acme/a' => ['1.0.0'], 'acme/b' => ['1.0.0']]);
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::never());
+
+        $versions->versions('acme/a');
+        $loaded = $versions->versionsOf(['acme/b', 'acme/a']);
+
+        self::assertSame(['acme/b' => ['1.0.0'], 'acme/a' => ['1.0.0']], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+        self::assertSame([[['acme/a'], 'stable'], [['acme/b'], 'stable']], $repository->asked);
+    }
+
+    /** One name whose request fails must not fail the names asked with it. */
+    public function testAFailedRequestOfSeveralNamesFailsOnlyTheNameThatFailsAlone(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/good' => ['1.0.0']], ['acme/bad']), self::recording(['acme/good' => ['9.0.0']])], [], false, Deadline::never());
+
+        $loaded = $versions->versionsOf(['acme/good', 'acme/bad']);
+
+        self::assertSame(['acme/good' => ['1.0.0'], 'acme/bad' => []], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+        self::assertSame([null, VersionSource::FAILED], [$versions->failure('acme/good'), $versions->failure('acme/bad')]);
+    }
+
+    /** A name that a later repository lists loads from there, though an earlier repository failed on it. */
+    public function testANameThatFailsInOneRepositoryLoadsFromTheNext(): void
+    {
+        $versions = new RepositoryVersions([self::recording([], ['acme/lib']), self::recording(['acme/lib' => ['1.0.0']])], [], true, Deadline::never());
+
+        self::assertSame(['1.0.0'], self::pretty($versions->versions('acme/lib')));
+        self::assertNull($versions->failure('acme/lib'));
+    }
+
+    public function testANameThatFailsAndThatNoOtherRepositoryListsIsFailedEvenOffline(): void
+    {
+        $versions = new RepositoryVersions([self::recording([], ['acme/lib']), self::recording([])], [], true, Deadline::never());
+
+        self::assertSame([], $versions->versions('acme/lib'));
+        self::assertSame(VersionSource::FAILED, $versions->failure('acme/lib'));
+    }
+
+    public function testAfterTheDeadlineNoRepositoryIsAskedAndEachNameIsOverTheBudget(): void
+    {
+        $repository = self::recording(['acme/a' => ['1.0.0']]);
+        $versions = new RepositoryVersions([$repository], ['acme/path'], false, Deadline::inSeconds(0.0, static fn (): float => 0.0));
+
+        self::assertSame(['acme/a' => [], 'acme/path' => []], $versions->versionsOf(['acme/a', 'acme/path']));
+        self::assertSame([VersionSource::BUDGET, null], [$versions->failure('acme/a'), $versions->failure('acme/path')]);
+        self::assertSame([], $repository->asked);
+    }
+
+    /** After a failed request of several names, each name loads alone only while the budget lasts. */
+    public function testTheNamesThatAFailedRequestLeavesAreOverTheBudgetOnceItRunsOut(): void
+    {
+        $clock = new class () {
+            public float $now = 0.0;
+        };
+        $repository = self::recording(['acme/good' => ['1.0.0']], ['acme/bad'], static function () use ($clock): void {
+            $clock->now = 10.0;
+        });
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::inSeconds(5.0, static fn (): float => $clock->now));
+
+        self::assertSame(['acme/good' => [], 'acme/bad' => []], $versions->versionsOf(['acme/good', 'acme/bad']));
+        self::assertSame([VersionSource::BUDGET, VersionSource::BUDGET], [$versions->failure('acme/good'), $versions->failure('acme/bad')]);
+        self::assertSame([[['acme/good', 'acme/bad'], 'stable']], $repository->asked);
+    }
+
+    /** A path, VCS or package repository serves the name: the lock's version is its only one. */
+    public function testANameThatNoComposerRepositoryServesIsNotAsked(): void
+    {
+        $repository = self::recording(['acme/path' => ['2.0.0'], 'acme/lib' => ['1.0.0']]);
+        $versions = new RepositoryVersions([$repository], ['acme/path'], false, Deadline::never());
+
+        self::assertSame(['acme/path' => [], 'acme/lib' => ['1.0.0']], array_map(static fn (array $packages): array => self::pretty($packages), $versions->versionsOf(['acme/path', 'acme/lib'])));
+        self::assertSame([[['acme/lib'], 'stable']], $repository->asked);
+        self::assertNull($versions->failure('acme/path'));
+    }
+
+    /**
+     * @param array<string, list<string>> $versions name => its pretty versions
+     * @param list<string>                $failing
+     * @param ?\Closure(): void            $onFailure
+     */
+    private static function recording(array $versions, array $failing = [], ?\Closure $onFailure = null): RecordingComposerRepository
+    {
+        $packages = [];
+        foreach ($versions as $name => $list) {
+            foreach ($list as $version) {
+                $packages[] = self::package($name, $version);
+            }
+        }
+
+        return new RecordingComposerRepository($packages, $failing, $onFailure);
     }
 
     /**

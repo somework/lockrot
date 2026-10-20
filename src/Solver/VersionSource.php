@@ -25,6 +25,15 @@ interface VersionSource
     public function versions(string $name): array;
 
     /**
+     * The versions of several names, as {@see versions()} gives them, asked together.
+     *
+     * @param list<string> $names
+     *
+     * @return array<string, list<BasePackage>> in the order of $names
+     */
+    public function versionsOf(array $names): array;
+
+    /**
      * Why the source has no versions of a name that it was asked for: {@see OFFLINE},
      * {@see FAILED} or {@see BUDGET}. Null when it was not asked, when it loaded versions, or when
      * a repository answered that it does not list the name.
