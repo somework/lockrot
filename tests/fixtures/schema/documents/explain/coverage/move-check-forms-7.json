@@ -323,7 +323,7 @@
    {
     "id": "S9",
     "level": "warn",
-    "summary": "2 advisories: 2 medium — all fixed on 3.x; worst: CVE-2026-84308 phpseclib — non-constant-time X25519 scalar multiplication permits full private-key recovery",
+    "summary": "2 security advisories affect 3.0.52 (CVE-2026-84308, CVE-2026-55599); 1 fixed in 3.0.57",
     "data": {
      "advisories": [
       {
@@ -1208,14 +1208,6 @@
    "ignores_extensions": true,
    "baseline": "resolves",
    "reason": null
-  }
- },
- "legacy": {
-  "verdict": "ok",
-  "priority": "none",
-  "basis": {
-   "base": "none",
-   "steps": []
   }
  },
  "generated_at": "2026-10-01T17:39:50+00:00",

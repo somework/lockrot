@@ -1168,14 +1168,6 @@
   },
   "move_check": null
  },
- "legacy": {
-  "verdict": "old-promise",
-  "priority": "high",
-  "basis": {
-   "base": "high",
-   "steps": []
-  }
- },
  "generated_at": "2026-10-01T17:40:04+00:00",
  "notes": [],
  "note_details": []

@@ -362,7 +362,7 @@
    {
     "id": "S9",
     "level": "high",
-    "summary": "7 advisories: 5 high, 2 medium — all fixed on 2.x; worst: CVE-2026-40176 Command injection via malicious Perforce repository definition",
+    "summary": "7 security advisories affect 2.9.5 (CVE-2026-40176, CVE-2026-45793, CVE-2026-40261 and 4 more); 2 fixed in 2.9.6, 1 fixed in 2.9.8, 1 fixed in 2.10.3, 3 fixed in 2.10.2",
     "data": {
      "advisories": [
       {
@@ -1383,14 +1383,6 @@
    ]
   },
   "move_check": null
- },
- "legacy": {
-  "verdict": "ok",
-  "priority": "none",
-  "basis": {
-   "base": "none",
-   "steps": []
-  }
  },
  "generated_at": "2026-10-01T17:40:04+00:00",
  "notes": [

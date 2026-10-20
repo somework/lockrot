@@ -913,11 +913,11 @@
  },
  "exposure": [
   {
-   "package": "guzzlehttp/guzzle",
+   "package": "friendsofsymfony/oauth-server-bundle",
    "flagged": 1
   },
   {
-   "package": "friendsofsymfony/oauth-server-bundle",
+   "package": "guzzlehttp/guzzle",
    "flagged": 1
   }
  ],
@@ -1421,7 +1421,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+     "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
      "data": {
       "advisories": [
        {
@@ -2766,7 +2766,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+     "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
      "data": {
       "advisories": [
        {
@@ -3249,7 +3249,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "9 advisories: 1 high, 8 medium — none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks",
+     "summary": "9 security advisories affect 6.5.8 (CVE-2026-69246, CVE-2026-55767, CVE-2026-67353 and 6 more); 2 fixed in 7.15.2, 2 fixed in 7.12.1, 3 fixed in 7.15.1, 1 fixed in 7.12.3, 1 fixed in 7.14.2",
      "data": {
       "advisories": [
        {
@@ -4820,7 +4820,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+     "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
      "data": {
       "advisories": [
        {
@@ -5246,7 +5246,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+     "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed in v1.38.1",
      "data": {
       "advisories": [
        {

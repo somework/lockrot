@@ -1497,7 +1497,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "16 advisories: 1 critical, 3 high, 5 medium, 2 unrated, 5 low — 2 of 16 fixed on 1.x (php floor raise); worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+     "summary": "16 security advisories affect v1.43.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 13 more); 6 fixed in v3.26.0, 6 fixed in v3.27.0, 1 fixed in v2.15.3, 1 fixed in v2.16.0, 2 fixed in v3.14.1",
      "data": {
       "advisories": [
        {

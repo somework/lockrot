@@ -1380,7 +1380,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "3 advisories: 2 high, 1 medium — all fixed on 2.x; worst: PKSA-m4t9-vsgq-8khn league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan",
+     "summary": "3 security advisories affect 2.9.1 (PKSA-m4t9-vsgq-8khn, PKSA-zyf5-hrxv-hrd7, PKSA-m2dq-1fhr-29b1); 2 fixed in 2.10.3, 1 fixed in 2.10.0",
      "data": {
       "advisories": [
        {
@@ -1797,7 +1797,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 low — all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information",
+     "summary": "1 security advisory affects v12.65.0 (CVE-2026-102279); fixed in v12.69.0",
      "data": {
       "advisories": [
        {

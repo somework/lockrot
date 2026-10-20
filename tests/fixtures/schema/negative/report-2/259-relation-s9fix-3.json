@@ -2857,7 +2857,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process",
+     "summary": "5 security advisories affect 4.3.x-dev (CVE-2022-25768, CVE-2024-47058, CVE-2024-47050 and 2 more)",
      "data": {
       "advisories": [
        {

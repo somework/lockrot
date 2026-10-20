@@ -292,7 +292,7 @@
    {
     "id": "S9",
     "level": "warn",
-    "summary": "1 advisory: 1 low — all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information",
+    "summary": "1 security advisory affects v12.68.0 (CVE-2026-102279); fixed in v12.69.0",
     "data": {
      "advisories": [
       {
@@ -1151,14 +1151,6 @@
    "ignores_extensions": true,
    "baseline": "refused",
    "reason": null
-  }
- },
- "legacy": {
-  "verdict": "ok",
-  "priority": "none",
-  "basis": {
-   "base": "none",
-   "steps": []
   }
  },
  "generated_at": "2026-10-01T17:39:50+00:00",
