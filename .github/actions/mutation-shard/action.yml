@@ -14,8 +14,10 @@ runs:
   using: composite
   steps:
     # pcntl: a mutant's test that never ends is stopped by an alarm (tests/Support/MutantTestTimeLimit.php).
+    # No coverage driver: Infection reads the coverage of the mutation-coverage job, and a loaded
+    # pcov slows every mutant process. Measurements: PR_LINK
     - uses: shivammathur/setup-php@v2
-      with: {php-version: '8.4', coverage: pcov, extensions: pcntl}
+      with: {php-version: '8.4', coverage: none, extensions: pcntl}
     - run: composer install --no-interaction
       shell: bash
     - name: Install Infection (not in require-dev, PHP ^8.2 floor)
