@@ -24,7 +24,7 @@ jobs:
     name: tests (${{ matrix.php }}, ${{ matrix.composer }})
     strategy:
       fail-fast: false
-      # A pull request into a branch other than main runs five rows. They hold each PHPUnit major
+      # A pull request into a branch other than main runs the rows below. They hold each PHPUnit major
       # that composer.json allows, because the majors read options and events differently. The
       # rows resolve 9.6 on 7.4 and 8.0, 10.5 on 8.1 only, and 11.5 on 8.2 and later. They also
       # hold both PHPUnit configurations, both ends of the PHP range and the middle of
@@ -76,7 +76,7 @@ jobs:
           groups_config() {
             sed "s#<groups>.*</groups>#<groups>$2</groups>#" "$config" > "$1"
             # A configuration whose <groups> element the sed does not match runs the wrong groups.
-            grep -qF "<groups>$2</groups>" "$1"
+            grep -qF "<groups>$2</groups>" "$1" || { echo "::error::$1 does not hold the <groups> of its process"; return 1; }
           }
           # Composer 2.4 to 2.6 write no advisory severity, which the advisory tests read. This row tests the move check.
           if [ "${{ matrix.composer }}" = "2.6" ]; then
@@ -94,10 +94,11 @@ jobs:
               runs+=("<include><group>runtime-php</group></include><exclude>$slow</exclude>")
             fi
             mkdir -p build
+            # The copies stay beside the configuration, because PHPUnit resolves its paths from there.
+            # All of them exist before a process starts, so a failed copy leaves no process running.
+            for i in "${!runs[@]}"; do groups_config "phpunit-ci-$i.xml" "${runs[$i]}"; done
             pids=()
             for i in "${!runs[@]}"; do
-              # The copy stays beside the configuration, because PHPUnit resolves its paths from there.
-              groups_config "phpunit-ci-$i.xml" "${runs[$i]}"
               vendor/bin/phpunit -c "phpunit-ci-$i.xml" > "build/phpunit-$i.log" 2>&1 &
               pids+=($!)
             done
