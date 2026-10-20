@@ -25,6 +25,7 @@ use Composer\Repository\LockArrayRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositorySet;
 use Composer\Repository\RootPackageRepository;
+use Composer\Semver\CompilingMatcher;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\Constraint\MultiConstraint;
@@ -48,6 +49,11 @@ final class ComposerSolver
     private array $blocked;
     private PlatformRequirementFilterInterface $filter;
     private ?PoolAdvisories $advisories = null;
+    private string $lastInputs = '';
+    /** @phpstan-ignore property.onlyWritten (the last built pool keeps the object ids of its packages taken: {@see SolverInputs}) */
+    private Pool $lastBuilt;
+    /** @var array{0: Pool, 1: LockTransaction|SolverProblemsException} the optimized pool and Composer's answer of the last solve */
+    private array $lastAnswer;
 
     /**
      * @param array<string, list<ConstraintInterface>> $blocked the advisory ranges by name that Composer 2.9 and later block in an update, none to block nothing
@@ -128,12 +134,10 @@ final class ComposerSolver
             $temporary = [];
         }
         $policy = new DefaultPolicy($root->getPreferStable(), false);
-        [$set, $composerRequest, $pool] = $this->pool($root, $requires, $temporary, $request, $policy);
-
-        try {
-            $transaction = (new Solver($policy, $pool, new NullIO()))->solve($composerRequest, $this->filter);
-        } catch (SolverProblemsException $e) {
-            $holds = ProblemHolds::of($e, $pool, $root, $request->allow(), $requested);
+        [$set, $composerRequest, $pool, $fixedRoot] = $this->pool($root, $requires, $temporary, $request);
+        [$pool, $answer] = $this->answer($policy, $composerRequest, $pool, $fixedRoot);
+        if ($answer instanceof SolverProblemsException) {
+            $holds = ProblemHolds::of($answer, $pool, $root, $request->allow(), $requested);
             $unloaded = [];
             foreach ($holds->wanted() as $name) {
                 $failure = $this->source->failure($name);
@@ -142,19 +146,47 @@ final class ComposerSolver
                 }
             }
 
-            return Solution::refused($holds->holds(), static fn (): string => self::problemText($e->getPrettyString($set, $composerRequest, $pool, false)), $unloaded);
+            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false)), $unloaded);
         }
 
-        return Solution::resolved(self::installs($transaction));
+        return Solution::resolved(self::installs($answer));
+    }
+
+    /**
+     * The optimized pool and Composer's answer: the transaction, or the refusal. The forms of one
+     * move often build the same pool, and Composer then answers the same.
+     *
+     * @return array{0: Pool, 1: LockTransaction|SolverProblemsException}
+     */
+    private function answer(DefaultPolicy $policy, Request $request, Pool $pool, BasePackage $root): array
+    {
+        $inputs = SolverInputs::of($pool, $request, $root);
+        if ($inputs !== $this->lastInputs) {
+            $optimized = (new PoolOptimizer($policy))->optimize($request, $pool);
+            try {
+                $answer = (new Solver($policy, $optimized, new NullIO()))->solve($request, $this->filter);
+            } catch (SolverProblemsException $e) {
+                $answer = $e;
+            }
+            $this->lastInputs = $inputs;
+            $this->lastBuilt = $pool;
+            $this->lastAnswer = [$optimized, $answer];
+        } else {
+            // A pool numbers its packages, and Composer's problem text reads the numbers: number them
+            // as the optimizer did.
+            new Pool($this->lastAnswer[0]->getPackages());
+        }
+
+        return $this->lastAnswer;
     }
 
     /**
      * @param array<string, ConstraintInterface> $requires  the root requirements: RepositorySet leaves out the platform ones
      * @param array<string, ConstraintInterface> $temporary
      *
-     * @return array{0: RepositorySet, 1: Request, 2: Pool}
+     * @return array{0: RepositorySet, 1: Request, 2: Pool, 3: BasePackage} the set, the request, the built pool and the root's copy in it
      */
-    private function pool(RootPackageInterface $root, array $requires, array $temporary, SolveRequest $request, DefaultPolicy $policy): array
+    private function pool(RootPackageInterface $root, array $requires, array $temporary, SolveRequest $request): array
     {
         $flags = $root->getStabilityFlags();
         $flags[$root->getName()] = BasePackage::$stabilities[VersionParser::parseStability($root->getVersion())];
@@ -209,9 +241,8 @@ final class ComposerSolver
         foreach ($this->advisories === null ? [] : $this->advisories->ranges($names) as $name => $ranges) {
             $blocked[$name] = array_merge($blocked[$name] ?? [], $ranges);
         }
-        $kept = new Pool(array_filter($pool->getPackages(), self::keeps($blocked, $stayLocked, $blocking)), $pool->getUnacceptableFixedOrLockedPackages());
 
-        return [$set, $composerRequest, (new PoolOptimizer($policy))->optimize($composerRequest, $kept)];
+        return [$set, $composerRequest, new Pool(array_filter($pool->getPackages(), self::keeps($blocked, $stayLocked, $blocking)), $pool->getUnacceptableFixedOrLockedPackages()), $fixedRoot];
     }
 
     /**
@@ -237,10 +268,9 @@ final class ComposerSolver
             if ($base->isDev() || isset($stayLocked[$base->getName().' '.$base->getVersion()])) {
                 return true;
             }
-            $exact = new Constraint('==', $base->getVersion());
             foreach ($base->getNames(false) as $name) {
                 foreach ($blocked[$name] ?? [] as $range) {
-                    if ($range->matches($exact)) {
+                    if (CompilingMatcher::match($range, Constraint::OP_EQ, $base->getVersion())) {
                         return false;
                     }
                 }

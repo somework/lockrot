@@ -146,6 +146,27 @@ final class ComposerSolverTest extends TestCase
         self::assertStringContainsString('acme/a[1.1.0, ..., 1.4.0]', $problem);
     }
 
+    /** The forms of a move of a package with no dependency build one pool, and the solves after them build their own. */
+    public function testASolveThatBuildsThePoolOfTheLastSolveGetsTheAnswerOfAFreshSolver(): void
+    {
+        $root = ['require' => ['acme/a' => '^1.0', 'acme/b' => '^1.0']];
+        $locked = [['name' => 'acme/a', 'version' => '1.0.0'], ['name' => 'acme/b', 'version' => '1.0.0']];
+        $remote = ['acme/a' => [['version' => '1.0.0'], ['version' => '1.1.0', 'conflict' => ['acme/b' => '<2.0']]], 'acme/b' => [['version' => '1.0.0'], ['version' => '1.1.0']]];
+        $inline = SolveRequest::update(['acme/a' => '^1.1']);
+        $withDependencies = $inline->withTransitive(SolveRequest::WITH_DEPENDENCIES);
+        $solver = self::solver($root, $locked, $remote);
+
+        $solver->solve($inline);
+        $again = $solver->solve($withDependencies);
+        $after = $solver->solve(SolveRequest::update(['acme/b' => '^1.1']));
+
+        $fresh = self::solver($root, $locked, $remote)->solve($withDependencies);
+        self::assertSame(self::rows($fresh->holds()), self::rows($again->holds()));
+        self::assertNotSame([], $again->holds());
+        self::assertSame($fresh->problem(), $again->problem());
+        self::assertSame(['acme/b' => '1.1.0'], $after->installs());
+    }
+
     /** Composer reads the lock as a repository too, so its problem text names the locked version that no remote repository serves. */
     public function testTheProblemTextNamesALockedVersionThatNoRemoteRepositoryServes(): void
     {
