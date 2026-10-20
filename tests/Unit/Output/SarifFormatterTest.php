@@ -655,6 +655,28 @@ final class SarifFormatterTest extends TestCase
     }
 
     /** An offline finding with S10 for its advisories, and a package outside every Composer repository, which is skipped. */
+    /** SPEC §7.11: `unchecked` marks the first record of a graded finding with S10, a flag's or else an advisory's. */
+    public function testTheUncheckedValueMarksTheFirstRecordOfAGradedFinding(): void
+    {
+        $composite = CaseHydrator::composite();
+        $graded = array_values(array_filter($composite->graded(), static fn (Finding $finding): bool => \in_array($finding->package(), ['symfony/debug', 'symfony/yaml'], true)));
+        $report = new Report(array_map(static fn (Finding $finding): Finding => FindingBuilder::withAdvisoriesUnchecked($finding, 'offline'), $graded), [], $composite->generatedAt(), 2, 0);
+
+        $records = [];
+        foreach (JsonPath::arrayAt($this->singleRun($this->formatter('unchecked', null)->format($report)), ['results']) as $result) {
+            self::assertIsArray($result);
+            $records[] = [JsonPath::stringAt($result, ['properties', 'package']), JsonPath::stringAt($result, ['level']), JsonPath::arrayAt($result, ['properties', 'error_by'])];
+        }
+
+        self::assertSame([
+            ['symfony/debug', 'error', ['unchecked']],
+            ['symfony/debug', 'warning', []],
+            ['symfony/yaml', 'error', ['unchecked']],
+            ['symfony/yaml', 'warning', []],
+            ['symfony/yaml', 'warning', []],
+        ], $records);
+    }
+
     private static function uncheckedReport(): Report
     {
         $at = new \DateTimeImmutable(self::AT);

@@ -60,6 +60,14 @@ final class HtmlFormatterTest extends TestCase
         (new HtmlFormatter(null, [1]))->format(new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0));
     }
 
+    public function testThePageDataNamesTheSchemasTheRendererReads(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('(this build vendors one that reads [1])');
+
+        (new HtmlFormatter(new PageData(null, null, null, null, [1])))->format(new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0));
+    }
+
     public function testTheVendoredRendererRendersReport2(): void
     {
         $page = (new HtmlFormatter())->format($this->report([$this->finding('vendor/pkg')]));

@@ -20,4 +20,14 @@ final class AdvisoryBatchTest extends TestCase
         self::assertSame([], AdvisoryBatch::empty()->ignored('vendor/pkg'));
         self::assertSame([], AdvisoryBatch::empty()->every('vendor/pkg'));
     }
+
+    public function testTheRecordsGoToACopy(): void
+    {
+        $batch = new AdvisoryBatch([]);
+
+        $with = $batch->withRecords(['acme/lib' => []], ['acme/lib']);
+
+        self::assertSame([['acme/lib' => []], ['acme/lib']], [$with->records(), $with->asked()]);
+        self::assertSame([[], []], [$batch->records(), $batch->asked()]);
+    }
 }

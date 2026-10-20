@@ -8,6 +8,7 @@ use Lockrot\Allowlist\AcceptedCheck;
 use Lockrot\Allowlist\UncheckedAcceptanceEntry;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryFeed;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
@@ -23,12 +24,14 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\ExplainFormatter;
 use Lockrot\Output\FindingBlock;
+use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\AgeReading;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
@@ -39,6 +42,7 @@ use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Age;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
+use Lockrot\Verdict\Moves;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -210,6 +214,7 @@ final class ExplainFormatterTest extends TestCase
         $decorated = ConsoleMarkup::render($markup, true);
 
         self::assertStringStartsWith('vendor/'.$text.' '.$text." — critical: abandoned\n", $plain);
+        self::assertStringStartsWith("\033[1mvendor/".$text.' '.$text."\033[22m — ", $decorated, 'the package and its version print bold');
         self::assertStringEndsWith("\nnote: run: ".$text."\n", $plain);
         self::assertSame($plain, str_replace(["\033[1m", "\033[22m", "\033[31m", "\033[39m"], '', $decorated), 'nothing but lockrot\'s styles');
     }
@@ -263,6 +268,50 @@ final class ExplainFormatterTest extends TestCase
 
         self::assertSame(Explanation::BRANCH_ROWS, preg_match_all('/^   [ *] 0\.0\.\d+ /m', $text));
         self::assertStringContainsString("\n     … and 5 more\n", $text);
+    }
+
+    public function testABranchTableAtTheCapHasNoMoreLine(): void
+    {
+        $releases = [];
+        for ($i = Explanation::BRANCH_ROWS; $i >= 1; --$i) {
+            $releases[] = ['0.0.'.$i, '2020-01-01T00:00:00+00:00'];
+        }
+        $finding = (new FindingBuilder())->withVersion('0.0.3')->build();
+        $text = self::plain(new Explanation($finding, F::facts(F::package(['version' => '0.0.3']), F::metadata($releases)), new Thresholds(), '8.4', self::report()));
+
+        self::assertSame(Explanation::BRANCH_ROWS, preg_match_all('/^   [ *] 0\.0\.\d+ /m', $text));
+        self::assertStringNotContainsString(' more', $text);
+    }
+
+    public function testTheIgnoredMarkingNamesEachConstraintOfEveryRuleOnce(): void
+    {
+        $finding = (new FindingBuilder())->withPackage('doctrine/cache')->withVersion('1.0.0')->build();
+        $rules = [new AbandonedIgnoreRule('doctrine/*', null, ['^3.0', '^1.0']), new AbandonedIgnoreRule('doctrine/cache', null, ['^1.0'])];
+        $ignored = new AbandonedIgnored('audit.ignore-abandoned', $rules, AbandonedIgnored::MARKED_BY_LOCK, null, null);
+
+        $text = self::plain(self::explain($finding->withDetails(FindingBuilder::detailsOf($finding, true, null, null, $ignored))));
+
+        self::assertStringContainsString(' The constraint ^3.0, ^1.0 on that entry is not applied, as composer audit does not apply it.', $text);
+    }
+
+    /** D10: a row whose move Composer did not check keeps the caveat and names no answer of the solver. */
+    public function testARowThatComposerDidNotCheckKeepsTheCaveat(): void
+    {
+        $case = CaseHydrator::case('E');
+        $package = JsonPath::stringAt($case, ['finding', 'package']);
+        $analysis = CaseHydrator::analysisOf($case);
+        $finding = $analysis->finding($package);
+        $facts = $analysis->facts($package);
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+        $moves = $finding->details()->moves();
+        $after = $moves->rowIfApplied('5.x');
+        self::assertNotNull($after);
+        $unchecked = new Moves($moves->nextStep(), $moves->moveIn(), $moves->fixKind(), $moves->partial(), ['5.x' => $after], ['5.x' => MoveCheck::notChecked(MoveCheck::OFFLINE)]);
+
+        $text = self::plain(new Explanation($finding->withMoves($unchecked), $facts, new Thresholds(), '8.4', $analysis->report()));
+
+        self::assertStringContainsString(" 3 of 3 · composer update (lowest fix); after it: 0, ok, if Composer resolves it\n", $text);
     }
 
     public function testJsonCarriesTheEnvelopeAndTheExplanation(): void

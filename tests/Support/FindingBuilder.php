@@ -301,11 +301,22 @@ final class FindingBuilder
      */
     public static function advisoriesUnchecked(string $package, string $reason, bool $inS10): Finding
     {
-        $signals = $inS10 ? [new Signal(Signal::LEVEL_INFO, 'security advisories not checked', new NotCheckedData([new Check('advisories', $reason, [Signal::S9])]))] : [];
+        $signals = $inS10 ? [self::advisoriesNotChecked($reason)] : [];
         $finding = (new self())->withPackage($package)->withSignals($signals)->withChain([$package])->build();
         $activity = self::activityOf($finding);
 
         return $finding->withDetails(new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'not_run', $reason, [], null, $activity, self::ageOf($finding, 'read', $activity), null, null));
+    }
+
+    /** A copy of a built finding with S10 for an advisory lookup that did not run for $reason. Its verdict stays. */
+    public static function withAdvisoriesUnchecked(Finding $finding, string $reason): Finding
+    {
+        return $finding->withSignals(array_merge($finding->signals(), [self::advisoriesNotChecked($reason)]));
+    }
+
+    private static function advisoriesNotChecked(string $reason): Signal
+    {
+        return new Signal(Signal::LEVEL_INFO, 'security advisories not checked', new NotCheckedData([new Check('advisories', $reason, [Signal::S9])]));
     }
 
     /** No reading taken, for details whose test reads no age. */
