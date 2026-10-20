@@ -296,8 +296,10 @@ install at the target PHP. Every move would be refused for the same reason, so l
 and each move's `check.reason` reads `baseline_refused`. Run lockrot with the PHP that the project
 runs on (`--target-php` or `config.platform.php`), or update the lock.
 
-The text quotes the last line of Composer's first problem, cut before ` -> `. The first line names
-only the locked package, and the last line names the cause. The two `update now` notes below quote a
+The text quotes the first rule line of Composer's first problem whose reply after ` -> ` is not
+"satisfiable by", cut before ` -> `. Composer does not always list that rule last. If no rule line
+has such a reply, the text quotes the last rule line. The notes
+[update now reduced](#update_now_reduced) and [update now refused](#update_now_refused) quote a
 refusal in the same way.
 
 - `data`: `reason` (`baseline_refused`), `php` (the version that the solve ran at), `problem`

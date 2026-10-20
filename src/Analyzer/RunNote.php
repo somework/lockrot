@@ -547,8 +547,9 @@ final class RunNote
     }
 
     /**
-     * The last rule line of Composer's first problem, without its list marker and cut before " -> ":
-     * the first line names only the locked package, and the last names the cause.
+     * The first rule line of Composer's first problem whose reply after " -> " is not "satisfiable by",
+     * else its last rule line, without the list marker and cut before " -> ". Composer does not always
+     * list the unsatisfied rule last, and a satisfied rule only names a step to it.
      */
     private static function causeOfFirstProblem(string $problem): string
     {
@@ -560,6 +561,10 @@ final class RunNote
             }
             if (preg_match('/^- (.+)/', $line, $marked) === 1) {
                 $cause = $marked[1];
+                $arrow = strpos($cause, ' -> ');
+                if ($arrow !== false && strpos($cause, ' -> satisfiable by') !== $arrow) {
+                    break;
+                }
             }
         }
         if ($cause === null) {

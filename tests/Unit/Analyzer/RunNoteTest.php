@@ -458,7 +458,6 @@ final class RunNoteTest extends TestCase
 
     private const CONFLICT = "Problem 1\n    - acme/a 2.1.0 conflicts with acme/b <3.0.";
 
-    /** Every constructor refuses what no run can produce: a note about nothing, or a reason it does not know. */
     private const DRUPAL_PROBLEM = "Problem 1\n"
         ."    - drupal/core-recommended is locked to version 9.3.14 and an update of this package was not requested.\n"
         ."    - drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros ~2.8.0 -> satisfiable by laminas/laminas-diactoros[2.8.0].\n"
@@ -466,8 +465,8 @@ final class RunNoteTest extends TestCase
         ."  Problem 2\n"
         ."    - acme/other is locked to version 1.0.0 and an update of this package was not requested.";
 
-    /** The first line of a problem names the locked package. Its last line names the cause, and Composer's reply after " -> " only repeats the php. */
-    public function testARefusedSolveNamesTheLastLineOfTheFirstProblemUpToItsArrow(): void
+    /** The drupal-site lock at --target-php=8.3: the rule that Composer cannot satisfy is the last line, and its reply after " -> " only repeats the php. */
+    public function testARefusedSolveNamesTheUnsatisfiedRuleOfTheFirstProblemUpToItsArrow(): void
     {
         $note = RunNote::movesNotChecked('8.3.99', self::DRUPAL_PROBLEM);
 
@@ -476,6 +475,35 @@ final class RunNoteTest extends TestCase
             $note->text()
         );
         self::assertSame(self::DRUPAL_PROBLEM, $note->data()['problem']);
+    }
+
+    private const WALLABAG_PROBLEM = "Problem 1\n"
+        ."    - lcobucci/jwt is locked to version 4.3.0 and an update of this package was not requested.\n"
+        ."    - lcobucci/clock 3.3.1 requires php ~8.2.0 || ~8.3.0 || ~8.4.0 -> your php version (8.5.99; overridden via config.platform) does not satisfy that requirement.\n"
+        ."    - lcobucci/jwt 4.3.0 requires lcobucci/clock ^2.0 || ^3.0 -> satisfiable by lcobucci/clock[3.3.1].";
+
+    /** The wallabag master lock at php 8.5: Composer lists the unsatisfied rule before a rule that it satisfies. */
+    public function testARefusedSolveNamesTheUnsatisfiedRuleWhenASatisfiedRuleFollowsIt(): void
+    {
+        $note = RunNote::movesNotChecked('8.5.99', self::WALLABAG_PROBLEM);
+
+        self::assertSame(
+            "moves not checked: Composer's solver refuses the lock itself at php 8.5.99, so it would refuse every move: lcobucci/clock 3.3.1 requires php ~8.2.0 || ~8.3.0 || ~8.4.0.",
+            $note->text()
+        );
+        self::assertSame(self::WALLABAG_PROBLEM, $note->data()['problem']);
+    }
+
+    /** With no unsatisfied " -> " rule, the cause is the last rule line, cut before its arrow. */
+    public function testAProblemWithOnlySatisfiedRulesNamesItsLastRule(): void
+    {
+        $problem = "Problem 1\n"
+            ."    - acme/a is locked to version 1.0.0 and an update of this package was not requested.\n"
+            ."    - acme/a 1.0.0 requires acme/b ^2.0 -> satisfiable by acme/b[2.0.0].\n"
+            ."    - acme/b 2.0.0 conflicts with acme/c 1.0.0.\n"
+            ."    - acme/c 1.0.0 requires acme/d ^1.0 -> satisfiable by acme/d[1.0.0].";
+
+        self::assertStringEndsWith('own command: acme/c 1.0.0 requires acme/d ^1.0.', RunNote::updateNowRefused($problem)->text());
     }
 
     public function testTheUpdateNowNotesQuoteTheSameCauseOfARefusal(): void
@@ -492,10 +520,11 @@ final class RunNoteTest extends TestCase
     }
 
     /** Only a line that is `Problem <n>` whole ends the first problem, and only a line that starts with the list marker is a rule. */
-    public function testTheCauseIsTheLastMarkedLineBeforeTheNextProblemLine(): void
+    public function testTheCauseIsTheUnsatisfiedMarkedLineBeforeTheNextProblemLine(): void
     {
         $problem = "Problem 1\n"
-            ."    - acme/a 2.1.0 requires acme/b ^3.0 -> found acme/b[3.0.0].\n"
+            ."    - acme/a 2.1.0 requires acme/b ^3.0 -> satisfiable by acme/b[3.0.0].\n"
+            ."    the rule below - and this line -> name no rule\n"
             ."    See Problem 9\n"
             ."    Problem 2 follows\n"
             ."    - acme/b 3.0.0 requires php >=8.2 -> your php version (7.4) does not satisfy that requirement.\n"
@@ -511,6 +540,7 @@ final class RunNoteTest extends TestCase
         self::assertStringEndsWith('own command: Your requirements could not be resolved.', RunNote::updateNowRefused("  Your requirements could not be resolved.\n")->text());
     }
 
+    /** Every constructor refuses what no run can produce: a note about nothing, or a reason it does not know. */
     public function testANoteAboutNothingIsRefused(): void
     {
         $refused = [
