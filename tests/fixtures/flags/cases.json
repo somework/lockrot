@@ -1141,7 +1141,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+      "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
       "data": {
        "advisories": [
         {
@@ -4170,7 +4170,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+      "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -8877,7 +8877,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+      "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -10820,7 +10820,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+      "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed in v1.38.1",
       "data": {
        "advisories": [
         {
@@ -16602,7 +16602,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "9 advisories: 1 high, 8 medium — none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks",
+      "summary": "9 security advisories affect 6.5.8 (CVE-2026-69246, CVE-2026-55767, CVE-2026-67353 and 6 more); 2 fixed in 7.15.2, 2 fixed in 7.12.1, 3 fixed in 7.15.1, 1 fixed in 7.12.3, 1 fixed in 7.14.2",
       "data": {
        "advisories": [
         {
@@ -19142,7 +19142,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "3 advisories: 3 low — none fixed on 3.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+      "summary": "3 security advisories affect v3.4.47 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -21206,7 +21206,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "4 advisories: 4 medium — none fixed on 1.x; worst: CVE-2026-55766 CRLF injection in HTTP start-line serialization",
+      "summary": "4 security advisories affect 1.9.1 (CVE-2026-55766, CVE-2026-49214, CVE-2026-48998 and 1 more); 1 fixed in 2.12.1, 2 fixed in 2.10.2, 1 fixed in 2.12.3",
       "data": {
        "advisories": [
         {
@@ -23485,7 +23485,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "16 advisories: 1 critical, 3 high, 5 medium, 2 unrated, 5 low — 2 of 16 fixed on 1.x (php floor raise); worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+      "summary": "16 security advisories affect v1.43.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 13 more); 6 fixed in v3.26.0, 6 fixed in v3.27.0, 1 fixed in v2.15.3, 1 fixed in v2.16.0, 2 fixed in v3.14.1",
       "data": {
        "advisories": [
         {
@@ -27194,7 +27194,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "2 advisories: 1 high, 1 medium — all fixed on 3.x; worst: CVE-2026-32313 xmlseclibs: Missing AES-GCM Authentication Tag Validation on Encrypted Nodes Allows for Unauthorized Decryption",
+      "summary": "2 security advisories affect 3.1.1 (CVE-2026-32313, CVE-2025-66578); fixed in 3.1.5",
       "data": {
        "advisories": [
         {
@@ -28024,7 +28024,7 @@
       {
        "id": "S9",
        "level": "high",
-       "summary": "5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process",
+       "summary": "5 security advisories affect 4.3.x-dev (CVE-2022-25768, CVE-2024-47058, CVE-2024-47050 and 2 more)",
        "data": {
         "advisories": [
          {
@@ -29561,7 +29561,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "1 advisory: 1 low — none fixed on 1.x; advisory: CVE-2026-102601 Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter",
+      "summary": "1 security advisory affects 1.1.9 (CVE-2026-102601); fixed in 3.36.0",
       "data": {
        "advisories": [
         {
@@ -35497,7 +35497,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "3 advisories: 2 high, 1 medium — all fixed on 2.x; worst: PKSA-m4t9-vsgq-8khn league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan",
+      "summary": "3 security advisories affect 2.9.1 (PKSA-m4t9-vsgq-8khn, PKSA-zyf5-hrxv-hrd7, PKSA-m2dq-1fhr-29b1); 2 fixed in 2.10.3, 1 fixed in 2.10.0",
       "data": {
        "advisories": [
         {
@@ -36988,7 +36988,7 @@
       {
        "id": "S9",
        "level": "warn",
-       "summary": "1 advisory: 1 low — all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information",
+       "summary": "1 security advisory affects v12.65.0 (CVE-2026-102279); fixed in v12.69.0",
        "data": {
         "advisories": [
          {
@@ -51278,7 +51278,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "14 advisories: 6 high, 8 medium — none fixed on 5.x; worst: CVE-2022-31043 Fix failure to strip Authorization header on HTTP downgrade",
+      "summary": "14 security advisories affect 5.3.4 (CVE-2022-31043, CVE-2022-29248, CVE-2022-31042 and 11 more); 2 fixed in 6.5.7, 1 fixed in 6.5.6, 2 fixed in 7.15.2, 2 fixed in 6.5.8, 2 fixed in 7.12.1, 3 fixed in 7.15.1, 1 fixed in 7.12.3, 1 fixed in 7.14.2",
       "data": {
        "advisories": [
         {
@@ -58484,7 +58484,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "2 advisories: 2 medium — none fixed on 4.x; worst: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+      "summary": "2 security advisories affect v4.4.41 (CVE-2026-48784, CVE-2026-45065); 1 fixed in v5.4.53, 1 fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -65302,7 +65302,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "14 advisories: 6 high, 8 medium — none fixed on 5.x; worst: CVE-2022-31043 Fix failure to strip Authorization header on HTTP downgrade",
+      "summary": "14 security advisories affect 5.3.4 (CVE-2022-31043, CVE-2022-29248, CVE-2022-31042 and 11 more); 2 fixed in 6.5.7, 1 fixed in 6.5.6, 2 fixed in 7.15.2, 2 fixed in 6.5.8, 2 fixed in 7.12.1, 3 fixed in 7.15.1, 1 fixed in 7.12.3, 1 fixed in 7.14.2",
       "data": {
        "advisories": [
         {
@@ -69793,7 +69793,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "1 advisory: 1 medium — all fixed on 2.x (blocked); advisory: CVE-2025-54476 Joomla! CMS vulnerable to XSS via the input filter",
+      "summary": "1 security advisory affects 2.0.5 (CVE-2025-54476); fixed in 3.0.5",
       "data": {
        "advisories": [
         {
@@ -71618,7 +71618,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+      "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v2.8.52",
       "data": {
        "advisories": [
         {
@@ -73610,7 +73610,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+      "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed in v1.38.1",
       "data": {
        "advisories": [
         {
@@ -75023,7 +75023,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "1 advisory: 1 low — fix not known on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+      "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644)",
       "data": {
        "advisories": [
         {
@@ -76407,7 +76407,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+      "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
       "data": {
        "advisories": [
         {
@@ -78713,7 +78713,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+      "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
       "data": {
        "advisories": [
         {
@@ -81667,7 +81667,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+      "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
       "data": {
        "advisories": [
         {
@@ -85643,7 +85643,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+      "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -89106,7 +89106,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "1 advisory: 1 medium — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+      "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077)",
       "data": {
        "advisories": [
         {
@@ -90864,7 +90864,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+      "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -93833,7 +93833,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+      "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -98786,7 +98786,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+      "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -100744,7 +100744,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+      "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
       "data": {
        "advisories": [
         {
@@ -102958,7 +102958,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 high — fix not known on 1.x; advisory: CVE-2026-00002 an advisory on a package whose release data did not come (‡)",
+      "summary": "1 security advisory affects 1.3.7 (CVE-2026-00002)",
       "data": {
        "advisories": [
         {
@@ -104209,7 +104209,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "1 advisory: 1 medium — all fixed on 2.x (blocked); advisory: CVE-2025-54476 Joomla! CMS vulnerable to XSS via the input filter",
+      "summary": "1 security advisory affects 2.0.5 (CVE-2025-54476); fixed in 3.0.5",
       "data": {
        "advisories": [
         {
@@ -109317,7 +109317,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "3 advisories: 1 medium, 1 unrated, 1 low — 2 of 3 fixed on 5.x; weighs most: CVE-2026-45305 YAML Parser ReDoS via Catastrophic Backtracking in Parser::cleanup() Regex",
+      "summary": "3 security advisories affect v5.4.23 (CVE-2026-45304, CVE-2026-45133, CVE-2026-45305); 2 fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -115892,7 +115892,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "2 advisories: 1 medium, 1 low — all fixed on 2.x; worst: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
+      "summary": "2 security advisories affect v2.2.0 (CVE-2026-47345, CVE-2026-47344); fixed in v2.3.2",
       "data": {
        "advisories": [
         {
@@ -121332,7 +121332,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "6 advisories: 2 high, 2 medium, 1 unrated, 1 low — 1 of 6 fixed on 9.x; worst: PKSA-3r5d-mb8f-1qw9 Laravel Framework: CRLF injection in default email rule",
+      "summary": "6 security advisories affect v9.52.16 (PKSA-3r5d-mb8f-1qw9, CVE-2024-52301, CVE-2025-27515 and 3 more); 2 fixed in v12.60.0, 1 fixed in v9.52.17, 1 fixed in v10.48.29, 1 fixed in v12.61.1, 1 fixed in v12.69.0",
       "data": {
        "advisories": [
         {
@@ -125232,7 +125232,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "2 advisories: 1 high, 1 medium — 1 of 2 fixed on 2.x; worst: CVE-2026-00011 an advisory only the next major fixes (‡)",
+      "summary": "2 security advisories affect v2.4.5 (CVE-2026-00011, CVE-2026-00012); 1 fixed in v3.0.0, 1 fixed in v2.13.0",
       "data": {
        "advisories": [
         {
@@ -127423,7 +127423,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+      "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -129317,7 +129317,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 high — fix not known on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+      "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077)",
       "data": {
        "advisories": [
         {
@@ -138196,7 +138196,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 critical — none fixed on 3.x; advisory: CVE-2026-00003 an advisory added to show the either opening (‡)",
+      "summary": "1 security advisory affects v3.4.47 (CVE-2026-00003); fixed in v4.4.0",
       "data": {
        "advisories": [
         {
@@ -139832,7 +139832,7 @@
      {
       "id": "S9",
       "level": "warn",
-      "summary": "1 advisory: 1 low — none fixed on 1.x; advisory: CVE-2026-00004 an advisory added to show the either opening (‡)",
+      "summary": "1 security advisory affects v1.0.2 (CVE-2026-00004)",
       "data": {
        "advisories": [
         {
@@ -157641,7 +157641,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+      "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
       "data": {
        "advisories": [
         {
@@ -164524,7 +164524,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process",
+      "summary": "5 security advisories affect 4.3.x-dev (CVE-2022-25768, CVE-2024-47058, CVE-2024-47050 and 2 more)",
       "data": {
        "advisories": [
         {
@@ -182056,7 +182056,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+      "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -184068,7 +184068,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+      "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -190164,7 +190164,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+      "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -192145,7 +192145,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+      "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
       "data": {
        "advisories": [
         {
@@ -195190,7 +195190,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+      "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -197207,7 +197207,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+      "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
       "data": {
        "advisories": [
         {
@@ -199172,7 +199172,7 @@
      {
       "id": "S9",
       "level": "high",
-      "summary": "15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+      "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
       "data": {
        "advisories": [
         {

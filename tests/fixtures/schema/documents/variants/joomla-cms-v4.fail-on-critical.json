@@ -1093,8 +1093,7 @@
  },
  "data_date": "2026-10-01T17:41:33+00:00",
  "notes": [
-  "1 package is not from a Composer repository: their release metadata and repository activity were not read",
-  "1 finding reached --fail-on=critical under 0.13's rules and no longer does: enshrined/svg-sanitize 0.15.4 (24 = left-behind 16 + vulnerable 8 [medium advisory]). 0.13 raised each one for any advisory not fixed on its branch; an advisory now adds its own severity."
+  "1 package is not from a Composer repository: their release metadata and repository activity were not read"
  ],
  "note_details": [
   {
@@ -1105,38 +1104,6 @@
    "data": {
     "package_count": 1,
     "advisories_asked": true
-   }
-  },
-  {
-   "code": "verdict_rules_changed",
-   "text": "1 finding reached --fail-on=critical under 0.13's rules and no longer does: enshrined/svg-sanitize 0.15.4 (24 = left-behind 16 + vulnerable 8 [medium advisory]). 0.13 raised each one for any advisory not fixed on its branch; an advisory now adds its own severity.",
-   "docs_url": "https://lockrot.dev/notes/#verdict_rules_changed",
-   "sets_network_failures": false,
-   "data": {
-    "fail_on": "critical",
-    "findings": [
-     {
-      "package": "enshrined/svg-sanitize",
-      "version": "0.15.4",
-      "legacy": {
-       "verdict": "left-behind",
-       "priority": "critical",
-       "basis": {
-        "base": "high",
-        "steps": [
-         {
-          "reason": "no_fix_expected",
-          "from": "high",
-          "to": "critical"
-         }
-        ]
-       }
-      },
-      "verdict": "high",
-      "score_total": 24,
-      "score_text": "24 = left-behind 16 + vulnerable 8 [medium advisory]"
-     }
-    ]
    }
   }
  ],
@@ -1975,7 +1942,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "2 advisories: 1 high, 1 medium — all fixed on 2.x (blocked); worst: CVE-2023-29530 HTTP Multiline Header Termination",
+     "summary": "2 security advisories affect 2.4.1 (CVE-2023-29530, CVE-2022-31109)",
      "data": {
       "advisories": [
        {
@@ -2406,7 +2373,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "5 advisories: 2 high, 2 medium, 1 low — all fixed on 3.x; worst: CVE-2026-32935 phpseclib's AES-CBC unpadding susceptible to padding oracle timing attack",
+     "summary": "5 security advisories affect 3.0.37 (CVE-2026-32935, CVE-2026-44167, CVE-2026-84308 and 2 more); 1 fixed in 3.0.57, 1 fixed in 3.0.51",
      "data": {
       "advisories": [
        {
@@ -2904,7 +2871,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 medium — none fixed on 0.15.x; advisory: CVE-2025-55166 svg-sanitizer Bypasses Attribute Sanitization",
+     "summary": "1 security advisory affects 0.15.4 (CVE-2025-55166); fixed in 0.22.0",
      "data": {
       "advisories": [
        {
@@ -14045,7 +14012,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 medium — all fixed on 2.x (blocked); advisory: CVE-2025-54476 Joomla! CMS vulnerable to XSS via the input filter",
+     "summary": "1 security advisory affects 2.0.5 (CVE-2025-54476); fixed in 3.0.5",
      "data": {
       "advisories": [
        {
@@ -14412,7 +14379,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "3 advisories: 1 medium, 2 unrated — all fixed on 1.x; worst: CVE-2025-69277 libsodium has Incomplete List of Disallowed Inputs",
+     "summary": "3 security advisories affect v1.20.0 (CVE-2025-69277, PKSA-32g2-byr9-drtw, PKSA-8x19-j2j3-bn67); 2 fixed in v1.24.0, 1 fixed in v1.24.1",
      "data": {
       "advisories": [
        {
@@ -17218,7 +17185,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+     "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
      "data": {
       "advisories": [
        {

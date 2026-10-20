@@ -4722,7 +4722,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "2 advisories: 2 medium — none fixed on 3.x; worst: CVE-2026-49858 API Platform Core vulnerable to cross-user attribute leak in JSON:API and HAL item normalizers due to missing isCacheKeySafe gate",
+          "summary": "2 security advisories affect v3.4.17 (CVE-2026-49858, CVE-2026-54164); 1 fixed in v4.3.8, 1 fixed in v4.3.12",
           "data": {
             "advisories": [
               {

@@ -1513,7 +1513,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "6 advisories: 2 high, 2 medium, 1 unrated, 1 low — 1 of 6 fixed on 9.x; worst: PKSA-3r5d-mb8f-1qw9 Laravel Framework: CRLF injection in default email rule",
+     "summary": "6 security advisories affect v9.52.16 (PKSA-3r5d-mb8f-1qw9, CVE-2024-52301, CVE-2025-27515 and 3 more); 2 fixed in v12.60.0, 1 fixed in v9.52.17, 1 fixed in v10.48.29, 1 fixed in v12.61.1, 1 fixed in v12.69.0",
      "data": {
       "advisories": [
        {

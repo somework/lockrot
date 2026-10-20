@@ -941,14 +941,6 @@
   },
   "move_check": null
  },
- "legacy": {
-  "verdict": "unknown",
-  "priority": "none",
-  "basis": {
-   "base": "none",
-   "steps": []
-  }
- },
  "generated_at": "2026-10-01T17:39:09+00:00",
  "notes": [
   "1 package is not from a Composer repository: their release metadata, repository activity and advisories were not read"

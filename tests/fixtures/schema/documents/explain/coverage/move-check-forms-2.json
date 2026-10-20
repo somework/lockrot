@@ -316,7 +316,7 @@
    {
     "id": "S9",
     "level": "high",
-    "summary": "2 advisories: 1 high, 1 medium — all fixed on 2.x; worst: PKSA-m4t9-vsgq-8khn league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan",
+    "summary": "2 security advisories affect 2.10.0 (PKSA-m4t9-vsgq-8khn, PKSA-m2dq-1fhr-29b1)",
     "data": {
      "advisories": [
       {
@@ -1212,14 +1212,6 @@
    "ignores_extensions": true,
    "baseline": "resolves",
    "reason": null
-  }
- },
- "legacy": {
-  "verdict": "ok",
-  "priority": "none",
-  "basis": {
-   "base": "none",
-   "steps": []
   }
  },
  "generated_at": "2026-10-01T17:39:50+00:00",

@@ -1394,7 +1394,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "1 advisory: 1 critical — all fixed on 2.x; advisory: CVE-2026-54133 CompilerRuntime code injection via unescaped function names",
+          "summary": "1 security advisory affects 2.8.0 (CVE-2026-54133); fixed in 2.9.1",
           "data": {
             "advisories": [
               {
@@ -2890,7 +2890,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "2 advisories: 1 high, 1 medium — all fixed on 2.x; worst: PKSA-m4t9-vsgq-8khn league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan",
+          "summary": "2 security advisories affect 2.10.0 (PKSA-m4t9-vsgq-8khn, PKSA-m2dq-1fhr-29b1)",
           "data": {
             "advisories": [
               {
@@ -5885,7 +5885,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "3 advisories: 3 medium — none fixed on 0.22.x; worst: CVE-2026-107381 svg-sanitizer: Mixed-case xlink:HrEf skips the `<use>` nesting-DoS check in Resolver::processReferences",
+          "summary": "3 security advisories affect 0.22.0 (CVE-2026-107381, CVE-2026-107380, CVE-2026-107379)",
           "data": {
             "advisories": [
               {
@@ -6268,7 +6268,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 medium — all fixed on 4.x; advisory: CVE-2026-81887 Livewire DOM-based cross-site scripting during client-side state handling",
+          "summary": "1 security advisory affects v4.3.0 (CVE-2026-81887)",
           "data": {
             "advisories": [
               {
@@ -6599,7 +6599,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 unrated — all fixed on 1.x; advisory: PKSA-32g2-byr9-drtw Incorrect Ed25519 public key validation",
+          "summary": "1 security advisory affects v1.24.0 (PKSA-32g2-byr9-drtw); fixed in v1.24.1",
           "data": {
             "advisories": [
               {
@@ -6986,7 +6986,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "2 advisories: 2 medium — all fixed on 3.x; worst: CVE-2026-84308 phpseclib — non-constant-time X25519 scalar multiplication permits full private-key recovery",
+          "summary": "2 security advisories affect 3.0.52 (CVE-2026-84308, CVE-2026-55599); 1 fixed in 3.0.57",
           "data": {
             "advisories": [
               {
@@ -7975,7 +7975,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 low — all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information",
+          "summary": "1 security advisory affects v12.68.0 (CVE-2026-102279); fixed in v12.69.0",
           "data": {
             "advisories": [
               {

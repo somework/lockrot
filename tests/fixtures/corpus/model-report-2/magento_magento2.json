@@ -1413,7 +1413,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "1 advisory: 1 critical — all fixed on 2.x; advisory: CVE-2026-54133 CompilerRuntime code injection via unescaped function names",
+          "summary": "1 security advisory affects 2.8.0 (CVE-2026-54133); fixed in 2.9.1",
           "data": {
             "advisories": [
               {
@@ -1868,7 +1868,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "8 advisories: 5 high, 3 medium — all fixed on 2.x; worst: CVE-2026-40176 Command injection via malicious Perforce repository definition",
+          "summary": "8 security advisories affect 2.9.5 (CVE-2026-40176, CVE-2026-45793, CVE-2026-40261 and 5 more); 2 fixed in 2.9.6, 1 fixed in 2.9.8, 2 fixed in 2.10.3, 3 fixed in 2.10.2",
           "data": {
             "advisories": [
               {
@@ -2509,7 +2509,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "9 advisories: 1 high, 8 medium — all fixed on 7.x; worst: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks",
+          "summary": "9 security advisories affect 7.10.0 (CVE-2026-69246, CVE-2026-55767, CVE-2026-67353 and 6 more); 2 fixed in 7.15.2, 2 fixed in 7.12.1, 3 fixed in 7.15.1, 1 fixed in 7.12.3, 1 fixed in 7.14.2",
           "data": {
             "advisories": [
               {
@@ -3116,7 +3116,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "5 advisories: 2 high, 2 medium, 1 low — all fixed on 3.x; worst: CVE-2026-32935 phpseclib's AES-CBC unpadding susceptible to padding oracle timing attack",
+          "summary": "5 security advisories affect 3.0.49 (CVE-2026-32935, CVE-2026-44167, CVE-2026-84308 and 2 more); 1 fixed in 3.0.57, 1 fixed in 3.0.51",
           "data": {
             "advisories": [
               {
@@ -3608,7 +3608,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "2 advisories: 1 high, 1 medium — all fixed on 7.x; worst: CVE-2026-45067 Email Header / SMTP Command Injection via CRLF in Symfony\\Component\\Mime\\Address",
+          "summary": "2 security advisories affect v7.4.7 (CVE-2026-45067, CVE-2026-45070); fixed in v7.4.12",
           "data": {
             "advisories": [
               {
@@ -4056,7 +4056,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "4 advisories: 2 high, 1 medium, 1 unrated — all fixed on 4.x; worst: PKSA-m2bn-5kyy-vzsk RSA1_5 (RSAES-PKCS1-v1_5) decryption lacks implicit rejection, exposing a Bleichenbacher/Marvin padding oracle",
+          "summary": "4 security advisories affect 4.1.3 (PKSA-m2bn-5kyy-vzsk, PKSA-p7vh-1fk6-znth, PKSA-ztxk-m2k2-bkgv and 1 more); fixed in 4.1.7",
           "data": {
             "advisories": [
               {
@@ -4511,7 +4511,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "3 advisories: 2 high, 1 medium — all fixed on 15.x; worst: PKSA-sf9j-1gs7-xzvx webonyx/graphql-php has quadratic validation cost in OverlappingFieldsCanBeMerged via inline fragments",
+          "summary": "3 security advisories affect v15.30.2 (PKSA-sf9j-1gs7-xzvx, PKSA-xwpn-zs9j-6wy5, CVE-2026-40476); 1 fixed in v15.32.2",
           "data": {
             "advisories": [
               {
@@ -4924,7 +4924,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "1 advisory: 1 high — all fixed on 7.x; advisory: CVE-2026-45075 HEAD Request Bypasses methods: ['GET'] Filter in #[IsGranted] / #[IsSignatureValid] / #[IsCsrfTokenValid]",
+          "summary": "1 security advisory affects v7.4.7 (CVE-2026-45075); fixed in v7.4.12",
           "data": {
             "advisories": [
               {
@@ -7038,7 +7038,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 medium — all fixed on 7.x; advisory: CVE-2026-45073 SQL Injection in PdoAdapter::doClear() via Unsanitized $prefix",
+          "summary": "1 security advisory affects v7.4.7 (CVE-2026-45073); fixed in v7.4.12",
           "data": {
             "advisories": [
               {
@@ -7391,7 +7391,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 medium — all fixed on 7.x; advisory: CVE-2026-45068 Argument Injection in SendmailTransport via Dash-Prefixed Recipient Address",
+          "summary": "1 security advisory affects v7.4.6 (CVE-2026-45068); fixed in v7.4.12",
           "data": {
             "advisories": [
               {
@@ -7812,7 +7812,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "4 advisories: 4 medium — all fixed on 2.x; worst: CVE-2026-55766 CRLF injection in HTTP start-line serialization",
+          "summary": "4 security advisories affect 2.9.0 (CVE-2026-55766, CVE-2026-49214, CVE-2026-48998 and 1 more); 1 fixed in 2.12.1, 2 fixed in 2.10.2, 1 fixed in 2.12.3",
           "data": {
             "advisories": [
               {
@@ -8241,7 +8241,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 medium — all fixed on 7.x; advisory: CVE-2026-48736 IpUtils::PRIVATE_SUBNETS Omits IPv6 Transition Forms (6to4, NAT64, Teredo, IPv4-compatible): SSRF Bypass in NoPrivateNetworkHttpClient",
+          "summary": "1 security advisory affects v7.4.7 (CVE-2026-48736); fixed in v7.4.13",
           "data": {
             "advisories": [
               {
@@ -9057,7 +9057,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 low — all fixed on 3.x; advisory: CVE-2026-102601 Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter",
+          "summary": "1 security advisory affects 3.32.0 (CVE-2026-102601)",
           "data": {
             "advisories": [
               {
@@ -9437,7 +9437,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+          "summary": "1 security advisory affects v1.33.0 (CVE-2026-46644); fixed in v1.38.1",
           "data": {
             "advisories": [
               {
@@ -9815,7 +9815,7 @@
         {
           "id": "S9",
           "level": "warn",
-          "summary": "3 advisories: 3 low — all fixed on 7.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+          "summary": "3 security advisories affect v7.4.6 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v7.4.12",
           "data": {
             "advisories": [
               {

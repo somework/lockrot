@@ -1288,7 +1288,7 @@
     {
      "id": "S9",
      "level": "warn",
-     "summary": "1 advisory: 1 medium — all fixed on 2.x (blocked); advisory: CVE-2025-54476 Joomla! CMS vulnerable to XSS via the input filter",
+     "summary": "1 security advisory affects 2.0.5 (CVE-2025-54476); fixed in 3.0.5",
      "data": {
       "advisories": [
        {

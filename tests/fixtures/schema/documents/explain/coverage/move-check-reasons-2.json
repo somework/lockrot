@@ -267,7 +267,7 @@
    {
     "id": "S9",
     "level": "warn",
-    "summary": "1 advisory: 1 medium — all fixed on 4.x; advisory: CVE-2026-81887 Livewire DOM-based cross-site scripting during client-side state handling",
+    "summary": "1 security advisory affects v4.3.3 (CVE-2026-81887)",
     "data": {
      "advisories": [
       {
@@ -1126,14 +1126,6 @@
    "ignores_extensions": true,
    "baseline": "resolves",
    "reason": null
-  }
- },
- "legacy": {
-  "verdict": "ok",
-  "priority": "none",
-  "basis": {
-   "base": "none",
-   "steps": []
   }
  },
  "generated_at": "2026-10-01T17:39:50+00:00",

@@ -1486,7 +1486,7 @@
     {
      "id": "S9",
      "level": "high",
-     "summary": "2 advisories: 1 high, 1 medium — 1 of 2 fixed on 2.x; worst: CVE-2026-00011 an advisory only the next major fixes (‡)",
+     "summary": "2 security advisories affect v2.4.5 (CVE-2026-00011, CVE-2026-00012); 1 fixed in v3.0.0, 1 fixed in v2.13.0",
      "data": {
       "advisories": [
        {
