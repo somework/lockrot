@@ -163,6 +163,24 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([], $repository->asked);
     }
 
+    /** A name that loads alone after a failed request keeps only its own versions, in the answer's order. */
+    public function testANameThatLoadsAloneAfterAFailedRequestKeepsOnlyItsVersions(): void
+    {
+        $served = [self::package('acme/other', '2.0.0'), self::package('acme/good', '1.0.0'), self::package('acme/good', '1.1.0')];
+        $versions = new RepositoryVersions([new RecordingComposerRepository($served, ['acme/bad'], null, true)], [], false, Deadline::never());
+
+        self::assertSame(['1.0.0', '1.1.0'], self::pretty($versions->versionsOf(['acme/good', 'acme/bad'])['acme/good']));
+        self::assertSame([0, 1], array_keys($versions->versions('acme/good')));
+    }
+
+    public function testANameThatNoRepositoryListsAfterAFailedRequestHasNoFailureOnline(): void
+    {
+        $versions = new RepositoryVersions([self::recording([], ['acme/bad'])], [], false, Deadline::never());
+
+        self::assertSame(['acme/none' => [], 'acme/bad' => []], $versions->versionsOf(['acme/none', 'acme/bad']));
+        self::assertSame([null, VersionSource::FAILED], [$versions->failure('acme/none'), $versions->failure('acme/bad')]);
+    }
+
     /** After a failed request of several names, each name loads alone only while the budget lasts. */
     public function testTheNamesThatAFailedRequestLeavesAreOverTheBudgetOnceItRunsOut(): void
     {
@@ -177,6 +195,30 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame(['acme/good' => [], 'acme/bad' => []], $versions->versionsOf(['acme/good', 'acme/bad']));
         self::assertSame([VersionSource::BUDGET, VersionSource::BUDGET], [$versions->failure('acme/good'), $versions->failure('acme/bad')]);
         self::assertSame([[['acme/good', 'acme/bad'], 'stable']], $repository->asked);
+    }
+
+    public function testTheFailureOfANameStaysWhenALaterNameIsOffline(): void
+    {
+        $versions = new RepositoryVersions([self::recording([])], [], true, Deadline::never());
+
+        $versions->versions('acme/first');
+        $versions->versionsOf(['acme/second', 'acme/third']);
+
+        self::assertSame([VersionSource::OFFLINE, VersionSource::OFFLINE], [$versions->failure('acme/first'), $versions->failure('acme/second')]);
+    }
+
+    public function testTheFailureOfANameStaysWhenALaterNameIsOverTheBudget(): void
+    {
+        $clock = new class () {
+            public float $now = 0.0;
+        };
+        $versions = new RepositoryVersions([self::recording([], ['acme/bad'])], [], false, Deadline::inSeconds(5.0, static fn (): float => $clock->now));
+
+        $versions->versions('acme/bad');
+        $clock->now = 10.0;
+        $versions->versionsOf(['acme/late', 'acme/later']);
+
+        self::assertSame([VersionSource::FAILED, VersionSource::BUDGET], [$versions->failure('acme/bad'), $versions->failure('acme/late')]);
     }
 
     /** A path, VCS or package repository serves the name: the lock's version is its only one. */
