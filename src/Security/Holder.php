@@ -28,7 +28,6 @@ final class Holder implements \JsonSerializable
     public const PLATFORM = 'platform';
 
     /** `held_by[]`'s order: the root first, then by package, then by link in this order, then by target. */
-    private const SOURCE_ORDER = [self::ROOT => 0, self::PACKAGE => 1];
     private const LINK_ORDER = [self::REQUIRE => 0, self::REQUIRE_DEV => 1, self::CONFLICT => 2, self::REPLACE => 3, self::ROOT_REQUIRE => 4, self::PLATFORM => 5];
 
     /** @var self::ROOT|self::PACKAGE */
@@ -126,14 +125,21 @@ final class Holder implements \JsonSerializable
     {
         $kept = [];
         foreach ($holders as $holder) {
-            $key = implode("\0", [$holder->source, $holder->source === self::ROOT ? '' : (string) $holder->package, $holder->link, (string) $holder->target, $holder->constraint]);
-            $kept[$key] ??= $holder;
+            $kept[implode("\0", $holder->order())] ??= $holder;
         }
-        $kept = array_values($kept);
-        usort($kept, static fn (self $a, self $b): int => [self::SOURCE_ORDER[$a->source], $a->source === self::ROOT ? '' : (string) $a->package, self::LINK_ORDER[$a->link], (string) $a->target, $a->constraint]
-            <=> [self::SOURCE_ORDER[$b->source], $b->source === self::ROOT ? '' : (string) $b->package, self::LINK_ORDER[$b->link], (string) $b->target, $b->constraint]);
+        usort($kept, static fn (self $a, self $b): int => $a->order() <=> $b->order());
 
         return $kept;
+    }
+
+    /**
+     * The root sorts first: its package is the empty string, and a package name is never empty.
+     *
+     * @return array{?string, int, ?string, string}
+     */
+    private function order(): array
+    {
+        return [$this->source === self::ROOT ? '' : $this->package, self::LINK_ORDER[$this->link], $this->target, $this->constraint];
     }
 
     /** @return array{source: string, package: ?string, version: ?string, link: string, target: ?string, constraint: string, holder: ?GradedPackage} */

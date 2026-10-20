@@ -444,6 +444,21 @@ final class GitlabFormatterTest extends TestCase
         self::assertSame('minor', $leftBehind['symfony/monolog-bridge lockrot/vulnerable']);
     }
 
+    /** SPEC §7.11: `unchecked` raises the first issue of a graded finding with S10 to `major`, and no other. */
+    public function testTheUncheckedValueRaisesTheFirstIssueOfAGradedFinding(): void
+    {
+        $composite = CaseHydrator::composite();
+        $graded = array_values(array_filter($composite->graded(), static fn (Finding $finding): bool => \in_array($finding->package(), ['symfony/debug', 'symfony/yaml'], true)));
+        $report = new Report(array_map(static fn (Finding $finding): Finding => FindingBuilder::withAdvisoriesUnchecked($finding, 'offline'), $graded), [], $composite->generatedAt(), 2, 0);
+
+        $issues = [];
+        foreach ($this->decode($this->formatter('unchecked', null)->format($report)) as $issue) {
+            $issues[] = [$issue['check_name'], $issue['severity']];
+        }
+
+        self::assertSame([['lockrot/abandoned', 'major'], ['lockrot/old-promise', 'minor'], ['lockrot/vulnerable', 'major']], $issues);
+    }
+
     /** @return list<array<mixed, mixed>> */
     private static function issues(string $failOn): array
     {

@@ -287,7 +287,7 @@ final class LockrotCommandTest extends TestCase
      *
      * @param array<string, mixed> $args
      *
-     * @return array{rootVersion: string|false, disableNetwork: string|false, offline: bool}
+     * @return array{rootVersion: string|false, disableNetwork: string|false, offline: bool, repositoryKeys: list<int|string>}
      */
     private function observeDuringRun(array $args, ?MetadataLoaderInterface $loader = null): array
     {
@@ -298,6 +298,7 @@ final class LockrotCommandTest extends TestCase
                 'rootVersion' => Platform::getEnv('COMPOSER_ROOT_VERSION'),
                 'disableNetwork' => Platform::getEnv('COMPOSER_DISABLE_NETWORK'),
                 'offline' => $lockrot->offline(),
+                'repositoryKeys' => array_keys($repositories),
             ];
 
             return self::testAnalyzer($loader, $lockrot, $clock);
@@ -1598,6 +1599,16 @@ final class LockrotCommandTest extends TestCase
         } finally {
             $this->restoreGlobalEnv('COMPOSER_ROOT_VERSION', $previous);
         }
+    }
+
+    /** Composer keys its default repositories by name, and the analyzer reads them as a list in lookup order. */
+    public function testTheAnalyzerTakesTheRepositoriesAsAList(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+
+        $observed = $this->observeDuringRun(['--offline' => true, '--target-php' => '8.4'], $this->loader());
+
+        self::assertSame([0], $observed['repositoryKeys'], 'the skeleton names no repository, so packagist.org is the one');
     }
 
     /**

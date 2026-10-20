@@ -34,6 +34,21 @@ final class HolderTest extends TestCase
         self::assertSame('v5.4.54', $holds[4]->version(), 'the first of two that differ only in the version');
     }
 
+    public function testTheLinkOrdersBeforeTheTargetAndEveryFieldKeepsAnEntryApart(): void
+    {
+        $holds = Holder::distinct([
+            new Holder(Holder::PACKAGE, 'acme/x', '1.0.0', Holder::REQUIRE, '^1.0', 'acme/z'),
+            new Holder(Holder::PACKAGE, 'acme/x', '1.0.0', Holder::CONFLICT, '<2.0', 'acme/a'),
+            new Holder(Holder::PACKAGE, 'acme/x', '1.0.0', Holder::REQUIRE, '^1.0', 'acme/y'),
+            new Holder(Holder::PACKAGE, 'acme/x', '1.0.0', Holder::REQUIRE, '^2.0', 'acme/z'),
+        ]);
+
+        self::assertSame(
+            [['require', 'acme/y', '^1.0'], ['require', 'acme/z', '^1.0'], ['require', 'acme/z', '^2.0'], ['conflict', 'acme/a', '<2.0']],
+            array_map(static fn (Holder $hold): array => [$hold->link(), $hold->target(), $hold->constraint()], $holds)
+        );
+    }
+
     public function testTheTargetIsWrittenBesideTheLink(): void
     {
         self::assertSame(

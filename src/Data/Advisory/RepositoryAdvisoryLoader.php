@@ -76,7 +76,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         [$repositories, $answers, $askNotes] = $this->ask(array_keys($asked));
 
         return $this->batch($versionByName, $outside, $aliasVersionsByName, $repositories, $answers, array_merge($notes, $askNotes))
-            ->withRecords(self::merged($answers), array_map('strval', array_keys($asked)));
+            ->withRecords(self::merged($answers), array_keys($asked));
     }
 
     /**
@@ -107,7 +107,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         $records = [];
         foreach ($answers as $answer) {
             foreach ($answer as $name => $advisories) {
-                $records[(string) $name] = array_merge($records[(string) $name] ?? [], array_values($advisories));
+                $records[$name] = array_merge($records[$name] ?? [], $advisories);
             }
         }
 

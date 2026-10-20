@@ -295,6 +295,36 @@ final class TableFormatterTest extends TestCase
         ], Notes::texts(['GitHub token not set']), $at, 5, 0, null, null, false);
     }
 
+    /**
+     * A fold counts ` · ` as 4 bytes and the closing ` ·` of every item but the last as 3.
+     *
+     * @return iterable<string, array{int, list<string>}>
+     */
+    public static function gateFolds(): iterable
+    {
+        yield 'one byte short of a third item and its closing separator' => [54, ['gate: fails · --fail-on=stale ·', '3 findings fail it · target php 8.4 (--target-php)']];
+        yield 'a third item and its closing separator' => [55, ['gate: fails · --fail-on=stale · 3 findings fail it ·', 'target php 8.4 (--target-php)']];
+        yield 'one byte short of the last item' => [84, ['gate: fails · --fail-on=stale · 3 findings fail it ·', 'target php 8.4 (--target-php)']];
+        yield 'the last item, which closes with no separator' => [85, ['gate: fails · --fail-on=stale · 3 findings fail it · target php 8.4 (--target-php)']];
+    }
+
+    /**
+     * @param list<string> $expected
+     *
+     * @dataProvider gateFolds
+     */
+    #[DataProvider('gateFolds')]
+    public function testTheGateLineFoldsBetweenItemsAtTheWidth(int $width, array $expected): void
+    {
+        $told = self::report()->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('stale'), RunSettings::SOURCE_OPTION, null));
+        $lines = self::lines(self::formatter($width, 'high')->format($told));
+        $gate = array_search('gate: fails', array_map(static fn (string $line): string => substr($line, 0, 11), $lines), true);
+        self::assertIsInt($gate);
+
+        self::assertSame($expected, \array_slice($lines, $gate, \count($expected)));
+        self::assertStringStartsWith('Data as of ', $lines[$gate + \count($expected)]);
+    }
+
     public function testTheContextFailOnStandsInForARunTheReportWasNotTold(): void
     {
         $report = self::report();
