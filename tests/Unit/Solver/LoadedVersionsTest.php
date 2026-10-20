@@ -104,7 +104,7 @@ final class LoadedVersionsTest extends TestCase
     public static function asks(): iterable
     {
         $stable = ['stable' => BasePackage::STABILITY_STABLE];
-        $all = BasePackage::STABILITIES;
+        $all = ['stable' => BasePackage::STABILITY_STABLE, 'RC' => BasePackage::STABILITY_RC, 'beta' => BasePackage::STABILITY_BETA, 'alpha' => BasePackage::STABILITY_ALPHA, 'dev' => BasePackage::STABILITY_DEV];
 
         yield 'a constraint on one name and none on another' => [['acme/b' => null, 'acme/a' => '^1.0'], $stable, [], []];
         yield 'every stability' => [['acme/a' => null, 'acme/b' => null], $all, [], []];
