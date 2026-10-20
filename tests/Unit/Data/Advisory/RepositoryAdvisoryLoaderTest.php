@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Data\Advisory;
 
+use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\FilterRepository;
@@ -316,6 +317,24 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         $batch = (new RepositoryAdvisoryLoader([$throwing(new \RuntimeException(''))]))->load(['doctrine/cache' => '2.2.0']);
         self::assertSame(['security advisories unavailable from throwing repo: RuntimeException'], self::texts($batch));
+    }
+
+    /** The move check's blocking reads every record of each name from every repository, and the names asked. */
+    public function testTheBatchKeepsTheRecordsOfEveryRepositoryAndTheNamesItAsked(): void
+    {
+        $first = $this->api([
+            'acme/lib' => [self::record('PKSA-1', '<2.0', ['packageName' => 'acme/lib'])],
+            'acme/other' => [self::record('PKSA-2', '<2.0', ['packageName' => 'acme/other'])],
+        ]);
+        $second = $this->api(['acme/lib' => [self::record('PKSA-3', '<2.0', ['packageName' => 'acme/lib'])]]);
+
+        $batch = (new RepositoryAdvisoryLoader(array_merge($first->repositories(), $second->repositories())))->load(['acme/lib' => '1.0.0', 'acme/other' => '1.0.0']);
+
+        self::assertSame(
+            ['acme/lib' => ['PKSA-1', 'PKSA-3'], 'acme/other' => ['PKSA-2']],
+            array_map(static fn (array $records): array => array_map(static fn (PartialSecurityAdvisory $advisory): string => $advisory->advisoryId, $records), $batch->records())
+        );
+        self::assertSame(['acme/lib', 'acme/other'], $batch->asked());
     }
 
     public function testOfflineAsksNothing(): void

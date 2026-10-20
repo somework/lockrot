@@ -74,6 +74,7 @@ final class ExplanationTest extends TestCase
         self::assertSame('10.x', $installed['branch']);
         self::assertNull($installed['highest_released']);
         self::assertSame('10.13.1', $installed['newest_dated']);
+        self::assertEquals(new \DateTimeImmutable('2023-03-17T00:00:00+00:00'), $installed['newest_dated_released']);
     }
 
     /**

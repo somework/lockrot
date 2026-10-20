@@ -59,5 +59,7 @@ final class ReleaseBranchTest extends TestCase
         self::assertNull(ReleaseBranch::aliasLine('0.0.x-dev'), 'a 0.0 line is one release wide');
         self::assertNull(ReleaseBranch::aliasLine('dev-main'));
         self::assertNull(ReleaseBranch::aliasLine('1.2.0'));
+        self::assertNull(ReleaseBranch::aliasLine('dev-5.4.x-dev'), 'a branch whose name only ends like a line');
+        self::assertNull(ReleaseBranch::aliasLine('5.4.x-dev-fix'), 'a branch whose name only starts like a line');
     }
 }

@@ -21,6 +21,7 @@ use Lockrot\Security\FixFinder;
 use Lockrot\Security\Holder;
 use Lockrot\Security\LinkIndex;
 use Lockrot\Security\PackageFixes;
+use Lockrot\Security\RefusedMoves;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use PHPUnit\Framework\TestCase;
@@ -310,6 +311,17 @@ final class FixFinderTest extends TestCase
         self::assertSame(Fix::BLOCKED_BY_TARGET, $fix->blockedBy());
         self::assertCount(1, $fix->heldBy());
         self::assertSame(Fix::BLOCKED, $fixes->branches()[0]->fixKind());
+    }
+
+    public function testARefusedMoveHoldsTheReleaseOnlyInTheScanThatTakesIt(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', null], ['1.1.0', null]], ['A' => '<1.1.0']);
+        $finder = new FixFinder(new PhpFloor(null, null), LinkIndex::of($lock, ProjectConfig::empty()));
+
+        $held = $finder->withRefused(RefusedMoves::none()->with('^1.1', [new Holder(Holder::ROOT, 'acme/app', null, Holder::REQUIRE, '<1.1')]));
+
+        self::assertSame([['source' => Holder::ROOT, 'package' => 'acme/app', 'version' => null, 'link' => Holder::REQUIRE, 'constraint' => '<1.1']], self::holders($held->find($facts)->forAdvisory('A')->heldBy()));
+        self::assertSame([], $finder->find($facts)->forAdvisory('A')->heldBy());
     }
 
     public function testNoFloorAdmitsEveryRelease(): void
@@ -860,6 +872,23 @@ final class FixFinderTest extends TestCase
      */
     private function find(array $package, array $releases, array $ranges, PhpFloor $floor, array $packages = [], array $devPackages = [], array $root = [], array $extra = [], array $own = []): PackageFixes
     {
+        [$lock, $facts] = $this->facts($package, $releases, $ranges, $packages, $devPackages, $extra);
+
+        return (new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::fromArray($root))))->find($facts, array_merge($facts->advisories(), $own));
+    }
+
+    /**
+     * @param array<string, mixed>                $package
+     * @param list<array{0: string, 1: ?string}> $releases
+     * @param array<string, string>               $ranges
+     * @param list<array<string, mixed>>          $packages
+     * @param list<array<string, mixed>>          $devPackages
+     * @param list<Advisory>                      $extra
+     *
+     * @return array{LockFile, PackageFacts}
+     */
+    private function facts(array $package, array $releases, array $ranges, array $packages = [], array $devPackages = [], array $extra = []): array
+    {
         $package += ['notification-url' => self::PACKAGIST];
         $lock = LockFile::fromArray(['packages' => array_merge([$package], $packages), 'packages-dev' => $devPackages]);
         $name = $package['name'];
@@ -883,7 +912,7 @@ final class FixFinderTest extends TestCase
             $advisories[] = self::advisory((string) $id, $range);
         }
 
-        return (new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::fromArray($root))))->find(new PackageFacts($locked, $metadata, null, $advisories), array_merge($advisories, $own));
+        return [$lock, new PackageFacts($locked, $metadata, null, $advisories)];
     }
 
     /** @param list<array<string, mixed>> $packages */

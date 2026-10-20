@@ -117,6 +117,12 @@ def entries(markdown: str) -> List[str]:
     return [entry for entry in found if entry]
 
 
+def entry_keys(match, mutator: str, source: Source) -> List[Key]:
+    named = re.match(r'\W*in (\w+)\(\):', match.group('reason'))
+    methods = (named.group(1),) if named else ()
+    return source.keys(match.group('path'), mutator, 0, normalise(match.group('code')), methods)
+
+
 def allowances(markdown: str, source: Source) -> List[list]:
     """One claim per mutator an entry names: [the keys it answers to, how many escapes it covers]."""
     found: List[list] = []
@@ -124,12 +130,20 @@ def allowances(markdown: str, source: Source) -> List[list]:
         match = ENTRY.match(entry)
         if not match:
             continue
-        named = re.match(r'\W*in (\w+)\(\):', match.group('reason'))
-        methods = (named.group(1),) if named else ()
         for mutator in re.finditer(r'([A-Z]\w*)(?: x(\d+))?', match.group('mutators')):
-            keys = source.keys(match.group('path'), mutator.group(1), 0, normalise(match.group('code')), methods)
+            keys = entry_keys(match, mutator.group(1), source)
             if keys:
                 found.append([set(keys), int(mutator.group(2) or 1)])
+    return found
+
+
+def stale(markdown: str, source: Source) -> List[str]:
+    """The entries whose code span names no line of the checked-out source: no escape can match them."""
+    found: List[str] = []
+    for entry in entries(markdown):
+        match = ENTRY.match(entry)
+        if match and not entry_keys(match, '', source):
+            found.append(entry)
     return found
 
 

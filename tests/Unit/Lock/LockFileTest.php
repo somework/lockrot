@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Lock;
 
+use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
@@ -372,18 +373,26 @@ final class LockFileTest extends TestCase
     public function testTheLockedRepositoryHoldsBothSectionsAndTheRootAliases(): void
     {
         $lock = LockFile::fromArray([
-            'packages' => [['name' => 'vendor/a', 'version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/a.git', 'reference' => 'abc']]],
+            'packages' => [['name' => 'vendor/a', 'version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/a.git', 'reference' => 'abc'], 'transport-options' => ['ssl' => ['verify_peer' => false]]]],
             'packages-dev' => [['name' => 'vendor/b', 'version' => '2.0.0']],
-            'aliases' => [['package' => 'vendor/a', 'version' => 'dev-main', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']],
+            'aliases' => [
+                ['package' => 'vendor/a', 'version' => 'dev-main', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev'],
+                ['package' => 'vendor/missing', 'version' => 'dev-main', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev'],
+                (object) ['package' => 'vendor/b', 'version' => '2.0.0', 'alias' => '3.0.x-dev', 'alias_normalized' => '3.0.9999999.9999999-dev'],
+                'vendor/b',
+            ],
         ]);
 
         $versions = [];
         foreach ($lock->lockedRepository()->getPackages() as $package) {
-            $versions[] = $package->getName().' '.$package->getPrettyVersion();
+            $versions[] = [$package->getName(), $package->getPrettyVersion(), $package instanceof AliasPackage && $package->isRootPackageAlias()];
+            if ($package->getPrettyVersion() === 'dev-main') {
+                self::assertSame(['ssl' => ['verify_peer' => false]], $package->getTransportOptions(), 'loaded as Composer\'s Locker loads the lock for an update');
+            }
         }
         sort($versions);
 
-        self::assertSame(['vendor/a 1.0.x-dev', 'vendor/a dev-main', 'vendor/b 2.0.0'], $versions);
+        self::assertSame([['vendor/a', '1.0.x-dev', true], ['vendor/a', 'dev-main', false], ['vendor/b', '2.0.0', false]], $versions, 'an aliases entry that is not an array, or names no locked package, adds nothing');
         self::assertCount(0, LockFile::empty()->lockedRepository()->getPackages());
     }
 }

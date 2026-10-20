@@ -235,7 +235,7 @@ final class ConfiguredRepositoriesTest extends TestCase
         self::assertSame('path', ConfiguredRepositories::fromManifest([['type' => 'composer', 'url' => 'https://satis.acme.test'], $inline])->kindServing('acme/lib', '2.0.0', self::pathDist()));
     }
 
-    /** @return iterable<string, array{string, string, ?string}> the artifact repository's url, the entry's dist url, the kind */
+    /** @return iterable<string, array{string, ?string, ?string}> the artifact repository's url, the entry's dist url, the kind */
     public static function artifacts(): iterable
     {
         yield 'relative' => ['artifacts', 'artifacts/lib-1.0.0.zip', 'artifact'];
@@ -252,6 +252,8 @@ final class ConfiguredRepositoriesTest extends TestCase
         yield 'a variable lockrot does not expand' => ['$ARTIFACTS', '/srv/artifacts/lib-1.0.0.zip', 'unknown'];
         yield 'a URL, not a file' => ['artifacts', 'https://example.test/artifacts/lib-1.0.0.zip', null];
         yield 'a file URL' => ['/srv/artifacts', 'file:///srv/artifacts/lib-1.0.0.zip', null];
+        yield 'a URL beside an artifact directory at the root' => ['.', 'https://example.test/lib-1.0.0.zip', null];
+        yield 'no dist' => ['artifacts', null, null];
         yield 'the project root' => ['./', './lib-1.0.0.zip', 'artifact'];
         yield 'the project root as a dot' => ['.', './nested/lib-1.0.0.zip', 'artifact'];
         yield 'outside the project root' => ['.', '../lib-1.0.0.zip', null];
@@ -261,7 +263,7 @@ final class ConfiguredRepositoriesTest extends TestCase
 
     /** @dataProvider artifacts */
     #[DataProvider('artifacts')]
-    public function testAnArtifactRepositoryServedTheArchivesInsideIt(string $configured, string $dist, ?string $kind): void
+    public function testAnArtifactRepositoryServedTheArchivesInsideIt(string $configured, ?string $dist, ?string $kind): void
     {
         $repositories = ConfiguredRepositories::fromManifest([$configured === '' ? ['type' => 'artifact'] : ['type' => 'artifact', 'url' => $configured]]);
 
