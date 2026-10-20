@@ -97,7 +97,12 @@ final class LoadedVersionsTest extends TestCase
             array_push($inLoadOrder, ...($served[$name] ?? []));
         }
 
-        self::assertSame((new ArrayRepository($inLoadOrder))->loadPackages($map, $stabilities, $flags, $alreadyLoaded), (new LoadedVersions($source))->loadPackages($map, $stabilities, $flags, $alreadyLoaded));
+        $expected = (new ArrayRepository($inLoadOrder))->loadPackages($map, $stabilities, $flags, $alreadyLoaded);
+        $actual = (new LoadedVersions($source))->loadPackages($map, $stabilities, $flags, $alreadyLoaded);
+
+        // The keys of `packages` are object ids or object hashes, by Composer version: the pool builder reads the values.
+        self::assertSame($expected['namesFound'], $actual['namesFound']);
+        self::assertSame(array_values($expected['packages']), array_values($actual['packages']));
     }
 
     /** @return iterable<string, array{array<string, ?string>, array<'stable'|'RC'|'beta'|'alpha'|'dev', 0|5|10|15|20>, array<string, 0|5|10|15|20>, array<string, array<string, \Composer\Package\PackageInterface>>}> */
