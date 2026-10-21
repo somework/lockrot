@@ -84,8 +84,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   gains the links `root-require`, `platform` and `replace` and the field `target`, and
   `run.move_check` names the Composer that solved. ([The move check](docs/verdicts.md#the-move-check))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
-  installs, with require-dev and without, and the links that set each edge. It reads what `composer
-  install` checks: the lock's `platform-overrides`, not composer.json's `config.platform`. The text
+  installs, with require-dev and without, and the links that set each edge. The minors and edges
+  assume no override, and `platform_override` names the lock's `platform-overrides.php`. The text
   formats print it as a `php:` line. ([The PHP window](docs/verdicts.md#the-php-window))
 - **All formats:** the run notes `update_now_not_checked`, `move_check_failed` and
   `package_name_invalid`. lockrot skips a lock entry whose name is no Composer package name.

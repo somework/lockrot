@@ -644,6 +644,19 @@ final class AnalyzerTest extends TestCase
         self::assertSame($original, $analyzer->allowlist());
     }
 
+    public function testThePhpWindowReadsTheTargetAtTheSolvesPhpOfTheMoveCheck(): void
+    {
+        // Composer's merged config, COMPOSER_HOME/config.json included, sets the solve's php: composer.json sets none here.
+        $lock = LockFile::fromArray(['packages' => [self::locked('vendor/pkg') + ['require' => ['php' => '>=8.2.15']]], 'packages-dev' => []]);
+        $analyzer = $this->analyzer($this->loader(['vendor/pkg' => $this->ancient()]), $this->http([]), true, new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, null, null, '8.2')
+            ->withMoveChecks(new MoveChecks(new RecordedMoveChecker([], ['php' => '8.2.10']), true));
+
+        $window = $analyzer->analyze($lock, ProjectConfig::empty(), false)->phpWindow();
+
+        self::assertNotNull($window);
+        self::assertSame(['php' => '8.2.10', 'inside' => false], $window->toArray()['target']);
+    }
+
     public function testWithMoveChecksReturnsAClonedInstanceLeavingOriginalWithoutChecks(): void
     {
         $lock = LockFile::fromArray(['packages' => [self::locked('vendor/pkg')]]);

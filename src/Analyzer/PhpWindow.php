@@ -31,7 +31,7 @@ final class PhpWindow implements \JsonSerializable
     public const LINK_CONFLICT = 'conflict';
     /** Composer gives `php-64bit` the version of `php` on a 64-bit PHP. */
     public const VERSIONED = ['php', 'php-64bit'];
-    /** Host features: Composer gives them no version that a range can intersect. */
+    /** Host features: whether Composer's platform holds them depends on the PHP build of the host. */
     public const HOST_FEATURES = ['php-debug', 'php-ipv6', 'php-zts'];
 
     /** @var Data */
@@ -57,8 +57,10 @@ final class PhpWindow implements \JsonSerializable
      *
      * @param string       $targetMinor the run's target PHP minor
      * @param list<string> $knownMinors {@see \Lockrot\Data\Php\PhpReleaseDates::minors()}
+     * @param ?string      $solvePhp    the php that the move check solves at, from Composer's merged
+     *                                  config; null reads composer.json's `config.platform.php`
      */
-    public static function of(LockFile $lock, ProjectConfig $project, string $targetMinor, array $knownMinors): ?self
+    public static function of(LockFile $lock, ProjectConfig $project, string $targetMinor, array $knownMinors, ?string $solvePhp = null): ?self
     {
         $rootProvides = $project->platformConstraints(ProjectConfig::PROVIDE) + $project->platformConstraints(ProjectConfig::REPLACE);
         if (array_intersect(array_keys($rootProvides), self::VERSIONED) !== []) {
@@ -67,7 +69,8 @@ final class PhpWindow implements \JsonSerializable
         $all = [];
         $withoutDev = [];
         foreach ($lock->lockedRepository()->getPackages() as $package) {
-            // A root alias repeats its package's links under another version.
+            // An alias package repeats the links of the package it aliases under another version: a
+            // root alias, an `extra.branch-alias` or a `default-branch`.
             if (!$package instanceof AliasPackage) {
                 if (array_intersect(array_keys($package->getProvides() + $package->getReplaces()), self::VERSIONED) !== []) {
                     return null;
@@ -95,7 +98,7 @@ final class PhpWindow implements \JsonSerializable
         $hosts = array_unique($hosts);
         sort($hosts);
 
-        $targetPoint = MoveCheckers::platformPhp($targetMinor, $project->platformPhp());
+        $targetPoint = $solvePhp ?? MoveCheckers::platformPhp($targetMinor, $project->platformPhp());
         $windows = [];
         foreach ($sets as $set => $links) {
             $windows[$set] = $links === null ? null : self::setWindow($links, $knownMinors, $targetMinor, $targetPoint);
