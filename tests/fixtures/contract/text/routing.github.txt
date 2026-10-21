@@ -3,4 +3,5 @@
 flags: left-behind 1 · vulnerable 1 · 1 package carries more than one
 depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: symfony/routing, 1 hop (mautic/core-lib › symfony/routing)
 security: 1 vulnerable package · 2 advisories: 2 medium
+php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; mautic/core-lib excludes 8.1
 gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

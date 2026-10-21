@@ -12,5 +12,6 @@ security: 1 vulnerable package · 4 advisories: 4 medium
 libyears: 3.4 behind across the one package · 0.0 from direct requirements · furthest behind guzzlehttp/psr7 1.9.1 at 3.4
 pulled in by: `guzzlehttp/guzzle` 1
 advisories: 1 package asked · packagist.org answered (21 on record for 2 packages)
+php: the lock installs on PHP 7.2 to 8.5
 
 <sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

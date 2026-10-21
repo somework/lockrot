@@ -761,6 +761,116 @@
             ]
         },
         "move_check": null,
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "7.2",
+                    "7.3",
+                    "7.4"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "7.2.5",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.2.5",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": {
+                    "excludes": "8.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.2.5",
+                            "dev": false
+                        },
+                        {
+                            "name": "web-auth/metadata-service",
+                            "version": "v2.1.7",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.1",
+                            "dev": false
+                        },
+                        {
+                            "name": "web-auth/webauthn-lib",
+                            "version": "v2.1.7",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.2",
+                            "dev": false
+                        }
+                    ]
+                },
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "7.2",
+                    "7.3",
+                    "7.4"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "7.2.5",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.2.5",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": {
+                    "excludes": "8.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.2.5",
+                            "dev": false
+                        },
+                        {
+                            "name": "web-auth/metadata-service",
+                            "version": "v2.1.7",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.1",
+                            "dev": false
+                        },
+                        {
+                            "name": "web-auth/webauthn-lib",
+                            "version": "v2.1.7",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.2",
+                            "dev": false
+                        }
+                    ]
+                },
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": false
+            }
+        },
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,

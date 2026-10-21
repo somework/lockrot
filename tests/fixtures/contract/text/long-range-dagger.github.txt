@@ -3,4 +3,5 @@ flags: vulnerable 1
 depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: symfony/polyfill-intl-idn, 1 hop (guzzlehttp/guzzle › symfony/polyfill-intl-idn)
 security: 1 vulnerable package · 1 advisory: 1 low
 update now: composer update symfony/polyfill-intl-idn
+php: the lock installs on PHP 7.2 to 8.5
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

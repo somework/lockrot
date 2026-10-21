@@ -778,7 +778,501 @@
     }
    ]
   },
-  "move_check": null
+  "move_check": null,
+  "php_window": {
+   "platform_override": null,
+   "host_requires": [],
+   "with_dev": {
+    "minors": [
+     "7.2",
+     "7.3",
+     "7.4"
+    ],
+    "gaps": false,
+    "lower_edge": {
+     "php": "7.2.5",
+     "set_by": [
+      {
+       "name": null,
+       "version": null,
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5",
+       "dev": false
+      },
+      {
+       "name": "joomla/application",
+       "version": "2.0.4",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/archive",
+       "version": "2.0.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/authentication",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/console",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/crypt",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/data",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/di",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/event",
+       "version": "2.0.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/filesystem",
+       "version": "2.0.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/filter",
+       "version": "2.0.5",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/input",
+       "version": "2.0.4",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/oauth1",
+       "version": "2.0.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/oauth2",
+       "version": "2.0.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/registry",
+       "version": "2.0.4",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/router",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/session",
+       "version": "2.0.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/string",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/uri",
+       "version": "2.0.4",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0|~8.2.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/utilities",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "symfony/yaml",
+       "version": "v5.4.23",
+       "link": "require",
+       "target": "php",
+       "constraint": ">=7.2.5",
+       "dev": false
+      }
+     ]
+    },
+    "upper_edge": {
+     "excludes": "8.0",
+     "set_by": [
+      {
+       "name": null,
+       "version": null,
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5",
+       "dev": false
+      },
+      {
+       "name": "joomla/ldap",
+       "version": "2.0.0",
+       "link": "require",
+       "target": "php",
+       "constraint": "~7.0",
+       "dev": false
+      },
+      {
+       "name": "laminas/laminas-diactoros",
+       "version": "2.4.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.1",
+       "dev": false
+      },
+      {
+       "name": "lcobucci/jwt",
+       "version": "3.4.6",
+       "link": "require",
+       "target": "php",
+       "constraint": "^5.6 || ^7.0",
+       "dev": false
+      },
+      {
+       "name": "web-auth/cose-lib",
+       "version": "v2.1.7",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2",
+       "dev": false
+      },
+      {
+       "name": "web-auth/metadata-service",
+       "version": "v2.1.7",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.1",
+       "dev": false
+      },
+      {
+       "name": "web-auth/webauthn-lib",
+       "version": "v2.1.7",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2",
+       "dev": false
+      }
+     ]
+    },
+    "closest": null
+   },
+   "without_dev": {
+    "minors": [
+     "7.2",
+     "7.3",
+     "7.4"
+    ],
+    "gaps": false,
+    "lower_edge": {
+     "php": "7.2.5",
+     "set_by": [
+      {
+       "name": null,
+       "version": null,
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5",
+       "dev": false
+      },
+      {
+       "name": "joomla/application",
+       "version": "2.0.4",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/archive",
+       "version": "2.0.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/authentication",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/console",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/crypt",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/data",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/di",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/event",
+       "version": "2.0.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/filesystem",
+       "version": "2.0.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/filter",
+       "version": "2.0.5",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/input",
+       "version": "2.0.4",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/oauth1",
+       "version": "2.0.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/oauth2",
+       "version": "2.0.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/registry",
+       "version": "2.0.4",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/router",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/session",
+       "version": "2.0.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/string",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/uri",
+       "version": "2.0.4",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0|~8.2.0",
+       "dev": false
+      },
+      {
+       "name": "joomla/utilities",
+       "version": "2.0.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5|~8.0.0|~8.1.0",
+       "dev": false
+      },
+      {
+       "name": "symfony/yaml",
+       "version": "v5.4.23",
+       "link": "require",
+       "target": "php",
+       "constraint": ">=7.2.5",
+       "dev": false
+      }
+     ]
+    },
+    "upper_edge": {
+     "excludes": "8.0",
+     "set_by": [
+      {
+       "name": null,
+       "version": null,
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5",
+       "dev": false
+      },
+      {
+       "name": "joomla/ldap",
+       "version": "2.0.0",
+       "link": "require",
+       "target": "php",
+       "constraint": "~7.0",
+       "dev": false
+      },
+      {
+       "name": "laminas/laminas-diactoros",
+       "version": "2.4.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.1",
+       "dev": false
+      },
+      {
+       "name": "lcobucci/jwt",
+       "version": "3.4.6",
+       "link": "require",
+       "target": "php",
+       "constraint": "^5.6 || ^7.0",
+       "dev": false
+      },
+      {
+       "name": "web-auth/cose-lib",
+       "version": "v2.1.7",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2",
+       "dev": false
+      },
+      {
+       "name": "web-auth/metadata-service",
+       "version": "v2.1.7",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.1",
+       "dev": false
+      },
+      {
+       "name": "web-auth/webauthn-lib",
+       "version": "v2.1.7",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2",
+       "dev": false
+      }
+     ]
+    },
+    "closest": null
+   },
+   "target": {
+    "php": "8.4.99",
+    "inside": false
+   }
+  }
  },
  "activity_cache_oldest_at": "2026-10-01T16:05:49+00:00",
  "activity_cache_age_hours": 1.6,

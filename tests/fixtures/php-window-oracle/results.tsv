@@ -1,0 +1,690 @@
+apps__BookStackApp_BookStack	5.3	all	2	- Root composer.json requires php ^8.2.0 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	5.3	no_dev	2	- Root composer.json requires php ^8.2.0 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	5.4	all	2	- Root composer.json requires php ^8.2.0 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	5.4	no_dev	2	- Root composer.json requires php ^8.2.0 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	5.5	all	2	- Root composer.json requires php ^8.2.0 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	5.5	no_dev	2	- Root composer.json requires php ^8.2.0 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	5.6	all	2	- Root composer.json requires php ^8.2.0 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	5.6	no_dev	2	- Root composer.json requires php ^8.2.0 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	7.0	all	2	- Root composer.json requires php ^8.2.0 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	7.0	no_dev	2	- Root composer.json requires php ^8.2.0 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	7.1	all	2	- Root composer.json requires php ^8.2.0 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	7.1	no_dev	2	- Root composer.json requires php ^8.2.0 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	7.2	all	2	- Root composer.json requires php ^8.2.0 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	7.2	no_dev	2	- Root composer.json requires php ^8.2.0 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	7.3	all	2	- Root composer.json requires php ^8.2.0 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	7.3	no_dev	2	- Root composer.json requires php ^8.2.0 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	7.4	all	2	- Root composer.json requires php ^8.2.0 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	7.4	no_dev	2	- Root composer.json requires php ^8.2.0 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	8.0	all	2	- Root composer.json requires php ^8.2.0 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	8.0	no_dev	2	- Root composer.json requires php ^8.2.0 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	8.1	all	2	- Root composer.json requires php ^8.2.0 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	8.1	no_dev	2	- Root composer.json requires php ^8.2.0 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__BookStackApp_BookStack	8.2	all	0	
+apps__BookStackApp_BookStack	8.2	no_dev	0	
+apps__BookStackApp_BookStack	8.3	all	0	
+apps__BookStackApp_BookStack	8.3	no_dev	0	
+apps__BookStackApp_BookStack	8.4	all	0	
+apps__BookStackApp_BookStack	8.4	no_dev	0	
+apps__BookStackApp_BookStack	8.5	all	0	
+apps__BookStackApp_BookStack	8.5	no_dev	0	
+apps__PrestaShop_PrestaShop	5.3	all	2	- Root composer.json requires php >=8.1 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	5.3	no_dev	2	- Root composer.json requires php >=8.1 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	5.4	all	2	- Root composer.json requires php >=8.1 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	5.4	no_dev	2	- Root composer.json requires php >=8.1 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	5.5	all	2	- Root composer.json requires php >=8.1 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	5.5	no_dev	2	- Root composer.json requires php >=8.1 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	5.6	all	2	- Root composer.json requires php >=8.1 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	5.6	no_dev	2	- Root composer.json requires php >=8.1 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	7.0	all	2	- Root composer.json requires php >=8.1 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	7.0	no_dev	2	- Root composer.json requires php >=8.1 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	7.1	all	2	- Root composer.json requires php >=8.1 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	7.1	no_dev	2	- Root composer.json requires php >=8.1 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	7.2	all	2	- Root composer.json requires php >=8.1 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	7.2	no_dev	2	- Root composer.json requires php >=8.1 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	7.3	all	2	- Root composer.json requires php >=8.1 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	7.3	no_dev	2	- Root composer.json requires php >=8.1 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	7.4	all	2	- Root composer.json requires php >=8.1 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	7.4	no_dev	2	- Root composer.json requires php >=8.1 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	8.0	all	2	- Root composer.json requires php >=8.1 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	8.0	no_dev	2	- Root composer.json requires php >=8.1 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__PrestaShop_PrestaShop	8.1	all	0	
+apps__PrestaShop_PrestaShop	8.1	no_dev	0	
+apps__PrestaShop_PrestaShop	8.2	all	0	
+apps__PrestaShop_PrestaShop	8.2	no_dev	0	
+apps__PrestaShop_PrestaShop	8.3	all	2	- ezyang/htmlpurifier v4.16.0 requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not sati
+apps__PrestaShop_PrestaShop	8.3	no_dev	2	- ezyang/htmlpurifier v4.16.0 requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not sati
+apps__PrestaShop_PrestaShop	8.4	all	2	- ezyang/htmlpurifier v4.16.0 requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not sati
+apps__PrestaShop_PrestaShop	8.4	no_dev	2	- ezyang/htmlpurifier v4.16.0 requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not sati
+apps__PrestaShop_PrestaShop	8.5	all	2	- ezyang/htmlpurifier v4.16.0 requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 -> your php version (8.5.99; overridden via config.platform, actual: 8.5.11) does not sati
+apps__PrestaShop_PrestaShop	8.5	no_dev	2	- ezyang/htmlpurifier v4.16.0 requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 -> your php version (8.5.99; overridden via config.platform, actual: 8.5.11) does not sati
+apps__drupal_drupal	5.3	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	5.3	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	5.4	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	5.4	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	5.5	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	5.5	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	5.6	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	5.6	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	7.0	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	7.0	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	7.1	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	7.1	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	7.2	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	7.2	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	7.3	all	2	- doctrine/lexer 3.0.1 requires php ^8.1 -> your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	7.3	no_dev	2	- doctrine/lexer 3.0.1 requires php ^8.1 -> your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	7.4	all	2	- doctrine/lexer 3.0.1 requires php ^8.1 -> your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	7.4	no_dev	2	- doctrine/lexer 3.0.1 requires php ^8.1 -> your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	8.0	all	2	- doctrine/lexer 3.0.1 requires php ^8.1 -> your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	8.0	no_dev	2	- doctrine/lexer 3.0.1 requires php ^8.1 -> your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	8.1	all	2	- drupal/core 12.x-dev requires php >=8.5.0 -> your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	8.1	no_dev	2	- drupal/core 12.x-dev requires php >=8.5.0 -> your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	8.2	all	2	- drupal/core 12.x-dev requires php >=8.5.0 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	8.2	no_dev	2	- drupal/core 12.x-dev requires php >=8.5.0 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	8.3	all	2	- drupal/core 12.x-dev requires php >=8.5.0 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	8.3	no_dev	2	- drupal/core 12.x-dev requires php >=8.5.0 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	8.4	all	2	- drupal/core 12.x-dev requires php >=8.5.0 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	8.4	no_dev	2	- drupal/core 12.x-dev requires php >=8.5.0 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__drupal_drupal	8.5	all	0	
+apps__drupal_drupal	8.5	no_dev	0	
+apps__firefly-iii_firefly-iii	5.3	all	2	- Root composer.json requires php >=8.5 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	5.3	no_dev	2	- Root composer.json requires php >=8.5 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	5.4	all	2	- Root composer.json requires php >=8.5 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	5.4	no_dev	2	- Root composer.json requires php >=8.5 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	5.5	all	2	- Root composer.json requires php >=8.5 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	5.5	no_dev	2	- Root composer.json requires php >=8.5 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	5.6	all	2	- Root composer.json requires php >=8.5 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	5.6	no_dev	2	- Root composer.json requires php >=8.5 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	7.0	all	2	- Root composer.json requires php >=8.5 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	7.0	no_dev	2	- Root composer.json requires php >=8.5 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	7.1	all	2	- Root composer.json requires php >=8.5 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	7.1	no_dev	2	- Root composer.json requires php >=8.5 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	7.2	all	2	- Root composer.json requires php >=8.5 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	7.2	no_dev	2	- Root composer.json requires php >=8.5 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	7.3	all	2	- Root composer.json requires php >=8.5 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	7.3	no_dev	2	- Root composer.json requires php >=8.5 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	7.4	all	2	- Root composer.json requires php >=8.5 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	7.4	no_dev	2	- Root composer.json requires php >=8.5 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	8.0	all	2	- Root composer.json requires php >=8.5 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	8.0	no_dev	2	- Root composer.json requires php >=8.5 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	8.1	all	2	- Root composer.json requires php >=8.5 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	8.1	no_dev	2	- Root composer.json requires php >=8.5 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	8.2	all	2	- Root composer.json requires php >=8.5 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	8.2	no_dev	2	- Root composer.json requires php >=8.5 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	8.3	all	2	- Root composer.json requires php >=8.5 but your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	8.3	no_dev	2	- Root composer.json requires php >=8.5 but your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	8.4	all	2	- Root composer.json requires php >=8.5 but your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	8.4	no_dev	2	- Root composer.json requires php >=8.5 but your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__firefly-iii_firefly-iii	8.5	all	0	
+apps__firefly-iii_firefly-iii	8.5	no_dev	0	
+apps__grokability_snipe-it	5.3	all	2	- Root composer.json requires php ^8.2 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	5.3	no_dev	2	- Root composer.json requires php ^8.2 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	5.4	all	2	- Root composer.json requires php ^8.2 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	5.4	no_dev	2	- Root composer.json requires php ^8.2 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	5.5	all	2	- Root composer.json requires php ^8.2 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	5.5	no_dev	2	- Root composer.json requires php ^8.2 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	5.6	all	2	- Root composer.json requires php ^8.2 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	5.6	no_dev	2	- Root composer.json requires php ^8.2 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	7.0	all	2	- Root composer.json requires php ^8.2 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	7.0	no_dev	2	- Root composer.json requires php ^8.2 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	7.1	all	2	- Root composer.json requires php ^8.2 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	7.1	no_dev	2	- Root composer.json requires php ^8.2 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	7.2	all	2	- Root composer.json requires php ^8.2 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	7.2	no_dev	2	- Root composer.json requires php ^8.2 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	7.3	all	2	- Root composer.json requires php ^8.2 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	7.3	no_dev	2	- Root composer.json requires php ^8.2 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	7.4	all	2	- Root composer.json requires php ^8.2 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	7.4	no_dev	2	- Root composer.json requires php ^8.2 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	8.0	all	2	- Root composer.json requires php ^8.2 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	8.0	no_dev	2	- Root composer.json requires php ^8.2 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	8.1	all	2	- Root composer.json requires php ^8.2 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	8.1	no_dev	2	- Root composer.json requires php ^8.2 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__grokability_snipe-it	8.2	all	0	
+apps__grokability_snipe-it	8.2	no_dev	0	
+apps__grokability_snipe-it	8.3	all	0	
+apps__grokability_snipe-it	8.3	no_dev	0	
+apps__grokability_snipe-it	8.4	all	0	
+apps__grokability_snipe-it	8.4	no_dev	0	
+apps__grokability_snipe-it	8.5	all	0	
+apps__grokability_snipe-it	8.5	no_dev	0	
+apps__koel_koel	5.3	all	2	- Root composer.json requires php >=8.3 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	5.3	no_dev	2	- Root composer.json requires php >=8.3 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	5.4	all	2	- Root composer.json requires php >=8.3 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	5.4	no_dev	2	- Root composer.json requires php >=8.3 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	5.5	all	2	- Root composer.json requires php >=8.3 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	5.5	no_dev	2	- Root composer.json requires php >=8.3 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	5.6	all	2	- Root composer.json requires php >=8.3 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	5.6	no_dev	2	- Root composer.json requires php >=8.3 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	7.0	all	2	- Root composer.json requires php >=8.3 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	7.0	no_dev	2	- Root composer.json requires php >=8.3 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	7.1	all	2	- Root composer.json requires php >=8.3 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	7.1	no_dev	2	- Root composer.json requires php >=8.3 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	7.2	all	2	- Root composer.json requires php >=8.3 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	7.2	no_dev	2	- Root composer.json requires php >=8.3 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	7.3	all	2	- Root composer.json requires php >=8.3 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	7.3	no_dev	2	- Root composer.json requires php >=8.3 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	7.4	all	2	- Root composer.json requires php >=8.3 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	7.4	no_dev	2	- Root composer.json requires php >=8.3 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	8.0	all	2	- Root composer.json requires php >=8.3 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	8.0	no_dev	2	- Root composer.json requires php >=8.3 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	8.1	all	2	- Root composer.json requires php >=8.3 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	8.1	no_dev	2	- Root composer.json requires php >=8.3 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	8.2	all	2	- Root composer.json requires php >=8.3 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	8.2	no_dev	2	- Root composer.json requires php >=8.3 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__koel_koel	8.3	all	0	
+apps__koel_koel	8.3	no_dev	0	
+apps__koel_koel	8.4	all	0	
+apps__koel_koel	8.4	no_dev	0	
+apps__koel_koel	8.5	all	0	
+apps__koel_koel	8.5	no_dev	0	
+apps__magento_magento2	5.3	all	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	5.3	no_dev	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	5.4	all	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	5.4	no_dev	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	5.5	all	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	5.5	no_dev	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	5.6	all	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	5.6	no_dev	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	7.0	all	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	7.0	no_dev	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	7.1	all	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	7.1	no_dev	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	7.2	all	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	7.2	no_dev	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	7.3	all	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	7.3	no_dev	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	7.4	all	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	7.4	no_dev	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	8.0	all	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	8.0	no_dev	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	8.1	all	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	8.1	no_dev	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	8.2	all	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	8.2	no_dev	2	- Root composer.json requires php ~8.3.0||~8.4.0||~8.5.0 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__magento_magento2	8.3	all	0	
+apps__magento_magento2	8.3	no_dev	0	
+apps__magento_magento2	8.4	all	0	
+apps__magento_magento2	8.4	no_dev	0	
+apps__magento_magento2	8.5	all	0	
+apps__magento_magento2	8.5	no_dev	0	
+apps__matomo-org_matomo	5.3	all	2	- Root composer.json requires php >=8.1.0 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	5.3	no_dev	2	- Root composer.json requires php >=8.1.0 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	5.4	all	2	- Root composer.json requires php >=8.1.0 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	5.4	no_dev	2	- Root composer.json requires php >=8.1.0 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	5.5	all	2	- Root composer.json requires php >=8.1.0 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	5.5	no_dev	2	- Root composer.json requires php >=8.1.0 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	5.6	all	2	- Root composer.json requires php >=8.1.0 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	5.6	no_dev	2	- Root composer.json requires php >=8.1.0 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	7.0	all	2	- Root composer.json requires php >=8.1.0 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	7.0	no_dev	2	- Root composer.json requires php >=8.1.0 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	7.1	all	2	- Root composer.json requires php >=8.1.0 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	7.1	no_dev	2	- Root composer.json requires php >=8.1.0 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	7.2	all	2	- Root composer.json requires php >=8.1.0 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	7.2	no_dev	2	- Root composer.json requires php >=8.1.0 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	7.3	all	2	- Root composer.json requires php >=8.1.0 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	7.3	no_dev	2	- Root composer.json requires php >=8.1.0 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	7.4	all	2	- Root composer.json requires php >=8.1.0 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	7.4	no_dev	2	- Root composer.json requires php >=8.1.0 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	8.0	all	2	- Root composer.json requires php >=8.1.0 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	8.0	no_dev	2	- Root composer.json requires php >=8.1.0 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__matomo-org_matomo	8.1	all	0	
+apps__matomo-org_matomo	8.1	no_dev	0	
+apps__matomo-org_matomo	8.2	all	0	
+apps__matomo-org_matomo	8.2	no_dev	0	
+apps__matomo-org_matomo	8.3	all	0	
+apps__matomo-org_matomo	8.3	no_dev	0	
+apps__matomo-org_matomo	8.4	all	0	
+apps__matomo-org_matomo	8.4	no_dev	0	
+apps__matomo-org_matomo	8.5	all	0	
+apps__matomo-org_matomo	8.5	no_dev	0	
+apps__mautic_mautic	5.3	all	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	5.3	no_dev	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	5.4	all	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	5.4	no_dev	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	5.5	all	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	5.5	no_dev	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	5.6	all	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	5.6	no_dev	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	7.0	all	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	7.0	no_dev	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	7.1	all	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	7.1	no_dev	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	7.2	all	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	7.2	no_dev	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	7.3	all	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	7.3	no_dev	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	7.4	all	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	7.4	no_dev	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	8.0	all	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	8.0	no_dev	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	8.1	all	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	8.1	no_dev	2	- api-platform/core v4.3.17 requires php >=8.2 -> your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__mautic_mautic	8.2	all	0	
+apps__mautic_mautic	8.2	no_dev	0	
+apps__mautic_mautic	8.3	all	0	
+apps__mautic_mautic	8.3	no_dev	0	
+apps__mautic_mautic	8.4	all	2	- ezyang/htmlpurifier v4.17.0 requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) doe
+apps__mautic_mautic	8.4	no_dev	2	- ezyang/htmlpurifier v4.17.0 requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) doe
+apps__mautic_mautic	8.5	all	2	- ezyang/htmlpurifier v4.17.0 requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 -> your php version (8.5.99; overridden via config.platform, actual: 8.5.11) doe
+apps__mautic_mautic	8.5	no_dev	2	- ezyang/htmlpurifier v4.17.0 requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 -> your php version (8.5.99; overridden via config.platform, actual: 8.5.11) doe
+apps__monicahq_monica	5.3	all	2	- Root composer.json requires php ^8.3 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	5.3	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	5.4	all	2	- Root composer.json requires php ^8.3 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	5.4	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	5.5	all	2	- Root composer.json requires php ^8.3 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	5.5	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	5.6	all	2	- Root composer.json requires php ^8.3 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	5.6	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	7.0	all	2	- Root composer.json requires php ^8.3 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	7.0	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	7.1	all	2	- Root composer.json requires php ^8.3 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	7.1	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	7.2	all	2	- Root composer.json requires php ^8.3 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	7.2	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	7.3	all	2	- Root composer.json requires php ^8.3 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	7.3	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	7.4	all	2	- Root composer.json requires php ^8.3 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	7.4	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	8.0	all	2	- Root composer.json requires php ^8.3 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	8.0	no_dev	2	- Root composer.json requires php ^8.3 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	8.1	all	2	- Root composer.json requires php ^8.3 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	8.1	no_dev	2	- Root composer.json requires php ^8.3 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	8.2	all	2	- Root composer.json requires php ^8.3 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	8.2	no_dev	2	- Root composer.json requires php ^8.3 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	8.3	all	0	
+apps__monicahq_monica	8.3	no_dev	0	
+apps__monicahq_monica	8.4	all	0	
+apps__monicahq_monica	8.4	no_dev	0	
+apps__monicahq_monica	8.5	all	2	- moneyphp/money v4.7.1 requires php ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 -> your php version (8.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__monicahq_monica	8.5	no_dev	2	- moneyphp/money v4.7.1 requires php ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 -> your php version (8.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	5.3	all	2	- Root composer.json requires php ^8.3 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	5.3	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	5.4	all	2	- Root composer.json requires php ^8.3 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	5.4	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	5.5	all	2	- Root composer.json requires php ^8.3 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	5.5	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	5.6	all	2	- Root composer.json requires php ^8.3 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	5.6	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	7.0	all	2	- Root composer.json requires php ^8.3 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	7.0	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	7.1	all	2	- Root composer.json requires php ^8.3 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	7.1	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	7.2	all	2	- Root composer.json requires php ^8.3 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	7.2	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	7.3	all	2	- Root composer.json requires php ^8.3 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	7.3	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	7.4	all	2	- Root composer.json requires php ^8.3 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	7.4	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	8.0	all	2	- Root composer.json requires php ^8.3 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	8.0	no_dev	2	- Root composer.json requires php ^8.3 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	8.1	all	2	- Root composer.json requires php ^8.3 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	8.1	no_dev	2	- Root composer.json requires php ^8.3 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	8.2	all	2	- Root composer.json requires php ^8.3 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	8.2	no_dev	2	- Root composer.json requires php ^8.3 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__nextcloud_3rdparty	8.3	all	0	
+apps__nextcloud_3rdparty	8.3	no_dev	0	
+apps__nextcloud_3rdparty	8.4	all	0	
+apps__nextcloud_3rdparty	8.4	no_dev	0	
+apps__nextcloud_3rdparty	8.5	all	0	
+apps__nextcloud_3rdparty	8.5	no_dev	0	
+apps__wallabag_wallabag	5.3	all	2	- Root composer.json requires php >=8.2 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	5.3	no_dev	2	- Root composer.json requires php >=8.2 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	5.4	all	2	- Root composer.json requires php >=8.2 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	5.4	no_dev	2	- Root composer.json requires php >=8.2 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	5.5	all	2	- Root composer.json requires php >=8.2 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	5.5	no_dev	2	- Root composer.json requires php >=8.2 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	5.6	all	2	- Root composer.json requires php >=8.2 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	5.6	no_dev	2	- Root composer.json requires php >=8.2 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	7.0	all	2	- Root composer.json requires php >=8.2 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	7.0	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	7.1	all	2	- Root composer.json requires php >=8.2 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	7.1	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	7.2	all	2	- Root composer.json requires php >=8.2 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	7.2	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	7.3	all	2	- Root composer.json requires php >=8.2 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	7.3	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	7.4	all	2	- Root composer.json requires php >=8.2 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	7.4	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	8.0	all	2	- Root composer.json requires php >=8.2 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	8.0	no_dev	2	- Root composer.json requires php >=8.2 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	8.1	all	2	- Root composer.json requires php >=8.2 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	8.1	no_dev	2	- Root composer.json requires php >=8.2 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	8.2	all	0	
+apps__wallabag_wallabag	8.2	no_dev	0	
+apps__wallabag_wallabag	8.3	all	0	
+apps__wallabag_wallabag	8.3	no_dev	0	
+apps__wallabag_wallabag	8.4	all	0	
+apps__wallabag_wallabag	8.4	no_dev	0	
+apps__wallabag_wallabag	8.5	all	2	- lcobucci/clock 3.3.1 requires php ~8.2.0 || ~8.3.0 || ~8.4.0 -> your php version (8.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+apps__wallabag_wallabag	8.5	no_dev	2	- lcobucci/clock 3.3.1 requires php ~8.2.0 || ~8.3.0 || ~8.4.0 -> your php version (8.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	5.3	all	2	- asm89/stack-cors 1.3.0 requires php >=5.5.9 -> your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	5.3	no_dev	2	- asm89/stack-cors 1.3.0 requires php >=5.5.9 -> your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	5.4	all	2	- asm89/stack-cors 1.3.0 requires php >=5.5.9 -> your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	5.4	no_dev	2	- asm89/stack-cors 1.3.0 requires php >=5.5.9 -> your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	5.5	all	2	- consolidation/annotated-command 4.5.5 requires php >=7.1.3 -> your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	5.5	no_dev	2	- consolidation/annotated-command 4.5.5 requires php >=7.1.3 -> your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	5.6	all	2	- consolidation/annotated-command 4.5.5 requires php >=7.1.3 -> your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	5.6	no_dev	2	- consolidation/annotated-command 4.5.5 requires php >=7.1.3 -> your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	7.0	all	2	- consolidation/annotated-command 4.5.5 requires php >=7.1.3 -> your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	7.0	no_dev	2	- consolidation/annotated-command 4.5.5 requires php >=7.1.3 -> your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	7.1	all	2	- doctrine/lexer 1.2.1 requires php ^7.2 || ^8.0 -> your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	7.1	no_dev	2	- doctrine/lexer 1.2.1 requires php ^7.2 || ^8.0 -> your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	7.2	all	2	- drupal/core 9.3.14 requires php >=7.3.0 -> your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	7.2	no_dev	2	- drupal/core 9.3.14 requires php >=7.3.0 -> your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	7.3	all	0	
+sites__drupal-site	7.3	no_dev	0	
+sites__drupal-site	7.4	all	0	
+sites__drupal-site	7.4	no_dev	0	
+sites__drupal-site	8.0	all	0	
+sites__drupal-site	8.0	no_dev	0	
+sites__drupal-site	8.1	all	0	
+sites__drupal-site	8.1	no_dev	0	
+sites__drupal-site	8.2	all	2	- laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	8.2	no_dev	2	- laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	8.3	all	2	- laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	8.3	no_dev	2	- laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	8.4	all	2	- laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	8.4	no_dev	2	- laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	8.5	all	2	- laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0 -> your php version (8.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__drupal-site	8.5	no_dev	2	- laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0 -> your php version (8.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	5.3	all	2	- Root composer.json requires php >=7.4 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	5.3	no_dev	2	- Root composer.json requires php >=7.4 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	5.4	all	2	- Root composer.json requires php >=7.4 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	5.4	no_dev	2	- Root composer.json requires php >=7.4 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	5.5	all	2	- Root composer.json requires php >=7.4 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	5.5	no_dev	2	- Root composer.json requires php >=7.4 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	5.6	all	2	- Root composer.json requires php >=7.4 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	5.6	no_dev	2	- Root composer.json requires php >=7.4 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	7.0	all	2	- Root composer.json requires php >=7.4 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	7.0	no_dev	2	- Root composer.json requires php >=7.4 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	7.1	all	2	- Root composer.json requires php >=7.4 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	7.1	no_dev	2	- Root composer.json requires php >=7.4 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	7.2	all	2	- Root composer.json requires php >=7.4 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	7.2	no_dev	2	- Root composer.json requires php >=7.4 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	7.3	all	2	- Root composer.json requires php >=7.4 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	7.3	no_dev	2	- Root composer.json requires php >=7.4 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	7.4	all	0	
+sites__wallabag-2.6.14	7.4	no_dev	0	
+sites__wallabag-2.6.14	8.0	all	2	- php-http/guzzle5-adapter 2.0.0 requires php ^7.0 -> your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	8.0	no_dev	2	- php-http/guzzle5-adapter 2.0.0 requires php ^7.0 -> your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	8.1	all	2	- php-http/guzzle5-adapter 2.0.0 requires php ^7.0 -> your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	8.1	no_dev	2	- php-http/guzzle5-adapter 2.0.0 requires php ^7.0 -> your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	8.2	all	2	- laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	8.2	no_dev	2	- laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	8.3	all	2	- laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	8.3	no_dev	2	- laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	8.4	all	2	- laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	8.4	no_dev	2	- laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	8.5	all	2	- laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+sites__wallabag-2.6.14	8.5	no_dev	2	- laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	5.3	all	2	- Root composer.json requires php >=8.3 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	5.3	no_dev	2	- Root composer.json requires php >=8.3 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	5.4	all	2	- Root composer.json requires php >=8.3 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	5.4	no_dev	2	- Root composer.json requires php >=8.3 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	5.5	all	2	- Root composer.json requires php >=8.3 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	5.5	no_dev	2	- Root composer.json requires php >=8.3 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	5.6	all	2	- Root composer.json requires php >=8.3 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	5.6	no_dev	2	- Root composer.json requires php >=8.3 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	7.0	all	2	- Root composer.json requires php >=8.3 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	7.0	no_dev	2	- Root composer.json requires php >=8.3 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	7.1	all	2	- Root composer.json requires php >=8.3 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	7.1	no_dev	2	- Root composer.json requires php >=8.3 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	7.2	all	2	- Root composer.json requires php >=8.3 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	7.2	no_dev	2	- Root composer.json requires php >=8.3 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	7.3	all	2	- Root composer.json requires php >=8.3 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	7.3	no_dev	2	- Root composer.json requires php >=8.3 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	7.4	all	2	- Root composer.json requires php >=8.3 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	7.4	no_dev	2	- Root composer.json requires php >=8.3 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	8.0	all	2	- Root composer.json requires php >=8.3 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	8.0	no_dev	2	- Root composer.json requires php >=8.3 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	8.1	all	2	- Root composer.json requires php >=8.3 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	8.1	no_dev	2	- Root composer.json requires php >=8.3 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	8.2	all	2	- Root composer.json requires php >=8.3 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	8.2	no_dev	2	- Root composer.json requires php >=8.3 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	8.3	all	2	- symfony/console v8.1.6 requires php >=8.4.1 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__bedrock	8.3	no_dev	0	
+skeletons__bedrock	8.4	all	0	
+skeletons__bedrock	8.4	no_dev	0	
+skeletons__bedrock	8.5	all	0	
+skeletons__bedrock	8.5	no_dev	0	
+skeletons__cakephp	5.3	all	2	- Root composer.json requires php >=8.2 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	5.3	no_dev	2	- Root composer.json requires php >=8.2 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	5.4	all	2	- Root composer.json requires php >=8.2 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	5.4	no_dev	2	- Root composer.json requires php >=8.2 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	5.5	all	2	- Root composer.json requires php >=8.2 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	5.5	no_dev	2	- Root composer.json requires php >=8.2 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	5.6	all	2	- Root composer.json requires php >=8.2 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	5.6	no_dev	2	- Root composer.json requires php >=8.2 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	7.0	all	2	- Root composer.json requires php >=8.2 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	7.0	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	7.1	all	2	- Root composer.json requires php >=8.2 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	7.1	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	7.2	all	2	- Root composer.json requires php >=8.2 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	7.2	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	7.3	all	2	- Root composer.json requires php >=8.2 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	7.3	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	7.4	all	2	- Root composer.json requires php >=8.2 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	7.4	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	8.0	all	2	- Root composer.json requires php >=8.2 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	8.0	no_dev	2	- Root composer.json requires php >=8.2 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	8.1	all	2	- Root composer.json requires php >=8.2 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	8.1	no_dev	2	- Root composer.json requires php >=8.2 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	8.2	all	2	- phpunit/php-code-coverage 14.3.3 requires php >=8.4 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	8.2	no_dev	0	
+skeletons__cakephp	8.3	all	2	- phpunit/php-code-coverage 14.3.3 requires php >=8.4 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__cakephp	8.3	no_dev	0	
+skeletons__cakephp	8.4	all	0	
+skeletons__cakephp	8.4	no_dev	0	
+skeletons__cakephp	8.5	all	0	
+skeletons__cakephp	8.5	no_dev	0	
+skeletons__drupal	5.3	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	5.3	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	5.4	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	5.4	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	5.5	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	5.5	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	5.6	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	5.6	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	7.0	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	7.0	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	7.1	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	7.1	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	7.2	all	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	7.2	no_dev	2	- asm89/stack-cors v2.4.0 requires php ^7.3|^8.0 -> your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	7.3	all	2	- doctrine/lexer 3.0.1 requires php ^8.1 -> your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	7.3	no_dev	2	- doctrine/lexer 3.0.1 requires php ^8.1 -> your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	7.4	all	2	- doctrine/lexer 3.0.1 requires php ^8.1 -> your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	7.4	no_dev	2	- doctrine/lexer 3.0.1 requires php ^8.1 -> your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	8.0	all	2	- doctrine/lexer 3.0.1 requires php ^8.1 -> your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	8.0	no_dev	2	- doctrine/lexer 3.0.1 requires php ^8.1 -> your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	8.1	all	2	- drupal/core 11.4.6 requires php >=8.3.0 -> your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	8.1	no_dev	2	- drupal/core 11.4.6 requires php >=8.3.0 -> your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	8.2	all	2	- drupal/core 11.4.6 requires php >=8.3.0 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	8.2	no_dev	2	- drupal/core 11.4.6 requires php >=8.3.0 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__drupal	8.3	all	0	
+skeletons__drupal	8.3	no_dev	0	
+skeletons__drupal	8.4	all	0	
+skeletons__drupal	8.4	no_dev	0	
+skeletons__drupal	8.5	all	0	
+skeletons__drupal	8.5	no_dev	0	
+skeletons__laminas	5.3	all	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	5.3	no_dev	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	5.4	all	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	5.4	no_dev	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	5.5	all	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	5.5	no_dev	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	5.6	all	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	5.6	no_dev	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	7.0	all	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	7.0	no_dev	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	7.1	all	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	7.1	no_dev	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	7.2	all	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	7.2	no_dev	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	7.3	all	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	7.3	no_dev	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	7.4	all	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	7.4	no_dev	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	8.0	all	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	8.0	no_dev	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	8.1	all	2	- laminas/laminas-component-installer 3.8.0 requires php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 -> your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	8.1	no_dev	2	- laminas/laminas-component-installer 3.8.0 requires php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 -> your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	8.2	all	2	- symfony/string v8.1.2 requires php >=8.4.1 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	8.2	no_dev	0	
+skeletons__laminas	8.3	all	2	- symfony/string v8.1.2 requires php >=8.4.1 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	8.3	no_dev	0	
+skeletons__laminas	8.4	all	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	8.4	no_dev	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	8.5	all	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (8.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laminas	8.5	no_dev	2	- Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (8.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	5.3	all	2	- Root composer.json requires php ^8.3 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	5.3	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	5.4	all	2	- Root composer.json requires php ^8.3 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	5.4	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	5.5	all	2	- Root composer.json requires php ^8.3 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	5.5	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	5.6	all	2	- Root composer.json requires php ^8.3 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	5.6	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	7.0	all	2	- Root composer.json requires php ^8.3 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	7.0	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	7.1	all	2	- Root composer.json requires php ^8.3 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	7.1	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	7.2	all	2	- Root composer.json requires php ^8.3 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	7.2	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	7.3	all	2	- Root composer.json requires php ^8.3 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	7.3	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	7.4	all	2	- Root composer.json requires php ^8.3 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	7.4	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	8.0	all	2	- Root composer.json requires php ^8.3 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	8.0	no_dev	2	- Root composer.json requires php ^8.3 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	8.1	all	2	- Root composer.json requires php ^8.3 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	8.1	no_dev	2	- Root composer.json requires php ^8.3 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	8.2	all	2	- Root composer.json requires php ^8.3 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	8.2	no_dev	2	- Root composer.json requires php ^8.3 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	8.3	all	2	- symfony/clock v8.1.0 requires php >=8.4.1 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	8.3	no_dev	2	- symfony/clock v8.1.0 requires php >=8.4.1 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__laravel	8.4	all	0	
+skeletons__laravel	8.4	no_dev	0	
+skeletons__laravel	8.5	all	0	
+skeletons__laravel	8.5	no_dev	0	
+skeletons__shopware	5.3	all	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	5.3	no_dev	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	5.4	all	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	5.4	no_dev	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	5.5	all	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	5.5	no_dev	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	5.6	all	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	5.6	no_dev	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	7.0	all	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	7.0	no_dev	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	7.1	all	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	7.1	no_dev	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	7.2	all	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	7.2	no_dev	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	7.3	all	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	7.3	no_dev	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	7.4	all	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	7.4	no_dev	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	8.0	all	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	8.0	no_dev	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	8.1	all	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	8.1	no_dev	2	- async-aws/core 1.30.0 requires php ^8.2 -> your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	8.2	all	2	- doctrine/instantiator 2.1.0 requires php ^8.4 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	8.2	no_dev	2	- doctrine/instantiator 2.1.0 requires php ^8.4 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	8.3	all	2	- doctrine/instantiator 2.1.0 requires php ^8.4 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	8.3	no_dev	2	- doctrine/instantiator 2.1.0 requires php ^8.4 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__shopware	8.4	all	0	- Installing shopware/conflicts (0.6.2)
+skeletons__shopware	8.4	no_dev	0	- Installing shopware/conflicts (0.6.2)
+skeletons__shopware	8.5	all	0	- Installing shopware/conflicts (0.6.2)
+skeletons__shopware	8.5	no_dev	0	- Installing shopware/conflicts (0.6.2)
+skeletons__sylius	5.3	all	2	- Root composer.json requires php ^8.3 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	5.3	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	5.4	all	2	- Root composer.json requires php ^8.3 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	5.4	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	5.5	all	2	- Root composer.json requires php ^8.3 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	5.5	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	5.6	all	2	- Root composer.json requires php ^8.3 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	5.6	no_dev	2	- Root composer.json requires php ^8.3 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	7.0	all	2	- Root composer.json requires php ^8.3 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	7.0	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	7.1	all	2	- Root composer.json requires php ^8.3 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	7.1	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	7.2	all	2	- Root composer.json requires php ^8.3 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	7.2	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	7.3	all	2	- Root composer.json requires php ^8.3 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	7.3	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	7.4	all	2	- Root composer.json requires php ^8.3 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	7.4	no_dev	2	- Root composer.json requires php ^8.3 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	8.0	all	2	- Root composer.json requires php ^8.3 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	8.0	no_dev	2	- Root composer.json requires php ^8.3 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	8.1	all	2	- Root composer.json requires php ^8.3 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	8.1	no_dev	2	- Root composer.json requires php ^8.3 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	8.2	all	2	- Root composer.json requires php ^8.3 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	8.2	no_dev	2	- Root composer.json requires php ^8.3 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	8.3	all	2	- doctrine/instantiator 2.1.0 requires php ^8.4 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	8.3	no_dev	2	- doctrine/instantiator 2.1.0 requires php ^8.4 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__sylius	8.4	all	0	
+skeletons__sylius	8.4	no_dev	0	
+skeletons__sylius	8.5	all	0	
+skeletons__sylius	8.5	no_dev	0	
+skeletons__symfony-webapp	5.3	all	2	- Root composer.json requires php >=8.4 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	5.3	no_dev	2	- Root composer.json requires php >=8.4 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	5.4	all	2	- Root composer.json requires php >=8.4 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	5.4	no_dev	2	- Root composer.json requires php >=8.4 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	5.5	all	2	- Root composer.json requires php >=8.4 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	5.5	no_dev	2	- Root composer.json requires php >=8.4 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	5.6	all	2	- Root composer.json requires php >=8.4 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	5.6	no_dev	2	- Root composer.json requires php >=8.4 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	7.0	all	2	- Root composer.json requires php >=8.4 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	7.0	no_dev	2	- Root composer.json requires php >=8.4 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	7.1	all	2	- Root composer.json requires php >=8.4 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	7.1	no_dev	2	- Root composer.json requires php >=8.4 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	7.2	all	2	- Root composer.json requires php >=8.4 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	7.2	no_dev	2	- Root composer.json requires php >=8.4 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	7.3	all	2	- Root composer.json requires php >=8.4 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	7.3	no_dev	2	- Root composer.json requires php >=8.4 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	7.4	all	2	- Root composer.json requires php >=8.4 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	7.4	no_dev	2	- Root composer.json requires php >=8.4 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	8.0	all	2	- Root composer.json requires php >=8.4 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	8.0	no_dev	2	- Root composer.json requires php >=8.4 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	8.1	all	2	- Root composer.json requires php >=8.4 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	8.1	no_dev	2	- Root composer.json requires php >=8.4 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	8.2	all	2	- Root composer.json requires php >=8.4 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	8.2	no_dev	2	- Root composer.json requires php >=8.4 but your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	8.3	all	2	- Root composer.json requires php >=8.4 but your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	8.3	no_dev	2	- Root composer.json requires php >=8.4 but your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__symfony-webapp	8.4	all	0	
+skeletons__symfony-webapp	8.4	no_dev	0	
+skeletons__symfony-webapp	8.5	all	0	
+skeletons__symfony-webapp	8.5	no_dev	0	
+skeletons__yii2	5.3	all	2	- Root composer.json requires php >=8.2 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	5.3	no_dev	2	- Root composer.json requires php >=8.2 but your php version (5.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	5.4	all	2	- Root composer.json requires php >=8.2 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	5.4	no_dev	2	- Root composer.json requires php >=8.2 but your php version (5.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	5.5	all	2	- Root composer.json requires php >=8.2 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	5.5	no_dev	2	- Root composer.json requires php >=8.2 but your php version (5.5.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	5.6	all	2	- Root composer.json requires php >=8.2 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	5.6	no_dev	2	- Root composer.json requires php >=8.2 but your php version (5.6.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	7.0	all	2	- Root composer.json requires php >=8.2 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	7.0	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	7.1	all	2	- Root composer.json requires php >=8.2 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	7.1	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	7.2	all	2	- Root composer.json requires php >=8.2 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	7.2	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	7.3	all	2	- Root composer.json requires php >=8.2 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	7.3	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	7.4	all	2	- Root composer.json requires php >=8.2 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	7.4	no_dev	2	- Root composer.json requires php >=8.2 but your php version (7.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	8.0	all	2	- Root composer.json requires php >=8.2 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	8.0	no_dev	2	- Root composer.json requires php >=8.2 but your php version (8.0.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	8.1	all	2	- Root composer.json requires php >=8.2 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	8.1	no_dev	2	- Root composer.json requires php >=8.2 but your php version (8.1.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	8.2	all	2	- symfony/event-dispatcher v8.1.5 requires php >=8.4.1 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	8.2	no_dev	2	- symfony/event-dispatcher v8.1.5 requires php >=8.4.1 -> your php version (8.2.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	8.3	all	2	- symfony/event-dispatcher v8.1.5 requires php >=8.4.1 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	8.3	no_dev	2	- symfony/event-dispatcher v8.1.5 requires php >=8.4.1 -> your php version (8.3.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.
+skeletons__yii2	8.4	all	0	
+skeletons__yii2	8.4	no_dev	0	
+skeletons__yii2	8.5	all	0	
+skeletons__yii2	8.5	no_dev	0	

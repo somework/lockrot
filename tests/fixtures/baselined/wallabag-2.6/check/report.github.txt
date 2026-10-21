@@ -115,4 +115,5 @@
 flags: abandoned 27 · silent 10 · pinned 1 · left-behind 54 · old-promise 18 · stale 12 · vulnerable 20 · 29 packages carry more than one
 depth: 51 of 112 flagged packages are named by no line of composer.json · direct 60 · 1 hop 31 · 2 hops 14 · 3 hops 5 · 4 hops 2 · deepest: hoa/ustring and hoa/zformat, 4 hops (kphoen/rulerz › hoa/ruler › hoa/compiler › hoa/regex › hoa/ustring) · 1 more is named only in require-dev, which this run did not walk (pass --dev)
 security: 20 vulnerable packages · 64 advisories: 1 critical, 17 high, 30 medium, 3 unrated, 13 low
+php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer checks it at 7.4.29 from config.platform.php; php-http/guzzle5-adapter excludes 8.0
 gate: fails · --fail-on=high · 46 findings fail it; 38 reach it and are known to the baseline · target php 8.4 (--target-php)

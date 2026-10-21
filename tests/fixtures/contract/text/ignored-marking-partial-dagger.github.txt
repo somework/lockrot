@@ -1,3 +1,4 @@
 ::notice file=composer.lock,line=12,title=lockrot%3A finished::doctrine/cache 2.1.1: 0 (stale accepted). abandoned marking ignored (policy.abandoned: doctrine/cache): PSR-6 migration is planned for 9.0.
 ::notice title=lockrot::Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/cache. lockrot does not count the marking; an archived repository and the release and push dates still count.
+php: the lock installs on PHP 7.2 to 8.5
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

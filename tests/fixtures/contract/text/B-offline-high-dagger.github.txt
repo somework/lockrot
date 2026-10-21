@@ -3,4 +3,5 @@
 flags: left-behind 1 · old-promise 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
 security: no vulnerable package · advisories not checked
+php: the lock installs on PHP 7.2 to 8.5
 gate: fails · --fail-on=high · 1 finding fails it · advisories not applied to 1 package: not checked (offline) · target php 8.4 (--target-php)

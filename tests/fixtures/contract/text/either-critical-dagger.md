@@ -11,5 +11,6 @@ depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 1 advisory: 1 critical
 libyears: 1.8 behind across the one package · 1.8 from direct requirements · furthest behind symfony/debug v3.4.47 at 1.8
 advisories: 1 package asked · packagist.org answered (1 on record for 1 package)
+php: the lock installs on PHP 7.2 to 8.5
 
 <sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

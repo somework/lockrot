@@ -1,3 +1,4 @@
 ::notice file=composer.lock,line=4,title=lockrot%3A ok::doctrine/annotations 2.0.2: 0. abandoned marking ignored (policy.abandoned: doctrine/*): the annotations reader goes with the ORM 3 upgrade. (via mautic/core-lib)
 ::notice title=lockrot::Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/annotations. lockrot does not count the marking; an archived repository and the release and push dates still count.
+php: the lock installs on PHP 7.2 to 8.5
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

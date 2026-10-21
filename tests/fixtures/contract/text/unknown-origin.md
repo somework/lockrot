@@ -8,6 +8,7 @@
 
 libyears: the one package could not be measured
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+php: the lock installs on PHP 8.2 to 8.5
 
 - note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 

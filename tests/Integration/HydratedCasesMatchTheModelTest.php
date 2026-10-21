@@ -131,6 +131,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'abandoned_ignored', 'from_composer_repository', 'checks_missing[].{blocks,reason}', 'checks_skipped[].{blocks,check,reason}',
             'origin.kind', 'signals[].id', 'unchecked_accepted[].{check,reason}', 'run.signal_ids',
         ],
+        'php_line' => ['run.php_window', 'run.target_php'],
     ];
 
     /**

@@ -11,5 +11,6 @@ depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low
 libyears: 2.0 behind across the one package · 2.0 from direct requirements · furthest behind twig/twig v2.16.1 at 2.0
 advisories: 1 package asked · packagist.org answered (28 on record for 2 packages)
+php: the lock installs on PHP 7.2 to 8.5
 
 <sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

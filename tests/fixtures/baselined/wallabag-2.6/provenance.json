@@ -5063,23 +5063,23 @@
     },
     "server_mask": "http://127.0.0.1:<port> reads http://127.0.0.1",
     "files": {
-        "t0/report.json": "ef8dda10dac6e2768ebe1dc533e1a0e5990df1852a043de5f17eebc1a2b0f6ce",
+        "t0/report.json": "905a5660b5942c6037204defa65a04eb7de03b8337684be949fe879eeb491c25",
         "lockrot-baseline.json": "54fcceafdea65b1da80b5c97a7e66021e77a34b0f9ee9301a58068ef50da8f64",
-        "check/report.json": "3dca940da04f0906b316bab69a1690ba649d34702f72c52471e7da9dcb3a10d7",
-        "check/report.table.txt": "456b4b1f53f83daa67b78e3046eace095dbded8928432c816dfd5f82ee40c258",
-        "check/report.md": "f6f618e977b03ddb79dc57e6b1f04887da5fb3417e9f77fdc2020b947422f304",
-        "check/report.github.txt": "1ec2e352b41b174a68bab052433064fa3d1dd1545256ea0c20d9453150f41559",
+        "check/report.json": "b511783c4db8c8cdfb649d62b89baafe11a748598c60e0b73987496761ee43d7",
+        "check/report.table.txt": "c88dd9a44230de86d9b376e4e4433a201085cac53c43d8fd63ac46463da53b20",
+        "check/report.md": "881d474fab1bcc88dbe59b86e83995e29ba330230cd22e8d38fbde8bd25a352f",
+        "check/report.github.txt": "9c64a9382b90afdd38098d64981042a8505ea7ff53d061412a54a525d398e086",
         "check/report.gitlab.json": "5191ecfb98e173cd8000d17fec5cb7320f1869fa573c74b7789edc1099d14dac",
         "check/report.sarif.json": "6c0ac8ba740160bbdbe08ac1c8cb1a11d1231f1983770893da1ca007ea2f4cfd",
-        "check/report.bundle.json": "e419e346d35374b1809c2f8b8d984155b41b62c0d235f330f7e4da98484d6d77",
+        "check/report.bundle.json": "a9e78e61eca8bc26dc54ea690421eff23b1ffb8397a6d2bfce4a76e98422c5df",
         "check/explain/javibravo--simpleue.json": "c7b92385b85fc1a8314bee90834ebb677446a60a4f08d609c56a50c282ea4d07",
         "check/explain/symfony--http-foundation.json": "d674e48e5b2d84c1bf787455dcd75365f21b8d8342919991527b06c28329e1d1",
         "check/explain/symfony--security-guard.json": "ee8166375f2aec6aa66aef1b0caee0f4d5b2aecf97fb5a7dafcb8c17881b7f15",
         "check/explain/twig--twig.json": "d599d57f06ae7d1c3f88eebc487303d4656f110bc3616e6241bfd9582a48e943",
-        "check/gates-left-behind-vulnerable-high.json": "01128359c18e96b44cd892ebdf11e0ba0c90124e609b33a03a655efa53b3d580",
+        "check/gates-left-behind-vulnerable-high.json": "8a51552687e5246db5a32fae1c18bc0f977d8eb06bab148a0cd0608aba3a2be9",
         "check/gates-left-behind-vulnerable-high.sarif.json": "b398a83f772fc4a67e281390ecace317e4bfa8ffbc0a2ad67776172b29c28a5c",
-        "check/target-8.3.json": "01f568cdadf7d5bd5df19f1719f79c075893cfb7a27d8a5ebeae574c418d0a54",
+        "check/target-8.3.json": "c0d59be4e1e8edb1f80cd7ac66f2b8edded40f89574d6e2dd7ab2f88206cc87f",
         "regenerate/lockrot-baseline.json": "00d00bc39e0015b14cf70867704506139a0aa922c1c57e6c591bc7995db8f450",
-        "regenerate/report.json": "5dc2b0aeca9a27aa908c798ca044fb8e18db7ebce8777d47de70f728792db497"
+        "regenerate/report.json": "9cfc48156624edb34445d05cf55ce9313f3b6a25316b4eec16e50bf726fed813"
     }
 }

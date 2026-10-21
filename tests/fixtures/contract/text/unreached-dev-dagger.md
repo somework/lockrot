@@ -10,5 +10,6 @@ flags: left-behind 1
 depth: 1 of 1 flagged package is named by no line of composer.json · unreached 1 · 0 in packages-dev
 libyears: 3.3 behind across the one package · 0.0 from direct requirements · furthest behind bacon/bacon-qr-code 2.0.8 at 3.3
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+php: the lock installs on PHP 7.2 to 8.5
 
 <sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

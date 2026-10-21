@@ -2,4 +2,5 @@
 ::notice title=lockrot::GitHub token not set: repository activity checked for 0 candidate packages, 1 packages skipped (set GITHUB_TOKEN to check all)
 flags: abandoned 1 · old-promise 1 · 1 package carries more than one
 depth: 1 of 1 flagged package is named by no line of composer.json · 2 hops 1 · deepest: hoa/consistency, 2 hops (lorisleiva/laravel-search-string › hoa/compiler › hoa/consistency)
+php: the lock installs on PHP 8.1 to 8.5
 gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

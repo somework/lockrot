@@ -42,7 +42,7 @@ DOCS_OUT = os.path.join(REPO, 'tests', 'fixtures', 'schema', 'documents')
 PAGE_GOLDENS_OUT = os.path.join(REPO, 'tests', 'fixtures', 'contract', 'page-goldens.json')
 
 # The pull requests of the 0.14 train that change report-2, in merge order.
-TRAIN = ['4b', '4c', '4d', '4e', '4f', '5', '6a', '6b']
+TRAIN = ['4b', '4c', '4d', '4e', '4f', '5', '6a', '6b', '7a']
 
 # Each change a later pull request makes, keyed by that pull request. A fixture of pull request P
 # undoes every change of a pull request after P.
@@ -512,6 +512,11 @@ def inputs_of(case):
     if checks:
         inputs['checks'] = checks
         inputs['move_check'] = run['move_check']
+    # The lock facts that the case's findings do not carry (SPEC §5.9, the model): the ‡ run inputs.
+    if run.get('_php_lock') is not None:
+        inputs['php_lock'] = run['_php_lock']
+    if run.get('_config_platform_php') is not None:
+        inputs['config_platform_php'] = run['_config_platform_php']
     act = f.get('activity') or {}
     if f['origin']['kind'] == 'vcs' and act.get('host') and inputs['root'] is not None:
         # The project's vcs repository serves the package: lockrot names its origin from it.

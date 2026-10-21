@@ -10,5 +10,6 @@ flags: old-promise 1
 depth: every flagged package is named in composer.json · direct 1
 libyears: 5.5 behind across the one package · 5.5 from direct requirements · furthest behind matomo/network 2.0.1 at 5.5
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+php: the lock installs on PHP 7.2 to 8.5
 
 <sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

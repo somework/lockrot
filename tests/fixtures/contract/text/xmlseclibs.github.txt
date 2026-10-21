@@ -5,4 +5,5 @@ flags: pinned 1 · old-promise 1 · vulnerable 2 · 2 packages carry more than o
 depth: 1 of 2 flagged packages is named by no line of composer.json · direct 1 · 4 hops 1 · deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs)
 security: 2 vulnerable packages · 7 advisories: 2 high, 5 medium
 update now: composer update robrichards/xmlseclibs
+php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; mautic/core-lib excludes 8.1
 gate: fails · --fail-on=high · 2 findings fail it · target php 8.4 (--target-php)

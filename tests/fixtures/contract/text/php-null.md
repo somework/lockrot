@@ -11,5 +11,6 @@ depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 ·
 libyears: 2.9 behind across the one package · 0.0 from direct requirements · furthest behind genealabs/laravel-pivot-events 10.0.1 at 2.9
 pulled in by: `genealabs/laravel-model-caching` 1
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+php: the lock installs on PHP 8.1 to 8.5
 
 <sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

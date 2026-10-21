@@ -12,6 +12,7 @@ security: 1 vulnerable package · 1 advisory: 1 low
 libyears: the one package could not be measured
 pulled in by: `guzzlehttp/guzzle` 1
 advisories: 1 package asked · packagist.org answered (1 on record for 1 package)
+php: the lock installs on PHP 7.2 to 8.5
 
 **Update now:** `composer update symfony/polyfill-intl-idn`
 

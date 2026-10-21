@@ -11,5 +11,6 @@ depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 9 advisories: 1 high, 8 medium
 libyears: 4.2 behind across the one package · 4.2 from direct requirements · furthest behind guzzlehttp/guzzle 6.5.8 at 4.2
 advisories: 1 package asked · packagist.org answered (22 on record for 3 packages)
+php: the lock installs on PHP 7.2 to 8.5
 
 <sub>4 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

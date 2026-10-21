@@ -761,6 +761,60 @@
             ]
         },
         "move_check": null,
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.3.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "~8.3.0||~8.4.0||~8.5.0",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.3.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "~8.3.0||~8.4.0||~8.5.0",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": true
+            }
+        },
         "score_rules_used": {
             "counted": 1,
             "lead-first": 1,

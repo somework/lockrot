@@ -1,5 +1,5 @@
 {
- "pr": "6b",
+ "pr": "7a",
  "cases": [
   {
    "id": "A",
@@ -778,7 +778,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)",
@@ -3771,7 +3837,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)",
@@ -5789,7 +5921,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -7225,7 +7423,61 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.3.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "~8.3.0||~8.4.0||~8.5.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.3.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "~8.3.0||~8.4.0||~8.5.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -8583,7 +8835,101 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "symfony/yaml",
+         "version": "v5.4.23",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "symfony/yaml",
+         "version": "v5.4.23",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -10519,7 +10865,89 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        },
+        {
+         "name": "symfony/polyfill-intl-idn",
+         "version": "v1.37.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        },
+        {
+         "name": "symfony/polyfill-intl-idn",
+         "version": "v1.37.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -12147,7 +12575,69 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -13511,7 +14001,61 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.3.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.3",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.3.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.3",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -14718,7 +15262,65 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -16177,7 +16779,89 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        },
+        {
+         "name": "symfony/polyfill-intl-idn",
+         "version": "v1.37.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        },
+        {
+         "name": "symfony/polyfill-intl-idn",
+         "version": "v1.37.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -18736,7 +19420,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -20809,7 +21559,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)",
@@ -22998,7 +23814,119 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.1",
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.1.3",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1.3",
+         "dev": false
+        },
+        {
+         "name": "twig/twig",
+         "version": "v1.43.1",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.1.3",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1.3",
+         "dev": false
+        },
+        {
+         "name": "csa/guzzle-bundle",
+         "version": "dev-compat-php",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.1",
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.1.3",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1.3",
+         "dev": false
+        },
+        {
+         "name": "twig/twig",
+         "version": "v1.43.1",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.1.3",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1.3",
+         "dev": false
+        },
+        {
+         "name": "csa/guzzle-bundle",
+         "version": "dev-compat-php",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)",
@@ -26826,7 +27754,83 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.4",
+       "8.0"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": "mautic/core-lib",
+         "version": "4.3.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4.0 <8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.1",
+       "set_by": [
+        {
+         "name": "mautic/core-lib",
+         "version": "4.3.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4.0 <8.1",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.4",
+       "8.0"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": "mautic/core-lib",
+         "version": "4.3.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4.0 <8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.1",
+       "set_by": [
+        {
+         "name": "mautic/core-lib",
+         "version": "4.3.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4.0 <8.1",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -29168,7 +30172,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": "league/flysystem",
+         "version": "1.1.9",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": "league/flysystem",
+         "version": "1.1.9",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)",
@@ -31258,7 +32328,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -32330,7 +33466,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -33661,7 +34863,87 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.1",
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.1.3",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1.3",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1.3",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.1",
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.1.3",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1.3",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1.3",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -35161,7 +36443,59 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -38592,7 +39926,65 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -39836,7 +41228,85 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -41033,7 +42503,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -42508,7 +44044,69 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -45196,7 +46794,59 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -46667,7 +48317,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -48006,7 +49722,75 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "~8.4.0 || ~8.5.0",
+         "dev": false
+        },
+        {
+         "name": "scheb/2fa-google-authenticator",
+         "version": "v8.6.1",
+         "link": "require",
+         "target": "php",
+         "constraint": "~8.4.0 || ~8.5.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "~8.4.0 || ~8.5.0",
+         "dev": false
+        },
+        {
+         "name": "scheb/2fa-google-authenticator",
+         "version": "v8.6.1",
+         "link": "require",
+         "target": "php",
+         "constraint": "~8.4.0 || ~8.5.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -49266,7 +51050,101 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        },
+        {
+         "name": "pagerfanta/core",
+         "version": "v3.8.0",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.4 || ^8.0",
+         "dev": false
+        },
+        {
+         "name": "pagerfanta/twig",
+         "version": "v3.8.0",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.4 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        },
+        {
+         "name": "pagerfanta/core",
+         "version": "v3.8.0",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.4 || ^8.0",
+         "dev": false
+        },
+        {
+         "name": "pagerfanta/twig",
+         "version": "v3.8.0",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.4 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -50725,7 +52603,81 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": "php-http/guzzle5-adapter",
+         "version": "2.0.0",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.0",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": "php-http/guzzle5-adapter",
+         "version": "2.0.0",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.0",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)",
@@ -54613,7 +56565,97 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "web-token/jwt-key-mgmt",
+         "version": "3.4.3",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "web-token/jwt-library",
+         "version": "3.4.3",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "web-token/jwt-key-mgmt",
+         "version": "3.4.3",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "web-token/jwt-library",
+         "version": "3.4.3",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -56620,7 +58662,69 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -58097,7 +60201,83 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.4",
+       "8.0"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": "mautic/core-lib",
+         "version": "4.3.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4.0 <8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.1",
+       "set_by": [
+        {
+         "name": "mautic/core-lib",
+         "version": "4.3.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4.0 <8.1",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.4",
+       "8.0"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": "mautic/core-lib",
+         "version": "4.3.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4.0 <8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.1",
+       "set_by": [
+        {
+         "name": "mautic/core-lib",
+         "version": "4.3.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4.0 <8.1",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)",
@@ -60549,7 +62729,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": "guzzlehttp/guzzle",
+         "version": "7.15.1",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": "guzzlehttp/guzzle",
+         "version": "7.15.1",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -61819,7 +64065,65 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -63428,7 +65732,63 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.2|^8.3|^8.4|^8.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.2|^8.3|^8.4|^8.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -64695,7 +67055,103 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.1",
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.1.3",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1.3",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1.3",
+         "dev": false
+        },
+        {
+         "name": "csa/guzzle-bundle",
+         "version": "dev-compat-php",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.1",
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.1.3",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1.3",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1.3",
+         "dev": false
+        },
+        {
+         "name": "csa/guzzle-bundle",
+         "version": "dev-compat-php",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)",
@@ -69536,7 +71992,101 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "joomla/filter",
+         "version": "2.0.5",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5|~8.0.0|~8.1.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "joomla/filter",
+         "version": "2.0.5",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5|~8.0.0|~8.1.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "advisories[].fix.version and next_step versions are read from advisory ranges (the reports carry only each branch newest tag)"
@@ -71143,7 +73693,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "S9 affected_versions set to \">=2.0.0,<2.8.52\" (‡)",
@@ -73309,7 +75925,89 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        },
+        {
+         "name": "symfony/polyfill-intl-idn",
+         "version": "v1.37.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        },
+        {
+         "name": "symfony/polyfill-intl-idn",
+         "version": "v1.37.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "S9 affected_versions \">=1.0.0,>=1.10.0,>=1.17.1,<1.40.0,<1.38.1\", the same versions as \">=1.17.1,<1.38.1\" (‡)"
@@ -74756,7 +77454,89 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        },
+        {
+         "name": "symfony/polyfill-intl-idn",
+         "version": "v1.37.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        },
+        {
+         "name": "symfony/polyfill-intl-idn",
+         "version": "v1.37.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "S9 affected_versions null (‡)"
@@ -76119,7 +78899,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.0.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "target php 8.0; 3.x admits_target_php false (‡)"
@@ -78356,7 +81202,75 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.1",
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.1.3",
+       "set_by": [
+        {
+         "name": "twig/twig",
+         "version": "v2.16.1",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.1.3",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.1",
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.1.3",
+       "set_by": [
+        {
+         "name": "twig/twig",
+         "version": "v2.16.1",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.1.3",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "require.php \"*\"; every branch admits the project (‡)",
@@ -81340,7 +84254,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "baseline-2 entry (‡)"
@@ -83771,7 +86751,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "baseline-2 entry {flags: {abandoned}} written 2026-06-01 (‡)"
@@ -85236,7 +88282,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "baseline-2 entry {flags: {left-behind}} written 2026-06-01, before its advisory (‡)",
@@ -87319,7 +90431,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "no repository token on GitHub: S3 and S4 removed, checks_skipped activity no_token (‡)"
@@ -88737,7 +91915,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "S5 removed; the advisory medium with affected_versions \">=2.0.0\" (‡)"
@@ -90560,7 +93804,101 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "symfony/yaml",
+         "version": "v5.4.23",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "symfony/yaml",
+         "version": "v5.4.23",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "S9 ignored[] gains one entry (‡)"
@@ -92520,7 +95858,85 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "an S9 with one ignored advisory (‡)"
@@ -93521,7 +96937,101 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "symfony/yaml",
+         "version": "v5.4.23",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "symfony/yaml",
+         "version": "v5.4.23",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "extra.lockrot.ignore[] {package: symfony/*} (‡)"
@@ -95485,7 +98995,65 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "no repository token on GitHub: S3 and S4 removed, checks_skipped repository_activity no_token (‡)"
@@ -96931,7 +100499,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "--offline: S3 and S4 removed, checks_skipped repository_activity offline; S10 advisories offline, security not_run (‡)"
@@ -98379,7 +102013,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "dev: true (‡)",
@@ -100409,7 +104109,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "dev: true (‡)"
@@ -102726,7 +106492,85 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "metadata unavailable (fetch_failed); an S9 with one advisory, releases not read, and S10 releases (‡)"
@@ -103952,7 +107796,101 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "joomla/filter",
+         "version": "2.0.5",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5|~8.0.0|~8.1.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "joomla/filter",
+         "version": "2.0.5",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5|~8.0.0|~8.1.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "config.policy.advisories false (‡)"
@@ -105576,7 +109514,85 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "--offline: S10 advisories (‡)"
@@ -106603,7 +110619,85 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "--offline: S9 removed, S10 advisories offline (‡)"
@@ -107681,7 +111775,61 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.3.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "~8.3.0||~8.4.0||~8.5.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.3.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "~8.3.0||~8.4.0||~8.5.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "extra.lockrot.ignore[] {package: tubalmartin/cssmin, flags: [stale]} (‡)"
@@ -109031,7 +113179,101 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "symfony/yaml",
+         "version": "v5.4.23",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "symfony/yaml",
+         "version": "v5.4.23",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "S9: the first advisory medium, the second unrated with no fixing release (‡)"
@@ -110930,7 +115172,69 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "1.x php \">=5.5\", admits the target; the snapshot dated 2018-06-01 (‡)"
@@ -112327,7 +116631,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "--offline: S9 removed, S10 advisories offline (‡)"
@@ -113968,7 +118338,117 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "joomla/filter",
+         "version": "2.0.5",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5|~8.0.0|~8.1.0",
+         "dev": false
+        },
+        {
+         "name": "joomla/string",
+         "version": "2.0.1",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5|~8.0.0|~8.1.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "joomla/filter",
+         "version": "2.0.5",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5|~8.0.0|~8.1.0",
+         "dev": false
+        },
+        {
+         "name": "joomla/string",
+         "version": "2.0.1",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5|~8.0.0|~8.1.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "next_step.held_by: joomla/filter 2.0.5 requires joomla/string ^2.0 (‡)",
@@ -115602,6 +120082,64 @@
      "ignores_extensions": true,
      "baseline": "resolves",
      "reason": null
+    },
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
     }
    },
    "synthetic_inputs": [
@@ -117128,7 +121666,85 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "dev: true (‡)"
@@ -118581,7 +123197,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "S6: no stable release listed; metadata.branches empty, so no row has a tag (‡)"
@@ -119696,7 +124378,65 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "extra.lockrot.ignore[] {package: akaunting/laravel-version, flags: [stale]} (‡)"
@@ -120835,7 +125575,145 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/http-foundation",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/mailer",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/mime",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/process",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/routing",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/http-foundation",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/mailer",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/mime",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/process",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/routing",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "next_step.held_by[], also[].held_by[] and the S9 rows' fix.held_by: the lock links of the corpus commit (LINKS)"
@@ -124765,7 +129643,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "S9: a high advisory affecting <3.0.0 and a medium one affecting <2.13.0 (‡)"
@@ -127056,7 +132000,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "extra.lockrot.ignore[] {package: symfony/monolog-bridge, flags: [left-behind, old-promise]} (‡)",
@@ -129037,7 +134047,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "not from a Composer repository: S2, S3, S4, S8 removed; ignore[] lists old-promise (‡)"
@@ -130336,7 +135412,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "the run used --dev (‡)"
@@ -131690,7 +136832,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": "symfony/event-dispatcher",
+         "version": "5.4.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": "symfony/event-dispatcher",
+         "version": "5.4.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [],
    "finding": {
@@ -133188,7 +138396,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": "symfony/event-dispatcher",
+         "version": "4.4.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": "symfony/event-dispatcher",
+         "version": "4.4.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "installed version 4.4.x-dev instead of 5.4.x-dev (‡)"
@@ -134697,7 +139971,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": "symfony/event-dispatcher",
+         "version": "4.4.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": "symfony/event-dispatcher",
+         "version": "4.4.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "installed version 4.4.x-dev; the 4.x row has no release date (‡)"
@@ -136204,7 +141544,117 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "web-auth/metadata-service",
+         "version": "v2.1.7",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1",
+         "dev": false
+        },
+        {
+         "name": "web-auth/webauthn-lib",
+         "version": "v2.1.7",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        },
+        {
+         "name": "web-auth/metadata-service",
+         "version": "v2.1.7",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.1",
+         "dev": false
+        },
+        {
+         "name": "web-auth/webauthn-lib",
+         "version": "v2.1.7",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [],
    "finding": {
@@ -137732,7 +143182,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "S9 with one critical advisory, affected \">=3.0.0,<4.4.0\" (‡)",
@@ -139514,7 +145030,65 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "dev: true; S9 with one low advisory affecting every version (‡)"
@@ -140925,7 +146499,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "S3 and S4 host bitbucket.org (‡)"
@@ -142361,7 +148001,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "S3 and S4 host gitlab.example.com/gitlab (‡)"
@@ -143802,7 +149508,63 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.2.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.2.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [],
    "finding": {
@@ -144829,7 +150591,65 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "the host answered 404 for hoaproject/Consistency: S3 and S4 removed (‡)"
@@ -146270,7 +152090,65 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "S3 removed, S4 on gitlab.com; the answer carries no archived flag (‡)"
@@ -147728,7 +153606,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": "doctrine/annotations",
+         "version": "2.0.2",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": "doctrine/annotations",
+         "version": "2.0.2",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "config.policy.abandoned.ignore {\"doctrine/*\": \"...\"} (‡)"
@@ -148868,7 +154812,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "config.policy.abandoned.ignore {\"doctrine/cache\": \"...\"} (‡)"
@@ -150183,7 +156193,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "config.audit.ignore-abandoned {\"symfony/debug\": {constraint: ^3.4, ...}} (‡)"
@@ -151635,7 +157711,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "ignore list as ignored-marking-archived‡; S3, S4 removed, S10 rate_limit (‡)"
@@ -153143,7 +159285,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "config.policy.abandoned.ignore and extra.lockrot.ignore[] {flags: [abandoned]} (‡)"
@@ -154403,7 +160611,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "config.policy.abandoned.audit: ignore (‡)"
@@ -155851,7 +162125,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "an unparsable constraint in config.policy.abandoned.ignore (‡)"
@@ -157307,7 +163647,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "the run lists packages.drupal.org before packagist.org; the Drupal feed holds no record for twig/twig (‡)"
@@ -159619,7 +166025,57 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.5.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.5.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.5.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.5.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "extra.lockrot.advisory-lookup: composer-repositories (‡)"
@@ -160665,7 +167121,85 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "the run lists one repository, a mirror with no security-advisories feed (‡)"
@@ -161687,7 +168221,85 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "VersionParser::normalize throws on the installed version (‡)"
@@ -162684,7 +169296,99 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.4",
+       "8.0"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": "mautic/core-lib",
+         "version": "4.3.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4.0 <8.1",
+         "dev": false
+        },
+        {
+         "name": "oneup/uploader-bundle",
+         "version": "3.2.0",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.4 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.1",
+       "set_by": [
+        {
+         "name": "mautic/core-lib",
+         "version": "4.3.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4.0 <8.1",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.4",
+       "8.0"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": "mautic/core-lib",
+         "version": "4.3.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4.0 <8.1",
+         "dev": false
+        },
+        {
+         "name": "oneup/uploader-bundle",
+         "version": "3.2.0",
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.4 || ^8.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.1",
+       "set_by": [
+        {
+         "name": "mautic/core-lib",
+         "version": "4.3.x-dev",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4.0 <8.1",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [],
    "finding": {
@@ -174712,7 +181416,63 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.2",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.2",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [],
    "finding": {
@@ -175831,7 +182591,63 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.2.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.2.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "extra.lockrot.accept-unchecked [{check: repository_activity, host: codeberg.org, expires: 2027-03-31}] (‡)"
@@ -176837,7 +183653,63 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.2.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.2.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "extra.lockrot.accept-unchecked [{check: repository_activity, host: codeberg.org, expires: 2026-06-30}] (‡)"
@@ -177866,7 +184738,85 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "the run lists one repository, a mirror with no security-advisories feed; extra.lockrot.accept-unchecked names it (‡)"
@@ -178875,7 +185825,85 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": {
+       "excludes": "8.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": false
+     }
+    }
    },
    "synthetic_inputs": [
     "extra.lockrot.accept-unchecked [{check: release_metadata, package: tobscure/*}, {check: repository_activity, repository: https://github.com/joomla-backports/json-api-php.git}] (‡)"
@@ -180026,7 +187054,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "--offline: S9 removed, S10 advisories offline (‡)"
@@ -181657,7 +188751,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "extra.lockrot.fail-on: high; config.platform.php 8.4 (‡)",
@@ -183669,7 +190829,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "no --fail-on, LOCKROT_FAIL_ON or extra.lockrot.fail-on (‡)",
@@ -185671,7 +192897,69 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "composer.json require-dev names symfony/var-dumper (‡: the watch report carries no composer.json)"
@@ -188350,7 +195638,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "no composer.json: every package unreached (‡)"
@@ -189766,7 +197120,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "next_step.held_by[].constraint and the S9 rows' fix.held_by on the same branch (the reports carry no lock links)"
@@ -191783,7 +199203,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "next_step.held_by[].constraint and the S9 rows' fix.held_by on the same branch (the reports carry no lock links)"
@@ -194792,7 +202278,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "next_step.held_by[].constraint and the S9 rows' fix.held_by on the same branch (the reports carry no lock links)"
@@ -196809,7 +204361,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.5",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.2.5",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "next_step.held_by[].constraint and the S9 rows' fix.held_by on the same branch (the reports carry no lock links)"
@@ -198810,7 +206428,73 @@
       }
      ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.2.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^7.2 || ^8.0.0",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     }
+    }
    },
    "synthetic_inputs": [
     "next_step.held_by[].constraint and the S9 rows' fix.held_by on the same branch (the reports carry no lock links)"

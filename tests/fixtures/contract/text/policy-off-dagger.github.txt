@@ -2,4 +2,5 @@
 flags: vulnerable 1
 depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 1 advisory: 1 medium
+php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php excludes 8.0
 gate: passes · --fail-on=high,unchecked · no finding fails it · target php 8.4 (--target-php)

@@ -761,6 +761,74 @@
             ]
         },
         "move_check": null,
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "7.1",
+                    "7.2",
+                    "7.3",
+                    "7.4",
+                    "8.0",
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "7.1.3",
+                    "set_by": [
+                        {
+                            "name": "twig/twig",
+                            "version": "v2.16.1",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.1.3",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "7.1",
+                    "7.2",
+                    "7.3",
+                    "7.4",
+                    "8.0",
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "7.1.3",
+                    "set_by": [
+                        {
+                            "name": "twig/twig",
+                            "version": "v2.16.1",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.1.3",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": true
+            }
+        },
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,

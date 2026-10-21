@@ -465,6 +465,7 @@ pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepu
 scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 22 more
 advisories: 200 packages asked · packagist.org answered (184 on record for 50 packages)
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
+php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
 gate: off · --fail-on=none (default) · target php 8.4 (--target-php)
 Data as of 2026-10-18 (package repositories; repository activity from lockrot's cache, up to 21 h old) · score model 1.
 Run composer lockrot --format=json for details.
@@ -501,6 +502,8 @@ Run composer lockrot --format=json for details.
     - `pulled in by:`, the S7 totals per direct requirement;
     - `advisories:`, what the advisory lookup asked and what each repository answered;
     - `moves:`, which Composer's solver checked the moves ([the move check](verdicts.md#the-move-check));
+    - `php:`, the PHP minors on which the lock installs, and the packages that exclude the next minor
+      ([the PHP window](verdicts.md#the-php-window));
     - `gate:`, the [gate line](ci.md#reading-the-gate-line);
     - with a baseline, its summary line ([baseline.md](baseline.md)).
 
@@ -859,6 +862,148 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             "ignores_extensions": true,
             "baseline": "resolves",
             "reason": null
+        },
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "8.2",
+                    "8.3",
+                    "8.4"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.2.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.2",
+                            "dev": false
+                        },
+                        {
+                            "name": "laminas/laminas-code",
+                            "version": "4.17.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                            "dev": false
+                        },
+                        {
+                            "name": "lcobucci/clock",
+                            "version": "3.3.1",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "~8.2.0 || ~8.3.0 || ~8.4.0",
+                            "dev": false
+                        },
+                        {
+                            "name": "symfony/stopwatch",
+                            "version": "v7.4.8",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.2",
+                            "dev": false
+                        },
+                        {
+                            "name": "symfony/var-exporter",
+                            "version": "v7.4.9",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.2",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": {
+                    "excludes": "8.5",
+                    "set_by": [
+                        {
+                            "name": "lcobucci/clock",
+                            "version": "3.3.1",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "~8.2.0 || ~8.3.0 || ~8.4.0",
+                            "dev": false
+                        }
+                    ]
+                },
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "8.2",
+                    "8.3",
+                    "8.4"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.2.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.2",
+                            "dev": false
+                        },
+                        {
+                            "name": "laminas/laminas-code",
+                            "version": "4.17.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                            "dev": false
+                        },
+                        {
+                            "name": "lcobucci/clock",
+                            "version": "3.3.1",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "~8.2.0 || ~8.3.0 || ~8.4.0",
+                            "dev": false
+                        },
+                        {
+                            "name": "symfony/stopwatch",
+                            "version": "v7.4.8",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.2",
+                            "dev": false
+                        },
+                        {
+                            "name": "symfony/var-exporter",
+                            "version": "v7.4.9",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.2",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": {
+                    "excludes": "8.5",
+                    "set_by": [
+                        {
+                            "name": "lcobucci/clock",
+                            "version": "3.3.1",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "~8.2.0 || ~8.3.0 || ~8.4.0",
+                            "dev": false
+                        }
+                    ]
+                },
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": true
+            }
         },
         "score_rules_used": {
             "counted": 10,
@@ -1763,6 +1908,7 @@ libyears: 0.0 behind across all 20 packages · 0.0 from direct requirements ·
 furthest behind psr/container 2.0.2 at 0.0
 advisories: 20 packages asked · packagist.org answered (25 on record for 3 packages)
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
+php: without require-dev the lock installs on PHP 8.2 to 8.5, and with require-dev on PHP 8.4 to 8.5
 gate: off · --fail-on=none (default) · target php 8.4 (--target-php)
 Data as of 2026-10-18 (package repositories; repository activity from lockrot's cache, up to 23 h old) · score model 1.
 Run composer lockrot --format=json for details.

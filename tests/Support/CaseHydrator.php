@@ -13,6 +13,7 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Clock;
@@ -41,6 +42,7 @@ use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
+use Lockrot\Json\JsonReader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Rule\NotCheckedRule;
@@ -186,8 +188,8 @@ final class CaseHydrator
         foreach ($ids === [] ? self::COMPOSITE : $ids as $id) {
             $inputs = JsonPath::arrayAt(self::case($id), ['inputs']);
             $packages = self::packages($inputs);
-            $data = self::lockData(self::entries($inputs, $packages), $packages);
-            foreach ($data as $section => $packages) {
+            $data = self::lockData(self::entries($inputs, $packages), $packages, $inputs);
+            foreach (['packages' => $data['packages'], 'packages-dev' => $data['packages-dev'] ?? []] as $section => $packages) {
                 foreach ($packages as $package) {
                     $name = JsonPath::stringAt($package, ['name']);
                     if (!isset($seen[$name])) {
@@ -254,8 +256,12 @@ final class CaseHydrator
         }
         $coverage = new AdvisoryCoverage('all', 'default', $repositories, 0, []);
         $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null);
+        // The window reads the lock that the cases make together, as lockJson() writes it.
+        $lock = json_decode(self::lockJson($ids), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertArray($lock);
+        $window = PhpWindow::of(LockFile::fromArray(JsonReader::stringKeyed($lock)), ProjectConfig::fromArray([]), '8.4', PhpReleaseDates::load()->minors(new Clock($generatedAt)));
 
-        return (new Report(array_values($findings), [], $generatedAt, \count($findings), 0, null, $oldest, false, $coverage))->withRun($run);
+        return (new Report(array_values($findings), [], $generatedAt, \count($findings), 0, null, $oldest, false, $coverage))->withRun($run)->withPhpWindow($window);
     }
 
     /**
@@ -312,7 +318,7 @@ final class CaseHydrator
         $packages = self::packages($inputs);
         $package = (string) array_key_first($packages);
         $activity = $packages[$package]['activity'];
-        $lock = LockFile::fromArray(self::lockData(self::entries($inputs, $packages), $packages));
+        $lock = LockFile::fromArray(self::lockData(self::entries($inputs, $packages), $packages, $inputs));
         $root = self::root($inputs, $packages);
         $project = $root === null ? ProjectConfig::empty() : ProjectConfig::fromArray($root);
         $clock = self::clock($case);
@@ -521,6 +527,13 @@ final class CaseHydrator
                 $root[$section] = $require + [$head => '*'];
             }
         }
+        $phpLock = \is_array($inputs['php_lock'] ?? null) ? $inputs['php_lock'] : [];
+        foreach (\is_array($phpLock['root'] ?? null) ? $phpLock['root'] : [] as $section => $links) {
+            $root[(string) $section] = (\is_array($links) ? $links : []) + (\is_array($root[$section] ?? null) ? $root[$section] : []);
+        }
+        if (\is_string($inputs['config_platform_php'] ?? null)) {
+            $root['config'] = ['platform' => ['php' => $inputs['config_platform_php']]];
+        }
 
         return $root;
     }
@@ -529,9 +542,11 @@ final class CaseHydrator
      * @param array<string, array<mixed, mixed>>                                                          $entries  by name
      * @param array<string, array{abandoned: array<mixed, mixed>|null, activity: array<mixed, mixed>|null}> $packages S1's marking (`by` the repository or the lock, and the replacement) and the repository of each package that has facts
      *
-     * @return array{packages: list<array<string, mixed>>, packages-dev: list<array<string, mixed>>}
+     * @param array<mixed, mixed>                                                                         $inputs   the case's `inputs` block: `php_lock` adds the lock facts of `_php_lock`
+     *
+     * @return array{packages: list<array<mixed, mixed>>, packages-dev?: list<array<mixed, mixed>>, platform: array<mixed, mixed>, platform-dev: array<mixed, mixed>, platform-overrides: array<mixed, mixed>}
      */
-    private static function lockData(array $entries, array $packages): array
+    private static function lockData(array $entries, array $packages, array $inputs): array
     {
         $out = [];
         $dev = [];
@@ -542,7 +557,7 @@ final class CaseHydrator
             if (\is_string($entry['php'] ?? null)) {
                 $require = ['php' => $entry['php']] + $require;
             }
-            $locked = ['name' => $entry['name'], 'version' => $entry['version'], 'require' => $require] + array_intersect_key($entry, ['conflict' => true]);
+            $locked = ['name' => $entry['name'], 'version' => $entry['version'], 'require' => $require] + array_intersect_key($entry, ['conflict' => true, 'provide' => true, 'replace' => true]);
             $marking = $packages[$name]['abandoned'] ?? null;
             if ($marking !== null && ($marking['by'] ?? null) === 'lock') {
                 $locked['abandoned'] = $marking['replacement'] ?? true;
@@ -567,7 +582,36 @@ final class CaseHydrator
             }
         }
 
-        return ['packages' => $out, 'packages-dev' => $dev];
+        $phpLock = \is_array($inputs['php_lock'] ?? null) ? $inputs['php_lock'] : [];
+        $lock = ['packages' => self::byName($out, $phpLock['packages'] ?? null), 'packages-dev' => self::byName($dev, $phpLock['packages-dev'] ?? null)];
+        if (($phpLock['has_dev_key'] ?? true) === false) {
+            unset($lock['packages-dev']);
+        }
+        $run = \is_array($inputs['run'] ?? null) ? $inputs['run'] : [];
+        // A run with no composer.json reads the root's php from the lock's `platform`, as Composer wrote it.
+        $platform = !\is_array($inputs['root'] ?? null) && \is_string($run['project_php'] ?? null) ? ['php' => $run['project_php']] : [];
+        foreach (['platform' => $platform, 'platform-dev' => [], 'platform-overrides' => []] as $key => $own) {
+            $extra = \is_array($phpLock[$key] ?? null) ? $phpLock[$key] : [];
+            $lock[$key] = $extra + $own;
+        }
+
+        return $lock;
+    }
+
+    /**
+     * The entries of one lock section, each `_php_lock` entry in place of the entry of its name.
+     *
+     * @param list<array<mixed, mixed>> $entries
+     * @param mixed                     $extra
+     *
+     * @return list<array<mixed, mixed>>
+     */
+    private static function byName(array $entries, $extra): array
+    {
+        $extra = \is_array($extra) ? array_values(array_filter($extra, 'is_array')) : [];
+        $names = array_column($extra, 'name');
+
+        return array_merge(array_values(array_filter($entries, static fn (array $entry): bool => !\in_array($entry['name'] ?? null, $names, true))), $extra);
     }
 
     /**

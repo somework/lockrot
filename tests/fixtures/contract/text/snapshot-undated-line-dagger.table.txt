@@ -13,6 +13,7 @@ deepest: symfony/event-dispatcher, 1 hop (mautic/core-lib › symfony/event-disp
 libyears: the one package could not be measured
 pulled in by: mautic/core-lib 1
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+php: the lock installs on PHP 7.2 to 8.5
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

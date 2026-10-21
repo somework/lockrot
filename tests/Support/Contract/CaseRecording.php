@@ -82,7 +82,8 @@ final class CaseRecording
         // A whole report checks the packages it holds. A case finding alone keeps the count of its lock.
         $checked = isset($case['parents']) ? \count($findings) : $full->packagesChecked();
         $report = (new Report($findings, $full->runNotes(), $full->generatedAt(), $checked, $full->notFromComposerRepository(), null, $full->activityCacheOldestAt(), $full->includesDev(), $coverage))
-            ->withRun(self::run(JsonPath::arrayAt($case, ['run'])));
+            ->withRun(self::run(JsonPath::arrayAt($case, ['run'])))
+            ->withPhpWindow($full->phpWindow());
         $checks = CaseHydrator::moveChecksOf(JsonPath::arrayAt($case, ['inputs']));
         $moveCheck = $full->moveCheck();
         if ($checks !== null && $moveCheck !== null) {

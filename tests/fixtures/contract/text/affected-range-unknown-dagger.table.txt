@@ -18,6 +18,7 @@ fix, by package: fix unknown 1
 libyears: the one package could not be measured
 pulled in by: guzzlehttp/guzzle 1
 advisories: 1 package asked · packagist.org answered (1 on record for 1 package)
+php: the lock installs on PHP 7.2 to 8.5
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

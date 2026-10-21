@@ -10,5 +10,6 @@ flags: abandoned 1
 depth: every flagged package is named in composer.json · direct 1
 libyears: the one package could not be measured
 advisories: 1 package asked · packagist.org answered (7 on record for 2 packages)
+php: the lock installs on PHP 8.1 to 8.5
 
 <sub>7 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

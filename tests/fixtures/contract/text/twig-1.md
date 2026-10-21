@@ -11,6 +11,7 @@ depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 16 advisories: 1 critical, 3 high, 5 medium, 2 unrated, 5 low
 libyears: 6.1 behind across the one package · 6.1 from direct requirements · furthest behind twig/twig v1.43.1 at 6.1
 advisories: 1 package asked · packagist.org answered (130 on record for 2 packages)
+php: the lock installs on PHP 7.1 to 7.4, so your target, 8.4, is excluded; require.php and `csa/guzzle-bundle` exclude 8.0
 
 - note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 
