@@ -20,6 +20,7 @@ security: no vulnerable package · advisories not checked
 libyears: at least 47.5 behind across all 94 packages · 13.3 from direct requirements · furthest behind punic/punic 3.8.1 at 3.5
 pulled in by: `pear/archive_tar` 2 · `pear/pear-core-minimal` 2 · `cweagans/composer-patches` 1 · `microsoft/azure-storage-blob` 1
 advisories: 0 packages asked, 94 not asked
+php: the lock installs on PHP 8.3 to 8.5; Composer checks it at 8.3.0 from config.platform.php
 
 - note: Repository activity not checked for 3 packages on hosts lockrot cannot ask: codeberg.org (3). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.
 

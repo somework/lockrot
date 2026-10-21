@@ -11,6 +11,7 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,8 +20,11 @@ use PHPUnit\Framework\TestCase;
  * mutant is killed by the tests that state the rules, not by this oracle.
  *
  * @coversNothing
+ *
+ * @group covers-nothing
  */
 #[CoversNothing]
+#[Group('covers-nothing')]
 final class PhpWindowComposerOracleTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';

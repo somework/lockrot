@@ -20,6 +20,7 @@ security: 5 vulnerable packages · 29 advisories: 1 critical, 5 high, 12 medium,
 libyears: 22.1 behind across 7 of 9 packages · 22.1 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: `friendsofsymfony/oauth-server-bundle` 1 · `guzzlehttp/guzzle` 1
 advisories: 9 packages asked · packagist.org answered (49 on record for 6 packages)
+php: the lock installs on PHP 7.2 to 8.5
 
 **Update now:** `composer update symfony/yaml symfony/polyfill-intl-idn`
 

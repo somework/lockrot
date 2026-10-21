@@ -49,4 +49,5 @@ flags: abandoned 7 · silent 1 · pinned 4 · left-behind 14 · old-promise 12 �
 depth: 16 of 41 flagged packages are named by no line of composer.json · direct 24 · 1 hop 11 · 2 hops 2 · 4 hops 1 · unreached 3 · deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs) · 1 more is named only in require-dev, which this run did not walk (pass --dev)
 security: 16 vulnerable packages · 58 advisories: 1 critical, 12 high, 29 medium, 3 unrated, 13 low
 update now: composer update robrichards/xmlseclibs league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn
+php: the lock installs on no PHP, so your target, 8.4, is excluded
 gate: fails · --fail-on=high,unchecked · 25 findings fail it (high 24, unchecked 3); 2 reach it and are known to the baseline · target php 8.4 (--target-php)

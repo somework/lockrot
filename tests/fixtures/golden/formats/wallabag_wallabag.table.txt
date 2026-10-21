@@ -341,6 +341,7 @@ furthest behind smalot/pdfparser v1.1.0 at 4.7
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
 scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 20 more
 advisories: 0 packages asked, 200 not asked
+php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
 <fg=red>gate: fails · --fail-on=high · 38 findings fail it ·</fg=red>
 <fg=red>advisories not applied to 200 packages: not checked (Composer below 2.4) · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
