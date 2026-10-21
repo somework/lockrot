@@ -298,13 +298,16 @@ final class PhpWindowTest extends TestCase
 
     public function testATargetPointPastTheNewestPatchIsTheLowerEdgeOfItsMinor(): void
     {
-        $window = self::window(['packages' => [self::package('acme/a', ['php' => '>=8.4.100'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.4.100']]]);
+        $window = self::window(
+            ['packages' => [self::package('acme/a', ['php' => '>=8.4.100']), self::package('acme/b', ['php' => '>=8.4.50'])], 'packages-dev' => []],
+            ['config' => ['platform' => ['php' => '8.4.100']]]
+        );
         $set = $window['without_dev'];
 
         self::assertSame(['8.4', '8.5'], $set['minors']);
         self::assertNotNull($set['lower_edge']);
         self::assertSame('8.4.100', $set['lower_edge']['php']);
-        self::assertSame(['acme/a'], array_column($set['lower_edge']['set_by'], 'name'), 'read at 8.4.99');
+        self::assertSame(['acme/a'], array_column($set['lower_edge']['set_by'], 'name'), 'read at 8.4.99, where acme/b admits');
     }
 
     public function testTheLockOverrideIsReportedAndDoesNotMoveTheWindow(): void

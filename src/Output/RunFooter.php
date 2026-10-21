@@ -272,13 +272,13 @@ final class RunFooter
         foreach ($minors as $minor) {
             $index = $known[$minor];
             if ($previous !== null && $index === $previous + 1) {
-                $runs[\count($runs) - 1][1] = $minor;
+                $runs[\count($runs) - 1][] = $minor;
             } else {
-                $runs[] = [$minor, $minor];
+                $runs[] = [$minor];
             }
             $previous = $index;
         }
-        $parts = array_map(static fn (array $run): string => implode(' to ', array_unique($run)), $runs);
+        $parts = array_map(static fn (array $run): string => \count($run) === 1 ? $run[0] : $run[0].' to '.$run[\count($run) - 1], $runs);
         $last = array_pop($parts);
 
         return 'on PHP '.($parts === [] ? $last : implode(', ', $parts).' and '.$last);
