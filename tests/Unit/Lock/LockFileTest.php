@@ -240,6 +240,53 @@ final class LockFileTest extends TestCase
         self::assertSame('2.0.0', $found->version());
     }
 
+    public function testReadsThePlatformKeysAndWhetherPackagesDevExists(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [['name' => 'acme/lib', 'version' => '1.0.0']],
+            'packages-dev' => [['name' => 'acme/dev', 'version' => '1.0.0'], ['name' => '--bad', 'version' => '1.0.0']],
+            'platform' => ['php' => '>=7.4', 'ext-json' => '*', 'broken' => 7],
+            'platform-dev' => ['php' => '>=8.1'],
+            'platform-overrides' => ['php' => '7.4.29', 'ext-intl' => false],
+        ]);
+
+        self::assertSame(['php' => '>=7.4', 'ext-json' => '*'], $lock->platform());
+        self::assertSame(['php' => '>=8.1'], $lock->platformDev());
+        self::assertSame('7.4.29', $lock->platformOverridePhp());
+        self::assertTrue($lock->hasDevKey());
+        self::assertTrue($lock->isDevEntry('acme/dev'));
+        self::assertTrue($lock->isDevEntry('--bad'), 'an invalid name stays in the locked repository');
+        self::assertFalse($lock->isDevEntry('acme/lib'));
+    }
+
+    public function testALockWithoutTheKeysHasNoPlatformAndNoPackagesDev(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [], 'platform' => [], 'platform-overrides' => ['php' => false]]);
+
+        self::assertSame([], $lock->platform());
+        self::assertSame([], $lock->platformDev());
+        self::assertNull($lock->platformOverridePhp());
+        self::assertFalse($lock->hasDevKey());
+        self::assertFalse(LockFile::empty()->hasDevKey());
+    }
+
+    public function testWithPackagesKeepsThePlatformKeys(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [],
+            'packages-dev' => [['name' => 'acme/dev', 'version' => '1.0.0']],
+            'platform' => ['php' => '>=7.4'],
+            'platform-dev' => ['php' => '>=8.1'],
+            'platform-overrides' => ['php' => '7.4.29'],
+        ])->withPackages([]);
+
+        self::assertSame(['php' => '>=7.4'], $lock->platform());
+        self::assertSame(['php' => '>=8.1'], $lock->platformDev());
+        self::assertSame('7.4.29', $lock->platformOverridePhp());
+        self::assertTrue($lock->hasDevKey());
+        self::assertTrue($lock->isDevEntry('acme/dev'));
+    }
+
     public function testEmptyBuildsALockWithNoPackagesAndNoContentHash(): void
     {
         $lock = LockFile::empty();

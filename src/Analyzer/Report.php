@@ -46,6 +46,7 @@ final class Report
     private ?array $sorted = null;
     private ?MoveCheckRun $moveCheck = null;
     private ?UpdateNow $updateNow = null;
+    private ?PhpWindow $phpWindow = null;
 
     /**
      * @param list<Finding> $findings
@@ -107,6 +108,7 @@ final class Report
         $copy->sorted = $this->sorted;
         $copy->moveCheck = $this->moveCheck;
         $copy->updateNow = $this->updateNow;
+        $copy->phpWindow = $this->phpWindow;
 
         return $copy;
     }
@@ -134,6 +136,7 @@ final class Report
         $copy->sorted = $this->sorted;
         $copy->moveCheck = $this->moveCheck;
         $copy->updateNow = $this->updateNow;
+        $copy->phpWindow = $this->phpWindow;
 
         return $copy;
     }
@@ -158,6 +161,20 @@ final class Report
         $copy->notes[] = $note;
 
         return $copy;
+    }
+
+    public function withPhpWindow(?PhpWindow $phpWindow): self
+    {
+        $copy = clone $this;
+        $copy->phpWindow = $phpWindow;
+
+        return $copy;
+    }
+
+    /** `run.php_window`, null when the window is unknowable or the run did not compute it. */
+    public function phpWindow(): ?PhpWindow
+    {
+        return $this->phpWindow;
     }
 
     /** `run.move_check`, null when the run checked no move. */
@@ -423,7 +440,7 @@ final class Report
 
         return [
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
-            'run' => $run->toArray(ScoreRulesUsed::of($sorted), $this->includesDev, $this->advisoryLookup(), $this->moveCheck),
+            'run' => $run->toArray(ScoreRulesUsed::of($sorted), $this->includesDev, $this->advisoryLookup(), $this->moveCheck, $this->phpWindow),
             'activity_cache_oldest_at' => $oldest === null ? null : $oldest->format(\DATE_ATOM),
             'activity_cache_age_hours' => $oldest === null ? null : round(max(0, $this->generatedAt->getTimestamp() - $oldest->getTimestamp()) / 3600, 1),
             'packages_checked' => $this->packagesChecked,

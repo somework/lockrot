@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Php;
 
+use Lockrot\Clock;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
 
@@ -40,6 +41,16 @@ final class PhpReleaseDates
     public function gaDate(string $minor): ?\DateTimeImmutable
     {
         return $this->dates[$minor] ?? null;
+    }
+
+    /** @return list<string> the minors whose GA is on or before the clock's day, as the report dates it, oldest first */
+    public function minors(Clock $clock): array
+    {
+        $today = $clock->now()->format('Y-m-d');
+        $minors = array_keys(array_filter($this->dates, static fn (\DateTimeImmutable $ga): bool => $ga->format('Y-m-d') <= $today));
+        usort($minors, 'version_compare');
+
+        return array_map('strval', $minors);
     }
 
     /**

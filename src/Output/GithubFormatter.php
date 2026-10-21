@@ -52,7 +52,7 @@ final class GithubFormatter implements FormatterInterface
         }
         $name = static fn (string $package): string => $package;
         $updateNow = RunFooter::updateNow($report);
-        foreach ([RunFooter::flags($report), RunFooter::depth($report, $name), RunFooter::security($report, false), $updateNow === null ? null : 'update now: '.$updateNow, RunGateText::render($gate, $this->context->runOf($report))] as $line) {
+        foreach ([RunFooter::flags($report), RunFooter::depth($report, $name), RunFooter::security($report, false), $updateNow === null ? null : 'update now: '.$updateNow, RunFooter::phpWindow($report, $name), RunGateText::render($gate, $this->context->runOf($report))] as $line) {
             // A plain log line, not an annotation. A package name comes unvalidated from the lock, so
             // fold line breaks into spaces: a `::` after one runs as a workflow command.
             if ($line !== null) {

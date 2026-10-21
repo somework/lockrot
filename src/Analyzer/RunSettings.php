@@ -121,10 +121,11 @@ final class RunSettings
      * @param ?bool                        $includeDev     whether the report analysed packages-dev, which wins over the setting
      * @param AdvisoryLookup               $advisoryLookup the report's
      * @param ?MoveCheckRun                $moveCheck      the report's, null when the run checked no move
+     * @param ?PhpWindow                   $phpWindow      the report's
      *
      * @return array<string, mixed>
      */
-    public function toArray(?array $scoreRulesUsed, ?bool $includeDev, AdvisoryLookup $advisoryLookup, ?MoveCheckRun $moveCheck = null): array
+    public function toArray(?array $scoreRulesUsed, ?bool $includeDev, AdvisoryLookup $advisoryLookup, ?MoveCheckRun $moveCheck = null, ?PhpWindow $phpWindow = null): array
     {
         return ['project' => $this->project, 'root_package' => $this->rootPackage]
             + $this->php()
@@ -132,7 +133,7 @@ final class RunSettings
             + $this->failOnKeys()
             + ['strict_network' => $this->strictNetwork, 'mode' => $this->mode, 'include_dev' => $includeDev ?? $this->includeDev]
             + $this->toModelArray()
-            + ['advisory_lookup' => $advisoryLookup, 'move_check' => $moveCheck]
+            + ['advisory_lookup' => $advisoryLookup, 'move_check' => $moveCheck, 'php_window' => $phpWindow]
             + ['score_rules_used' => $scoreRulesUsed ?? ScoreModel::rulesUnused()];
     }
 
