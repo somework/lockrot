@@ -309,8 +309,8 @@ shapes leave out the parts that do not apply. A score of 0 carries only `model`,
 | `score_model` | object | The whole score model: weights, severities, fix kinds, bands, sort and rules ([Score model 1](verdicts/model-1.md)) |
 | `score_rules_used` | object | Rule id → the number of findings on which the rule changed or decided a number. Null for `sort` |
 | `advisory_lookup` | object | `scope` and `scope_source`, the packages asked and not asked, and each Composer repository that can publish advisories, with its `outcome` ([Which advisories count](verdicts.md#which-advisories-count)) |
-| `move_check` | object or null | Which Composer checked the moves (`composer`), whether it blocked the versions that an advisory affects, and whether Composer's solver resolves or refuses the lock itself (`baseline`, with `reason` when it was not checked). Null when the run checked no move ([The move check](verdicts.md#the-move-check)) |
-| `php_window` | object or null | The PHP minors on which the lock installs, with require-dev (`with_dev`) and without (`without_dev`), with the links that set each edge, the lock's `platform-overrides.php` and the host features that a requirement names. `target` says whether the window admits the target PHP. Null when a package or the root provides or replaces `php` or `php-64bit`, or a php link does not parse ([The PHP window](verdicts.md#the-php-window)) |
+| `move_check` | object or null | Which Composer checked the moves (`composer`), and whether it blocked the versions that an advisory affects. `baseline` says whether Composer's solver resolves or refuses the lock itself, with `reason` when lockrot did not check it. Null when the run checked no move ([The move check](verdicts.md#the-move-check)) |
+| `php_window` | object or null | The PHP minors on which the lock installs, with require-dev (`with_dev`) and without (`without_dev`), and the links that set each edge. It also holds the lock's `platform-overrides.php` and the host features that a requirement names. `target` says whether the window admits the target PHP. Null when the window is unknowable ([The PHP window](verdicts.md#the-php-window)) |
 
 ### The gate
 

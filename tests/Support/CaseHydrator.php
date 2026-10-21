@@ -532,7 +532,9 @@ final class CaseHydrator
             $root[(string) $section] = (\is_array($links) ? $links : []) + (\is_array($root[$section] ?? null) ? $root[$section] : []);
         }
         if (\is_string($inputs['config_platform_php'] ?? null)) {
-            $root['config'] = ['platform' => ['php' => $inputs['config_platform_php']]];
+            $config = \is_array($root['config'] ?? null) ? $root['config'] : [];
+            $platform = \is_array($config['platform'] ?? null) ? $config['platform'] : [];
+            $root['config'] = ['platform' => ['php' => $inputs['config_platform_php']] + $platform] + $config;
         }
 
         return $root;
@@ -583,7 +585,9 @@ final class CaseHydrator
         }
 
         $phpLock = \is_array($inputs['php_lock'] ?? null) ? $inputs['php_lock'] : [];
-        $lock = ['packages' => self::byName($out, $phpLock['packages'] ?? null), 'packages-dev' => self::byName($dev, $phpLock['packages-dev'] ?? null)];
+        $overrides = ['packages' => self::sectionEntries($phpLock['packages'] ?? null), 'packages-dev' => self::sectionEntries($phpLock['packages-dev'] ?? null)];
+        $names = array_column(array_merge(...array_values($overrides)), 'name');
+        $lock = ['packages' => self::byName($out, $overrides['packages'], $names), 'packages-dev' => self::byName($dev, $overrides['packages-dev'], $names)];
         if (($phpLock['has_dev_key'] ?? true) === false) {
             unset($lock['packages-dev']);
         }
@@ -599,19 +603,29 @@ final class CaseHydrator
     }
 
     /**
-     * The entries of one lock section, each `_php_lock` entry in place of the entry of its name.
-     *
-     * @param list<array<mixed, mixed>> $entries
-     * @param mixed                     $extra
+     * @param mixed $section
      *
      * @return list<array<mixed, mixed>>
      */
-    private static function byName(array $entries, $extra): array
+    private static function sectionEntries($section): array
     {
-        $extra = \is_array($extra) ? array_values(array_filter($extra, 'is_array')) : [];
-        $names = array_column($extra, 'name');
+        return \is_array($section) ? array_values(array_filter($section, 'is_array')) : [];
+    }
 
-        return array_merge(array_values(array_filter($entries, static fn (array $entry): bool => !\in_array($entry['name'] ?? null, $names, true))), $extra);
+    /**
+     * The entries of one lock section, with the `_php_lock` entries of that section added. An entry
+     * that `_php_lock` overrides in either section leaves its own section, so a moved package is
+     * listed once.
+     *
+     * @param list<array<mixed, mixed>> $entries
+     * @param list<array<mixed, mixed>> $extra
+     * @param list<mixed>               $overridden the names of every `_php_lock` entry
+     *
+     * @return list<array<mixed, mixed>>
+     */
+    private static function byName(array $entries, array $extra, array $overridden): array
+    {
+        return array_merge(array_values(array_filter($entries, static fn (array $entry): bool => !\in_array($entry['name'] ?? null, $overridden, true))), $extra);
     }
 
     /**

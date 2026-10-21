@@ -617,52 +617,55 @@ Limits of the check:
 
 ### The PHP window {#the-php-window}
 
-On which PHP minors does your lock install? `run.php_window` answers twice: `with_dev` reads the
-packages, packages-dev and the root with its `require-dev`, and `without_dev` reads the packages and
-the root without it. `with_dev` is null when the lock has no `packages-dev` key, because Composer
-then refuses an install with require-dev. A run writes both sets, with or without `--dev`.
+On which PHP minors does your lock install? `run.php_window` answers with require-dev and without.
+`with_dev` reads the packages, packages-dev and the root with its `require-dev`. `without_dev` reads
+the packages and the root without `require-dev`. `with_dev` is null when the lock has no
+`packages-dev` key, because Composer then refuses an install with require-dev. A run writes
+`with_dev` and `without_dev`, with or without `--dev`.
 
-Composer does not show the window, and two facts hide it:
+Composer does not show the window, and these facts hide it:
 
 - `composer install` checks the lock against the lock's own `platform-overrides`. A change of
   `config.platform.php` in composer.json does not change that check. `platform_override` holds the
-  lock's `platform-overrides.php`, the PHP at which Composer checks the lock on every machine.
-- The runtime `platform_check.php` checks only the lower bound of `php` and `php-64bit`, and only
-  for the packages without require-dev.
+  lock's `platform-overrides.php`. Composer checks the lock at that PHP on every machine.
+- The platform check that the Composer autoloader runs checks only the lower bound of `php` and
+  `php-64bit`. It checks only the packages without require-dev.
 
 How lockrot reads the window:
 
 - It reads the `require` and `conflict` links on `php` and `php-64bit` of each package of the lock.
-  On a 64-bit PHP, Composer gives `php-64bit` the version of `php`, so both count as versions.
+  On a 64-bit PHP, Composer gives `php-64bit` the version of `php`, so lockrot reads each link as a
+  version.
 - It reads the root's links per name: composer.json first, then the lock's `platform` for a name that
-  composer.json lacks. A run without composer.json reads the lock's `platform` alone. In the set with
-  require-dev, a `require-dev` link replaces the `require` link of the same name, and `platform-dev`
-  replaces `platform`. So require-dev can widen the window as well as narrow it.
+  composer.json lacks. A run without composer.json reads the lock's `platform` alone.
+- In the set with require-dev, a `require-dev` link replaces the `require` link of the same name.
+  `platform-dev` replaces `platform` in the same way. So require-dev can widen the window as well as
+  narrow it.
 - `php-zts`, `php-debug` and `php-ipv6` are host features, not versions. `host_requires` lists the
   ones that a requirement names, and the window ignores them.
 - A known minor is a PHP minor whose GA date is on or before the run's date. A known minor is in
-  `minors` when every requirement admits its newest patch (`8.4.99`) and no conflict matches it. The
-  target's minor is read at the PHP of the move check instead, which `target.php` writes. A cap
-  inside a minor, such as `<8.4.5`, leaves that minor out.
-- The edges and `gaps` are read on the known minors. PHP 6 and PHP 7.5 to 7.9 do not exist, so
+  `minors` when every requirement admits its newest patch (`8.4.99`) and no conflict matches it.
+- lockrot reads the target's minor at the PHP of the move check instead, and `target.php` holds that
+  PHP. A cap inside a minor, such as `<8.4.5`, leaves that minor out.
+- lockrot reads the edges and `gaps` on the known minors. PHP 6 and PHP 7.5 to 7.9 do not exist, so
   `~7.4.0 || ~8.0.0` has no gap.
 - `lower_edge.php` is the lowest PHP of the first minor in the window. `lower_edge.set_by` lists the
-  links that exclude the PHP just below it. `upper_edge.excludes` is the known minor after the
-  window, with the links that exclude it, and `upper_edge` is null when the newest known minor is in
-  the window.
+  links that exclude the PHP just below it.
+- `upper_edge.excludes` is the known minor after the window, and `upper_edge.set_by` lists the links
+  that exclude it. `upper_edge` is null when the newest known minor is in the window.
 - A set with no minor has `closest`: the known minors that the fewest links exclude, and those
   links.
-- `target.inside` says whether the set with require-dev admits the target PHP (`without_dev` when
-  `with_dev` is null). While it is false, Composer refuses the baseline of
+- `target.inside` says whether the set with require-dev admits the target PHP. When `with_dev` is
+  null, `without_dev` decides. While `target.inside` is false, Composer refuses the baseline of
   [the move check](#the-move-check), and every move is `not_checked`.
 
 The window is null when a package or the root provides or replaces `php` or `php-64bit`, or when a
 php link does not parse. It judges no package and changes no move.
 
-The `php:` line of the table, markdown and github formats prints the window. A set with require-dev
-whose minors differ prints both sets. The line adds the target when the window excludes it, the
-PHP of `platform_override`, and the links that exclude the next minor of the analysed set. Abridged
-from the [example run](example-run.md):
+The `php:` line of the table, markdown and github formats prints the window. When the minors of
+`with_dev` differ, the line prints `with_dev` and `without_dev`. The line adds the target when the
+window excludes it, and the PHP of `platform_override`. It ends with the links that exclude the
+next minor of the analysed set. Abridged from the [example run](example-run.md):
 
 ```text
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
