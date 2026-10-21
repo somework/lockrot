@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
@@ -27,11 +28,15 @@ final class CorpusSchemaSweepTest extends TestCase
 
     public function testEveryCorpusScaleDocumentIsValid(): void
     {
+        $provenance = JsonPath::decodeFile(self::DOCUMENTS.'provenance.json');
         $paths = [];
-        foreach (['corpus/*.json.gz', 'coverage/baselined/*.json.gz', 'coverage/variants/*.json.gz'] as $pattern) {
-            $paths = array_merge($paths, glob(self::DOCUMENTS.$pattern) ?: []);
+        $described = 0;
+        foreach (['corpus', 'coverage/baselined', 'coverage/variants'] as $directory) {
+            $paths = array_merge($paths, glob(self::DOCUMENTS.$directory.'/*.json.gz') ?: []);
+            $described += JsonPath::intAt($provenance, ['documents', $directory]);
         }
-        self::assertCount(149, $paths, 'tests/fixtures/schema/documents/provenance.json');
+        self::assertNotSame(0, $described);
+        self::assertCount($described, $paths, 'the documents that tests/fixtures/schema/documents/provenance.json counts');
         $invalid = [];
         foreach ($paths as $path) {
             $errors = $this->errors('report', (string) file_get_contents('compress.zlib://'.$path), false);
