@@ -37,7 +37,7 @@ final class PhpWindowComposerOracleTest extends TestCase
         foreach (file(self::ANSWERS, \FILE_IGNORE_NEW_LINES) ?: [] as $line) {
             [$lock, $minor, $set, $exit] = explode("\t", $line);
             $asked[$lock][$minor] = true;
-            $installs[$lock][$set] = $installs[$lock][$set] ?? [];
+            $installs[$lock][$set] ??= [];
             if ($exit === '0') {
                 $installs[$lock][$set][] = $minor;
             }

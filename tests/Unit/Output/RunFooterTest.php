@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\MoveCheckRun;
+use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\UpdateNow;
+use Lockrot\Clock;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryRepository;
+use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\RunFooter;
 use Lockrot\Solver\MoveCheck;
@@ -138,5 +142,78 @@ final class RunFooterTest extends TestCase
         $report = self::report([])->withMoveChecks(new MoveCheckRun(null, false, MoveCheck::notChecked(MoveCheck::NO_COMPOSER_JSON)), UpdateNow::of([], $checks));
 
         self::assertSame('moves: not checked (the project has no composer.json)', RunFooter::moveCheck($report));
+    }
+
+    public function testThePhpLineNamesTheMinorsOnceWhenBothSetsAgree(): void
+    {
+        $line = self::phpLine(['packages' => [self::package('acme/a', ['php' => '>=8.2'])], 'packages-dev' => []], [], '8.4');
+
+        self::assertSame('php: the lock installs on PHP 8.2 to 8.5', $line);
+    }
+
+    public function testThePhpLineNamesBothSetsWhenRequireDevMovesTheWindowAndSaysTheTargetIsExcluded(): void
+    {
+        $line = self::phpLine(['packages' => [self::package('acme/a', ['php' => '7.1.* || >=8.1'])], 'packages-dev' => []], ['require' => ['php' => '>=8.2'], 'require-dev' => ['php' => '>=7.1']], '7.4');
+
+        self::assertSame('php: without require-dev the lock installs on PHP 8.2 to 8.5, and with require-dev on PHP 7.1 and 8.1 to 8.5, so your target, 7.4, is excluded', $line);
+    }
+
+    public function testThePhpLineNamesTheOverrideAndAtMostThreeSettersOfTheUpperEdge(): void
+    {
+        $packages = array_map(static fn (string $name): array => self::package($name, ['php' => '<8.4']), ['acme/a', 'acme/b', 'acme/c', 'acme/d']);
+        $line = self::phpLine(['packages' => $packages, 'packages-dev' => [], 'platform-overrides' => ['php' => '8.2.0']], ['require' => ['php' => '<8.4']], '8.3');
+
+        self::assertSame('php: the lock installs on PHP 5.3 to 8.3; Composer checks it at 8.2.0 from config.platform.php; require.php, acme/a, acme/b and 2 more exclude 8.4', $line);
+    }
+
+    public function testThePhpLineOfAnEmptyWindowSaysOnNoPhp(): void
+    {
+        $line = self::phpLine(['packages' => [self::package('acme/a', ['php' => '<8.0']), self::package('acme/b', ['php' => '>=8.1'])]], [], '8.4');
+
+        self::assertSame('php: the lock installs on no PHP, so your target, 8.4, is excluded', $line);
+    }
+
+    public function testThePhpLineReadsTheUpperEdgeOfTheSetThatTheRunAnalysed(): void
+    {
+        $lock = ['packages' => [], 'packages-dev' => [self::package('acme/tool', ['php' => '<8.3'])]];
+        $window = 'php: without require-dev the lock installs on PHP 5.3 to 8.5, and with require-dev on PHP 5.3 to 8.2, so your target, 8.4, is excluded';
+
+        self::assertSame($window, self::phpLine($lock, [], '8.4'));
+        self::assertSame($window.'; acme/tool excludes 8.3', self::phpLine($lock, [], '8.4', true));
+    }
+
+    public function testThePhpLineNamesEachRootLinkByItsSection(): void
+    {
+        $line = self::phpLine(['packages' => [], 'packages-dev' => []], ['require' => ['php-64bit' => '<8.4'], 'require-dev' => ['php' => '<8.4'], 'conflict' => ['php' => '>=8.4']], '8.3', true);
+
+        self::assertSame('php: the lock installs on PHP 5.3 to 8.3; conflict.php, require-dev.php and require.php-64bit exclude 8.4', $line);
+    }
+
+    public function testThereIsNoPhpLineWithoutAWindow(): void
+    {
+        self::assertNull(RunFooter::phpWindow(self::report([]), [self::class, 'asWritten']));
+    }
+
+    /**
+     * @param array<string, mixed> $lock
+     * @param array<string, mixed> $composer
+     */
+    private static function phpLine(array $lock, array $composer, string $target, bool $includeDev = false): ?string
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $window = PhpWindow::of(LockFile::fromArray($lock), ProjectConfig::fromArray($composer), $target, PhpReleaseDates::load()->minors(new Clock($at)));
+        $report = (new Report([], [], $at, 0, 0, null, null, $includeDev))->withPhpWindow($window);
+
+        return RunFooter::phpWindow($report, [self::class, 'asWritten']);
+    }
+
+    /**
+     * @param array<string, string> $require
+     *
+     * @return array<string, mixed>
+     */
+    private static function package(string $name, array $require): array
+    {
+        return ['name' => $name, 'version' => '1.0.0', 'require' => $require];
     }
 }

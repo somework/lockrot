@@ -512,7 +512,7 @@ def inputs_of(case):
     if checks:
         inputs['checks'] = checks
         inputs['move_check'] = run['move_check']
-    # The lock facts that the case's findings do not carry (SPEC §5.9, the model): the ‡ run inputs.
+    # The lock facts that the case's findings do not carry: the model's ‡ run inputs `_php_lock` and `_config_platform_php`.
     if run.get('_php_lock') is not None:
         inputs['php_lock'] = run['_php_lock']
     if run.get('_config_platform_php') is not None:
