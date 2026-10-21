@@ -97,6 +97,9 @@ Nothing is added to these sets, removed from them or reordered within 1.x:
 - `run.advisory_lookup.scope`: `all`, `composer-repositories`.
 - `run.advisory_lookup.scope_source`: `config`, `default`.
 - The `scope` of an `unchecked_accepted[]` entry's `accepted_by`: `host`, `repository`, `package`.
+- The `link` of a PHP window link, in `run.php_window`: `require`, `conflict`.
+- The `target` of a PHP window link, in `run.php_window`: `php`, `php-64bit`.
+- `run.php_window.host_requires`: `php-debug`, `php-ipv6`, `php-zts`.
 
 The document number `lockrot.schema` is `2` for all of 1.x. A new value in a closed set needs
 report-3 and lockrot 2.0. [verdicts.md](verdicts.md#the-nine-verdicts) says what each value means.

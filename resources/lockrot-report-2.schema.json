@@ -20763,6 +20763,7 @@
         "score_model",
         "advisory_lookup",
         "move_check",
+        "php_window",
         "score_rules_used"
       ],
       "properties": {
@@ -21048,6 +21049,81 @@
                   ]
                 }
               ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "php_window": {
+          "description": "On which PHP minors the lock installs at each minor's newest patch, with require-dev and without; null when a package or the root provides or replaces `php` or `php-64bit`, or a php link does not parse.",
+          "oneOf": [
+            {
+              "description": "The PHP window of the lock.",
+              "type": "object",
+              "required": [
+                "platform_override",
+                "host_requires",
+                "with_dev",
+                "without_dev",
+                "target"
+              ],
+              "properties": {
+                "platform_override": {
+                  "description": "The lock's `platform-overrides.php`: the PHP at which `composer install` checks the lock.",
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "minLength": 1
+                },
+                "host_requires": {
+                  "description": "The host features that a requirement names (`php-debug`, `php-ipv6`, `php-zts`), sorted.",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "php-debug",
+                      "php-ipv6",
+                      "php-zts"
+                    ]
+                  },
+                  "uniqueItems": true
+                },
+                "with_dev": {
+                  "description": "Packages, packages-dev and the root with require-dev; null when the lock has no `packages-dev` key.",
+                  "oneOf": [
+                    {
+                      "$ref": "#/definitions/phpWindowSet"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "without_dev": {
+                  "$ref": "#/definitions/phpWindowSet"
+                },
+                "target": {
+                  "description": "The target PHP against the window.",
+                  "type": "object",
+                  "required": [
+                    "php",
+                    "inside"
+                  ],
+                  "properties": {
+                    "php": {
+                      "description": "The php that the move check solves at: `config.platform.php` when it lies in the target minor, else the minor at patch 99.",
+                      "type": "string",
+                      "pattern": "^[0-9]+(\\.[0-9]+)*$"
+                    },
+                    "inside": {
+                      "description": "Whether the set with require-dev (`without_dev` when `with_dev` is null) admits that point.",
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
             },
             {
               "type": "null"
@@ -22033,6 +22109,184 @@
           },
           "minItems": 1,
           "uniqueItems": true
+        }
+      }
+    },
+    "phpWindowReq": {
+      "description": "A php link of the lock: a package's `require` or `conflict` on `php` or `php-64bit`, or the root's.",
+      "type": "object",
+      "required": [
+        "name",
+        "version",
+        "link",
+        "target",
+        "constraint",
+        "dev"
+      ],
+      "properties": {
+        "name": {
+          "description": "The package; null for the root.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "version": {
+          "description": "The locked version; null for the root.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "link": {
+          "description": "The link. Closed.",
+          "type": "string",
+          "enum": [
+            "require",
+            "conflict"
+          ]
+        },
+        "target": {
+          "description": "The platform name. Composer gives `php-64bit` the version of `php`. Closed.",
+          "type": "string",
+          "enum": [
+            "php",
+            "php-64bit"
+          ]
+        },
+        "constraint": {
+          "description": "The constraint as the lock writes it.",
+          "type": "string",
+          "minLength": 1
+        },
+        "dev": {
+          "description": "Whether it is a packages-dev entry, or the root's `require-dev` or `platform-dev`.",
+          "type": "boolean"
+        }
+      }
+    },
+    "phpWindowSet": {
+      "description": "The PHP minors on which one set of the lock installs.",
+      "type": "object",
+      "required": [
+        "minors",
+        "gaps",
+        "lower_edge",
+        "upper_edge",
+        "closest"
+      ],
+      "properties": {
+        "minors": {
+          "description": "The known minors whose point every requirement matches and no conflict matches, in GA order.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+$"
+          },
+          "uniqueItems": true
+        },
+        "gaps": {
+          "description": "Whether the admitted minors skip a known minor.",
+          "type": "boolean"
+        },
+        "lower_edge": {
+          "description": "The lowest edge; null when no minor is admitted.",
+          "oneOf": [
+            {
+              "description": "The lowest edge.",
+              "type": "object",
+              "required": [
+                "php",
+                "set_by"
+              ],
+              "properties": {
+                "php": {
+                  "description": "The lowest X.Y.Z of the first admitted minor that the set admits.",
+                  "type": "string",
+                  "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+                },
+                "set_by": {
+                  "description": "The requirements that fail, and the conflicts that match, at the last point below the edge.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/phpWindowReq"
+                  }
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "upper_edge": {
+          "description": "The highest edge; null when the newest known minor is admitted or no minor is.",
+          "oneOf": [
+            {
+              "description": "The highest edge.",
+              "type": "object",
+              "required": [
+                "excludes",
+                "set_by"
+              ],
+              "properties": {
+                "excludes": {
+                  "description": "The known minor after the last admitted one.",
+                  "type": "string",
+                  "pattern": "^[0-9]+\\.[0-9]+$"
+                },
+                "set_by": {
+                  "description": "The requirements that fail, and the conflicts that match, at that minor.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/phpWindowReq"
+                  },
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "closest": {
+          "description": "With no admitted minor, the known minors that the fewest links exclude, and those links; null when a minor is admitted.",
+          "oneOf": [
+            {
+              "description": "Why the set admits no PHP.",
+              "type": "object",
+              "required": [
+                "minors",
+                "set_by"
+              ],
+              "properties": {
+                "minors": {
+                  "description": "The known minors with the fewest excluding links, in GA order.",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9]+\\.[0-9]+$"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "set_by": {
+                  "description": "The links that exclude those minors: the requirements that fail and the conflicts that match there.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/phpWindowReq"
+                  },
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     },
