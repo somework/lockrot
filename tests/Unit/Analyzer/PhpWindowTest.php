@@ -26,6 +26,7 @@ final class PhpWindowTest extends TestCase
 
         $set = $window['without_dev'];
         self::assertSame([], $set['minors']);
+        self::assertFalse($set['gaps']);
         self::assertNull($set['lower_edge']);
         self::assertNull($set['upper_edge']);
         self::assertNotNull($set['closest']);
@@ -74,6 +75,7 @@ final class PhpWindowTest extends TestCase
     public static function lowerEdges(): iterable
     {
         yield 'a patch floor' => [['php' => '>=8.4.1'], [], '8.4.1', 'require'];
+        yield 'the second known minor' => [['php' => '>=5.4'], [], '5.4.0', 'require'];
         yield 'an exclusive minor' => [['php' => '>7.4'], [], '7.4.1', 'require'];
         yield 'an exclusive dev version' => [['php' => '>7.4.3-dev'], [], '7.4.3', 'require'];
         yield 'a conflict that ends inside the minor' => [['php' => '>=7.4'], ['php' => '7.4.0 - 7.4.1'], '7.4.2', 'conflict'];
@@ -123,6 +125,35 @@ final class PhpWindowTest extends TestCase
 
         self::assertSame(['php-ipv6', 'php-zts'], $window['host_requires'], 'a conflict names no host feature');
         self::assertSame(['8.2', '8.3', '8.4', '8.5'], $window['without_dev']['minors']);
+    }
+
+    public function testTheHostFeaturesOfBothSetsAreListedOnceInNameOrder(): void
+    {
+        $window = self::window(
+            ['packages' => [self::package('acme/a', ['php-ipv6' => '*']), self::package('acme/b', ['php-zts' => '*'])], 'packages-dev' => [self::package('acme/tool', ['php-debug' => '*'])]],
+            ['require' => ['php-zts' => '*']]
+        );
+
+        self::assertSame(['php-debug', 'php-ipv6', 'php-zts'], $window['host_requires'], 'php-debug comes from require-dev only, php-zts from the root and acme/b');
+    }
+
+    public function testEachRootLinkFromTheLockKeepsTheSideItComesFrom(): void
+    {
+        $window = self::window(
+            ['packages' => [], 'packages-dev' => [], 'platform' => ['php' => '>=8.1'], 'platform-dev' => ['php-64bit' => '<8.5']],
+            ['conflict' => ['php' => '>=8.5']]
+        );
+        $platform = ['name' => null, 'version' => null, 'link' => 'require', 'target' => 'php', 'constraint' => '>=8.1', 'dev' => false];
+        $conflict = ['name' => null, 'version' => null, 'link' => 'conflict', 'target' => 'php', 'constraint' => '>=8.5', 'dev' => false];
+        $platformDev = ['name' => null, 'version' => null, 'link' => 'require', 'target' => 'php-64bit', 'constraint' => '<8.5', 'dev' => true];
+
+        $withDev = $window['with_dev'];
+        self::assertNotNull($withDev);
+        self::assertSame(['8.1', '8.2', '8.3', '8.4'], $withDev['minors'], 'platform-dev adds to platform');
+        self::assertSame(['php' => '8.1.0', 'set_by' => [$platform]], $withDev['lower_edge']);
+        self::assertSame(['excludes' => '8.5', 'set_by' => [$conflict, $platformDev]], $withDev['upper_edge']);
+        self::assertSame(['php' => '8.1.0', 'set_by' => [$platform]], $window['without_dev']['lower_edge']);
+        self::assertSame(['excludes' => '8.5', 'set_by' => [$conflict]], $window['without_dev']['upper_edge']);
     }
 
     public function testTheRootRequireDevPhpReplacesTheRequirePhpWithRequireDevOnly(): void
@@ -262,6 +293,18 @@ final class PhpWindowTest extends TestCase
     public function testAProvidedExtensionKeepsTheWindow(): void
     {
         self::assertNotNull(PhpWindow::of(LockFile::fromArray(['packages' => [self::package('acme/a') + ['provide' => ['ext-json' => '*']]]]), ProjectConfig::empty(), '8.4', self::minors()));
+        self::assertNotNull(PhpWindow::of(LockFile::fromArray(['packages' => []]), ProjectConfig::fromArray(['provide' => ['ext-json' => '*'], 'replace' => ['ext-mbstring' => '*']]), '8.4', self::minors()), 'the root');
+    }
+
+    public function testATargetPointPastTheNewestPatchIsTheLowerEdgeOfItsMinor(): void
+    {
+        $window = self::window(['packages' => [self::package('acme/a', ['php' => '>=8.4.100'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.4.100']]]);
+        $set = $window['without_dev'];
+
+        self::assertSame(['8.4', '8.5'], $set['minors']);
+        self::assertNotNull($set['lower_edge']);
+        self::assertSame('8.4.100', $set['lower_edge']['php']);
+        self::assertSame(['acme/a'], array_column($set['lower_edge']['set_by'], 'name'), 'read at 8.4.99');
     }
 
     public function testTheLockOverrideIsReportedAndDoesNotMoveTheWindow(): void

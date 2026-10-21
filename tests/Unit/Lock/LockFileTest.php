@@ -245,12 +245,12 @@ final class LockFileTest extends TestCase
         $lock = LockFile::fromArray([
             'packages' => [['name' => 'acme/lib', 'version' => '1.0.0']],
             'packages-dev' => [['name' => 'acme/dev', 'version' => '1.0.0'], ['name' => '--bad', 'version' => '1.0.0']],
-            'platform' => ['php' => '>=7.4', 'ext-json' => '*', 'broken' => 7],
+            'platform' => ['PHP' => '>=7.4', 'ext-json' => '*', 'broken' => 7, '0' => '*'],
             'platform-dev' => ['php' => '>=8.1'],
             'platform-overrides' => ['php' => '7.4.29', 'ext-intl' => false],
         ]);
 
-        self::assertSame(['php' => '>=7.4', 'ext-json' => '*'], $lock->platform());
+        self::assertSame(['php' => '>=7.4', 'ext-json' => '*'], $lock->platform(), 'a name is lowercased, and a value or a name that is no string is skipped');
         self::assertSame(['php' => '>=8.1'], $lock->platformDev());
         self::assertSame('7.4.29', $lock->platformOverridePhp());
         self::assertTrue($lock->hasDevKey());

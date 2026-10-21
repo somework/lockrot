@@ -24,7 +24,7 @@ final class LockFile
     private array $skipped = [];
     private ?string $contentHash;
     private LockArrayRepository $locked;
-    /** @var array<string, true> the names of the `packages-dev` entries, valid or not */
+    /** @var list<string> the names of the `packages-dev` entries, valid or not */
     private array $devNames = [];
     /** @var array<string, string> */
     private array $platform = [];
@@ -99,7 +99,7 @@ final class LockFile
                 }
                 $locked->addPackage($forUpdate);
                 if ($dev) {
-                    $devNames[$loaded->getName()] = true;
+                    $devNames[] = $loaded->getName();
                 }
                 if (preg_match(self::NAME, $loaded->getName()) !== 1) {
                     // A name from data can read as a command option: it reaches no finding and no command.
@@ -135,14 +135,14 @@ final class LockFile
     /**
      * @param mixed $links
      *
-     * @return array<string, string>
+     * @return array<string, string> lowercased name => string value
      */
     private static function stringValues($links): array
     {
         $out = [];
         foreach (\is_array($links) ? $links : [] as $name => $value) {
-            if (\is_string($value)) {
-                $out[(string) $name] = $value;
+            if (\is_string($name) && \is_string($value)) {
+                $out[strtolower($name)] = $value;
             }
         }
 
@@ -227,10 +227,10 @@ final class LockFile
     /** Whether the {@see lockedRepository()} entry of this name is in `packages-dev`. */
     public function isDevEntry(string $name): bool
     {
-        return isset($this->devNames[$name]);
+        return \in_array($name, $this->devNames, true);
     }
 
-    /** @return array<string, string> the lock's `platform`: the root's platform requirements of `require` */
+    /** @return array<string, string> the lock's `platform`: the root's platform requirements of `require`, by lowercased name */
     public function platform(): array
     {
         return $this->platform;

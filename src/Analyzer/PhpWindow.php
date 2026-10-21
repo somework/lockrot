@@ -6,9 +6,9 @@ namespace Lockrot\Analyzer;
 
 use Composer\Package\AliasPackage;
 use Composer\Package\Link;
+use Composer\Package\PackageInterface;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
-use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
@@ -37,12 +37,18 @@ final class PhpWindow implements \JsonSerializable
     /** @var Data */
     private array $data;
     private string $targetMinor;
+    /** @var list<string> */
+    private array $knownMinors;
 
-    /** @param Data $data */
-    private function __construct(array $data, string $targetMinor)
+    /**
+     * @param Data         $data
+     * @param list<string> $knownMinors
+     */
+    private function __construct(array $data, string $targetMinor, array $knownMinors)
     {
         $this->data = $data;
         $this->targetMinor = $targetMinor;
+        $this->knownMinors = $knownMinors;
     }
 
     /**
@@ -54,77 +60,54 @@ final class PhpWindow implements \JsonSerializable
      */
     public static function of(LockFile $lock, ProjectConfig $project, string $targetMinor, array $knownMinors): ?self
     {
-        $packages = [];
-        foreach ($lock->lockedRepository()->getPackages() as $package) {
-            // A root alias repeats its package's links under another version.
-            if (!$package instanceof AliasPackage) {
-                $packages[] = $package;
-            }
-        }
         $rootProvides = $project->platformConstraints(ProjectConfig::PROVIDE) + $project->platformConstraints(ProjectConfig::REPLACE);
         if (array_intersect(array_keys($rootProvides), self::VERSIONED) !== []) {
             return null;
         }
-        foreach ($packages as $package) {
-            if (array_intersect(array_keys($package->getProvides() + $package->getReplaces()), self::VERSIONED) !== []) {
-                return null;
+        $all = [];
+        $withoutDev = [];
+        foreach ($lock->lockedRepository()->getPackages() as $package) {
+            // A root alias repeats its package's links under another version.
+            if (!$package instanceof AliasPackage) {
+                if (array_intersect(array_keys($package->getProvides() + $package->getReplaces()), self::VERSIONED) !== []) {
+                    return null;
+                }
+                $all[] = $package;
+                if (!$lock->isDevEntry($package->getName())) {
+                    $withoutDev[] = $package;
+                }
             }
         }
 
-        $parser = new VersionParser();
         $hosts = [];
         $sets = ['with_dev' => null, 'without_dev' => []];
-        foreach (array_keys($sets) as $set) {
-            $dev = $set === 'with_dev';
-            if ($dev && !$lock->hasDevKey()) {
+        foreach (['with_dev' => $all, 'without_dev' => $withoutDev] as $set => $packages) {
+            if ($set === 'with_dev' && !$lock->hasDevKey()) {
                 continue;
             }
-            $raw = self::rootLinks($lock, $project, $dev);
-            foreach ($packages as $package) {
-                $isDev = $lock->isDevEntry($package->getName());
-                if ($isDev && !$dev) {
-                    continue;
-                }
-                foreach ([self::LINK_REQUIRE => $package->getRequires(), self::LINK_CONFLICT => $package->getConflicts()] as $kind => $links) {
-                    foreach ($links as $target => $link) {
-                        $raw[] = [self::req($package->getPrettyName(), $package->getPrettyVersion(), $kind, (string) $target, (string) $link->getPrettyConstraint(), $isDev), $link];
-                    }
-                }
+            $read = self::phpLinks(array_merge(self::rootLinks($lock, $project, $set === 'with_dev'), self::packageLinks($lock, $packages)));
+            if ($read === null) {
+                return null;
             }
-            $links = [];
-            foreach ($raw as [$req, $link]) {
-                if (\in_array($req['target'], self::HOST_FEATURES, true)) {
-                    if ($req['link'] === self::LINK_REQUIRE) {
-                        $hosts[$req['target']] = true;
-                    }
-                    continue;
-                }
-                if (!\in_array($req['target'], self::VERSIONED, true)) {
-                    continue;
-                }
-                try {
-                    $links[] = [$req, $link instanceof Link ? $link->getConstraint() : $parser->parseConstraints($req['constraint'])];
-                } catch (\UnexpectedValueException $e) {
-                    return null;
-                }
-            }
-            $sets[$set] = $links;
+            [$sets[$set], $found] = $read;
+            $hosts = array_merge($hosts, $found);
         }
+        $hosts = array_unique($hosts);
+        sort($hosts);
 
         $targetPoint = MoveCheckers::platformPhp($targetMinor, $project->platformPhp());
         $windows = [];
         foreach ($sets as $set => $links) {
             $windows[$set] = $links === null ? null : self::setWindow($links, $knownMinors, $targetMinor, $targetPoint);
         }
-        ksort($hosts);
 
         return new self([
             'platform_override' => $lock->platformOverridePhp(),
-            'host_requires' => array_map('strval', array_keys($hosts)),
+            'host_requires' => $hosts,
             'with_dev' => $windows['with_dev'],
             'without_dev' => $windows['without_dev'],
-            'target' => ['php' => $targetPoint, 'inside' => self::failing($sets['with_dev'] ?? $sets['without_dev'] ?? [], $targetPoint) === []],
-        ], $targetMinor);
+            'target' => ['php' => $targetPoint, 'inside' => self::failing($sets['with_dev'] ?? $sets['without_dev'], $targetPoint) === []],
+        ], $targetMinor, $knownMinors);
     }
 
     /**
@@ -145,7 +128,7 @@ final class PhpWindow implements \JsonSerializable
         }
         $links = [];
         foreach ($named + $lockNamed as $target => [$constraint, $fromDev]) {
-            $links[] = [self::req(null, null, self::LINK_REQUIRE, (string) $target, $constraint, $fromDev), null];
+            $links[] = [self::req(null, null, self::LINK_REQUIRE, $target, $constraint, $fromDev), null];
         }
         foreach ($project->platformConstraints(ProjectConfig::CONFLICT) as $target => $constraint) {
             $links[] = [self::req(null, null, self::LINK_CONFLICT, $target, $constraint, false), null];
@@ -155,24 +138,69 @@ final class PhpWindow implements \JsonSerializable
     }
 
     /**
+     * @param list<PackageInterface> $packages
+     *
+     * @return list<array{0: Req, 1: Link}>
+     */
+    private static function packageLinks(LockFile $lock, array $packages): array
+    {
+        $links = [];
+        foreach ($packages as $package) {
+            $dev = $lock->isDevEntry($package->getName());
+            foreach ([self::LINK_REQUIRE => $package->getRequires(), self::LINK_CONFLICT => $package->getConflicts()] as $kind => $packageLinks) {
+                foreach ($packageLinks as $link) {
+                    $links[] = [self::req($package->getPrettyName(), $package->getPrettyVersion(), $kind, $link->getTarget(), $link->getPrettyConstraint(), $dev), $link];
+                }
+            }
+        }
+
+        return $links;
+    }
+
+    /**
+     * The links to `php` and `php-64bit` with their constraints, and the host features that a
+     * requirement names. Null when a constraint does not parse.
+     *
+     * @param list<array{0: Req, 1: ?Link}> $links
+     *
+     * @return ?array{0: list<PhpLink>, 1: list<string>}
+     */
+    private static function phpLinks(array $links): ?array
+    {
+        $parser = new VersionParser();
+        $php = [];
+        $hosts = [];
+        foreach ($links as [$req, $link]) {
+            if (\in_array($req['target'], self::HOST_FEATURES, true)) {
+                if ($req['link'] === self::LINK_REQUIRE) {
+                    $hosts[] = $req['target'];
+                }
+            } elseif (\in_array($req['target'], self::VERSIONED, true)) {
+                try {
+                    $php[] = [$req, $link === null ? $parser->parseConstraints($req['constraint']) : $link->getConstraint()];
+                } catch (\UnexpectedValueException $e) {
+                    return null;
+                }
+            }
+        }
+
+        return [$php, $hosts];
+    }
+
+    /**
      * @param array<string, string> $links
      *
-     * @return array<string, array{0: string, 1: bool}> lowercased name => [constraint, from the dev side]
+     * @return array<string, array{0: string, 1: bool}> name => [constraint, from the dev side]
      */
     private static function byName(array $links, bool $dev): array
     {
-        $out = [];
-        foreach ($links as $name => $constraint) {
-            $out[strtolower($name)] = [$constraint, $dev];
-        }
-
-        return $out;
+        return array_map(static fn (string $constraint): array => [$constraint, $dev], $links);
     }
 
     /** @return Req */
     private static function req(?string $name, ?string $version, string $link, string $target, string $constraint, bool $dev): array
     {
-        return ['name' => $name, 'version' => $version, 'link' => $link, 'target' => strtolower($target), 'constraint' => $constraint, 'dev' => $dev];
+        return ['name' => $name, 'version' => $version, 'link' => $link, 'target' => $target, 'constraint' => $constraint, 'dev' => $dev];
     }
 
     /**
@@ -215,22 +243,20 @@ final class PhpWindow implements \JsonSerializable
             foreach ($minors as $minor) {
                 $fails[$minor] = self::failing($links, $point($minor));
             }
-            $fewest = $fails === [] ? 0 : min(array_map('count', $fails));
+            $fewest = $fails === [] ? null : min(array_map('count', $fails));
             $closest = array_keys(array_filter($fails, static fn (array $failing): bool => \count($failing) === $fewest));
             $window['closest'] = [
-                'minors' => array_map('strval', $closest),
+                'minors' => $closest,
                 'set_by' => self::clean(array_merge([], ...array_map(static fn ($minor): array => $fails[$minor], $closest))),
             ];
 
             return $window;
         }
-        $first = (int) array_search($in[0], $minors, true);
-        $last = (int) array_search($in[\count($in) - 1], $minors, true);
+        $position = array_flip($minors);
+        $first = $position[$in[0]];
+        $last = $position[$in[\count($in) - 1]];
         $window['gaps'] = $last - $first + 1 !== \count($in);
-        $lowest = self::lowestPoint($links, $in[0]);
-        [$major, $minor, $patch] = array_map('intval', explode('.', $lowest));
-        $below = $patch > 0 ? $major.'.'.$minor.'.'.($patch - 1) : (isset($minors[$first - 1]) ? $point($minors[$first - 1]) : null);
-        $window['lower_edge'] = ['php' => $lowest, 'set_by' => $below === null ? [] : self::clean(self::failing($links, $below))];
+        $window['lower_edge'] = self::lowerEdge($links, $minors, $first, $point);
         if (isset($minors[$last + 1])) {
             $next = $minors[$last + 1];
             $window['upper_edge'] = ['excludes' => $next, 'set_by' => self::clean(self::failing($links, $point($next)))];
@@ -240,43 +266,29 @@ final class PhpWindow implements \JsonSerializable
     }
 
     /**
-     * The lowest X.Y.Z of the minor that the links admit: X.Y.0, or the start of a requirement or
-     * the end of a conflict inside the minor.
+     * The lowest X.Y.Z of the first admitted minor, Z from 0 to {@see MoveCheckers::NEWEST_PATCH},
+     * and the links that fail at the point just below it: the patch before, or the minor before.
      *
-     * @param list<PhpLink> $links
+     * @param list<PhpLink>            $links
+     * @param list<string>             $minors
+     * @param callable(string): string $point  the point at which a minor is read
+     *
+     * @return array{php: string, set_by: list<Req>}
      */
-    private static function lowestPoint(array $links, string $minor): string
+    private static function lowerEdge(array $links, array $minors, int $first, callable $point): array
     {
-        $parser = new VersionParser();
-        $candidates = [$minor.'.0'];
-        $inMinor = $parser->parseConstraints('~'.$minor.'.0');
-        foreach ($links as [$req, $constraint]) {
-            foreach (Intervals::get($constraint)['numeric'] as $interval) {
-                $bound = $req['link'] === self::LINK_REQUIRE ? $interval->getStart() : $interval->getEnd();
-                $version = $bound->getVersion();
-                // An open end (`>=8.5` ends at PHP_INT_MAX) names no point.
-                if ($version === \PHP_INT_MAX.'.0.0.0' || preg_match('/^(\d+)\.(\d+)\.(\d+)\.(\d+)/', $version, $m) !== 1) {
-                    continue;
-                }
-                // An exclusive bound or a fourth segment usually moves to the next patch, but
-                // `>7.4.3-dev` admits 7.4.3: both are candidates, and failing() decides.
-                $exclusive = \in_array($bound->getOperator(), ['>', '<='], true);
-                foreach ($exclusive || (int) $m[4] !== 0 ? [0, 1] : [0] as $add) {
-                    $candidate = $m[1].'.'.$m[2].'.'.((int) $m[3] + $add);
-                    if ($inMinor->matches(new Constraint('==', $parser->normalize($candidate)))) {
-                        $candidates[] = $candidate;
-                    }
-                }
+        $minor = $minors[$first];
+        $below = isset($minors[$first - 1]) ? $point($minors[$first - 1]) : null;
+        foreach (range(0, MoveCheckers::NEWEST_PATCH) as $patch) {
+            $php = $minor.'.'.$patch;
+            if (self::failing($links, $php) === []) {
+                return ['php' => $php, 'set_by' => $below === null ? [] : self::clean(self::failing($links, $below))];
             }
-        }
-        usort($candidates, 'version_compare');
-        foreach ($candidates as $candidate) {
-            if (self::failing($links, $candidate) === []) {
-                return $candidate;
-            }
+            $below = $php;
         }
 
-        return $minor.'.'.MoveCheckers::NEWEST_PATCH;
+        // Only the target point admits the minor: config.platform.php names a patch past the range.
+        return ['php' => $point($minor), 'set_by' => self::clean(self::failing($links, $minor.'.'.MoveCheckers::NEWEST_PATCH))];
     }
 
     /**
@@ -292,8 +304,8 @@ final class PhpWindow implements \JsonSerializable
                 $out[] = $req;
             }
         }
-        usort($out, static fn (array $a, array $b): int => [$a['name'] !== null, (string) $a['name'], $a['link'], $a['target'], $a['dev']]
-            <=> [$b['name'] !== null, (string) $b['name'], $b['link'], $b['target'], $b['dev']]);
+        usort($out, static fn (array $a, array $b): int => [$a['name'] !== null, $a['name'], $a['link'], $a['target'], $a['dev']]
+            <=> [$b['name'] !== null, $b['name'], $b['link'], $b['target'], $b['dev']]);
 
         return $out;
     }
@@ -301,6 +313,12 @@ final class PhpWindow implements \JsonSerializable
     public function targetMinor(): string
     {
         return $this->targetMinor;
+    }
+
+    /** @return list<string> the known minors that the window was read on, oldest first */
+    public function knownMinors(): array
+    {
+        return $this->knownMinors;
     }
 
     /** @return Data */

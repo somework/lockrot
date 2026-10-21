@@ -9,9 +9,7 @@ use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\Report2Root;
 use Lockrot\Analyzer\SecurityTotals;
-use Lockrot\Clock;
 use Lockrot\Data\Advisory\AdvisoryRepository;
-use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Security\Severity;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Verdict\ScoreModel;
@@ -229,7 +227,7 @@ final class RunFooter
             return null;
         }
         $data = $window->toArray();
-        $known = PhpReleaseDates::load()->minors(new Clock($report->generatedAt()));
+        $known = array_flip($window->knownMinors());
         $with = $data['with_dev'];
         $without = $data['without_dev'];
         $clause = $with === null || $with['minors'] === $without['minors']
@@ -244,23 +242,25 @@ final class RunFooter
         }
         $analysed = $report->includesDev() && $with !== null ? $with : $without;
         $edge = $analysed['upper_edge'];
-        $setters = [];
-        foreach ($edge === null ? [] : $edge['set_by'] as $req) {
-            $setter = self::setter($req, $name);
-            if (!\in_array($setter, $setters, true)) {
-                $setters[] = $setter;
+        if ($edge !== null) {
+            $setters = [];
+            foreach ($edge['set_by'] as $req) {
+                $setter = self::setter($req, $name);
+                if (!\in_array($setter, $setters, true)) {
+                    $setters[] = $setter;
+                }
             }
-        }
-        if ($edge !== null && $setters !== []) {
-            $parts[] = self::names($setters).(\count($setters) === 1 ? ' excludes ' : ' exclude ').$edge['excludes'];
+            if ($setters !== []) {
+                $parts[] = self::names($setters).(\count($setters) === 1 ? ' excludes ' : ' exclude ').$edge['excludes'];
+            }
         }
 
         return 'php: '.implode('; ', $parts);
     }
 
     /**
-     * @param list<string> $minors
-     * @param list<string> $known
+     * @param list<string>       $minors
+     * @param array<string, int> $known known minor => its place, oldest first
      */
     private static function installsOn(array $minors, array $known): string
     {
@@ -270,7 +270,7 @@ final class RunFooter
         $runs = [];
         $previous = null;
         foreach ($minors as $minor) {
-            $index = (int) array_search($minor, $known, true);
+            $index = $known[$minor];
             if ($previous !== null && $index === $previous + 1) {
                 $runs[\count($runs) - 1][1] = $minor;
             } else {
@@ -278,7 +278,7 @@ final class RunFooter
             }
             $previous = $index;
         }
-        $parts = array_map(static fn (array $run): string => $run[0] === $run[1] ? $run[0] : $run[0].' to '.$run[1], $runs);
+        $parts = array_map(static fn (array $run): string => implode(' to ', array_unique($run)), $runs);
         $last = array_pop($parts);
 
         return 'on PHP '.($parts === [] ? $last : implode(', ', $parts).' and '.$last);

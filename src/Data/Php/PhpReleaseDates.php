@@ -50,7 +50,7 @@ final class PhpReleaseDates
         $minors = array_keys(array_filter($this->dates, static fn (\DateTimeImmutable $ga): bool => $ga->format('Y-m-d') <= $today));
         usort($minors, 'version_compare');
 
-        return array_map('strval', $minors);
+        return $minors;
     }
 
     /**

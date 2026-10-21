@@ -110,7 +110,7 @@ final class AnalyzerTest extends TestCase
         };
     }
 
-    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, bool $token, Allowlist $allowlist, bool $offline = false, int $noTokenBudget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, ?ForgeAuth $auth = null, ?AdvisoryLoaderInterface $advisories = null): Analyzer
+    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, bool $token, Allowlist $allowlist, bool $offline = false, int $noTokenBudget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, ?ForgeAuth $auth = null, ?AdvisoryLoaderInterface $advisories = null, string $targetPhp = '8.4'): Analyzer
     {
         $clock = Clock::fixed(F::NOW);
         $auth ??= ForgeAuth::withTokens(new Tokens($token ? 't' : null, null));
@@ -120,7 +120,7 @@ final class AnalyzerTest extends TestCase
             new ActivityFetchPlanner($auth, $noTokenBudget),
             new RepoLocator(),
             $allowlist,
-            SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
+            SignalSet::default($clock, new Thresholds(), $targetPhp, PhpReleaseDates::load()),
             $clock,
             $offline,
             $advisories
@@ -696,6 +696,18 @@ final class AnalyzerTest extends TestCase
     {
         return $this->analyzer($loader, $http, $token, $allowlist ?? new Allowlist([]), false, $noTokenBudget, $auth)
             ->analyze(LockFile::fromArray(['packages' => $packages]), ProjectConfig::empty(), false);
+    }
+
+    public function testThePhpWindowIsReadAtTheTargetPhpAndNotAtTheRuntimePhp(): void
+    {
+        // No PHP that the CI matrix runs on is 7.1.
+        $report = $this->analyzer($this->loader(), $this->http([]), true, new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, null, null, '7.1')
+            ->analyze(LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), false);
+
+        $window = $report->phpWindow();
+        self::assertNotNull($window);
+        self::assertSame('7.1', $window->targetMinor());
+        self::assertSame('7.1.99', $window->toArray()['target']['php']);
     }
 
     public function testPackagesNotFromAComposerRepositoryAreCountedInOneNote(): void
