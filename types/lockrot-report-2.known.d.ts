@@ -395,6 +395,8 @@ export type RunMoveCheckIgnoresExtensions = true;
 export type RunMoveCheckBaseline = "resolves" | "refused" | "not_checked";
 /** open set at #/definitions/run/properties/move_check/oneOf/0/properties/reason/oneOf/0 */
 export type RunMoveCheckReason = "install_time_budget" | "no_composer_json" | "composer_json_invalid" | "solver_error" | (string & {});
+/** closed set at #/definitions/run/properties/php_window/oneOf/0/properties/host_requires/items */
+export type RunPhpWindowHostRequiresItem = "php-debug" | "php-ipv6" | "php-zts";
 /** open set at #/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key */
 export type NoteAdvisoriesDisabledByPolicyPolicyKey = "policy" | "policy.advisories" | "policy.advisories.audit" | "COMPOSER_POLICY" | (string & {});
 /** open set at #/definitions/noteAbandonedNotAuditedByComposer/properties/policy_key */
@@ -409,6 +411,10 @@ export type NoteBaselineTargetDiffersRunTargetPhpSource = "option" | "env" | "co
 export type NoteMovesNotCheckedReason = "baseline_refused" | (string & {});
 /** open set at #/definitions/noteUpdateNowNotChecked/properties/reason */
 export type NoteUpdateNowNotCheckedReason = "baseline_refused" | "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "no_release_read" | "pass_cap" | "solver_error" | (string & {});
+/** closed set at #/definitions/phpWindowReq/properties/link */
+export type PhpWindowReqLink = "require" | "conflict";
+/** closed set at #/definitions/phpWindowReq/properties/target */
+export type PhpWindowReqTarget = "php" | "php-64bit";
 /** open set at #/definitions/noteCode */
 export type NoteCode = "offline" | "metadata_unavailable" | "monorepo_parent_unavailable" | "advisory_ignore_unreadable" | "advisories_unavailable" | "advisories_not_checked" | "repository_activity_not_checked" | "repository_activity_anonymous_cap" | "repository_activity_rate_limited" | "repository_activity_unreachable" | "repository_activity_not_found" | "not_from_composer_repository" | "baseline_target_differs" | "baseline_fix_model_differs" | "ignore_does_not_cover_advisories" | "advisories_disabled_by_policy" | "abandoned_markings_ignored" | "abandoned_not_audited_by_composer" | "abandoned_ignore_unreadable" | "repository_activity_host_not_supported" | "moves_not_checked" | "update_now_reduced" | "update_now_refused" | "update_now_not_checked" | "move_check_failed" | "package_name_invalid" | (string & {});
 /** closed set at #/definitions/noteDetail/anyOf/0/properties/code */

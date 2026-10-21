@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\FlagTotals;
+use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\Report2Root;
 use Lockrot\Analyzer\SecurityTotals;
@@ -211,6 +212,94 @@ final class RunFooter
             default:
                 return 'moves: not checked ('.MoveCheck::reasonWords((string) $data['reason']).')';
         }
+    }
+
+    /**
+     * The `php:` line of `run.php_window`: the minors the lock installs on, the PHP that Composer
+     * checks it at, and the links that exclude the next minor. Null when the window is null.
+     *
+     * @param callable(string): string $name
+     */
+    public static function phpWindow(Report $report, callable $name): ?string
+    {
+        $window = $report->phpWindow();
+        if ($window === null) {
+            return null;
+        }
+        $data = $window->toArray();
+        $known = array_flip($window->knownMinors());
+        $with = $data['with_dev'];
+        $without = $data['without_dev'];
+        $clause = $with === null || $with['minors'] === $without['minors']
+            ? 'the lock installs '.self::installsOn($without['minors'], $known)
+            : 'without require-dev the lock installs '.self::installsOn($without['minors'], $known).', and with require-dev '.self::installsOn($with['minors'], $known);
+        if (!$data['target']['inside']) {
+            $clause .= ', so your target, '.$window->targetMinor().', is excluded';
+        }
+        $parts = [$clause];
+        if ($data['platform_override'] !== null) {
+            $parts[] = 'Composer checks it at '.$data['platform_override'].' from config.platform.php';
+        }
+        $analysed = $report->includesDev() && $with !== null ? $with : $without;
+        $edge = $analysed['upper_edge'];
+        if ($edge !== null) {
+            $setters = [];
+            foreach ($edge['set_by'] as $req) {
+                $setter = self::setter($req, $name);
+                if (!\in_array($setter, $setters, true)) {
+                    $setters[] = $setter;
+                }
+            }
+            if ($setters !== []) {
+                $parts[] = self::names($setters).(\count($setters) === 1 ? ' excludes ' : ' exclude ').$edge['excludes'];
+            }
+        }
+
+        return 'php: '.implode('; ', $parts);
+    }
+
+    /**
+     * @param list<string>       $minors
+     * @param array<string, int> $known known minor => its place, oldest first
+     */
+    private static function installsOn(array $minors, array $known): string
+    {
+        if ($minors === []) {
+            return 'on no PHP';
+        }
+        $runs = [];
+        $previous = null;
+        foreach ($minors as $minor) {
+            $index = $known[$minor];
+            if ($previous !== null && $index === $previous + 1) {
+                $runs[\count($runs) - 1][] = $minor;
+            } else {
+                $runs[] = [$minor];
+            }
+            $previous = $index;
+        }
+        $parts = array_map(static fn (array $run): string => \count($run) === 1 ? $run[0] : $run[0].' to '.$run[\count($run) - 1], $runs);
+        $last = array_pop($parts);
+
+        return 'on PHP '.($parts === [] ? $last : implode(', ', $parts).' and '.$last);
+    }
+
+    /**
+     * A package name, or the root's link: `require.php`, `require-dev.php`, `conflict.php`, `require.php-64bit`.
+     *
+     * @param array{name: ?string, link: string, target: string, dev: bool} $req
+     * @param callable(string): string                                       $name
+     */
+    private static function setter(array $req, callable $name): string
+    {
+        if ($req['name'] !== null) {
+            return $name($req['name']);
+        }
+        if ($req['link'] === PhpWindow::LINK_CONFLICT) {
+            return 'conflict.'.$req['target'];
+        }
+
+        return ($req['dev'] ? 'require-dev.' : 'require.').$req['target'];
     }
 
     /** The `advisories:` line of `run.advisory_lookup`, on every run. */

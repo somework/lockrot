@@ -9,4 +9,5 @@
 flags: abandoned 1 · silent 2 · pinned 3 · old-promise 2 · stale 3 · 3 packages carry more than one
 depth: 2 of 7 flagged packages are named by no line of composer.json · direct 5 · 1 hop 1 · 3 hops 1 · deepest: pear/console_getopt, 3 hops (matomo/decompress › pear/archive_tar › pear/pear-core-minimal › pear/console_getopt)
 security: no vulnerable package · advisories not checked
+php: the lock installs on PHP 8.1 to 8.5; Composer checks it at 8.1.0 from config.platform.php
 gate: fails · --fail-on=high · 5 findings fail it · advisories not applied to 52 packages: not checked (Composer below 2.4) · target php 8.4 (--target-php)

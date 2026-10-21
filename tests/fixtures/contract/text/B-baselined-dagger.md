@@ -11,6 +11,7 @@ depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 1 advisory: 1 high
 libyears: 10.6 behind across the one package · 10.6 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 advisories: 1 package asked · packagist.org answered (1 on record for 1 package)
+php: the lock installs on PHP 7.2 to 8.5
 baseline: 0 known · 0 new · 1 worsened · 0 stale (lockrot-baseline.json)
 
 <sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

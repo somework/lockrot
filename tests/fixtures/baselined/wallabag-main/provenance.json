@@ -8276,23 +8276,23 @@
     },
     "server_mask": "http://127.0.0.1:<port> reads http://127.0.0.1",
     "files": {
-        "t0/report.json": "546e7703c9d917ec851ab038ce13f65eab8e20a28a9c0b39bfee2d860aeb852e",
+        "t0/report.json": "3219449c9342f7b626b439077e2b102a6a7c7bb6f5a1998754ddb1180827ef46",
         "lockrot-baseline.json": "e341e32e57bad95d3b1aa662bbb7c6ea9217f5062ad55788814610c993042150",
-        "check/report.json": "6187b1896799d79ccfba9e7f624db332a6c21e2fb0d840b13c0600076948b85b",
-        "check/report.table.txt": "f8eb16d421150e24935fc6eff2374b9bae73533c0e7e6c07e907248c236bfefc",
-        "check/report.md": "7d8af29b72f091b9db2d26f591ccfd386c9608cb8a03c13074843345d92a6d0a",
-        "check/report.github.txt": "5d9a6e3d0f30d1518083cd12fab9ef3520a565fb6d14b7e456c5378374c218f0",
+        "check/report.json": "4bca1da402a440ede34f9ce48a01adc6898102810eb457be5c3d2d39c2fcba48",
+        "check/report.table.txt": "a5666bc6fe4c789ab501d22d24075a4634796782ec1dff9cbfa3c9f8f2394d7e",
+        "check/report.md": "a7fa0fc9fc531b4bbf53141e18a688995ba764a2a0c08aebd65f6d06a19dace9",
+        "check/report.github.txt": "71275822a89bcf6f62631ad8dc88d3b64751e21f83bae34dfed93a88be011dca",
         "check/report.gitlab.json": "58a929f52c38dbc1b1db296ec1c4c928d95a8c16a99a691ae97d14232729a92f",
         "check/report.sarif.json": "df0432f1b7464c9905e024277f03f69c268837f50b6074dc2f6f941abda52a01",
-        "check/report.bundle.json": "06856495983b69f9ebf513c58c0e84647a45334199ec44e651a88b44af0596f8",
+        "check/report.bundle.json": "b7663be6d8c2ef66b7fe8ec2e2152175351d21899d35b3ec0f9cdafbb53732eb",
         "check/explain/javibravo--simpleue.json": "d4823e9b617ec4b90970172395abe13f2904d1da46f27a853db5b745bd8942d4",
         "check/explain/mnapoli--piwik-twig-extension.json": "d756060f03a0539d056a61a820946dd8e529d15386b08df046f834f98002828c",
         "check/explain/spomky-labs--otphp.json": "608336cee7eb5a2c178a40a333cbb209b4e586bee951768c9b78f99a2f640268",
         "check/explain/symfony--web-server-bundle.json": "bee8ded7b5cb5f1bd060b71e0f8291589cb3be0ee1a733a23da6d4ee6dfa8f1f",
         "check/explain/willdurand--jsonp-callback-validator.json": "b9a2defdb8c3d4cb9c86b57b376e3d65c0add1270a4368b7f417ddc53c1f9957",
-        "check/gates-left-behind-vulnerable-high.json": "4c91f76aa16aff4bc66eaea613fdf1172b5a5cd2ae39ee620b9d39d4c28c2e6c",
+        "check/gates-left-behind-vulnerable-high.json": "bd701e35f20c3e048d3f23648b7a9bd2c43bccd0ff4bd7c64d455302164b8de7",
         "check/gates-left-behind-vulnerable-high.sarif.json": "0ac3ec8be37bdc1358a54eec6a394f2d1f8562176397530efef61377ed1f607b",
         "regenerate/lockrot-baseline.json": "089841caa85602f5e033a50ded61a7369ec7de8a319bc1e864b0f389e7827c58",
-        "regenerate/report.json": "a2e080b11a71722986432f266e561af65658f4f8a679e88a5fe3d371d2c36f4e"
+        "regenerate/report.json": "b55c048a9eacb612913ff2f971600ad4cac1d38e1ada203d7508ab7980a16552"
     }
 }

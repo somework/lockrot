@@ -11,5 +11,6 @@ depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 6 advisories: 2 high, 2 medium, 1 unrated, 1 low
 libyears: 3.0 behind across the one package · 3.0 from direct requirements · furthest behind laravel/framework v9.52.16 at 3.0
 advisories: 1 package asked · packagist.org answered (74 on record for 10 packages)
+php: the lock installs on PHP 8.1 to 8.5
 
 <sub>15 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

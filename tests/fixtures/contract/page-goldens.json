@@ -421,6 +421,11 @@
         }
       ],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 8.5 · lowest 7.2.5, set by symfony/yaml >=7.2.5",
+        "PHP window, without require-dev: 7.2 to 8.5 · lowest 7.2.5, set by symfony/yaml >=7.2.5"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -521,6 +526,11 @@
       "signals_key": [],
       "advisory_groups": [],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 8.4 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 8.4 to 8.5 · lowest 8.4.0, set by require.php >=8.4",
+        "PHP window, without require-dev: 8.4 to 8.5 · lowest 8.4.0, set by require.php >=8.4"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -1300,6 +1310,11 @@
         }
       ],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 8.1 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1, genealabs/laravel-model-caching >=8.1, laravel/framework ^8.1 and 1 more",
+        "PHP window, without require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1, genealabs/laravel-model-caching >=8.1, laravel/framework ^8.1 and 1 more"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -1321,7 +1336,8 @@
       "gate_link": "#view=packages&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [
-        "Incomplete data: no advisory check ran. What this run could not see"
+        "Incomplete data: no advisory check ran. What this run could not see",
+        "PHP: this lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded. The PHP window"
       ],
       "waffle_caption": "0 of 1 package flagged · 1 ok · 0 allowlisted",
       "lead_scope": null,
@@ -1392,6 +1408,11 @@
       "run_notes": [
         "security advisories not checked (offline): no finding is graded for an advisory, and each next step's score after the move assumes its versions carry none"
       ],
+      "php_line": "php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php excludes 8.0",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 · 8.0 excluded by require.php ^7.2.5",
+        "PHP window, without require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 · 8.0 excluded by require.php ^7.2.5"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -1412,7 +1433,9 @@
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": null,
       "gate_link_rows": null,
-      "state_lines": [],
+      "state_lines": [
+        "PHP: this lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded. The PHP window"
+      ],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
@@ -1527,6 +1550,11 @@
       "run_notes": [
         "Composer is set not to block an install or an update on security advisories (policy.advisories: false); lockrot still checks and counts them."
       ],
+      "php_line": "php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php excludes 8.0",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 and joomla/filter ^7.2.5|~8.0.0|~8.1.0 · 8.0 excluded by require.php ^7.2.5",
+        "PHP window, without require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 and joomla/filter ^7.2.5|~8.0.0|~8.1.0 · 8.0 excluded by require.php ^7.2.5"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -1547,7 +1575,9 @@
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 84,
-      "state_lines": [],
+      "state_lines": [
+        "PHP: this lock installs on PHP 7.4, so your target, 8.4, is excluded · Composer checks it at 7.4.29, the PHP that the lock records from config.platform.php, not the PHP of the machine. The PHP window"
+      ],
       "waffle_caption": "110 of 210 packages flagged · 81 ok · 19 allowlisted",
       "lead_scope": "all 110 in production · 60 required directly, 50 pulled in",
       "grade_chips": [
@@ -3189,6 +3219,12 @@
         }
       ],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer checks it at 7.4.29 from config.platform.php; php-http/guzzle5-adapter excludes 8.0",
+      "php_rows": [
+        "PHP window, with require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
+        "PHP window, without require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
+        "Composer checks the lock at: 7.4.29 (config.platform.php)"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -3352,6 +3388,11 @@
         }
       ],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 8.5 · lowest 7.2.5, set by require.php >=7.2.5",
+        "PHP window, without require-dev: 7.2 to 8.5 · lowest 7.2.5, set by require.php >=7.2.5"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -3778,6 +3819,11 @@
         }
       ],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 8.5 · lowest 7.2.5, set by symfony/yaml >=7.2.5",
+        "PHP window, without require-dev: 7.2 to 8.5 · lowest 7.2.5, set by symfony/yaml >=7.2.5"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -3925,6 +3971,11 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.4 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.4 to 8.5 · lowest 7.4.0, set by require.php >=7.4, pagerfanta/core ^7.4 || ^8.0 and pagerfanta/twig ^7.4 || ^8.0",
+        "PHP window, without require-dev: 7.4 to 8.5 · lowest 7.4.0, set by require.php >=7.4, pagerfanta/core ^7.4 || ^8.0 and pagerfanta/twig ^7.4 || ^8.0"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -4119,6 +4170,11 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 8.0 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 8.0 to 8.5 · lowest 8.0.0, set by psr/log >=8.0.0 and slim/psr7 ^8.0",
+        "PHP window, without require-dev: 8.0 to 8.5 · lowest 8.0.0, set by psr/log >=8.0.0 and slim/psr7 ^8.0"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -4515,6 +4571,11 @@
         }
       ],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 8.5 · lowest 7.2.5, set by symfony/yaml >=7.2.5",
+        "PHP window, without require-dev: 7.2 to 8.5 · lowest 7.2.5, set by symfony/yaml >=7.2.5"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -4535,7 +4596,9 @@
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
-      "state_lines": [],
+      "state_lines": [
+        "PHP: this lock installs on PHP 7.1 to 7.4, so your target, 8.4, is excluded. The PHP window"
+      ],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
@@ -4672,6 +4735,11 @@
         }
       ],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.1 to 7.4, so your target, 8.4, is excluded; require.php and csa/guzzle-bundle exclude 8.0",
+      "php_rows": [
+        "PHP window, with require-dev: 7.1 to 7.4 · lowest 7.1.3, set by require.php ^7.1.3 · 8.0 excluded by require.php ^7.1.3 and csa/guzzle-bundle ^7.1",
+        "PHP window, without require-dev: 7.1 to 7.4 · lowest 7.1.3, set by require.php ^7.1.3 · 8.0 excluded by require.php ^7.1.3 and csa/guzzle-bundle ^7.1"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -5140,6 +5208,11 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 8.5 · lowest 7.2.9, set by wikimedia/less.php >=7.2.9",
+        "PHP window, without require-dev: 7.2 to 8.5 · lowest 7.2.9, set by wikimedia/less.php >=7.2.9"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -5161,6 +5234,7 @@
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [
+        "PHP: this lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded. The PHP window",
         "extra.lockrot.ignore accepts maintenance flags, not advisories · 1 package it lists still counts for advisories. The run note"
       ],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
@@ -5275,6 +5349,11 @@
       "run_notes": [
         "extra.lockrot.ignore[] no longer hides advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision"
       ],
+      "php_line": "php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php excludes 8.0",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 and symfony/yaml >=7.2.5 · 8.0 excluded by require.php ^7.2.5",
+        "PHP window, without require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 and symfony/yaml >=7.2.5 · 8.0 excluded by require.php ^7.2.5"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -5295,7 +5374,9 @@
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": null,
       "gate_link_rows": null,
-      "state_lines": [],
+      "state_lines": [
+        "PHP: this lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded. The PHP window"
+      ],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
       "lead_scope": "1 dev-only · 1 pulled in",
       "grade_chips": [
@@ -5402,6 +5483,11 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php excludes 8.0",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 · 8.0 excluded by require.php ^7.2.5",
+        "PHP window, without require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 · 8.0 excluded by require.php ^7.2.5"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -5529,6 +5615,11 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 8.5 · lowest 7.2.5, set by require.php ^7.2.5 || ^8.0",
+        "PHP window, without require-dev: 7.2 to 8.5 · lowest 7.2.5, set by require.php ^7.2.5 || ^8.0"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -5664,6 +5755,11 @@
         }
       ],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 8.5 · lowest 7.2.5, set by require.php >=7.2.5",
+        "PHP window, without require-dev: 7.2 to 8.5 · lowest 7.2.5, set by require.php >=7.2.5"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -5803,6 +5899,11 @@
         }
       ],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 8.5 · lowest 7.2.5, set by require.php >=7.2.5",
+        "PHP window, without require-dev: 7.2 to 8.5 · lowest 7.2.5, set by require.php >=7.2.5"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -5885,6 +5986,1633 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 8.4 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 8.4 to 8.5 · lowest 8.4.0, set by require.php ~8.4.0 || ~8.5.0 and scheb/2fa-google-authenticator ~8.4.0 || ~8.5.0",
+        "PHP window, without require-dev: 8.4 to 8.5 · lowest 8.4.0, set by require.php ~8.4.0 || ~8.5.0 and scheb/2fa-google-authenticator ~8.4.0 || ~8.5.0"
+      ],
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
+    },
+    "composite.php-empty-with-dev‡": {
+      "document": "page/composite.php-empty-with-dev-dagger.json",
+      "title": "lockrot: 9 of 9 packages flagged",
+      "description": "lockrot flagged 9 of 9 packages in composer.lock: 4 critical, 2 high, 3 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for lockrot/composite · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "9 of 9 packages flagged (100%): 4 graded critical, 2 high, 3 low. Flags: abandoned 1, pinned 1, left-behind 2, old-promise 3, stale 3, vulnerable 5.",
+        "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 6,
+      "state_lines": [
+        "PHP: without require-dev this lock installs on PHP 8.1 to 8.3, and with require-dev on no PHP (8.1 to 8.3 are excluded only by acme/string 1.0.0 >=8.4.1), so your target, 8.4, is excluded. The PHP window"
+      ],
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
+      "grade_chips": [
+        "critical 4",
+        "high 2",
+        "low 3"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 4
+        },
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 2
+        },
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 3
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": "1 of 6 findings that fail the gate is held by other packages. Their holders are in each sheet's Held by.",
+        "held_link": "#view=findings&gate=fails%2Cheld",
+        "held_link_rows": 1,
+        "way_out": "5 need another way out: 1 replace, 1 test, 1 blocked, 2 not checked: the run checked no move",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 5,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": "29",
+        "unit": "advisories on 5 packages",
+        "lookup_complete": true,
+        "counted_as": [
+          "unrated, counted as medium"
+        ]
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "symfony/monolog-bridge",
+            "link": "#view=findings&pkg=symfony%2Fmonolog-bridge",
+            "reach": "",
+            "total": 36,
+            "terms": "left-behind 16 · old-promise 4 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "symfony/debug",
+            "link": "#view=findings&pkg=symfony%2Fdebug",
+            "reach": "",
+            "total": 36,
+            "terms": "abandoned 32 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "twig/twig",
+            "link": "#view=findings&pkg=twig%2Ftwig",
+            "reach": "",
+            "total": 32,
+            "terms": "vulnerable 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "guzzlehttp/guzzle",
+            "link": "#view=findings&pkg=guzzlehttp%2Fguzzle",
+            "reach": "",
+            "total": 32,
+            "terms": "left-behind 16 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "link": "#view=findings&pkg=friendsofsymfony%2Foauth-server-bundle",
+            "reach": "",
+            "total": 18,
+            "terms": "pinned 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "tubalmartin/cssmin",
+            "link": "#view=findings&pkg=tubalmartin%2Fcssmin",
+            "reach": "",
+            "total": 18,
+            "terms": "old-promise 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "friendsofsymfony/oauth2-php",
+            "link": "#view=findings&pkg=friendsofsymfony%2Foauth2-php",
+            "reach": "transitive",
+            "total": 4,
+            "terms": "stale 4",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "symfony/yaml",
+            "link": "#view=findings&pkg=symfony%2Fyaml",
+            "reach": "",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "symfony/polyfill-intl-idn",
+            "link": "#view=findings&pkg=symfony%2Fpolyfill-intl-idn",
+            "reach": "transitive",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "5 carry more than one flag · score model 1",
+        "1 abandoned package, 1 with a replacement",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 9"
+        ],
+        "rows": [
+          {
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=friendsofsymfony%2Foauth-server-bundle"
+          },
+          {
+            "package": "guzzlehttp/guzzle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
+          }
+        ],
+        "count": "2 direct requirements pull in flagged packages.",
+        "overlap": "A flagged package counts under each direct requirement it is reached from, up to 8, so the rows overlap.",
+        "more": null,
+        "shared": null
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 7",
+          "1 hop away 2"
+        ],
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+      },
+      "libyears": {
+        "figure": "22.06",
+        "bound": "",
+        "sub": "over 7 packages · 22.06 from direct requirements",
+        "unmeasured": "Not measured: 1 a branch snapshot has no release branch · 1 dated only by a commit its tags share",
+        "top": [
+          [
+            "symfony/monolog-bridge v2.6.13",
+            "10.6",
+            "v6.4.45 (2026-08-30)"
+          ],
+          [
+            "guzzlehttp/guzzle 6.5.8",
+            "4.2",
+            "8.2.0 (2026-09-06)"
+          ],
+          [
+            "symfony/yaml v5.4.23",
+            "3.4",
+            "v8.1.8 (2026-09-26)"
+          ],
+          [
+            "twig/twig v2.16.1",
+            "2.0",
+            "v3.30.0 (2026-09-25)"
+          ],
+          [
+            "symfony/debug v3.4.47",
+            "1.8",
+            "v4.4.44 (2022-07-28)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "4 packages",
+          "gate": "all fail the gate",
+          "major": "3 of 3 moves cross a major"
+        },
+        {
+          "grade": "high",
+          "count": "2 packages",
+          "gate": "all fail the gate",
+          "major": null
+        },
+        {
+          "grade": "low",
+          "count": "3 packages",
+          "gate": null,
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "twig/twig",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/twig-bridge",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/monolog-bridge:^5.4.52'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'php:>=7.2.5' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/debug",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth-server-bundle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tubalmartin/cssmin",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/yaml",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update symfony/yaml",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "fails_gate": false,
+          "reach": "via guzzlehttp/guzzle",
+          "held": null,
+          "command": "composer update symfony/polyfill-intl-idn",
+          "after": "after it: 0, finished",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth2-php",
+          "fails_gate": false,
+          "reach": "via friendsofsymfony/oauth-server-bundle",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 1,
+        "wayout": 5
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S1 marked abandoned",
+        "S2 release age",
+        "S3 archived repository",
+        "S4 repository activity",
+        "S5 PHP promise",
+        "S6 pinned version",
+        "S7 pulled-in packages",
+        "S8 release branch",
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "twig/twig",
+          "same_cve_as": [],
+          "fix_notes": [
+            "needs PHP >=8.1.0 · held by symfony/twig-bridge"
+          ]
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "same_cve_as": [],
+          "fix_notes": [
+            "needs PHP ^7.2.5 || ^8.0"
+          ]
+        },
+        {
+          "package": "symfony/yaml",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ],
+      "run_notes": [],
+      "php_line": "php: without require-dev the lock installs on PHP 8.1 to 8.3, and with require-dev on no PHP, so your target, 8.4, is excluded; require.php and acme/installer exclude 8.4",
+      "php_rows": [
+        "PHP window, with require-dev: none · 8.1 to 8.3 are excluded only by acme/string 1.0.0 >=8.4.1",
+        "PHP window, without require-dev: 8.1 to 8.3 · lowest 8.1.0, set by require.php ~8.1.0 || ~8.2.0 || ~8.3.0 and acme/installer ~8.1.0 || ~8.2.0 || ~8.3.0 · 8.4 excluded by require.php ~8.1.0 || ~8.2.0 || ~8.3.0 and acme/installer ~8.1.0 || ~8.2.0 || ~8.3.0"
+      ],
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
+    },
+    "composite.php-gap‡": {
+      "document": "page/composite.php-gap-dagger.json",
+      "title": "lockrot: 9 of 9 packages flagged",
+      "description": "lockrot flagged 9 of 9 packages in composer.lock: 4 critical, 2 high, 3 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for lockrot/composite · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "9 of 9 packages flagged (100%): 4 graded critical, 2 high, 3 low. Flags: abandoned 1, pinned 1, left-behind 2, old-promise 3, stale 3, vulnerable 5.",
+        "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 6,
+      "state_lines": [],
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
+      "grade_chips": [
+        "critical 4",
+        "high 2",
+        "low 3"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 4
+        },
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 2
+        },
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 3
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": "1 of 6 findings that fail the gate is held by other packages. Their holders are in each sheet's Held by.",
+        "held_link": "#view=findings&gate=fails%2Cheld",
+        "held_link_rows": 1,
+        "way_out": "5 need another way out: 1 replace, 1 test, 1 blocked, 2 not checked: the run checked no move",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 5,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": "29",
+        "unit": "advisories on 5 packages",
+        "lookup_complete": true,
+        "counted_as": [
+          "unrated, counted as medium"
+        ]
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "symfony/monolog-bridge",
+            "link": "#view=findings&pkg=symfony%2Fmonolog-bridge",
+            "reach": "",
+            "total": 36,
+            "terms": "left-behind 16 · old-promise 4 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "symfony/debug",
+            "link": "#view=findings&pkg=symfony%2Fdebug",
+            "reach": "",
+            "total": 36,
+            "terms": "abandoned 32 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "twig/twig",
+            "link": "#view=findings&pkg=twig%2Ftwig",
+            "reach": "",
+            "total": 32,
+            "terms": "vulnerable 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "guzzlehttp/guzzle",
+            "link": "#view=findings&pkg=guzzlehttp%2Fguzzle",
+            "reach": "",
+            "total": 32,
+            "terms": "left-behind 16 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "link": "#view=findings&pkg=friendsofsymfony%2Foauth-server-bundle",
+            "reach": "",
+            "total": 18,
+            "terms": "pinned 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "tubalmartin/cssmin",
+            "link": "#view=findings&pkg=tubalmartin%2Fcssmin",
+            "reach": "",
+            "total": 18,
+            "terms": "old-promise 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "friendsofsymfony/oauth2-php",
+            "link": "#view=findings&pkg=friendsofsymfony%2Foauth2-php",
+            "reach": "transitive",
+            "total": 4,
+            "terms": "stale 4",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "symfony/yaml",
+            "link": "#view=findings&pkg=symfony%2Fyaml",
+            "reach": "",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "symfony/polyfill-intl-idn",
+            "link": "#view=findings&pkg=symfony%2Fpolyfill-intl-idn",
+            "reach": "transitive",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "5 carry more than one flag · score model 1",
+        "1 abandoned package, 1 with a replacement",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 9"
+        ],
+        "rows": [
+          {
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=friendsofsymfony%2Foauth-server-bundle"
+          },
+          {
+            "package": "guzzlehttp/guzzle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
+          }
+        ],
+        "count": "2 direct requirements pull in flagged packages.",
+        "overlap": "A flagged package counts under each direct requirement it is reached from, up to 8, so the rows overlap.",
+        "more": null,
+        "shared": null
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 7",
+          "1 hop away 2"
+        ],
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+      },
+      "libyears": {
+        "figure": "22.06",
+        "bound": "",
+        "sub": "over 7 packages · 22.06 from direct requirements",
+        "unmeasured": "Not measured: 1 a branch snapshot has no release branch · 1 dated only by a commit its tags share",
+        "top": [
+          [
+            "symfony/monolog-bridge v2.6.13",
+            "10.6",
+            "v6.4.45 (2026-08-30)"
+          ],
+          [
+            "guzzlehttp/guzzle 6.5.8",
+            "4.2",
+            "8.2.0 (2026-09-06)"
+          ],
+          [
+            "symfony/yaml v5.4.23",
+            "3.4",
+            "v8.1.8 (2026-09-26)"
+          ],
+          [
+            "twig/twig v2.16.1",
+            "2.0",
+            "v3.30.0 (2026-09-25)"
+          ],
+          [
+            "symfony/debug v3.4.47",
+            "1.8",
+            "v4.4.44 (2022-07-28)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "4 packages",
+          "gate": "all fail the gate",
+          "major": "3 of 3 moves cross a major"
+        },
+        {
+          "grade": "high",
+          "count": "2 packages",
+          "gate": "all fail the gate",
+          "major": null
+        },
+        {
+          "grade": "low",
+          "count": "3 packages",
+          "gate": null,
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "twig/twig",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/twig-bridge",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/monolog-bridge:^5.4.52'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'php:>=7.2.5' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/debug",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth-server-bundle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tubalmartin/cssmin",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/yaml",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update symfony/yaml",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "fails_gate": false,
+          "reach": "via guzzlehttp/guzzle",
+          "held": null,
+          "command": "composer update symfony/polyfill-intl-idn",
+          "after": "after it: 0, finished",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth2-php",
+          "fails_gate": false,
+          "reach": "via friendsofsymfony/oauth-server-bundle",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 1,
+        "wayout": 5
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S1 marked abandoned",
+        "S2 release age",
+        "S3 archived repository",
+        "S4 repository activity",
+        "S5 PHP promise",
+        "S6 pinned version",
+        "S7 pulled-in packages",
+        "S8 release branch",
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "twig/twig",
+          "same_cve_as": [],
+          "fix_notes": [
+            "needs PHP >=8.1.0 · held by symfony/twig-bridge"
+          ]
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "same_cve_as": [],
+          "fix_notes": [
+            "needs PHP ^7.2.5 || ^8.0"
+          ]
+        },
+        {
+          "package": "symfony/yaml",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ],
+      "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.1 and 8.1 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.1 and 8.1 to 8.5 · lowest 7.1.0, set by require.php >=7.1 and acme/legacy 7.1.* || >=8.1",
+        "PHP window, without require-dev: 7.1 and 8.1 to 8.5 · lowest 7.1.0, set by require.php >=7.1 and acme/legacy 7.1.* || >=8.1"
+      ],
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
+    },
+    "composite.php-override‡": {
+      "document": "page/composite.php-override-dagger.json",
+      "title": "lockrot: 9 of 9 packages flagged",
+      "description": "lockrot flagged 9 of 9 packages in composer.lock: 4 critical, 2 high, 3 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for lockrot/composite · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "9 of 9 packages flagged (100%): 4 graded critical, 2 high, 3 low. Flags: abandoned 1, pinned 1, left-behind 2, old-promise 3, stale 3, vulnerable 5.",
+        "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 6,
+      "state_lines": [
+        "PHP: this lock installs on PHP 8.2 to 8.4 · Composer checks it at 8.4.1, the PHP that the lock records from config.platform.php, not the PHP of the machine. The PHP window"
+      ],
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
+      "grade_chips": [
+        "critical 4",
+        "high 2",
+        "low 3"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 4
+        },
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 2
+        },
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 3
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": "1 of 6 findings that fail the gate is held by other packages. Their holders are in each sheet's Held by.",
+        "held_link": "#view=findings&gate=fails%2Cheld",
+        "held_link_rows": 1,
+        "way_out": "5 need another way out: 1 replace, 1 test, 1 blocked, 2 not checked: the run checked no move",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 5,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": "29",
+        "unit": "advisories on 5 packages",
+        "lookup_complete": true,
+        "counted_as": [
+          "unrated, counted as medium"
+        ]
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "symfony/monolog-bridge",
+            "link": "#view=findings&pkg=symfony%2Fmonolog-bridge",
+            "reach": "",
+            "total": 36,
+            "terms": "left-behind 16 · old-promise 4 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "symfony/debug",
+            "link": "#view=findings&pkg=symfony%2Fdebug",
+            "reach": "",
+            "total": 36,
+            "terms": "abandoned 32 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "twig/twig",
+            "link": "#view=findings&pkg=twig%2Ftwig",
+            "reach": "",
+            "total": 32,
+            "terms": "vulnerable 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "guzzlehttp/guzzle",
+            "link": "#view=findings&pkg=guzzlehttp%2Fguzzle",
+            "reach": "",
+            "total": 32,
+            "terms": "left-behind 16 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "link": "#view=findings&pkg=friendsofsymfony%2Foauth-server-bundle",
+            "reach": "",
+            "total": 18,
+            "terms": "pinned 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "tubalmartin/cssmin",
+            "link": "#view=findings&pkg=tubalmartin%2Fcssmin",
+            "reach": "",
+            "total": 18,
+            "terms": "old-promise 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "friendsofsymfony/oauth2-php",
+            "link": "#view=findings&pkg=friendsofsymfony%2Foauth2-php",
+            "reach": "transitive",
+            "total": 4,
+            "terms": "stale 4",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "symfony/yaml",
+            "link": "#view=findings&pkg=symfony%2Fyaml",
+            "reach": "",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "symfony/polyfill-intl-idn",
+            "link": "#view=findings&pkg=symfony%2Fpolyfill-intl-idn",
+            "reach": "transitive",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "5 carry more than one flag · score model 1",
+        "1 abandoned package, 1 with a replacement",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 9"
+        ],
+        "rows": [
+          {
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=friendsofsymfony%2Foauth-server-bundle"
+          },
+          {
+            "package": "guzzlehttp/guzzle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
+          }
+        ],
+        "count": "2 direct requirements pull in flagged packages.",
+        "overlap": "A flagged package counts under each direct requirement it is reached from, up to 8, so the rows overlap.",
+        "more": null,
+        "shared": null
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 7",
+          "1 hop away 2"
+        ],
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+      },
+      "libyears": {
+        "figure": "22.06",
+        "bound": "",
+        "sub": "over 7 packages · 22.06 from direct requirements",
+        "unmeasured": "Not measured: 1 a branch snapshot has no release branch · 1 dated only by a commit its tags share",
+        "top": [
+          [
+            "symfony/monolog-bridge v2.6.13",
+            "10.6",
+            "v6.4.45 (2026-08-30)"
+          ],
+          [
+            "guzzlehttp/guzzle 6.5.8",
+            "4.2",
+            "8.2.0 (2026-09-06)"
+          ],
+          [
+            "symfony/yaml v5.4.23",
+            "3.4",
+            "v8.1.8 (2026-09-26)"
+          ],
+          [
+            "twig/twig v2.16.1",
+            "2.0",
+            "v3.30.0 (2026-09-25)"
+          ],
+          [
+            "symfony/debug v3.4.47",
+            "1.8",
+            "v4.4.44 (2022-07-28)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "4 packages",
+          "gate": "all fail the gate",
+          "major": "3 of 3 moves cross a major"
+        },
+        {
+          "grade": "high",
+          "count": "2 packages",
+          "gate": "all fail the gate",
+          "major": null
+        },
+        {
+          "grade": "low",
+          "count": "3 packages",
+          "gate": null,
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "twig/twig",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/twig-bridge",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/monolog-bridge:^5.4.52'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'php:>=7.2.5' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/debug",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth-server-bundle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tubalmartin/cssmin",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/yaml",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update symfony/yaml",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "fails_gate": false,
+          "reach": "via guzzlehttp/guzzle",
+          "held": null,
+          "command": "composer update symfony/polyfill-intl-idn",
+          "after": "after it: 0, finished",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth2-php",
+          "fails_gate": false,
+          "reach": "via friendsofsymfony/oauth-server-bundle",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 1,
+        "wayout": 5
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S1 marked abandoned",
+        "S2 release age",
+        "S3 archived repository",
+        "S4 repository activity",
+        "S5 PHP promise",
+        "S6 pinned version",
+        "S7 pulled-in packages",
+        "S8 release branch",
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "twig/twig",
+          "same_cve_as": [],
+          "fix_notes": [
+            "needs PHP >=8.1.0 · held by symfony/twig-bridge"
+          ]
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "same_cve_as": [],
+          "fix_notes": [
+            "needs PHP ^7.2.5 || ^8.0"
+          ]
+        },
+        {
+          "package": "symfony/yaml",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ],
+      "run_notes": [],
+      "php_line": "php: the lock installs on PHP 8.2 to 8.4; Composer checks it at 8.4.1 from config.platform.php; acme/clock excludes 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 8.2 to 8.4 · lowest 8.2.0, set by require.php >=8.2 and acme/clock ~8.2.0 || ~8.3.0 || ~8.4.0 · 8.5 excluded by acme/clock ~8.2.0 || ~8.3.0 || ~8.4.0",
+        "PHP window, without require-dev: 8.2 to 8.4 · lowest 8.2.0, set by require.php >=8.2 and acme/clock ~8.2.0 || ~8.3.0 || ~8.4.0 · 8.5 excluded by acme/clock ~8.2.0 || ~8.3.0 || ~8.4.0",
+        "Composer checks the lock at: 8.4.1 (config.platform.php)"
+      ],
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
+    },
+    "composite.php-provided‡": {
+      "document": "page/composite.php-provided-dagger.json",
+      "title": "lockrot: 9 of 9 packages flagged",
+      "description": "lockrot flagged 9 of 9 packages in composer.lock: 4 critical, 2 high, 3 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for lockrot/composite · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "9 of 9 packages flagged (100%): 4 graded critical, 2 high, 3 low. Flags: abandoned 1, pinned 1, left-behind 2, old-promise 3, stale 3, vulnerable 5.",
+        "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 6,
+      "state_lines": [],
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
+      "grade_chips": [
+        "critical 4",
+        "high 2",
+        "low 3"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 4
+        },
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 2
+        },
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 3
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": "1 of 6 findings that fail the gate is held by other packages. Their holders are in each sheet's Held by.",
+        "held_link": "#view=findings&gate=fails%2Cheld",
+        "held_link_rows": 1,
+        "way_out": "5 need another way out: 1 replace, 1 test, 1 blocked, 2 not checked: the run checked no move",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 5,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": "29",
+        "unit": "advisories on 5 packages",
+        "lookup_complete": true,
+        "counted_as": [
+          "unrated, counted as medium"
+        ]
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "symfony/monolog-bridge",
+            "link": "#view=findings&pkg=symfony%2Fmonolog-bridge",
+            "reach": "",
+            "total": 36,
+            "terms": "left-behind 16 · old-promise 4 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "symfony/debug",
+            "link": "#view=findings&pkg=symfony%2Fdebug",
+            "reach": "",
+            "total": 36,
+            "terms": "abandoned 32 · old-promise 4",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "twig/twig",
+            "link": "#view=findings&pkg=twig%2Ftwig",
+            "reach": "",
+            "total": 32,
+            "terms": "vulnerable 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "guzzlehttp/guzzle",
+            "link": "#view=findings&pkg=guzzlehttp%2Fguzzle",
+            "reach": "",
+            "total": 32,
+            "terms": "left-behind 16 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "link": "#view=findings&pkg=friendsofsymfony%2Foauth-server-bundle",
+            "reach": "",
+            "total": 18,
+            "terms": "pinned 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "tubalmartin/cssmin",
+            "link": "#view=findings&pkg=tubalmartin%2Fcssmin",
+            "reach": "",
+            "total": 18,
+            "terms": "old-promise 16 · stale 2",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "friendsofsymfony/oauth2-php",
+            "link": "#view=findings&pkg=friendsofsymfony%2Foauth2-php",
+            "reach": "transitive",
+            "total": 4,
+            "terms": "stale 4",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "symfony/yaml",
+            "link": "#view=findings&pkg=symfony%2Fyaml",
+            "reach": "",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          },
+          {
+            "grade": "low",
+            "package": "symfony/polyfill-intl-idn",
+            "link": "#view=findings&pkg=symfony%2Fpolyfill-intl-idn",
+            "reach": "transitive",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "5 carry more than one flag · score model 1",
+        "1 abandoned package, 1 with a replacement",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 9"
+        ],
+        "rows": [
+          {
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=friendsofsymfony%2Foauth-server-bundle"
+          },
+          {
+            "package": "guzzlehttp/guzzle",
+            "flagged": 1,
+            "link": "#view=radius&pkg=guzzlehttp%2Fguzzle"
+          }
+        ],
+        "count": "2 direct requirements pull in flagged packages.",
+        "overlap": "A flagged package counts under each direct requirement it is reached from, up to 8, so the rows overlap.",
+        "more": null,
+        "shared": null
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 7",
+          "1 hop away 2"
+        ],
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+      },
+      "libyears": {
+        "figure": "22.06",
+        "bound": "",
+        "sub": "over 7 packages · 22.06 from direct requirements",
+        "unmeasured": "Not measured: 1 a branch snapshot has no release branch · 1 dated only by a commit its tags share",
+        "top": [
+          [
+            "symfony/monolog-bridge v2.6.13",
+            "10.6",
+            "v6.4.45 (2026-08-30)"
+          ],
+          [
+            "guzzlehttp/guzzle 6.5.8",
+            "4.2",
+            "8.2.0 (2026-09-06)"
+          ],
+          [
+            "symfony/yaml v5.4.23",
+            "3.4",
+            "v8.1.8 (2026-09-26)"
+          ],
+          [
+            "twig/twig v2.16.1",
+            "2.0",
+            "v3.30.0 (2026-09-25)"
+          ],
+          [
+            "symfony/debug v3.4.47",
+            "1.8",
+            "v4.4.44 (2022-07-28)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "4 packages",
+          "gate": "all fail the gate",
+          "major": "3 of 3 moves cross a major"
+        },
+        {
+          "grade": "high",
+          "count": "2 packages",
+          "gate": "all fail the gate",
+          "major": null
+        },
+        {
+          "grade": "low",
+          "count": "3 packages",
+          "gate": null,
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "twig/twig",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/twig-bridge",
+          "command": "composer require 'php:>=8.1' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'symfony/monolog-bridge:^5.4.52'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'php:>=7.2.5' --no-update",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/debug",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth-server-bundle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "tubalmartin/cssmin",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/yaml",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update symfony/yaml",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "fails_gate": false,
+          "reach": "via guzzlehttp/guzzle",
+          "held": null,
+          "command": "composer update symfony/polyfill-intl-idn",
+          "after": "after it: 0, finished",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "friendsofsymfony/oauth2-php",
+          "fails_gate": false,
+          "reach": "via friendsofsymfony/oauth-server-bundle",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 1,
+        "wayout": 5
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S1 marked abandoned",
+        "S2 release age",
+        "S3 archived repository",
+        "S4 repository activity",
+        "S5 PHP promise",
+        "S6 pinned version",
+        "S7 pulled-in packages",
+        "S8 release branch",
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "twig/twig",
+          "same_cve_as": [],
+          "fix_notes": [
+            "needs PHP >=8.1.0 · held by symfony/twig-bridge"
+          ]
+        },
+        {
+          "package": "symfony/monolog-bridge",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "same_cve_as": [],
+          "fix_notes": [
+            "needs PHP ^7.2.5 || ^8.0"
+          ]
+        },
+        {
+          "package": "symfony/yaml",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ],
+      "run_notes": [],
+      "php_line": null,
+      "php_rows": [],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -6565,6 +8293,11 @@
       "run_notes": [
         "1 package is not from a Composer repository: its release metadata and repository activity were not read · advisories asked"
       ],
+      "php_line": "php: the lock installs on PHP 8.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 8.2 to 8.5 · lowest 8.2.0, set by require.php ^8.2, brianium/paratest ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, brick/math ^8.2 and 70 more",
+        "PHP window, without require-dev: 8.2 to 8.5 · lowest 8.2.0, set by require.php ^8.2, brick/math ^8.2, dragonmantank/cron-expression ^8.2|^8.3|^8.4|^8.5 and 36 more"
+      ],
       "sheet_moves": {
         "pragmarx/google2fa-laravel": [
           {
@@ -6647,6 +8380,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 46,
       "state_lines": [
+        "PHP: this lock installs on PHP 7.4, so your target, 8.4, is excluded · Composer checks it at 7.4.29, the PHP that the lock records from config.platform.php, not the PHP of the machine. The PHP window",
         "Against lockrot-baseline.json: 61 new · 6 worsened · 47 known · 2 entries for packages that left the lock: behat/transliterator, true/punycode."
       ],
       "waffle_caption": "112 of 210 packages flagged · 79 ok · 19 allowlisted",
@@ -8337,6 +10071,12 @@
       "run_notes": [
         "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code 4.7.1 requires php >=7.4, <8.2."
       ],
+      "php_line": "php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer checks it at 7.4.29 from config.platform.php; php-http/guzzle5-adapter excludes 8.0",
+      "php_rows": [
+        "PHP window, with require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
+        "PHP window, without require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
+        "Composer checks the lock at: 7.4.29 (config.platform.php)"
+      ],
       "sheet_moves": {
         "twig/twig": [
           {
@@ -8858,6 +10598,11 @@
         }
       ],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 8.5 · lowest 7.2.5, set by symfony/yaml >=7.2.5",
+        "PHP window, without require-dev: 7.2 to 8.5 · lowest 7.2.5, set by symfony/yaml >=7.2.5"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -9011,6 +10756,11 @@
         }
       ],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 8.5 · lowest 7.2.5, set by require.php >=7.2.5",
+        "PHP window, without require-dev: 7.2 to 8.5 · lowest 7.2.5, set by require.php >=7.2.5"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}
@@ -9108,6 +10858,11 @@
       "advisory_groups": [],
       "run_notes": [
         "offline: repository metadata served from Composer's cache"
+      ],
+      "php_line": "php: the lock installs on PHP 7.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 7.2 to 8.5 · lowest 7.2.5, set by guzzlehttp/guzzle ^7.2.5 || ^8.0",
+        "PHP window, without require-dev: 7.2 to 8.5 · lowest 7.2.5, set by guzzlehttp/guzzle ^7.2.5 || ^8.0"
       ],
       "sheet_moves": {},
       "sheet_holders": {},
@@ -9804,6 +11559,11 @@
       "run_notes": [
         "1 package is not from a Composer repository: its release metadata and repository activity were not read · advisories asked"
       ],
+      "php_line": "php: the lock installs on PHP 8.2 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 8.2 to 8.5 · lowest 8.2.0, set by require.php ^8.2, brianium/paratest ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, brick/math ^8.2 and 70 more",
+        "PHP window, without require-dev: 8.2 to 8.5 · lowest 8.2.0, set by require.php ^8.2, brick/math ^8.2, dragonmantank/cron-expression ^8.2|^8.3|^8.4|^8.5 and 36 more"
+      ],
       "sheet_moves": {
         "mtdowling/jmespath.php": [
           {
@@ -9953,7 +11713,9 @@
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": null,
       "gate_link_rows": null,
-      "state_lines": [],
+      "state_lines": [
+        "PHP: this lock installs on PHP 7.3 to 8.0, so your target, 8.4, is excluded. The PHP window"
+      ],
       "waffle_caption": null,
       "lead_scope": null,
       "grade_chips": [],
@@ -9977,6 +11739,11 @@
       "signals_key": [],
       "advisory_groups": [],
       "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.3 to 8.0, so your target, 8.4, is excluded; require.php excludes 8.1",
+      "php_rows": [
+        "PHP window, with require-dev: 7.3 to 8.0 · lowest 7.3.0, set by require.php >=7.3.0 <8.1 · 8.1 excluded by require.php >=7.3.0 <8.1",
+        "PHP window, without require-dev: 7.3 to 8.0 · lowest 7.3.0, set by require.php >=7.3.0 <8.1 · 8.1 excluded by require.php >=7.3.0 <8.1"
+      ],
       "sheet_moves": {},
       "sheet_holders": {},
       "sheet_ladder": {}

@@ -86,6 +86,9 @@ final class ClosedSets
             '`run.advisory_lookup.scope`' => [$definition('advisoryLookup', 'properties', 'scope')],
             '`run.advisory_lookup.scope_source`' => [$definition('advisoryLookup', 'properties', 'scope_source')],
             'The `scope` of an `unchecked_accepted[]` entry\'s `accepted_by`' => [$definition('uncheckedAccepted', 'properties', 'accepted_by', 'properties', 'scope')],
+            'The `link` of a PHP window link, in `run.php_window`' => [$definition('phpWindowReq', 'properties', 'link')],
+            'The `target` of a PHP window link, in `run.php_window`' => [$definition('phpWindowReq', 'properties', 'target')],
+            '`run.php_window.host_requires`' => [$definition('run', 'properties', 'php_window', 'oneOf', '0', 'properties', 'host_requires', 'items')],
         ];
     }
 

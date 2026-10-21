@@ -11,6 +11,7 @@ depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 1 advisory: 1 high
 libyears: 10.6 behind across the one package · 10.6 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 advisories: 1 package asked · packagist.org answered (1 on record for 1 package)
+php: the lock installs on PHP 7.2 to 8.5
 
 - note: extra.lockrot.ignore\[\] accepts maintenance flags only, not advisories: symfony/monolog-bridge: 1 counted advisory; accept them in Composer's audit policy if that is the decision
 

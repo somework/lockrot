@@ -3,4 +3,5 @@
 flags: left-behind 1 · vulnerable 1 · 1 package carries more than one
 depth: 1 of 1 flagged package is named by no line of composer.json · 2 hops 1 · deepest: league/flysystem, 2 hops (mautic/core-lib › barryvdh/elfinder-flysystem-driver › league/flysystem)
 security: 1 vulnerable package · 1 advisory: 1 low
+php: the lock installs on PHP 7.2 to 8.5
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

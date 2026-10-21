@@ -1,3 +1,4 @@
 ::error file=composer.lock,line=4,title=lockrot%3A unknown — unchecked::bower-asset/jquery 3.7.1: release metadata not checked (lockrot cannot tell which repository serves it), so S2 and S8 could not be read; repository activity not checked (lockrot cannot tell which repository serves it), so S3 and S4 could not be read. checks missing: S2, S3, S4, S8 (origin unknown).
 ::notice title=lockrot::1 package is not from a Composer repository: its release metadata and repository activity were not read
+php: the lock installs on PHP 8.2 to 8.5
 gate: fails · --fail-on=high,unchecked · 1 finding fails it (unchecked 1) · target php 8.4 (--target-php)

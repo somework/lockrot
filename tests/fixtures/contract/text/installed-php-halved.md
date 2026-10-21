@@ -11,5 +11,6 @@ depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 ·
 libyears: 4.9 behind across the one package · 0.0 from direct requirements · furthest behind web-auth/metadata-service v2.1.7 at 4.9
 pulled in by: `web-auth/webauthn-lib` 1
 advisories: 1 package asked · packagist.org answered (3 on record for 1 package)
+php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php, `web-auth/metadata-service` and `web-auth/webauthn-lib` exclude 8.0
 
 <sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

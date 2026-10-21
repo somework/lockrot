@@ -18,6 +18,8 @@ final class ProjectConfig
     public const REQUIRE = 'require';
     public const REQUIRE_DEV = 'require-dev';
     public const CONFLICT = 'conflict';
+    public const PROVIDE = 'provide';
+    public const REPLACE = 'replace';
 
     private ?string $name;
     /** @var list<string> */
@@ -31,6 +33,8 @@ final class ProjectConfig
     private ConfiguredRepositories $repositories;
     /** @var array<string, array<string, string>> section => lowercased package name => constraint */
     private array $constraints = [];
+    /** @var array<string, array<string, string>> section => lowercased platform package name => constraint */
+    private array $platformConstraints = [];
     private bool $read = true;
 
     /**
@@ -93,7 +97,10 @@ final class ProjectConfig
             ConfiguredRepositories::fromManifest($json['repositories'] ?? null)
         );
         foreach ([self::REQUIRE, self::REQUIRE_DEV, self::CONFLICT] as $section) {
-            $config->constraints[$section] = self::constraintsOf($json[$section] ?? null);
+            $config->constraints[$section] = self::constraintsOf($json[$section] ?? null, false);
+        }
+        foreach ([self::REQUIRE, self::REQUIRE_DEV, self::CONFLICT, self::PROVIDE, self::REPLACE] as $section) {
+            $config->platformConstraints[$section] = self::constraintsOf($json[$section] ?? null, true);
         }
 
         return $config;
@@ -103,12 +110,12 @@ final class ProjectConfig
      * @param mixed $links
      * @return array<string, string>
      */
-    private static function constraintsOf($links): array
+    private static function constraintsOf($links, bool $platform): array
     {
         $constraints = [];
         foreach (\is_array($links) ? $links : [] as $name => $constraint) {
             $name = strtolower((string) $name);
-            if (\is_string($constraint) && !PlatformRepository::isPlatformPackage($name)) {
+            if (\is_string($constraint) && PlatformRepository::isPlatformPackage($name) === $platform) {
                 $constraints[$name] = $constraint;
             }
         }
@@ -209,6 +216,18 @@ final class ProjectConfig
     public function constraints(string $section): array
     {
         return $this->constraints[$section] ?? [];
+    }
+
+    /**
+     * The root's platform links of one section (`php`, `ext-json`), named as {@see constraints()} names them.
+     *
+     * @param self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT|self::PROVIDE|self::REPLACE $section
+     *
+     * @return array<string, string> platform package name => constraint as written
+     */
+    public function platformConstraints(string $section): array
+    {
+        return $this->platformConstraints[$section] ?? [];
     }
 
     /** @return array<string, mixed> */

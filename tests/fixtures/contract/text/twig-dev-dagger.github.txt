@@ -2,4 +2,5 @@
 flags: vulnerable 1
 depth: every flagged package is named in composer.json · direct 1 · 1 in packages-dev
 security: 1 vulnerable package · 15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low
+php: the lock installs on PHP 7.2 to 8.5
 gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

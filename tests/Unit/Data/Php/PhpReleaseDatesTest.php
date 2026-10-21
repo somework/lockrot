@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Data\Php;
 
+use Lockrot\Clock;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Exception\ConfigException;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +21,29 @@ final class PhpReleaseDatesTest extends TestCase
         self::assertNotNull($ga84);
         self::assertSame('2024-11-21', $ga84->format('Y-m-d'));
         self::assertNull($dates->gaDate('9.9'));
+    }
+
+    public function testMinorsAreTheMinorsReleasedOnOrBeforeTheClocksDayOldestFirst(): void
+    {
+        $dates = PhpReleaseDates::load();
+
+        self::assertSame(['8.3', '8.4'], \array_slice($dates->minors(Clock::fixed('2024-11-21T00:00:00+00:00')), -2));
+        self::assertSame(['8.2', '8.3'], \array_slice($dates->minors(Clock::fixed('2024-11-20T23:59:59+00:00')), -2));
+        self::assertSame('8.4', \array_slice($dates->minors(Clock::fixed('2024-11-21T01:00:00+08:00')), -1)[0]);
+        self::assertSame('5.3', $dates->minors(Clock::fixed('2026-10-01T00:00:00+00:00'))[0]);
+    }
+
+    public function testMinorsSortsByVersionNotByFileOrder(): void
+    {
+        $path = tempnam(sys_get_temp_dir(), 'lockrot-php-ga-dates-');
+        self::assertIsString($path);
+        try {
+            file_put_contents($path, '{"8.10": "2030-01-01", "8.9": "2029-01-01", "7.4": "2019-11-28"}');
+
+            self::assertSame(['7.4', '8.9', '8.10'], PhpReleaseDates::load($path)->minors(Clock::fixed('2031-01-01T00:00:00+00:00')));
+        } finally {
+            unlink($path);
+        }
     }
 
     public function testMinorOf(): void

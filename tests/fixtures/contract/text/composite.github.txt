@@ -11,4 +11,5 @@ flags: abandoned 1 · pinned 1 · left-behind 2 · old-promise 3 · stale 3 · v
 depth: 2 of 9 flagged packages are named by no line of composer.json · direct 7 · 1 hop 2 · deepest: friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, 1 hop (friendsofsymfony/oauth-server-bundle › friendsofsymfony/oauth2-php)
 security: 5 vulnerable packages · 29 advisories: 1 critical, 5 high, 12 medium, 2 unrated, 9 low
 update now: composer update symfony/yaml symfony/polyfill-intl-idn
+php: the lock installs on PHP 7.2 to 8.5
 gate: fails · --fail-on=high · 6 findings fail it · target php 8.4 (--target-php)

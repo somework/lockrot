@@ -15,6 +15,7 @@ security: 2 vulnerable packages · 4 advisories: 2 high, 1 medium, 1 low
 libyears: 0.4 behind across all 4 packages · 0.3 from direct requirements · furthest behind laravel/framework v12.65.0 at 0.2
 pulled in by: `laravel/framework` 1 · `laravel/nightwatch` 1 · `spatie/laravel-markdown` 1
 advisories: 4 packages asked · packagist.org answered (46 on record for 2 packages)
+php: the lock installs on PHP 8.4 to 8.5
 
 **Update now:** `composer update league/commonmark laravel/framework`
 

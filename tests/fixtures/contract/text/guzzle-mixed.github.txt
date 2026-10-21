@@ -3,4 +3,5 @@
 flags: left-behind 1 · old-promise 1 · vulnerable 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 14 advisories: 6 high, 8 medium
+php: the lock installs on PHP 7.1 to 7.4, so your target, 8.4, is excluded; require.php and csa/guzzle-bundle exclude 8.0
 gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

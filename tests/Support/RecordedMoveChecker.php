@@ -76,9 +76,10 @@ final class RecordedMoveChecker implements MoveChecker
         return $check === null ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : self::outcome($check);
     }
 
+    /** A case can record the solve's php, `php`, in `inputs.move_check`. */
     public function platformPhp(): ?string
     {
-        return null;
+        return self::text($this->run, 'php');
     }
 
     public function composerVersion(): ?string

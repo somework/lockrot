@@ -244,4 +244,22 @@ final class ProjectConfigTest extends TestCase
         self::assertSame([], ProjectConfig::empty()->constraints(ProjectConfig::REQUIRE));
         self::assertSame(['Twig/Twig', 'broken/value'], $cfg->directRequires(), 'the names stay as written');
     }
+
+    public function testThePlatformLinksAreKeptApartUnderLowercasedNames(): void
+    {
+        $cfg = ProjectConfig::fromArray([
+            'require' => ['PHP' => '^8.1', 'ext-intl' => '*', 'twig/twig' => '^2.0', 'php-64bit' => ['^8']],
+            'require-dev' => ['php' => '>=8.2'],
+            'conflict' => ['php' => '8.3.0'],
+            'provide' => ['ext-mbstring' => '*', 'psr/log-implementation' => '1.0'],
+            'replace' => ['php-64bit' => '8.4.0'],
+        ]);
+
+        self::assertSame(['php' => '^8.1', 'ext-intl' => '*'], $cfg->platformConstraints(ProjectConfig::REQUIRE));
+        self::assertSame(['ext-mbstring' => '*'], $cfg->platformConstraints(ProjectConfig::PROVIDE));
+        self::assertSame(['php-64bit' => '8.4.0'], $cfg->platformConstraints(ProjectConfig::REPLACE));
+        self::assertSame(['php' => '>=8.2'], $cfg->platformConstraints(ProjectConfig::REQUIRE_DEV));
+        self::assertSame(['php' => '8.3.0'], $cfg->platformConstraints(ProjectConfig::CONFLICT));
+        self::assertSame([], ProjectConfig::empty()->platformConstraints(ProjectConfig::REQUIRE));
+    }
 }

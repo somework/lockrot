@@ -141,10 +141,11 @@ final class GithubFormatterTest extends TestCase
         $lines = explode("\n", trim($this->formatter('high', null)->format(CaseHydrator::composite())));
 
         self::assertSame('gate: fails · --fail-on=high · 6 findings fail it · target php 8.4 (--target-php)', end($lines));
-        self::assertSame('update now: composer update symfony/yaml symfony/polyfill-intl-idn', $lines[\count($lines) - 2]);
-        self::assertStringStartsWith('security: 5 vulnerable packages · 29 advisories: ', $lines[\count($lines) - 3]);
-        self::assertStringStartsWith('depth: ', $lines[\count($lines) - 4]);
-        self::assertStringStartsWith('flags: ', $lines[\count($lines) - 5]);
+        self::assertStringStartsWith('php: ', $lines[\count($lines) - 2]);
+        self::assertSame('update now: composer update symfony/yaml symfony/polyfill-intl-idn', $lines[\count($lines) - 3]);
+        self::assertStringStartsWith('security: 5 vulnerable packages · 29 advisories: ', $lines[\count($lines) - 4]);
+        self::assertStringStartsWith('depth: ', $lines[\count($lines) - 5]);
+        self::assertStringStartsWith('flags: ', $lines[\count($lines) - 6]);
     }
 
     public function testTheTitleNamesTheDecidingSeverityAfterVulnerable(): void

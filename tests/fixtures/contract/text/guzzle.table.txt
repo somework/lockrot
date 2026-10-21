@@ -19,6 +19,7 @@ fix, by package: php floor raise 1
 libyears: 4.2 behind across the one package · 4.2 from direct requirements ·
 furthest behind guzzlehttp/guzzle 6.5.8 at 4.2
 advisories: 1 package asked · packagist.org answered (22 on record for 3 packages)
+php: the lock installs on PHP 7.2 to 8.5
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

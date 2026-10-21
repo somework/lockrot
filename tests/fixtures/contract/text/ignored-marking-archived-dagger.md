@@ -10,6 +10,7 @@ flags: abandoned 1 · old-promise 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
 libyears: 1.8 behind across the one package · 1.8 from direct requirements · furthest behind symfony/debug v3.4.47 at 1.8
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+php: the lock installs on PHP 7.2 to 8.5
 
 - note: Composer's abandoned ignore list (config.audit.ignore-abandoned) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count.
 

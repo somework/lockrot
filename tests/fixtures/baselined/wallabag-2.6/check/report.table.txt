@@ -979,6 +979,7 @@ pulled in by: kphoen/rulerz-bundle 15 · kphoen/rulerz 14 · wallabag/phpepub 5 
 pagerfanta/doctrine-orm-adapter 3 · … and 31 more
 advisories: 210 packages asked · composer repo (http://127.0.0.1) answered (193 on record for 49 packages)
 moves: not checked, because Composer's solver refuses the lock itself (see the moves_not_checked note)
+php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer checks it at 7.4.29 from config.platform.php; php-http/guzzle5-adapter excludes 8.0
 baseline: 47 known · 61 new · 6 worsened · 2 stale (lockrot-baseline.json)
 <fg=red>gate: fails · --fail-on=high · 46 findings fail it; 38 reach it and are known to the baseline ·</fg=red>
 <fg=red>target php 8.4 (--target-php)</fg=red>

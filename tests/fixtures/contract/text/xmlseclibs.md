@@ -13,6 +13,7 @@ security: 2 vulnerable packages · 7 advisories: 2 high, 5 medium
 libyears: 6.0 behind across 1 of 2 packages · 0.0 from direct requirements · furthest behind robrichards/xmlseclibs 3.1.1 at 6.0
 pulled in by: `mautic/core-lib` 1
 advisories: 2 packages asked · packagist.org answered (9 on record for 2 packages)
+php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; `mautic/core-lib` excludes 8.1
 
 **Update now:** `composer update robrichards/xmlseclibs`
 

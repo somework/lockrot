@@ -74,4 +74,5 @@ flags: abandoned 21 · silent 8 · pinned 4 · left-behind 23 · old-promise 18 
 depth: 50 of 71 flagged packages are named by no line of composer.json · direct 21 · 1 hop 29 · 2 hops 13 · 3 hops 6 · 4 hops 2 · 18 in packages-dev · deepest: hoa/ustring and hoa/zformat, 4 hops (wallabag/rulerz › hoa/ruler › hoa/compiler › hoa/regex › hoa/ustring)
 security: 2 vulnerable packages · 3 advisories: 1 high, 2 medium
 update now: composer update 'phpseclib/phpseclib:^3.0.57'
+php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
 gate: fails · --fail-on=high · 11 findings fail it; 30 reach it and are known to the baseline · target php 8.4 (--target-php)

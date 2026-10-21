@@ -1,3 +1,4 @@
 ::notice file=composer.lock,line=4,title=lockrot%3A unknown::drupal/core 10.6.18: 0.
 ::notice title=lockrot::1 package is not from a Composer repository: its release metadata and repository activity were not read
+php: the lock installs on PHP 7.2 to 8.5
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

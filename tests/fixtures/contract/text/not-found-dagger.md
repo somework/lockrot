@@ -11,6 +11,7 @@ depth: 1 of 1 flagged package is named by no line of composer.json · 2 hops 1 �
 libyears: 0.3 behind across the one package · 0.0 from direct requirements · furthest behind hoa/consistency 1.17.05.02 at 0.3
 pulled in by: `lorisleiva/laravel-search-string` 1
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+php: the lock installs on PHP 8.1 to 8.5
 
 - note: GitHub did not answer for 1 repositories (private, renamed or removed); repository activity missing
 

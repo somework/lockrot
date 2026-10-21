@@ -8,6 +8,7 @@ use Composer\Downloader\TransportException;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\MoveCheckRun;
+use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
@@ -16,6 +17,8 @@ use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
+use Lockrot\Lock\LockFile;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\RunFooter;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -386,6 +389,16 @@ final class ReportTest extends TestCase
         self::assertSame([], $report->notes());
         self::assertNotNull($checked->moveCheck());
         self::assertSame([RunNote::offline()->text()], $noted->notes());
+    }
+
+    public function testWithPhpWindowLeavesTheOriginalReportUntouched(): void
+    {
+        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
+
+        $windowed = $report->withPhpWindow(PhpWindow::of(LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), '8.4', ['8.4']));
+
+        self::assertNull($report->phpWindow());
+        self::assertNotNull($windowed->phpWindow());
     }
 
     public function testWithBaselineLeavesTheOriginalReportUntouched(): void

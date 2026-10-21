@@ -11,6 +11,7 @@ depth: every flagged package is named in composer.json · direct 1
 security: no vulnerable package · advisories not checked
 libyears: 1.8 behind across the one package · 1.8 from direct requirements · furthest behind symfony/debug v3.4.47 at 1.8
 advisories: 0 packages asked, 1 not asked (offline) · packagist.org not asked (offline)
+php: the lock installs on PHP 7.2 to 8.5
 
 - note: offline: repository metadata served from Composer's cache
 - note: GitHub unreachable for 1 repositories: not stubbed: https://api.github.com/repos/symfony/debug

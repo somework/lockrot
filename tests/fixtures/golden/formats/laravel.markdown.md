@@ -12,5 +12,6 @@ security: no vulnerable package · advisories not checked
 libyears: 0.5 behind across 73 of 76 packages · 0.0 from direct requirements · furthest behind brick/math 0.18.0 at 0.2
 pulled in by: `laravel/framework` 1 · `laravel/tinker` 1
 advisories: 0 packages asked, 76 not asked
+php: the lock installs on PHP 8.4 to 8.5
 
 <sub>76 packages checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

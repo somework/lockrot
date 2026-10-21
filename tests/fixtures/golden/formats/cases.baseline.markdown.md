@@ -57,6 +57,7 @@ security: 16 vulnerable packages · 58 advisories: 1 critical, 12 high, 29 mediu
 libyears: at least 101.5 behind across 37 of 46 packages · 57.3 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: `mautic/core-lib` 4 · `guzzlehttp/guzzle` 2 · `akaunting/laravel-apexcharts` 1 · `genealabs/laravel-model-caching` 1 · `jfcherng/php-diff` 1 · … and 5 more
 advisories: 46 packages asked · packagist.org answered (240 on record for 19 packages)
+php: the lock installs on no PHP, so your target, 8.4, is excluded
 baseline: 3 known · 35 new · 4 worsened · 0 stale (lockrot-baseline.json)
 
 **Update now:** `composer update robrichards/xmlseclibs league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn`

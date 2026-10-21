@@ -2,4 +2,5 @@
 ::notice title=lockrot::Composer's abandoned ignore list (config.audit.ignore-abandoned) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count.
 flags: abandoned 1 · old-promise 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
+php: the lock installs on PHP 7.2 to 8.5
 gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

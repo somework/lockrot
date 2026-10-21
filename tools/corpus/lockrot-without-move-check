@@ -4,7 +4,8 @@
 declare(strict_types=1);
 // The lockrot command of bin/lockrot with an Analyzer that checks no move, so that `run.move_check` is null: the model
 // records no Composer check. tools/corpus/differential.php runs it. It registers only the lockrot command, and it hides the
-// project's composer.json from Composer's preamble as bin/lockrot does.
+// project's composer.json from Composer's preamble as bin/lockrot does. `run.php_window` needs no solve, so it is the one
+// that bin/lockrot writes.
 require __DIR__.'/../../vendor/autoload.php';
 
 use Composer\Config;

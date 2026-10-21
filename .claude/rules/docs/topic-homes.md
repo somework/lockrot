@@ -31,6 +31,7 @@ fact in full twice only when a test reads every copy. Link the home's anchor whe
 | `unchecked` and S10 | `verdicts.md#what-was-not-checked` | Links |
 | Transitive exposure, `unattributed` | `verdicts.md#transitive-exposure` | `schema.md` field rows |
 | Libyears | `verdicts.md#libyears` | One sentence |
+| The PHP window, the `php:` line | `verdicts.md#the-php-window` | `schema.md` field rows. `notes.md#moves_not_checked`: one sentence and a link |
 | Baseline: buckets, the file's fields, `--generate-baseline` and its exit codes | `baseline.md` | One sentence in README and `ci.md`, one line in `ci.md#exit-codes` |
 | `extra.lockrot` keys and defaults | `configuration.md#extralockrot-keys` | README: a few common keys and a link |
 | Environment variables | `configuration.md#environment-overrides` | `SECURITY.md` links it for what lockrot reads |

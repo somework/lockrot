@@ -12,6 +12,7 @@ security: 1 vulnerable package · 1 advisory: 1 low
 libyears: 4.7 behind across the one package · 0.0 from direct requirements · furthest behind league/flysystem 1.1.9 at 4.7
 pulled in by: `mautic/core-lib` 1
 advisories: 1 package asked · packagist.org answered (2 on record for 1 package)
+php: the lock installs on PHP 7.2 to 8.5
 
 - note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 

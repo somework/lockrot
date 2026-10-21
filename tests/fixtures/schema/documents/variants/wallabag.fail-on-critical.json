@@ -778,7 +778,81 @@
     }
    ]
   },
-  "move_check": null
+  "move_check": null,
+  "php_window": {
+   "platform_override": "7.4.29",
+   "host_requires": [],
+   "with_dev": {
+    "minors": [
+     "7.4"
+    ],
+    "gaps": false,
+    "lower_edge": {
+     "php": "7.4.2",
+     "set_by": [
+      {
+       "name": "php-amqplib/php-amqplib",
+       "version": "v3.7.3",
+       "link": "conflict",
+       "target": "php",
+       "constraint": "7.4.0 - 7.4.1",
+       "dev": false
+      }
+     ]
+    },
+    "upper_edge": {
+     "excludes": "8.0",
+     "set_by": [
+      {
+       "name": "php-http/guzzle5-adapter",
+       "version": "2.0.0",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.0",
+       "dev": false
+      }
+     ]
+    },
+    "closest": null
+   },
+   "without_dev": {
+    "minors": [
+     "7.4"
+    ],
+    "gaps": false,
+    "lower_edge": {
+     "php": "7.4.2",
+     "set_by": [
+      {
+       "name": "php-amqplib/php-amqplib",
+       "version": "v3.7.3",
+       "link": "conflict",
+       "target": "php",
+       "constraint": "7.4.0 - 7.4.1",
+       "dev": false
+      }
+     ]
+    },
+    "upper_edge": {
+     "excludes": "8.0",
+     "set_by": [
+      {
+       "name": "php-http/guzzle5-adapter",
+       "version": "2.0.0",
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.0",
+       "dev": false
+      }
+     ]
+    },
+    "closest": null
+   },
+   "target": {
+    "php": "8.4.99",
+    "inside": false
+   }
+  }
  },
  "activity_cache_oldest_at": "2026-10-01T16:04:02+00:00",
  "activity_cache_age_hours": 1.6,

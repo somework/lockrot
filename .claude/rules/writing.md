@@ -88,5 +88,6 @@ that pins it. Write "this job checks X", not "the only check of X".
 | the lock | `composer.lock` | lock file, lockfile |
 | direct requirement | A package in the project's `require` or `require-dev` | direct dependency |
 | target PHP | The PHP version that lockrot judges the lock against | PHP floor (that is `require.php`) |
+| PHP window | The PHP minors on which the lock installs, with require-dev and without (`verdicts.md#the-php-window`) | PHP range, supported PHP |
 | libyears | Plural, except the unit name that libyear.com defines (`verdicts.md#libyears`) | libyear |
 | unchecked, unmeasured, unknown | S10 and its `--fail-on` value, libyears without a result, a verdict. Never swap them | not verified |

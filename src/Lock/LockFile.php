@@ -24,6 +24,14 @@ final class LockFile
     private array $skipped = [];
     private ?string $contentHash;
     private LockArrayRepository $locked;
+    /** @var list<string> the names of the `packages-dev` entries, valid or not */
+    private array $devNames = [];
+    /** @var array<string, string> */
+    private array $platform = [];
+    /** @var array<string, string> */
+    private array $platformDev = [];
+    private ?string $platformOverridePhp = null;
+    private bool $hasDevKey = false;
 
     /** @param array<string, LockedPackage> $packages */
     private function __construct(array $packages, ?string $contentHash, LockArrayRepository $locked)
@@ -48,6 +56,7 @@ final class LockFile
         $locked = new LockArrayRepository();
         $aliased = [];
         $skipped = [];
+        $devNames = [];
         foreach ([['packages', false], ['packages-dev', true]] as [$key, $dev]) {
             $entries = $lock[$key] ?? null;
             $entries = \is_array($entries) ? array_values($entries) : [];
@@ -89,6 +98,9 @@ final class LockFile
                     ));
                 }
                 $locked->addPackage($forUpdate);
+                if ($dev) {
+                    $devNames[] = $loaded->getName();
+                }
                 if (preg_match(self::NAME, $loaded->getName()) !== 1) {
                     // A name from data can read as a command option: it reaches no finding and no command.
                     $skipped[] = $loaded->getName();
@@ -110,8 +122,31 @@ final class LockFile
         $hash = $lock['content-hash'] ?? null;
         $file = new self($packages, \is_string($hash) ? $hash : null, $locked);
         $file->skipped = $skipped;
+        $file->devNames = $devNames;
+        $file->platform = self::stringValues($lock['platform'] ?? null);
+        $file->platformDev = self::stringValues($lock['platform-dev'] ?? null);
+        $file->platformOverridePhp = self::stringValues($lock['platform-overrides'] ?? null)['php'] ?? null;
+        // Composer's Locker refuses an install with require-dev when the key is missing.
+        $file->hasDevKey = isset($lock['packages-dev']);
 
         return $file;
+    }
+
+    /**
+     * @param mixed $links
+     *
+     * @return array<string, string> lowercased name => string value
+     */
+    private static function stringValues($links): array
+    {
+        $out = [];
+        foreach (\is_array($links) ? $links : [] as $name => $value) {
+            if (\is_string($name) && \is_string($value)) {
+                $out[strtolower($name)] = $value;
+            }
+        }
+
+        return $out;
     }
 
     /** @return list<string> the names of the entries that are no Composer package name, in lock order */
@@ -147,6 +182,11 @@ final class LockFile
 
         $file = new self($merged, $this->contentHash, $this->locked);
         $file->skipped = $this->skipped;
+        $file->devNames = $this->devNames;
+        $file->platform = $this->platform;
+        $file->platformDev = $this->platformDev;
+        $file->platformOverridePhp = $this->platformOverridePhp;
+        $file->hasDevKey = $this->hasDevKey;
 
         return $file;
     }
@@ -182,5 +222,34 @@ final class LockFile
     public function contentHash(): ?string
     {
         return $this->contentHash;
+    }
+
+    /** Whether the {@see lockedRepository()} entry of this name is in `packages-dev`. */
+    public function isDevEntry(string $name): bool
+    {
+        return \in_array($name, $this->devNames, true);
+    }
+
+    /** @return array<string, string> the lock's `platform`: the root's platform requirements of `require`, by lowercased name */
+    public function platform(): array
+    {
+        return $this->platform;
+    }
+
+    /** @return array<string, string> the lock's `platform-dev`: those of `require-dev` */
+    public function platformDev(): array
+    {
+        return $this->platformDev;
+    }
+
+    /** The lock's `platform-overrides.php`: the PHP that `composer install` checks the lock at. */
+    public function platformOverridePhp(): ?string
+    {
+        return $this->platformOverridePhp;
+    }
+
+    public function hasDevKey(): bool
+    {
+        return $this->hasDevKey;
     }
 }

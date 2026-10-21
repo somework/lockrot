@@ -370,7 +370,8 @@ The shape of one annotation:
 - The report's notes, the stale-baseline note included, follow as `::notice title=lockrot::`
   lines.
 - The output ends with plain log lines, not annotations: `flags:`, `depth:`, `security:`,
-  `update now:`, then the [`gate:` line](#reading-the-gate-line).
+  `update now:`, [`php:`](verdicts.md#the-php-window), then the
+  [`gate:` line](#reading-the-gate-line).
 
 ## `--format=sarif` {#-formatsarif}
 
@@ -506,8 +507,8 @@ Top to bottom, it holds:
 3. With a [baseline](baseline.md), its `known`/`new`/`worsened`/`stale` counts.
 4. A table of the graded findings (every finding with `--all`) in report order. The verdict is bold
    where the finding fails the gate.
-5. The `flags:`, `depth:`, `security:`, `libyears:`, `pulled in by:` and `advisories:` lines, then
-   **Update now** with the command.
+5. The `flags:`, `depth:`, `security:`, `libyears:`, `pulled in by:`, `advisories:`, `moves:` and
+   [`php:`](verdicts.md#the-php-window) lines, then **Update now** with the command.
 6. The report's notes as a bullet list, and a `<sub>` footer with the data date and the score model.
 
 The shape of the table:

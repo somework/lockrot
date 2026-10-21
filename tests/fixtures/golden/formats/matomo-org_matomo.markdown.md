@@ -18,5 +18,6 @@ security: no vulnerable package · advisories not checked
 libyears: 0.9 behind across 47 of 52 packages · 0.1 from direct requirements · furthest behind maxmind-db/reader v1.13.1 at 0.8
 pulled in by: `matomo/cache` 1 · `matomo/decompress` 1
 advisories: 0 packages asked, 52 not asked
+php: the lock installs on PHP 8.1 to 8.5; Composer checks it at 8.1.0 from config.platform.php
 
 <sub>52 packages checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

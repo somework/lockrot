@@ -829,6 +829,14 @@ def _(d): d['findings'][0]['unchecked_accepted'][0]['reason'] = 'rate_limit'  # 
 def _(d): d['run']['move_check']['reason'] = 'solver_error'
 @case('run-move-check-not-checked-without-a-reason', 'move-check-dagger', 'run.move_check')
 def _(d): d['run']['move_check']['baseline'] = 'not_checked'
+@case('run-php-window-missing', 'composite', 'run.php_window')
+def _(d): del d['run']['php_window']
+@case('run-php-window-link-provide', 'composite', 'run.php_window')
+def _(d): d['run']['php_window']['without_dev']['lower_edge']['set_by'][0]['link'] = 'provide'  # a provide of php makes the window null
+@case('run-php-window-upper-edge-without-a-setter', 'composite', 'run.php_window')
+def _(d): d['run']['php_window']['without_dev']['upper_edge'] = {'excludes': '8.6', 'set_by': []}
+@case('run-php-window-host-feature-unknown', 'composite', 'run.php_window')
+def _(d): d['run']['php_window']['host_requires'] = ['php-gd']
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)

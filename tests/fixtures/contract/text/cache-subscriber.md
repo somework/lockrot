@@ -10,5 +10,6 @@ flags: abandoned 1 · old-promise 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
 libyears: 0.0 behind across the one package
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+php: the lock installs on PHP 7.1 to 7.4, so your target, 8.4, is excluded; require.php excludes 8.0
 
 <sub>4 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

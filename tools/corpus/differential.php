@@ -24,6 +24,8 @@ declare(strict_types=1);
 // tests/fixtures/corpus/model-divergences.json does not allow, on an allowed difference that does not occur exactly once, on
 // a cache or a model document that provenance.json does not describe, and on a recording that neither lockrot nor the 0.13
 // PHAR reads. It also fails on a lockrot document that breaks Lockrot\Tests\Support\FiredSignalsUnblocked.
+// It compares findings only. `run.php_window` stays out: the model reads the window off its findings, lockrot off the
+// whole lock (docs/verdicts.md#the-php-window), and tests/Integration/PhpWindowComposerOracleTest holds lockrot's window to Composer.
 require __DIR__.'/../../vendor/autoload.php';
 
 use Lockrot\Tests\Support\FiredSignalsUnblocked;
