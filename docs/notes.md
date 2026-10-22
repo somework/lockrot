@@ -293,10 +293,9 @@ Composer rejected the project's abandoned ignore list, so every abandoned markin
 
 Composer's solver refuses a partial update of a name outside the lock: the lock itself does not
 install at the target PHP. Every move would be refused for the same reason, so lockrot checks none,
-and each move's `check.reason` reads `baseline_refused`. Run lockrot with the PHP that the project
-runs on (`--target-php` or `config.platform.php`), or update the lock. `run.php_window` gives the
-PHP minors on which the lock installs, and the links that exclude the others
-([the PHP window](verdicts.md#the-php-window)).
+and each move's `check.reason` reads `baseline_refused`. `run.php_window.target_fix` names the
+packages that exclude the target PHP and, when Composer's solver resolves it, the update that admits
+it ([the update that admits the target](verdicts.md#the-update-that-admits-the-target)).
 
 The text quotes the first rule line of Composer's first problem whose reply after ` -> ` is not
 "satisfiable by", cut before ` -> `. Composer does not always list that rule last. If no rule line

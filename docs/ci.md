@@ -371,7 +371,8 @@ The shape of one annotation:
   lines.
 - The output ends with plain log lines, not annotations: `flags:`, `depth:`, `security:`,
   `update now:`, [`php:`](verdicts.md#the-php-window), then the
-  [`gate:` line](#reading-the-gate-line).
+  [`gate:` line](#reading-the-gate-line). When the lock excludes the target PHP, the `php:` line
+  names [the update that admits it](verdicts.md#the-update-that-admits-the-target).
 
 ## `--format=sarif` {#-formatsarif}
 

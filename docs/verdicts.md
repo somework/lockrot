@@ -720,19 +720,55 @@ How lockrot reads the window:
   links.
 - `target.inside` says whether the set with require-dev admits the target PHP. When `with_dev` is
   null, `without_dev` decides. While `target.inside` is false, Composer refuses the baseline of
-  [the move check](#the-move-check), and every move is `not_checked`.
+  [the move check](#the-move-check), and every move is `not_checked`. `target_fix` then names the
+  update that admits the target.
 
 The window is null when a package or the root provides or replaces `php` or `php-64bit`, or when a
 php link does not parse. It judges no package and changes no move.
 
+#### The update that admits the target {#the-update-that-admits-the-target}
+
+When the window excludes the target PHP, `target_fix` gives one update of the packages that exclude
+it, and the answer of Composer's solver to that update:
+
+- `packages` lists the package `require` links that fail at `target.php` and the package
+  `conflict` links that match it, on the set that `target.inside` reads. Production packages come
+  first, then packages-dev, each by name.
+- lockrot solves `composer update` of those packages at `target.php`, with no constraint. It tries
+  the packages alone, then `--with-dependencies`, then `--with-all-dependencies`, as
+  [the move check](#the-move-check) does.
+- `check` is `resolves`, `refused` or `not_checked`. On `resolves`, `command` holds the update that
+  resolved. On `refused`, `held_by` lists the links that the refusal names, as a move's `held_by[]`
+  does. On `not_checked`, `reason` says why, and it is null when the run checked no move.
+- A root link on `php` or `php-64bit` that excludes the target is the root ceiling. No update can
+  admit the target, so `check` is `refused` with no solve. `held_by` names each such root link with
+  its section: `require`, `require-dev` or `conflict`.
+- `platform_step` is true when `config.platform.php` lies outside the target minor. The solve then
+  runs at the target, so set `config.platform.php` to your release of the target PHP before you run
+  the command. The lock's `platform-overrides` does not set it.
+- A listed name that is no Composer package name reaches no solve. `check` is then `not_checked`
+  with the reason `unloaded_name`.
+
+`target_fix` is null when the window admits the target, and when the target lies below the lowest
+edge of the set that `target.inside` reads. No update of a package can lower that edge.
+
 The `php:` line of the table, markdown and github formats prints the window. When the minors of
 `with_dev` differ, the line prints `with_dev` and `without_dev`. The line adds the target when the
-window excludes it, and the PHP of `platform_override`. It ends with the links that exclude the
-next minor of the analysed set. Abridged from the [example run](example-run.md):
+window excludes it. With `target_fix`, the line ends with its answer: the command, the holds of the
+refusal, the root links of the root ceiling, or the reason it was not checked. Without
+`target_fix`, the line adds the PHP of `platform_override` and the links that set one edge. That is
+the lowest edge when the target lies below it, else the edge after the last minor of the analysed
+set. Abridged from the [example run](example-run.md):
 
 ```text
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
+```
+
+wallabag 2.6.14 at the target PHP 8.4, whose composer.json requires `php-http/guzzle5-adapter ^2.0`:
+
+```text
+php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of the 3 packages that exclude it: composer.json requires php-http/guzzle5-adapter ^2.0
 ```
 
 ## The score {#score}
