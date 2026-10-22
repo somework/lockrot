@@ -39,7 +39,7 @@ final class ScoreBasisTest extends TestCase
         }
         ksort($decidedBy);
 
-        self::assertSame(['combination' => 10809, 'either' => 3070, 'maintenance' => 12225, 'security' => 21508], $decidedBy);
+        self::assertSame(['combination' => 16013, 'either' => 4818, 'maintenance' => 18115, 'security' => 32474], $decidedBy);
         self::assertSame(104, $largest);
     }
 

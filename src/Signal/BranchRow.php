@@ -6,6 +6,7 @@ namespace Lockrot\Signal;
 
 use Lockrot\Clock;
 use Lockrot\Data\Repository\ReleaseBranch;
+use Lockrot\Data\Repository\StableRelease;
 use Lockrot\Security\BranchFixes;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Signal\Data\LeftBehindData;
@@ -100,6 +101,42 @@ final class BranchRow
         }
 
         return $rows;
+    }
+
+    /**
+     * The row of one release, as its branch's newest: what a move to S11's `admits_newest` reads.
+     * It has no age and no fixes.
+     */
+    public static function ofRelease(StableRelease $release, bool $installed, PhpFloor $floor): ?self
+    {
+        $key = ReleaseBranch::of($release->normalized());
+        if ($key === null) {
+            return null;
+        }
+        $php = $release->php();
+        $row = new self();
+        $row->branch = ReleaseBranch::label($key);
+        $row->installed = $installed;
+        $row->highest = $release->pretty();
+        $row->highestReleased = $release->at();
+        $row->highestCommitDate = null;
+        $row->newestDated = $release->pretty();
+        $row->newestDatedReleased = $release->at();
+        $row->datedBy = null;
+        $row->php = $php;
+        $row->highestPhp = $php;
+        $row->admitsTargetPhp = $floor->admitsTarget($php);
+        $row->admitsProjectPhp = $floor->admitsProject($php);
+        $row->phpBlockedBy = $floor->blocking($php);
+        $row->missesTargetPhp = $floor->missesTarget($php);
+        $row->missesProjectPhp = $floor->missesProject($php);
+        $row->highestAdmitsTargetPhp = $row->admitsTargetPhp;
+        $row->highestAdmitsProjectPhp = $row->admitsProjectPhp;
+        $row->highestMissesProjectPhp = $row->missesProjectPhp;
+        $row->releasedYears = null;
+        $row->fixes = null;
+
+        return $row;
     }
 
     /** `ReleaseBranch::label()`, `2.x`. */

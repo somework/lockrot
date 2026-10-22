@@ -66,7 +66,7 @@ final class LockrotCommand extends BaseCommand
     /** The formats a CI step parses: writing one prints the upgrade notice. */
     private const NOTICE_FORMATS = ['json', 'sarif', 'gitlab'];
 
-    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null): Analyzer */
+    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null, ?string): Analyzer */
     private $analyzerFactory;
 
     /**
@@ -87,7 +87,7 @@ final class LockrotCommand extends BaseCommand
     private ?array $htmlReads;
 
     /**
-     * @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null): Analyzer $analyzerFactory
+     * @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null, ?string): Analyzer $analyzerFactory
      * @param list<int>|null                                                                                                       $htmlReads       the report numbers the html renderer reads, its manifest's unless given
      */
     public function __construct(?callable $analyzerFactory = null, ?array $htmlReads = null)
@@ -101,9 +101,9 @@ final class LockrotCommand extends BaseCommand
     {
         $this
             ->setAliases(['rot'])
-            ->setDescription('Shows dependency rot in composer.lock: abandoned, silent, pinned, left-behind and old-promise packages, with the security advisories no fix is coming for')
+            ->setDescription('Shows dependency rot in composer.lock: abandoned, silent, pinned, left-behind, old-promise and capped packages, with the security advisories no fix is coming for')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'Output format: table, json, github (workflow annotations), sarif (SARIF 2.1.0), gitlab (Code Quality JSON), markdown (PR comment) or html (one self-contained page)')
-            ->addOption('fail-on', null, InputOption::VALUE_REQUIRED, 'Exit 1 when a finding reaches this verdict (none, abandoned, silent, pinned, left-behind, old-promise, stale), priority (critical, high, medium, low) or `unchecked`, a finding whose check did not run')
+            ->addOption('fail-on', null, InputOption::VALUE_REQUIRED, 'Exit 1 when a finding reaches this verdict (none, abandoned, silent, pinned, left-behind, old-promise, stale, capped), priority (critical, high, medium, low) or `unchecked`, a finding whose check did not run')
             ->addOption('target-php', null, InputOption::VALUE_REQUIRED, 'PHP version the project targets, e.g. 8.4 (default: config.platform.php or the running PHP)')
             ->addOption('dev', null, InputOption::VALUE_NONE, 'Include packages-dev')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Show every package, not only flagged ones')
@@ -232,7 +232,7 @@ final class LockrotCommand extends BaseCommand
             $markdownMaxBytes = self::markdownMaxBytes($input);
             // No time budget, unlike the install-time summary (docs/install-time.md#time-budget).
             $checks = static fn (): MoveChecks => MoveChecks::of($root === null ? new UncheckedMoves($hasComposerJson ? MoveCheck::COMPOSER_JSON_INVALID : MoveCheck::NO_COMPOSER_JSON) : MoveCheckers::forProject($root, $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), Deadline::never()));
-            $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never(), $checks);
+            $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never(), $checks, $lock->platform()['php'] ?? null);
             // Before the baseline is read: an explanation ignores it, so a missing or unreadable
             // baseline must not block it.
             if (\is_string($explain)) {

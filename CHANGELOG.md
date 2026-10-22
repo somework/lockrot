@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new facts add)`. Action: run once, review, then `--generate-baseline`.
   ([Baseline](docs/baseline.md))
 - **Breaking:** **All formats:** a finding lists every flag that fired (`abandoned`, `silent`,
-  `pinned`, `left-behind`, `old-promise`, `stale`, and the new `vulnerable`). Accepted flags stay
+  `pinned`, `left-behind`, `old-promise`, `stale`, and the new `capped` and `vulnerable`). Accepted flags stay
   listed, muted. Action: read a finding's `flags` where you read the verdict, or `lead` for 0.13's
   word.
   ([Flags](docs/verdicts.md#flags))
@@ -37,6 +37,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   unknown origin. A path package and a package outside the `composer-repositories` scope are skips.
   Action: list a GitLab host in `gitlab-domains`, or accept a lasting gap in `accept-unchecked`. On
   Composer below 2.4, upgrade Composer or run the PHAR. ([What was not checked](docs/verdicts.md#what-was-not-checked))
+- **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
+  `require.php` stops below the newest PHP minor that the project's root php allows. It comes after
+  `stale` in flag order, so `--fail-on=stale` and a baseline entry that records `stale` keep their
+  reach. A grade gate at `medium` or `low` can fail on a package that 0.13 passed. Action: run once
+  without a gate. ([Capped](docs/verdicts.md#capped))
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
   is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.

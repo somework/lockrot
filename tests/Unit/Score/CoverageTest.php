@@ -24,6 +24,8 @@ final class CoverageTest extends TestCase
         yield 'stale recorded, old-promise fires' => ['stale', ['old-promise', 'stale'], ['old-promise']];
         yield 'old-promise recorded, left-behind fires' => ['old-promise', ['left-behind', 'old-promise'], ['left-behind']];
         yield 'old-promise recorded, two flags above it fire' => ['old-promise', ['abandoned', 'left-behind', 'old-promise'], ['abandoned', 'left-behind']];
+        yield 'stale recorded, capped fires' => ['stale', ['stale', 'capped'], []];
+        yield 'capped recorded, stale fires' => ['capped', ['stale', 'capped'], ['stale']];
         yield 'an entry with no flag covers none' => [null, ['left-behind', 'stale'], ['left-behind', 'stale']];
     }
 

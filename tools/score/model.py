@@ -4,12 +4,12 @@ It reads no file, and it imports only the Python standard library.
 """
 from fractions import Fraction as Fr
 
-ORDER = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable']
-MAINT = ORDER[:6]
+ORDER = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped', 'vulnerable']
+MAINT = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped']
 GRADES = ['critical', 'high', 'medium', 'low']
 SEVS = ['critical', 'high', 'medium', 'unrated', 'low']
 SEV_GATE = {'critical': 4, 'high': 3, 'medium': 2, 'unrated': 2, 'low': 1}
-PTS = {'abandoned': 32, 'silent': 32, 'pinned': 16, 'left-behind': 16, 'old-promise': 16, 'stale': 8}
+PTS = {'abandoned': 32, 'silent': 32, 'pinned': 16, 'left-behind': 16, 'old-promise': 16, 'stale': 8, 'capped': 8}
 SEVPTS = {'critical': 32, 'high': 16, 'medium': 8, 'unrated': 8, 'low': 2}
 DOUBLING = ('none', 'blocked')
 FIXES = ['update', 'upgrade', 'raise-php', 'unknown', 'blocked', 'none']

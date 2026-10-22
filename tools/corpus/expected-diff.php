@@ -7,8 +7,9 @@ declare(strict_types=1);
 //
 //   php tools/corpus/expected-diff.php <base commit> [--allow <json path>]... [--allow-line <prefix>]...
 //
-// Each `--allow` names a JSON path of report-2 that may differ, and each `--allow-line` the prefix of a text line that
-// this checkout may add. Every other difference of the json document and of the table, markdown and github outputs fails
+// Each `--allow` names a JSON path of report-2 that may differ, as an fnmatch() pattern, and each `--allow-line` the
+// prefix of a text line that this checkout may add. Findings are compared by package (`findings.<package>.…`), so a
+// finding that a change grades does not move the others. Every other difference of the json document and of the table, markdown and github outputs fails
 // the run with exit 1. The base is a `git archive` of the commit with this checkout's vendor/ beside it, so both sides run
 // the same dependencies. Both sides run bin/lockrot, the move check included.
 require __DIR__.'/../../vendor/autoload.php';
@@ -59,9 +60,10 @@ try {
         foreach (['base' => $work.'/base/bin/lockrot', 'head' => ROOT.'/bin/lockrot'] as $side => $entry) {
             $sides[$side] = runOnce($entry, $app, $work.'/'.$side.'/'.$name);
         }
-        foreach (paths(json_decode($sides['base']['json'], true), json_decode($sides['head']['json'], true), '') as $path) {
-            if (in_array($path, $allowPaths, true)) {
-                $counts[$path] = ($counts[$path] ?? 0) + 1;
+        foreach (paths(byPackage(json_decode($sides['base']['json'], true)), byPackage(json_decode($sides['head']['json'], true)), '') as $path) {
+            $allowed = array_values(array_filter($allowPaths, static fn (string $pattern): bool => fnmatch($pattern, $path)));
+            if ($allowed !== []) {
+                $counts[$allowed[0]] = ($counts[$allowed[0]] ?? 0) + 1;
             } else {
                 $problems[] = $name.' json: '.$path;
             }
@@ -83,7 +85,7 @@ try {
 ksort($counts);
 fwrite(STDOUT, sprintf("expected-diff: %d apps against %s\n", count($apps), $base));
 foreach ($counts as $what => $count) {
-    fwrite(STDOUT, sprintf("  allowed %-40s %d apps\n", $what, $count));
+    fwrite(STDOUT, sprintf("  allowed %-40s %d paths\n", $what, $count));
 }
 foreach ($problems as $line) {
     fwrite(STDERR, 'expected-diff: '.$line."\n");
@@ -130,6 +132,27 @@ function runOnce(string $entry, string $app, string $out): array
     }
 
     return $outputs;
+}
+
+/**
+ * The document with its findings keyed by package name.
+ *
+ * @param mixed $document
+ *
+ * @return mixed
+ */
+function byPackage($document)
+{
+    if (!is_array($document) || !is_array($document['findings'] ?? null)) {
+        return $document;
+    }
+    $findings = [];
+    foreach ($document['findings'] as $finding) {
+        $findings[(string) ($finding['package'] ?? '')] = $finding;
+    }
+    $document['findings'] = $findings;
+
+    return $document;
 }
 
 /**

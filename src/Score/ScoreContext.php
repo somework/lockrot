@@ -22,7 +22,7 @@ final class ScoreContext
      * @param bool $advisoriesComplete every advisory feed answered
      * @param bool $livenessComplete   lockrot read S2 and S4
      * @param bool $s3Unread           no S3 answer
-     * @param bool $s8Unread           S8 cannot date a branch that a tag can land on
+     * @param bool $s8Unread           a tag can be left behind: the branch table was not read, or S8's rule fires or cannot be dated on the tag move's row
      */
     public function __construct(bool $maintenanceJudged, bool $advisoriesComplete, bool $livenessComplete, bool $s3Unread, bool $s8Unread)
     {

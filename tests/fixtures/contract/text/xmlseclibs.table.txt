@@ -1,8 +1,9 @@
 <options=bold><fg=red>critical (1)</fg=red></options=bold>
-  mautic/core-lib 4.3.x-dev  direct  ·  pinned · vulnerable
-      32 = pinned 16 + vulnerable 16 [high advisory]
+  mautic/core-lib 4.3.x-dev  direct  ·  pinned · capped · vulnerable
+      34 = pinned 16 + capped 2 [¼ of 8] + vulnerable 16 [high advisory]
       do: no move: it is installed from a local path (your own package)
       pinned       pinned to branch snapshot 4.3.x-dev
+      capped       requires php \>=7.4.0 \<8.1: it stops at 8.0, so the newest PHP, 8.5, is excluded
       vulnerable   5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in
                    UI upgrade process
       pulls in 1 flagged package: robrichards/xmlseclibs (old-promise · vulnerable)
@@ -19,7 +20,7 @@
            newest release 4.0.0 2026-08-22 (0.1 years ago); last push 2026-08-22 (0.1 years ago)
 
 2 packages checked · 2 flagged: critical 1 · high 1
-flags: pinned 1 · old-promise 1 · vulnerable 2 · 2 packages carry more than one
+flags: pinned 1 · old-promise 1 · capped 1 · vulnerable 2 · 2 packages carry more than one
 depth: 1 of 2 flagged packages is named by no line of composer.json · direct 1 · 4 hops 1 ·
 deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs)
 security: 2 vulnerable packages · 7 advisories: 2 high, 5 medium · packages-dev not checked (pass --dev)

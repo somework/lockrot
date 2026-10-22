@@ -53,6 +53,15 @@ final class MoveBuilder
         if ($kind === Move::TAG) {
             $clears = [MoveFact::on(MoveFact::FLAG, FlagSet::PINNED, MoveFact::TAGS_ONLY)];
             [$adds, $unverified] = self::tagRisks($row, $latest, $flags, $context);
+            if ($row !== null && \in_array(FlagSet::CAPPED, self::countedMaintenance($finding), true)) {
+                [$cappedClears, $cappedUnverified] = self::cappedOn($row, $context);
+                $clears = array_merge($clears, $cappedClears);
+                $unverified = array_merge($unverified, $cappedUnverified);
+            }
+        }
+        if ($row !== null && \in_array($kind, array_merge(Move::ROW_KINDS, [Move::TAG]), true) && !\in_array(FlagSet::CAPPED, $flags->fired(), true)
+            && !\in_array(FlagSet::CAPPED, $flags->acceptSet(), true) && $context->phpCap()->stopsBelow($row->php()) === true) {
+            $adds[] = MoveFact::on(MoveFact::FLAG, FlagSet::CAPPED, MoveFact::STOPS_BELOW_NEWEST_PHP);
         }
         $cleared = self::keys(array_merge($clears, $unverified));
         $leaves = [];
@@ -181,6 +190,11 @@ final class MoveBuilder
                 $clears[] = MoveFact::on(MoveFact::FLAG, FlagSet::OLD_PROMISE, MoveFact::RELEASED_AFTER_GA);
             }
         }
+        if (\in_array(FlagSet::CAPPED, $flags, true)) {
+            [$cappedClears, $cappedUnverified] = self::cappedOn($row, $context);
+            $clears = array_merge($clears, $cappedClears);
+            $unverified = array_merge($unverified, $cappedUnverified);
+        }
         $ranges = $context->ranges();
         $newest = $lower === null ? null : $context->release($row->highest());
         foreach ($advisories as $id) {
@@ -196,6 +210,22 @@ final class MoveBuilder
         }
 
         return [$clears, $unverified];
+    }
+
+    /**
+     * Whether the row's newest release admits R: it clears `capped`, and a release that states no
+     * php leaves it unverified.
+     *
+     * @return array{0: list<MoveFact>, 1: list<MoveFact>}
+     */
+    private static function cappedOn(BranchRow $row, MoveContext $context): array
+    {
+        $below = $context->phpCap()->stopsBelow($row->php());
+        if ($below === null) {
+            return [[], [MoveFact::unchecked(MoveFact::FLAG, FlagSet::CAPPED, MoveFact::NO_RELEASE_DATA)]];
+        }
+
+        return [$below ? [] : [MoveFact::on(MoveFact::FLAG, FlagSet::CAPPED, MoveFact::ADMITS_NEWEST_PHP)], []];
     }
 
     /**

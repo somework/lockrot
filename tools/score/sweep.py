@@ -55,8 +55,9 @@ def combinations():
     live = [None, 'abandoned', 'silent', 'stale']
     one = [(sv, fx) for sv in M.SEVS for fx in M.FIXES]
     advsets = [()] + [(a,) for a in one] + list(itertools.combinations_with_replacement(one, 2))
-    for lv, pn, lb, op, adv, d, dv in itertools.product(live, [0, 1], [0, 1], [0, 1], advsets, [True, False], [False, True]):
-        fl = [x for x in (lv, 'pinned' if pn else None, 'left-behind' if lb else None, 'old-promise' if op else None) if x]
+    # `capped` takes the place of `old-promise`: the exclusive group `php_bound` never raises the two together.
+    for lv, pn, lb, op, adv, d, dv in itertools.product(live, [0, 1], [0, 1], [None, 'old-promise', 'capped'], advsets, [True, False], [False, True]):
+        fl = [x for x in (lv, 'pinned' if pn else None, 'left-behind' if lb else None, op) if x]
         if (not fl and not adv) or (pn and lb):
             continue
         yield fl, adv, d, dv

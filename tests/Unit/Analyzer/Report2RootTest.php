@@ -120,7 +120,7 @@ final class Report2RootTest extends TestCase
         self::assertSame(['carrying' => 0, 'leading' => 0, 'accepted' => ['all' => 1, 'in_graded' => 1], 'by_verdict' => ['critical' => 0, 'high' => 0, 'medium' => 0, 'low' => 0]], $flags['pinned']);
         self::assertSame(['all' => 2, 'in_graded' => 1], JsonPath::arrayAt($flags, ['stale', 'accepted']));
         self::assertSame(['carrying' => 1, 'leading' => null, 'accepted' => null, 'by_verdict' => ['critical' => 1, 'high' => 0, 'medium' => 0, 'low' => 0]], $flags['vulnerable']);
-        self::assertSame(['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable'], array_keys($flags));
+        self::assertSame(['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped', 'vulnerable'], array_keys($flags));
     }
 
     public function testAbandonedCountsTheReplacementsAndTheSuggestions(): void

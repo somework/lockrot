@@ -45,13 +45,13 @@ use Lockrot\Version;
  */
 final class InstallTimeSummary
 {
-    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null): Analyzer */
+    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null, ?string): Analyzer */
     private $analyzerFactory;
     /** @var null|callable(): float */
     private $monotonicNow;
 
     /**
-     * @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null): Analyzer $analyzerFactory
+     * @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null, ?string): Analyzer $analyzerFactory
      * @param null|callable(): float $monotonicNow monotonic seconds, hrtime() when null
      */
     public function __construct(?callable $analyzerFactory = null, ?callable $monotonicNow = null)
@@ -138,7 +138,7 @@ final class InstallTimeSummary
 
         // The check counts against the same budget: a move that it reaches too late is not checked.
         $checks = static fn (): MoveChecks => MoveChecks::of(MoveCheckers::forProject($composer->getPackage(), $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), $deadline));
-        $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $event->getIO(), $config, $repositories, $project, $lockrot, $env, $deadline, $checks);
+        $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $event->getIO(), $config, $repositories, $project, $lockrot, $env, $deadline, $checks, $lock->platform()['php'] ?? null);
 
         $report = $analyzer->analyzePackages($packages, $lock, $project, $event->isDevMode());
         // The baseline reaches the gate only: the block still reports everything that this

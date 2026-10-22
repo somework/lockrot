@@ -123,6 +123,7 @@ Each package gets the flags that fired on it:
 | `left-behind` | The installed release branch stopped releasing while a newer branch still releases |
 | `old-promise` | Released before the target PHP major existed, and admits it only because `require.php` has no upper bound |
 | `stale` | An old release or an old push, short of `silent` |
+| `capped` | The installed release's `require.php` stops below the newest PHP that the project allows |
 | `vulnerable` | A security advisory affects the installed version |
 
 - **Score and verdict:** the flags add up to a score, and the score's band is the finding's grade,

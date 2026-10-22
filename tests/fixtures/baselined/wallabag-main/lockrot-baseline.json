@@ -67,6 +67,15 @@
                 }
             }
         },
+        "friendsoftwig/twigcs": {
+            "version": "v6.1.0",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "capped": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
         "grandt/binstring": {
             "version": "1.0.0",
             "first_seen": "2024-05-17",
@@ -331,6 +340,15 @@
                 }
             }
         },
+        "laminas/laminas-code": {
+            "version": "4.7.1",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "capped": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
         "mgargano/simplehtmldom": {
             "version": "1.5",
             "first_seen": "2024-05-17",
@@ -360,6 +378,9 @@
             "first_seen": "2024-05-17",
             "flags": {
                 "abandoned": {
+                    "known_since": "2024-05-17"
+                },
+                "capped": {
                     "known_since": "2024-05-17"
                 }
             }

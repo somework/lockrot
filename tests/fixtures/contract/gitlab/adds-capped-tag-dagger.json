@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/pinned",
+        "description": "matomo/referrer-spam-list dev-master \u2014 finding high (16 = pinned 16) \u2014 pinned: pinned to branch snapshot dev-master. Do: require a tag \u2014 the newest is 4.0.5 (2026-04-15); 4.x needs php >=7.2 <8.5, which require.php allows; it stops below the newest PHP, so capped would count.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "59a72f255e750a23c04d2146c2c95c27329f949178cd1efc83671e48702b279a",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

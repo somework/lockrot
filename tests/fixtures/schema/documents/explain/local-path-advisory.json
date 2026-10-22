@@ -36,6 +36,21 @@
     "summary": "pinned to branch snapshot 4.3.x-dev"
    },
    {
+    "id": "capped",
+    "role": "corroborating",
+    "baseline": null,
+    "signal_ids": [
+     "S11"
+    ],
+    "degree": null,
+    "headline": {
+     "unit": "php_minor",
+     "value": "8.0",
+     "source": null
+    },
+    "summary": "requires php >=7.4.0 <8.1: it stops at 8.0, so the newest PHP, 8.5, is excluded"
+   },
+   {
     "id": "vulnerable",
     "role": "security",
     "baseline": null,
@@ -53,8 +68,8 @@
   ],
   "score": {
    "model": 1,
-   "total": 32,
-   "exact": 32,
+   "total": 34,
+   "exact": 34,
    "rounded_down": false,
    "band": {
     "floor": 32,
@@ -65,9 +80,9 @@
    "parts": {
     "maintenance": {
      "status": "counted",
-     "contribution": 16,
+     "contribution": 18,
      "alone": {
-      "total": 16,
+      "total": 18,
       "verdict": "high"
      }
     },
@@ -93,6 +108,15 @@
      "contribution": 16
     },
     {
+     "part": "maintenance",
+     "flag": "capped",
+     "role": "corroborating",
+     "weight": 8,
+     "divisor": 4,
+     "points": 2,
+     "contribution": 2
+    },
+    {
      "part": "security",
      "flag": "vulnerable",
      "role": "security",
@@ -114,11 +138,23 @@
       "id": "pinned"
      },
      "revealed": [],
-     "total": 16,
+     "total": 24,
      "verdict": "high",
-     "lead": null,
+     "lead": "capped",
      "deciding_advisory": "PKSA-j4xy-fb9q-x9h7",
      "at_least": true
+    },
+    {
+     "remove": {
+      "kind": "flag",
+      "id": "capped"
+     },
+     "revealed": [],
+     "total": 32,
+     "verdict": "critical",
+     "lead": "pinned",
+     "deciding_advisory": "PKSA-j4xy-fb9q-x9h7",
+     "at_least": false
     },
     {
      "remove": {
@@ -126,7 +162,7 @@
       "id": "vulnerable"
      },
      "revealed": [],
-     "total": 16,
+     "total": 18,
      "verdict": "high",
      "lead": "pinned",
      "deciding_advisory": null,
@@ -138,20 +174,20 @@
       "id": "PKSA-j4xy-fb9q-x9h7"
      },
      "revealed": [],
-     "total": 24,
+     "total": 26,
      "verdict": "high",
      "lead": "pinned",
      "deciding_advisory": "PKSA-81ww-1p5d-6c6k",
      "at_least": false
     }
    ],
-   "text": "32 = pinned 16 + vulnerable 16 [high advisory]"
+   "text": "34 = pinned 16 + capped 2 [¼ of 8] + vulnerable 16 [high advisory]"
   },
   "next_step": {
    "kind": "no-move",
-   "source": "vulnerable",
+   "source": "pinned",
    "merged": [],
-   "fix_kind": "unknown",
+   "fix_kind": null,
    "reason": "local_package",
    "replacement": null,
    "quiet_years": null,
@@ -170,6 +206,10 @@
     {
      "kind": "flag",
      "id": "pinned"
+    },
+    {
+     "kind": "flag",
+     "id": "capped"
     },
     {
      "kind": "advisory",
@@ -228,7 +268,7 @@
    "ignored_count": 0,
    "fix_kind": "unknown",
    "installed_branch_fixes": null,
-   "move_in": "next_step",
+   "move_in": null,
    "gets": null,
    "partial": null
   },
@@ -247,7 +287,8 @@
     "reason": "not_from_composer_repository",
     "blocks": [
      "S2",
-     "S8"
+     "S8",
+     "S11"
     ]
    }
   ],
@@ -1980,9 +2021,22 @@
      "releases_read": false,
      "complete": true
     }
+   },
+   {
+    "id": "S11",
+    "level": "warn",
+    "summary": "php \">=7.4.0 <8.1\" stops at 8.0; the newest PHP, 8.5, is excluded",
+    "data": {
+     "newest_php": "8.5",
+     "newest_php_source": "known",
+     "requires": ">=7.4.0 <8.1",
+     "stops_at": "8.0",
+     "excludes_target": true,
+     "admits_newest": null
+    }
    }
   ],
-  "evidence": "pinned: pinned to branch snapshot 4.3.x-dev; vulnerable: 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process",
+  "evidence": "pinned: pinned to branch snapshot 4.3.x-dev; capped: requires php >=7.4.0 <8.1: it stops at 8.0, so the newest PHP, 8.5, is excluded; vulnerable: 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process",
   "allowlist_reason": null,
   "data_date": null,
   "libyears": null,
@@ -2049,6 +2103,7 @@
    "left-behind",
    "old-promise",
    "stale",
+   "capped",
    "vulnerable"
   ],
   "verdicts": [
@@ -2076,7 +2131,8 @@
    "S7",
    "S8",
    "S9",
-   "S10"
+   "S10",
+   "S11"
   ],
   "fail_on": "high",
   "fail_on_source": "option",
@@ -2099,6 +2155,7 @@
     "left-behind",
     "old-promise",
     "stale",
+    "capped",
     "vulnerable"
    ],
    "parts": [
@@ -2110,7 +2167,8 @@
       "pinned",
       "left-behind",
       "old-promise",
-      "stale"
+      "stale",
+      "capped"
      ],
      "combine": "lead_plus_share"
     },
@@ -2250,9 +2308,10 @@
      "band": "medium",
      "can_corroborate": true,
      "corroborating_points": 2,
-     "max_maintenance": 8,
+     "max_maintenance": 10,
      "max_maintenance_flags": [
-      "stale"
+      "stale",
+      "capped"
      ],
      "raised_by": [
       "S2",
@@ -2264,6 +2323,27 @@
      ],
      "basis": {
       "v013_base": "medium",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "capped",
+     "part": "maintenance",
+     "points": 8,
+     "band": "medium",
+     "can_corroborate": true,
+     "corroborating_points": 2,
+     "max_maintenance": 8,
+     "max_maintenance_flags": [
+      "capped"
+     ],
+     "raised_by": [
+      "S11"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": null,
       "points": "band_floor"
      },
      "points_from": null
@@ -2460,6 +2540,14 @@
       "threshold": "push-warn-years",
       "below": "release-warn-years"
      }
+    },
+    {
+     "id": "php_bound",
+     "flag_ids": [
+      "old-promise",
+      "capped"
+     ],
+     "holds_unless": null
     }
    ],
    "sort": [

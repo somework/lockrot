@@ -38,6 +38,7 @@
             "left-behind",
             "old-promise",
             "stale",
+            "capped",
             "vulnerable"
         ],
         "verdicts": [
@@ -65,7 +66,8 @@
             "S7",
             "S8",
             "S9",
-            "S10"
+            "S10",
+            "S11"
         ],
         "fix_model": 1,
         "text_grammar": 1,
@@ -79,6 +81,7 @@
                 "left-behind",
                 "old-promise",
                 "stale",
+                "capped",
                 "vulnerable"
             ],
             "parts": [
@@ -90,7 +93,8 @@
                         "pinned",
                         "left-behind",
                         "old-promise",
-                        "stale"
+                        "stale",
+                        "capped"
                     ],
                     "combine": "lead_plus_share"
                 },
@@ -230,9 +234,10 @@
                     "band": "medium",
                     "can_corroborate": true,
                     "corroborating_points": 2,
-                    "max_maintenance": 8,
+                    "max_maintenance": 10,
                     "max_maintenance_flags": [
-                        "stale"
+                        "stale",
+                        "capped"
                     ],
                     "raised_by": [
                         "S2",
@@ -244,6 +249,27 @@
                     ],
                     "basis": {
                         "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
                         "points": "band_floor"
                     },
                     "points_from": null
@@ -440,6 +466,14 @@
                         "threshold": "push-warn-years",
                         "below": "release-warn-years"
                     }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
                 }
             ],
             "sort": [
@@ -843,18 +877,18 @@
         },
         "score_rules_used": {
             "counted": 6,
-            "lead-first": 56,
-            "corroborating-share": 27,
+            "lead-first": 58,
+            "corroborating-share": 28,
             "advisory-points": 22,
             "no-reachable-fix-multiplier": 0,
             "security-max": 13,
             "divide-reach": 48,
             "security-exempt-from-reach": 6,
             "sum": 1,
-            "divide-dev": 11,
+            "divide-dev": 12,
             "floor-once": 0,
-            "band-floors": 77,
-            "zero-verdicts": 204,
+            "band-floors": 79,
+            "zero-verdicts": 202,
             "sort": null,
             "gate-bounded-new": 0,
             "baseline-cover": 0
@@ -863,8 +897,8 @@
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
     "packages_checked": 281,
-    "packages_flagged": 77,
-    "packages_multi_flag": 27,
+    "packages_flagged": 79,
+    "packages_multi_flag": 28,
     "include_dev": true,
     "not_from_composer_repository": 0,
     "packages_unchecked_accepted": 0,
@@ -872,11 +906,11 @@
     "counts": {
         "critical": 7,
         "high": 41,
-        "medium": 14,
-        "low": 15,
+        "medium": 15,
+        "low": 16,
         "unknown": 0,
         "finished": 21,
-        "ok": 183
+        "ok": 181
     },
     "abandoned": {
         "total": 27,
@@ -886,9 +920,9 @@
     "priorities": {
         "critical": 7,
         "high": 41,
-        "medium": 14,
-        "low": 15,
-        "none": 204
+        "medium": 15,
+        "low": 16,
+        "none": 202
     },
     "flags": {
         "abandoned": {
@@ -973,6 +1007,20 @@
                 "high": 4,
                 "medium": 1,
                 "low": 2
+            }
+        },
+        "capped": {
+            "carrying": 3,
+            "leading": 2,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 1,
+                "high": 0,
+                "medium": 1,
+                "low": 1
             }
         },
         "vulnerable": {
@@ -1138,25 +1186,25 @@
         }
     ],
     "rot_depth": {
-        "flagged": 77,
-        "measured": 77,
+        "flagged": 79,
+        "measured": 79,
         "unmeasured": {
             "unreached": 0,
             "no_composer_json": 0
         },
         "by_reach": {
-            "direct": 28,
+            "direct": 30,
             "transitive": 49,
             "unreached": 0
         },
         "not_in_composer_json": 49,
         "require_dev_not_walked": 0,
-        "production": 66,
-        "development": 11,
+        "production": 67,
+        "development": 12,
         "by_depth": [
             {
                 "depth": 0,
-                "flagged": 28
+                "flagged": 30
             },
             {
                 "depth": 1,
@@ -2500,7 +2548,8 @@
                             "verdict": "critical",
                             "lead": "abandoned",
                             "flag_ids": [
-                                "abandoned"
+                                "abandoned",
+                                "capped"
                             ],
                             "replacement": "php-http/guzzle7-adapter",
                             "next_step": {
@@ -2835,7 +2884,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -2893,7 +2943,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -2951,7 +3002,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3009,7 +3061,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3067,7 +3120,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3125,7 +3179,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3183,7 +3238,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3241,7 +3297,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3299,7 +3356,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3357,7 +3415,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3415,7 +3474,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3473,7 +3533,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3531,7 +3592,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3589,7 +3651,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -4354,12 +4417,27 @@
                         "source": null
                     },
                     "summary": "marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived on GitHub; last release 2019-02-05 (5.3 years ago)"
+                },
+                {
+                    "id": "capped",
+                    "role": "corroborating",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S11"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "php_minor",
+                        "value": "7.4",
+                        "source": null
+                    },
+                    "summary": "requires php ^7.0: it stops at 7.4, so the newest PHP, 8.3, is excluded"
                 }
             ],
             "score": {
                 "model": 1,
-                "total": 32,
-                "exact": 32,
+                "total": 34,
+                "exact": 34,
                 "rounded_down": false,
                 "band": {
                     "floor": 32,
@@ -4370,9 +4448,9 @@
                 "parts": {
                     "maintenance": {
                         "status": "counted",
-                        "contribution": 32,
+                        "contribution": 34,
                         "alone": {
-                            "total": 32,
+                            "total": 34,
                             "verdict": "critical"
                         }
                     },
@@ -4396,12 +4474,51 @@
                         "divisor": 1,
                         "points": 32,
                         "contribution": 32
+                    },
+                    {
+                        "part": "maintenance",
+                        "flag": "capped",
+                        "role": "corroborating",
+                        "weight": 8,
+                        "divisor": 4,
+                        "points": 2,
+                        "contribution": 2
                     }
                 ],
                 "modifiers": [],
                 "accepted": [],
-                "without": [],
-                "text": "32 = abandoned 32"
+                "without": [
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "abandoned"
+                        },
+                        "revealed": [
+                            {
+                                "flag": "stale",
+                                "role": "lead"
+                            }
+                        ],
+                        "total": 10,
+                        "verdict": "medium",
+                        "lead": "stale",
+                        "deciding_advisory": null,
+                        "at_least": false
+                    },
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "capped"
+                        },
+                        "revealed": [],
+                        "total": 32,
+                        "verdict": "critical",
+                        "lead": "abandoned",
+                        "deciding_advisory": null,
+                        "at_least": false
+                    }
+                ],
+                "text": "34 = abandoned 32 + capped 2 [\u00bc of 8]"
             },
             "next_step": {
                 "kind": "replace",
@@ -4432,6 +4549,10 @@
                     {
                         "kind": "flag",
                         "id": "abandoned"
+                    },
+                    {
+                        "kind": "flag",
+                        "id": "capped"
                     }
                 ],
                 "clears_all": false,
@@ -4565,9 +4686,22 @@
                             }
                         ]
                     }
+                },
+                {
+                    "id": "S11",
+                    "level": "warn",
+                    "summary": "php \"^7.0\" stops at 7.4; the newest PHP, 8.3, is excluded",
+                    "data": {
+                        "newest_php": "8.3",
+                        "newest_php_source": "known",
+                        "requires": "^7.0",
+                        "stops_at": "7.4",
+                        "excludes_target": true,
+                        "admits_newest": null
+                    }
                 }
             ],
-            "evidence": "abandoned: marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived on GitHub; last release 2019-02-05 (5.3 years ago)",
+            "evidence": "abandoned: marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived on GitHub; last release 2019-02-05 (5.3 years ago); capped: requires php ^7.0: it stops at 7.4, so the newest PHP, 8.3, is excluded",
             "allowlist_reason": null,
             "data_date": "2026-10-13T01:30:39+00:00",
             "libyears": 0,
@@ -24450,6 +24584,281 @@
             }
         },
         {
+            "package": "laminas/laminas-code",
+            "version": "4.7.1",
+            "branch": "4.x",
+            "installed_php": {
+                "requires": ">=7.4, <8.2",
+                "target_runs": false,
+                "project_allows": true
+            },
+            "verdict": "medium",
+            "priority": "medium",
+            "lead": "capped",
+            "rank": 60,
+            "flags": [
+                {
+                    "id": "capped",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S11"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "php_minor",
+                        "value": "8.1",
+                        "source": null
+                    },
+                    "summary": "requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.3, is excluded"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 8,
+                "exact": 8,
+                "rounded_down": false,
+                "band": {
+                    "floor": 8,
+                    "next": "high",
+                    "to_next": 8
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 8,
+                        "alone": {
+                            "total": 8,
+                            "verdict": "medium"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "capped",
+                        "role": "lead",
+                        "weight": 8,
+                        "divisor": 1,
+                        "points": 8,
+                        "contribution": 8
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [],
+                "text": "8 = capped 8"
+            },
+            "next_step": {
+                "kind": "raise-php",
+                "source": "capped",
+                "merged": [],
+                "fix_kind": null,
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "4.x",
+                "version": "4.17.0",
+                "newest": "4.17.0",
+                "constraint": "^4.17.0",
+                "latest": null,
+                "php_check": {
+                    "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                    "project_allows": false,
+                    "target_runs": true,
+                    "raise_to": ">=8.2",
+                    "raise_size": "major"
+                },
+                "crosses_major": false,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "basis": "admits_newest_php"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold"
+                    ]
+                },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
+                "composer_moves_because": [],
+                "commands": [
+                    [
+                        "composer",
+                        "require",
+                        "php:>=8.2",
+                        "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "require",
+                        "laminas/laminas-code:^4.17.0"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "laminas/laminas-code",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T18:49:09+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/laminas/laminas-code",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "laminas/laminas-code"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "doctrine/doctrine-migrations-bundle",
+                "doctrine/migrations",
+                "friendsofphp/proxy-manager-lts",
+                "laminas/laminas-code",
+                "symfony/proxy-manager-bridge"
+            ],
+            "signals": [
+                {
+                    "id": "S11",
+                    "level": "warn",
+                    "summary": "php \">=7.4, <8.2\" stops at 8.1; the newest PHP, 8.3, is excluded",
+                    "data": {
+                        "newest_php": "8.3",
+                        "newest_php_source": "known",
+                        "requires": ">=7.4, <8.2",
+                        "stops_at": "8.1",
+                        "excludes_target": true,
+                        "admits_newest": {
+                            "version": "4.17.0",
+                            "branch": "4.x",
+                            "blocking": "project"
+                        }
+                    }
+                }
+            ],
+            "evidence": "capped: requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.3, is excluded",
+            "allowlist_reason": null,
+            "data_date": "2026-09-14T18:49:09+00:00",
+            "libyears": 2.95,
+            "age": {
+                "installed": {
+                    "at": "2022-11-21T01:32:31+00:00",
+                    "years": 1.5,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "4.17.0",
+                    "at": "2025-11-01T09:38:14+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "4.17.0",
+                    "at": "2025-11-01T09:38:14+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-08T13:11:10+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
             "package": "endroid/qr-code",
             "version": "3.9.7",
             "branch": "3.x",
@@ -24461,7 +24870,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 60,
+            "rank": 61,
             "flags": [
                 {
                     "id": "left-behind",
@@ -24783,7 +25192,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "abandoned",
-            "rank": 61,
+            "rank": 62,
             "flags": [
                 {
                     "id": "abandoned",
@@ -25055,7 +25464,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "pinned",
-            "rank": 62,
+            "rank": 63,
             "flags": [
                 {
                     "id": "pinned",
@@ -25300,7 +25709,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": null,
-            "rank": 63,
+            "rank": 64,
             "flags": [
                 {
                     "id": "vulnerable",
@@ -25688,7 +26097,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": null,
-            "rank": 64,
+            "rank": 65,
             "flags": [
                 {
                     "id": "vulnerable",
@@ -26028,7 +26437,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": null,
-            "rank": 65,
+            "rank": 66,
             "flags": [
                 {
                     "id": "vulnerable",
@@ -26370,7 +26779,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": null,
-            "rank": 66,
+            "rank": 67,
             "flags": [
                 {
                     "id": "vulnerable",
@@ -26778,7 +27187,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": null,
-            "rank": 67,
+            "rank": 68,
             "flags": [
                 {
                     "id": "vulnerable",
@@ -27248,7 +27657,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "left-behind",
-            "rank": 68,
+            "rank": 69,
             "flags": [
                 {
                     "id": "left-behind",
@@ -27648,7 +28057,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "left-behind",
-            "rank": 69,
+            "rank": 70,
             "flags": [
                 {
                     "id": "left-behind",
@@ -28063,7 +28472,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "left-behind",
-            "rank": 70,
+            "rank": 71,
             "flags": [
                 {
                     "id": "left-behind",
@@ -28463,7 +28872,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "left-behind",
-            "rank": 71,
+            "rank": 72,
             "flags": [
                 {
                     "id": "left-behind",
@@ -28863,7 +29272,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "left-behind",
-            "rank": 72,
+            "rank": 73,
             "flags": [
                 {
                     "id": "left-behind",
@@ -29253,7 +29662,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "left-behind",
-            "rank": 73,
+            "rank": 74,
             "flags": [
                 {
                     "id": "left-behind",
@@ -29653,7 +30062,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "left-behind",
-            "rank": 74,
+            "rank": 75,
             "flags": [
                 {
                     "id": "left-behind",
@@ -30070,7 +30479,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "left-behind",
-            "rank": 75,
+            "rank": 76,
             "flags": [
                 {
                     "id": "left-behind",
@@ -30474,6 +30883,285 @@
             }
         },
         {
+            "package": "friendsoftwig/twigcs",
+            "version": "v6.1.0",
+            "branch": "6.x",
+            "installed_php": {
+                "requires": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0",
+                "target_runs": false,
+                "project_allows": true
+            },
+            "verdict": "low",
+            "priority": "low",
+            "lead": "capped",
+            "rank": 77,
+            "flags": [
+                {
+                    "id": "capped",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S11"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "php_minor",
+                        "value": "8.2",
+                        "source": null
+                    },
+                    "summary": "requires php ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0: it stops at 8.2, so the newest PHP, 8.3, is excluded"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 4,
+                "exact": 4,
+                "rounded_down": false,
+                "band": {
+                    "floor": 1,
+                    "next": "medium",
+                    "to_next": 4
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 4,
+                        "alone": {
+                            "total": 4,
+                            "verdict": "low"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "capped",
+                        "role": "lead",
+                        "weight": 8,
+                        "divisor": 1,
+                        "points": 8,
+                        "contribution": 4
+                    }
+                ],
+                "modifiers": [
+                    {
+                        "reason": "dev",
+                        "applies_to": "total",
+                        "divide_by": 2,
+                        "before": 8,
+                        "after": 4
+                    }
+                ],
+                "accepted": [],
+                "without": [],
+                "text": "4 = capped 8 \u00f7 2 dev"
+            },
+            "next_step": {
+                "kind": "raise-php",
+                "source": "capped",
+                "merged": [],
+                "fix_kind": null,
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "6.x",
+                "version": "v6.6.1",
+                "newest": "v6.6.1",
+                "constraint": "^6.6.1",
+                "latest": null,
+                "php_check": {
+                    "requires": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                    "project_allows": false,
+                    "target_runs": true,
+                    "raise_to": ">=8.0",
+                    "raise_size": "major"
+                },
+                "crosses_major": false,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "basis": "admits_newest_php"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold"
+                    ]
+                },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
+                "composer_moves_because": [],
+                "commands": [
+                    [
+                        "composer",
+                        "require",
+                        "php:>=8.0",
+                        "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "require",
+                        "friendsoftwig/twigcs:^6.6.1"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "raise require.php to >=8.0, then require friendsoftwig/twigcs ^6.6.1 \u2014 clears capped; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "friendsoftwig/twigcs",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-10-07T05:14:33+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/friendsoftwig/twigcs",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": true,
+            "reach": "direct",
+            "chain": [
+                "friendsoftwig/twigcs"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require-dev"
+            ],
+            "direct_dependents": [
+                "friendsoftwig/twigcs"
+            ],
+            "signals": [
+                {
+                    "id": "S11",
+                    "level": "warn",
+                    "summary": "php \"~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0\" stops at 8.2; the newest PHP, 8.3, is excluded",
+                    "data": {
+                        "newest_php": "8.3",
+                        "newest_php_source": "known",
+                        "requires": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0",
+                        "stops_at": "8.2",
+                        "excludes_target": true,
+                        "admits_newest": {
+                            "version": "v6.6.1",
+                            "branch": "6.x",
+                            "blocking": "project"
+                        }
+                    }
+                }
+            ],
+            "evidence": "capped: requires php ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0: it stops at 8.2, so the newest PHP, 8.3, is excluded",
+            "allowlist_reason": null,
+            "data_date": "2026-10-07T05:14:33+00:00",
+            "libyears": 3.05,
+            "age": {
+                "installed": {
+                    "at": "2023-01-04T16:01:24+00:00",
+                    "years": 1.4,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "v6.6.1",
+                    "at": "2026-01-23T11:42:09+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "v6.6.1",
+                    "at": "2026-01-23T11:42:09+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-01-23T11:42:49+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
             "package": "friendsofsymfony/oauth2-php",
             "version": "1.3.1",
             "branch": "1.x",
@@ -30485,7 +31173,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 76,
+            "rank": 78,
             "flags": [
                 {
                     "id": "stale",
@@ -30739,7 +31427,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 77,
+            "rank": 79,
             "flags": [
                 {
                     "id": "stale",
@@ -30994,7 +31682,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 78,
+            "rank": 80,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31126,7 +31814,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 79,
+            "rank": 81,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31258,7 +31946,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 80,
+            "rank": 82,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31390,7 +32078,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 81,
+            "rank": 83,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31522,7 +32210,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 82,
+            "rank": 84,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31660,7 +32348,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 83,
+            "rank": 85,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31798,7 +32486,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 84,
+            "rank": 86,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31931,7 +32619,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 85,
+            "rank": 87,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32073,7 +32761,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 86,
+            "rank": 88,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32209,7 +32897,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 87,
+            "rank": 89,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32341,7 +33029,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 88,
+            "rank": 90,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32473,7 +33161,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 89,
+            "rank": 91,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32621,7 +33309,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 90,
+            "rank": 92,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32754,7 +33442,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 91,
+            "rank": 93,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32890,7 +33578,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 92,
+            "rank": 94,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33035,7 +33723,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 93,
+            "rank": 95,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33192,7 +33880,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 94,
+            "rank": 96,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33324,7 +34012,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 95,
+            "rank": 97,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33456,7 +34144,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 96,
+            "rank": 98,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33591,7 +34279,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 97,
+            "rank": 99,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33747,7 +34435,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 98,
+            "rank": 100,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33903,7 +34591,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 99,
+            "rank": 101,
             "flags": [],
             "score": {
                 "model": 1,
@@ -34024,138 +34712,6 @@
             }
         },
         {
-            "package": "friendsoftwig/twigcs",
-            "version": "v6.1.0",
-            "branch": "6.x",
-            "installed_php": {
-                "requires": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0",
-                "target_runs": false,
-                "project_allows": true
-            },
-            "verdict": "ok",
-            "priority": "none",
-            "lead": null,
-            "rank": 100,
-            "flags": [],
-            "score": {
-                "model": 1,
-                "total": 0,
-                "exact": 0,
-                "accepted": [],
-                "text": "0"
-            },
-            "next_step": null,
-            "security": {
-                "status": "clear",
-                "check": "complete",
-                "complete": true,
-                "unchecked_reason": null,
-                "records": 0,
-                "feeds": [
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 0,
-                        "reason": null
-                    }
-                ],
-                "ignored": [],
-                "ignored_count": 0
-            },
-            "checks_missing": [],
-            "checks_skipped": [],
-            "unchecked_accepted": [],
-            "maintenance_judged": true,
-            "metadata": {
-                "status": "read",
-                "reason": null,
-                "message": null
-            },
-            "activity": {
-                "status": "read",
-                "reason": null,
-                "forge": "github",
-                "host": "github.com",
-                "repo": "friendsoftwig/twigcs",
-                "event": "push",
-                "archived": false,
-                "fetched_at": "2026-10-07T05:14:33+00:00",
-                "cached_at": null
-            },
-            "allowlist": null,
-            "abandoned_ignored": null,
-            "from_composer_repository": true,
-            "origin": {
-                "kind": "packagist",
-                "registry": "packagist.org",
-                "package_url": "https://packagist.org/packages/friendsoftwig/twigcs",
-                "local": false
-            },
-            "replacement": null,
-            "replacement_url": null,
-            "note": null,
-            "libyears_unmeasured": null,
-            "libyears_at_least": false,
-            "direct": true,
-            "dev": true,
-            "reach": "direct",
-            "chain": [
-                "friendsoftwig/twigcs"
-            ],
-            "depth": 0,
-            "depth_unmeasured": null,
-            "named_in": [
-                "require-dev"
-            ],
-            "direct_dependents": [
-                "friendsoftwig/twigcs"
-            ],
-            "signals": [],
-            "evidence": "",
-            "allowlist_reason": null,
-            "data_date": "2026-10-07T05:14:33+00:00",
-            "libyears": 3.05,
-            "age": {
-                "installed": {
-                    "at": "2023-01-04T16:01:24+00:00",
-                    "years": 1.4,
-                    "dated_by": null
-                },
-                "installed_unmeasured": null,
-                "release": {
-                    "version": "v6.6.1",
-                    "at": "2026-01-23T11:42:09+00:00",
-                    "years": 0,
-                    "level": null,
-                    "dated_by": null
-                },
-                "release_unmeasured": null,
-                "branch_release": {
-                    "version": "v6.6.1",
-                    "at": "2026-01-23T11:42:09+00:00",
-                    "years": 0,
-                    "level": null,
-                    "dated_by": null
-                },
-                "branch_release_unmeasured": null,
-                "push": {
-                    "at": "2026-01-23T11:42:49+00:00",
-                    "years": 0,
-                    "level": null
-                },
-                "push_unmeasured": null
-            },
-            "baseline": null,
-            "gate": {
-                "reaches_fail_on": false,
-                "fails": false,
-                "exempt_by": null,
-                "by": [],
-                "basis": null
-            }
-        },
-        {
             "package": "html2text/html2text",
             "version": "4.3.1",
             "branch": "4.x",
@@ -34167,7 +34723,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 101,
+            "rank": 102,
             "flags": [],
             "score": {
                 "model": 1,
@@ -34299,7 +34855,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 102,
+            "rank": 103,
             "flags": [],
             "score": {
                 "model": 1,
@@ -34454,7 +35010,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 103,
+            "rank": 104,
             "flags": [],
             "score": {
                 "model": 1,
@@ -34589,7 +35145,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 104,
+            "rank": 105,
             "flags": [],
             "score": {
                 "model": 1,
@@ -34696,142 +35252,6 @@
                 "branch_release_unmeasured": null,
                 "push": {
                     "at": "2026-03-26T22:03:55+00:00",
-                    "years": 0,
-                    "level": null
-                },
-                "push_unmeasured": null
-            },
-            "baseline": null,
-            "gate": {
-                "reaches_fail_on": false,
-                "fails": false,
-                "exempt_by": null,
-                "by": [],
-                "basis": null
-            }
-        },
-        {
-            "package": "laminas/laminas-code",
-            "version": "4.7.1",
-            "branch": "4.x",
-            "installed_php": {
-                "requires": ">=7.4, <8.2",
-                "target_runs": false,
-                "project_allows": true
-            },
-            "verdict": "ok",
-            "priority": "none",
-            "lead": null,
-            "rank": 105,
-            "flags": [],
-            "score": {
-                "model": 1,
-                "total": 0,
-                "exact": 0,
-                "accepted": [],
-                "text": "0"
-            },
-            "next_step": null,
-            "security": {
-                "status": "clear",
-                "check": "complete",
-                "complete": true,
-                "unchecked_reason": null,
-                "records": 0,
-                "feeds": [
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 0,
-                        "reason": null
-                    }
-                ],
-                "ignored": [],
-                "ignored_count": 0
-            },
-            "checks_missing": [],
-            "checks_skipped": [],
-            "unchecked_accepted": [],
-            "maintenance_judged": true,
-            "metadata": {
-                "status": "read",
-                "reason": null,
-                "message": null
-            },
-            "activity": {
-                "status": "read",
-                "reason": null,
-                "forge": "github",
-                "host": "github.com",
-                "repo": "laminas/laminas-code",
-                "event": "push",
-                "archived": false,
-                "fetched_at": "2026-09-14T18:49:09+00:00",
-                "cached_at": null
-            },
-            "allowlist": null,
-            "abandoned_ignored": null,
-            "from_composer_repository": true,
-            "origin": {
-                "kind": "packagist",
-                "registry": "packagist.org",
-                "package_url": "https://packagist.org/packages/laminas/laminas-code",
-                "local": false
-            },
-            "replacement": null,
-            "replacement_url": null,
-            "note": null,
-            "libyears_unmeasured": null,
-            "libyears_at_least": false,
-            "direct": true,
-            "dev": false,
-            "reach": "direct",
-            "chain": [
-                "laminas/laminas-code"
-            ],
-            "depth": 0,
-            "depth_unmeasured": null,
-            "named_in": [
-                "require"
-            ],
-            "direct_dependents": [
-                "doctrine/doctrine-migrations-bundle",
-                "doctrine/migrations",
-                "friendsofphp/proxy-manager-lts",
-                "laminas/laminas-code",
-                "symfony/proxy-manager-bridge"
-            ],
-            "signals": [],
-            "evidence": "",
-            "allowlist_reason": null,
-            "data_date": "2026-09-14T18:49:09+00:00",
-            "libyears": 2.95,
-            "age": {
-                "installed": {
-                    "at": "2022-11-21T01:32:31+00:00",
-                    "years": 1.5,
-                    "dated_by": null
-                },
-                "installed_unmeasured": null,
-                "release": {
-                    "version": "4.17.0",
-                    "at": "2025-11-01T09:38:14+00:00",
-                    "years": 0,
-                    "level": null,
-                    "dated_by": null
-                },
-                "release_unmeasured": null,
-                "branch_release": {
-                    "version": "4.17.0",
-                    "at": "2025-11-01T09:38:14+00:00",
-                    "years": 0,
-                    "level": null,
-                    "dated_by": null
-                },
-                "branch_release_unmeasured": null,
-                "push": {
-                    "at": "2026-09-08T13:11:10+00:00",
                     "years": 0,
                     "level": null
                 },

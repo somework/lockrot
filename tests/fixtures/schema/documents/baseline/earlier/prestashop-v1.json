@@ -32,7 +32,7 @@
    "version": "dev-compat-php",
    "first_seen": "2026-09-24",
    "flags": {
-    "abandoned": {
+    "pinned": {
      "known_since": "2026-09-24"
     }
    }
@@ -361,18 +361,6 @@
     }
    }
   },
-  "ircmaxell/security-lib": {
-   "version": "v1.1.0",
-   "first_seen": "2026-09-24",
-   "flags": {
-    "silent": {
-     "known_since": "2026-09-24"
-    },
-    "old-promise": {
-     "known_since": "2026-09-24"
-    }
-   }
-  },
   "jakeasmith/http_build_url": {
    "version": "1.0.1",
    "first_seen": "2026-09-24",
@@ -390,15 +378,6 @@
      "known_since": "2026-09-24"
     },
     "stale": {
-     "known_since": "2026-09-24"
-    }
-   }
-  },
-  "league/tactician-bundle": {
-   "version": "v1.2.0",
-   "first_seen": "2026-09-24",
-   "flags": {
-    "old-promise": {
      "known_since": "2026-09-24"
     }
    }
@@ -713,6 +692,15 @@
     }
    }
   },
+  "prestashop/decimal": {
+   "version": "1.4.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
   "prestashop/graphnvd3": {
    "version": "v2.0.3",
    "first_seen": "2026-09-24",
@@ -830,11 +818,20 @@
     }
    }
   },
+  "sensiolabs/security-checker": {
+   "version": "v6.0.3",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
   "shudrum/array-finder": {
    "version": "v1.1.0",
    "first_seen": "2026-09-24",
    "flags": {
-    "stale": {
+    "abandoned": {
      "known_since": "2026-09-24"
     }
    }
@@ -869,7 +866,10 @@
    "version": "0.5.0",
    "first_seen": "2026-09-24",
    "flags": {
-    "abandoned": {
+    "old-promise": {
+     "known_since": "2026-09-24"
+    },
+    "stale": {
      "known_since": "2026-09-24"
     }
    }

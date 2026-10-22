@@ -38,6 +38,7 @@
       "left-behind",
       "old-promise",
       "stale",
+      "capped",
       "vulnerable"
     ],
     "verdicts": [
@@ -65,7 +66,8 @@
       "S7",
       "S8",
       "S9",
-      "S10"
+      "S10",
+      "S11"
     ],
     "fix_model": 1,
     "text_grammar": 1,
@@ -79,6 +81,7 @@
         "left-behind",
         "old-promise",
         "stale",
+        "capped",
         "vulnerable"
       ],
       "parts": [
@@ -90,7 +93,8 @@
             "pinned",
             "left-behind",
             "old-promise",
-            "stale"
+            "stale",
+            "capped"
           ],
           "combine": "lead_plus_share"
         },
@@ -230,9 +234,10 @@
           "band": "medium",
           "can_corroborate": true,
           "corroborating_points": 2,
-          "max_maintenance": 8,
+          "max_maintenance": 10,
           "max_maintenance_flags": [
-            "stale"
+            "stale",
+            "capped"
           ],
           "raised_by": [
             "S2",
@@ -244,6 +249,27 @@
           ],
           "basis": {
             "v013_base": "medium",
+            "points": "band_floor"
+          },
+          "points_from": null
+        },
+        {
+          "id": "capped",
+          "part": "maintenance",
+          "points": 8,
+          "band": "medium",
+          "can_corroborate": true,
+          "corroborating_points": 2,
+          "max_maintenance": 8,
+          "max_maintenance_flags": [
+            "capped"
+          ],
+          "raised_by": [
+            "S11"
+          ],
+          "thresholds": [],
+          "basis": {
+            "v013_base": null,
             "points": "band_floor"
           },
           "points_from": null
@@ -440,6 +466,14 @@
             "threshold": "push-warn-years",
             "below": "release-warn-years"
           }
+        },
+        {
+          "id": "php_bound",
+          "flag_ids": [
+            "old-promise",
+            "capped"
+          ],
+          "holds_unless": null
         }
       ],
       "sort": [
@@ -778,7 +812,672 @@
         }
       ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+      "platform_override": null,
+      "host_requires": [],
+      "with_dev": {
+        "minors": [
+          "8.2",
+          "8.3",
+          "8.4",
+          "8.5"
+        ],
+        "gaps": false,
+        "lower_edge": {
+          "php": "8.2.0",
+          "set_by": [
+            {
+              "name": null,
+              "version": null,
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "brick/math",
+              "version": "0.14.8",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "dragonmantank/cron-expression",
+              "version": "v3.6.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2|^8.3|^8.4|^8.5",
+              "dev": false
+            },
+            {
+              "name": "innoge/laravel-msgraph-mail",
+              "version": "v2.0.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "laravel/framework",
+              "version": "v12.68.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "lcobucci/jwt",
+              "version": "5.6.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+              "dev": false
+            },
+            {
+              "name": "nette/utils",
+              "version": "v4.1.5",
+              "link": "require",
+              "target": "php",
+              "constraint": "8.2 - 8.5",
+              "dev": false
+            },
+            {
+              "name": "nunomaduro/collision",
+              "version": "v8.9.4",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2.0",
+              "dev": false
+            },
+            {
+              "name": "nunomaduro/termwind",
+              "version": "v2.4.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "phpspec/prophecy",
+              "version": "v1.26.1",
+              "link": "require",
+              "target": "php",
+              "constraint": "8.2.* || 8.3.* || 8.4.* || 8.5.*",
+              "dev": false
+            },
+            {
+              "name": "sebastian/comparator",
+              "version": "6.3.3",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "sebastian/diff",
+              "version": "6.0.2",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "sebastian/exporter",
+              "version": "6.3.2",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "sebastian/recursion-context",
+              "version": "6.0.3",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "spatie/laravel-backup",
+              "version": "9.3.6",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "spatie/laravel-ignition",
+              "version": "2.12.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "spatie/laravel-signal-aware-command",
+              "version": "2.1.2",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/clock",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/console",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/css-selector",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/error-handler",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/event-dispatcher",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/filesystem",
+              "version": "v7.4.11",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/finder",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-foundation",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-kernel",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/mailer",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/mime",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/process",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/psr-http-message-bridge",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/routing",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/string",
+              "version": "v7.4.15",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/translation",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/uid",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/var-dumper",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "tecnickcom/tc-lib-file",
+              "version": "2.6.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "tecnickcom/tc-lib-pdf-encrypt",
+              "version": "2.3.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "tecnickcom/tc-lib-pdf-font",
+              "version": "2.13.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "webmozart/assert",
+              "version": "2.4.1",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            }
+          ]
+        },
+        "upper_edge": null,
+        "closest": null
+      },
+      "without_dev": {
+        "minors": [
+          "8.2",
+          "8.3",
+          "8.4",
+          "8.5"
+        ],
+        "gaps": false,
+        "lower_edge": {
+          "php": "8.2.0",
+          "set_by": [
+            {
+              "name": null,
+              "version": null,
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "brick/math",
+              "version": "0.14.8",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "dragonmantank/cron-expression",
+              "version": "v3.6.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2|^8.3|^8.4|^8.5",
+              "dev": false
+            },
+            {
+              "name": "innoge/laravel-msgraph-mail",
+              "version": "v2.0.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "laravel/framework",
+              "version": "v12.68.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "lcobucci/jwt",
+              "version": "5.6.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+              "dev": false
+            },
+            {
+              "name": "nette/utils",
+              "version": "v4.1.5",
+              "link": "require",
+              "target": "php",
+              "constraint": "8.2 - 8.5",
+              "dev": false
+            },
+            {
+              "name": "nunomaduro/collision",
+              "version": "v8.9.4",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2.0",
+              "dev": false
+            },
+            {
+              "name": "nunomaduro/termwind",
+              "version": "v2.4.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "phpspec/prophecy",
+              "version": "v1.26.1",
+              "link": "require",
+              "target": "php",
+              "constraint": "8.2.* || 8.3.* || 8.4.* || 8.5.*",
+              "dev": false
+            },
+            {
+              "name": "sebastian/comparator",
+              "version": "6.3.3",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "sebastian/diff",
+              "version": "6.0.2",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "sebastian/exporter",
+              "version": "6.3.2",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "sebastian/recursion-context",
+              "version": "6.0.3",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "spatie/laravel-backup",
+              "version": "9.3.6",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "spatie/laravel-ignition",
+              "version": "2.12.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "spatie/laravel-signal-aware-command",
+              "version": "2.1.2",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/clock",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/console",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/css-selector",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/error-handler",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/event-dispatcher",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/filesystem",
+              "version": "v7.4.11",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/finder",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-foundation",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-kernel",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/mailer",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/mime",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/process",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/psr-http-message-bridge",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/routing",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/string",
+              "version": "v7.4.15",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/translation",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/uid",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/var-dumper",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "tecnickcom/tc-lib-file",
+              "version": "2.6.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "tecnickcom/tc-lib-pdf-encrypt",
+              "version": "2.3.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "tecnickcom/tc-lib-pdf-font",
+              "version": "2.13.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "webmozart/assert",
+              "version": "2.4.1",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            }
+          ]
+        },
+        "upper_edge": null,
+        "closest": null
+      },
+      "target": {
+        "php": "8.4.99",
+        "inside": true
+      },
+      "target_fix": null
+    }
   },
   "activity_cache_oldest_at": "2026-10-14T00:00:00+00:00",
   "activity_cache_age_hours": 0,
@@ -893,6 +1592,20 @@
         "high": 1,
         "medium": 1,
         "low": 4
+      }
+    },
+    "capped": {
+      "carrying": 0,
+      "leading": 0,
+      "accepted": {
+        "all": 0,
+        "in_graded": 0
+      },
+      "by_verdict": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0
       }
     },
     "vulnerable": {

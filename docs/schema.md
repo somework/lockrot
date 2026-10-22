@@ -467,6 +467,7 @@ validates with any object as its `data`.
 | S8 | `suggested_constraint`, `reachable_branch`, `reachable_version`, `reachable_release` | The newest higher branch that releases and is within reach ([Within reach](verdicts.md#within-reach)) |
 | S9 | `advisories`, `releases_read`, `complete` | One row per counted advisory, the deciding one first: `id`, `cve`, `title`, `link`, `reported_at`, `severity`, `severity_published`, `affected_versions`, `counted`, `points`, `deciding`, `fix` and `baseline` |
 | S10 | `unchecked`, `blocks` | See [What was not checked](verdicts.md#what-was-not-checked) |
+| S11 | `newest_php`, `newest_php_source`, `requires`, `stops_at`, `excludes_target`, `admits_newest` | See [Capped](verdicts.md#capped) |
 
 ### Dates
 

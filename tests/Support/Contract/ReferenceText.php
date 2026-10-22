@@ -40,7 +40,7 @@ final class ReferenceText
         'metadata_not_read' => 'no move: lockrot did not read its releases, so it names none',
         'local_package' => 'no move: it is installed from a local path (your own package)',
     ];
-    private const ADDS = ['released_before_ga' => "it was released before your target PHP's major", 'branch_not_releasing' => 'that line no longer releases while a higher line does'];
+    private const ADDS = ['released_before_ga' => "it was released before your target PHP's major", 'branch_not_releasing' => 'that line no longer releases while a higher line does', 'stops_below_newest_php' => 'it stops below the newest PHP'];
     private const LIMITED_BY = ['score' => 'the score is lower', 'cap' => 'the new facts bound it', 'equal' => 'both agree'];
     private const LOST = ['none', 'blocked'];
     private const NOT_CHECKED = [
@@ -382,7 +382,7 @@ final class ReferenceText
 
                 return 'test it on PHP '.$target.($latest !== null && Fields::bool($latest, 'is_installed') ? ' — '.Fields::string($latest, 'version').' is its newest release' : '');
             case 'update':
-                return self::update($move).' (gets '.Fields::string($move, 'newest').')'.self::clears($move);
+                return self::update($move).' (gets '.Fields::string($move, 'newest').')'.self::clears($move).self::adds($move);
             case 'require':
             case 'raise-php':
                 $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';
@@ -390,7 +390,7 @@ final class ReferenceText
                 $text = Fields::bool($in, 'direct')
                     ? $raise.'require '.$package.' '.$constraint
                     : $raise.'move '.$package.' to '.$constraint.(self::dependents($in) === '' ? '' : ' through '.self::dependents($in));
-                $text .= self::clears($move);
+                $text .= self::clears($move).self::adds($move);
                 if ($check !== null && \is_string($check['requires'] ?? null)) {
                     $text .= self::php($move, $check, $run).'; the target php '.$target.' runs it';
                 }
@@ -449,10 +449,18 @@ final class ReferenceText
         if ($check !== null && \is_string($check['requires'] ?? null)) {
             $text .= self::php($move, $check, Fields::object($in, 'run'));
         }
+
+        return $text.self::adds($move);
+    }
+
+    /** @param array<mixed, mixed> $move */
+    private static function adds(array $move): string
+    {
         $byBasis = [];
         foreach (Fields::objects($move, 'adds') as $fact) {
             $byBasis[Fields::string($fact, 'basis')][] = Fields::string($fact, 'id');
         }
+        $text = '';
         foreach ($byBasis as $basis => $ids) {
             $text .= '; '.(self::ADDS[$basis] ?? str_replace('_', ' ', (string) $basis)).', so '.implode(' and ', $ids).' would count';
         }

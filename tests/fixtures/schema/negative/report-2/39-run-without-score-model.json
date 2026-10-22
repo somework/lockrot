@@ -42,6 +42,7 @@
    "left-behind",
    "old-promise",
    "stale",
+   "capped",
    "vulnerable"
   ],
   "verdicts": [
@@ -69,7 +70,8 @@
    "S7",
    "S8",
    "S9",
-   "S10"
+   "S10",
+   "S11"
   ],
   "fix_model": 1,
   "text_grammar": 1,
@@ -291,6 +293,20 @@
     "high": 2,
     "medium": 0,
     "low": 1
+   }
+  },
+  "capped": {
+   "carrying": 0,
+   "leading": 0,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
    }
   },
   "vulnerable": {

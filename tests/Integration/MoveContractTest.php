@@ -42,6 +42,12 @@ final class MoveContractTest extends TestCase
         'unreached-dev‡' => [[['version'], self::VERSION]],
         'B-offline-high‡' => [[['version'], self::VERSION]],
         'require-dev-name‡' => [[['version'], self::VERSION]],
+        'capped-require-php' => [[['version'], self::VERSION]],
+        'adds-capped-raise-php' => [[['version'], self::VERSION]],
+        'adds-capped-require‡' => [[['version'], self::VERSION]],
+        'php-edge-lower‡' => [[['version'], self::VERSION]],
+        'php-edge-equal‡' => [[['version'], self::VERSION]],
+        'php-edge-upper‡' => [[['version'], self::VERSION]],
     ];
 
     private const NO_SCORE_AFTER = ['replace', 'find-alternative', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'];
@@ -240,6 +246,10 @@ final class MoveContractTest extends TestCase
             self::assertSame('vulnerable', $move['source']);
         }
         if ($move === null) {
+            $next = \is_array($finding['next_step'] ?? null) ? $finding['next_step'] : ['source' => null, 'merged' => [], 'also' => []];
+            $sources = array_merge([$next['source']], JsonPath::arrayAt($next, ['merged']), array_column(JsonPath::arrayAt($next, ['also']), 'source'));
+            self::assertNotContains('vulnerable', $sources, 'with no move_in, no published move has the source vulnerable');
+
             return;
         }
         self::assertSame($move['fix_kind'], $security['fix_kind'], 'security.fix_kind is the fix kind of that move');

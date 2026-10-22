@@ -32,8 +32,8 @@ def pinned(name):
 
 R1 = pinned('lockrot-report.schema.json')
 
-FLAGS = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable']
-MAINT = FLAGS[:6]
+FLAGS = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped', 'vulnerable']
+MAINT = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped']  # a named list: a slice of FLAGS would lose a flag added before vulnerable
 VERDICTS = ['critical', 'high', 'medium', 'low', 'unknown', 'finished', 'ok']
 GRADES = VERDICTS[:4]
 SEVERITIES = ['critical', 'high', 'medium', 'unrated', 'low']
@@ -139,6 +139,7 @@ defs['envelope'] = obj('Who wrote the document and under which schema number (§
 for k in ('dateTime', 'date', 'packageName', 'level', 'years', 'datedBy', 'forgeId', 'metadataFailureReason', 'repositoryActivityNotCheckedReason',
           'forgeRepository', 'failedForgeRepository', 'originKind', 'originRegistry', 'signalId'):
     defs[k] = copy.deepcopy(R1['definitions'][k])
+defs['signalId']['x-known-values'] = defs['signalId']['x-known-values'] + ['S11']  # CAPPED (§5.10)
 defs['dateTime']['description'] = 'An ISO 8601 date-time with its offset, as lockrot writes every instant (`2026-10-01T17:39:31+00:00`).'
 defs['date']['description'] = 'A calendar date, `YYYY-MM-DD`.'
 defs['level']['description'] = "A signal's own level, as report-1 (`info`, `warn`, `high`); kept for consumers, never printed beside a grade (§2.1). Closed."
@@ -151,7 +152,7 @@ defs['advisoriesNotCheckedReason'] = open_set(['offline', 'composer_too_old', 'i
     "Why security advisories were not checked (§5.1): `offline` (`--offline`; advisories are never served from a cache), `composer_too_old` "
     "(Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw, §5.7). "
     "An open set: read a reason you do not know as another reason.")
-defs['flag'] = closed(FLAGS, 'A flag id (§2.1), in the frozen flag order `abandoned silent pinned left-behind old-promise stale vulnerable`. Closed: a new flag is a report-3 event (§3.7, §8.2).')
+defs['flag'] = closed(FLAGS, 'A flag id (§2.1), in the frozen flag order `abandoned silent pinned left-behind old-promise stale capped vulnerable`. Closed: a new flag is a report-3 event (§3.7, §8.2).')
 defs['maintenanceFlag'] = closed(MAINT, 'A maintenance flag id: the flag order without `vulnerable` (§2.1). The same closed set as `flag`, restricted; the values `lead`, an accepted flag and a baseline entry can name.')
 defs['verdict'] = closed(VERDICTS, 'The verdict (§4.1): a grade scored from the counted flags (`critical high medium low`, by `score.total` and the bands of `run.score_model`), or at score 0 the word that says why (`unknown` no metadata, `finished` the allowlist accepted a fired flag, `ok` otherwise). Closed (§8.2).')
 defs['grade'] = closed(GRADES, 'A grade: the verdict set without its score-0 words, highest first (`run.graded_verdicts`). The same closed set as `verdict`, restricted.')
@@ -175,9 +176,10 @@ defs['fact'] = obj('A counted fact a move leaves in place (§5.6 `leaves[]`): a 
 defs['clearedFact'] = obj("A fact a move clears (§5.6 \"What clears[] may name\"): checked for every version the emitted constraint admits, or for the one release `composer update` installs.", {
     'kind': ref('factKind'),
     'id': d('The flag id or the advisory id the move clears.', {'type': 'string', 'minLength': 1}),
-    'basis': open_set(['branch_releasing', 'released_after_ga', 'outside_range', 'tags_only'],
+    'basis': open_set(['branch_releasing', 'released_after_ga', 'outside_range', 'tags_only', 'admits_newest_php'],
         ('Why it is cleared (§5.6): `branch_releasing` (left-behind: the branch released within `release-warn-years`), `released_after_ga` (old-promise: the lowest admitted release '
-         'came out after the target major\'s GA), `outside_range` (an advisory: no admitted version is inside its range), `tags_only` (pinned: the constraint admits only tags). '
+         'came out after the target major\'s GA), `outside_range` (an advisory: no admitted version is inside its range), `tags_only` (pinned: the constraint admits only tags), '
+         '`admits_newest_php` (capped: the release the move installs admits the newest PHP minor that the project allows, §5.10). '
          'An open set (§8.2, round 2): read an unknown basis as another reason the fact is cleared.')),
 })
 defs['unverifiedFact'] = obj("A fact lockrot could not check for the move (§5.6): a counted fact it may not clear (kept as counted), or a flag the move may raise "
@@ -190,8 +192,9 @@ defs['unverifiedFact'] = obj("A fact lockrot could not check for the move (§5.6
 defs['addedFact'] = obj("A fact the move would raise (§5.6 `adds[]`); every surface names it (I22).", {
     'kind': ref('factKind'),
     'id': d('The flag id the move would raise.', {'type': 'string', 'minLength': 1}),
-    'basis': open_set(['released_before_ga', 'branch_not_releasing'], ("Why the move raises it (§5.6): `released_before_ga` (a tag released before the target major's GA, with an open `require.php`, adds old-promise), "
-        "`branch_not_releasing` (a tag on a line that has not released in `release-warn-years` while a higher line has, S8's own rule, adds left-behind). "
+    'basis': open_set(['released_before_ga', 'branch_not_releasing', 'stops_below_newest_php'], ("Why the move raises it (§5.6): `released_before_ga` (a tag released before the target major's GA, with an open `require.php`, adds old-promise), "
+        "`branch_not_releasing` (a tag on a line that has not released in `release-warn-years` while a higher line has, S8's own rule, adds left-behind), "
+        "`stops_below_newest_php` (an `update`, `require`, `raise-php` or `tag` move to a release whose `require.php` stops below the newest PHP minor that the project allows, S11's own rule, adds capped, §5.10). "
         "An open set (§8.2): read an unknown basis as another reason.")),
 })
 
@@ -468,9 +471,11 @@ def move_props(with_also):
         'fix_kind': nul(("The security fix kind beside the move kind when `source` or `merged` holds `vulnerable`, or the move clears every counted advisory (round 3); else null "
                          "(`upgrade` is the move `require`, §8.2)."), ref('fixKind')),
         'reason': nul(("Set exactly on `no-move` (I18): `package_quiet` (stale), `no_higher_release` and `higher_undated` (left-behind), `releases_unknown` (vulnerable, round 4), "
-                       "`affected_range_unknown` (vulnerable: the releases were read, but no counted advisory names the versions it affects), `metadata_not_read` (pinned: its releases were never read, so lockrot cannot say whether a tag exists) and `local_package` (pinned: installed from a "
-                       "local path, the project's own package) (attack round 1). An open set (§8.2)."),
-                      {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['package_quiet', 'no_higher_release', 'higher_undated', 'releases_unknown', 'affected_range_unknown', 'metadata_not_read', 'local_package']}),
+                       "`affected_range_unknown` (vulnerable: the releases were read, but no counted advisory names the versions it affects), `metadata_not_read` (pinned or capped: its releases were never read, so lockrot cannot say whether a tag exists or a release admits the newest PHP), "
+                       "`local_package` (pinned or capped: installed from a local path, the project's own package) (attack round 1) and `no_release_admits` (capped: no "
+                       "stable release above the installed one admits S11's `newest_php`). An open set (§8.2)."),
+                      {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['package_quiet', 'no_higher_release', 'higher_undated', 'releases_unknown', 'affected_range_unknown', 'metadata_not_read', 'local_package',
+                                                                              'no_release_admits']}),
         'replacement': ref('replacement'),
         'quiet_years': nul('On a `silent` `find-alternative` move, the years nothing was released (a years field, §2.1); else null.', ref('years')),
         'to_branch': nul('The branch moved to; null when the move names none.', ref('branchLabel')),
@@ -645,8 +650,8 @@ defs['security'] = d("The finding's advisories (§5.3, §7.6), told apart by `st
 # flags on a finding
 defs['headline'] = obj(("The pill qualifier, chosen by lockrot, never by the page (§2.1): `{unit, value, source}`. `unit` and `source` are closed (§8.2); "
                         "the branches below type `value` and `source` per unit."), {
-    'unit': closed(['years', 'php', 'reason', 'advisories'], 'What `value` measures. Closed.'),
-    'value': d('A years field (`years`, null for a liveness word with no dated reading), the PHP major the release was written for (`php`), a reason id worded by the page (`reason`), or the count of counted advisories (`advisories`).',
+    'unit': closed(['years', 'php', 'php_minor', 'reason', 'advisories'], 'What `value` measures. Closed.'),
+    'value': d('A years field (`years`, null for a liveness word with no dated reading), the PHP major the release was written for (`php`), the PHP minor the installed `require.php` stops at (`php_minor`), a reason id worded by the page (`reason`), or the count of counted advisories (`advisories`).',
                {'type': ['number', 'string', 'null']}),
     'source': nul('Which reading the years come from (`release push branch`, closed); null for every unit but `years`.', closed(['release', 'push', 'branch'])),
 }, anyOf=[
@@ -657,6 +662,7 @@ defs['headline'] = obj(("The pill qualifier, chosen by lockrot, never by the pag
     {'description': "`reason` (abandoned: `archived` wins over `marked`; pinned: S6's reason).", 'properties': {'unit': {'enum': ['reason']}, 'value': {'type': 'string', 'pattern': SNAKE,
         'x-known-values': ['archived', 'marked', 'branch_snapshot', 'no_stable_release']}, 'source': {'type': 'null'}}},
     {'description': '`advisories` (vulnerable: the count of counted advisories).', 'properties': {'unit': {'enum': ['advisories']}, 'value': {'type': 'integer', 'minimum': 1}, 'source': {'type': 'null'}}},
+    {'description': '`php_minor` (capped: S11 `stops_at`).', 'properties': {'unit': {'enum': ['php_minor']}, 'value': {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}, 'source': {'type': 'null'}}},
 ])
 LIVENESS_COMPLETE = d('"S2 and S4 were both read" (§2.3, round 4): false exactly when a `checks_skipped[]` or `checks_missing[]` entry blocks S2 or S4.', {'type': 'boolean'})
 defs['degreeAbandoned'] = obj("`abandoned`'s degree: which sources fired (§2.2: S3 is a degree of abandoned, not a flag).", {
@@ -686,6 +692,7 @@ defs['findingFlag'] = obj("A fired flag (§2.1, §7.6): facts only, no weight or
     {'description': '`left-behind`: headline in years of the branch.',
      'properties': {'id': {'enum': ['left-behind']}, 'degree': {'type': 'null'}, 'headline': {'properties': {'unit': {'enum': ['years']}, 'source': {'enum': ['branch']}}}}},
     {'description': '`old-promise`: headline `php`.', 'properties': {'id': {'enum': ['old-promise']}, 'degree': {'type': 'null'}, 'headline': {'properties': {'unit': {'enum': ['php']}}}}},
+    {'description': '`capped`: headline `php_minor`.', 'properties': {'id': {'enum': ['capped']}, 'degree': {'type': 'null'}, 'headline': {'properties': {'unit': {'enum': ['php_minor']}}}}},
     {'description': '`vulnerable`: no degree, its baseline is null (its advisories carry theirs), headline `advisories`; its role is not constrained (open).',
      'properties': {'id': {'enum': ['vulnerable']}, 'degree': {'type': 'null'}, 'baseline': {'type': 'null'}, 'headline': {'properties': {'unit': {'enum': ['advisories']}}}}},
 ])
@@ -936,11 +943,30 @@ defs['s10'] = sig_data("S10 (§2.2): a check the verdict rests on did not run; a
     'unchecked': arr('One entry per check that did not run.', ref('checkMissing'), minItems=1),
     'blocks': arr('The union of its entries\' `blocks` (I21).', ref('signalId'), minItems=1, uniqueItems=True),
 })
-SIG_IDS = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10']
-defs['signal'] = obj("A signal (§2.1, §7.6): S1–S10 as in report-1, with the data keys report-2 adds; typed per id by the branches below.", {
+defs['s11'] = sig_data(("S11 (§5.10): the installed release's `require.php` has a finite upper bound and admits no PHP at or above the newest minor that "
+                        "the root php allows; it raises `capped`. A `release_metadata` entry beside it lists S11 in `blocks`, and only `admits_newest` is unread."), {
+    'newest_php': d('R: the newest known PHP minor that the root php (composer.json `require.php`, else the lock\'s `platform.php`) admits.', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}),
+    'newest_php_source': closed(['known', 'require_php', 'platform_php'], ("Why `newest_php` is R: `known` when R is the newest known minor, with a root php or "
+                                                                          "without; `require_php` when composer.json's `require.php` limits R below it; "
+                                                                          "`platform_php` when the lock's `platform.php` limits it in a run with no root "
+                                                                          "`require.php`. Closed.")),
+    'requires': d("The installed release's `require.php`, as `installed_php.requires`.", {'type': 'string', 'minLength': 1}),
+    'stops_at': d('The newest known PHP minor that `requires` admits.', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}),
+    'excludes_target': d('Exactly `installed_php.target_runs` false: no patch of the target minor meets `requires`.', {'type': 'boolean'}),
+    'admits_newest': nul(("The newest release whose `require.php` admits `newest_php`, on the lowest branch that has such a release, among the stable "
+                          "releases above the installed one; above a snapshot, those from X.Y.0 of an `X.Y.x-dev` or aliased snapshot, else those dated "
+                          "after the lock entry's `time`. Null when none does, or when the release metadata was not read."), obj('A release that admits the newest PHP.', {
+        'version': d('The release.', {'type': 'string', 'minLength': 1}),
+        'branch': ref('branchLabel'),
+        'blocking': nul("What holds the release back: `project` (the project's lowest PHP is outside its `require.php`), `target` (no patch of the target minor is inside it); null when nothing does. Closed.",
+                       closed(['project', 'target'])),
+    })),
+})
+SIG_IDS = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11']
+defs['signal'] = obj("A signal (§2.1, §7.6): S1–S10 as in report-1 and S11 (report-2), with the data keys report-2 adds; typed per id by the branches below.", {
     'id': ref('signalId'),
     'level': ref('level'),
-    'summary': rendered('The signal sentence, `SignalSentence` (§7.11): S1–S6 and S8 from their `data`, S7 from `data.packages[]`, S9 from `security` and the S9 rows, S10 from `data.unchecked[]` and, for `host_not_supported`, `activity.host`.',
+    'summary': rendered('The signal sentence, `SignalSentence` (§7.11): S1–S6, S8 and S11 from their `data`, S7 from `data.packages[]`, S9 from `security` and the S9 rows, S10 from `data.unchecked[]` and, for `host_not_supported`, `activity.host`.',
                         ['signals[].data', 'security', 'branch', 'activity.host']),
     'data': d('The facts, typed per `id`.', {'type': 'object'}),
 }, anyOf=[{'properties': {'id': {'enum': [s]}, 'data': ref(s.lower())}} for s in SIG_IDS] + [{
@@ -1170,7 +1196,7 @@ FINDING = {
                      "lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). "
                      "Not a reach fact: a run without --dev reaches a require-dev package through others."), ref('composerJsonSection'), uniqueItems=True, maxItems=2),
     'direct_dependents': arr('The direct requirements that reach it (report-1); a transitive move names them (§5.6).', ref('packageName')),
-    'signals': arr('S1–S10 that fired, as report-1 orders them (§7.6).', ref('signal')),
+    'signals': arr('S1–S11 that fired, in id order (§7.6).', ref('signal')),
     'evidence': rendered("The join of the counted flags' `flags[].summary` (a flag counts when a `score.terms[].flag` names it) as `<id>: <summary>` in flag order; kept for jq (§7.6). "
                          "Empty exactly on the score-0 shape (no flag counts).", ['flags[].id', 'flags[].summary', 'score.terms[].flag']),
     'allowlist_reason': nul(("report-1's key, kept (§6.5): the reason of an entry that accepts the whole package; null for a partial entry (`allowlist.flag_ids` set) and "
@@ -1261,8 +1287,9 @@ defs['scoreModel'] = obj(("The score model, self-described (§3.7): ordered flag
         'raised_by': arr('The signals that raise it.', ref('signalId'), minItems=1),
         'thresholds': arr('The `run.thresholds` keys it reads.', open_set(['release-warn-years', 'release-high-years', 'push-warn-years', 'push-high-years'], 'A threshold key.', HYPHEN)),
         'basis': obj('How its points are formed (round 4).', {
-            'v013_base': nul('The 0.13 band it is anchored to; null for `vulnerable`.', ref('grade')),
-            'points': open_set(['band_floor', 'severities'], '`band_floor` (its points are that band\'s floor) or `severities`. Open.'),
+            'v013_base': nul('The 0.13 band it is anchored to; null for `capped` (0.13 had no such verdict) and `vulnerable`.', ref('grade')),
+            'points': open_set(['band_floor', 'severities'], ('`band_floor` (its points are the floor of its 0.13 band, or of its own `band` when `v013_base` '
+                                                              'is null) or `severities`. Open.')),
         }),
         'points_from': nul('The table its points come from: `severities` on `vulnerable`; null on a maintenance row, whose `points` are its own (schema round: written on every row, as every report-2 key is). Open.',
                            {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['severities']}),
@@ -1294,7 +1321,7 @@ defs['scoreModel'] = obj(("The score model, self-described (§3.7): ordered flag
     'bar_max': d('The bar\'s axis maximum (64; one block = 2 points).', INT1),
     'bar_overflow': open_set(['clip'], 'How a total above `bar_max` is drawn (round 4). Open.'),
     'exclusive_groups': arr('Flags that never show together.', obj('A group.', {
-        'id': open_set(['liveness', 'branch', 'release_age', 'release_push'], 'The group id. Open.'), 'flag_ids': arr('Its flag ids.', ref('flag'), minItems=2),
+        'id': open_set(['liveness', 'branch', 'release_age', 'release_push', 'php_bound'], 'The group id. Open.'), 'flag_ids': arr('Its flag ids.', ref('flag'), minItems=2),
         'holds_unless': nul(("When the group holds only under a threshold relation: it holds unless `threshold` is below `below` (`release_push`: stale beside "
                              "left-behind needs push-warn-years below release-warn-years); null when it always holds."),
                             obj('A threshold relation.', {'threshold': open_set(['push-warn-years', 'push-high-years', 'release-warn-years', 'release-high-years'], 'A threshold id. Open.', HYPHEN),
@@ -1348,10 +1375,10 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
                      {'type': 'boolean'}),
     'mode': copy.deepcopy(R1RUN['mode']),
     'thresholds': d("The ages, in years, that separate the liveness words (report-1).", copy.deepcopy(R1RUN['thresholds'])),
-    'flag_ids': arr('The seven flag ids in flag order (the vocabulary used, not a setting).', ref('flag'), minItems=1, uniqueItems=True),
+    'flag_ids': arr('The eight flag ids in flag order (the vocabulary used, not a setting).', ref('flag'), minItems=1, uniqueItems=True),
     'verdicts': arr('The seven verdicts, highest first.', ref('verdict'), minItems=1, uniqueItems=True),
     'graded_verdicts': arr('The grades, highest first (replaces `flagged_verdicts`).', ref('grade'), minItems=1, uniqueItems=True),
-    'signal_ids': arr('The ten check ids, for the Checks strip ("3 fired · 7 quiet").', ref('signalId'), minItems=1, uniqueItems=True),
+    'signal_ids': arr('The eleven check ids, for the Checks strip ("3 fired · 8 quiet").', ref('signalId'), minItems=1, uniqueItems=True),
     'fix_model': d("The fix classification's id (§8.3); baselines compare fixes only under equal fix models.", INT1),
     'text_grammar': d('The version of the sentence grammars: MoveText, GateText, FlagSentence, SignalSentence, NoteSentence, the suffix and the command renderings (§7.11, round 4). ScoreText is versioned apart, by `score_model.score_text_grammar`.', INT1),
     'score_model': ref('scoreModel'),
@@ -1648,7 +1675,7 @@ ROOT = {
     }),
     'priorities': obj('The deprecated `priority` alias over the four grades + none (§8.2).', {p: COUNT(f'Findings whose priority is `{p}`.') for p in GRADES + ['none']},
                       **{'x-deprecated': True}),
-    'flags': obj('Per flag, all seven (§7.6): an object keyed by flag id at the root (§8.2).', {f: ref('rootFlagVulnerable' if f == 'vulnerable' else 'rootFlagMaintenance') for f in FLAGS}),
+    'flags': obj('Per flag, all eight (§7.6): an object keyed by flag id at the root (§8.2).', {f: ref('rootFlagVulnerable' if f == 'vulnerable' else 'rootFlagMaintenance') for f in FLAGS}),
     'exposure': d("Direct requirements that pull in graded transitive packages, `[{package, flagged}]`, one per finding that carries S7, its `flagged` equal to S7's: "
                    "every graded transitive package reached from 1 to `exposure_rule.max_fan_in` direct requirements is named by each of them (vulnerable-only ones included).",
                    copy.deepcopy(R1['properties']['exposure'])),
@@ -1795,13 +1822,13 @@ def add_relations_round4(defs):
     run = defs['run']
     relate(run, ['`project_php_lowest` is null when `project_php` is (no `require.php`, so no lowest).',
                  '`verdicts` is the seven verdicts in their fixed order.', '`graded_verdicts` is the four grades in their fixed order.',
-                 '`flag_ids` is the seven flags in flag order.', '`signal_ids` begins with S1 to S10 in order (a later check is appended).',
+                 '`flag_ids` is the eight flags in flag order.', '`signal_ids` begins with S1 to S11 in order (a later check is appended).',
                  '`none` stands alone in `fail_on`.'],
            [P(project_php=STR), P(project_php=NULL, project_php_lowest=NULL)],
            [P(verdicts=dict(E(['critical', 'high', 'medium', 'low', 'unknown', 'finished', 'ok']), description='The seven verdicts, in order.'))],
            [P(graded_verdicts=dict(E(['critical', 'high', 'medium', 'low']), description='The four grades, in order.'))],
-           [P(flag_ids=dict(E(['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable']), description='The seven flags, in flag order.'))],
-           [P(signal_ids={'description': 'S1 to S10 first, in order.', 'items': [E(x) for x in BO.SIGNAL_IDS], 'minItems': len(BO.SIGNAL_IDS)})],
+           [P(flag_ids=dict(E(FLAGS), description='The eight flags, in flag order.'))],
+           [P(signal_ids={'description': 'S1 to S11 first, in order.', 'items': [E(x) for x in BO.SIGNAL_IDS], 'minItems': len(BO.SIGNAL_IDS)})],
            [P(fail_on=E('none')), P(fail_on={'not': {'pattern': '(^|,)none(,|$)'}})])
     relate(defs['s6'], '`last_stable_version` is null exactly when `last_stable_release` is.',
            [P(last_stable_release=NULL, last_stable_version=NULL), P(last_stable_release=STR, last_stable_version=STR)])

@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "38df0aa98acb8519114830b3512e1e2ca9bbc467e8ef0b5d942c6dedac0535cd",
-        "tests/fixtures/flags/composite.json": "29fcd389becba13bc263a35aa4cf74bc23b5867c96b85feffef0dfcf108b2ca9",
-        "tests/fixtures/flags/provenance.json": "d3ce3f4eb62e89fc38ec6be4e7c5f84adaad16ee80372ff46820f29482decceb"
+        "tests/fixtures/flags/cases.json": "21f0fd22f8ad99aee989390d46de3b3ecdc2484b56793ad312c0f7afe43b1334",
+        "tests/fixtures/flags/composite.json": "f3fbea347b0c0f81f3191f23044320174bbc2a7f68c68e59d0aa8c68b4d72e72",
+        "tests/fixtures/flags/provenance.json": "498665151474958255aba7e5298146f4014b2673d2a84648c730ac786e9ca2b2"
     },
     "version_mask": {
         "paths": [
@@ -39,6 +39,25 @@
         "scope-registries‡",
         "no-feed‡",
         "unparseable-version‡",
+        "capped-raise-php",
+        "capped-update‡",
+        "capped-require‡",
+        "capped-require-higher‡",
+        "capped-held-update‡",
+        "capped-snapshot-alias‡",
+        "capped-snapshot-dev‡",
+        "capped-platform‡",
+        "capped-accepted‡",
+        "capped-dev‡",
+        "capped-blocked‡",
+        "capped-project-blocked‡",
+        "capped-no-release‡",
+        "capped-unread‡",
+        "capped-known‡",
+        "capped-new‡",
+        "capped-money‡",
+        "capped-nette‡",
+        "capped-htmlpurifier‡",
         "host-accepted‡",
         "host-accept-expired‡",
         "no-feed-accepted‡",
@@ -49,27 +68,27 @@
     "case_lock": "each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out",
     "model_goldens": {
         "compared": {
-            "age_line": 90,
-            "baseline_suffix": 92,
-            "commands_cmd": 94,
-            "commands_posix": 94,
-            "gate_line": 93,
-            "next_step_text": 81,
-            "run_gate_line": 94,
-            "score_text": 93
+            "age_line": 102,
+            "baseline_suffix": 103,
+            "commands_cmd": 106,
+            "commands_posix": 106,
+            "gate_line": 104,
+            "next_step_text": 87,
+            "run_gate_line": 106,
+            "score_text": 105
         },
         "inputs_differ": {
             "age_line": 4,
-            "baseline_suffix": 2,
-            "gate_line": 1,
-            "next_step_text": 13,
+            "baseline_suffix": 3,
+            "gate_line": 2,
+            "next_step_text": 19,
             "score_text": 1
         }
     },
     "page_goldens": {
         "file": "page-goldens.json",
         "source": "the model's page goldens (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded",
-        "sha256": "11ebffa8b73651281fb299c41ac5bd2df839689ccd34e6585501b8ad1b732acf",
+        "sha256": "7e87c6da8003f933f5e70d6e46041902e4b9e96414ecc87d541688132c2f83d5",
         "read_by": "tests/Integration/PageGoldensTest.php validates each page document against the report-2 schema and reads title, description, grade_line, figure_line, load_line, gate_partition, ready, run_notes, flags_notes, advisory_groups, sheet_moves, sheet_holders and sheet_ladder. The other keys are the renderer's"
     },
     "engine_pages": "page/ holds the report-2 that bin/lockrot writes for each case of Lockrot\\Tests\\Support\\Contract\\EnginePage::CASES. tools/report/record --engine-pages records them",

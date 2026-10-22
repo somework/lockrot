@@ -74,6 +74,7 @@ final class FindingBuilder
         Verdict::LEFT_BEHIND => [[Signal::S8, Signal::LEVEL_WARN]],
         Verdict::OLD_PROMISE => [[Signal::S5, Signal::LEVEL_WARN]],
         Verdict::STALE => [[Signal::S2, Signal::LEVEL_WARN]],
+        Verdict::CAPPED => [[Signal::S11, Signal::LEVEL_WARN]],
     ];
 
     public function withPackage(string $package): self

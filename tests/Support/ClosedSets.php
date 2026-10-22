@@ -89,6 +89,8 @@ final class ClosedSets
             'The `link` of a PHP window link, in `run.php_window`' => [$definition('phpWindowReq', 'properties', 'link')],
             'The `target` of a PHP window link, in `run.php_window`' => [$definition('phpWindowReq', 'properties', 'target')],
             '`run.php_window.host_requires`' => [$definition('run', 'properties', 'php_window', 'oneOf', '0', 'properties', 'host_requires', 'items')],
+            'S11\'s `newest_php_source`' => [$definition('s11', 'properties', 'newest_php_source')],
+            'S11\'s `admits_newest.blocking`' => [$definition('s11', 'properties', 'admits_newest', 'oneOf', '0', 'properties', 'blocking', 'oneOf', '0')],
         ];
     }
 

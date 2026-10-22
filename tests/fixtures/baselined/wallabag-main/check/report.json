@@ -38,6 +38,7 @@
             "left-behind",
             "old-promise",
             "stale",
+            "capped",
             "vulnerable"
         ],
         "verdicts": [
@@ -65,7 +66,8 @@
             "S7",
             "S8",
             "S9",
-            "S10"
+            "S10",
+            "S11"
         ],
         "fix_model": 1,
         "text_grammar": 1,
@@ -79,6 +81,7 @@
                 "left-behind",
                 "old-promise",
                 "stale",
+                "capped",
                 "vulnerable"
             ],
             "parts": [
@@ -90,7 +93,8 @@
                         "pinned",
                         "left-behind",
                         "old-promise",
-                        "stale"
+                        "stale",
+                        "capped"
                     ],
                     "combine": "lead_plus_share"
                 },
@@ -230,9 +234,10 @@
                     "band": "medium",
                     "can_corroborate": true,
                     "corroborating_points": 2,
-                    "max_maintenance": 8,
+                    "max_maintenance": 10,
                     "max_maintenance_flags": [
-                        "stale"
+                        "stale",
+                        "capped"
                     ],
                     "raised_by": [
                         "S2",
@@ -244,6 +249,27 @@
                     ],
                     "basis": {
                         "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
                         "points": "band_floor"
                     },
                     "points_from": null
@@ -440,6 +466,14 @@
                         "threshold": "push-warn-years",
                         "below": "release-warn-years"
                     }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
                 }
             ],
             "sort": [
@@ -911,18 +945,18 @@
         },
         "score_rules_used": {
             "counted": 10,
-            "lead-first": 70,
+            "lead-first": 71,
             "corroborating-share": 19,
             "advisory-points": 2,
             "no-reachable-fix-multiplier": 0,
             "security-max": 1,
-            "divide-reach": 56,
+            "divide-reach": 57,
             "security-exempt-from-reach": 2,
             "sum": 1,
             "divide-dev": 18,
             "floor-once": 0,
-            "band-floors": 71,
-            "zero-verdicts": 200,
+            "band-floors": 72,
+            "zero-verdicts": 199,
             "sort": null,
             "gate-bounded-new": 0,
             "baseline-cover": 0
@@ -931,7 +965,7 @@
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
     "packages_checked": 271,
-    "packages_flagged": 71,
+    "packages_flagged": 72,
     "packages_multi_flag": 20,
     "include_dev": true,
     "not_from_composer_repository": 0,
@@ -941,10 +975,10 @@
         "critical": 3,
         "high": 38,
         "medium": 10,
-        "low": 20,
+        "low": 21,
         "unknown": 0,
         "finished": 18,
-        "ok": 182
+        "ok": 181
     },
     "abandoned": {
         "total": 21,
@@ -955,8 +989,8 @@
         "critical": 3,
         "high": 38,
         "medium": 10,
-        "low": 20,
-        "none": 200
+        "low": 21,
+        "none": 199
     },
     "flags": {
         "abandoned": {
@@ -1043,6 +1077,20 @@
                 "low": 9
             }
         },
+        "capped": {
+            "carrying": 1,
+            "leading": 1,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 1
+            }
+        },
         "vulnerable": {
             "carrying": 2,
             "leading": null,
@@ -1089,6 +1137,10 @@
             "flagged": 2
         },
         {
+            "package": "scheb/2fa-trusted-device",
+            "flagged": 2
+        },
+        {
             "package": "craue/config-bundle",
             "flagged": 1
         },
@@ -1125,6 +1177,10 @@
             "flagged": 1
         },
         {
+            "package": "lcobucci/jwt",
+            "flagged": 1
+        },
+        {
             "package": "nelmio/api-doc-bundle",
             "flagged": 1
         },
@@ -1157,10 +1213,6 @@
             "flagged": 1
         },
         {
-            "package": "scheb/2fa-trusted-device",
-            "flagged": 1
-        },
-        {
             "package": "sensio/framework-extra-bundle",
             "flagged": 1
         },
@@ -1186,20 +1238,20 @@
     },
     "unattributed": [],
     "rot_depth": {
-        "flagged": 71,
-        "measured": 71,
+        "flagged": 72,
+        "measured": 72,
         "unmeasured": {
             "unreached": 0,
             "no_composer_json": 0
         },
         "by_reach": {
             "direct": 21,
-            "transitive": 50,
+            "transitive": 51,
             "unreached": 0
         },
-        "not_in_composer_json": 50,
+        "not_in_composer_json": 51,
         "require_dev_not_walked": 0,
-        "production": 53,
+        "production": 54,
         "development": 18,
         "by_depth": [
             {
@@ -1208,7 +1260,7 @@
             },
             {
                 "depth": 1,
-                "flagged": 29
+                "flagged": 30
             },
             {
                 "depth": 2,
@@ -1272,8 +1324,8 @@
     },
     "baseline": {
         "path": "lockrot-baseline.json",
-        "known": 45,
-        "new": 25,
+        "known": 47,
+        "new": 26,
         "worsened": 2,
         "stale": [
             "endroid/qr-code",
@@ -7289,6 +7341,28 @@
             ],
             "signals": [
                 {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: lcobucci/clock (capped)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "lcobucci/clock",
+                                "chain": [
+                                    "lcobucci/jwt",
+                                    "lcobucci/clock"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
                     "id": "S8",
                     "level": "warn",
                     "summary": "branch 4.x last released 2023-01-02 (3.8 years ago); 5.x released 5.6.0 (2025-10-17)",
@@ -9708,9 +9782,9 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 1 flagged package: symfony/security-guard (abandoned)",
+                    "summary": "pulls in 2 flagged packages: symfony/security-guard (abandoned), lcobucci/clock (capped)",
                     "data": {
-                        "flagged": 1,
+                        "flagged": 2,
                         "packages": [
                             {
                                 "package": "symfony/security-guard",
@@ -9724,6 +9798,19 @@
                                 "lead": "abandoned",
                                 "flag_ids": [
                                     "abandoned"
+                                ]
+                            },
+                            {
+                                "package": "lcobucci/clock",
+                                "chain": [
+                                    "scheb/2fa-trusted-device",
+                                    "lcobucci/jwt",
+                                    "lcobucci/clock"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
                                 ]
                             }
                         ]
@@ -24772,6 +24859,338 @@
             }
         },
         {
+            "package": "lcobucci/clock",
+            "version": "3.3.1",
+            "branch": "3.x",
+            "installed_php": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "low",
+            "priority": "low",
+            "lead": "capped",
+            "rank": 62,
+            "flags": [
+                {
+                    "id": "capped",
+                    "role": "lead",
+                    "baseline": {
+                        "state": "new",
+                        "since": null,
+                        "covered_by": null
+                    },
+                    "signal_ids": [
+                        "S11"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "php_minor",
+                        "value": "8.4",
+                        "source": null
+                    },
+                    "summary": "requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 4,
+                "exact": 4,
+                "rounded_down": false,
+                "band": {
+                    "floor": 1,
+                    "next": "medium",
+                    "to_next": 4
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 4,
+                        "alone": {
+                            "total": 4,
+                            "verdict": "low"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "capped",
+                        "role": "lead",
+                        "weight": 8,
+                        "divisor": 1,
+                        "points": 8,
+                        "contribution": 4
+                    }
+                ],
+                "modifiers": [
+                    {
+                        "reason": "transitive",
+                        "applies_to": "maintenance",
+                        "divide_by": 2,
+                        "before": 8,
+                        "after": 4
+                    }
+                ],
+                "accepted": [],
+                "without": [],
+                "text": "4 = capped 8 \u00f7 2 transitive"
+            },
+            "next_step": {
+                "kind": "raise-php",
+                "source": "capped",
+                "merged": [],
+                "fix_kind": null,
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "3.x",
+                "version": "3.6.0",
+                "newest": "3.6.0",
+                "constraint": "^3.6.0",
+                "latest": null,
+                "php_check": {
+                    "requires": "~8.4.0 || ~8.5.0",
+                    "project_allows": false,
+                    "target_runs": true,
+                    "raise_to": ">=8.4",
+                    "raise_size": "minor"
+                },
+                "crosses_major": false,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "basis": "admits_newest_php"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold"
+                    ]
+                },
+                "check": {
+                    "result": "resolves",
+                    "form": "inline",
+                    "reason": null
+                },
+                "composer_moves_because": [
+                    "transitive"
+                ],
+                "commands": [
+                    [
+                        "composer",
+                        "require",
+                        "php:>=8.4",
+                        "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "update",
+                        "lcobucci/clock:^3.6.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "lcobucci/jwt",
+                        "5.6.0"
+                    ]
+                ],
+                "through": [
+                    {
+                        "package": "lcobucci/jwt",
+                        "installed_version": "4.3.0",
+                        "installed_requires": true,
+                        "newest_stable": {
+                            "version": "5.6.0",
+                            "released": "2025-10-17T11:30:53+00:00"
+                        },
+                        "newest_requires": false,
+                        "newest_requires_unmeasured": null
+                    },
+                    {
+                        "package": "scheb/2fa-trusted-device",
+                        "installed_version": "v5.13.2",
+                        "installed_requires": false,
+                        "newest_stable": {
+                            "version": "v8.6.1",
+                            "released": "2026-01-24T13:26:10+00:00"
+                        },
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    }
+                ],
+                "also": [],
+                "text": "raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt, scheb/2fa-trusted-device \u2014 clears capped; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 8.2 (a minor raise); the target php 8.4 runs it; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it; Composer's solver checked it against the lock"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "lcobucci/clock",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T18:49:10+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/lcobucci/clock",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": false,
+            "dev": false,
+            "reach": "transitive",
+            "chain": [
+                "lcobucci/jwt",
+                "lcobucci/clock"
+            ],
+            "depth": 1,
+            "depth_unmeasured": null,
+            "named_in": [],
+            "direct_dependents": [
+                "lcobucci/jwt",
+                "scheb/2fa-trusted-device"
+            ],
+            "signals": [
+                {
+                    "id": "S11",
+                    "level": "warn",
+                    "summary": "php \"~8.2.0 || ~8.3.0 || ~8.4.0\" stops at 8.4; the newest PHP, 8.5, is excluded",
+                    "data": {
+                        "newest_php": "8.5",
+                        "newest_php_source": "known",
+                        "requires": "~8.2.0 || ~8.3.0 || ~8.4.0",
+                        "stops_at": "8.4",
+                        "excludes_target": false,
+                        "admits_newest": {
+                            "version": "3.6.0",
+                            "branch": "3.x",
+                            "blocking": "project"
+                        }
+                    }
+                }
+            ],
+            "evidence": "capped: requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded",
+            "allowlist_reason": null,
+            "data_date": "2026-10-14T00:00:00+00:00",
+            "libyears": 1.55,
+            "age": {
+                "installed": {
+                    "at": "2024-09-24T20:45:14+00:00",
+                    "years": 2.1,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "3.6.0",
+                    "at": "2026-04-13T21:30:16+00:00",
+                    "years": 0.5,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "3.6.0",
+                    "at": "2026-04-13T21:30:16+00:00",
+                    "years": 0.5,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-13T02:11:22+00:00",
+                    "years": 0.1,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": {
+                "status": "new",
+                "recorded": null,
+                "advisories_now": {
+                    "known": 0,
+                    "new": 0,
+                    "re_rated": 0,
+                    "fix_lost": 0
+                },
+                "worsened_by": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "why": "new",
+                        "recorded": null,
+                        "now": null
+                    }
+                ]
+            },
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
             "package": "phpdocumentor/reflection-common",
             "version": "2.2.0",
             "branch": "2.x",
@@ -24783,7 +25202,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 62,
+            "rank": 63,
             "flags": [
                 {
                     "id": "stale",
@@ -25075,7 +25494,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "left-behind",
-            "rank": 63,
+            "rank": 64,
             "flags": [
                 {
                     "id": "left-behind",
@@ -25439,7 +25858,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "left-behind",
-            "rank": 64,
+            "rank": 65,
             "flags": [
                 {
                     "id": "left-behind",
@@ -25803,7 +26222,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "left-behind",
-            "rank": 65,
+            "rank": 66,
             "flags": [
                 {
                     "id": "left-behind",
@@ -26152,7 +26571,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 66,
+            "rank": 67,
             "flags": [
                 {
                     "id": "stale",
@@ -26472,7 +26891,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 67,
+            "rank": 68,
             "flags": [
                 {
                     "id": "stale",
@@ -26762,7 +27181,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 68,
+            "rank": 69,
             "flags": [
                 {
                     "id": "stale",
@@ -27045,7 +27464,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 69,
+            "rank": 70,
             "flags": [
                 {
                     "id": "stale",
@@ -27329,7 +27748,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 70,
+            "rank": 71,
             "flags": [
                 {
                     "id": "stale",
@@ -27612,7 +28031,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 71,
+            "rank": 72,
             "flags": [
                 {
                     "id": "stale",
@@ -27897,7 +28316,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 72,
+            "rank": 73,
             "flags": [],
             "score": {
                 "model": 1,
@@ -28029,7 +28448,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 73,
+            "rank": 74,
             "flags": [],
             "score": {
                 "model": 1,
@@ -28185,7 +28604,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 74,
+            "rank": 75,
             "flags": [],
             "score": {
                 "model": 1,
@@ -28322,7 +28741,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 75,
+            "rank": 76,
             "flags": [],
             "score": {
                 "model": 1,
@@ -28458,7 +28877,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 76,
+            "rank": 77,
             "flags": [],
             "score": {
                 "model": 1,
@@ -28591,7 +29010,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 77,
+            "rank": 78,
             "flags": [],
             "score": {
                 "model": 1,
@@ -28732,7 +29151,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 78,
+            "rank": 79,
             "flags": [],
             "score": {
                 "model": 1,
@@ -28891,7 +29310,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 79,
+            "rank": 80,
             "flags": [],
             "score": {
                 "model": 1,
@@ -29047,7 +29466,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 80,
+            "rank": 81,
             "flags": [],
             "score": {
                 "model": 1,
@@ -29203,7 +29622,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 81,
+            "rank": 82,
             "flags": [],
             "score": {
                 "model": 1,
@@ -29336,7 +29755,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 82,
+            "rank": 83,
             "flags": [],
             "score": {
                 "model": 1,
@@ -29494,7 +29913,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 83,
+            "rank": 84,
             "flags": [],
             "score": {
                 "model": 1,
@@ -29638,7 +30057,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 84,
+            "rank": 85,
             "flags": [],
             "score": {
                 "model": 1,
@@ -29772,7 +30191,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 85,
+            "rank": 86,
             "flags": [],
             "score": {
                 "model": 1,
@@ -29904,7 +30323,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 86,
+            "rank": 87,
             "flags": [],
             "score": {
                 "model": 1,
@@ -30036,7 +30455,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 87,
+            "rank": 88,
             "flags": [],
             "score": {
                 "model": 1,
@@ -30218,7 +30637,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 88,
+            "rank": 89,
             "flags": [],
             "score": {
                 "model": 1,
@@ -30351,7 +30770,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 89,
+            "rank": 90,
             "flags": [],
             "score": {
                 "model": 1,
@@ -30506,7 +30925,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 90,
+            "rank": 91,
             "flags": [],
             "score": {
                 "model": 1,
@@ -30673,7 +31092,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 91,
+            "rank": 92,
             "flags": [],
             "score": {
                 "model": 1,
@@ -30829,7 +31248,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 92,
+            "rank": 93,
             "flags": [],
             "score": {
                 "model": 1,
@@ -30940,13 +31359,46 @@
                 },
                 "push_unmeasured": null
             },
-            "baseline": null,
+            "baseline": {
+                "status": "known",
+                "recorded": {
+                    "lead": "capped",
+                    "flags": {
+                        "capped": {
+                            "known_since": "2024-05-17"
+                        }
+                    },
+                    "advisory_count": 0,
+                    "first_seen": "2024-05-17",
+                    "target_php": "8.4",
+                    "fix_model": 1
+                },
+                "advisories_now": {
+                    "known": 0,
+                    "new": 0,
+                    "re_rated": 0,
+                    "fix_lost": 0
+                },
+                "worsened_by": []
+            },
             "gate": {
                 "reaches_fail_on": false,
                 "fails": false,
                 "exempt_by": null,
                 "by": [],
-                "basis": null
+                "basis": {
+                    "score": 0,
+                    "verdict": null,
+                    "cap": 0,
+                    "limited_by": "cap",
+                    "new": {
+                        "total": 0,
+                        "exact": 0,
+                        "rounded_down": false,
+                        "terms": [],
+                        "modifiers": []
+                    }
+                }
             }
         },
         {
@@ -30961,7 +31413,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 93,
+            "rank": 94,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31093,7 +31545,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 94,
+            "rank": 95,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31228,7 +31680,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 95,
+            "rank": 96,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31360,7 +31812,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 96,
+            "rank": 97,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31515,7 +31967,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 97,
+            "rank": 98,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31648,7 +32100,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 98,
+            "rank": 99,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31781,7 +32233,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 99,
+            "rank": 100,
             "flags": [],
             "score": {
                 "model": 1,
@@ -31916,7 +32368,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 100,
+            "rank": 101,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32049,7 +32501,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 101,
+            "rank": 102,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32162,13 +32614,46 @@
                 },
                 "push_unmeasured": null
             },
-            "baseline": null,
+            "baseline": {
+                "status": "known",
+                "recorded": {
+                    "lead": "capped",
+                    "flags": {
+                        "capped": {
+                            "known_since": "2024-05-17"
+                        }
+                    },
+                    "advisory_count": 0,
+                    "first_seen": "2024-05-17",
+                    "target_php": "8.4",
+                    "fix_model": 1
+                },
+                "advisories_now": {
+                    "known": 0,
+                    "new": 0,
+                    "re_rated": 0,
+                    "fix_lost": 0
+                },
+                "worsened_by": []
+            },
             "gate": {
                 "reaches_fail_on": false,
                 "fails": false,
                 "exempt_by": null,
                 "by": [],
-                "basis": null
+                "basis": {
+                    "score": 0,
+                    "verdict": null,
+                    "cap": 0,
+                    "limited_by": "cap",
+                    "new": {
+                        "total": 0,
+                        "exact": 0,
+                        "rounded_down": false,
+                        "terms": [],
+                        "modifiers": []
+                    }
+                }
             }
         },
         {
@@ -32183,7 +32668,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 102,
+            "rank": 103,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32315,7 +32800,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 103,
+            "rank": 104,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32449,7 +32934,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 104,
+            "rank": 105,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32605,7 +33090,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 105,
+            "rank": 106,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32737,7 +33222,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 106,
+            "rank": 107,
             "flags": [],
             "score": {
                 "model": 1,
@@ -32872,7 +33357,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 107,
+            "rank": 108,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33028,7 +33513,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 108,
+            "rank": 109,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33172,7 +33657,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 109,
+            "rank": 110,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33328,7 +33813,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 110,
+            "rank": 111,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33484,7 +33969,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 111,
+            "rank": 112,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33616,7 +34101,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 112,
+            "rank": 113,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33748,7 +34233,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 113,
+            "rank": 114,
             "flags": [],
             "score": {
                 "model": 1,
@@ -33885,7 +34370,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 114,
+            "rank": 115,
             "flags": [],
             "score": {
                 "model": 1,
@@ -34017,7 +34502,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 115,
+            "rank": 116,
             "flags": [],
             "score": {
                 "model": 1,
@@ -34149,7 +34634,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 116,
+            "rank": 117,
             "flags": [],
             "score": {
                 "model": 1,
@@ -34281,7 +34766,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 117,
+            "rank": 118,
             "flags": [],
             "score": {
                 "model": 1,
@@ -34590,7 +35075,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 118,
+            "rank": 119,
             "flags": [],
             "score": {
                 "model": 1,
@@ -34722,7 +35207,7 @@
             "verdict": "finished",
             "priority": "none",
             "lead": null,
-            "rank": 119,
+            "rank": 120,
             "flags": [
                 {
                     "id": "stale",
@@ -34912,7 +35397,7 @@
             "verdict": "finished",
             "priority": "none",
             "lead": null,
-            "rank": 120,
+            "rank": 121,
             "flags": [],
             "score": {
                 "model": 1,
@@ -35063,7 +35548,7 @@
             "verdict": "finished",
             "priority": "none",
             "lead": null,
-            "rank": 121,
+            "rank": 122,
             "flags": [
                 {
                     "id": "stale",
@@ -35259,7 +35744,7 @@
             "verdict": "finished",
             "priority": "none",
             "lead": null,
-            "rank": 122,
+            "rank": 123,
             "flags": [
                 {
                     "id": "left-behind",
@@ -35518,7 +36003,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 123,
+            "rank": 124,
             "flags": [],
             "score": {
                 "model": 1,
@@ -35650,7 +36135,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 124,
+            "rank": 125,
             "flags": [],
             "score": {
                 "model": 1,
@@ -35782,7 +36267,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 125,
+            "rank": 126,
             "flags": [],
             "score": {
                 "model": 1,
@@ -35937,7 +36422,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 126,
+            "rank": 127,
             "flags": [],
             "score": {
                 "model": 1,
@@ -36069,7 +36554,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 127,
+            "rank": 128,
             "flags": [],
             "score": {
                 "model": 1,
@@ -36225,7 +36710,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 128,
+            "rank": 129,
             "flags": [],
             "score": {
                 "model": 1,
@@ -36381,7 +36866,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 129,
+            "rank": 130,
             "flags": [],
             "score": {
                 "model": 1,
@@ -36514,7 +36999,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 130,
+            "rank": 131,
             "flags": [],
             "score": {
                 "model": 1,
@@ -36646,7 +37131,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 131,
+            "rank": 132,
             "flags": [],
             "score": {
                 "model": 1,
@@ -36813,7 +37298,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 132,
+            "rank": 133,
             "flags": [],
             "score": {
                 "model": 1,
@@ -36962,7 +37447,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 133,
+            "rank": 134,
             "flags": [],
             "score": {
                 "model": 1,
@@ -37094,7 +37579,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 134,
+            "rank": 135,
             "flags": [],
             "score": {
                 "model": 1,
@@ -37226,7 +37711,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 135,
+            "rank": 136,
             "flags": [],
             "score": {
                 "model": 1,
@@ -37393,7 +37878,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 136,
+            "rank": 137,
             "flags": [],
             "score": {
                 "model": 1,
@@ -37601,7 +38086,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 137,
+            "rank": 138,
             "flags": [],
             "score": {
                 "model": 1,
@@ -37738,7 +38223,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 138,
+            "rank": 139,
             "flags": [],
             "score": {
                 "model": 1,
@@ -37871,7 +38356,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 139,
+            "rank": 140,
             "flags": [],
             "score": {
                 "model": 1,
@@ -38003,7 +38488,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 140,
+            "rank": 141,
             "flags": [],
             "score": {
                 "model": 1,
@@ -38173,7 +38658,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 141,
+            "rank": 142,
             "flags": [],
             "score": {
                 "model": 1,
@@ -38347,7 +38832,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 142,
+            "rank": 143,
             "flags": [],
             "score": {
                 "model": 1,
@@ -38523,7 +39008,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 143,
+            "rank": 144,
             "flags": [],
             "score": {
                 "model": 1,
@@ -38657,7 +39142,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 144,
+            "rank": 145,
             "flags": [],
             "score": {
                 "model": 1,
@@ -38830,7 +39315,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 145,
+            "rank": 146,
             "flags": [],
             "score": {
                 "model": 1,
@@ -38993,7 +39478,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 146,
+            "rank": 147,
             "flags": [],
             "score": {
                 "model": 1,
@@ -39130,7 +39615,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 147,
+            "rank": 148,
             "flags": [],
             "score": {
                 "model": 1,
@@ -39288,7 +39773,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 148,
+            "rank": 149,
             "flags": [],
             "score": {
                 "model": 1,
@@ -39420,7 +39905,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 149,
+            "rank": 150,
             "flags": [],
             "score": {
                 "model": 1,
@@ -39552,7 +40037,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 150,
+            "rank": 151,
             "flags": [],
             "score": {
                 "model": 1,
@@ -39685,7 +40170,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 151,
+            "rank": 152,
             "flags": [],
             "score": {
                 "model": 1,
@@ -39855,7 +40340,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 152,
+            "rank": 153,
             "flags": [],
             "score": {
                 "model": 1,
@@ -40024,7 +40509,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 153,
+            "rank": 154,
             "flags": [],
             "score": {
                 "model": 1,
@@ -40156,7 +40641,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 154,
+            "rank": 155,
             "flags": [],
             "score": {
                 "model": 1,
@@ -40289,7 +40774,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 155,
+            "rank": 156,
             "flags": [],
             "score": {
                 "model": 1,
@@ -40421,7 +40906,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 156,
+            "rank": 157,
             "flags": [],
             "score": {
                 "model": 1,
@@ -40555,7 +41040,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 157,
+            "rank": 158,
             "flags": [],
             "score": {
                 "model": 1,
@@ -40687,7 +41172,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 158,
+            "rank": 159,
             "flags": [],
             "score": {
                 "model": 1,
@@ -40830,7 +41315,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 159,
+            "rank": 160,
             "flags": [],
             "score": {
                 "model": 1,
@@ -40962,7 +41447,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 160,
+            "rank": 161,
             "flags": [],
             "score": {
                 "model": 1,
@@ -41097,7 +41582,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 161,
+            "rank": 162,
             "flags": [],
             "score": {
                 "model": 1,
@@ -41229,7 +41714,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 162,
+            "rank": 163,
             "flags": [],
             "score": {
                 "model": 1,
@@ -41389,7 +41874,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 163,
+            "rank": 164,
             "flags": [],
             "score": {
                 "model": 1,
@@ -41521,7 +42006,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 164,
+            "rank": 165,
             "flags": [],
             "score": {
                 "model": 1,
@@ -41683,7 +42168,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 165,
+            "rank": 166,
             "flags": [],
             "score": {
                 "model": 1,
@@ -41825,7 +42310,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 166,
+            "rank": 167,
             "flags": [],
             "score": {
                 "model": 1,
@@ -41965,7 +42450,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 167,
+            "rank": 168,
             "flags": [],
             "score": {
                 "model": 1,
@@ -42097,7 +42582,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 168,
+            "rank": 169,
             "flags": [],
             "score": {
                 "model": 1,
@@ -42245,7 +42730,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 169,
+            "rank": 170,
             "flags": [],
             "score": {
                 "model": 1,
@@ -42386,7 +42871,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 170,
+            "rank": 171,
             "flags": [],
             "score": {
                 "model": 1,
@@ -42521,7 +43006,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 171,
+            "rank": 172,
             "flags": [],
             "score": {
                 "model": 1,
@@ -42692,7 +43177,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 172,
+            "rank": 173,
             "flags": [],
             "score": {
                 "model": 1,
@@ -42824,7 +43309,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 173,
+            "rank": 174,
             "flags": [],
             "score": {
                 "model": 1,
@@ -42956,7 +43441,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 174,
+            "rank": 175,
             "flags": [],
             "score": {
                 "model": 1,
@@ -43088,7 +43573,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 175,
+            "rank": 176,
             "flags": [],
             "score": {
                 "model": 1,
@@ -43220,7 +43705,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 176,
+            "rank": 177,
             "flags": [],
             "score": {
                 "model": 1,
@@ -43367,7 +43852,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 177,
+            "rank": 178,
             "flags": [],
             "score": {
                 "model": 1,
@@ -43500,7 +43985,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 178,
+            "rank": 179,
             "flags": [],
             "score": {
                 "model": 1,
@@ -43632,7 +44117,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 179,
+            "rank": 180,
             "flags": [],
             "score": {
                 "model": 1,
@@ -43764,7 +44249,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 180,
+            "rank": 181,
             "flags": [],
             "score": {
                 "model": 1,
@@ -43897,7 +44382,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 181,
+            "rank": 182,
             "flags": [],
             "score": {
                 "model": 1,
@@ -44029,7 +44514,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 182,
+            "rank": 183,
             "flags": [],
             "score": {
                 "model": 1,
@@ -44160,7 +44645,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 183,
+            "rank": 184,
             "flags": [],
             "score": {
                 "model": 1,
@@ -44291,7 +44776,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 184,
+            "rank": 185,
             "flags": [],
             "score": {
                 "model": 1,
@@ -44439,7 +44924,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 185,
+            "rank": 186,
             "flags": [],
             "score": {
                 "model": 1,
@@ -44574,7 +45059,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 186,
+            "rank": 187,
             "flags": [],
             "score": {
                 "model": 1,
@@ -44713,7 +45198,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 187,
+            "rank": 188,
             "flags": [],
             "score": {
                 "model": 1,
@@ -44855,7 +45340,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 188,
+            "rank": 189,
             "flags": [],
             "score": {
                 "model": 1,
@@ -44990,7 +45475,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 189,
+            "rank": 190,
             "flags": [],
             "score": {
                 "model": 1,
@@ -45121,7 +45606,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 190,
+            "rank": 191,
             "flags": [],
             "score": {
                 "model": 1,
@@ -45252,7 +45737,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 191,
+            "rank": 192,
             "flags": [],
             "score": {
                 "model": 1,
@@ -45383,7 +45868,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 192,
+            "rank": 193,
             "flags": [],
             "score": {
                 "model": 1,
@@ -45515,7 +46000,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 193,
+            "rank": 194,
             "flags": [],
             "score": {
                 "model": 1,
@@ -45646,7 +46131,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 194,
+            "rank": 195,
             "flags": [],
             "score": {
                 "model": 1,
@@ -45778,7 +46263,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 195,
+            "rank": 196,
             "flags": [],
             "score": {
                 "model": 1,
@@ -45909,7 +46394,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 196,
+            "rank": 197,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46040,7 +46525,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 197,
+            "rank": 198,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46171,7 +46656,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 198,
+            "rank": 199,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46302,7 +46787,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 199,
+            "rank": 200,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46434,7 +46919,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 200,
+            "rank": 201,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46601,7 +47086,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 201,
+            "rank": 202,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46732,7 +47217,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 202,
+            "rank": 203,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46866,7 +47351,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 203,
+            "rank": 204,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46971,138 +47456,6 @@
                 "branch_release_unmeasured": null,
                 "push": {
                     "at": "2026-09-09T19:44:37+00:00",
-                    "years": 0.1,
-                    "level": null
-                },
-                "push_unmeasured": null
-            },
-            "baseline": null,
-            "gate": {
-                "reaches_fail_on": false,
-                "fails": false,
-                "exempt_by": null,
-                "by": [],
-                "basis": null
-            }
-        },
-        {
-            "package": "lcobucci/clock",
-            "version": "3.3.1",
-            "branch": "3.x",
-            "installed_php": {
-                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0",
-                "target_runs": true,
-                "project_allows": true
-            },
-            "verdict": "ok",
-            "priority": "none",
-            "lead": null,
-            "rank": 204,
-            "flags": [],
-            "score": {
-                "model": 1,
-                "total": 0,
-                "exact": 0,
-                "accepted": [],
-                "text": "0"
-            },
-            "next_step": null,
-            "security": {
-                "status": "clear",
-                "check": "complete",
-                "complete": true,
-                "unchecked_reason": null,
-                "records": 0,
-                "feeds": [
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 0,
-                        "reason": null
-                    }
-                ],
-                "ignored": [],
-                "ignored_count": 0
-            },
-            "checks_missing": [],
-            "checks_skipped": [],
-            "unchecked_accepted": [],
-            "maintenance_judged": true,
-            "metadata": {
-                "status": "read",
-                "reason": null,
-                "message": null
-            },
-            "activity": {
-                "status": "read",
-                "reason": null,
-                "forge": "github",
-                "host": "github.com",
-                "repo": "lcobucci/clock",
-                "event": "push",
-                "archived": false,
-                "fetched_at": "2026-09-14T18:49:10+00:00",
-                "cached_at": null
-            },
-            "allowlist": null,
-            "abandoned_ignored": null,
-            "from_composer_repository": true,
-            "origin": {
-                "kind": "packagist",
-                "registry": "packagist.org",
-                "package_url": "https://packagist.org/packages/lcobucci/clock",
-                "local": false
-            },
-            "replacement": null,
-            "replacement_url": null,
-            "note": null,
-            "libyears_unmeasured": null,
-            "libyears_at_least": false,
-            "direct": false,
-            "dev": false,
-            "reach": "transitive",
-            "chain": [
-                "lcobucci/jwt",
-                "lcobucci/clock"
-            ],
-            "depth": 1,
-            "depth_unmeasured": null,
-            "named_in": [],
-            "direct_dependents": [
-                "lcobucci/jwt",
-                "scheb/2fa-trusted-device"
-            ],
-            "signals": [],
-            "evidence": "",
-            "allowlist_reason": null,
-            "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": 1.55,
-            "age": {
-                "installed": {
-                    "at": "2024-09-24T20:45:14+00:00",
-                    "years": 2.1,
-                    "dated_by": null
-                },
-                "installed_unmeasured": null,
-                "release": {
-                    "version": "3.6.0",
-                    "at": "2026-04-13T21:30:16+00:00",
-                    "years": 0.5,
-                    "level": null,
-                    "dated_by": null
-                },
-                "release_unmeasured": null,
-                "branch_release": {
-                    "version": "3.6.0",
-                    "at": "2026-04-13T21:30:16+00:00",
-                    "years": 0.5,
-                    "level": null,
-                    "dated_by": null
-                },
-                "branch_release_unmeasured": null,
-                "push": {
-                    "at": "2026-09-13T02:11:22+00:00",
                     "years": 0.1,
                     "level": null
                 },

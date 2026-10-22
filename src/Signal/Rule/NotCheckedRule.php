@@ -72,10 +72,13 @@ final class NotCheckedRule implements SignalRule
     private const MAINTENANCE_CHECKS = ['repository_activity', 'release_dates', 'release_metadata'];
 
     private LeftBehindRule $leftBehind;
+    private ?CappedRule $capped;
 
-    public function __construct(LeftBehindRule $leftBehind)
+    /** @param ?CappedRule $capped S11 fires without release metadata, so an unread one blocks only its `admits_newest` */
+    public function __construct(LeftBehindRule $leftBehind, ?CappedRule $capped = null)
     {
         $this->leftBehind = $leftBehind;
+        $this->capped = $capped;
     }
 
     public function evaluate(PackageFacts $facts): ?Signal
@@ -84,7 +87,7 @@ final class NotCheckedRule implements SignalRule
         $reason = $facts->activityNotChecked();
         $origin = $facts->package()->origin()->kind();
         if ($reason === self::NOT_FROM_COMPOSER_REPOSITORY && \in_array($origin, self::ORIGIN_GAPS, true)) {
-            $unchecked[] = new Check('release_metadata', $reason, [Signal::S2, Signal::S8]);
+            $unchecked[] = new Check('release_metadata', $reason, $this->capped !== null && $this->capped->evaluate($facts) !== null ? [Signal::S2, Signal::S8, Signal::S11] : [Signal::S2, Signal::S8]);
             $unchecked[] = new Check('repository_activity', $reason, [Signal::S3, Signal::S4]);
         } elseif ($reason === self::HOST_NOT_SUPPORTED || isset(self::ACTIVITY_WORDS[$reason ?? ''])) {
             $unchecked[] = new Check('repository_activity', (string) $reason, [Signal::S3, Signal::S4]);

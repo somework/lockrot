@@ -31,15 +31,6 @@
     }
    }
   },
-  "composer/installers": {
-   "version": "v1.12.0",
-   "first_seen": "2026-09-24",
-   "flags": {
-    "left-behind": {
-     "known_since": "2026-09-24"
-    }
-   }
-  },
   "cssjanus/cssjanus": {
    "version": "v2.1.0",
    "first_seen": "2026-09-24",
@@ -62,7 +53,7 @@
    "version": "v2.3.1",
    "first_seen": "2026-09-24",
    "flags": {
-    "abandoned": {
+    "stale": {
      "known_since": "2026-09-24"
     }
    }
@@ -85,11 +76,11 @@
     }
    }
   },
-  "doctrine/collections": {
-   "version": "1.8.0",
+  "doctrine/dbal": {
+   "version": "2.13.8",
    "first_seen": "2026-09-24",
    "flags": {
-    "left-behind": {
+    "abandoned": {
      "known_since": "2026-09-24"
     }
    }
@@ -107,7 +98,7 @@
    "version": "1.2.0",
    "first_seen": "2026-09-24",
    "flags": {
-    "abandoned": {
+    "left-behind": {
      "known_since": "2026-09-24"
     }
    }
@@ -143,7 +134,16 @@
    "version": "dev-master",
    "first_seen": "2026-09-24",
    "flags": {
-    "pinned": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "friendsofsymfony/jsrouting-bundle": {
+   "version": "2.8.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
      "known_since": "2026-09-24"
     }
    }
@@ -194,15 +194,6 @@
     }
    }
   },
-  "guzzlehttp/promises": {
-   "version": "1.5.2",
-   "first_seen": "2026-09-24",
-   "flags": {
-    "left-behind": {
-     "known_since": "2026-09-24"
-    }
-   }
-  },
   "guzzlehttp/psr7": {
    "version": "2.4.5",
    "first_seen": "2026-09-24",
@@ -234,6 +225,18 @@
    "first_seen": "2026-09-24",
    "flags": {
     "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "intervention/httpauth": {
+   "version": "3.0.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    },
+    "capped": {
      "known_since": "2026-09-24"
     }
    }
@@ -272,7 +275,7 @@
    "version": "dev-3.4.6-patch",
    "first_seen": "2026-09-24",
    "flags": {
-    "abandoned": {
+    "pinned": {
      "known_since": "2026-09-24"
     }
    }
@@ -474,6 +477,9 @@
    "flags": {
     "left-behind": {
      "known_since": "2026-09-24"
+    },
+    "capped": {
+     "known_since": "2026-09-24"
     }
    }
   },
@@ -653,20 +659,14 @@
     }
    }
   },
-  "prestashop/gridhtml": {
-   "version": "v2.0.3",
-   "first_seen": "2026-09-24",
-   "flags": {
-    "stale": {
-     "known_since": "2026-09-24"
-    }
-   }
-  },
   "prestashop/laminas-code-lts": {
    "version": "dev-4.5-lts",
    "first_seen": "2026-09-24",
    "flags": {
     "stale": {
+     "known_since": "2026-09-24"
+    },
+    "capped": {
      "known_since": "2026-09-24"
     }
    }
@@ -689,6 +689,15 @@
     }
    }
   },
+  "prestashop/ps_currencyselector": {
+   "version": "v2.1.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
   "prestashop/ps_customeraccountlinks": {
    "version": "v3.2.0",
    "first_seen": "2026-09-24",
@@ -702,7 +711,7 @@
    "version": "v2.0.5",
    "first_seen": "2026-09-24",
    "flags": {
-    "abandoned": {
+    "stale": {
      "known_since": "2026-09-24"
     }
    }
@@ -777,7 +786,10 @@
    "version": "0.5.0",
    "first_seen": "2026-09-24",
    "flags": {
-    "abandoned": {
+    "old-promise": {
+     "known_since": "2026-09-24"
+    },
+    "stale": {
      "known_since": "2026-09-24"
     }
    }
@@ -951,18 +963,6 @@
     }
    }
   },
-  "tubalmartin/cssmin": {
-   "version": "v4.1.1",
-   "first_seen": "2026-09-24",
-   "flags": {
-    "old-promise": {
-     "known_since": "2026-09-24"
-    },
-    "stale": {
-     "known_since": "2026-09-24"
-    }
-   }
-  },
   "twig/twig": {
    "version": "v3.4.3",
    "first_seen": "2026-09-24",
@@ -1046,6 +1046,15 @@
      "known_since": "2026-09-24",
      "severity": "low",
      "fix_kind": "raise-php"
+    }
+   }
+  },
+  "willdurand/jsonp-callback-validator": {
+   "version": "v1.1.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
     }
    }
   },

@@ -125,6 +125,7 @@
           left-behind); the packages that hold it may need to move too; a new major brings its own requirements;
           Composer's solver refuses it against the lock
       left-behind  branch 4.x last released 2023-01-02 (3.8 years ago); 5.x released 5.6.0 (2025-10-17)
+      pulls in 1 flagged package: lcobucci/clock (capped)
   scheb/2fa-backup-code v5.13.2  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
       do: require scheb/2fa-backup-code ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 ||
@@ -192,7 +193,7 @@
           v7.14.0 (requires scheb/2fa-bundle self.version; itself left-behind); the packages that hold it may need to
           move too; a new major brings its own requirements; Composer's solver refuses it against the lock
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)
-      pulls in 1 flagged package: symfony/security-guard (abandoned)
+      pulls in 2 flagged packages: symfony/security-guard (abandoned), lcobucci/clock (capped)
       checks missing: S2 (undated releases)
   symfony/web-server-bundle v4.4.44  direct  ·  abandoned (baseline)
       16 = abandoned 32 ÷ 2 dev (baseline: known)
@@ -417,7 +418,7 @@
       pinned       pinned to branch snapshot dev-master
       age: last push 2023-12-24 (2.8 years ago)
 
-<options=bold>low (20)</options=bold>
+<options=bold>low (21)</options=bold>
   phpunit/php-invoker 3.1.1  via phpunit/phpunit  ·  left-behind (baseline) · old-promise (baseline)
       5 = ((left-behind 16 + old-promise 4 [¼ of 16]) ÷ 2 transitive) ÷ 2 dev (baseline: known)
       gate 0 = min(5, 2 × 0) (the new facts bound it); new: 0
@@ -520,6 +521,15 @@
       gate 0 = min(4, 2 × 0) (the new facts bound it); new: 0
       do: —
       stale        last release 2021-04-06 (5.5 years ago)
+  lcobucci/clock 3.3.1  via lcobucci/jwt, scheb/2fa-trusted-device  ·  capped
+      4 = capped 8 ÷ 2 transitive (baseline: new package)
+      do: raise require.php to \>=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt, scheb/2fa-trusted-device
+          — clears capped; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 8.2 (a minor raise); the target php 8.4
+          runs it; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it;
+          Composer's solver checked it against the lock
+      capped       requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded
+      age: installed 3.3.1 released 2024-09-24 (2.1 years ago); 3.x last released 3.6.0 2026-04-13 (0.5 years ago),
+           its newest release; last push 2026-09-13 (0.1 years ago)
   phpdocumentor/reflection-common 2.2.0  via nelmio/api-doc-bundle  ·  stale (baseline)
       4 = stale 8 ÷ 2 transitive (baseline: known)
       gate 0 = min(4, 2 × 0) (the new facts bound it); new: 0
@@ -577,10 +587,10 @@
       do: —
       stale        last release 2022-11-30 (3.9 years ago)
 
-271 packages checked · 71 flagged: critical 3 · high 38 · medium 10 · low 20
-flags: abandoned 21 · silent 8 · pinned 4 · left-behind 23 · old-promise 18 · stale 15 · vulnerable 2 ·
-20 packages carry more than one
-depth: 50 of 71 flagged packages are named by no line of composer.json · direct 21 · 1 hop 29 · 2 hops 13 ·
+271 packages checked · 72 flagged: critical 3 · high 38 · medium 10 · low 21
+flags: abandoned 21 · silent 8 · pinned 4 · left-behind 23 · old-promise 18 · stale 15 · capped 1 ·
+vulnerable 2 · 20 packages carry more than one
+depth: 51 of 72 flagged packages are named by no line of composer.json · direct 21 · 1 hop 30 · 2 hops 13 ·
 3 hops 6 · 4 hops 2 · 18 in packages-dev ·
 deepest: hoa/ustring and hoa/zformat, 4 hops (wallabag/rulerz › hoa/ruler › hoa/compiler › hoa/regex › hoa/ustring)
 security: 2 vulnerable packages · 3 advisories: 1 high, 2 medium
@@ -589,11 +599,11 @@ update now: composer update 'phpseclib/phpseclib:^3.0.57'
 libyears: at least 264.2 behind across 265 of 271 packages · 132.7 from direct requirements ·
 furthest behind sebastian/version 3.0.2 at 6.0
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · phpunit/phpunit 13 · wallabag/phpepub 5 ·
-friendsofphp/php-cs-fixer 3 · … and 26 more
+friendsofphp/php-cs-fixer 3 · … and 27 more
 advisories: 271 packages asked · composer repo (http://127.0.0.1) answered (187 on record for 53 packages)
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
-baseline: 45 known · 25 new · 2 worsened · 9 stale (lockrot-baseline.json)
+baseline: 47 known · 26 new · 2 worsened · 9 stale (lockrot-baseline.json)
 <fg=red>gate: fails · --fail-on=high · 11 findings fail it; 30 reach it and are known to the baseline ·</fg=red>
 <fg=red>target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for

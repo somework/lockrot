@@ -246,7 +246,7 @@ final class PageGoldensTest extends TestCase
                     $expected = [
                         'resolves' => 'checked with Composer',
                         'refused' => 'Composer refuses the move',
-                        'not_checked' => 'if Composer resolves it (not checked: '.($result === MoveCheck::NOT_CHECKED ? MoveCheck::reasonWords(JsonPath::stringAt($move, ['check', 'reason'])) : '').')',
+                        'not_checked' => 'if Composer resolves it (not checked: '.($result === MoveCheck::NOT_CHECKED ? self::cardReasonWords(JsonPath::stringAt($move, ['check', 'reason'])) : '').')',
                     ][$result];
                     $conditions = JsonPath::arrayAt(JsonPath::decoded($cards), [$i, 'after', 'conditions']);
                     $lines[] = $expected;
@@ -258,7 +258,7 @@ final class PageGoldensTest extends TestCase
         }
 
         self::assertSame([], $differ);
-        foreach (['checked with Composer', 'Composer refuses the move', 'if Composer resolves it (not checked: '.MoveCheck::reasonWords(MoveCheck::UNLOADED_NAME).')', 'if Composer resolves it (not checked: '.MoveCheck::reasonWords(MoveCheck::BASELINE_REFUSED).')'] as $line) {
+        foreach (['checked with Composer', 'Composer refuses the move', 'if Composer resolves it (not checked: '.MoveCheck::reasonWords(MoveCheck::UNLOADED_NAME).')', 'if Composer resolves it (not checked: '.self::cardReasonWords(MoveCheck::BASELINE_REFUSED).')'] as $line) {
             self::assertContains($line, $lines, 'no sheet move card of a page case reads: '.$line);
         }
     }
@@ -472,6 +472,15 @@ final class PageGoldensTest extends TestCase
         }
 
         return ($link === 'conflict' ? 'conflicts with ' : 'requires ').($target === null ? '' : $target.' ').$constraint;
+    }
+
+    /**
+     * SPEC-0.14.md §7.9.21: the check line of a move card names the place that holds the fix on a
+     * refused baseline. Every other reason keeps the words of `next_step.text`.
+     */
+    private static function cardReasonWords(string $reason): string
+    {
+        return $reason === MoveCheck::BASELINE_REFUSED ? "Composer's solver refuses the lock itself at the target PHP; see the PHP line in the Overview" : MoveCheck::reasonWords($reason);
     }
 
     /**

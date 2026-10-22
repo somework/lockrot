@@ -117,7 +117,8 @@
    "S7",
    "S8",
    "S9",
-   "S10"
+   "S10",
+   "S11"
   ],
   "open": true,
   "integer": false
@@ -150,6 +151,7 @@
    "left-behind",
    "old-promise",
    "stale",
+   "capped",
    "vulnerable"
   ],
   "open": false,
@@ -167,7 +169,8 @@
    "pinned",
    "left-behind",
    "old-promise",
-   "stale"
+   "stale",
+   "capped"
   ],
   "open": false,
   "integer": false
@@ -261,7 +264,8 @@
    "branch_releasing",
    "released_after_ga",
    "outside_range",
-   "tags_only"
+   "tags_only",
+   "admits_newest_php"
   ],
   "open": true,
   "integer": false
@@ -287,7 +291,8 @@
   ],
   "values": [
    "released_before_ga",
-   "branch_not_releasing"
+   "branch_not_releasing",
+   "stops_below_newest_php"
   ],
   "open": true,
   "integer": false
@@ -722,7 +727,8 @@
    "releases_unknown",
    "affected_range_unknown",
    "metadata_not_read",
-   "local_package"
+   "local_package",
+   "no_release_admits"
   ],
   "open": true,
   "integer": false
@@ -924,6 +930,7 @@
   "values": [
    "years",
    "php",
+   "php_minor",
    "reason",
    "advisories"
   ],
@@ -940,30 +947,42 @@
    "#/definitions/headline/anyOf/1/properties/source/oneOf/0",
    "#/definitions/headline/anyOf/2/properties/source/oneOf/0",
    "#/definitions/headline/anyOf/3/properties/source/oneOf/0",
+   "#/definitions/headline/anyOf/4/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/0/properties/headline/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/0/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/0/anyOf/1/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/1/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/2/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/3/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/4/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/2/properties/headline/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/0/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/0/anyOf/1/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/1/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/2/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/3/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/4/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/4/properties/headline/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/0/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/0/anyOf/1/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/1/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/2/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/3/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/4/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/5/properties/headline/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/0/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/0/anyOf/1/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/1/properties/source/oneOf/0",
    "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/2/properties/source/oneOf/0",
-   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/3/properties/source/oneOf/0"
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/3/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/4/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/anyOf/0/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/anyOf/0/anyOf/1/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/anyOf/1/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/anyOf/2/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/anyOf/3/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/anyOf/4/properties/source/oneOf/0"
   ],
   "values": [
    "release",
@@ -985,7 +1004,8 @@
    "#/definitions/findingFlag/anyOf/3/properties/headline/properties/unit",
    "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/0/properties/unit",
    "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/0/properties/unit",
-   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/0/properties/unit"
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/0/properties/unit",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/anyOf/0/properties/unit"
   ],
   "values": [
    "years"
@@ -1004,7 +1024,8 @@
    "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/1/properties/unit",
    "#/definitions/findingFlag/anyOf/4/properties/headline/properties/unit",
    "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/1/properties/unit",
-   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/1/properties/unit"
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/1/properties/unit",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/anyOf/1/properties/unit"
   ],
   "values": [
    "php"
@@ -1024,7 +1045,8 @@
    "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/2/properties/unit",
    "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/2/properties/unit",
    "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/2/properties/unit",
-   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/2/properties/unit"
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/2/properties/unit",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/anyOf/2/properties/unit"
   ],
   "values": [
    "reason"
@@ -1041,7 +1063,8 @@
    "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/2/properties/value",
    "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/2/properties/value",
    "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/2/properties/value",
-   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/2/properties/value"
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/2/properties/value",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/anyOf/2/properties/value"
   ],
   "values": [
    "archived",
@@ -1062,11 +1085,32 @@
    "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/3/properties/unit",
    "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/3/properties/unit",
    "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/3/properties/unit",
-   "#/definitions/findingFlag/anyOf/5/properties/headline/properties/unit",
-   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/3/properties/unit"
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/3/properties/unit",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/properties/unit",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/anyOf/3/properties/unit"
   ],
   "values": [
    "advisories"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "HeadlineUnit6",
+  "pointer": "#/definitions/headline/anyOf/4/properties/unit",
+  "pointers": [
+   "#/definitions/headline/anyOf/4/properties/unit",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/4/properties/unit",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/4/properties/unit",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/4/properties/unit",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/4/properties/unit",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/4/properties/unit",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/properties/unit",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/4/properties/unit",
+   "#/definitions/findingFlag/anyOf/6/properties/headline/anyOf/4/properties/unit"
+  ],
+  "values": [
+   "php_minor"
   ],
   "open": false,
   "integer": false
@@ -1120,7 +1164,8 @@
    "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/0/anyOf/0/properties/value",
    "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/1/properties/value",
    "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/2/properties/value",
-   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/3/properties/value"
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/3/properties/value",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/4/properties/value"
   ],
   "values": [
    "archived",
@@ -1151,7 +1196,8 @@
    "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/0/anyOf/1/properties/source",
    "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/1/properties/source",
    "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/2/properties/source",
-   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/3/properties/source"
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/3/properties/source",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/4/properties/source"
   ],
   "values": [
    "release",
@@ -1194,7 +1240,8 @@
    "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/0/anyOf/1/properties/source",
    "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/1/properties/source",
    "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/2/properties/source",
-   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/3/properties/source"
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/3/properties/source",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/4/properties/source"
   ],
   "values": [
    "branch"
@@ -1219,6 +1266,18 @@
   "pointer": "#/definitions/findingFlag/anyOf/5/properties/id",
   "pointers": [
    "#/definitions/findingFlag/anyOf/5/properties/id"
+  ],
+  "values": [
+   "capped"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingFlagId7",
+  "pointer": "#/definitions/findingFlag/anyOf/6/properties/id",
+  "pointers": [
+   "#/definitions/findingFlag/anyOf/6/properties/id"
   ],
   "values": [
    "vulnerable"
@@ -1579,6 +1638,33 @@
   "integer": false
  },
  {
+  "name": "S11NewestPhpSource",
+  "pointer": "#/definitions/s11/properties/newest_php_source",
+  "pointers": [
+   "#/definitions/s11/properties/newest_php_source"
+  ],
+  "values": [
+   "known",
+   "require_php",
+   "platform_php"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "S11AdmitsNewestBlocking",
+  "pointer": "#/definitions/s11/properties/admits_newest/oneOf/0/properties/blocking/oneOf/0",
+  "pointers": [
+   "#/definitions/s11/properties/admits_newest/oneOf/0/properties/blocking/oneOf/0"
+  ],
+  "values": [
+   "project",
+   "target"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
   "name": "SignalId2",
   "pointer": "#/definitions/signal/anyOf/0/properties/id",
   "pointers": [
@@ -1694,6 +1780,18 @@
   ],
   "values": [
    "S10"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SignalId12",
+  "pointer": "#/definitions/signal/anyOf/10/properties/id",
+  "pointers": [
+   "#/definitions/signal/anyOf/10/properties/id"
+  ],
+  "values": [
+   "S11"
   ],
   "open": false,
   "integer": false
@@ -2707,7 +2805,8 @@
    "liveness",
    "branch",
    "release_age",
-   "release_push"
+   "release_push",
+   "php_bound"
   ],
   "open": true,
   "integer": false

@@ -152,7 +152,7 @@ final class AllowlistTest extends TestCase
     public function testALivenessWordAlsoAcceptsTheWordsAfterIt(?array $listed, array $accepted): void
     {
         $entry = new AllowlistEntry('vendor/*', null, 'kept', null, 'config', $listed);
-        $flags = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable'];
+        $flags = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped', 'vulnerable'];
 
         self::assertSame($accepted, array_values(array_filter($flags, [$entry, 'accepts'])));
     }
@@ -160,7 +160,8 @@ final class AllowlistTest extends TestCase
     /** @return iterable<string, array{list<string>|null, list<string>}> */
     public static function covers(): iterable
     {
-        yield 'every maintenance flag' => [null, ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale']];
+        yield 'every maintenance flag' => [null, ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped']];
+        yield 'capped is no liveness word' => [['capped'], ['capped']];
         yield 'abandoned' => [['abandoned'], ['abandoned', 'silent', 'stale']];
         yield 'silent' => [['silent'], ['silent', 'stale']];
         yield 'stale' => [['stale'], ['stale']];

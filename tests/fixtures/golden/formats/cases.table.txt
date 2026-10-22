@@ -1,4 +1,4 @@
-critical (10)
+critical (11)
   twig/twig v2.16.1  direct  ·  vulnerable
       32 = vulnerable 32 [critical advisory]
       do: raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0,
@@ -9,6 +9,15 @@ critical (10)
                    CVE-2026-46633 PHP code injection via `{% use %}` template name
       age: installed v2.16.1 released 2024-09-09 (2.1 years ago), the newest on 2.x; newest release v3.30.0
            2026-09-25 (less than three weeks ago); last push 2026-09-30 (less than three weeks ago)
+  phpoffice/phpspreadsheet 1.23.0  via mautic/core-lib  ·  vulnerable
+      32 = vulnerable 32 [critical advisory]
+      do: composer update phpoffice/phpspreadsheet (gets 1.30.7) — clears 28 advisories; it stops below the newest
+          PHP, so capped would count
+      vulnerable   28 advisories: 2 critical, 15 high, 11 medium — all fixed on 1.x; worst: CVE-2026-34084
+                   PhpSpreadsheet has SSRF/RCE in IOFactory::load when $filename is user controlled
+      age: installed 1.23.0 released 2022-04-24 (4.4 years ago); 1.x last released 1.30.7 2026-09-17 (less than
+           three weeks ago); newest release 3.10.8 2026-09-17 (less than three weeks ago); last push 2026-10-01 (less
+           than three weeks ago)
   geoip2/geoip2 v2.4.5  direct  ·  left-behind · old-promise · vulnerable
       36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory]
       do: raise require.php to >=8.1, then require geoip2/geoip2 ^3.4 — clears left-behind, old-promise and 2
@@ -32,6 +41,16 @@ critical (10)
                    untested
       vulnerable   1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object
                    Deserialization in MonologBridge server:log Listener
+  mautic/core-lib 4.3.x-dev  direct  ·  pinned · capped · vulnerable
+      34 = pinned 16 + capped 2 [¼ of 8] + vulnerable 16 [high advisory]
+      do: no move: it is installed from a local path (your own package)
+      pinned       pinned to branch snapshot 4.3.x-dev
+      capped       requires php >=7.4.0 <8.1: it stops at 8.0, so the newest PHP, 8.5, is excluded
+      vulnerable   5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in
+                   UI upgrade process
+      pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable),
+      twig/twig (vulnerable), robrichards/xmlseclibs (old-promise · vulnerable), symfony/http-foundation (left-behind
+      · vulnerable) and 114 more
   guzzlehttp/guzzle 6.5.8  direct  ·  left-behind · vulnerable
       32 = left-behind 16 + vulnerable 16 [high advisory]
       do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 — clears left-behind and 9 advisories;
@@ -43,15 +62,6 @@ critical (10)
                    can bypass host-based checks
       pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind · vulnerable), guzzlehttp/promises (left-behind),
       symfony/polyfill-intl-idn (vulnerable)
-  mautic/core-lib 4.3.x-dev  direct  ·  pinned · vulnerable
-      32 = pinned 16 + vulnerable 16 [high advisory]
-      do: no move: it is installed from a local path (your own package)
-      pinned       pinned to branch snapshot 4.3.x-dev
-      vulnerable   5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in
-                   UI upgrade process
-      pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable),
-      twig/twig (vulnerable), robrichards/xmlseclibs (old-promise · vulnerable), symfony/http-foundation (left-behind
-      · vulnerable) and 114 more
   guzzlehttp/cache-subscriber 0.2.0  direct  ·  abandoned · old-promise
       36 = abandoned 32 + old-promise 4 [¼ of 16]
       do: find a replacement (none named)
@@ -89,7 +99,7 @@ critical (10)
       pulls in 3 flagged packages: web-token/jwt-library (vulnerable), paragonie/sodium_compat (vulnerable), brick/math
       (left-behind)
 
-high (15)
+high (18)
   robrichards/xmlseclibs 3.1.1  via mautic/core-lib  ·  old-promise · vulnerable
       24 = old-promise 16 ÷ 2 transitive + vulnerable 16 [high advisory]
       do: composer update robrichards/xmlseclibs (gets 3.1.5) — clears old-promise and 2 advisories
@@ -146,6 +156,16 @@ high (15)
       pinned       pinned to branch snapshot dev-master
       stale        last release 2019-01-23 (7.7 years ago)
       pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)
+  pelago/emogrifier v2.2.0  direct  ·  left-behind · capped
+      18 = left-behind 16 + capped 2 [¼ of 8]
+      do: raise require.php to >=7.3, then require pelago/emogrifier ^7.3 — clears left-behind and capped; 7.x needs
+          php ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.1.3 (a minor
+          raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+      left-behind  branch 2.x last released 2019-09-04 (7.1 years ago); 8.x released v8.2.0 (2025-11-27), needs php
+                   ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php
+                   ^7.1.3; no releasing branch within reach
+      capped       requires php ^5.5.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0: it stops at 7.3, so 7.4, the newest PHP
+                   that require.php allows, is excluded
   tubalmartin/cssmin v4.1.1  direct  ·  old-promise · stale
       18 = old-promise 16 + stale 2 [¼ of 8]
       do: test it on PHP 8.4 — v4.1.1 is its newest release
@@ -182,6 +202,12 @@ high (15)
                    untested
       age: installed 2.0.1 released 2020-10-05 (6.0 years ago); 2.x last released 2.0.3 2026-04-17 (0.5 years ago),
            its newest release; last push 2026-04-17 (0.5 years ago)
+  matomo/referrer-spam-list dev-master  direct  ·  pinned
+      16 = pinned 16
+      do: require a tag — the newest is 4.0.5 (2026-04-15); 4.x needs php >=7.2 <8.5, which require.php allows; it
+          stops below the newest PHP, so capped would count
+      pinned       pinned to branch snapshot dev-master
+      age: newest release 4.0.5 2026-04-15 (0.5 years ago); last push 2026-09-22 (less than three weeks ago)
   pagerfanta/twig v3.8.0  direct  ·  left-behind
       16 = left-behind 16
       do: raise require.php to >=8.1, then require pagerfanta/twig ^4.9 — clears left-behind; 4.x needs php ^8.1,
@@ -198,6 +224,14 @@ high (15)
                    untested
       age: installed 1.0.0 released 2018-08-10 (8.1 years ago), the newest on 1.x; newest release v2.0.0-beta.1
            2026-03-21 (0.5 years ago); last push 2026-03-29 (0.5 years ago)
+  scheb/2fa-bundle v5.13.2  direct  ·  left-behind
+      16 = left-behind 16
+      do: raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the
+          newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php
+          allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot
+          does not solve
+      left-behind  branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php
+                   ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach
   tobscure/json-api dev-joomla-backports  direct  ·  pinned
       16 = pinned 16
       do: no move: lockrot did not read its releases, so it names none; review the snapshot
@@ -301,7 +335,7 @@ medium (12)
       left-behind  branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.7 (2026-09-03), needs php
                    >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-08)
 
-low (4)
+low (5)
   balping/json-raw-encoder v1.0.2  via akaunting/laravel-apexcharts  ·  stale · vulnerable
       4 = (stale 8 ÷ 2 transitive + vulnerable 4 [low advisory 2 × 2: no reachable fix]) ÷ 2 dev
       do: no release fixes it
@@ -325,6 +359,11 @@ low (4)
            three weeks ago), its newest release
       maintenance accepted (lockrot's list)  polyfills for PHP extensions; released with Symfony and complete for the
                               API of the extension they replace
+  ocramius/proxy-manager 2.2.4  via symfony/proxy-manager-bridge  ·  stale · capped
+      5 = (stale 8 + capped 2 [¼ of 8]) ÷ 2 transitive
+      do: —
+      stale        last release 2022-03-05 (4.6 years ago)
+      capped       requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded
   jfcherng/php-color-output 2.0.2  via jfcherng/php-diff  ·  old-promise · stale
       4 = ((old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive) ÷ 2 dev (4.5, rounded down)
       do: move jfcherng/php-color-output to ^3.0.0 through jfcherng/php-diff — clears old-promise; 3.x needs php
@@ -352,23 +391,23 @@ not flagged (5)
       0
       checks missing: S2 (undated releases)
 
-46 packages checked · 41 flagged: critical 10 · high 15 · medium 12 · low 4
-flags: abandoned 7 · silent 1 · pinned 4 · left-behind 14 · old-promise 12 · stale 7 · vulnerable 16 ·
-18 packages carry more than one
-depth: 16 of 41 flagged packages are named by no line of composer.json · direct 24 · 1 hop 11 · 2 hops 2 ·
+51 packages checked · 46 flagged: critical 11 · high 18 · medium 12 · low 5
+flags: abandoned 7 · silent 1 · pinned 5 · left-behind 16 · old-promise 12 · stale 8 · capped 3 ·
+vulnerable 17 · 20 packages carry more than one
+depth: 18 of 46 flagged packages are named by no line of composer.json · direct 27 · 1 hop 13 · 2 hops 2 ·
 4 hops 1 · unreached 3 ·
 deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs) ·
 1 more is named only in require-dev, which this run did not walk (pass --dev)
-security: 16 vulnerable packages · 58 advisories: 1 critical, 12 high, 29 medium, 3 unrated, 13 low ·
+security: 17 vulnerable packages · 86 advisories: 3 critical, 27 high, 40 medium, 3 unrated, 13 low ·
 packages-dev not checked (pass --dev)
-fix, by package: composer update 5 · upgrade 3 · php floor raise 6 · fix unknown 1 · no fix 1
-update now: composer update robrichards/xmlseclibs league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn
-libyears: at least 101.5 behind across 37 of 46 packages · 57.3 from direct requirements ·
+fix, by package: composer update 6 · upgrade 3 · php floor raise 6 · fix unknown 1 · no fix 1
+update now: composer update phpoffice/phpspreadsheet robrichards/xmlseclibs league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn
+libyears: at least 116.4 behind across 41 of 51 packages · 67.8 from direct requirements ·
 furthest behind symfony/monolog-bridge v2.6.13 at 10.6
-pulled in by: mautic/core-lib 4 · guzzlehttp/guzzle 2 · akaunting/laravel-apexcharts 1 ·
-genealabs/laravel-model-caching 1 · jfcherng/php-diff 1 · … and 5 more
-advisories: 46 packages asked · packagist.org answered (240 on record for 19 packages)
+pulled in by: mautic/core-lib 5 · guzzlehttp/guzzle 2 · akaunting/laravel-apexcharts 1 ·
+genealabs/laravel-model-caching 1 · jfcherng/php-diff 1 · … and 6 more
+advisories: 51 packages asked · packagist.org answered (271 on record for 20 packages)
 php: the lock installs on no PHP, so your target, 8.4, is excluded
-gate: fails · --fail-on=high,unchecked · 27 findings fail it (high 25, unchecked 4) · target php 8.4 (--target-php)
+gate: fails · --fail-on=high,unchecked · 31 findings fail it (high 29, unchecked 4) · target php 8.4 (--target-php)
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

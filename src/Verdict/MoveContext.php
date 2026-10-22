@@ -19,6 +19,7 @@ use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Data\LeftBehindData;
+use Lockrot\Signal\PhpCap;
 use Lockrot\Signal\PhpFloor;
 
 /**
@@ -49,6 +50,7 @@ final class MoveContext
     private array $own;
     private bool $advisoriesComplete;
     private ?MoveChecks $checks = null;
+    private ?PhpCap $cap = null;
 
     /**
      * @param list<BranchRow>                    $rows      highest branch first
@@ -87,6 +89,20 @@ final class MoveContext
     public function checks(): ?MoveChecks
     {
         return $this->checks;
+    }
+
+    /** A copy that judges `capped` on the releases that its moves install. Without it no release is capped. */
+    public function withPhpCap(PhpCap $cap): self
+    {
+        $clone = clone $this;
+        $clone->cap = $cap;
+
+        return $clone;
+    }
+
+    public function phpCap(): PhpCap
+    {
+        return $this->cap ?? PhpCap::none();
     }
 
     public function finding(): Finding

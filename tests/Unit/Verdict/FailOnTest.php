@@ -15,7 +15,7 @@ final class FailOnTest extends TestCase
 {
     public function testTheAllowedValuesAreNoneThenEachKindInOrder(): void
     {
-        self::assertSame(['none', 'critical', 'high', 'medium', 'low', 'abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable', 'vulnerable-medium', 'vulnerable-high', 'vulnerable-critical', 'unchecked'], FailOn::allowed());
+        self::assertSame(['none', 'critical', 'high', 'medium', 'low', 'abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped', 'vulnerable', 'vulnerable-medium', 'vulnerable-high', 'vulnerable-critical', 'unchecked'], FailOn::allowed());
     }
 
     /** @return iterable<string, array{string, string, string, ?string}> */

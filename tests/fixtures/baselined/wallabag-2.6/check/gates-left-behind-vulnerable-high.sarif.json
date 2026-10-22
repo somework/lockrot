@@ -821,6 +821,25 @@
                             }
                         },
                         {
+                            "id": "lockrot/capped",
+                            "name": "capped",
+                            "shortDescription": {
+                                "text": "capped: The installed version's php constraint stops below the newest PHP the project allows"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version's php requirement has an upper bound below the newest PHP minor that the project allows."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
                             "id": "lockrot/advisory/PKSA-kbc7-dq62-pt7d",
                             "name": "advisory/PKSA-kbc7-dq62-pt7d",
                             "shortDescription": {
@@ -2772,7 +2791,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -2908,7 +2928,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -3032,7 +3053,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -3151,7 +3173,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -3275,7 +3298,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -3399,7 +3423,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -3516,7 +3541,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -3633,7 +3659,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -3750,7 +3777,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -3867,7 +3895,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -3984,7 +4013,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -4101,7 +4131,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -4218,7 +4249,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -4335,7 +4367,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -5997,6 +6030,171 @@
                     "level": "note",
                     "rank": 100.0,
                     "message": {
+                        "text": "php-http/guzzle5-adapter 2.0.0 \u2014 finding critical, 34 = abandoned 32 + capped 2 [\u00bc of 8] \u2014 abandoned: marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived on GitHub; last release 2019-02-05 (7.7 years ago). Do: replace with php-http/guzzle7-adapter (named by its registry)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "php-http/guzzle5-adapter"
+                    },
+                    "suppressions": [
+                        {
+                            "kind": "external",
+                            "status": "accepted",
+                            "justification": "covered by lockrot-baseline.json (known since 2024-11-03)"
+                        }
+                    ],
+                    "properties": {
+                        "package": "php-http/guzzle5-adapter",
+                        "version": "2.0.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "abandoned",
+                        "score_total": 34,
+                        "score_text": "34 = abandoned 32 + capped 2 [\u00bc of 8]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "abandoned",
+                            "capped"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": "known",
+                        "error_by": [],
+                        "chain": [
+                            "php-http/guzzle5-adapter"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "php-http/guzzle5-adapter",
+                            "php-http/httplug-bundle"
+                        ],
+                        "signal_ids": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S7",
+                            "S11"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2019-02-05T12:28:45+00:00",
+                                "years": 7.7,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "2.0.0",
+                                "at": "2019-02-05T12:28:45+00:00",
+                                "years": 7.7,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "2.0.0",
+                                "at": "2019-02-05T12:28:45+00:00",
+                                "years": 7.7,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2024-01-06T12:25:01+00:00",
+                                "years": 2.8,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "abandoned",
+                            "role": "lead",
+                            "weight": 32,
+                            "divisor": 1,
+                            "points": 32,
+                            "contribution": 32
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 6719
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/capped",
+                    "ruleIndex": 39,
+                    "level": "note",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "php-http/guzzle5-adapter 2.0.0 \u2014 finding critical, 34 = abandoned 32 + capped 2 [\u00bc of 8] \u2014 capped: requires php ^7.0: it stops at 7.4, so the newest PHP, 8.5, is excluded. Do: replace with php-http/guzzle7-adapter (named by its registry)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "php-http/guzzle5-adapter"
+                    },
+                    "suppressions": [
+                        {
+                            "kind": "external",
+                            "status": "accepted",
+                            "justification": "covered by lockrot-baseline.json (known since 2024-11-03)"
+                        }
+                    ],
+                    "properties": {
+                        "package": "php-http/guzzle5-adapter",
+                        "version": "2.0.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "abandoned",
+                        "score_total": 34,
+                        "score_text": "34 = abandoned 32 + capped 2 [\u00bc of 8]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "abandoned",
+                            "capped"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": "known",
+                        "error_by": [],
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "capped",
+                            "role": "corroborating",
+                            "weight": 8,
+                            "divisor": 4,
+                            "points": 2,
+                            "contribution": 2
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 6719
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 38,
+                    "level": "note",
+                    "rank": 100.0,
+                    "message": {
                         "text": "lexik/form-filter-bundle v7.0.3 \u2014 finding critical, 32 = abandoned 32 \u2014 abandoned: marked abandoned by its registry, replacement: spiriitlabs/form-filter-bundle; its repository is archived on GitHub; last release 2023-05-19 (3.4 years ago). Do: replace with spiriitlabs/form-filter-bundle (named by its registry)."
                     },
                     "partialFingerprints": {
@@ -6088,109 +6286,6 @@
                                 },
                                 "region": {
                                     "startLine": 5594
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "ruleId": "lockrot/abandoned",
-                    "ruleIndex": 38,
-                    "level": "note",
-                    "rank": 100.0,
-                    "message": {
-                        "text": "php-http/guzzle5-adapter 2.0.0 \u2014 finding critical, 32 = abandoned 32 \u2014 abandoned: marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived on GitHub; last release 2019-02-05 (7.7 years ago). Do: replace with php-http/guzzle7-adapter (named by its registry)."
-                    },
-                    "partialFingerprints": {
-                        "lockrot/package": "php-http/guzzle5-adapter"
-                    },
-                    "suppressions": [
-                        {
-                            "kind": "external",
-                            "status": "accepted",
-                            "justification": "covered by lockrot-baseline.json (known since 2024-11-03)"
-                        }
-                    ],
-                    "properties": {
-                        "package": "php-http/guzzle5-adapter",
-                        "version": "2.0.0",
-                        "verdict": "critical",
-                        "priority": "critical",
-                        "lead": "abandoned",
-                        "score_total": 32,
-                        "score_text": "32 = abandoned 32",
-                        "score_model_id": 1,
-                        "flag_ids": [
-                            "abandoned"
-                        ],
-                        "direct": true,
-                        "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
-                        "baseline_status": "known",
-                        "error_by": [],
-                        "chain": [
-                            "php-http/guzzle5-adapter"
-                        ],
-                        "depth": 0,
-                        "direct_dependents": [
-                            "php-http/guzzle5-adapter",
-                            "php-http/httplug-bundle"
-                        ],
-                        "signal_ids": [
-                            "S1",
-                            "S2",
-                            "S3",
-                            "S7"
-                        ],
-                        "age": {
-                            "installed": {
-                                "at": "2019-02-05T12:28:45+00:00",
-                                "years": 7.7,
-                                "dated_by": null
-                            },
-                            "installed_unmeasured": null,
-                            "release": {
-                                "version": "2.0.0",
-                                "at": "2019-02-05T12:28:45+00:00",
-                                "years": 7.7,
-                                "level": "high",
-                                "dated_by": null
-                            },
-                            "release_unmeasured": null,
-                            "branch_release": {
-                                "version": "2.0.0",
-                                "at": "2019-02-05T12:28:45+00:00",
-                                "years": 7.7,
-                                "level": "high",
-                                "dated_by": null
-                            },
-                            "branch_release_unmeasured": null,
-                            "push": {
-                                "at": "2024-01-06T12:25:01+00:00",
-                                "years": 2.8,
-                                "level": null
-                            },
-                            "push_unmeasured": null
-                        },
-                        "term": {
-                            "part": "maintenance",
-                            "flag": "abandoned",
-                            "role": "lead",
-                            "weight": 32,
-                            "divisor": 1,
-                            "points": 32,
-                            "contribution": 32
-                        }
-                    },
-                    "locations": [
-                        {
-                            "physicalLocation": {
-                                "artifactLocation": {
-                                    "uri": "composer.lock",
-                                    "uriBaseId": "%SRCROOT%"
-                                },
-                                "region": {
-                                    "startLine": 6719
                                 }
                             }
                         }
@@ -6842,7 +6937,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-kbc7-dq62-pt7d",
-                    "ruleIndex": 39,
+                    "ruleIndex": 40,
                     "level": "error",
                     "rank": 80.0,
                     "message": {
@@ -6987,7 +7082,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-qv5y-crcz-9nxw",
-                    "ruleIndex": 40,
+                    "ruleIndex": 41,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -7076,7 +7171,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-px1b-j2dd-31r6",
-                    "ruleIndex": 41,
+                    "ruleIndex": 42,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -7190,7 +7285,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-km2b-zc3b-mjm3",
-                    "ruleIndex": 42,
+                    "ruleIndex": 43,
                     "level": "error",
                     "rank": 80.0,
                     "message": {
@@ -7307,7 +7402,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-smrh-yx37-92ws",
-                    "ruleIndex": 43,
+                    "ruleIndex": 44,
                     "level": "error",
                     "rank": 80.0,
                     "message": {
@@ -7370,7 +7465,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-12sz-bcny-pk4m",
-                    "ruleIndex": 44,
+                    "ruleIndex": 45,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -7431,7 +7526,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-432p-hv1d-chf7",
-                    "ruleIndex": 45,
+                    "ruleIndex": 46,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -7492,7 +7587,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-zh4j-by9m-7mz8",
-                    "ruleIndex": 46,
+                    "ruleIndex": 47,
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
@@ -7553,7 +7648,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-4wjj-gy1p-ft3r",
-                    "ruleIndex": 47,
+                    "ruleIndex": 48,
                     "level": "error",
                     "rank": 80.0,
                     "message": {
@@ -7765,7 +7860,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-4g5g-4rkv-myqs",
-                    "ruleIndex": 48,
+                    "ruleIndex": 49,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -7890,7 +7985,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-6j95-1jtb-x6wc",
-                    "ruleIndex": 49,
+                    "ruleIndex": 50,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -7962,7 +8057,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-8j6w-3kr7-s9xk",
-                    "ruleIndex": 50,
+                    "ruleIndex": 51,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -8034,7 +8129,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-cbx2-m9db-bmzd",
-                    "ruleIndex": 51,
+                    "ruleIndex": 52,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -8203,7 +8298,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-28rh-rzzn-djk4",
-                    "ruleIndex": 52,
+                    "ruleIndex": 53,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -8449,7 +8544,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-bf7t-jnpz-492k",
-                    "ruleIndex": 53,
+                    "ruleIndex": 54,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -8598,7 +8693,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-yc7t-91v9-99xs",
-                    "ruleIndex": 54,
+                    "ruleIndex": 55,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -8766,7 +8861,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-5r1g-c7b7-y1zg",
-                    "ruleIndex": 55,
+                    "ruleIndex": 56,
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
@@ -8990,7 +9085,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-w2tw-kmfg-rt9s",
-                    "ruleIndex": 56,
+                    "ruleIndex": 57,
                     "level": "note",
                     "rank": 20.0,
                     "message": {
@@ -9148,7 +9243,7 @@
                 },
                 {
                     "ruleId": "lockrot/pinned",
-                    "ruleIndex": 57,
+                    "ruleIndex": 58,
                     "level": "note",
                     "rank": 75.0,
                     "message": {
@@ -9240,7 +9335,7 @@
                 },
                 {
                     "ruleId": "lockrot/stale",
-                    "ruleIndex": 58,
+                    "ruleIndex": 59,
                     "level": "note",
                     "rank": 25.0,
                     "message": {
@@ -9404,7 +9499,7 @@
                 },
                 {
                     "ruleId": "lockrot/stale",
-                    "ruleIndex": 58,
+                    "ruleIndex": 59,
                     "level": "note",
                     "rank": 25.0,
                     "message": {
@@ -9566,7 +9661,7 @@
                 },
                 {
                     "ruleId": "lockrot/stale",
-                    "ruleIndex": 58,
+                    "ruleIndex": 59,
                     "level": "note",
                     "rank": 25.0,
                     "message": {
@@ -12214,7 +12309,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "scheb/2fa-backup-code v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-backup-code ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it."
+                        "text": "scheb/2fa-backup-code v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-backup-code ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-backup-code"
@@ -12303,7 +12398,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "scheb/2fa-bundle v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and scheb/2fa-backup-code v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-qr-code v5.13.2 (requires self.version; itself abandoned) and scheb/2fa-trusted-device v5.13.2 (requires self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it."
+                        "text": "scheb/2fa-bundle v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and scheb/2fa-backup-code v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-qr-code v5.13.2 (requires self.version; itself abandoned) and scheb/2fa-trusted-device v5.13.2 (requires self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-bundle"
@@ -12402,7 +12497,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "scheb/2fa-email v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-06-08), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-email ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it."
+                        "text": "scheb/2fa-email v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-06-08), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-email ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-email"
@@ -12496,7 +12591,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "scheb/2fa-google-authenticator v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-google-authenticator ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it."
+                        "text": "scheb/2fa-google-authenticator v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-google-authenticator ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-google-authenticator"
@@ -12586,7 +12681,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "scheb/2fa-trusted-device v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-trusted-device ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it."
+                        "text": "scheb/2fa-trusted-device v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-trusted-device ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-trusted-device"
@@ -16207,7 +16302,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-7qs6-zvnz-h66r",
-                    "ruleIndex": 59,
+                    "ruleIndex": 60,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -16322,7 +16417,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-gm5x-j3mz-71n9",
-                    "ruleIndex": 60,
+                    "ruleIndex": 61,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -16383,7 +16478,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-jj5t-2zs1-dcfm",
-                    "ruleIndex": 61,
+                    "ruleIndex": 62,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -16444,7 +16539,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-vznr-tgp9-fd7d",
-                    "ruleIndex": 62,
+                    "ruleIndex": 63,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -16505,7 +16600,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-z7t6-zt6p-wtng",
-                    "ruleIndex": 63,
+                    "ruleIndex": 64,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -16644,7 +16739,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-35by-yxtt-jc85",
-                    "ruleIndex": 64,
+                    "ruleIndex": 65,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -17026,7 +17121,7 @@
                 },
                 {
                     "ruleId": "lockrot/stale",
-                    "ruleIndex": 58,
+                    "ruleIndex": 59,
                     "level": "note",
                     "rank": 25.0,
                     "message": {
@@ -17086,7 +17181,7 @@
                 },
                 {
                     "ruleId": "lockrot/stale",
-                    "ruleIndex": 58,
+                    "ruleIndex": 59,
                     "level": "warning",
                     "rank": 50.0,
                     "message": {
@@ -17180,7 +17275,7 @@
                 },
                 {
                     "ruleId": "lockrot/stale",
-                    "ruleIndex": 58,
+                    "ruleIndex": 59,
                     "level": "warning",
                     "rank": 50.0,
                     "message": {
@@ -17273,7 +17368,7 @@
                 },
                 {
                     "ruleId": "lockrot/stale",
-                    "ruleIndex": 58,
+                    "ruleIndex": 59,
                     "level": "warning",
                     "rank": 50.0,
                     "message": {
@@ -17364,8 +17459,111 @@
                     ]
                 },
                 {
+                    "ruleId": "lockrot/capped",
+                    "ruleIndex": 39,
+                    "level": "note",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "laminas/laminas-code 4.7.1 \u2014 finding medium, 8 = capped 8 \u2014 capped: requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded. Do: raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "laminas/laminas-code"
+                    },
+                    "suppressions": [
+                        {
+                            "kind": "external",
+                            "status": "accepted",
+                            "justification": "covered by lockrot-baseline.json (known since 2024-11-03)"
+                        }
+                    ],
+                    "properties": {
+                        "package": "laminas/laminas-code",
+                        "version": "4.7.1",
+                        "verdict": "medium",
+                        "priority": "medium",
+                        "lead": "capped",
+                        "score_total": 8,
+                        "score_text": "8 = capped 8",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "capped"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": "known",
+                        "error_by": [],
+                        "chain": [
+                            "laminas/laminas-code"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "doctrine/doctrine-migrations-bundle",
+                            "doctrine/migrations",
+                            "friendsofphp/proxy-manager-lts",
+                            "laminas/laminas-code",
+                            "symfony/proxy-manager-bridge"
+                        ],
+                        "signal_ids": [
+                            "S11"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2022-11-21T01:32:31+00:00",
+                                "years": 3.9,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "4.17.0",
+                                "at": "2025-11-01T09:38:14+00:00",
+                                "years": 0.9,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "4.17.0",
+                                "at": "2025-11-01T09:38:14+00:00",
+                                "years": 0.9,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-09-08T13:11:10+00:00",
+                                "years": 0.1,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "capped",
+                            "role": "lead",
+                            "weight": 8,
+                            "divisor": 1,
+                            "points": 8,
+                            "contribution": 8
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 5393
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
                     "ruleId": "lockrot/stale",
-                    "ruleIndex": 58,
+                    "ruleIndex": 59,
                     "level": "note",
                     "rank": 50.0,
                     "message": {
@@ -17465,7 +17663,7 @@
                 },
                 {
                     "ruleId": "lockrot/stale",
-                    "ruleIndex": 58,
+                    "ruleIndex": 59,
                     "level": "warning",
                     "rank": 50.0,
                     "message": {
@@ -18805,7 +19003,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-j5hk-b83d-1p4h",
-                    "ruleIndex": 65,
+                    "ruleIndex": 66,
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
@@ -18919,7 +19117,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-dwsq-ppd2-mb1x",
-                    "ruleIndex": 66,
+                    "ruleIndex": 67,
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
@@ -19063,7 +19261,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-b14r-zh1d-vdrc",
-                    "ruleIndex": 67,
+                    "ruleIndex": 68,
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
@@ -19179,7 +19377,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-ft77-7h5f-p3r6",
-                    "ruleIndex": 68,
+                    "ruleIndex": 69,
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
@@ -19240,7 +19438,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-v5yj-8nmz-sk2q",
-                    "ruleIndex": 69,
+                    "ruleIndex": 70,
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
@@ -19301,7 +19499,7 @@
                 },
                 {
                     "ruleId": "lockrot/stale",
-                    "ruleIndex": 58,
+                    "ruleIndex": 59,
                     "level": "note",
                     "rank": 25.0,
                     "message": {
@@ -19401,7 +19599,7 @@
                 },
                 {
                     "ruleId": "lockrot/stale",
-                    "ruleIndex": 58,
+                    "ruleIndex": 59,
                     "level": "note",
                     "rank": 25.0,
                     "message": {
@@ -19502,7 +19700,7 @@
                 },
                 {
                     "ruleId": "lockrot/stale",
-                    "ruleIndex": 58,
+                    "ruleIndex": 59,
                     "level": "warning",
                     "rank": 25.0,
                     "message": {

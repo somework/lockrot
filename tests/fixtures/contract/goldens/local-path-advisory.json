@@ -1,5 +1,5 @@
 {
-    "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+    "score_text": "34 = pinned 16 + capped 2 [¼ of 8] + vulnerable 16 [high advisory]",
     "next_step_text": "no move: it is installed from a local path (your own package)",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",

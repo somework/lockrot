@@ -23,6 +23,8 @@ final class MoveFact implements \JsonSerializable
     public const BRANCH_NOT_RELEASING = 'branch_not_releasing';
     public const UNDATED = 'undated';
     public const NO_RELEASE_DATA = 'no_release_data';
+    public const ADMITS_NEWEST_PHP = 'admits_newest_php';
+    public const STOPS_BELOW_NEWEST_PHP = 'stops_below_newest_php';
 
     /** @var self::FLAG|self::ADVISORY */
     private string $kind;

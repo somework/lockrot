@@ -40,25 +40,40 @@
      "source": null
     },
     "summary": "marked abandoned by its registry, replacement: laminas/laminas-eventmanager; last release 2018-04-25 (8.4 years ago)"
+   },
+   {
+    "id": "capped",
+    "role": "corroborating",
+    "baseline": null,
+    "signal_ids": [
+     "S11"
+    ],
+    "degree": null,
+    "headline": {
+     "unit": "php_minor",
+     "value": "7.4",
+     "source": null
+    },
+    "summary": "requires php ^5.6 || ^7.0: it stops at 7.4, so the newest PHP, 8.5, is excluded"
    }
   ],
   "score": {
    "model": 1,
-   "total": 16,
-   "exact": 16,
+   "total": 17,
+   "exact": 17,
    "rounded_down": false,
    "band": {
     "floor": 16,
     "next": "critical",
-    "to_next": 16
+    "to_next": 15
    },
    "decided_by": "maintenance",
    "parts": {
     "maintenance": {
      "status": "counted",
-     "contribution": 16,
+     "contribution": 17,
      "alone": {
-      "total": 16,
+      "total": 17,
       "verdict": "high"
      }
     },
@@ -82,6 +97,15 @@
      "divisor": 1,
      "points": 32,
      "contribution": 16
+    },
+    {
+     "part": "maintenance",
+     "flag": "capped",
+     "role": "corroborating",
+     "weight": 8,
+     "divisor": 4,
+     "points": 2,
+     "contribution": 1
     }
    ],
    "modifiers": [
@@ -89,13 +113,43 @@
      "reason": "transitive",
      "applies_to": "maintenance",
      "divide_by": 2,
-     "before": 32,
-     "after": 16
+     "before": 34,
+     "after": 17
     }
    ],
    "accepted": [],
-   "without": [],
-   "text": "16 = abandoned 32 ÷ 2 transitive"
+   "without": [
+    {
+     "remove": {
+      "kind": "flag",
+      "id": "abandoned"
+     },
+     "revealed": [
+      {
+       "flag": "stale",
+       "role": "lead"
+      }
+     ],
+     "total": 5,
+     "verdict": "low",
+     "lead": "stale",
+     "deciding_advisory": null,
+     "at_least": true
+    },
+    {
+     "remove": {
+      "kind": "flag",
+      "id": "capped"
+     },
+     "revealed": [],
+     "total": 16,
+     "verdict": "high",
+     "lead": "abandoned",
+     "deciding_advisory": null,
+     "at_least": false
+    }
+   ],
+   "text": "17 = (abandoned 32 + capped 2 [¼ of 8]) ÷ 2 transitive"
   },
   "next_step": {
    "kind": "replace",
@@ -126,6 +180,10 @@
     {
      "kind": "flag",
      "id": "abandoned"
+    },
+    {
+     "kind": "flag",
+     "id": "capped"
     }
    ],
    "clears_all": false,
@@ -248,9 +306,22 @@
      "years": 8.4,
      "dated_by": null
     }
+   },
+   {
+    "id": "S11",
+    "level": "warn",
+    "summary": "php \"^5.6 || ^7.0\" stops at 7.4; the newest PHP, 8.5, is excluded",
+    "data": {
+     "newest_php": "8.5",
+     "newest_php_source": "known",
+     "requires": "^5.6 || ^7.0",
+     "stops_at": "7.4",
+     "excludes_target": true,
+     "admits_newest": null
+    }
    }
   ],
-  "evidence": "abandoned: marked abandoned by its registry, replacement: laminas/laminas-eventmanager; last release 2018-04-25 (8.4 years ago)",
+  "evidence": "abandoned: marked abandoned by its registry, replacement: laminas/laminas-eventmanager; last release 2018-04-25 (8.4 years ago); capped: requires php ^5.6 || ^7.0: it stops at 7.4, so the newest PHP, 8.5, is excluded",
   "allowlist_reason": null,
   "data_date": "2026-10-01T17:41:20+00:00",
   "libyears": 0,
@@ -344,6 +415,7 @@
    "left-behind",
    "old-promise",
    "stale",
+   "capped",
    "vulnerable"
   ],
   "verdicts": [
@@ -371,7 +443,8 @@
    "S7",
    "S8",
    "S9",
-   "S10"
+   "S10",
+   "S11"
   ],
   "fail_on": "high",
   "fail_on_source": "option",
@@ -394,6 +467,7 @@
     "left-behind",
     "old-promise",
     "stale",
+    "capped",
     "vulnerable"
    ],
    "parts": [
@@ -405,7 +479,8 @@
       "pinned",
       "left-behind",
       "old-promise",
-      "stale"
+      "stale",
+      "capped"
      ],
      "combine": "lead_plus_share"
     },
@@ -545,9 +620,10 @@
      "band": "medium",
      "can_corroborate": true,
      "corroborating_points": 2,
-     "max_maintenance": 8,
+     "max_maintenance": 10,
      "max_maintenance_flags": [
-      "stale"
+      "stale",
+      "capped"
      ],
      "raised_by": [
       "S2",
@@ -559,6 +635,27 @@
      ],
      "basis": {
       "v013_base": "medium",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "capped",
+     "part": "maintenance",
+     "points": 8,
+     "band": "medium",
+     "can_corroborate": true,
+     "corroborating_points": 2,
+     "max_maintenance": 8,
+     "max_maintenance_flags": [
+      "capped"
+     ],
+     "raised_by": [
+      "S11"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": null,
       "points": "band_floor"
      },
      "points_from": null
@@ -755,6 +852,14 @@
       "threshold": "push-warn-years",
       "below": "release-warn-years"
      }
+    },
+    {
+     "id": "php_bound",
+     "flag_ids": [
+      "old-promise",
+      "capped"
+     ],
+     "holds_unless": null
     }
    ],
    "sort": [

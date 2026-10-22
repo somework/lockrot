@@ -65,7 +65,7 @@
         "jms/serializer": "ok",
         "jms/serializer-bundle": "ok",
         "laminas/laminas-code": "ok",
-        "lcobucci/clock": "ok",
+        "lcobucci/clock": "low",
         "lcobucci/jwt": "high",
         "league/html-to-markdown": "ok",
         "league/uri": "ok",
@@ -208,6 +208,7 @@
         "scheb/2fa-google-authenticator": 3,
         "friendsofsymfony/oauth-server-bundle": 2,
         "friendsofsymfony/rest-bundle": 2,
+        "scheb/2fa-trusted-device": 2,
         "craue/config-bundle": 1,
         "doctrine/doctrine-bundle": 1,
         "doctrine/doctrine-migrations-bundle": 1,
@@ -215,18 +216,18 @@
         "friendsofsymfony/jsrouting-bundle": 1,
         "friendsofsymfony/user-bundle": 1,
         "j0k3r/graby": 1,
+        "lcobucci/jwt": 1,
         "nelmio/api-doc-bundle": 1,
         "pagerfanta/doctrine-orm-adapter": 1,
         "pragmarx/recovery": 1,
         "scheb/2fa-backup-code": 1,
         "scheb/2fa-bundle": 1,
         "scheb/2fa-email": 1,
-        "scheb/2fa-trusted-device": 1,
         "sensio/framework-extra-bundle": 1,
         "sentry/sentry-symfony": 1,
         "spiriitlabs/form-filter-bundle": 1,
         "stof/doctrine-extensions-bundle": 1,
         "symfony/security-bundle": 1
     },
-    "exposure_summary_line": "pulled in by: wallabag/rulerz-bundle 15 \u00b7 wallabag/rulerz 14 \u00b7 wallabag/phpepub 5 \u00b7 scheb/2fa-google-authenticator 3 \u00b7 friendsofsymfony/oauth-server-bundle 2 \u00b7 \u2026 and 20 more"
+    "exposure_summary_line": "pulled in by: wallabag/rulerz-bundle 15 \u00b7 wallabag/rulerz 14 \u00b7 wallabag/phpepub 5 \u00b7 scheb/2fa-google-authenticator 3 \u00b7 friendsofsymfony/oauth-server-bundle 2 \u00b7 \u2026 and 21 more"
 }

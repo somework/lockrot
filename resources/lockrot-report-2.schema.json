@@ -221,7 +221,7 @@
       "x-deprecated": true
     },
     "flags": {
-      "description": "Per flag, all seven: an object keyed by flag id at the root.",
+      "description": "Per flag, all eight: an object keyed by flag id at the root.",
       "type": "object",
       "required": [
         "abandoned",
@@ -230,6 +230,7 @@
         "left-behind",
         "old-promise",
         "stale",
+        "capped",
         "vulnerable"
       ],
       "properties": {
@@ -249,6 +250,9 @@
           "$ref": "#/definitions/rootFlagMaintenance"
         },
         "stale": {
+          "$ref": "#/definitions/rootFlagMaintenance"
+        },
+        "capped": {
           "$ref": "#/definitions/rootFlagMaintenance"
         },
         "vulnerable": {
@@ -1204,7 +1208,8 @@
         "S7",
         "S8",
         "S9",
-        "S10"
+        "S10",
+        "S11"
       ]
     },
     "advisoriesNotCheckedReason": {
@@ -1219,7 +1224,7 @@
       ]
     },
     "flag": {
-      "description": "A flag id, in the frozen flag order `abandoned silent pinned left-behind old-promise stale vulnerable`. Closed: a new flag is a report-3 event.",
+      "description": "A flag id, in the frozen flag order `abandoned silent pinned left-behind old-promise stale capped vulnerable`. Closed: a new flag is a report-3 event.",
       "type": "string",
       "enum": [
         "abandoned",
@@ -1228,6 +1233,7 @@
         "left-behind",
         "old-promise",
         "stale",
+        "capped",
         "vulnerable"
       ]
     },
@@ -1240,7 +1246,8 @@
         "pinned",
         "left-behind",
         "old-promise",
-        "stale"
+        "stale",
+        "capped"
       ]
     },
     "verdict": {
@@ -1350,14 +1357,15 @@
           "minLength": 1
         },
         "basis": {
-          "description": "Why it is cleared: `branch_releasing` (left-behind: the branch released within `release-warn-years`), `released_after_ga` (old-promise: the lowest admitted release came out after the target major's GA), `outside_range` (an advisory: no admitted version is inside its range), `tags_only` (pinned: the constraint admits only tags). An open set: read an unknown basis as another reason the fact is cleared.",
+          "description": "Why it is cleared: `branch_releasing` (left-behind: the branch released within `release-warn-years`), `released_after_ga` (old-promise: the lowest admitted release came out after the target major's GA), `outside_range` (an advisory: no admitted version is inside its range), `tags_only` (pinned: the constraint admits only tags), `admits_newest_php` (capped: the release the move installs admits the newest PHP minor that the project allows). An open set: read an unknown basis as another reason the fact is cleared.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
             "branch_releasing",
             "released_after_ga",
             "outside_range",
-            "tags_only"
+            "tags_only",
+            "admits_newest_php"
           ]
         }
       }
@@ -1408,12 +1416,13 @@
           "minLength": 1
         },
         "basis": {
-          "description": "Why the move raises it: `released_before_ga` (a tag released before the target major's GA, with an open `require.php`, adds old-promise), `branch_not_releasing` (a tag on a line that has not released in `release-warn-years` while a higher line has, S8's own rule, adds left-behind). An open set: read an unknown basis as another reason.",
+          "description": "Why the move raises it: `released_before_ga` (a tag released before the target major's GA, with an open `require.php`, adds old-promise), `branch_not_releasing` (a tag on a line that has not released in `release-warn-years` while a higher line has, S8's own rule, adds left-behind), `stops_below_newest_php` (an `update`, `require`, `raise-php` or `tag` move to a release whose `require.php` stops below the newest PHP minor that the project allows, S11's own rule, adds capped). An open set: read an unknown basis as another reason.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
             "released_before_ga",
-            "branch_not_releasing"
+            "branch_not_releasing",
+            "stops_below_newest_php"
           ]
         }
       }
@@ -3336,7 +3345,7 @@
           ]
         },
         {
-          "description": "Under score model 1 each term carries model 1's weight for its flag (abandoned 32, silent 32, pinned 16, left-behind 16, old-promise 16, stale 8) or for its severity (critical 32, high 16, medium 8, unrated 8, low 2).",
+          "description": "Under score model 1 each term carries model 1's weight for its flag (abandoned 32, silent 32, pinned 16, left-behind 16, old-promise 16, stale 8, capped 8) or for its severity (critical 32, high 16, medium 8, unrated 8, low 2).",
           "anyOf": [
             {
               "properties": {
@@ -3459,6 +3468,25 @@
                           "flag": {
                             "enum": [
                               "stale"
+                            ]
+                          },
+                          "weight": {
+                            "enum": [
+                              8
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "properties": {
+                          "part": {
+                            "enum": [
+                              "maintenance"
+                            ]
+                          },
+                          "flag": {
+                            "enum": [
+                              "capped"
                             ]
                           },
                           "weight": {
@@ -4241,7 +4269,7 @@
           ]
         },
         "reason": {
-          "description": "Set exactly on `no-move`: `package_quiet` (stale), `no_higher_release` and `higher_undated` (left-behind), `releases_unknown` (vulnerable), `affected_range_unknown` (vulnerable: the releases were read, but no counted advisory names the versions it affects), `metadata_not_read` (pinned: its releases were never read, so lockrot cannot say whether a tag exists) and `local_package` (pinned: installed from a local path, the project's own package). An open set.",
+          "description": "Set exactly on `no-move`: `package_quiet` (stale), `no_higher_release` and `higher_undated` (left-behind), `releases_unknown` (vulnerable), `affected_range_unknown` (vulnerable: the releases were read, but no counted advisory names the versions it affects), `metadata_not_read` (pinned or capped: its releases were never read, so lockrot cannot say whether a tag exists or a release admits the newest PHP), `local_package` (pinned or capped: installed from a local path, the project's own package) and `no_release_admits` (capped: no stable release above the installed one admits S11's `newest_php`). An open set.",
           "oneOf": [
             {
               "type": "string",
@@ -4253,7 +4281,8 @@
                 "releases_unknown",
                 "affected_range_unknown",
                 "metadata_not_read",
-                "local_package"
+                "local_package",
+                "no_release_admits"
               ]
             },
             {
@@ -5432,7 +5461,7 @@
           ]
         },
         "reason": {
-          "description": "Set exactly on `no-move`: `package_quiet` (stale), `no_higher_release` and `higher_undated` (left-behind), `releases_unknown` (vulnerable), `affected_range_unknown` (vulnerable: the releases were read, but no counted advisory names the versions it affects), `metadata_not_read` (pinned: its releases were never read, so lockrot cannot say whether a tag exists) and `local_package` (pinned: installed from a local path, the project's own package). An open set.",
+          "description": "Set exactly on `no-move`: `package_quiet` (stale), `no_higher_release` and `higher_undated` (left-behind), `releases_unknown` (vulnerable), `affected_range_unknown` (vulnerable: the releases were read, but no counted advisory names the versions it affects), `metadata_not_read` (pinned or capped: its releases were never read, so lockrot cannot say whether a tag exists or a release admits the newest PHP), `local_package` (pinned or capped: installed from a local path, the project's own package) and `no_release_admits` (capped: no stable release above the installed one admits S11's `newest_php`). An open set.",
           "oneOf": [
             {
               "type": "string",
@@ -5444,7 +5473,8 @@
                 "releases_unknown",
                 "affected_range_unknown",
                 "metadata_not_read",
-                "local_package"
+                "local_package",
+                "no_release_admits"
               ]
             },
             {
@@ -7980,12 +8010,13 @@
           "enum": [
             "years",
             "php",
+            "php_minor",
             "reason",
             "advisories"
           ]
         },
         "value": {
-          "description": "A years field (`years`, null for a liveness word with no dated reading), the PHP major the release was written for (`php`), a reason id worded by the page (`reason`), or the count of counted advisories (`advisories`).",
+          "description": "A years field (`years`, null for a liveness word with no dated reading), the PHP major the release was written for (`php`), the PHP minor the installed `require.php` stops at (`php_minor`), a reason id worded by the page (`reason`), or the count of counted advisories (`advisories`).",
           "type": [
             "number",
             "string",
@@ -8097,6 +8128,23 @@
             "value": {
               "type": "integer",
               "minimum": 1
+            },
+            "source": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "description": "`php_minor` (capped: S11 `stops_at`).",
+          "properties": {
+            "unit": {
+              "enum": [
+                "php_minor"
+              ]
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+$"
             },
             "source": {
               "type": "null"
@@ -8351,6 +8399,28 @@
           }
         },
         {
+          "description": "`capped`: headline `php_minor`.",
+          "properties": {
+            "id": {
+              "enum": [
+                "capped"
+              ]
+            },
+            "degree": {
+              "type": "null"
+            },
+            "headline": {
+              "properties": {
+                "unit": {
+                  "enum": [
+                    "php_minor"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
           "description": "`vulnerable`: no degree, its baseline is null (its advisories carry theirs), headline `advisories`; its role is not constrained (open).",
           "properties": {
             "id": {
@@ -8378,7 +8448,7 @@
       ],
       "allOf": [
         {
-          "description": "A flag names only the signals that raise or date it: abandoned S1 S3 S2 S4, silent and stale S2 S4, pinned S6, left-behind S8, old-promise S5, vulnerable S9; a signal id this schema does not list is not constrained.",
+          "description": "A flag names only the signals that raise or date it: abandoned S1 S3 S2 S4, silent and stale S2 S4, pinned S6, left-behind S8, old-promise S5, capped S11, vulnerable S9; a signal id this schema does not list is not constrained.",
           "anyOf": [
             {
               "properties": {
@@ -8410,7 +8480,8 @@
                             "S7",
                             "S8",
                             "S9",
-                            "S10"
+                            "S10",
+                            "S11"
                           ]
                         }
                       }
@@ -8447,7 +8518,8 @@
                             "S7",
                             "S8",
                             "S9",
-                            "S10"
+                            "S10",
+                            "S11"
                           ]
                         }
                       }
@@ -8484,7 +8556,8 @@
                             "S7",
                             "S8",
                             "S9",
-                            "S10"
+                            "S10",
+                            "S11"
                           ]
                         }
                       }
@@ -8520,7 +8593,8 @@
                             "S7",
                             "S8",
                             "S9",
-                            "S10"
+                            "S10",
+                            "S11"
                           ]
                         }
                       }
@@ -8556,7 +8630,8 @@
                             "S7",
                             "S8",
                             "S9",
-                            "S10"
+                            "S10",
+                            "S11"
                           ]
                         }
                       }
@@ -8592,7 +8667,45 @@
                             "S7",
                             "S8",
                             "S9",
-                            "S10"
+                            "S10",
+                            "S11"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "id": {
+                  "enum": [
+                    "capped"
+                  ]
+                },
+                "signal_ids": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "S11"
+                        ]
+                      },
+                      {
+                        "not": {
+                          "enum": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4",
+                            "S5",
+                            "S6",
+                            "S7",
+                            "S8",
+                            "S9",
+                            "S10",
+                            "S11"
                           ]
                         }
                       }
@@ -8628,7 +8741,8 @@
                             "S7",
                             "S8",
                             "S9",
-                            "S10"
+                            "S10",
+                            "S11"
                           ]
                         }
                       }
@@ -9337,6 +9451,19 @@
                               }
                             },
                             "stale": {
+                              "description": "One recorded flag.",
+                              "type": "object",
+                              "required": [
+                                "known_since"
+                              ],
+                              "properties": {
+                                "known_since": {
+                                  "description": "The date it was first known (baseline-2 stores a date for every fact).",
+                                  "$ref": "#/definitions/date"
+                                }
+                              }
+                            },
+                            "capped": {
                               "description": "One recorded flag.",
                               "type": "object",
                               "required": [
@@ -11017,8 +11144,92 @@
         }
       }
     },
+    "s11": {
+      "description": "S11: the installed release's `require.php` has a finite upper bound and admits no PHP at or above the newest minor that the root php allows; it raises `capped`. A `release_metadata` entry beside it lists S11 in `blocks`, and only `admits_newest` is unread.",
+      "type": "object",
+      "required": [
+        "newest_php",
+        "newest_php_source",
+        "requires",
+        "stops_at",
+        "excludes_target",
+        "admits_newest"
+      ],
+      "properties": {
+        "newest_php": {
+          "description": "R: the newest known PHP minor that the root php (composer.json `require.php`, else the lock's `platform.php`) admits.",
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+$"
+        },
+        "newest_php_source": {
+          "description": "Why `newest_php` is R: `known` when R is the newest known minor, with a root php or without; `require_php` when composer.json's `require.php` limits R below it; `platform_php` when the lock's `platform.php` limits it in a run with no root `require.php`. Closed.",
+          "type": "string",
+          "enum": [
+            "known",
+            "require_php",
+            "platform_php"
+          ]
+        },
+        "requires": {
+          "description": "The installed release's `require.php`, as `installed_php.requires`.",
+          "type": "string",
+          "minLength": 1
+        },
+        "stops_at": {
+          "description": "The newest known PHP minor that `requires` admits.",
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+$"
+        },
+        "excludes_target": {
+          "description": "Exactly `installed_php.target_runs` false: no patch of the target minor meets `requires`.",
+          "type": "boolean"
+        },
+        "admits_newest": {
+          "description": "The newest release whose `require.php` admits `newest_php`, on the lowest branch that has such a release, among the stable releases above the installed one; above a snapshot, those from X.Y.0 of an `X.Y.x-dev` or aliased snapshot, else those dated after the lock entry's `time`. Null when none does, or when the release metadata was not read.",
+          "oneOf": [
+            {
+              "description": "A release that admits the newest PHP.",
+              "type": "object",
+              "required": [
+                "version",
+                "branch",
+                "blocking"
+              ],
+              "properties": {
+                "version": {
+                  "description": "The release.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "branch": {
+                  "$ref": "#/definitions/branchLabel"
+                },
+                "blocking": {
+                  "description": "What holds the release back: `project` (the project's lowest PHP is outside its `require.php`), `target` (no patch of the target minor is inside it); null when nothing does. Closed.",
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "project",
+                        "target"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
     "signal": {
-      "description": "A signal: S1–S10 as in report-1, with the data keys report-2 adds; typed per id by the branches below.",
+      "description": "A signal: S1–S10 as in report-1 and S11 (report-2), with the data keys report-2 adds; typed per id by the branches below.",
       "type": "object",
       "required": [
         "id",
@@ -11034,7 +11245,7 @@
           "$ref": "#/definitions/level"
         },
         "summary": {
-          "description": "The signal sentence, `SignalSentence`: S1–S6 and S8 from their `data`, S7 from `data.packages[]`, S9 from `security` and the S9 rows, S10 from `data.unchecked[]` and, for `host_not_supported`, `activity.host`. Prose, not contract; key on the fields it is rendered from.",
+          "description": "The signal sentence, `SignalSentence`: S1–S6, S8 and S11 from their `data`, S7 from `data.packages[]`, S9 from `security` and the S9 rows, S10 from `data.unchecked[]` and, for `host_not_supported`, `activity.host`. Prose, not contract; key on the fields it is rendered from.",
           "type": "string",
           "x-rendered-from": [
             "signals[].data",
@@ -11170,6 +11381,18 @@
           }
         },
         {
+          "properties": {
+            "id": {
+              "enum": [
+                "S11"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/s11"
+            }
+          }
+        },
+        {
           "description": "A signal whose id this schema does not list, from a later release or not from lockrot: its data is any object.",
           "not": {
             "properties": {
@@ -11184,7 +11407,8 @@
                   "S7",
                   "S8",
                   "S9",
-                  "S10"
+                  "S10",
+                  "S11"
                 ]
               }
             }
@@ -12782,7 +13006,7 @@
           }
         },
         "signals": {
-          "description": "S1–S10 that fired, as report-1 orders them.",
+          "description": "S1–S11 that fired, in id order.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/signal"
@@ -13316,6 +13540,40 @@
                             "flag": {
                               "enum": [
                                 "stale"
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "lead": {
+                  "enum": [
+                    "capped"
+                  ]
+                },
+                "score": {
+                  "required": [
+                    "terms"
+                  ],
+                  "properties": {
+                    "terms": {
+                      "items": [
+                        {
+                          "properties": {
+                            "part": {
+                              "enum": [
+                                "maintenance"
+                              ]
+                            },
+                            "flag": {
+                              "enum": [
+                                "capped"
                               ]
                             }
                           }
@@ -16332,6 +16590,25 @@
                                     "properties": {
                                       "part": {
                                         "enum": [
+                                          "maintenance"
+                                        ]
+                                      },
+                                      "flag": {
+                                        "enum": [
+                                          "capped"
+                                        ]
+                                      },
+                                      "weight": {
+                                        "enum": [
+                                          8
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "properties": {
+                                      "part": {
+                                        "enum": [
                                           "security"
                                         ]
                                       },
@@ -16854,6 +17131,50 @@
                   }
                 }
               ]
+            },
+            {
+              "anyOf": [
+                {
+                  "properties": {
+                    "score": {
+                      "properties": {
+                        "accepted": {
+                          "items": {
+                            "not": {
+                              "properties": {
+                                "flag": {
+                                  "enum": [
+                                    "capped"
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "flags": {
+                      "not": {
+                        "items": {
+                          "not": {
+                            "properties": {
+                              "id": {
+                                "enum": [
+                                  "capped"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
             }
           ],
           "description": "An accepted flag fired: each `score.accepted[].flag` has its `flags[]` entry."
@@ -17293,6 +17614,20 @@
                               "flag": {
                                 "enum": [
                                   "stale"
+                                ]
+                              },
+                              "weight": {
+                                "enum": [
+                                  8
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "properties": {
+                              "flag": {
+                                "enum": [
+                                  "capped"
                                 ]
                               },
                               "weight": {
@@ -19859,7 +20194,7 @@
                 ],
                 "properties": {
                   "v013_base": {
-                    "description": "The 0.13 band it is anchored to; null for `vulnerable`.",
+                    "description": "The 0.13 band it is anchored to; null for `capped` (0.13 had no such verdict) and `vulnerable`.",
                     "oneOf": [
                       {
                         "$ref": "#/definitions/grade"
@@ -19870,7 +20205,7 @@
                     ]
                   },
                   "points": {
-                    "description": "`band_floor` (its points are that band's floor) or `severities`. Open.",
+                    "description": "`band_floor` (its points are the floor of its 0.13 band, or of its own `band` when `v013_base` is null) or `severities`. Open.",
                     "type": "string",
                     "pattern": "^[a-z][a-z0-9_]*$",
                     "x-known-values": [
@@ -20129,7 +20464,8 @@
                   "liveness",
                   "branch",
                   "release_age",
-                  "release_push"
+                  "release_push",
+                  "php_bound"
                 ]
               },
               "flag_ids": {
@@ -20380,7 +20716,7 @@
       ],
       "allOf": [
         {
-          "description": "A value's kind follows the value: the four grades are `grade`, the six maintenance flags `flag`, `vulnerable` and `vulnerable-<severity>` `vulnerable`, `unchecked` `unchecked`; a value or a kind this schema does not list is not constrained.",
+          "description": "A value's kind follows the value: the four grades are `grade`, the seven maintenance flags `flag`, `vulnerable` and `vulnerable-<severity>` `vulnerable`, `unchecked` `unchecked`; a value or a kind this schema does not list is not constrained.",
           "anyOf": [
             {
               "properties": {
@@ -20408,7 +20744,8 @@
                     "pinned",
                     "left-behind",
                     "old-promise",
-                    "stale"
+                    "stale",
+                    "capped"
                   ]
                 },
                 "kind": {
@@ -20478,7 +20815,8 @@
                           "pinned",
                           "left-behind",
                           "old-promise",
-                          "stale"
+                          "stale",
+                          "capped"
                         ]
                       },
                       {
@@ -20643,6 +20981,20 @@
               "properties": {
                 "value": {
                   "enum": [
+                    "capped"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "capped"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
                     "vulnerable"
                   ]
                 },
@@ -20722,6 +21074,7 @@
                       "left-behind",
                       "old-promise",
                       "stale",
+                      "capped",
                       "vulnerable",
                       "vulnerable-medium",
                       "vulnerable-high",
@@ -20905,7 +21258,7 @@
           ]
         },
         "flag_ids": {
-          "description": "The seven flag ids in flag order (the vocabulary used, not a setting).",
+          "description": "The eight flag ids in flag order (the vocabulary used, not a setting).",
           "type": "array",
           "items": {
             "$ref": "#/definitions/flag"
@@ -20932,7 +21285,7 @@
           "uniqueItems": true
         },
         "signal_ids": {
-          "description": "The ten check ids, for the Checks strip (\"3 fired · 7 quiet\").",
+          "description": "The eleven check ids, for the Checks strip (\"3 fired · 8 quiet\").",
           "type": "array",
           "items": {
             "$ref": "#/definitions/signalId"
@@ -21265,18 +21618,19 @@
                   "left-behind",
                   "old-promise",
                   "stale",
+                  "capped",
                   "vulnerable"
                 ]
               ],
-              "description": "The seven flags, in flag order."
+              "description": "The eight flags, in flag order."
             }
           },
-          "description": "`flag_ids` is the seven flags in flag order."
+          "description": "`flag_ids` is the eight flags in flag order."
         },
         {
           "properties": {
             "signal_ids": {
-              "description": "S1 to S10 first, in order.",
+              "description": "S1 to S11 first, in order.",
               "items": [
                 {
                   "enum": [
@@ -21327,12 +21681,17 @@
                   "enum": [
                     "S10"
                   ]
+                },
+                {
+                  "enum": [
+                    "S11"
+                  ]
                 }
               ],
-              "minItems": 10
+              "minItems": 11
             }
           },
-          "description": "`signal_ids` begins with S1 to S10 in order (a later check is appended)."
+          "description": "`signal_ids` begins with S1 to S11 in order (a later check is appended)."
         },
         {
           "description": "`none` stands alone in `fail_on`.",

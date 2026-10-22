@@ -1,0 +1,17 @@
+{
+    "score_text": "24 = capped 8 + vulnerable 16 [high advisory] (pinned accepted)",
+    "next_step_text": "no move: it is installed from a local path (your own package)",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": null,
+    "explain_age": [
+        "installed  4.3.x-dev not read (a branch snapshot has no release branch)",
+        "4.x                  not read (not from a Composer repository)",
+        "newest               not read (not from a Composer repository)",
+        "last push            not read (not from a Composer repository)",
+        "libyears not measured: not from a Composer repository"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

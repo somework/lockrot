@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Security\Candidate;
 use Lockrot\Security\Fix;
 use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\Data\AbandonedData;
+use Lockrot\Signal\Data\CappedData;
 use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\Data\OldPromiseData;
 use Lockrot\Signal\Data\PinnedData;
@@ -34,6 +36,8 @@ final class MaintenanceMove
                 return self::leftBehind($context);
             case FlagSet::OLD_PROMISE:
                 return self::oldPromise($context);
+            case FlagSet::CAPPED:
+                return self::capped($context);
             default:
                 return MoveDraft::of(Move::NO_MOVE, $lead)->withReason('package_quiet');
         }
@@ -155,6 +159,32 @@ final class MaintenanceMove
         $released = $context->lastStableVersion() === null ? ($s5 === null ? null : $s5->released()) : $context->lastStableReleased();
 
         return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($version, $released, ltrim($version, 'vV') === ltrim($installedVersion, 'vV'), null, null), null);
+    }
+
+    /**
+     * A move to S11's `admits_newest`, read as that release's branch row: its kind is the class of
+     * the release, as {@see kindOf()} reads it (docs/verdicts.md#capped).
+     */
+    private static function capped(MoveContext $context): MoveDraft
+    {
+        $finding = $context->finding();
+        if (!$finding->isMaintenanceJudged()) {
+            return MoveDraft::of(Move::NO_MOVE, FlagSet::CAPPED)->withReason($finding->origin()->isLocal() ? 'local_package' : 'metadata_not_read');
+        }
+        $s11 = $finding->signalData(CappedData::class);
+        $admits = $s11 === null ? null : $s11->admitsNewest();
+        $release = $admits === null ? null : $context->release($admits['version']);
+        $lower = $release === null ? null : $context->candidate($release);
+        if ($lower !== null) {
+            $row = BranchRow::ofRelease($lower->release(), $lower->branchKey() === ReleaseBranch::of($context->subject()->version()), $context->floor());
+            if ($row !== null) {
+                $kind = self::kindOf($lower, $row);
+
+                return MoveDraft::of($kind, FlagSet::CAPPED)->to($row, $lower, \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? '^'.ltrim($lower->release()->pretty(), 'vV') : null);
+            }
+        }
+
+        return MoveDraft::of(Move::NO_MOVE, FlagSet::CAPPED)->withReason('no_release_admits');
     }
 
     private static function after(?\DateTimeImmutable $released, ?\DateTimeImmutable $ga): bool

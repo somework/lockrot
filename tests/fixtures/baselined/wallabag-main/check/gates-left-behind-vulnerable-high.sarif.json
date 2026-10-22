@@ -185,6 +185,25 @@
                                 ],
                                 "security-severity": "5.5"
                             }
+                        },
+                        {
+                            "id": "lockrot/capped",
+                            "name": "capped",
+                            "shortDescription": {
+                                "text": "capped: The installed version's php constraint stops below the newest PHP the project allows"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version's php requirement has an upper bound below the newest PHP minor that the project allows."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
                         }
                     ]
                 }
@@ -2570,6 +2589,7 @@
                             "scheb/2fa-trusted-device"
                         ],
                         "signal_ids": [
+                            "S7",
                             "S8"
                         ],
                         "age": {
@@ -7694,6 +7714,100 @@
                                 },
                                 "region": {
                                     "startLine": 2249
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/capped",
+                    "ruleIndex": 9,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "lcobucci/clock 3.3.1 \u2014 finding low, 4 = capped 8 \u00f7 2 transitive \u2014 capped: requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded. Do: raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt, scheb/2fa-trusted-device \u2014 clears capped; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 8.2 (a minor raise); the target php 8.4 runs it; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it; Composer's solver checked it against the lock."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "lcobucci/clock"
+                    },
+                    "properties": {
+                        "package": "lcobucci/clock",
+                        "version": "3.3.1",
+                        "verdict": "low",
+                        "priority": "low",
+                        "lead": "capped",
+                        "score_total": 4,
+                        "score_text": "4 = capped 8 \u00f7 2 transitive",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "capped"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": "new",
+                        "error_by": [],
+                        "chain": [
+                            "lcobucci/jwt",
+                            "lcobucci/clock"
+                        ],
+                        "depth": 1,
+                        "direct_dependents": [
+                            "lcobucci/jwt",
+                            "scheb/2fa-trusted-device"
+                        ],
+                        "signal_ids": [
+                            "S11"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2024-09-24T20:45:14+00:00",
+                                "years": 2.1,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "3.6.0",
+                                "at": "2026-04-13T21:30:16+00:00",
+                                "years": 0.5,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "3.6.0",
+                                "at": "2026-04-13T21:30:16+00:00",
+                                "years": 0.5,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-09-13T02:11:22+00:00",
+                                "years": 0.1,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "capped",
+                            "role": "lead",
+                            "weight": 8,
+                            "divisor": 1,
+                            "points": 8,
+                            "contribution": 4
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4876
                                 }
                             }
                         }

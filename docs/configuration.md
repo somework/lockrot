@@ -48,7 +48,7 @@ one value of each kind. The key also takes a JSON array. lockrot trims and lower
 | Kind | Values | A finding reaches it when |
 |---|---|---|
 | `grade` | `critical`, `high`, `medium`, `low` | Its gate score is in that [grade](verdicts.md#the-nine-verdicts) or a higher one |
-| `flag` | `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale` | It carries a counted maintenance [flag](verdicts.md#flags) at or above the value in flag order |
+| `flag` | `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`, `capped` | It carries a counted maintenance [flag](verdicts.md#flags) at or above the value in flag order |
 | `vulnerable` | `vulnerable`, `vulnerable-medium`, `vulnerable-high`, `vulnerable-critical` | A counted advisory has that [severity](verdicts.md#severity) or a higher one. `vulnerable` takes any severity |
 | `unchecked` | `unchecked` | It carries [S10](verdicts.md#what-was-not-checked) |
 | No value | `none`, the default | Never. `none` stands alone |

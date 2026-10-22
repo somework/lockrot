@@ -95,6 +95,7 @@
           ^3.4|^4.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own
           requirements, which lockrot does not solve
       left-behind  branch 4.x last released 2023-01-02 (3.7 years ago); 5.x released 5.6.0 (2025-10-17)
+      pulls in 1 flagged package: lcobucci/clock (capped)
   scheb/2fa-backup-code v5.13.2  direct  ·  left-behind
       16 = left-behind 16
       do: require scheb/2fa-backup-code ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 ||
@@ -135,7 +136,7 @@
           ~8.5.0; the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own
           requirements, which lockrot does not solve
       left-behind  branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24)
-      pulls in 1 flagged package: symfony/security-guard (abandoned)
+      pulls in 2 flagged packages: symfony/security-guard (abandoned), lcobucci/clock (capped)
       checks missing: S2 (undated releases)
   wallabag/rulerz dev-master  direct  ·  pinned
       16 = pinned 16
@@ -311,11 +312,17 @@
       pinned       pinned to branch snapshot dev-master
       age: last push 2023-12-24 (2.7 years ago)
 
-<options=bold>low (4)</options=bold>
+<options=bold>low (5)</options=bold>
   friendsofsymfony/oauth2-php 1.3.1  via friendsofsymfony/oauth-server-bundle  ·  stale
       4 = stale 8 ÷ 2 transitive
       do: —
       stale        last release 2021-04-06 (5.4 years ago)
+  lcobucci/clock 3.3.1  via lcobucci/jwt, scheb/2fa-trusted-device  ·  capped
+      4 = capped 8 ÷ 2 transitive
+      do: composer update lcobucci/clock (gets 3.6.0) — clears capped
+      capped       requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded
+      age: installed 3.3.1 released 2024-09-24 (2.0 years ago); 3.x last released 3.6.0 2026-04-13 (0.4 years ago),
+           its newest release; last push 2026-09-13 (less than three weeks ago)
   phpdocumentor/reflection-common 2.2.0  via nelmio/api-doc-bundle  ·  stale
       4 = stale 8 ÷ 2 transitive
       do: —
@@ -329,17 +336,17 @@
       do: —
       stale        last release 2022-01-30 (4.6 years ago); last push 2023-08-03 (3.1 years ago)
 
-200 packages checked · 51 flagged: critical 3 · high 35 · medium 9 · low 4
-flags: abandoned 19 · silent 8 · pinned 4 · left-behind 11 · old-promise 10 · stale 10 ·
+200 packages checked · 52 flagged: critical 3 · high 35 · medium 9 · low 5
+flags: abandoned 19 · silent 8 · pinned 4 · left-behind 11 · old-promise 10 · stale 10 · capped 1 ·
 11 packages carry more than one
-depth: 33 of 51 flagged packages are named by no line of composer.json · direct 18 · 1 hop 16 · 2 hops 10 ·
+depth: 34 of 52 flagged packages are named by no line of composer.json · direct 18 · 1 hop 17 · 2 hops 10 ·
 3 hops 5 · 4 hops 2 ·
 deepest: hoa/ustring and hoa/zformat, 4 hops (wallabag/rulerz › hoa/ruler › hoa/compiler › hoa/regex › hoa/ustring)
 security: no vulnerable package · advisories not checked · packages-dev not checked (pass --dev)
 libyears: at least 163.7 behind across 194 of 200 packages · 108.3 from direct requirements ·
 furthest behind smalot/pdfparser v1.1.0 at 4.7
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
-scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 20 more
+scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 21 more
 advisories: 0 packages asked, 200 not asked
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
 <fg=red>gate: fails · --fail-on=high · 38 findings fail it ·</fg=red>

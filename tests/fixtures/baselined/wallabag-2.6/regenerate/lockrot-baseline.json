@@ -569,6 +569,15 @@
                 }
             }
         },
+        "laminas/laminas-code": {
+            "version": "4.7.1",
+            "first_seen": "2024-11-03",
+            "flags": {
+                "capped": {
+                    "known_since": "2024-11-03"
+                }
+            }
+        },
         "lcobucci/clock": {
             "version": "2.0.0",
             "first_seen": "2026-10-14",
@@ -652,6 +661,9 @@
             "first_seen": "2024-11-03",
             "flags": {
                 "abandoned": {
+                    "known_since": "2024-11-03"
+                },
+                "capped": {
                     "known_since": "2024-11-03"
                 }
             }

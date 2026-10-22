@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "ocramius/proxy-manager 2.2.4 \u2014 finding low (5 = (stale 8 + capped 2 [\u00bc of 8]) \u00f7 2 transitive) \u2014 stale: last release 2022-03-05 (4.6 years ago). Do: \u2014. (via symfony/proxy-manager-bridge)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "ae34463ffe24cf7e6cec09acb131ae43b52402a196bdd876cac70180888aadf8",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/capped",
+        "description": "ocramius/proxy-manager 2.2.4 \u2014 finding low (5 = (stale 8 + capped 2 [\u00bc of 8]) \u00f7 2 transitive) \u2014 capped: requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded. Do: \u2014. (via symfony/proxy-manager-bridge)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "c710e80b816502ee249f14920a3cb3785bea9c75176a239a2d948c4f674fdf9f",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

@@ -18,11 +18,11 @@ documents). The script writes, relative to the repository root:
     tests/fixtures/flags/coverage/<variant>.json        the coverage variants with a failed feed, from PR 4f on
     tests/fixtures/schema/documents/cases/<base>.json   the base documents of make_negatives.py
     tests/fixtures/schema/documents/explain/B.json      the base document of make_negatives_other.py
-At the last pull request of the train it also writes every model document, unprojected:
+From pull request 7a on it also writes every model document, without the keys of a later pull request:
     tests/fixtures/schema/documents/{cases,variants,explain,explain/coverage,baseline/*,config/*,page}/   plain JSON
     tests/fixtures/schema/documents/{corpus,coverage/baselined,coverage/variants}/   gzipped (`.json.gz`)
     tests/fixtures/schema/documents/provenance.json      the source, its run date and suite, the count of each set
-    tests/fixtures/contract/page-goldens.json            the model's page goldens, byte for byte
+    tests/fixtures/contract/page-goldens.json            the page goldens, byte for byte: the model's, or those of --page-goldens
 """
 import argparse
 import copy
@@ -42,7 +42,7 @@ DOCS_OUT = os.path.join(REPO, 'tests', 'fixtures', 'schema', 'documents')
 PAGE_GOLDENS_OUT = os.path.join(REPO, 'tests', 'fixtures', 'contract', 'page-goldens.json')
 
 # The pull requests of the 0.14 train that change report-2, in merge order.
-TRAIN = ['4b', '4c', '4d', '4e', '4f', '5', '6a', '6b', '7a']
+TRAIN = ['4b', '4c', '4d', '4e', '4f', '5', '6a', '6b', '7a', '7b', '7c']
 
 # Each change a later pull request makes, keyed by that pull request. A fixture of pull request P
 # undoes every change of a pull request after P.
@@ -54,6 +54,7 @@ FINDING_KEYS = {
 }
 SECURITY_KEYS = {'4f': ['records', 'feeds']}
 RUN_KEYS = {'4f': ['advisory_lookup']}
+PHP_WINDOW_KEYS = {'7c': ['target_fix']}
 ROOT_KEYS = {'4e': ['rot_depth'], '6a': ['packages_unchecked_accepted']}
 ROOT_GATE_KEYS = {'6b': ['failing_by', 'not_applied', 'text']}
 NOTE_CODES = {
@@ -256,6 +257,8 @@ def project_notes(container, proj):
 def project_run(run, proj, where='run'):
     run = copy.deepcopy(run)
     proj.drop(run, proj.later(RUN_KEYS), where)
+    if isinstance(run.get('php_window'), dict):
+        proj.drop(run['php_window'], proj.later(PHP_WINDOW_KEYS), where + '.php_window')
     return run
 
 
@@ -512,11 +515,12 @@ def inputs_of(case):
     if checks:
         inputs['checks'] = checks
         inputs['move_check'] = run['move_check']
-    # The lock facts that the case's findings do not carry: the model's ‡ run inputs `_php_lock` and `_config_platform_php`.
-    if run.get('_php_lock') is not None:
-        inputs['php_lock'] = run['_php_lock']
-    if run.get('_config_platform_php') is not None:
-        inputs['config_platform_php'] = run['_config_platform_php']
+    # The lock facts that the case's findings do not carry: the model's ‡ run inputs, in the case's `run_inputs` block.
+    run_inputs = case.get('run_inputs') or {}
+    if run_inputs.get('_php_lock') is not None:
+        inputs['php_lock'] = run_inputs['_php_lock']
+    if run_inputs.get('_config_platform_php') is not None:
+        inputs['config_platform_php'] = run_inputs['_config_platform_php']
     act = f.get('activity') or {}
     if f['origin']['kind'] == 'vcs' and act.get('host') and inputs['root'] is not None:
         # The project's vcs repository serves the package: lockrot names its origin from it.
@@ -595,13 +599,15 @@ DOCUMENT_SETS += [('page', 'page', False)]
 NOT_DOCUMENTS = ('INDEX.json', 'EXPECT.json', 'corrections.json')
 
 
-def write_documents(source, run_date, suite):
+def write_documents(source, run_date, suite, proj, page_goldens):
     counts = {}
     for model_dir, out_dir, zipped in DOCUMENT_SETS:
         paths = sorted(p for p in glob.glob(os.path.join(source, 'docs', model_dir, '*.json')) if not p.endswith(NOT_DOCUMENTS))
         for path in paths:
             with open(path) as fh:
                 doc = json.load(fh)
+            if isinstance(doc, dict) and isinstance(doc.get('run'), dict) and 'findings' in doc:
+                doc['run'] = project_run(doc['run'], proj, 'documents.run')
             stem = os.path.basename(path)
             if zipped:
                 dump_gz(os.path.join(DOCS_OUT, out_dir, stem + '.gz'), doc)
@@ -610,7 +616,7 @@ def write_documents(source, run_date, suite):
         counts[out_dir] = len(paths)
     dump(os.path.join(DOCS_OUT, 'provenance.json'), {'source': 'security-axis/r3/docs', 'model_run_date': run_date, 'suite': suite, 'documents': counts})
     # A page golden must never lag the page document that it reads.
-    shutil.copyfile(os.path.join(source, 'page-goldens.json'), PAGE_GOLDENS_OUT)
+    shutil.copyfile(page_goldens, PAGE_GOLDENS_OUT)
     return counts
 
 
@@ -625,8 +631,17 @@ def main():
     ap.add_argument('--source', required=True, help="the model directory with cases.json and docs/")
     ap.add_argument('--run-date', default=None, help='the date the model ran, for provenance.json')
     ap.add_argument('--suite', default=None, help="the model suite's result on that run, for provenance.json")
+    ap.add_argument('--page-goldens', default=None, help="the page goldens to copy, rendered by the model for this pull request's fields "
+                                                         "(default: the model directory's page-goldens.json)")
     args = ap.parse_args()
     proj = Projection(args.pr)
+    # From pull request 7a on, every model document is written, without the keys of a later pull request.
+    documents = not proj.after('7a')
+    if documents and args.page_goldens is None and proj.later(PHP_WINDOW_KEYS):
+        # The model's goldens render every run.php_window key, so they disagree with documents that drop one.
+        sys.stderr.write('--pr %s drops run.php_window.%s: pass --page-goldens with the goldens rendered without it\n'
+                         % (args.pr, ', run.php_window.'.join(proj.later(PHP_WINDOW_KEYS))))
+        return 2
     source = os.path.abspath(args.source)
     cases_path = os.path.join(source, 'cases.json')
     with open(cases_path) as fh:
@@ -640,8 +655,9 @@ def main():
         if c.get('details') is not None:
             c['details'] = project_details(case['details'], proj)
         c['inputs'] = inputs_of(case)
-        # The related packages' findings feed the inputs only.
+        # The related packages' findings and the ‡ run inputs feed the inputs only.
         c.pop('related', None)
+        c.pop('run_inputs', None)
         if c['inputs'] is None:
             without_inputs.append(case['id'])
         cases.append(c)
@@ -657,10 +673,15 @@ def main():
             dump(os.path.join(FLAGS_OUT, 'coverage', stem + '.json'), project_report(json.load(fh), proj))
     with open(os.path.join(source, 'docs', 'explain-2', 'B.json')) as fh:
         dump(os.path.join(DOCS_OUT, 'explain', 'B.json'), project_explain(json.load(fh), proj))
+    page_goldens = os.path.abspath(args.page_goldens) if args.page_goldens else os.path.join(source, 'page-goldens.json')
+    counts = write_documents(source, args.run_date, args.suite or model.get('validation'), proj, page_goldens) if documents else None
     dump(os.path.join(FLAGS_OUT, 'provenance.json'), {
         'pr': args.pr,
         'source': {'cases.json': sha256(cases_path), 'model_run_date': args.run_date},
         'suite': args.suite or model.get('validation'),
+        'page_goldens': {'sha256': sha256(page_goldens), 'rendered': "the model's goldens" if args.page_goldens is None
+                         else "the model's goldens, rendered again by the model with " + ', '.join('run.php_window.' + k for k in proj.later(PHP_WINDOW_KEYS)) + ' null'}
+        if documents else None,
         'dropped': sorted(proj.dropped),
         'reverted': dict(sorted(proj.reverted.items())),
         'cases_without_inputs': without_inputs,
@@ -668,8 +689,8 @@ def main():
     })
     print('%d cases (%d without inputs), %d base documents, %d dropped keys, %d kinds of reverted values'
           % (len(cases), len(without_inputs), len(bases), len(proj.dropped), len(proj.reverted)))
-    if args.pr == TRAIN[-1]:
-        print('documents: ' + ', '.join('%s %d' % kv for kv in write_documents(source, args.run_date, args.suite or model.get('validation')).items()))
+    if counts is not None:
+        print('documents: ' + ', '.join('%s %d' % kv for kv in counts.items()))
     return 0
 
 

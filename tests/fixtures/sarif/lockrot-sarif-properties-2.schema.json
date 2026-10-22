@@ -684,7 +684,7 @@
       ]
     },
     "flag": {
-      "description": "A flag id, in the frozen flag order `abandoned silent pinned left-behind old-promise stale vulnerable`. Closed: a new flag is a report-3 event.",
+      "description": "A flag id, in the frozen flag order `abandoned silent pinned left-behind old-promise stale capped vulnerable`. Closed: a new flag is a report-3 event.",
       "type": "string",
       "enum": [
         "abandoned",
@@ -693,6 +693,7 @@
         "left-behind",
         "old-promise",
         "stale",
+        "capped",
         "vulnerable"
       ]
     },
@@ -833,7 +834,7 @@
       ],
       "allOf": [
         {
-          "description": "A value's kind follows the value: the four grades are `grade`, the six maintenance flags `flag`, `vulnerable` and `vulnerable-<severity>` `vulnerable`, `unchecked` `unchecked`; a value or a kind this schema does not list is not constrained.",
+          "description": "A value's kind follows the value: the four grades are `grade`, the seven maintenance flags `flag`, `vulnerable` and `vulnerable-<severity>` `vulnerable`, `unchecked` `unchecked`; a value or a kind this schema does not list is not constrained.",
           "anyOf": [
             {
               "properties": {
@@ -861,7 +862,8 @@
                     "pinned",
                     "left-behind",
                     "old-promise",
-                    "stale"
+                    "stale",
+                    "capped"
                   ]
                 },
                 "kind": {
@@ -931,7 +933,8 @@
                           "pinned",
                           "left-behind",
                           "old-promise",
-                          "stale"
+                          "stale",
+                          "capped"
                         ]
                       },
                       {
@@ -1096,6 +1099,20 @@
               "properties": {
                 "value": {
                   "enum": [
+                    "capped"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "capped"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
                     "vulnerable"
                   ]
                 },
@@ -1175,6 +1192,7 @@
                       "left-behind",
                       "old-promise",
                       "stale",
+                      "capped",
                       "vulnerable",
                       "vulnerable-medium",
                       "vulnerable-high",
@@ -1589,7 +1607,8 @@
         "pinned",
         "left-behind",
         "old-promise",
-        "stale"
+        "stale",
+        "capped"
       ]
     },
     "moveCheck": {
@@ -1808,7 +1827,7 @@
             {
               "properties": {
                 "ruleId": {
-                  "pattern": "^lockrot\\/(abandoned|silent|pinned|left-behind|old-promise|stale)$"
+                  "pattern": "^lockrot\\/(abandoned|silent|pinned|left-behind|old-promise|stale|capped)$"
                 },
                 "properties": {
                   "$ref": "#/definitions/resultMaintenance"
@@ -1836,7 +1855,7 @@
                         "pattern": "^lockrot\\/advisory\\/"
                       },
                       {
-                        "pattern": "^lockrot\\/(abandoned|silent|pinned|left-behind|old-promise|stale)$"
+                        "pattern": "^lockrot\\/(abandoned|silent|pinned|left-behind|old-promise|stale|capped)$"
                       },
                       {
                         "enum": [
@@ -3232,7 +3251,8 @@
         "S7",
         "S8",
         "S9",
-        "S10"
+        "S10",
+        "S11"
       ]
     },
     "suppression": {

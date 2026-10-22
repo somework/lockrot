@@ -11,6 +11,7 @@ use Lockrot\Security\Severity;
 use Lockrot\Signal\Data\AbandonedData;
 use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Data\ArchivedData;
+use Lockrot\Signal\Data\CappedData;
 use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\Data\NoPushData;
 use Lockrot\Signal\Data\NoReleaseData;
@@ -39,6 +40,7 @@ final class FlagSentence
         FlagSet::LEFT_BEHIND => [Signal::S8],
         FlagSet::OLD_PROMISE => [Signal::S5],
         FlagSet::STALE => [Signal::S2, Signal::S4],
+        FlagSet::CAPPED => [Signal::S11],
         FlagSet::VULNERABLE => [Signal::S9],
     ];
 
@@ -139,6 +141,9 @@ final class FlagSentence
             $major = explode('.', $d->targetMajor())[0];
 
             return \sprintf('released %s for PHP %s (php "%s"), before PHP %s existed (%s GA %s); admits %s untested', substr($d->released(), 0, 10), (string) $d->writtenForPhp(), $d->phpConstraint(), $major, $d->targetMajor(), $d->gaDate(), $d->targetPhp());
+        }
+        if ($d instanceof CappedData) {
+            return \sprintf('requires php %s: it stops at %s, so %s, is excluded', $d->requires(), $d->stopsAt(), $d->newestWords());
         }
         if ($d instanceof PinnedData) {
             return 'pinned to '.($d->reason() === 'branch_snapshot' ? 'branch snapshot ' : '').$d->version();

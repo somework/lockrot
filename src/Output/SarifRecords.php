@@ -36,6 +36,7 @@ final class SarifRecords
         'left-behind' => ['The installed release branch stopped while a newer branch kept releasing', 'No stable release on the installed branch for release-warn-years, while a higher branch has released since.'],
         'old-promise' => ['Released before the target PHP\'s major with an open-ended php constraint', 'The installed version was released before the target PHP\'s GA date, and its php constraint admits that target untested.'],
         'stale' => ['Old release or old push, below the silent thresholds', 'No stable release or no repository push for release-warn-years or push-warn-years.'],
+        'capped' => ['The installed version\'s php constraint stops below the newest PHP the project allows', 'The installed version\'s php requirement has an upper bound below the newest PHP minor that the project allows.'],
         'ok' => ['Nothing counts', 'No flag counts and no counted advisory affects the installed version.'],
         'finished' => ['Accepted by an allowlist entry', 'An allowlist entry accepts the package as complete by design, not neglected.'],
         'unknown' => ['lockrot could not read its release metadata', 'No flag counts, and lockrot could not read the release metadata that judges maintenance.'],

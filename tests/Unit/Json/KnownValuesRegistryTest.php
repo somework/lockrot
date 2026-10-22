@@ -61,7 +61,7 @@ final class KnownValuesRegistryTest extends TestCase
         $misses = [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE];
         $floors = [PhpFloor::PROJECT, PhpFloor::TARGET];
         $moveKinds = ['replace', 'find-alternative', 'tag', 'require', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'];
-        $moveReasons = ['package_quiet', 'no_higher_release', 'higher_undated', 'releases_unknown', 'affected_range_unknown', 'metadata_not_read', 'local_package'];
+        $moveReasons = ['package_quiet', 'no_higher_release', 'higher_undated', 'releases_unknown', 'affected_range_unknown', 'metadata_not_read', 'local_package', 'no_release_admits'];
         $assumes = ['clears_hold', 'composer_resolves', 'no_new_advisories'];
         $thresholds = ['release-warn-years', 'release-high-years', 'push-warn-years', 'push-high-years'];
 
@@ -175,9 +175,9 @@ final class KnownValuesRegistryTest extends TestCase
             '#/definitions/repositoryMetadata/properties/branches/items/properties/misses_target_php/oneOf/0' => [$misses, 'PhpFloor'],
             '#/definitions/repositoryMetadata/properties/branches/items/properties/misses_project_php/oneOf/0' => [$misses, 'PhpFloor'],
             '#/definitions/repositoryMetadata/properties/branches/items/properties/highest_misses_project_php/oneOf/0' => [$misses, 'PhpFloor'],
-            '#/definitions/clearedFact/properties/basis' => [['branch_releasing', 'released_after_ga', 'outside_range', 'tags_only'], self::LATER],
+            '#/definitions/clearedFact/properties/basis' => [['branch_releasing', 'released_after_ga', 'outside_range', 'tags_only', 'admits_newest_php'], self::LATER],
             '#/definitions/unverifiedFact/properties/reason' => [['undated', 'no_release_data'], self::LATER],
-            '#/definitions/addedFact/properties/basis' => [['released_before_ga', 'branch_not_releasing'], self::LATER],
+            '#/definitions/addedFact/properties/basis' => [['released_before_ga', 'branch_not_releasing', 'stops_below_newest_php'], self::LATER],
             '#/definitions/factBaseline/oneOf/0/properties/state' => [['known', 'covered', 'new', 're_rated', 'fix_lost'], self::LATER],
             '#/definitions/findingBaseline/oneOf/0/properties/worsened_by/items/properties/why' => [['new', 're_rated', 'fix_lost'], self::LATER],
             '#/definitions/holder/oneOf/0/properties/next_step/oneOf/0/properties/kind' => [$moveKinds, self::LATER],

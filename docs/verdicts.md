@@ -47,7 +47,7 @@ Verdict order, used by the grade values of [`--fail-on`](ci.md) and the report's
 ## Flags
 
 A finding lists each flag that fired in `flags`, in flag order: `abandoned`, `silent`, `pinned`,
-`left-behind`, `old-promise`, `stale`, `vulnerable`. Each flag is one claim that is true whenever it
+`left-behind`, `old-promise`, `stale`, `capped`, `vulnerable`. Each flag is one claim that is true whenever it
 shows.
 
 | Flag | Rule | Raised by | What you can do | What the maintainer can do |
@@ -58,6 +58,7 @@ shows.
 | [`left-behind`](#left-behind) | No stable release on the installed version's release branch for `release-warn-years` (default 3), while a higher branch keeps releasing | S8 | Require the branch that the `do:` line names | Release on the old branch |
 | [`old-promise`](#old-promise) | The installed release predates the target PHP's major, and its `require.php` admits the target only because it has no upper bound | S5 | Update to a release cut after that major's GA, or to one whose `require.php` names the major | Release after that major's GA, or with a `require.php` that names it |
 | `stale` | No release for `release-warn-years` (default 3), or no push for `push-warn-years` (default 3), short of `silent` | S2 or S4 | Replace it, or accept it with an [`ignore` entry](configuration.md#the-allowlist) or the [baseline](baseline.md) | A release inside `release-warn-years` and a push inside `push-warn-years` |
+| [`capped`](#capped) | The installed release's `require.php` stops below the newest PHP minor that the root php allows | S11 | Update to the release that S11's `admits_newest` names, or require its branch | Release with a `require.php` that admits the newest PHP |
 | `vulnerable` | A counted [security advisory](#security-advisories) affects the installed version | S9 | Follow the `do:` line ([The move](#move)) | Release a fix |
 
 - `abandoned`, `silent` and `stale` are one reading of whether anyone still ships the package, so
@@ -66,8 +67,11 @@ shows.
 
 - `pinned` and `left-behind` never fire together: a branch snapshot is on no release branch.
 
+- `old-promise` and `capped` never fire together: S5 needs a `require.php` with no upper bound,
+  and S11 needs one with an upper bound.
+
 - Each flag carries `signal_ids`, the signals whose `data` it is written from. Its `headline` holds
-  one value for a pill: the years of a quiet package, the PHP major of an old promise, the reason
+  one value for a pill: the years of a quiet package, the PHP major of an old promise, the PHP minor where a cap stops, the reason
   of a pin, or the number of counted advisories.
 
 - **Accepted flags stay listed.** A flag that the built-in allowlist or an
@@ -92,6 +96,7 @@ shows.
 | S8 | Time since the newest stable release on the installed release branch, against `release-warn-years` / `release-high-years`, while a higher branch releases ([Left behind](#left-behind)) | Composer repository | `left-behind` |
 | S9 | The counted security advisories that affect the installed version | Composer repositories that publish advisories | `vulnerable` ([Security advisories](#security-advisories)) |
 | S10 | A check that a flag rests on did not run, and the signals it blocked | The other checks | nothing ([What was not checked](#what-was-not-checked)) |
+| S11 | The installed release's `require.php` stops below the newest PHP minor that the root php allows ([Capped](#capped)) | Lock, root php and PHP GA dates. Release metadata for `admits_newest` only | `capped` |
 
 - S2, S4 and S8 are `warn` from the warn threshold and `high` from the high one. Only `silent`
   reads the level. The thresholds are [`extra.lockrot` keys](configuration.md#extralockrot-keys).
@@ -303,6 +308,63 @@ Abridged from the [example run](example-run.md):
       do: test it on PHP 8.4 — 1.5 is its newest release
       old-promise  released 2014-01-05 for PHP 5 (php ">=5.3.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
+```
+
+## Capped
+
+S11 compares the installed release's `require.php` with R, the newest PHP minor that the project
+allows. R is the newest minor in `resources/php-ga-dates.json` with a GA on or before the run clock
+that the root php admits. The root php is composer.json's `require.php`, else the lock's
+`platform.php`. Without a root php, R is the newest of those minors.
+
+S11 fires when all of these hold:
+
+1. The installed `require.php` has an upper bound.
+
+2. It admits nothing at or above R's first release (`8.5.0` for R 8.5).
+
+3. It admits at least one known minor.
+
+A floor above R (`>=8.4.1` under a root that allows up to 8.3) and a disjunction with an open end
+are no cap. A constraint that skips R and admits a later minor (`~8.2.0 || ~8.4.0` against R 8.3)
+is no cap either. A root php that does not parse, or that admits no known minor, gives no R, and
+S11 does not fire. S11 reads `require.php` only. A cap from `php-64bit` or from a `conflict` shows
+in the [PHP window](#the-php-window), with no flag.
+
+S11's `data`:
+
+| Field | What it holds |
+|---|---|
+| `newest_php` | R |
+| `newest_php_source` | `known` when R is the newest known minor, `require_php` when composer.json's `require.php` limits it, `platform_php` when the lock's `platform.php` limits it |
+| `requires`, `stops_at` | The installed `require.php`, and the newest known minor that it admits |
+| `excludes_target` | True when the target PHP's minor is outside `requires`: exactly `installed_php.target_runs` false |
+| `admits_newest` | The newest release that admits R, on the lowest branch that has one, with its `branch` and `blocking` (`project`, `target` or null). Null when no release admits R, or when the release metadata was not read |
+
+- **Which releases count.** `admits_newest` reads the stable releases above the installed one. A
+  release that states no php does not count. Above an `X.Y.x-dev` snapshot or a snapshot with a
+  branch alias, the releases count from `X.Y.0`. Above a `dev-<name>` snapshot, only the releases
+  dated after the lock entry's `time` count.
+
+- **R moves with the GA dates.** When a newer minor gets its GA on or before the run clock, a
+  package capped below it gains `capped`. S5 reads the same GA dates.
+
+- **The move.** The `do:` line of a `capped` lead goes to `admits_newest`: `blocked` when the
+  target PHP does not run it, else `raise-php` when the project's lowest PHP is outside it, else
+  `require` for another branch or a held release, else `update`. With no such release, the line
+  is `no move: no release above <version> admits PHP <R>`.
+
+- **A move that lands on a cap.** A move of another flag whose release stops below R lists
+  `capped` in `next_step.adds[]`, and its line says that `capped` would count.
+
+Abridged from a recorded run on wallabag's lock:
+
+```text
+  lcobucci/clock 3.3.1  via lcobucci/jwt, scheb/2fa-trusted-device  ·  capped
+      4 = capped 8 ÷ 2 transitive
+      do: raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt, scheb/2fa-trusted-device
+          — clears capped; …
+      capped       requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded
 ```
 
 ## Dates from the monorepo
@@ -519,7 +581,7 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 
 | Kind | For | The line |
 |---|---|---|
-| `update` | an advisory or an old promise that the installed branch fixes | `composer update <package> (gets <version>)`, or `update it with Composer (gets <version>)` when the [command argument rule](schema.md#the-move) refuses the step |
+| `update` | an advisory, an old promise or a cap that the installed branch fixes | `composer update <package> (gets <version>)`, or `update it with Composer (gets <version>)` when the [command argument rule](schema.md#the-move) refuses the step |
 | `require` | a fix or a branch that a requirement must allow | `require <package> <constraint>`, or `move <package> to <constraint> through <dependents>` for a package you do not require |
 | `raise-php` | a fix or a branch that needs a higher `require.php` | `raise require.php to >=<version>, then require …` |
 | `blocked` | no fix or branch runs on the target PHP | `no move runs on the target: …` |
@@ -682,7 +744,7 @@ The score adds up the counted flags. Every report carries the whole model in `ru
 |---|---|
 | `abandoned`, `silent` | 32 |
 | `pinned`, `left-behind`, `old-promise` | 16 |
-| `stale` | 8 |
+| `stale`, `capped` | 8 |
 | each maintenance flag after the lead | a quarter of its points |
 | `vulnerable` | the highest advisory: critical 32, high 16, medium 8, unrated 8, low 2 |
 | no reachable fix (`none`, `blocked`) | that advisory × 2 |
@@ -719,7 +781,7 @@ The score line writes the sum, and it evaluates to the score:
 - `score.without[]` gives the score without each counted flag, and `score.accepted[]` the score if
   an accepted flag counted. Both are new runs of the rules, not a subtraction: when the lead goes,
   the next flag takes the lead in full. A row reads `at least` when a check that did not run could
-  raise it.
+  raise it, or when the `tag` move lands on a line that S8's rule can leave behind.
 
 - A package required only through a name that another locked package replaces or provides is
   reached through that package, so it is not `unreached`.

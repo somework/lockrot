@@ -3114,7 +3114,7 @@ repository metadata
      1.x      v1.44.8       2024-09-09   >=7.2.5    0 of 15
 
 == case local-path-advisory
-mautic/core-lib 4.3.x-dev — critical: pinned · vulnerable
+mautic/core-lib 4.3.x-dev — critical: pinned · capped · vulnerable
   direct requirement (composer.json require)
 
 age       installed  4.3.x-dev not read (a branch snapshot has no release branch)
@@ -3124,8 +3124,8 @@ age       installed  4.3.x-dev not read (a branch snapshot has no release branch
           libyears not measured: not from a Composer repository
 repository repository activity not asked (not from a Composer repository)
 
-score     32 = pinned 16 + vulnerable 16 [high advisory]     critical from 32
-  maintenance  pinned 16 (lead)
+score     34 = pinned 16 + capped 2 [¼ of 8] + vulnerable 16 [high advisory]     critical from 32
+  maintenance  pinned 16 (lead) · capped 2 (¼ of 8)
   security     vulnerable 16 (high advisory CVE-2022-25768)
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
@@ -3134,6 +3134,7 @@ do        no move: it is installed from a local path (your own package)
 
 flags
   pinned       S6 · pinned to branch snapshot 4.3.x-dev
+  capped       S11 · requires php >=7.4.0 <8.1: it stops at 8.0, so the newest PHP, 8.5, is excluded
   vulnerable   S9 high · 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process · lookup complete
     high       CVE-2022-25768  Mautic vulnerable to Improper Access Control in UI upgrade process
                PKSA-j4xy-fb9q-x9h7 · reported 2024-09-18 · 16 points · fix: fix unknown
@@ -3148,11 +3149,476 @@ flags
   feeds        packagist.org: 5 on record, 5 affect 4.3.x-dev
   pulls in     pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise · vulnerable), symfony/http-foundation (left-behind · vulnerable) and 114 more
   accepted     none
-  not checked  S3, S4 (not from a Composer repository) · S2, S8 (not from a Composer repository)
+  not checked  S3, S4 (not from a Composer repository) · S2, S8, S11 (not from a Composer repository)
 
 repository metadata
   none — not from a Composer repository, not checked
 note: 2 packages are not from a Composer repository: their release metadata and repository activity were not read
+
+== case capped-require-php
+pelago/emogrifier v2.2.0 — high: left-behind · capped
+  direct requirement (composer.json require)
+
+age       installed  v2.2.0    2019-09-04   7.1 years ago
+          2.x        v2.2.0    2019-09-04   7.1 years ago                 past release-high-years 5
+          newest     v8.2.0    2025-11-27   0.8 years ago                 below release-warn-years 3
+          last push            2026-10-01   less than three weeks ago     below push-warn-years 3
+          libyears 6.2 behind the newest stable release
+repository GitHub github.com/MyIntervals/emogrifier: last push 2026-10-01 · fetched 2026-09-14
+
+score     18 = left-behind 16 + capped 2 [¼ of 8]     high from 16
+  maintenance  left-behind 16 (lead) · capped 2 (¼ of 8)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        raise require.php to >=7.3, then require pelago/emogrifier ^7.3 — clears left-behind and capped; 7.x needs php ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+          clears left-behind, capped
+
+flags
+  left-behind  S8 high · branch 2.x last released 2019-09-04 (7.1 years ago); 8.x released v8.2.0 (2025-11-27), needs php ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php ^7.1.3; no releasing branch within reach
+  capped       S11 · requires php ^5.5.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0: it stops at 7.3, so 7.4, the newest PHP that require.php allows, is excluded
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     8.x      v8.2.0        2025-11-27   ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     7.x      v7.3.0        2024-10-28   ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
+     6.x      v6.0.0        2021-09-16   ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0
+     5.x      v5.0.1        2021-04-06   ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0
+     4.x      v4.0.0        2020-06-12   ~7.0 || ~7.1 || ~7.2 || ~7.3 || ~7.4
+     3.x      v3.1.0        2019-12-26   ^5.6 || ~7.0 || ~7.1 || ~7.2 || ~7.3 || ~7.4
+   * 2.x      v2.2.0        2019-09-04   ^5.5.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0
+     1.x      v1.2.2        2018-12-10   >=5.4.0,<=7.3.99
+     0.1.x    v0.1.1        2015-05-15   >=5.4.0
+     0.0.1    v0.0.1        2014-10-30   >=5.3.0
+
+== case capped-local‡
+mautic/core-lib 4.3.x-dev — high: capped · vulnerable
+  direct requirement (composer.json require)
+
+age       installed  4.3.x-dev not read (a branch snapshot has no release branch)
+          4.x                  not read (not from a Composer repository)
+          newest               not read (not from a Composer repository)
+          last push            not read (not from a Composer repository)
+          libyears not measured: not from a Composer repository
+repository repository activity not asked (not from a Composer repository)
+
+score     24 = capped 8 + vulnerable 16 [high advisory] (pinned accepted)     high from 16
+  maintenance  capped 8 (lead)
+  security     vulnerable 16 (high advisory CVE-2022-25768)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        no move: it is installed from a local path (your own package)
+
+flags
+  pinned       S6 · pinned to branch snapshot 4.3.x-dev
+  capped       S11 · requires php >=7.4.0 <8.1: it stops at 8.0, so the newest PHP, 8.5, is excluded
+  vulnerable   S9 high · 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process · lookup complete
+    high       CVE-2022-25768  Mautic vulnerable to Improper Access Control in UI upgrade process
+               PKSA-j4xy-fb9q-x9h7 · reported 2024-09-18 · 16 points · fix: fix unknown
+    medium     CVE-2024-47058  Mautic vulnerable to Cross-site Scripting (XSS) - stored (edit form HTML field)
+               PKSA-81ww-1p5d-6c6k · reported 2024-09-18 · 8 points · fix: fix unknown
+    medium     CVE-2024-47050  Mautic vulnerable to XSS in contact/company tracking (no authentication)
+               PKSA-bxhd-1cmh-djg9 · reported 2024-09-18 · 8 points · fix: fix unknown
+    medium     CVE-2021-27917  Mautic has an XSS in contact tracking and page hits report
+               PKSA-krjy-6tb4-skgg · reported 2024-09-18 · 8 points · fix: fix unknown
+    medium     CVE-2022-25770  Mautic has insufficient authentication in upgrade flow
+               PKSA-ydwx-2n98-5dyf · reported 2024-09-18 · 8 points · fix: fix unknown
+  feeds        packagist.org: 5 on record, 5 affect 4.3.x-dev
+  pulls in     pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise · vulnerable), symfony/http-foundation (left-behind · vulnerable) and 114 more
+  accepted     pinned
+  not checked  S3, S4 (not from a Composer repository) · S2, S8, S11 (not from a Composer repository)
+
+repository metadata
+  none — not from a Composer repository, not checked
+note: 2 packages are not from a Composer repository: their release metadata and repository activity were not read
+note: extra.lockrot.ignore[] accepts maintenance flags only, not advisories: mautic/core-lib: 5 counted advisories; accept them in Composer's audit policy if that is the decision
+
+== case stale-capped
+ocramius/proxy-manager 2.2.4 — low: stale · capped
+  via symfony/proxy-manager-bridge > ocramius/proxy-manager: 1 hop from the nearest composer.json line; no line of composer.json names it
+
+age       installed  2.2.4     2022-03-05   4.6 years ago
+          2.x        2.14.1    2022-03-05   4.6 years ago                 past release-warn-years 3
+          newest     2.14.1    2022-03-05   4.6 years ago                 past release-warn-years 3
+          last push            2026-09-25   less than three weeks ago     below push-warn-years 3
+          libyears 0.0 behind the newest stable release
+repository GitHub github.com/Ocramius/ProxyManager: last push 2026-09-25 · fetched 2026-09-14
+
+score     5 = (stale 8 + capped 2 [¼ of 8]) ÷ 2 transitive     low from 1
+  maintenance  stale 8 (lead) · capped 2 (¼ of 8)
+  reach        via symfony/proxy-manager-bridge: maintenance halved; security is never halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        —
+
+flags
+  stale        S2 · last release 2022-03-05 (4.6 years ago)
+  capped       S11 · requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 2.x      2.14.1        2022-03-05   ~8.0.0
+     1.x      1.0.2         2015-08-09   >=5.3.3
+     0.5.x    0.5.2         2014-09-28   >=5.3.3
+     0.4.x    0.4.1         2013-06-30   >=5.3.3
+     0.3.x    0.3.6         2013-06-04   >=5.3.3
+     0.2.x    0.2.0         2013-03-27   >=5.3.3
+     0.1.x    0.1.0         2013-03-23   >=5.3.3
+
+== case capped-covered‡
+ocramius/proxy-manager 2.2.4 — low: stale · capped
+  via symfony/proxy-manager-bridge > ocramius/proxy-manager: 1 hop from the nearest composer.json line; no line of composer.json names it
+
+age       installed  2.2.4     2022-03-05   4.6 years ago
+          2.x        2.14.1    2022-03-05   4.6 years ago                 past release-warn-years 3
+          newest     2.14.1    2022-03-05   4.6 years ago                 past release-warn-years 3
+          last push            2026-09-25   less than three weeks ago     below push-warn-years 3
+          libyears 0.0 behind the newest stable release
+repository GitHub github.com/Ocramius/ProxyManager: last push 2026-09-25 · fetched 2026-09-14
+
+score     5 = (stale 8 + capped 2 [¼ of 8]) ÷ 2 transitive     low from 1
+  maintenance  stale 8 (lead) · capped 2 (¼ of 8)
+  reach        via symfony/proxy-manager-bridge: maintenance halved; security is never halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        —
+
+flags
+  stale        S2 · last release 2022-03-05 (4.6 years ago)
+  capped       S11 · requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 2.x      2.14.1        2022-03-05   ~8.0.0
+     1.x      1.0.2         2015-08-09   >=5.3.3
+     0.5.x    0.5.2         2014-09-28   >=5.3.3
+     0.4.x    0.4.1         2013-06-30   >=5.3.3
+     0.3.x    0.3.6         2013-06-04   >=5.3.3
+     0.2.x    0.2.0         2013-03-27   >=5.3.3
+     0.1.x    0.1.0         2013-03-23   >=5.3.3
+
+== case adds-capped-update
+phpoffice/phpspreadsheet 1.23.0 — critical: vulnerable
+  via mautic/core-lib > phpoffice/phpspreadsheet: 1 hop from the nearest composer.json line; no line of composer.json names it
+
+age       installed  1.23.0    2022-04-24   4.4 years ago
+          1.x        1.30.7    2026-09-17   less than three weeks ago     below release-warn-years 3
+          newest     3.10.8    2026-09-17   less than three weeks ago     below release-warn-years 3
+          last push            2026-10-01   less than three weeks ago     below push-warn-years 3
+          libyears 4.4 behind the newest stable release
+repository GitHub github.com/PHPOffice/PhpSpreadsheet: last push 2026-10-01 · fetched 2026-09-14
+
+score     32 = vulnerable 32 [critical advisory]     critical from 32
+  security     vulnerable 32 (critical advisory CVE-2026-34084)
+  reach        via mautic/core-lib: maintenance would be halved (none counts); security is never halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update phpoffice/phpspreadsheet (gets 1.30.7) — clears 28 advisories; it stops below the newest PHP, so capped would count
+          clears PKSA-8cfg-tzhf-fr83, PKSA-x678-4z45-v3d5, PKSA-285y-y5bt-kvd9, PKSA-64jn-3d9t-gncx, PKSA-bcnb-9tc9-bjb8, PKSA-dbrb-pvhs-h3st, PKSA-dqzt-yst9-1w9y, PKSA-gst3-cdk3-bpqt, PKSA-gz3f-3cz3-3wsw, PKSA-jw5c-q9nd-tzj9, PKSA-m9cr-9614-rsf7, PKSA-mkg2-1wyw-57y7, PKSA-r22k-87hv-mfk4, PKSA-x13r-n4wc-4gcr, PKSA-xk3k-rd1m-pxmg, PKSA-xp7t-fbrb-qjv4, PKSA-ybqb-vyrq-8pdt, PKSA-4ckb-wpj6-c29d, PKSA-7f9v-sb8k-krfb, PKSA-7jd6-nb49-bz4v, PKSA-8b16-mcgz-h4cz, PKSA-dvbq-8ft2-ngrw, PKSA-hznc-gbby-6w16, PKSA-jtdk-dcr5-f11n, PKSA-m4hk-rk8p-4t5p, PKSA-nm34-xhtz-ww9p, PKSA-p1pj-q951-6f1x, PKSA-s99r-9yxm-hjvt
+
+flags
+  vulnerable   S9 high · 28 advisories: 2 critical, 15 high, 11 medium — all fixed on 1.x; worst: CVE-2026-34084 PhpSpreadsheet has SSRF/RCE in IOFactory::load when $filename is user controlled · lookup complete
+    critical   CVE-2026-34084  PhpSpreadsheet has SSRF/RCE in IOFactory::load when $filename is user controlled
+               PKSA-8cfg-tzhf-fr83 · reported 2026-04-29 · 32 points · fix: composer update to 1.x from 1.30.7
+    critical   CVE-2026-45034  PHPSpreadsheet has a patch bypass for CVE-2026-34084
+               PKSA-x678-4z45-v3d5 · reported 2026-06-08 · 32 points · fix: composer update to 1.x from 1.30.7
+    high       CVE-2024-56366  PhpSpreadsheet allows unauthorized Reflected XSS in the Accounting.php file
+               PKSA-285y-y5bt-kvd9 · reported 2025-01-03 · 16 points · fix: composer update to 1.x from 1.29.8
+    high       CVE-2025-54370  PhpSpreadsheet vulnerable to SSRF when reading and displaying a processed HTML document in the browser
+               PKSA-64jn-3d9t-gncx · reported 2025-08-03 · 16 points · fix: composer update to 1.x from 1.30.0
+    high       CVE-2024-56408  PhpSpreadsheet allows unauthorized Reflected XSS in `Convert-Online.php` file
+               PKSA-bcnb-9tc9-bjb8 · reported 2025-01-03 · 16 points · fix: composer update to 1.x from 1.29.8
+    high       CVE-2024-47873  XmlScanner bypass leads to XXE
+               PKSA-dbrb-pvhs-h3st · reported 2024-11-18 · 16 points · fix: composer update to 1.x from 1.29.4
+    high       CVE-2026-59931  PHPSpreadsheet: SSRF bypass via HTTP redirect in WEBSERVICE() domain whitelist
+               PKSA-dqzt-yst9-1w9y · reported 2026-07-23 · 16 points · fix: composer update to 1.x from 1.30.7
+    high       CVE-2024-48917  XXE in PHPSpreadsheet's XLSX reader
+               PKSA-gst3-cdk3-bpqt · reported 2024-11-18 · 16 points · fix: composer update to 1.x from 1.29.4
+    high       CVE-2026-40902  PhpSpreadsheet has CPU Denial of Service via Unbounded Row Number in XLSX Row Dimensions
+               PKSA-gz3f-3cz3-3wsw · reported 2026-04-29 · 16 points · fix: composer update to 1.x from 1.30.7
+    high       CVE-2024-56365  PhpSpreadsheet allows unauthorized Reflected XSS in the constructor of the Downloader class
+               PKSA-jw5c-q9nd-tzj9 · reported 2025-01-03 · 16 points · fix: composer update to 1.x from 1.29.8
+    high       CVE-2026-59932  PHPSpreadsheet: Gnumeric reader unbounded gzip expansion causes memory exhaustion
+               PKSA-m9cr-9614-rsf7 · reported 2026-07-23 · 16 points · fix: composer update to 1.x from 1.30.7
+    high       CVE-2024-45293  XXE in PHPSpreadsheet's XLSX reader
+               PKSA-mkg2-1wyw-57y7 · reported 2024-10-07 · 16 points · fix: composer update to 1.x from 1.29.1
+    high       CVE-2026-59933  PHPSpreadsheet: XLS/OLE sector-chain self-loop causes memory exhaustion
+               PKSA-r22k-87hv-mfk4 · reported 2026-07-23 · 16 points · fix: composer update to 1.x from 1.30.7
+    high       CVE-2026-40863  PhpSpreadsheet has CPU Denial of Service via Unbounded Row Index in SpreadsheetML XML Reader
+               PKSA-x13r-n4wc-4gcr · reported 2026-04-29 · 16 points · fix: composer update to 1.x from 1.30.7
+    high       CVE-2024-45290  PhpSpreadsheet allows absolute path traversal and Server-Side Request Forgery when opening XLSX file
+               PKSA-xk3k-rd1m-pxmg · reported 2024-10-07 · 16 points · fix: composer update to 1.x from 1.29.2
+    high       CVE-2024-45048  XXE in PHPSpreadsheet encoding is returned
+               PKSA-xp7t-fbrb-qjv4 · reported 2024-08-29 · 16 points · fix: composer update to 1.x from 1.29.1
+    high       CVE-2024-56409  PhpSpreadsheet allows unauthorized Reflected XSS in Currency.php file
+               PKSA-ybqb-vyrq-8pdt · reported 2025-01-03 · 16 points · fix: composer update to 1.x from 1.29.8
+    medium     CVE-2024-56410  PhpSpreadsheet has a Cross-Site Scripting (XSS) vulnerability in custom properties
+               PKSA-4ckb-wpj6-c29d · reported 2025-01-03 · 8 points · fix: composer update to 1.x from 1.29.8
+    medium     CVE-2024-45291  PhpSpreadsheet allows absolute path traversal and Server-Side Request Forgery in HTML writer when embedding images is enabled
+               PKSA-7f9v-sb8k-krfb · reported 2024-10-07 · 8 points · fix: composer update to 1.x from 1.29.2
+    medium     CVE-2024-56412  PhpSpreadsheet allows bypass XSS sanitizer using the javascript protocol and special characters
+               PKSA-7jd6-nb49-bz4v · reported 2025-01-03 · 8 points · fix: composer update to 1.x from 1.29.8
+    medium     CVE-2025-23210  PhpSpreadsheet allows bypassing of XSS sanitizer using the javascript protocol and special characters
+               PKSA-8b16-mcgz-h4cz · reported 2025-02-03 · 8 points · fix: composer update to 1.x from 1.29.9
+    medium     CVE-2024-45060  PhpSpreadsheet has an Unauthenticated Cross-Site-Scripting (XSS) in sample file
+               PKSA-dvbq-8ft2-ngrw · reported 2024-10-07 · 8 points · fix: composer update to 1.x from 1.29.2
+    medium     CVE-2026-40296  PhpSpreadsheet has XSS via number format code with @ text placeholder bypasses htmlspecialchars in HTML writer
+               PKSA-hznc-gbby-6w16 · reported 2026-04-28 · 8 points · fix: composer update to 1.x from 1.30.7
+    medium     CVE-2026-35453  PhpSpreadsheet has XSS via NumberFormat @ Text Substitution in HTML Writer
+               PKSA-jtdk-dcr5-f11n · reported 2026-04-28 · 8 points · fix: composer update to 1.x from 1.30.7
+    medium     CVE-2024-45046  PhpSpreadsheet HTML writer is vulnerable to Cross-Site Scripting via style information
+               PKSA-m4hk-rk8p-4t5p · reported 2024-08-29 · 8 points · fix: composer update to 1.x from 1.29.1
+    medium     CVE-2024-56411  PhpSpreadsheet has a Cross-Site Scripting (XSS) vulnerability of the hyperlink base in the HTML page header
+               PKSA-nm34-xhtz-ww9p · reported 2025-01-03 · 8 points · fix: composer update to 1.x from 1.29.8
+    medium     CVE-2024-45292  PhpSpreadsheet HTML writer is vulnerable to Cross-Site Scripting via JavaScript hyperlinks
+               PKSA-p1pj-q951-6f1x · reported 2024-10-07 · 8 points · fix: composer update to 1.x from 1.29.2
+    medium     CVE-2025-22131  Cross-Site Scripting (XSS) vulnerability in generateNavigation() function in PhpSpreadsheet
+               PKSA-s99r-9yxm-hjvt · reported 2025-01-21 · 8 points · fix: composer update to 1.x from 1.29.8
+  feeds        packagist.org: 31 on record, 28 affect 1.23.0
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     5.x      5.10.0        2026-09-17   ^8.2       28 of 28 · composer update; after it: 0, ok, if Composer resolves it
+     4.x      4.5.0         2025-07-24   ^8.1       19 of 28 · composer update; after it: 32, critical, if Composer resolves it
+     3.x      3.10.8        2026-09-17   ^8.1       28 of 28 · composer update; after it: 0, ok, if Composer resolves it
+     2.x      2.4.8         2026-09-17   >=8.1.0 <8.6.0 28 of 28 · composer update; after it: 0, ok, if Composer resolves it
+   * 1.x      1.30.7        2026-09-17   >=7.4.0 <8.5.0 28 of 28 · composer update (lowest fix); after it: 4, low, if Composer resolves it
+note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
+
+== case adds-capped-raise-php
+scheb/2fa-bundle v5.13.2 — high: left-behind
+  direct requirement (composer.json require)
+
+age       installed  v5.13.2   2022-04-16   4.5 years ago
+          5.x        v5.13.2   2022-04-16   4.5 years ago                 past release-warn-years 3
+          newest     v8.6.1    2026-07-10   0.2 years ago                 below release-warn-years 3
+          last push            2026-07-10   0.2 years ago                 below push-warn-years 3
+          libyears 4.2 behind the newest stable release
+repository GitHub github.com/scheb/2fa-bundle: last push 2026-07-10 · fetched 2026-09-14
+
+score     16 = left-behind 16     high from 16
+  maintenance  left-behind 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+          clears left-behind
+
+flags
+  left-behind  S8 · branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     8.x      v8.6.1        2026-07-10   ~8.4.0 || ~8.5.0
+     7.x      v7.14.0       2026-06-12   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     6.x      v6.13.1       2024-11-29   ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
+   * 5.x      v5.13.2       2022-04-16   >=7.2.5
+
+== case adds-capped-require‡
+scheb/2fa-bundle v5.13.2 — high: left-behind
+  direct requirement (composer.json require)
+
+age       installed  v5.13.2   2022-04-16   4.5 years ago
+          5.x        v5.13.2   2022-04-16   4.5 years ago                 past release-warn-years 3
+          newest     v8.6.1    2026-07-10   0.2 years ago                 below release-warn-years 3
+          last push            2026-07-10   0.2 years ago                 below push-warn-years 3
+          libyears 4.2 behind the newest stable release
+repository GitHub github.com/scheb/2fa-bundle: last push 2026-07-10 · fetched 2026-09-14
+
+score     16 = left-behind 16     high from 16
+  maintenance  left-behind 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+          clears left-behind
+
+flags
+  left-behind  S8 · branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=8.0; 6.x released v6.13.1 (2024-11-29)
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     8.x      v8.6.1        2026-07-10   ~8.4.0 || ~8.5.0
+     7.x      v7.14.0       2026-06-12   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     6.x      v6.13.1       2024-11-29   ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
+   * 5.x      v5.13.2       2022-04-16   >=7.2.5
+
+== case adds-capped-tag‡
+matomo/referrer-spam-list dev-master — high: pinned
+  direct requirement (composer.json require)
+
+age       installed  dev-masternot read (a branch snapshot has no release branch)
+          its branch           not read (a branch snapshot has no release branch)
+          newest     4.0.5     2026-04-15   0.5 years ago                 below release-warn-years 3
+          last push            2026-09-22   less than three weeks ago     below push-warn-years 3
+          libyears not measured: a branch snapshot has no release branch
+repository GitHub github.com/matomo-org/referrer-spam-list: last push 2026-09-22 · fetched 2026-09-14
+
+score     16 = pinned 16     high from 16
+  maintenance  pinned 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require a tag — the newest is 4.0.5 (2026-04-15); 4.x needs php >=7.2 <8.5, which require.php allows; it stops below the newest PHP, so capped would count
+          clears pinned
+
+flags
+  pinned       S6 · pinned to branch snapshot dev-master
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  S8 (a branch snapshot has no release branch)
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     4.x      4.0.5         2026-04-15   >=7.2 <8.5
+     3.x      3.11.0        2020-01-07   —
+     1.x      1.1.2         2018-08-08   —
+
+== case capped-tag-unverified‡
+matomo/referrer-spam-list dev-master — high: pinned · capped
+  direct requirement (composer.json require)
+
+age       installed  dev-masternot read (a branch snapshot has no release branch)
+          its branch           not read (a branch snapshot has no release branch)
+          newest     4.0.5     2026-04-15   0.5 years ago                 below release-warn-years 3
+          last push            2026-09-22   less than three weeks ago     below push-warn-years 3
+          libyears not measured: a branch snapshot has no release branch
+repository GitHub github.com/matomo-org/referrer-spam-list: last push 2026-09-22 · fetched 2026-09-14
+
+score     18 = pinned 16 + capped 2 [¼ of 8]     high from 16
+  maintenance  pinned 16 (lead) · capped 2 (¼ of 8)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require a tag — the newest is 4.0.5 (2026-04-15); not checked: capped
+          clears pinned
+
+flags
+  pinned       S6 · pinned to branch snapshot dev-master
+  capped       S11 · requires php >=7.2 <8.5: it stops at 8.4, so the newest PHP, 8.5, is excluded
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  S8 (a branch snapshot has no release branch)
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     4.x      4.0.5         2026-04-15   —
+     3.x      3.11.0        2020-01-07   —
+     1.x      1.1.2         2018-08-08   —
+
+== case php-edge-lower‡
+scheb/2fa-bundle v5.13.2 — high: left-behind
+  direct requirement (composer.json require)
+
+age       installed  v5.13.2   2022-04-16   4.5 years ago
+          5.x        v5.13.2   2022-04-16   4.5 years ago                 past release-warn-years 3
+          newest     v8.6.1    2026-07-10   0.2 years ago                 below release-warn-years 3
+          last push            2026-07-10   0.2 years ago                 below push-warn-years 3
+          libyears 4.2 behind the newest stable release
+repository GitHub github.com/scheb/2fa-bundle: last push 2026-07-10 · fetched 2026-09-14
+
+score     16 = left-behind 16     high from 16
+  maintenance  left-behind 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+          clears left-behind
+
+flags
+  left-behind  S8 · branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     8.x      v8.6.1        2026-07-10   ~8.4.0 || ~8.5.0
+     7.x      v7.14.0       2026-06-12   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     6.x      v6.13.1       2024-11-29   ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
+   * 5.x      v5.13.2       2022-04-16   >=7.2.5
+
+== case php-edge-equal‡
+scheb/2fa-bundle v5.13.2 — high: left-behind
+  direct requirement (composer.json require)
+
+age       installed  v5.13.2   2022-04-16   4.5 years ago
+          5.x        v5.13.2   2022-04-16   4.5 years ago                 past release-warn-years 3
+          newest     v8.6.1    2026-07-10   0.2 years ago                 below release-warn-years 3
+          last push            2026-07-10   0.2 years ago                 below push-warn-years 3
+          libyears 4.2 behind the newest stable release
+repository GitHub github.com/scheb/2fa-bundle: last push 2026-07-10 · fetched 2026-09-14
+
+score     16 = left-behind 16     high from 16
+  maintenance  left-behind 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+          clears left-behind
+
+flags
+  left-behind  S8 · branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=8.1; 6.x released v6.13.1 (2024-11-29)
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     8.x      v8.6.1        2026-07-10   ~8.4.0 || ~8.5.0
+     7.x      v7.14.0       2026-06-12   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     6.x      v6.13.1       2024-11-29   ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
+   * 5.x      v5.13.2       2022-04-16   >=7.2.5
+
+== case php-edge-upper‡
+scheb/2fa-bundle v5.13.2 — high: left-behind
+  direct requirement (composer.json require)
+
+age       installed  v5.13.2   2022-04-16   4.5 years ago
+          5.x        v5.13.2   2022-04-16   4.5 years ago                 past release-warn-years 3
+          newest     v8.6.1    2026-07-10   0.2 years ago                 below release-warn-years 3
+          last push            2026-07-10   0.2 years ago                 below push-warn-years 3
+          libyears 4.2 behind the newest stable release
+repository GitHub github.com/scheb/2fa-bundle: last push 2026-07-10 · fetched 2026-09-14
+
+score     16 = left-behind 16     high from 16
+  maintenance  left-behind 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+          clears left-behind
+
+flags
+  left-behind  S8 · branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     8.x      v8.6.1        2026-07-10   ~8.4.0 || ~8.5.0
+     7.x      v7.14.0       2026-06-12   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     6.x      v6.13.1       2024-11-29   ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
+   * 5.x      v5.13.2       2022-04-16   >=7.2.5
 
 == case unknown-origin
 bower-asset/jquery 3.7.1 — unknown

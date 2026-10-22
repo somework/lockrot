@@ -135,7 +135,8 @@ Matching rules:
 - **By package name only.** A bump of `vendor/pkg` from `1.2.3` to `1.3.0` keeps it `known` while
   its facts stay covered.
 - **A recorded flag covers itself and every flag after it in flag order.** So a flag that ageing
-  adds below the recorded ones stays `known`: `old-promise` recorded, then `stale`. A flag above
+  adds below the recorded ones stays `known`: `old-promise` recorded, then `stale`, or `stale`
+  recorded, then `capped`. A flag above
   them is new: `old-promise` recorded, then `abandoned`. A move between `warn` and `high` within
   one flag is not new.
 - **An advisory is known** while the entry holds its id, its severity is not higher (by gate rank,

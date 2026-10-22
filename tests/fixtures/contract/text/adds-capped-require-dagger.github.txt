@@ -1,0 +1,5 @@
+::error file=composer.lock,line=12,title=lockrot%3A high — left-behind::scheb/2fa-bundle v5.13.2: 16 = left-behind 16. Do: require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve. left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=8.0; 6.x released v6.13.1 (2024-11-29).
+flags: left-behind 1
+depth: every flagged package is named in composer.json · direct 1
+php: the lock installs on PHP 8.0 to 8.5
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

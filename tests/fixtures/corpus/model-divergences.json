@@ -414,6 +414,42 @@
     },
     {
       "app": "PrestaShop_PrestaShop",
+      "package": "pelago/emogrifier",
+      "path": "next_step.held_by",
+      "lockrot": [
+        {
+          "constraint": "^7.0.0",
+          "holder": null,
+          "link": "require",
+          "package": null,
+          "source": "root",
+          "target": null,
+          "version": null
+        }
+      ],
+      "model": [],
+      "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder."
+    },
+    {
+      "app": "PrestaShop_PrestaShop",
+      "package": "phpoffice/phpspreadsheet",
+      "path": "next_step.held_by",
+      "lockrot": [
+        {
+          "constraint": "^1.30.5",
+          "holder": null,
+          "link": "require",
+          "package": null,
+          "source": "root",
+          "target": null,
+          "version": null
+        }
+      ],
+      "model": [],
+      "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder."
+    },
+    {
+      "app": "PrestaShop_PrestaShop",
       "package": "prestashop/ps_banner",
       "path": "next_step.held_by",
       "lockrot": [
@@ -5672,6 +5708,346 @@
         "unknown": 0
       },
       "reason": "The model does not know the lowest fixing release, so the installed row's lowest is its newest release. lockrot reads the lowest release of the safe window (P2b)."
+    },
+    {
+      "app": "monicahq_monica",
+      "package": "nette/schema",
+      "path": "next_step.through",
+      "lockrot": [
+        {
+          "installed_requires": false,
+          "installed_version": "4.0.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2025-10-10T07:25:12+00:00",
+            "version": "4.1.0"
+          },
+          "package": "asbiin/laravel-localizer"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "2.3.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-09-17T13:06:05+00:00",
+            "version": "3.0.0"
+          },
+          "package": "asbiin/laravel-sentry-tunnel"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "5.3.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-06-02T17:36:35+00:00",
+            "version": "6.0.0"
+          },
+          "package": "asbiin/laravel-webauthn"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v2.0.4",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-10-01T10:38:10+00:00",
+            "version": "v3.5.1"
+          },
+          "package": "inertiajs/inertia-laravel"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "5.3.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-06-08T15:39:10+00:00",
+            "version": "5.11.0"
+          },
+          "package": "knuckleswtf/scribe"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "6.0.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-08-24T21:54:47+00:00",
+            "version": "8.0.0"
+          },
+          "package": "laravel-notification-channels/telegram"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v1.28.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-09-28T14:56:25+00:00",
+            "version": "v1.41.0"
+          },
+          "package": "laravel/fortify"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v12.22.1",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-10-13T13:21:00+00:00",
+            "version": "v13.36.0"
+          },
+          "package": "laravel/framework"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v5.3.8",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-05-19T01:30:03+00:00",
+            "version": "v5.5.3"
+          },
+          "package": "laravel/jetstream"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v1.11.5",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-10-13T04:38:02+00:00",
+            "version": "v1.30.3"
+          },
+          "package": "laravel/nightwatch"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v1.4.3",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-08-20T10:00:14+00:00",
+            "version": "v1.8.1"
+          },
+          "package": "laravel/pulse"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v4.2.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-06-23T18:26:55+00:00",
+            "version": "v4.3.3"
+          },
+          "package": "laravel/sanctum"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v10.17.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-10-06T14:26:28+00:00",
+            "version": "v11.9.0"
+          },
+          "package": "laravel/scout"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v5.23.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-08-31T13:49:19+00:00",
+            "version": "v5.31.0"
+          },
+          "package": "laravel/socialite"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "1.9.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-09-10T08:11:15+00:00",
+            "version": "2.0.0"
+          },
+          "package": "monicahq/laravel-sabre"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "4.15.1",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-10-08T12:31:48+00:00",
+            "version": "4.29.0"
+          },
+          "package": "sentry/sentry-laravel"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "4.1.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2020-12-01T23:10:59+00:00",
+            "version": "4.1.0"
+          },
+          "package": "socialiteproviders/facebook"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "4.1.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2020-12-01T23:10:59+00:00",
+            "version": "4.1.0"
+          },
+          "package": "socialiteproviders/github"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "4.1.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2020-12-01T23:10:59+00:00",
+            "version": "4.1.0"
+          },
+          "package": "socialiteproviders/google"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "5.0.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-09-11T22:29:56+00:00",
+            "version": "5.2.0"
+          },
+          "package": "socialiteproviders/kanidm"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "5.3.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2023-04-10T05:50:49+00:00",
+            "version": "5.3.0"
+          },
+          "package": "socialiteproviders/keycloak"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "5.0.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2024-11-27T10:35:28+00:00",
+            "version": "5.0.0"
+          },
+          "package": "socialiteproviders/linkedin"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "5.2.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-08-23T02:40:58+00:00",
+            "version": "5.2.1"
+          },
+          "package": "socialiteproviders/microsoft-azure"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v7.6.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-10-05T18:59:21+00:00",
+            "version": "v7.7.0"
+          },
+          "package": "stevebauman/location"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v2.5.3",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-10-10T22:16:55+00:00",
+            "version": "v2.6.5"
+          },
+          "package": "tightenco/ziggy"
+        }
+      ],
+      "model": [
+        {
+          "installed_requires": false,
+          "installed_version": "v2.0.4",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-10-01T10:38:10+00:00",
+            "version": "v3.5.1"
+          },
+          "package": "inertiajs/inertia-laravel"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "5.3.0",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-06-08T15:39:10+00:00",
+            "version": "5.11.0"
+          },
+          "package": "knuckleswtf/scribe"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v12.22.1",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-10-13T13:21:00+00:00",
+            "version": "v13.36.0"
+          },
+          "package": "laravel/framework"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v1.11.5",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-10-13T04:38:02+00:00",
+            "version": "v1.30.3"
+          },
+          "package": "laravel/nightwatch"
+        },
+        {
+          "installed_requires": false,
+          "installed_version": "v2.5.3",
+          "newest_requires": null,
+          "newest_requires_unmeasured": "through_other_package",
+          "newest_stable": {
+            "released": "2026-10-10T22:16:55+00:00",
+            "version": "v2.6.5"
+          },
+          "package": "tightenco/ziggy"
+        }
+      ],
+      "reason": "lockrot's graph follows replace and provide links, so a direct requirement that requires a replaced name comes in through the package that replaces it. The 0.13 graph that the model reads has no such link, so it lists fewer direct dependents. The entries that both sides list are equal."
     },
     {
       "app": "monicahq_monica",

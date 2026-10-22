@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/pinned",
-        "description": "mautic/core-lib 4.3.x-dev \u2014 finding critical (32 = pinned 16 + vulnerable 16 [high advisory]) \u2014 pinned: pinned to branch snapshot 4.3.x-dev. Do: no move: it is installed from a local path (your own package).",
+        "description": "mautic/core-lib 4.3.x-dev \u2014 finding critical (34 = pinned 16 + capped 2 [\u00bc of 8] + vulnerable 16 [high advisory]) \u2014 pinned: pinned to branch snapshot 4.3.x-dev. Do: no move: it is installed from a local path (your own package).",
         "categories": [
             "Bug Risk"
         ],
@@ -17,8 +17,24 @@
     },
     {
         "type": "issue",
+        "check_name": "lockrot/capped",
+        "description": "mautic/core-lib 4.3.x-dev \u2014 finding critical (34 = pinned 16 + capped 2 [\u00bc of 8] + vulnerable 16 [high advisory]) \u2014 capped: requires php >=7.4.0 <8.1: it stops at 8.0, so the newest PHP, 8.5, is excluded. Do: no move: it is installed from a local path (your own package).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "36c8b9642dfe9604644bc5a77b2ff056312847a1ee8c02656a0d1a690b4be6f7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 693
+            }
+        }
+    },
+    {
+        "type": "issue",
         "check_name": "lockrot/vulnerable",
-        "description": "mautic/core-lib 4.3.x-dev \u2014 finding critical (32 = pinned 16 + vulnerable 16 [high advisory]) \u2014 vulnerable: 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process. Do: no move: it is installed from a local path (your own package).",
+        "description": "mautic/core-lib 4.3.x-dev \u2014 finding critical (34 = pinned 16 + capped 2 [\u00bc of 8] + vulnerable 16 [high advisory]) \u2014 vulnerable: 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process. Do: no move: it is installed from a local path (your own package).",
         "categories": [
             "Security"
         ],

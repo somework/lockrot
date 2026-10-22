@@ -367,6 +367,15 @@
                 }
             }
         },
+        "laminas/laminas-code": {
+            "version": "4.7.1",
+            "first_seen": "2024-11-03",
+            "flags": {
+                "capped": {
+                    "known_since": "2024-11-03"
+                }
+            }
+        },
         "lexik/form-filter-bundle": {
             "version": "v7.0.3",
             "first_seen": "2024-11-03",
@@ -405,6 +414,9 @@
             "first_seen": "2024-11-03",
             "flags": {
                 "abandoned": {
+                    "known_since": "2024-11-03"
+                },
+                "capped": {
                     "known_since": "2024-11-03"
                 }
             }

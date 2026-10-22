@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/capped",
+        "description": "mautic/core-lib 4.3.x-dev \u2014 finding high (24 = capped 8 + vulnerable 16 [high advisory] (pinned accepted)) \u2014 capped: requires php >=7.4.0 <8.1: it stops at 8.0, so the newest PHP, 8.5, is excluded. Do: no move: it is installed from a local path (your own package).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "36c8b9642dfe9604644bc5a77b2ff056312847a1ee8c02656a0d1a690b4be6f7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 693
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "mautic/core-lib 4.3.x-dev \u2014 finding high (24 = capped 8 + vulnerable 16 [high advisory] (pinned accepted)) \u2014 vulnerable: 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process. Do: no move: it is installed from a local path (your own package).",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "8faadba515e425d6331c3cfcb9cb7a645503388572c59326e62020d6f5492072",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 693
+            }
+        }
+    }
+]

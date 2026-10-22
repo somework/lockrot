@@ -145,6 +145,7 @@ high (39)
           left-behind); the packages that hold it may need to move too; a new major brings its own requirements;
           Composer's solver refuses it against the lock
       left-behind  branch 4.x last released 2023-01-02 (3.8 years ago); 5.x released 5.6.1 (2026-10-10)
+      pulls in 1 flagged package: lcobucci/clock (capped)
   scheb/2fa-backup-code v5.13.2  direct  ·  left-behind
       16 = left-behind 16
       do: require scheb/2fa-backup-code ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 ||
@@ -212,7 +213,7 @@ high (39)
           v7.14.0 (requires scheb/2fa-bundle self.version; itself left-behind); the packages that hold it may need to
           move too; a new major brings its own requirements; Composer's solver refuses it against the lock
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)
-      pulls in 1 flagged package: symfony/security-guard (abandoned)
+      pulls in 2 flagged packages: symfony/security-guard (abandoned), lcobucci/clock (capped)
       checks missing: S2 (undated releases)
   symfony/webpack-encore-bundle v1.17.2  direct  ·  left-behind
       16 = left-behind 16
@@ -436,11 +437,20 @@ medium (12)
       pinned       pinned to branch snapshot dev-master
       age: last push 2023-12-24 (2.8 years ago)
 
-low (3)
+low (4)
   friendsofsymfony/oauth2-php 1.3.1  via friendsofsymfony/oauth-server-bundle  ·  stale
       4 = stale 8 ÷ 2 transitive
       do: —
       stale        last release 2021-04-06 (5.5 years ago)
+  lcobucci/clock 3.3.1  via lcobucci/jwt, scheb/2fa-trusted-device  ·  capped
+      4 = capped 8 ÷ 2 transitive
+      do: raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt, scheb/2fa-trusted-device
+          — clears capped; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 8.2 (a minor raise); the target php 8.4
+          runs it; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it;
+          Composer's solver checked it against the lock
+      capped       requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded
+      age: installed 3.3.1 released 2024-09-24 (2.1 years ago); 3.x last released 3.6.0 2026-04-13 (0.5 years ago),
+           its newest release; last push 2026-09-13 (0.1 years ago)
   willdurand/jsonp-callback-validator v2.0.0  via friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle  ·  stale
       4 = stale 8 ÷ 2 transitive
       do: —
@@ -450,10 +460,10 @@ low (3)
       do: —
       stale        last release 2022-01-30 (4.7 years ago); last push 2023-08-03 (3.2 years ago)
 
-200 packages checked · 57 flagged: critical 3 · high 39 · medium 12 · low 3
-flags: abandoned 19 · silent 8 · pinned 4 · left-behind 13 · old-promise 10 · stale 8 · vulnerable 7 ·
+200 packages checked · 58 flagged: critical 3 · high 39 · medium 12 · low 4
+flags: abandoned 19 · silent 8 · pinned 4 · left-behind 13 · old-promise 10 · stale 8 · capped 1 · vulnerable 7 ·
 12 packages carry more than one
-depth: 35 of 57 flagged packages are named by no line of composer.json · direct 22 · 1 hop 19 · 2 hops 9 ·
+depth: 36 of 58 flagged packages are named by no line of composer.json · direct 22 · 1 hop 20 · 2 hops 9 ·
 3 hops 5 · 4 hops 2 ·
 deepest: hoa/ustring and hoa/zformat, 4 hops (wallabag/rulerz › hoa/ruler › hoa/compiler › hoa/regex › hoa/ustring)
 security: 7 vulnerable packages · 10 advisories: 1 high, 5 medium, 4 unrated · packages-dev not checked (pass --dev)
@@ -462,7 +472,7 @@ update now: composer update 'symfony/expression-language:^5.4.54' 'symfony/http-
 libyears: at least 189.3 behind across 194 of 200 packages · 119.9 from direct requirements ·
 furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
-scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 22 more
+scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 23 more
 advisories: 200 packages asked · packagist.org answered (184 on record for 50 packages)
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
@@ -563,6 +573,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             "left-behind",
             "old-promise",
             "stale",
+            "capped",
             "vulnerable"
         ],
         "verdicts": [
@@ -590,7 +601,8 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             "S7",
             "S8",
             "S9",
-            "S10"
+            "S10",
+            "S11"
         ],
         "fix_model": 1,
         "text_grammar": 1,
@@ -604,6 +616,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                 "left-behind",
                 "old-promise",
                 "stale",
+                "capped",
                 "vulnerable"
             ],
             "parts": [
@@ -615,7 +628,8 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                         "pinned",
                         "left-behind",
                         "old-promise",
-                        "stale"
+                        "stale",
+                        "capped"
                     ],
                     "combine": "lead_plus_share"
                 },
@@ -1007,18 +1021,18 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         },
         "score_rules_used": {
             "counted": 10,
-            "lead-first": 51,
+            "lead-first": 52,
             "corroborating-share": 11,
             "advisory-points": 7,
             "no-reachable-fix-multiplier": 1,
             "security-max": 2,
-            "divide-reach": 39,
+            "divide-reach": 40,
             "security-exempt-from-reach": 4,
             "sum": 1,
             "divide-dev": 0,
             "floor-once": 0,
-            "band-floors": 57,
-            "zero-verdicts": 143,
+            "band-floors": 58,
+            "zero-verdicts": 142,
             "sort": null,
             "gate-bounded-new": 0,
             "baseline-cover": 0
@@ -1027,7 +1041,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
     "activity_cache_oldest_at": "2026-10-17T18:03:03+00:00",
     "activity_cache_age_hours": 20.5,
     "packages_checked": 200,
-    "packages_flagged": 57,
+    "packages_flagged": 58,
     "packages_multi_flag": 12,
     "include_dev": false,
     "not_from_composer_repository": 0,
@@ -1037,10 +1051,10 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         "critical": 3,
         "high": 39,
         "medium": 12,
-        "low": 3,
+        "low": 4,
         "unknown": 0,
         "finished": 18,
-        "ok": 125
+        "ok": 124
     },
     "abandoned": {
         "total": 19,
@@ -1051,8 +1065,8 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         "critical": 3,
         "high": 39,
         "medium": 12,
-        "low": 3,
-        "none": 143
+        "low": 4,
+        "none": 142
     },
     "flags": {
         "abandoned": {
@@ -1139,6 +1153,20 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                 "low": 3
             }
         },
+        "capped": {
+            "carrying": 1,
+            "leading": 1,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 1
+            }
+        },
         "vulnerable": {
             "carrying": 7,
             "leading": null,
@@ -1171,20 +1199,20 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
     },
     "unattributed": [],
     "rot_depth": {
-        "flagged": 57,
-        "measured": 57,
+        "flagged": 58,
+        "measured": 58,
         "unmeasured": {
             "unreached": 0,
             "no_composer_json": 0
         },
         "by_reach": {
             "direct": 22,
-            "transitive": 35,
+            "transitive": 36,
             "unreached": 0
         },
-        "not_in_composer_json": 35,
+        "not_in_composer_json": 36,
         "require_dev_not_walked": 0,
-        "production": 57,
+        "production": 58,
         "development": 0,
         "by_depth": [
             {
@@ -1193,7 +1221,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             },
             {
                 "depth": 1,
-                "flagged": 19
+                "flagged": 20
             },
             {
                 "depth": 2,
