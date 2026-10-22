@@ -19,6 +19,9 @@ use Lockrot\Solver\MoveChecker;
  */
 final class TargetFix
 {
+    /** The values of `reason`: the baseline's reasons, and those of the solve itself. */
+    public const REASONS = [MoveCheck::UNLOADED_NAME, MoveCheck::OFFLINE, MoveCheck::INSTALL_TIME_BUDGET, MoveCheck::NOT_FROM_COMPOSER_REPOSITORY, MoveCheck::NO_COMPOSER_JSON, MoveCheck::COMPOSER_JSON_INVALID, MoveCheck::SOLVER_ERROR];
+
     /**
      * A root link that fails is the root ceiling: no update can admit the target, so nothing solves.
      *

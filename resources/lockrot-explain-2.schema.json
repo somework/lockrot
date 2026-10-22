@@ -3508,6 +3508,75 @@
                     ]
                 },
                 {
+                    "description": "`run.php_window.target_fix.reason` is null on a `not_checked` fix exactly when `move_check` is null: a run that checks no move names no reason.",
+                    "anyOf": [
+                        {
+                            "not": {
+                                "properties": {
+                                    "php_window": {
+                                        "properties": {
+                                            "target_fix": {
+                                                "properties": {
+                                                    "check": {
+                                                        "enum": [
+                                                            "not_checked"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "check"
+                                                ]
+                                            }
+                                        },
+                                        "required": [
+                                            "target_fix"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "php_window"
+                                ]
+                            }
+                        },
+                        {
+                            "properties": {
+                                "move_check": {
+                                    "type": "null"
+                                },
+                                "php_window": {
+                                    "properties": {
+                                        "target_fix": {
+                                            "properties": {
+                                                "reason": {
+                                                    "type": "null"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "properties": {
+                                "move_check": {
+                                    "type": "object"
+                                },
+                                "php_window": {
+                                    "properties": {
+                                        "target_fix": {
+                                            "properties": {
+                                                "reason": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
                     "description": "`project_php_lowest` is null when `project_php` is (no `require.php`, so no lowest).",
                     "anyOf": [
                         {

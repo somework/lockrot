@@ -8,6 +8,7 @@ use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Allowlist\UncheckedAcceptanceEntry;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\RunNote;
+use Lockrot\Analyzer\TargetFix;
 use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
@@ -80,6 +81,7 @@ final class KnownValuesRegistryTest extends TestCase
             '#/definitions/noteUpdateNowNotChecked/properties/reason' => [MoveCheck::REASONS, 'MoveCheck'],
             '#/definitions/explainRun/properties/move_check/oneOf/0/properties/reason/oneOf/0' => [MoveCheck::BASELINE_REASONS, 'MoveCheck'],
             '#/definitions/noteMovesNotChecked/properties/reason' => [[MoveCheck::BASELINE_REFUSED], 'RunNote::movesNotChecked()'],
+            '#/definitions/targetFix/properties/reason/oneOf/0' => [TargetFix::REASONS, 'TargetFix'],
             '#/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key' => [['policy', 'policy.advisories', 'policy.advisories.audit', 'COMPOSER_POLICY'], 'RunNote::advisoriesDisabledByPolicy()'],
             '#/definitions/originKind' => [PackageOrigin::KINDS, 'PackageOrigin'],
             '#/definitions/originRegistry/oneOf/0' => [PackageOrigin::REGISTRIES, 'PackageOrigin'],

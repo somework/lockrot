@@ -21419,7 +21419,8 @@
                 "host_requires",
                 "with_dev",
                 "without_dev",
-                "target"
+                "target",
+                "target_fix"
               ],
               "properties": {
                 "platform_override": {
@@ -21475,6 +21476,17 @@
                       "type": "boolean"
                     }
                   }
+                },
+                "target_fix": {
+                  "description": "What admits the target: the package links that exclude it and Composer's answer to their update at the target's point. Null when the target is inside the window, or below the lowest edge of the set that `target.inside` reads.",
+                  "oneOf": [
+                    {
+                      "$ref": "#/definitions/targetFix"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             },
@@ -21545,6 +21557,75 @@
                 },
                 "gates": {
                   "minItems": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`run.php_window.target_fix.reason` is null on a `not_checked` fix exactly when `move_check` is null: a run that checks no move names no reason.",
+          "anyOf": [
+            {
+              "not": {
+                "properties": {
+                  "php_window": {
+                    "properties": {
+                      "target_fix": {
+                        "properties": {
+                          "check": {
+                            "enum": [
+                              "not_checked"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "check"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "target_fix"
+                    ]
+                  }
+                },
+                "required": [
+                  "php_window"
+                ]
+              }
+            },
+            {
+              "properties": {
+                "move_check": {
+                  "type": "null"
+                },
+                "php_window": {
+                  "properties": {
+                    "target_fix": {
+                      "properties": {
+                        "reason": {
+                          "type": "null"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "move_check": {
+                  "type": "object"
+                },
+                "php_window": {
+                  "properties": {
+                    "target_fix": {
+                      "properties": {
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -22470,6 +22551,235 @@
           "uniqueItems": true
         }
       }
+    },
+    "targetFix": {
+      "description": "`run.php_window.target_fix`: one update that unlocks every package that excludes the target PHP.",
+      "type": "object",
+      "required": [
+        "packages",
+        "command",
+        "check",
+        "reason",
+        "held_by",
+        "platform_step"
+      ],
+      "properties": {
+        "packages": {
+          "description": "The package links that exclude `target.php`, on the set that `target.inside` reads: each package `require` that fails there and each package `conflict` that matches there, on `php` and `php-64bit`. Production first, then packages-dev, each by name, then by `link` and `target`. A packages-dev entry is listed when the run did not analyse packages-dev. At least one, except at the root ceiling.",
+          "type": "array",
+          "items": {
+            "description": "A package link that excludes the target.",
+            "type": "object",
+            "required": [
+              "name",
+              "version",
+              "link",
+              "target",
+              "constraint",
+              "dev"
+            ],
+            "properties": {
+              "name": {
+                "description": "The package, as the lock names it. A name that is no Composer package name reaches no solve and no command.",
+                "type": "string",
+                "minLength": 1
+              },
+              "version": {
+                "description": "Its locked version.",
+                "type": "string",
+                "minLength": 1
+              },
+              "link": {
+                "description": "The link. Closed.",
+                "type": "string",
+                "enum": [
+                  "require",
+                  "conflict"
+                ]
+              },
+              "target": {
+                "description": "The platform name. Closed.",
+                "type": "string",
+                "enum": [
+                  "php",
+                  "php-64bit"
+                ]
+              },
+              "constraint": {
+                "description": "The constraint as the lock writes it.",
+                "type": "string",
+                "minLength": 1
+              },
+              "dev": {
+                "description": "Whether it is a packages-dev entry.",
+                "type": "boolean"
+              }
+            }
+          },
+          "uniqueItems": true
+        },
+        "command": {
+          "description": "The argv of the update that Composer's solver resolves: `composer update <packages>` with each listed package once, and `--with-dependencies` or `--with-all-dependencies` when that form resolved. Set exactly when `check` is `resolves`. It obeys the command argument rule of `next_step.commands[]`, and a page renders it as it renders `commands[]`.",
+          "oneOf": [
+            {
+              "description": "One command.",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 3
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "check": {
+          "description": "Composer's answer: `resolves`, `refused` (a refusal, or a root link that excludes the target, which no update can admit), or `not_checked`. Closed.",
+          "type": "string",
+          "enum": [
+            "resolves",
+            "refused",
+            "not_checked"
+          ]
+        },
+        "reason": {
+          "description": "Why the update was not checked, from the reasons of `next_step.check.reason`. Null on `resolves` and `refused`, and on `not_checked` exactly when `run.move_check` is null (a run that checks no move).",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "unloaded_name",
+                "offline",
+                "install_time_budget",
+                "not_from_composer_repository",
+                "no_composer_json",
+                "composer_json_invalid",
+                "solver_error"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "held_by": {
+          "description": "On `refused`, the holds that the refusal names, as a move's `held_by[]`, less the `platform` holds on php of the listed packages. `[]` when the refusal names no hold. At the root ceiling, which lockrot decides without a solve, the holds are the root links that fail at `target.php`: `link` is the link's section, `require`, `require-dev` or `conflict`, and `target` is `php` or `php-64bit`. Empty on `resolves` and `not_checked`.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/heldBy"
+          }
+        },
+        "platform_step": {
+          "description": "Whether the words of a `resolves` fix tell you to set `config.platform.php` to your release of the target PHP first. True exactly when the solve's `config.platform.php` is set and lies outside the minor of `run.target_php`. Then `target.php` is the `.99` point of `run.target_php`. The lock's `platform-overrides` does not set it.",
+          "type": "boolean"
+        }
+      },
+      "anyOf": [
+        {
+          "description": "`resolves`: a command, no reason, no hold, a package.",
+          "properties": {
+            "check": {
+              "enum": [
+                "resolves"
+              ]
+            },
+            "command": {
+              "type": "array"
+            },
+            "reason": {
+              "type": "null"
+            },
+            "held_by": {
+              "maxItems": 0
+            },
+            "packages": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "description": "`refused` by the solve: no command, no reason, a package.",
+          "properties": {
+            "check": {
+              "enum": [
+                "refused"
+              ]
+            },
+            "command": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "null"
+            },
+            "packages": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "description": "`refused` at the root ceiling: no command, no reason, only root holds on php.",
+          "properties": {
+            "check": {
+              "enum": [
+                "refused"
+              ]
+            },
+            "command": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "null"
+            },
+            "held_by": {
+              "minItems": 1,
+              "items": {
+                "properties": {
+                  "source": {
+                    "enum": [
+                      "root"
+                    ]
+                  },
+                  "link": {
+                    "enum": [
+                      "require",
+                      "require-dev",
+                      "conflict"
+                    ]
+                  },
+                  "target": {
+                    "enum": [
+                      "php",
+                      "php-64bit"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "`not_checked`: no command, no hold, a package.",
+          "properties": {
+            "check": {
+              "enum": [
+                "not_checked"
+              ]
+            },
+            "command": {
+              "type": "null"
+            },
+            "held_by": {
+              "maxItems": 0
+            },
+            "packages": {
+              "minItems": 1
+            }
+          }
+        }
+      ]
     },
     "phpWindowReq": {
       "description": "A php link of the lock: a package's `require` or `conflict` on `php` or `php-64bit`, or the root's.",

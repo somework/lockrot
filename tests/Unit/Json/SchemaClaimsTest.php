@@ -49,6 +49,8 @@ final class SchemaClaimsTest extends TestCase
         'phpCheck.project_allows' => 'the parse of require.php (PhpFloor)',
         'phpWindowReq.name' => 'the root link has no package name (PhpWindow)',
         'phpWindowReq.version' => 'the root link has no version (PhpWindow)',
+        'targetFix.command' => 'encoded (targetFix anyOf: an array on resolves, null otherwise); the argv contents are engine',
+        'targetFix.platform_step' => 'config.platform.php is outside the document (TargetFix)',
         's9fix.admits_target_php' => 'the parse of `php` against the target PHP (PhpFloor); the null of unknown and none is encoded (s9fix relation)',
         's9fix.admits_project_php' => 'the parse of `php` and require.php (PhpFloor); the null of unknown and none is encoded (s9fix relation)',
         'termSecurity.points' => 'weight x multiplier (scoreGraded model-1 tables hold its values)',

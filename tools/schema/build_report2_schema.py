@@ -1405,6 +1405,8 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
             'php': d("The php that the move check solves at: `config.platform.php` when it lies in the target minor, else the minor at patch 99.", {'type': 'string', 'pattern': '^[0-9]+(\\.[0-9]+)*$'}),
             'inside': d('Whether the set with require-dev (`without_dev` when `with_dev` is null) admits that point.', {'type': 'boolean'}),
         }),
+        'target_fix': nul(("What admits the target (§5.9): the package links that exclude it and Composer's answer to their update at the target's "
+                           "point. Null when the target is inside the window, or below the lowest edge of the set that `target.inside` reads."), ref('targetFix')),
     })),
     'score_rules_used': {'description': ("Rule id → the number of findings on which the rule changed or decided a number (each count's predicate is a field test: "
                                          "graded findings; score-0 findings for `zero-verdicts`; every finding with a non-empty `score.accepted[]` for `counted`), null only for "
@@ -1420,7 +1422,14 @@ defs['run']['properties']['mode']['description'] = "What the run was asked to do
 RUN_RELATION = {'description': '`fail_on` is `none` exactly when `gates` is empty (`--fail-on=none` is the absence of a gate).',
                 'anyOf': [{'properties': {'fail_on': {'enum': ['none']}, 'gates': {'maxItems': 0}}},
                           {'properties': {'fail_on': {'not': {'enum': ['none']}}, 'gates': {'minItems': 1}}}]}
-defs['run']['allOf'] = [RUN_RELATION]
+TARGET_FIX_UNCHECKED = {'properties': {'php_window': {'properties': {'target_fix': {'properties': {'check': {'enum': ['not_checked']}}, 'required': ['check']}}, 'required': ['target_fix']}},
+                        'required': ['php_window']}
+TARGET_FIX_RELATION = {'description': ("`run.php_window.target_fix.reason` is null on a `not_checked` fix exactly when `move_check` is null: a run that checks no move "
+                                       "names no reason."),
+                       'anyOf': [{'not': TARGET_FIX_UNCHECKED},
+                                 {'properties': {'move_check': {'type': 'null'}, 'php_window': {'properties': {'target_fix': {'properties': {'reason': {'type': 'null'}}}}}}},
+                                 {'properties': {'move_check': {'type': 'object'}, 'php_window': {'properties': {'target_fix': {'properties': {'reason': {'type': 'string'}}}}}}}]}
+defs['run']['allOf'] = [RUN_RELATION, TARGET_FIX_RELATION]
 defs['run']['properties']['project']['description'] = "What the report calls the project: composer.json's `name`, or `extra.lockrot.project` (report-1); null where neither says."
 
 # root blocks
@@ -1519,6 +1528,45 @@ defs['noteUpdateNowNotChecked'] = obj(("`update_now_not_checked`: Composer's sol
     'reason': {'description': 'Why it was not checked: a value of `check.reason` (§5.6). An open set.', 'type': 'string', 'pattern': SNAKE, 'x-known-values': MOVE_CHECK_REASONS},
     'packages': arr('The candidates: the vulnerable findings whose lead `update` Composer resolves inline, in report order.', ref('packageName'), minItems=1, uniqueItems=True),
 })
+defs['targetFix'] = obj("`run.php_window.target_fix` (§5.9): one update that unlocks every package that excludes the target PHP.", {
+    'packages': arr(("The package links that exclude `target.php`, on the set that `target.inside` reads: each package `require` "
+                     "that fails there and each package `conflict` that matches there, on `php` and `php-64bit`. Production first, then packages-dev, "
+                     "each by name, then by `link` and `target`. A packages-dev entry is listed when the run did not analyse packages-dev. At least "
+                     "one, except at the root ceiling."), obj('A package link that excludes the target.', {
+        'name': d('The package, as the lock names it. A name that is no Composer package name reaches no solve and no command.', {'type': 'string', 'minLength': 1}),
+        'version': d('Its locked version.', {'type': 'string', 'minLength': 1}),
+        'link': closed(['require', 'conflict'], 'The link. Closed.'),
+        'target': closed(['php', 'php-64bit'], 'The platform name. Closed.'),
+        'constraint': d('The constraint as the lock writes it.', {'type': 'string', 'minLength': 1}),
+        'dev': d('Whether it is a packages-dev entry.', {'type': 'boolean'}),
+    }), uniqueItems=True),
+    'command': nul(("The argv of the update that Composer's solver resolves: `composer update <packages>` with each listed package once, and "
+                    "`--with-dependencies` or `--with-all-dependencies` when that form resolved. Set exactly when `check` is `resolves`. It obeys the "
+                    "command argument rule of `next_step.commands[]`, and a page renders it as it renders `commands[]`."),
+                   arr('One command.', {'type': 'string', 'minLength': 1}, minItems=3)),
+    'check': closed(['resolves', 'refused', 'not_checked'], ("Composer's answer: `resolves`, `refused` (a refusal, or a root link that excludes the "
+                                                             "target, which no update can admit), or `not_checked`. Closed.")),
+    'reason': nul(("Why the update was not checked, from the reasons of `next_step.check.reason`. Null on `resolves` and `refused`, and on `not_checked` "
+                   "exactly when `run.move_check` is null (a run that checks no move)."), {'type': 'string', 'pattern': SNAKE,
+                  'x-known-values': ['unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'no_composer_json', 'composer_json_invalid',
+                                     'solver_error']}),
+    'held_by': arr(("On `refused`, the holds that the refusal names, as a move's `held_by[]`, less the `platform` holds on php of the listed "
+                    "packages. `[]` when the refusal names no hold. At the root ceiling, which lockrot decides without a solve, the holds are "
+                    "the root links that fail at `target.php`: `link` is the link's section, `require`, `require-dev` or `conflict`, and "
+                    "`target` is `php` or `php-64bit`. Empty on `resolves` and `not_checked`."), ref('heldBy')),
+    'platform_step': d(("Whether the words of a `resolves` fix tell you to set `config.platform.php` to your release of the target PHP first. True "
+                        "exactly when the solve's `config.platform.php` is set and lies outside the minor of `run.target_php`. Then `target.php` is "
+                        "the `.99` point of `run.target_php`. The lock's `platform-overrides` does not set it."), {'type': 'boolean'}),
+}, anyOf=[{'description': '`resolves`: a command, no reason, no hold, a package.', 'properties': {'check': {'enum': ['resolves']}, 'command': {'type': 'array'}, 'reason': {'type': 'null'},
+                                                                                         'held_by': {'maxItems': 0}, 'packages': {'minItems': 1}}},
+          {'description': '`refused` by the solve: no command, no reason, a package.', 'properties': {'check': {'enum': ['refused']}, 'command': {'type': 'null'}, 'reason': {'type': 'null'},
+                                                                                                  'packages': {'minItems': 1}}},
+          {'description': '`refused` at the root ceiling: no command, no reason, only root holds on php.',
+           'properties': {'check': {'enum': ['refused']}, 'command': {'type': 'null'}, 'reason': {'type': 'null'},
+                          'held_by': {'minItems': 1, 'items': {'properties': {'source': {'enum': ['root']}, 'link': {'enum': ['require', 'require-dev', 'conflict']},
+                                                                              'target': {'enum': ['php', 'php-64bit']}}}}}},
+          {'description': '`not_checked`: no command, no hold, a package.', 'properties': {'check': {'enum': ['not_checked']}, 'command': {'type': 'null'}, 'held_by': {'maxItems': 0},
+                                                                                      'packages': {'minItems': 1}}}])
 defs['phpWindowReq'] = obj("A php link of the lock (§5.9): a package's `require` or `conflict` on `php` or `php-64bit`, or the root's.", {
     'name': nul('The package; null for the root.', {'type': 'string', 'minLength': 1}),
     'version': nul('The locked version; null for the root.', {'type': 'string', 'minLength': 1}),
