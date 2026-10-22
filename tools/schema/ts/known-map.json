@@ -3108,6 +3108,41 @@
   "integer": false
  },
  {
+  "name": "PhpWindowReqLink",
+  "pointer": "#/definitions/phpWindowReq/properties/link",
+  "pointers": [
+   "#/definitions/phpWindowReq/properties/link",
+   "#/definitions/targetFix/anyOf/0/properties/packages/items/properties/link",
+   "#/definitions/targetFix/anyOf/1/properties/packages/items/properties/link",
+   "#/definitions/targetFix/properties/packages/items/properties/link",
+   "#/definitions/targetFix/anyOf/3/properties/packages/items/properties/link"
+  ],
+  "values": [
+   "require",
+   "conflict"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "PhpWindowReqTarget",
+  "pointer": "#/definitions/phpWindowReq/properties/target",
+  "pointers": [
+   "#/definitions/phpWindowReq/properties/target",
+   "#/definitions/targetFix/anyOf/0/properties/packages/items/properties/target",
+   "#/definitions/targetFix/anyOf/1/properties/packages/items/properties/target",
+   "#/definitions/targetFix/properties/packages/items/properties/target",
+   "#/definitions/targetFix/anyOf/2/properties/held_by/items/properties/target",
+   "#/definitions/targetFix/anyOf/3/properties/packages/items/properties/target"
+  ],
+  "values": [
+   "php",
+   "php-64bit"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
   "name": "TargetFixCheck",
   "pointer": "#/definitions/targetFix/properties/check",
   "pointers": [
@@ -3140,41 +3175,6 @@
    "solver_error"
   ],
   "open": true,
-  "integer": false
- },
- {
-  "name": "TargetFixPackagesItemLink",
-  "pointer": "#/definitions/targetFix/anyOf/0/properties/packages/items/properties/link",
-  "pointers": [
-   "#/definitions/targetFix/anyOf/0/properties/packages/items/properties/link",
-   "#/definitions/targetFix/anyOf/1/properties/packages/items/properties/link",
-   "#/definitions/targetFix/properties/packages/items/properties/link",
-   "#/definitions/targetFix/anyOf/3/properties/packages/items/properties/link",
-   "#/definitions/phpWindowReq/properties/link"
-  ],
-  "values": [
-   "require",
-   "conflict"
-  ],
-  "open": false,
-  "integer": false
- },
- {
-  "name": "TargetFixPackagesItemTarget",
-  "pointer": "#/definitions/targetFix/anyOf/0/properties/packages/items/properties/target",
-  "pointers": [
-   "#/definitions/targetFix/anyOf/0/properties/packages/items/properties/target",
-   "#/definitions/targetFix/anyOf/1/properties/packages/items/properties/target",
-   "#/definitions/targetFix/properties/packages/items/properties/target",
-   "#/definitions/targetFix/anyOf/2/properties/held_by/items/properties/target",
-   "#/definitions/targetFix/anyOf/3/properties/packages/items/properties/target",
-   "#/definitions/phpWindowReq/properties/target"
-  ],
-  "values": [
-   "php",
-   "php-64bit"
-  ],
-  "open": false,
   "integer": false
  },
  {

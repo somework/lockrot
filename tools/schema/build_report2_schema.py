@@ -1528,6 +1528,30 @@ defs['noteUpdateNowNotChecked'] = obj(("`update_now_not_checked`: Composer's sol
     'reason': {'description': 'Why it was not checked: a value of `check.reason` (§5.6). An open set.', 'type': 'string', 'pattern': SNAKE, 'x-known-values': MOVE_CHECK_REASONS},
     'packages': arr('The candidates: the vulnerable findings whose lead `update` Composer resolves inline, in report order.', ref('packageName'), minItems=1, uniqueItems=True),
 })
+defs['phpWindowReq'] = obj("A php link of the lock (§5.9): a package's `require` or `conflict` on `php` or `php-64bit`, or the root's.", {
+    'name': nul('The package; null for the root.', {'type': 'string', 'minLength': 1}),
+    'version': nul('The locked version; null for the root.', {'type': 'string', 'minLength': 1}),
+    'link': closed(['require', 'conflict'], 'The link. Closed.'),
+    'target': closed(['php', 'php-64bit'], 'The platform name. Composer gives `php-64bit` the version of `php`. Closed.'),
+    'constraint': d('The constraint as the lock writes it.', {'type': 'string', 'minLength': 1}),
+    'dev': d("Whether it is a packages-dev entry, or the root's `require-dev` or `platform-dev`.", {'type': 'boolean'}),
+})
+defs['phpWindowSet'] = obj('The PHP minors on which one set of the lock installs (§5.9).', {
+    'minors': arr('The known minors whose point every requirement matches and no conflict matches, in GA order.', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}, uniqueItems=True),
+    'gaps': d('Whether the admitted minors skip a known minor.', {'type': 'boolean'}),
+    'lower_edge': nul('The lowest edge; null when no minor is admitted.', obj('The lowest edge.', {
+        'php': d('The lowest X.Y.Z of the first admitted minor that the set admits.', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+\\.[0-9]+$'}),
+        'set_by': arr('The requirements that fail, and the conflicts that match, at the last point below the edge.', ref('phpWindowReq')),
+    })),
+    'upper_edge': nul('The highest edge; null when the newest known minor is admitted or no minor is.', obj('The highest edge.', {
+        'excludes': d('The known minor after the last admitted one.', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}),
+        'set_by': arr('The requirements that fail, and the conflicts that match, at that minor.', ref('phpWindowReq'), minItems=1),
+    })),
+    'closest': nul('With no admitted minor, the known minors that the fewest links exclude, and those links; null when a minor is admitted.', obj('Why the set admits no PHP.', {
+        'minors': arr('The known minors with the fewest excluding links, in GA order.', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}, minItems=1, uniqueItems=True),
+        'set_by': arr('The links that exclude those minors: the requirements that fail and the conflicts that match there.', ref('phpWindowReq'), minItems=1),
+    })),
+})
 defs['targetFix'] = obj("`run.php_window.target_fix` (§5.9): one update that unlocks every package that excludes the target PHP.", {
     'packages': arr(("The package links that exclude `target.php`, on the set that `target.inside` reads: each package `require` "
                      "that fails there and each package `conflict` that matches there, on `php` and `php-64bit`. Production first, then packages-dev, "
@@ -1567,30 +1591,6 @@ defs['targetFix'] = obj("`run.php_window.target_fix` (§5.9): one update that un
                                                                               'target': {'enum': ['php', 'php-64bit']}}}}}},
           {'description': '`not_checked`: no command, no hold, a package.', 'properties': {'check': {'enum': ['not_checked']}, 'command': {'type': 'null'}, 'held_by': {'maxItems': 0},
                                                                                       'packages': {'minItems': 1}}}])
-defs['phpWindowReq'] = obj("A php link of the lock (§5.9): a package's `require` or `conflict` on `php` or `php-64bit`, or the root's.", {
-    'name': nul('The package; null for the root.', {'type': 'string', 'minLength': 1}),
-    'version': nul('The locked version; null for the root.', {'type': 'string', 'minLength': 1}),
-    'link': closed(['require', 'conflict'], 'The link. Closed.'),
-    'target': closed(['php', 'php-64bit'], 'The platform name. Composer gives `php-64bit` the version of `php`. Closed.'),
-    'constraint': d('The constraint as the lock writes it.', {'type': 'string', 'minLength': 1}),
-    'dev': d("Whether it is a packages-dev entry, or the root's `require-dev` or `platform-dev`.", {'type': 'boolean'}),
-})
-defs['phpWindowSet'] = obj('The PHP minors on which one set of the lock installs (§5.9).', {
-    'minors': arr('The known minors whose point every requirement matches and no conflict matches, in GA order.', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}, uniqueItems=True),
-    'gaps': d('Whether the admitted minors skip a known minor.', {'type': 'boolean'}),
-    'lower_edge': nul('The lowest edge; null when no minor is admitted.', obj('The lowest edge.', {
-        'php': d('The lowest X.Y.Z of the first admitted minor that the set admits.', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+\\.[0-9]+$'}),
-        'set_by': arr('The requirements that fail, and the conflicts that match, at the last point below the edge.', ref('phpWindowReq')),
-    })),
-    'upper_edge': nul('The highest edge; null when the newest known minor is admitted or no minor is.', obj('The highest edge.', {
-        'excludes': d('The known minor after the last admitted one.', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}),
-        'set_by': arr('The requirements that fail, and the conflicts that match, at that minor.', ref('phpWindowReq'), minItems=1),
-    })),
-    'closest': nul('With no admitted minor, the known minors that the fewest links exclude, and those links; null when a minor is admitted.', obj('Why the set admits no PHP.', {
-        'minors': arr('The known minors with the fewest excluding links, in GA order.', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}, minItems=1, uniqueItems=True),
-        'set_by': arr('The links that exclude those minors: the requirements that fail and the conflicts that match there.', ref('phpWindowReq'), minItems=1),
-    })),
-})
 defs['noteMoveCheckFailed'] = obj(("`move_check_failed`: Composer's solver failed on a request with an exception other than a refusal. That move's `check` "
                                    "reads `not_checked` with `reason` `solver_error`. The note names the run's first such failure."), {
     'class': d("The exception's class, as PHP names it. Foreign text, not contract.", {'type': 'string', 'minLength': 1}),
