@@ -92,6 +92,7 @@ final class TargetFixTest extends TestCase
 
         self::assertSame(['refused', null, null], [$fix['check'], $fix['command'], $fix['reason']]);
         self::assertSame([['root', 'root-require', 'acme/capped'], ['package', 'platform', 'php']], self::holds($fix), 'the listed package\'s platform hold restates packages; another package\'s stays');
+        self::assertSame([null, 'acme/other'], array_map(static fn (Holder $hold): ?string => $hold->source() === Holder::ROOT ? null : $hold->package(), $fix['held_by']));
     }
 
     public function testARefusedFixKeepsEveryHoldOfAListedPackageThatIsNotOnPhp(): void
