@@ -107,15 +107,16 @@ final class MaintenanceMoveTest extends TestCase
         self::assertSame(Move::BLOCKED, $draft->kind());
     }
 
+    /** 4.7.1 requires php `>=7.4, <8.2`: target 8.1 runs it, and target 8.4 does not (S11's `excludes_target`). */
     public function testATargetThatTheInstalledReleaseExcludesChangesNoCappedMove(): void
     {
         $releases = ['4.7.1' => '>=7.4, <8.2', '4.17.0' => '>=7.4'];
 
-        $inside = self::capped($releases, '4.17.0', '4.x', '8.1');
-        $outside = self::capped($releases, '4.17.0', '4.x', '8.4');
+        $inside = self::capped($releases, '4.17.0', '4.x', '8.1', null, [], '4.7.1', true, '>=7.4, <8.2', false);
+        $outside = self::capped($releases, '4.17.0', '4.x', '8.4', null, [], '4.7.1', true, '>=7.4, <8.2', true);
 
         self::assertSame([Move::UPDATE, '4.x'], [$inside->kind(), self::branch($inside)]);
-        self::assertSame([Move::UPDATE, '4.x'], [$outside->kind(), self::branch($outside)]);
+        self::assertSame(self::shape($inside), self::shape($outside));
     }
 
     public function testACappedPackageWithNoReleaseThatAdmitsTheNewestPhpHasNoMove(): void
@@ -133,6 +134,14 @@ final class MaintenanceMoveTest extends TestCase
         self::assertSame([Move::NO_MOVE, 'metadata_not_read'], [$draft->kind(), $draft->reason()]);
     }
 
+    /** @return array{string, string, ?string, ?string, ?string} */
+    private static function shape(MoveDraft $draft): array
+    {
+        $lower = $draft->lower();
+
+        return [$draft->kind(), $draft->source(), self::branch($draft), $draft->constraint(), $lower === null ? null : $lower->release()->pretty()];
+    }
+
     private static function branch(MoveDraft $draft): ?string
     {
         $row = $draft->row();
@@ -145,8 +154,9 @@ final class MaintenanceMoveTest extends TestCase
      *
      * @param array<string, string>  $releases by version, the php that each requires
      * @param array<string, string>  $require  composer.json's `require`
+     * @param ?string                $installedPhp the lock entry's `require.php`
      */
-    private static function capped(array $releases, ?string $admits, ?string $branch, string $target = '8.4', ?string $projectPhp = null, array $require = [], string $installed = '4.7.1', bool $read = true): MoveDraft
+    private static function capped(array $releases, ?string $admits, ?string $branch, string $target = '8.4', ?string $projectPhp = null, array $require = [], string $installed = '4.7.1', bool $read = true, ?string $installedPhp = null, bool $excludesTarget = false): MoveDraft
     {
         $packages = [];
         foreach ($releases as $version => $php) {
@@ -154,12 +164,12 @@ final class MaintenanceMoveTest extends TestCase
             self::assertInstanceOf(BasePackage::class, $release);
             $packages[] = $release;
         }
-        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => $installed, 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => $installed, 'notification-url' => 'https://packagist.org/downloads/'] + ($installedPhp === null ? [] : ['require' => ['php' => $installedPhp]])]]);
         $locked = $lock->find('a/b');
         self::assertNotNull($locked);
         $facts = new PackageFacts($locked, $read ? PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::NOW), $installed) : null, null, []);
         $floor = new PhpFloor($target, $projectPhp);
-        $s11 = new Signal(Signal::LEVEL_WARN, 'capped', SignalDataStub::of(Signal::S11, ['admits_newest' => $admits === null ? null : ['version' => $admits, 'branch' => $branch, 'blocking' => $floor->blocking($releases[$admits])]]));
+        $s11 = new Signal(Signal::LEVEL_WARN, 'capped', SignalDataStub::of(Signal::S11, ['excludes_target' => $excludesTarget, 'admits_newest' => $admits === null ? null : ['version' => $admits, 'branch' => $branch, 'blocking' => $floor->blocking($releases[$admits])]]));
         $finding = (new FindingBuilder())->withPackage('a/b')->withVersion($installed)->withSignals([$s11])->withFlags(FlagSet::fromSignals([$s11], null, []), $read)->build();
         $context = new MoveContext($finding, new MoveSubject('a/b', $installed, true, [], $target, $floor->lowestAsString()), $facts->metadata(), BranchRow::all($facts, $floor, Clock::fixed(self::NOW)), null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::fromArray(['require' => $require]))), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
 

@@ -635,6 +635,13 @@ def main():
                                                          "(default: the model directory's page-goldens.json)")
     args = ap.parse_args()
     proj = Projection(args.pr)
+    # From pull request 7a on, every model document is written, without the keys of a later pull request.
+    documents = not proj.after('7a')
+    if documents and args.page_goldens is None and proj.later(PHP_WINDOW_KEYS):
+        # The model's goldens render every run.php_window key, so they disagree with documents that drop one.
+        sys.stderr.write('--pr %s drops run.php_window.%s: pass --page-goldens with the goldens rendered without it\n'
+                         % (args.pr, ', run.php_window.'.join(proj.later(PHP_WINDOW_KEYS))))
+        return 2
     source = os.path.abspath(args.source)
     cases_path = os.path.join(source, 'cases.json')
     with open(cases_path) as fh:
@@ -666,8 +673,6 @@ def main():
             dump(os.path.join(FLAGS_OUT, 'coverage', stem + '.json'), project_report(json.load(fh), proj))
     with open(os.path.join(source, 'docs', 'explain-2', 'B.json')) as fh:
         dump(os.path.join(DOCS_OUT, 'explain', 'B.json'), project_explain(json.load(fh), proj))
-    # From pull request 7a on, every model document is written, without the keys of a later pull request.
-    documents = not proj.after('7a')
     page_goldens = os.path.abspath(args.page_goldens) if args.page_goldens else os.path.join(source, 'page-goldens.json')
     counts = write_documents(source, args.run_date, args.suite or model.get('validation'), proj, page_goldens) if documents else None
     dump(os.path.join(FLAGS_OUT, 'provenance.json'), {

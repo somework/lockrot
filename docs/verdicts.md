@@ -96,7 +96,7 @@ shows.
 | S8 | Time since the newest stable release on the installed release branch, against `release-warn-years` / `release-high-years`, while a higher branch releases ([Left behind](#left-behind)) | Composer repository | `left-behind` |
 | S9 | The counted security advisories that affect the installed version | Composer repositories that publish advisories | `vulnerable` ([Security advisories](#security-advisories)) |
 | S10 | A check that a flag rests on did not run, and the signals it blocked | The other checks | nothing ([What was not checked](#what-was-not-checked)) |
-| S11 | The installed release's `require.php` stops below the newest PHP minor that the root php allows ([Capped](#capped)) | Lock, `composer.json`, Composer repository | `capped` |
+| S11 | The installed release's `require.php` stops below the newest PHP minor that the root php allows ([Capped](#capped)) | Lock, root php and PHP GA dates. Release metadata for `admits_newest` only | `capped` |
 
 - S2, S4 and S8 are `warn` from the warn threshold and `high` from the high one. Only `silent`
   reads the level. The thresholds are [`extra.lockrot` keys](configuration.md#extralockrot-keys).
@@ -347,7 +347,7 @@ S11's `data`:
   dated after the lock entry's `time` count.
 
 - **R moves with the GA dates.** When a newer minor gets its GA on or before the run clock, a
-  package capped below it gains `capped`. That is the GA rule of S5.
+  package capped below it gains `capped`. S5 reads the same GA dates.
 
 - **The move.** The `do:` line of a `capped` lead goes to `admits_newest`: `blocked` when the
   target PHP does not run it, else `raise-php` when the project's lowest PHP is outside it, else

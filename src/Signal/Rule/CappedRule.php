@@ -81,8 +81,8 @@ final class CappedRule implements SignalRule
 
     /**
      * The releases above the installed one, ascending. Above a snapshot they count from `X.Y.0` of
-     * an `X.Y.x-dev` or branch-aliased snapshot, else from the lock entry's `time`: every release
-     * would name a downgrade, as v0.6.0 below php-http/guzzle5-adapter 2.0.0.
+     * an `X.Y.x-dev` or branch-aliased snapshot, else from the lock entry's `time`. Counting every
+     * release could name a downgrade, as v0.6.0 below php-http/guzzle5-adapter 2.0.0.
      *
      * @param list<StableRelease> $releases {@see \Lockrot\Data\Repository\PackageMetadata::releasesAbove()}
      *

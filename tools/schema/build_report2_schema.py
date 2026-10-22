@@ -33,7 +33,7 @@ def pinned(name):
 R1 = pinned('lockrot-report.schema.json')
 
 FLAGS = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped', 'vulnerable']
-MAINT = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped']  # stage 0b: a named list, never a slice of FLAGS
+MAINT = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped']  # a named list: a slice of FLAGS would lose a flag added before vulnerable
 VERDICTS = ['critical', 'high', 'medium', 'low', 'unknown', 'finished', 'ok']
 GRADES = VERDICTS[:4]
 SEVERITIES = ['critical', 'high', 'medium', 'unrated', 'low']
