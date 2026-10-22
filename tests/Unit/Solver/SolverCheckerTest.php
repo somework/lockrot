@@ -267,6 +267,21 @@ final class SolverCheckerTest extends TestCase
         $checker = new SolverChecker($solver, ['acme/own'], '8.4.99', false, Deadline::never());
 
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'not_from_composer_repository'], $checker->solveAt(['acme/lib', 'acme/own'])->check()->jsonSerialize());
+        self::assertNotSame('not_from_composer_repository', $checker->solveAt(['acme/lib'])->check()->reason(), 'the other names solve');
+    }
+
+    /** The unlock takes the reason of a baseline that was not checked, although its own solve could run. */
+    public function testAnUnlockTakesTheReasonOfTheBaselineOverItsOwnSolve(): void
+    {
+        // The clock is past the budget only when the baseline asks it.
+        $readings = [0.0, 100.0];
+        $now = static function () use (&$readings): float {
+            return array_shift($readings) ?? 0.0;
+        };
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]), []);
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::inSeconds(10.0, $now));
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'install_time_budget'], $checker->solveAt(['acme/lib'])->check()->jsonSerialize());
     }
 
     /**

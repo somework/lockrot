@@ -33,7 +33,7 @@ final class TargetFix
      */
     public static function of(array $failing, array $skippedNames, bool $platformStep, ?MoveChecker $checker): array
     {
-        $packages = array_values(array_filter($failing, static fn (array $req): bool => $req['name'] !== null));
+        $packages = array_filter($failing, static fn (array $req): bool => $req['name'] !== null);
         usort($packages, static fn (array $a, array $b): int => [$a['dev'], $a['name'], $a['link'], $a['target']] <=> [$b['dev'], $b['name'], $b['link'], $b['target']]);
         $fix = ['packages' => $packages, 'command' => null, 'check' => MoveCheck::NOT_CHECKED, 'reason' => null, 'held_by' => [], 'platform_step' => $platformStep];
         $ceiling = [];
@@ -45,7 +45,7 @@ final class TargetFix
         if ($ceiling !== []) {
             return array_replace($fix, ['check' => MoveCheck::REFUSED, 'held_by' => Holder::distinct($ceiling)]);
         }
-        $names = array_values(array_unique(array_column($packages, 'name')));
+        $names = array_keys(array_flip(array_column($packages, 'name')));
         if ($checker === null || $names === []) {
             return $fix;
         }
@@ -56,13 +56,13 @@ final class TargetFix
         $outcome = $checker->solveAt($names);
         $check = $outcome->check();
         if ($check->isResolved()) {
-            $option = MoveCheck::OPTIONS[(string) $check->form()] ?? null;
+            $option = MoveCheck::OPTIONS[$check->form() ?? MoveCheck::INLINE] ?? null;
 
             return array_replace($fix, ['command' => array_merge(['composer', 'update'], $names, $option === null ? [] : [$option]), 'check' => MoveCheck::RESOLVES]);
         }
         if ($check->isRefused()) {
-            // A listed package's own php requirement restates `packages`.
-            $holds = array_values(array_filter($outcome->holds(), static fn (Holder $hold): bool => !($hold->source() === Holder::PACKAGE && $hold->link() === Holder::PLATFORM && $hold->target() === 'php' && \in_array(strtolower((string) $hold->package()), $lower, true))));
+            // A listed package's own php requirement restates `packages`. Composer names packages in lower case.
+            $holds = array_values(array_filter($outcome->holds(), static fn (Holder $hold): bool => !($hold->target() === 'php' && \in_array($hold->package(), $lower, true))));
 
             return array_replace($fix, ['check' => MoveCheck::REFUSED, 'held_by' => $holds]);
         }

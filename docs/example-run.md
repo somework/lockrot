@@ -1017,7 +1017,8 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 10,

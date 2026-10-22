@@ -272,6 +272,21 @@ final class RunFooterTest extends TestCase
         self::assertSame('php: the lock installs on PHP 7.3 to 8.5, so your target, 7.2, is excluded; acme/b sets the lowest PHP, 7.3.5', $two);
     }
 
+    public function testThePhpLineCountsAPackageWithTwoPhpLinksOnce(): void
+    {
+        $line = self::phpLine(['packages' => [self::package('acme/a', ['php' => '<8.4', 'php-64bit' => '<8.4'])], 'packages-dev' => []], [], '8.4', false, null);
+
+        self::assertStringEndsWith('; the update of the package that excludes it is not checked (the run checked no move)', (string) $line);
+    }
+
+    /** The lowest edge that excludes the target is the one of the set with require-dev. */
+    public function testThePhpLineNamesTheSettersOfTheLowestEdgeWithRequireDev(): void
+    {
+        $line = self::phpLine(['packages' => [], 'packages-dev' => [self::package('acme/tool', ['php' => '>=7.3'])]], [], '7.2', false, null);
+
+        self::assertSame('php: without require-dev the lock installs on PHP 5.3 to 8.5, and with require-dev on PHP 7.3 to 8.5, so your target, 7.2, is excluded; acme/tool sets the lowest PHP, 7.3.0', $line);
+    }
+
     /** markdown marks each package name and the command as code: the line hands them to the format's marker. */
     public function testThePhpLineHandsThePackageNamesAndTheCommandToTheMarker(): void
     {

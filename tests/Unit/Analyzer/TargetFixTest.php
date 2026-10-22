@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\PhpWindow;
+use Lockrot\Analyzer\TargetFix;
 use Lockrot\Clock;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Lock\LockFile;
@@ -93,6 +94,15 @@ final class TargetFixTest extends TestCase
         self::assertSame([['root', 'root-require', 'acme/capped'], ['package', 'platform', 'php']], self::holds($fix), 'the listed package\'s platform hold restates packages; another package\'s stays');
     }
 
+    public function testARefusedFixKeepsEveryHoldOfAListedPackageThatIsNotOnPhp(): void
+    {
+        $holds = [['source' => 'package', 'package' => 'acme/capped', 'version' => '2.0.0', 'link' => 'require', 'target' => 'acme/lib', 'constraint' => '^2.0']];
+
+        $fix = self::fix(['packages' => [self::CAPPED], 'packages-dev' => []], [], self::recorded(['result' => 'refused', 'holds' => $holds]));
+
+        self::assertSame([['package', 'require', 'acme/lib']], self::holds($fix));
+    }
+
     public function testARefusalThatNamesNoHoldHasAnEmptyHeldBy(): void
     {
         $fix = self::fix(['packages' => [self::CAPPED], 'packages-dev' => []], [], self::recorded(['result' => 'refused']));
@@ -125,6 +135,24 @@ final class TargetFixTest extends TestCase
 
         self::assertSame(['--with-all-dependencies'], array_column($fix['packages'], 'name'));
         self::assertSame(['not_checked', 'unloaded_name', null], [$fix['check'], $fix['reason'], $fix['command']]);
+    }
+
+    public function testANameThatIsNoComposerPackageNameInAnyCaseReachesNoSolve(): void
+    {
+        $lock = ['packages' => [['name' => '--With-All-Dependencies', 'version' => '1.0.0', 'require' => ['php' => '<8.4']]], 'packages-dev' => []];
+
+        $fix = self::fix($lock, [], self::recorded(['result' => 'resolves', 'form' => 'inline']));
+
+        self::assertSame(['not_checked', 'unloaded_name'], [$fix['check'], $fix['reason']]);
+    }
+
+    public function testASkippedNameThatExcludesNothingLeavesTheSolve(): void
+    {
+        $lock = ['packages' => [self::CAPPED, ['name' => '--with-dependencies', 'version' => '1.0.0']], 'packages-dev' => []];
+
+        $fix = self::fix($lock, [], self::recorded(['result' => 'resolves', 'form' => 'inline']));
+
+        self::assertSame(['resolves', ['composer', 'update', 'acme/capped']], [$fix['check'], $fix['command']]);
     }
 
     /** K1: a package conflict on php lists the package with its conflict link. */
@@ -218,11 +246,37 @@ final class TargetFixTest extends TestCase
         self::assertTrue($fix['platform_step']);
     }
 
+    public function testAFixLeavesTheWindowItWasBuiltFromUnchanged(): void
+    {
+        $window = PhpWindow::of(LockFile::fromArray(['packages' => [self::CAPPED], 'packages-dev' => []]), ProjectConfig::fromArray([]), '8.4', PhpReleaseDates::load()->minors(Clock::fixed('2026-10-01T00:00:00+00:00')));
+        self::assertNotNull($window);
+
+        $window->withTargetFix(null);
+
+        self::assertNull($window->toArray()['target_fix']);
+    }
+
+    /** A solved refusal whose root holds are no root php link is no root ceiling. */
+    public function testOnlyRootLinksOnPhpMakeTheRootCeiling(): void
+    {
+        self::assertTrue(TargetFix::isRootCeiling(self::refused(new Holder(Holder::ROOT, null, null, Holder::CONFLICT, '>=8.4', 'php-64bit'))));
+        self::assertFalse(TargetFix::isRootCeiling(self::refused(new Holder(Holder::ROOT, 'acme/app', null, Holder::PLATFORM, '^7.4', 'php'))), 'composer.json requires php, from a solve');
+        self::assertFalse(TargetFix::isRootCeiling(self::refused(new Holder(Holder::ROOT, 'acme/app', null, Holder::REQUIRE, '^2.0', 'acme/lib'))), 'a root requirement on a package');
+        self::assertFalse(TargetFix::isRootCeiling(self::refused(new Holder(Holder::PACKAGE, 'acme/lib', '1.0.0', Holder::REQUIRE, '<8.4', 'php'))));
+        self::assertFalse(TargetFix::isRootCeiling(self::refused()), 'a refusal that names no hold');
+    }
+
     public function testTheLocksPlatformOverrideIsNoPlatformStep(): void
     {
         $fix = self::fix(['packages' => [self::CAPPED], 'packages-dev' => [], 'platform-overrides' => ['php' => '7.4.29']], [], null);
 
         self::assertFalse($fix['platform_step']);
+    }
+
+    /** @return Fix */
+    private static function refused(Holder ...$holds): array
+    {
+        return ['packages' => [], 'command' => null, 'check' => 'refused', 'reason' => null, 'held_by' => array_values($holds), 'platform_step' => false];
     }
 
     /** @param array<string, mixed> $check */
