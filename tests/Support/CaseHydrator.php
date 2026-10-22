@@ -261,7 +261,7 @@ final class CaseHydrator
         self::assertArray($lock);
         $window = PhpWindow::of(LockFile::fromArray(JsonReader::stringKeyed($lock)), ProjectConfig::fromArray([]), '8.4', PhpReleaseDates::load()->minors(new Clock($generatedAt)));
 
-        return (new Report(array_values($findings), [], $generatedAt, \count($findings), 0, null, $oldest, false, $coverage))->withRun($run)->withPhpWindow($window);
+        return (new Report(array_values($findings), [], $generatedAt, \count($findings), 0, null, $oldest, false, $coverage))->withRun($run)->withPhpWindow($window === null ? null : $window->withTargetFix(null));
     }
 
     /**
