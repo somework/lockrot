@@ -54,6 +54,28 @@ final class SignalSetTest extends TestCase
         self::assertFalse($floor->admitsTarget('<8.4'));
     }
 
+    /** R reads composer.json's `require.php`, else the lock's `platform.php`, on the known minors of the run clock. */
+    public function testTheDefaultSetReadsTheNewestPhpFromTheRootPhp(): void
+    {
+        $clock = Clock::fixed('2026-10-01T00:00:00+00:00');
+        $dates = PhpReleaseDates::load();
+
+        $known = SignalSet::default($clock, new Thresholds(), '8.4', $dates)->phpCap();
+        $required = SignalSet::default($clock, new Thresholds(), '8.4', $dates, '~8.2.0 || ~8.3.0', '~8.1.0')->phpCap();
+        $platform = SignalSet::default($clock, new Thresholds(), '8.4', $dates, null, '~8.1.0')->phpCap();
+        $before = SignalSet::default(Clock::fixed('2025-11-19T00:00:00+00:00'), new Thresholds(), '8.4', $dates)->phpCap();
+
+        self::assertSame(['8.5', 'known'], [$known->newest(), $known->source()]);
+        self::assertSame(['8.3', 'require_php'], [$required->newest(), $required->source()]);
+        self::assertSame(['8.1', 'platform_php'], [$platform->newest(), $platform->source()]);
+        self::assertSame('8.4', $before->newest(), 'PHP 8.5 reached its GA on 2025-11-20');
+    }
+
+    public function testASetBuiltWithoutAFloorHasNoNewestPhp(): void
+    {
+        self::assertNull((new SignalSet([]))->phpCap()->newest());
+    }
+
     public function testASetBuiltWithoutAFloorHasNoTargetAndNoProjectPhp(): void
     {
         $floor = (new SignalSet([]))->phpFloor();

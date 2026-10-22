@@ -19,13 +19,16 @@ final class MoveSubject
     private array $dependents;
     private ?string $targetPhp;
     private ?string $projectPhpLowest;
+    private ?string $newestPhp;
 
     /**
      * @param list<string> $dependents       `direct_dependents`
      * @param ?string      $projectPhpLowest `run.project_php_lowest`
+     * @param ?string      $newestPhp        R, the newest PHP minor that the root php allows ({@see \Lockrot\Signal\PhpCap})
      */
-    public function __construct(string $package, string $version, bool $direct, array $dependents, ?string $targetPhp, ?string $projectPhpLowest)
+    public function __construct(string $package, string $version, bool $direct, array $dependents, ?string $targetPhp, ?string $projectPhpLowest, ?string $newestPhp = null)
     {
+        $this->newestPhp = $newestPhp;
         $this->package = $package;
         $this->version = $version;
         $this->direct = $direct;
@@ -63,5 +66,10 @@ final class MoveSubject
     public function projectPhpLowest(): ?string
     {
         return $this->projectPhpLowest;
+    }
+
+    public function newestPhp(): ?string
+    {
+        return $this->newestPhp;
     }
 }

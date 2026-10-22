@@ -13,6 +13,7 @@ use Lockrot\Signal\Data\AbandonedData;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Data\ArchivedData;
+use Lockrot\Signal\Data\CappedData;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\ExposedPackage;
 use Lockrot\Signal\Data\ExposureData;
@@ -24,6 +25,7 @@ use Lockrot\Signal\Data\OldPromiseData;
 use Lockrot\Signal\Data\PinnedData;
 use Lockrot\Signal\Data\ReachableBranch;
 use Lockrot\Signal\Data\SignalData;
+use Lockrot\Signal\PhpCap;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\ScoreModel;
@@ -104,6 +106,12 @@ final class SignalDataStub
                         self::opt($d, 'suggested_constraint')
                     )
                 );
+            case Signal::S11:
+                $admits = $d['admits_newest'] ?? null;
+                $source = self::str($d, 'newest_php_source', PhpCap::KNOWN);
+                $source = $source === PhpCap::REQUIRE_PHP || $source === PhpCap::PLATFORM_PHP ? $source : PhpCap::KNOWN;
+
+                return new CappedData(self::str($d, 'newest_php', '8.5'), $source, self::str($d, 'requires', '^7.0'), self::str($d, 'stops_at', '7.4'), ($d['excludes_target'] ?? false) === true, \is_array($admits) ? ['version' => self::str($admits, 'version', '2.0.0'), 'branch' => self::str($admits, 'branch', '2.x'), 'blocking' => self::opt($admits, 'blocking')] : null);
             case Signal::S9:
                 return new AdvisoryData(array_map([self::class, 'row'], self::list($d, 'advisories')), ($d['releases_read'] ?? false) === true, ($d['complete'] ?? false) === true);
             default:

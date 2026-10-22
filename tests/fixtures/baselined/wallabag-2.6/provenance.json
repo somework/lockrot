@@ -681,6 +681,21 @@
                 "at": "2026-02-04T18:08:13+00:00"
             },
             {
+                "package": "laminas/laminas-code",
+                "reading": "age.release.at",
+                "at": "2025-11-01T09:38:14+00:00"
+            },
+            {
+                "package": "laminas/laminas-code",
+                "reading": "age.branch_release.at",
+                "at": "2025-11-01T09:38:14+00:00"
+            },
+            {
+                "package": "laminas/laminas-code",
+                "reading": "age.push.at",
+                "at": "2026-09-08T13:11:10+00:00"
+            },
+            {
                 "package": "endroid/qr-code",
                 "reading": "age.release.at",
                 "at": "2026-02-05T07:01:58+00:00"
@@ -1039,21 +1054,6 @@
                 "package": "jms/serializer-bundle",
                 "reading": "age.push.at",
                 "at": "2026-03-26T22:03:55+00:00"
-            },
-            {
-                "package": "laminas/laminas-code",
-                "reading": "age.release.at",
-                "at": "2025-11-01T09:38:14+00:00"
-            },
-            {
-                "package": "laminas/laminas-code",
-                "reading": "age.branch_release.at",
-                "at": "2025-11-01T09:38:14+00:00"
-            },
-            {
-                "package": "laminas/laminas-code",
-                "reading": "age.push.at",
-                "at": "2026-09-08T13:11:10+00:00"
             },
             {
                 "package": "lcobucci/jwt",
@@ -5063,23 +5063,23 @@
     },
     "server_mask": "http://127.0.0.1:<port> reads http://127.0.0.1",
     "files": {
-        "t0/report.json": "905a5660b5942c6037204defa65a04eb7de03b8337684be949fe879eeb491c25",
-        "lockrot-baseline.json": "54fcceafdea65b1da80b5c97a7e66021e77a34b0f9ee9301a58068ef50da8f64",
-        "check/report.json": "b511783c4db8c8cdfb649d62b89baafe11a748598c60e0b73987496761ee43d7",
-        "check/report.table.txt": "c88dd9a44230de86d9b376e4e4433a201085cac53c43d8fd63ac46463da53b20",
-        "check/report.md": "881d474fab1bcc88dbe59b86e83995e29ba330230cd22e8d38fbde8bd25a352f",
-        "check/report.github.txt": "9c64a9382b90afdd38098d64981042a8505ea7ff53d061412a54a525d398e086",
-        "check/report.gitlab.json": "5191ecfb98e173cd8000d17fec5cb7320f1869fa573c74b7789edc1099d14dac",
-        "check/report.sarif.json": "6c0ac8ba740160bbdbe08ac1c8cb1a11d1231f1983770893da1ca007ea2f4cfd",
-        "check/report.bundle.json": "a9e78e61eca8bc26dc54ea690421eff23b1ffb8397a6d2bfce4a76e98422c5df",
-        "check/explain/javibravo--simpleue.json": "c7b92385b85fc1a8314bee90834ebb677446a60a4f08d609c56a50c282ea4d07",
-        "check/explain/symfony--http-foundation.json": "d674e48e5b2d84c1bf787455dcd75365f21b8d8342919991527b06c28329e1d1",
-        "check/explain/symfony--security-guard.json": "ee8166375f2aec6aa66aef1b0caee0f4d5b2aecf97fb5a7dafcb8c17881b7f15",
-        "check/explain/twig--twig.json": "d599d57f06ae7d1c3f88eebc487303d4656f110bc3616e6241bfd9582a48e943",
-        "check/gates-left-behind-vulnerable-high.json": "8a51552687e5246db5a32fae1c18bc0f977d8eb06bab148a0cd0608aba3a2be9",
-        "check/gates-left-behind-vulnerable-high.sarif.json": "b398a83f772fc4a67e281390ecace317e4bfa8ffbc0a2ad67776172b29c28a5c",
-        "check/target-8.3.json": "c0d59be4e1e8edb1f80cd7ac66f2b8edded40f89574d6e2dd7ab2f88206cc87f",
-        "regenerate/lockrot-baseline.json": "00d00bc39e0015b14cf70867704506139a0aa922c1c57e6c591bc7995db8f450",
-        "regenerate/report.json": "9cfc48156624edb34445d05cf55ce9313f3b6a25316b4eec16e50bf726fed813"
+        "t0/report.json": "8fa86e43a83944bc559b064c5bc179cab135f308cb2eb65a17a7ebe2c2662d8d",
+        "lockrot-baseline.json": "1b88f291ec69718d3acff2f076b5a4776660c98d6c4c5fbe6b09760b44a84fb8",
+        "check/report.json": "5683cf0c0d798fe8ae873fcb23e7cf4387dfd193d952dfaea4a8f33ac0d8acb3",
+        "check/report.table.txt": "b66e7b3ee819e2cfe38ff4ae04a55c470a57fd82c39eefa5591e36db639453d2",
+        "check/report.md": "bd45299925b1c69e9b48108470448187ef049a826f61f56f0cd366505a48ffc0",
+        "check/report.github.txt": "fc310591c2d9d93ba571b1d7999928d0e2d9690e2a4cd6f4777d37f0fc15e193",
+        "check/report.gitlab.json": "e19b3ccdb679d639cb40af64d0e4f70bc7005f42bc3eb1cf8d3c0775833ba388",
+        "check/report.sarif.json": "95f498a146f460071b5627878b6356df51db7047019aae05c5c2a56d50ac9962",
+        "check/report.bundle.json": "de88a4685e9c4fe833ce210e8cee141a044775d674b3489c59cf5f3caebf234d",
+        "check/explain/javibravo--simpleue.json": "c4fe3fdbaee602a9c0a3eb40b8a6df5dfea579a89ade2c29557d576b9c4721c4",
+        "check/explain/symfony--http-foundation.json": "ef42b082ca142fd495b0ada5079d8d7c075fb2ff2ccf3a2868c13e9054e28ae8",
+        "check/explain/symfony--security-guard.json": "71d0c9f7b2a3995ea318501cd6a32c3da289cf30d5fa91ccb74cea94950d3134",
+        "check/explain/twig--twig.json": "c3a69d1a09dcee8e25b8c418dd5e5baf1f2a7310fc8da625184884f52e88a453",
+        "check/gates-left-behind-vulnerable-high.json": "f155ca79ab0b0743815d3c2bcb4311094787351642c50ca0e79b8b207cf74c18",
+        "check/gates-left-behind-vulnerable-high.sarif.json": "a6fb77c7b0777ba28026c7f0db41c07eabfa70028fab807e91c4d064dbfeb89c",
+        "check/target-8.3.json": "6112778401ee36892a9aea8a171bf3d98b25bcbda4f82edd9e7159bd83c0df1d",
+        "regenerate/lockrot-baseline.json": "85ae65d5d0a21c5b960b3e9e9d24dca172ccc295cc452e2ee57254bbd2fc30ff",
+        "regenerate/report.json": "7cb8a0ddf7e1657f9fa74a610570d866708fac46d95b9a4aacd0d6b3ee1ab2a2"
     }
 }

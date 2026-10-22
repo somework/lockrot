@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/pinned",
+        "description": "matomo/referrer-spam-list dev-master \u2014 finding high (18 = pinned 16 + capped 2 [\u00bc of 8]) \u2014 pinned: pinned to branch snapshot dev-master. Do: require a tag \u2014 the newest is 4.0.5 (2026-04-15); not checked: capped.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "59a72f255e750a23c04d2146c2c95c27329f949178cd1efc83671e48702b279a",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/capped",
+        "description": "matomo/referrer-spam-list dev-master \u2014 finding high (18 = pinned 16 + capped 2 [\u00bc of 8]) \u2014 capped: requires php >=7.2 <8.5: it stops at 8.4, so the newest PHP, 8.5, is excluded. Do: require a tag \u2014 the newest is 4.0.5 (2026-04-15); not checked: capped.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "0fed562ffd6f79c9909b72bab9d5083a14142a16452394cb324e30830f962e5f",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

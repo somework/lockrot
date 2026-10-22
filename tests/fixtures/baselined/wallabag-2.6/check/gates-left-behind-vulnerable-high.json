@@ -43,6 +43,7 @@
             "left-behind",
             "old-promise",
             "stale",
+            "capped",
             "vulnerable"
         ],
         "verdicts": [
@@ -70,7 +71,8 @@
             "S7",
             "S8",
             "S9",
-            "S10"
+            "S10",
+            "S11"
         ],
         "fix_model": 1,
         "text_grammar": 1,
@@ -84,6 +86,7 @@
                 "left-behind",
                 "old-promise",
                 "stale",
+                "capped",
                 "vulnerable"
             ],
             "parts": [
@@ -95,7 +98,8 @@
                         "pinned",
                         "left-behind",
                         "old-promise",
-                        "stale"
+                        "stale",
+                        "capped"
                     ],
                     "combine": "lead_plus_share"
                 },
@@ -235,9 +239,10 @@
                     "band": "medium",
                     "can_corroborate": true,
                     "corroborating_points": 2,
-                    "max_maintenance": 8,
+                    "max_maintenance": 10,
                     "max_maintenance_flags": [
-                        "stale"
+                        "stale",
+                        "capped"
                     ],
                     "raised_by": [
                         "S2",
@@ -249,6 +254,27 @@
                     ],
                     "basis": {
                         "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
                         "points": "band_floor"
                     },
                     "points_from": null
@@ -445,6 +471,14 @@
                         "threshold": "push-warn-years",
                         "below": "release-warn-years"
                     }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
                 }
             ],
             "sort": [
@@ -848,8 +882,8 @@
         },
         "score_rules_used": {
             "counted": 9,
-            "lead-first": 102,
-            "corroborating-share": 20,
+            "lead-first": 103,
+            "corroborating-share": 21,
             "advisory-points": 20,
             "no-reachable-fix-multiplier": 1,
             "security-max": 11,
@@ -858,8 +892,8 @@
             "sum": 10,
             "divide-dev": 0,
             "floor-once": 0,
-            "band-floors": 112,
-            "zero-verdicts": 98,
+            "band-floors": 113,
+            "zero-verdicts": 97,
             "sort": null,
             "gate-bounded-new": 0,
             "baseline-cover": 0
@@ -868,8 +902,8 @@
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
     "packages_checked": 210,
-    "packages_flagged": 112,
-    "packages_multi_flag": 29,
+    "packages_flagged": 113,
+    "packages_multi_flag": 30,
     "include_dev": false,
     "not_from_composer_repository": 0,
     "packages_unchecked_accepted": 0,
@@ -877,11 +911,11 @@
     "counts": {
         "critical": 15,
         "high": 69,
-        "medium": 22,
+        "medium": 23,
         "low": 6,
         "unknown": 0,
         "finished": 19,
-        "ok": 79
+        "ok": 78
     },
     "abandoned": {
         "total": 27,
@@ -891,9 +925,9 @@
     "priorities": {
         "critical": 15,
         "high": 69,
-        "medium": 22,
+        "medium": 23,
         "low": 6,
-        "none": 98
+        "none": 97
     },
     "flags": {
         "abandoned": {
@@ -978,6 +1012,20 @@
                 "high": 3,
                 "medium": 6,
                 "low": 3
+            }
+        },
+        "capped": {
+            "carrying": 2,
+            "leading": 1,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 1,
+                "high": 0,
+                "medium": 1,
+                "low": 0
             }
         },
         "vulnerable": {
@@ -1208,25 +1256,25 @@
         }
     ],
     "rot_depth": {
-        "flagged": 112,
-        "measured": 112,
+        "flagged": 113,
+        "measured": 113,
         "unmeasured": {
             "unreached": 0,
             "no_composer_json": 0
         },
         "by_reach": {
-            "direct": 60,
+            "direct": 61,
             "transitive": 52,
             "unreached": 0
         },
         "not_in_composer_json": 51,
         "require_dev_not_walked": 1,
-        "production": 112,
+        "production": 113,
         "development": 0,
         "by_depth": [
             {
                 "depth": 0,
-                "flagged": 60
+                "flagged": 61
             },
             {
                 "depth": 1,
@@ -1294,7 +1342,7 @@
     },
     "baseline": {
         "path": "lockrot-baseline.json",
-        "known": 47,
+        "known": 48,
         "new": 61,
         "worsened": 6,
         "stale": [
@@ -2781,7 +2829,8 @@
                             "verdict": "critical",
                             "lead": "abandoned",
                             "flag_ids": [
-                                "abandoned"
+                                "abandoned",
+                                "capped"
                             ],
                             "replacement": "php-http/guzzle7-adapter",
                             "next_step": {
@@ -3153,7 +3202,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3237,7 +3287,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3321,7 +3372,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3405,7 +3457,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3489,7 +3542,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3573,7 +3627,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3657,7 +3712,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3741,7 +3797,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3825,7 +3882,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3909,7 +3967,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -3993,7 +4052,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -4077,7 +4137,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -4161,7 +4222,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -4245,7 +4307,8 @@
                                                 "verdict": "critical",
                                                 "lead": "abandoned",
                                                 "flag_ids": [
-                                                    "abandoned"
+                                                    "abandoned",
+                                                    "capped"
                                                 ],
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
@@ -7665,6 +7728,428 @@
             }
         },
         {
+            "package": "php-http/guzzle5-adapter",
+            "version": "2.0.0",
+            "branch": "2.x",
+            "installed_php": {
+                "requires": "^7.0",
+                "target_runs": false,
+                "project_allows": true
+            },
+            "verdict": "critical",
+            "priority": "critical",
+            "lead": "abandoned",
+            "rank": 9,
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "role": "lead",
+                    "baseline": {
+                        "state": "known",
+                        "since": "2024-11-03",
+                        "covered_by": null
+                    },
+                    "signal_ids": [
+                        "S1",
+                        "S3",
+                        "S2"
+                    ],
+                    "degree": {
+                        "reasons": [
+                            "marked",
+                            "archived"
+                        ],
+                        "liveness_complete": true
+                    },
+                    "headline": {
+                        "unit": "reason",
+                        "value": "archived",
+                        "source": null
+                    },
+                    "summary": "marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived on GitHub; last release 2019-02-05 (7.7 years ago)"
+                },
+                {
+                    "id": "capped",
+                    "role": "corroborating",
+                    "baseline": {
+                        "state": "known",
+                        "since": "2024-11-03",
+                        "covered_by": null
+                    },
+                    "signal_ids": [
+                        "S11"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "php_minor",
+                        "value": "7.4",
+                        "source": null
+                    },
+                    "summary": "requires php ^7.0: it stops at 7.4, so the newest PHP, 8.5, is excluded"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 34,
+                "exact": 34,
+                "rounded_down": false,
+                "band": {
+                    "floor": 32,
+                    "next": null,
+                    "to_next": null
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 34,
+                        "alone": {
+                            "total": 34,
+                            "verdict": "critical"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "abandoned",
+                        "role": "lead",
+                        "weight": 32,
+                        "divisor": 1,
+                        "points": 32,
+                        "contribution": 32
+                    },
+                    {
+                        "part": "maintenance",
+                        "flag": "capped",
+                        "role": "corroborating",
+                        "weight": 8,
+                        "divisor": 4,
+                        "points": 2,
+                        "contribution": 2
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "abandoned"
+                        },
+                        "revealed": [
+                            {
+                                "flag": "stale",
+                                "role": "lead"
+                            }
+                        ],
+                        "total": 10,
+                        "verdict": "medium",
+                        "lead": "stale",
+                        "deciding_advisory": null,
+                        "at_least": false
+                    },
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "capped"
+                        },
+                        "revealed": [],
+                        "total": 32,
+                        "verdict": "critical",
+                        "lead": "abandoned",
+                        "deciding_advisory": null,
+                        "at_least": false
+                    }
+                ],
+                "text": "34 = abandoned 32 + capped 2 [\u00bc of 8]"
+            },
+            "next_step": {
+                "kind": "replace",
+                "source": "abandoned",
+                "merged": [],
+                "fix_kind": null,
+                "reason": null,
+                "replacement": {
+                    "package": "php-http/guzzle7-adapter",
+                    "suggestion": "php-http/guzzle7-adapter",
+                    "url": null,
+                    "named_by": "repository",
+                    "finding": null
+                },
+                "quiet_years": null,
+                "to_branch": null,
+                "version": null,
+                "newest": null,
+                "constraint": null,
+                "latest": null,
+                "php_check": null,
+                "crosses_major": null,
+                "held_by": [],
+                "clears": [],
+                "unverified": [],
+                "adds": [],
+                "leaves": [
+                    {
+                        "kind": "flag",
+                        "id": "abandoned"
+                    },
+                    {
+                        "kind": "flag",
+                        "id": "capped"
+                    }
+                ],
+                "clears_all": false,
+                "if_applied": null,
+                "check": null,
+                "composer_moves_because": [],
+                "commands": [],
+                "through": [],
+                "also": [],
+                "text": "replace with php-http/guzzle7-adapter (named by its registry)"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "php-http/guzzle5-adapter",
+                "event": "push",
+                "archived": true,
+                "fetched_at": "2026-10-13T19:51:26+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/php-http/guzzle5-adapter",
+                "local": false
+            },
+            "replacement": "php-http/guzzle7-adapter",
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "php-http/guzzle5-adapter"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "php-http/guzzle5-adapter",
+                "php-http/httplug-bundle"
+            ],
+            "signals": [
+                {
+                    "id": "S1",
+                    "level": "high",
+                    "summary": "marked abandoned by its repository, replacement: php-http/guzzle7-adapter",
+                    "data": {
+                        "marked_by": "repository",
+                        "replacement": "php-http/guzzle7-adapter",
+                        "replacement_url": null
+                    }
+                },
+                {
+                    "id": "S2",
+                    "level": "high",
+                    "summary": "last release 2019-02-05 (7.7 years ago)",
+                    "data": {
+                        "last_release": "2019-02-05T12:28:45+00:00",
+                        "last_version": "2.0.0",
+                        "years": 7.7,
+                        "dated_by": null
+                    }
+                },
+                {
+                    "id": "S3",
+                    "level": "high",
+                    "summary": "repository archived on GitHub",
+                    "data": {
+                        "repo": "php-http/guzzle5-adapter",
+                        "host": "github.com",
+                        "forge": "github"
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned \u00b7 old-promise), guzzlehttp/streams (abandoned \u00b7 old-promise)",
+                    "data": {
+                        "flagged": 2,
+                        "packages": [
+                            {
+                                "package": "guzzlehttp/ringphp",
+                                "chain": [
+                                    "php-http/guzzle5-adapter",
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/streams",
+                                "chain": [
+                                    "php-http/guzzle5-adapter",
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp",
+                                    "guzzlehttp/streams"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "S11",
+                    "level": "warn",
+                    "summary": "php \"^7.0\" stops at 7.4; the newest PHP, 8.5, is excluded",
+                    "data": {
+                        "newest_php": "8.5",
+                        "newest_php_source": "known",
+                        "requires": "^7.0",
+                        "stops_at": "7.4",
+                        "excludes_target": true,
+                        "admits_newest": null
+                    }
+                }
+            ],
+            "evidence": "abandoned: marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived on GitHub; last release 2019-02-05 (7.7 years ago); capped: requires php ^7.0: it stops at 7.4, so the newest PHP, 8.5, is excluded",
+            "allowlist_reason": null,
+            "data_date": "2026-10-14T00:00:00+00:00",
+            "libyears": 0,
+            "age": {
+                "installed": {
+                    "at": "2019-02-05T12:28:45+00:00",
+                    "years": 7.7,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "2.0.0",
+                    "at": "2019-02-05T12:28:45+00:00",
+                    "years": 7.7,
+                    "level": "high",
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "2.0.0",
+                    "at": "2019-02-05T12:28:45+00:00",
+                    "years": 7.7,
+                    "level": "high",
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2024-01-06T12:25:01+00:00",
+                    "years": 2.8,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": {
+                "status": "known",
+                "recorded": {
+                    "lead": "abandoned",
+                    "flags": {
+                        "abandoned": {
+                            "known_since": "2024-11-03"
+                        },
+                        "capped": {
+                            "known_since": "2024-11-03"
+                        }
+                    },
+                    "advisory_count": 0,
+                    "first_seen": "2024-11-03",
+                    "target_php": "8.4",
+                    "fix_model": 1
+                },
+                "advisories_now": {
+                    "known": 0,
+                    "new": 0,
+                    "re_rated": 0,
+                    "fix_lost": 0
+                },
+                "worsened_by": []
+            },
+            "gate": {
+                "reaches_fail_on": true,
+                "fails": false,
+                "exempt_by": "baseline",
+                "by": [],
+                "basis": {
+                    "score": 0,
+                    "verdict": null,
+                    "cap": 0,
+                    "limited_by": "cap",
+                    "new": {
+                        "total": 0,
+                        "exact": 0,
+                        "rounded_down": false,
+                        "terms": [],
+                        "modifiers": []
+                    }
+                }
+            }
+        },
+        {
             "package": "lexik/form-filter-bundle",
             "version": "v7.0.3",
             "branch": "7.x",
@@ -7676,7 +8161,7 @@
             "verdict": "critical",
             "priority": "critical",
             "lead": "abandoned",
-            "rank": 9,
+            "rank": 10,
             "flags": [
                 {
                     "id": "abandoned",
@@ -7958,350 +8443,6 @@
                 "push": {
                     "at": "2024-08-01T13:31:08+00:00",
                     "years": 2.2,
-                    "level": null
-                },
-                "push_unmeasured": null
-            },
-            "baseline": {
-                "status": "known",
-                "recorded": {
-                    "lead": "abandoned",
-                    "flags": {
-                        "abandoned": {
-                            "known_since": "2024-11-03"
-                        }
-                    },
-                    "advisory_count": 0,
-                    "first_seen": "2024-11-03",
-                    "target_php": "8.4",
-                    "fix_model": 1
-                },
-                "advisories_now": {
-                    "known": 0,
-                    "new": 0,
-                    "re_rated": 0,
-                    "fix_lost": 0
-                },
-                "worsened_by": []
-            },
-            "gate": {
-                "reaches_fail_on": true,
-                "fails": false,
-                "exempt_by": "baseline",
-                "by": [],
-                "basis": {
-                    "score": 0,
-                    "verdict": null,
-                    "cap": 0,
-                    "limited_by": "cap",
-                    "new": {
-                        "total": 0,
-                        "exact": 0,
-                        "rounded_down": false,
-                        "terms": [],
-                        "modifiers": []
-                    }
-                }
-            }
-        },
-        {
-            "package": "php-http/guzzle5-adapter",
-            "version": "2.0.0",
-            "branch": "2.x",
-            "installed_php": {
-                "requires": "^7.0",
-                "target_runs": false,
-                "project_allows": true
-            },
-            "verdict": "critical",
-            "priority": "critical",
-            "lead": "abandoned",
-            "rank": 10,
-            "flags": [
-                {
-                    "id": "abandoned",
-                    "role": "lead",
-                    "baseline": {
-                        "state": "known",
-                        "since": "2024-11-03",
-                        "covered_by": null
-                    },
-                    "signal_ids": [
-                        "S1",
-                        "S3",
-                        "S2"
-                    ],
-                    "degree": {
-                        "reasons": [
-                            "marked",
-                            "archived"
-                        ],
-                        "liveness_complete": true
-                    },
-                    "headline": {
-                        "unit": "reason",
-                        "value": "archived",
-                        "source": null
-                    },
-                    "summary": "marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived on GitHub; last release 2019-02-05 (7.7 years ago)"
-                }
-            ],
-            "score": {
-                "model": 1,
-                "total": 32,
-                "exact": 32,
-                "rounded_down": false,
-                "band": {
-                    "floor": 32,
-                    "next": null,
-                    "to_next": null
-                },
-                "decided_by": "maintenance",
-                "parts": {
-                    "maintenance": {
-                        "status": "counted",
-                        "contribution": 32,
-                        "alone": {
-                            "total": 32,
-                            "verdict": "critical"
-                        }
-                    },
-                    "security": {
-                        "status": "clear",
-                        "contribution": 0,
-                        "alone": {
-                            "total": 0,
-                            "verdict": null
-                        },
-                        "of": 0,
-                        "tied": []
-                    }
-                },
-                "terms": [
-                    {
-                        "part": "maintenance",
-                        "flag": "abandoned",
-                        "role": "lead",
-                        "weight": 32,
-                        "divisor": 1,
-                        "points": 32,
-                        "contribution": 32
-                    }
-                ],
-                "modifiers": [],
-                "accepted": [],
-                "without": [],
-                "text": "32 = abandoned 32"
-            },
-            "next_step": {
-                "kind": "replace",
-                "source": "abandoned",
-                "merged": [],
-                "fix_kind": null,
-                "reason": null,
-                "replacement": {
-                    "package": "php-http/guzzle7-adapter",
-                    "suggestion": "php-http/guzzle7-adapter",
-                    "url": null,
-                    "named_by": "repository",
-                    "finding": null
-                },
-                "quiet_years": null,
-                "to_branch": null,
-                "version": null,
-                "newest": null,
-                "constraint": null,
-                "latest": null,
-                "php_check": null,
-                "crosses_major": null,
-                "held_by": [],
-                "clears": [],
-                "unverified": [],
-                "adds": [],
-                "leaves": [
-                    {
-                        "kind": "flag",
-                        "id": "abandoned"
-                    }
-                ],
-                "clears_all": false,
-                "if_applied": null,
-                "check": null,
-                "composer_moves_because": [],
-                "commands": [],
-                "through": [],
-                "also": [],
-                "text": "replace with php-http/guzzle7-adapter (named by its registry)"
-            },
-            "security": {
-                "status": "clear",
-                "check": "complete",
-                "complete": true,
-                "unchecked_reason": null,
-                "records": 0,
-                "feeds": [
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 0,
-                        "reason": null
-                    }
-                ],
-                "ignored": [],
-                "ignored_count": 0
-            },
-            "checks_missing": [],
-            "checks_skipped": [],
-            "unchecked_accepted": [],
-            "maintenance_judged": true,
-            "metadata": {
-                "status": "read",
-                "reason": null,
-                "message": null
-            },
-            "activity": {
-                "status": "read",
-                "reason": null,
-                "forge": "github",
-                "host": "github.com",
-                "repo": "php-http/guzzle5-adapter",
-                "event": "push",
-                "archived": true,
-                "fetched_at": "2026-10-13T19:51:26+00:00",
-                "cached_at": null
-            },
-            "allowlist": null,
-            "abandoned_ignored": null,
-            "from_composer_repository": true,
-            "origin": {
-                "kind": "packagist",
-                "registry": "packagist.org",
-                "package_url": "https://packagist.org/packages/php-http/guzzle5-adapter",
-                "local": false
-            },
-            "replacement": "php-http/guzzle7-adapter",
-            "replacement_url": null,
-            "note": null,
-            "libyears_unmeasured": null,
-            "libyears_at_least": false,
-            "direct": true,
-            "dev": false,
-            "reach": "direct",
-            "chain": [
-                "php-http/guzzle5-adapter"
-            ],
-            "depth": 0,
-            "depth_unmeasured": null,
-            "named_in": [
-                "require"
-            ],
-            "direct_dependents": [
-                "php-http/guzzle5-adapter",
-                "php-http/httplug-bundle"
-            ],
-            "signals": [
-                {
-                    "id": "S1",
-                    "level": "high",
-                    "summary": "marked abandoned by its repository, replacement: php-http/guzzle7-adapter",
-                    "data": {
-                        "marked_by": "repository",
-                        "replacement": "php-http/guzzle7-adapter",
-                        "replacement_url": null
-                    }
-                },
-                {
-                    "id": "S2",
-                    "level": "high",
-                    "summary": "last release 2019-02-05 (7.7 years ago)",
-                    "data": {
-                        "last_release": "2019-02-05T12:28:45+00:00",
-                        "last_version": "2.0.0",
-                        "years": 7.7,
-                        "dated_by": null
-                    }
-                },
-                {
-                    "id": "S3",
-                    "level": "high",
-                    "summary": "repository archived on GitHub",
-                    "data": {
-                        "repo": "php-http/guzzle5-adapter",
-                        "host": "github.com",
-                        "forge": "github"
-                    }
-                },
-                {
-                    "id": "S7",
-                    "level": "info",
-                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned \u00b7 old-promise), guzzlehttp/streams (abandoned \u00b7 old-promise)",
-                    "data": {
-                        "flagged": 2,
-                        "packages": [
-                            {
-                                "package": "guzzlehttp/ringphp",
-                                "chain": [
-                                    "php-http/guzzle5-adapter",
-                                    "guzzlehttp/guzzle",
-                                    "guzzlehttp/ringphp"
-                                ],
-                                "verdict": "high",
-                                "lead": "abandoned",
-                                "flag_ids": [
-                                    "abandoned",
-                                    "old-promise"
-                                ]
-                            },
-                            {
-                                "package": "guzzlehttp/streams",
-                                "chain": [
-                                    "php-http/guzzle5-adapter",
-                                    "guzzlehttp/guzzle",
-                                    "guzzlehttp/ringphp",
-                                    "guzzlehttp/streams"
-                                ],
-                                "verdict": "high",
-                                "lead": "abandoned",
-                                "flag_ids": [
-                                    "abandoned",
-                                    "old-promise"
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ],
-            "evidence": "abandoned: marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived on GitHub; last release 2019-02-05 (7.7 years ago)",
-            "allowlist_reason": null,
-            "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": 0,
-            "age": {
-                "installed": {
-                    "at": "2019-02-05T12:28:45+00:00",
-                    "years": 7.7,
-                    "dated_by": null
-                },
-                "installed_unmeasured": null,
-                "release": {
-                    "version": "2.0.0",
-                    "at": "2019-02-05T12:28:45+00:00",
-                    "years": 7.7,
-                    "level": "high",
-                    "dated_by": null
-                },
-                "release_unmeasured": null,
-                "branch_release": {
-                    "version": "2.0.0",
-                    "at": "2019-02-05T12:28:45+00:00",
-                    "years": 7.7,
-                    "level": "high",
-                    "dated_by": null
-                },
-                "branch_release_unmeasured": null,
-                "push": {
-                    "at": "2024-01-06T12:25:01+00:00",
-                    "years": 2.8,
                     "level": null
                 },
                 "push_unmeasured": null
@@ -23540,13 +23681,19 @@
                     }
                 ],
                 "unverified": [],
-                "adds": [],
+                "adds": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "basis": "stops_below_newest_php"
+                    }
+                ],
                 "leaves": [],
                 "clears_all": true,
                 "if_applied": {
-                    "total": 0,
-                    "verdict": "ok",
-                    "lead": null,
+                    "total": 8,
+                    "verdict": "medium",
+                    "lead": "capped",
                     "deciding_advisory": null,
                     "at_most": false,
                     "assumes": [
@@ -23577,7 +23724,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require scheb/2fa-backup-code ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "raise require.php to >=8.2, then require scheb/2fa-backup-code ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -24014,13 +24161,19 @@
                     }
                 ],
                 "unverified": [],
-                "adds": [],
+                "adds": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "basis": "stops_below_newest_php"
+                    }
+                ],
                 "leaves": [],
                 "clears_all": true,
                 "if_applied": {
-                    "total": 0,
-                    "verdict": "ok",
-                    "lead": null,
+                    "total": 8,
+                    "verdict": "medium",
+                    "lead": "capped",
                     "deciding_advisory": null,
                     "at_most": false,
                     "assumes": [
@@ -24052,7 +24205,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and scheb/2fa-backup-code v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-qr-code v5.13.2 (requires self.version; itself abandoned) and scheb/2fa-trusted-device v5.13.2 (requires self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "raise require.php to >=8.2, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and scheb/2fa-backup-code v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-qr-code v5.13.2 (requires self.version; itself abandoned) and scheb/2fa-trusted-device v5.13.2 (requires self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -24347,13 +24500,19 @@
                     }
                 ],
                 "unverified": [],
-                "adds": [],
+                "adds": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "basis": "stops_below_newest_php"
+                    }
+                ],
                 "leaves": [],
                 "clears_all": true,
                 "if_applied": {
-                    "total": 0,
-                    "verdict": "ok",
-                    "lead": null,
+                    "total": 8,
+                    "verdict": "medium",
+                    "lead": "capped",
                     "deciding_advisory": null,
                     "at_most": false,
                     "assumes": [
@@ -24384,7 +24543,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require scheb/2fa-email ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "raise require.php to >=8.2, then require scheb/2fa-email ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -24674,13 +24833,19 @@
                     }
                 ],
                 "unverified": [],
-                "adds": [],
+                "adds": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "basis": "stops_below_newest_php"
+                    }
+                ],
                 "leaves": [],
                 "clears_all": true,
                 "if_applied": {
-                    "total": 0,
-                    "verdict": "ok",
-                    "lead": null,
+                    "total": 8,
+                    "verdict": "medium",
+                    "lead": "capped",
                     "deciding_advisory": null,
                     "at_most": false,
                     "assumes": [
@@ -24711,7 +24876,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require scheb/2fa-google-authenticator ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "raise require.php to >=8.2, then require scheb/2fa-google-authenticator ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -25059,13 +25224,19 @@
                     }
                 ],
                 "unverified": [],
-                "adds": [],
+                "adds": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "basis": "stops_below_newest_php"
+                    }
+                ],
                 "leaves": [],
                 "clears_all": true,
                 "if_applied": {
-                    "total": 0,
-                    "verdict": "ok",
-                    "lead": null,
+                    "total": 8,
+                    "verdict": "medium",
+                    "lead": "capped",
                     "deciding_advisory": null,
                     "at_most": false,
                     "assumes": [
@@ -25096,7 +25267,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require scheb/2fa-trusted-device ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "raise require.php to >=8.2, then require scheb/2fa-trusted-device ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -40491,6 +40662,318 @@
             }
         },
         {
+            "package": "laminas/laminas-code",
+            "version": "4.7.1",
+            "branch": "4.x",
+            "installed_php": {
+                "requires": ">=7.4, <8.2",
+                "target_runs": false,
+                "project_allows": true
+            },
+            "verdict": "medium",
+            "priority": "medium",
+            "lead": "capped",
+            "rank": 93,
+            "flags": [
+                {
+                    "id": "capped",
+                    "role": "lead",
+                    "baseline": {
+                        "state": "known",
+                        "since": "2024-11-03",
+                        "covered_by": null
+                    },
+                    "signal_ids": [
+                        "S11"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "php_minor",
+                        "value": "8.1",
+                        "source": null
+                    },
+                    "summary": "requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 8,
+                "exact": 8,
+                "rounded_down": false,
+                "band": {
+                    "floor": 8,
+                    "next": "high",
+                    "to_next": 8
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 8,
+                        "alone": {
+                            "total": 8,
+                            "verdict": "medium"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "capped",
+                        "role": "lead",
+                        "weight": 8,
+                        "divisor": 1,
+                        "points": 8,
+                        "contribution": 8
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [],
+                "text": "8 = capped 8"
+            },
+            "next_step": {
+                "kind": "raise-php",
+                "source": "capped",
+                "merged": [],
+                "fix_kind": null,
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "4.x",
+                "version": "4.17.0",
+                "newest": "4.17.0",
+                "constraint": "^4.17.0",
+                "latest": null,
+                "php_check": {
+                    "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                    "project_allows": false,
+                    "target_runs": true,
+                    "raise_to": ">=8.2",
+                    "raise_size": "major"
+                },
+                "crosses_major": false,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "basis": "admits_newest_php"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold"
+                    ]
+                },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
+                "composer_moves_because": [],
+                "commands": [
+                    [
+                        "composer",
+                        "require",
+                        "php:>=8.2",
+                        "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "require",
+                        "laminas/laminas-code:^4.17.0"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "laminas/laminas-code",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T18:49:09+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/laminas/laminas-code",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "laminas/laminas-code"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "doctrine/doctrine-migrations-bundle",
+                "doctrine/migrations",
+                "friendsofphp/proxy-manager-lts",
+                "laminas/laminas-code",
+                "symfony/proxy-manager-bridge"
+            ],
+            "signals": [
+                {
+                    "id": "S11",
+                    "level": "warn",
+                    "summary": "php \">=7.4, <8.2\" stops at 8.1; the newest PHP, 8.5, is excluded",
+                    "data": {
+                        "newest_php": "8.5",
+                        "newest_php_source": "known",
+                        "requires": ">=7.4, <8.2",
+                        "stops_at": "8.1",
+                        "excludes_target": true,
+                        "admits_newest": {
+                            "version": "4.17.0",
+                            "branch": "4.x",
+                            "blocking": "project"
+                        }
+                    }
+                }
+            ],
+            "evidence": "capped: requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded",
+            "allowlist_reason": null,
+            "data_date": "2026-10-14T00:00:00+00:00",
+            "libyears": 2.95,
+            "age": {
+                "installed": {
+                    "at": "2022-11-21T01:32:31+00:00",
+                    "years": 3.9,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "4.17.0",
+                    "at": "2025-11-01T09:38:14+00:00",
+                    "years": 0.9,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "4.17.0",
+                    "at": "2025-11-01T09:38:14+00:00",
+                    "years": 0.9,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-08T13:11:10+00:00",
+                    "years": 0.1,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": {
+                "status": "known",
+                "recorded": {
+                    "lead": "capped",
+                    "flags": {
+                        "capped": {
+                            "known_since": "2024-11-03"
+                        }
+                    },
+                    "advisory_count": 0,
+                    "first_seen": "2024-11-03",
+                    "target_php": "8.4",
+                    "fix_model": 1
+                },
+                "advisories_now": {
+                    "known": 0,
+                    "new": 0,
+                    "re_rated": 0,
+                    "fix_lost": 0
+                },
+                "worsened_by": []
+            },
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": {
+                    "score": 0,
+                    "verdict": null,
+                    "cap": 0,
+                    "limited_by": "cap",
+                    "new": {
+                        "total": 0,
+                        "exact": 0,
+                        "rounded_down": false,
+                        "terms": [],
+                        "modifiers": []
+                    }
+                }
+            }
+        },
+        {
             "package": "pragmarx/recovery",
             "version": "v0.2.1",
             "branch": "0.2.x",
@@ -40502,7 +40985,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "stale",
-            "rank": 93,
+            "rank": 94,
             "flags": [
                 {
                     "id": "stale",
@@ -40797,7 +41280,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "stale",
-            "rank": 94,
+            "rank": 95,
             "flags": [
                 {
                     "id": "stale",
@@ -41131,7 +41614,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 95,
+            "rank": 96,
             "flags": [
                 {
                     "id": "left-behind",
@@ -41491,7 +41974,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 96,
+            "rank": 97,
             "flags": [
                 {
                     "id": "left-behind",
@@ -41895,7 +42378,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 97,
+            "rank": 98,
             "flags": [
                 {
                     "id": "left-behind",
@@ -42254,7 +42737,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 98,
+            "rank": 99,
             "flags": [
                 {
                     "id": "left-behind",
@@ -42614,7 +43097,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 99,
+            "rank": 100,
             "flags": [
                 {
                     "id": "left-behind",
@@ -42991,7 +43474,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 100,
+            "rank": 101,
             "flags": [
                 {
                     "id": "left-behind",
@@ -43426,7 +43909,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 101,
+            "rank": 102,
             "flags": [
                 {
                     "id": "left-behind",
@@ -43785,7 +44268,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 102,
+            "rank": 103,
             "flags": [
                 {
                     "id": "left-behind",
@@ -44584,7 +45067,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 103,
+            "rank": 104,
             "flags": [
                 {
                     "id": "left-behind",
@@ -45128,7 +45611,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 104,
+            "rank": 105,
             "flags": [
                 {
                     "id": "left-behind",
@@ -45460,7 +45943,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 105,
+            "rank": 106,
             "flags": [
                 {
                     "id": "left-behind",
@@ -45816,7 +46299,7 @@
             "verdict": "medium",
             "priority": "medium",
             "lead": "left-behind",
-            "rank": 106,
+            "rank": 107,
             "flags": [
                 {
                     "id": "left-behind",
@@ -46552,7 +47035,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": null,
-            "rank": 107,
+            "rank": 108,
             "flags": [
                 {
                     "id": "vulnerable",
@@ -46950,7 +47433,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": null,
-            "rank": 108,
+            "rank": 109,
             "flags": [
                 {
                     "id": "vulnerable",
@@ -47799,7 +48282,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": null,
-            "rank": 109,
+            "rank": 110,
             "flags": [
                 {
                     "id": "vulnerable",
@@ -48322,7 +48805,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 110,
+            "rank": 111,
             "flags": [
                 {
                     "id": "stale",
@@ -48613,7 +49096,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 111,
+            "rank": 112,
             "flags": [
                 {
                     "id": "stale",
@@ -48905,7 +49388,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 112,
+            "rank": 113,
             "flags": [
                 {
                     "id": "stale",
@@ -49195,7 +49678,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 113,
+            "rank": 114,
             "flags": [],
             "score": {
                 "model": 1,
@@ -49330,7 +49813,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 114,
+            "rank": 115,
             "flags": [],
             "score": {
                 "model": 1,
@@ -49469,7 +49952,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 115,
+            "rank": 116,
             "flags": [],
             "score": {
                 "model": 1,
@@ -49638,7 +50121,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 116,
+            "rank": 117,
             "flags": [],
             "score": {
                 "model": 1,
@@ -49807,7 +50290,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 117,
+            "rank": 118,
             "flags": [],
             "score": {
                 "model": 1,
@@ -49940,7 +50423,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 118,
+            "rank": 119,
             "flags": [],
             "score": {
                 "model": 1,
@@ -50109,7 +50592,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 119,
+            "rank": 120,
             "flags": [],
             "score": {
                 "model": 1,
@@ -50250,7 +50733,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 120,
+            "rank": 121,
             "flags": [],
             "score": {
                 "model": 1,
@@ -50385,7 +50868,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 121,
+            "rank": 122,
             "flags": [],
             "score": {
                 "model": 1,
@@ -50553,7 +51036,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 122,
+            "rank": 123,
             "flags": [],
             "score": {
                 "model": 1,
@@ -50708,7 +51191,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 123,
+            "rank": 124,
             "flags": [],
             "score": {
                 "model": 1,
@@ -50840,7 +51323,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 124,
+            "rank": 125,
             "flags": [],
             "score": {
                 "model": 1,
@@ -50995,7 +51478,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 125,
+            "rank": 126,
             "flags": [],
             "score": {
                 "model": 1,
@@ -51128,7 +51611,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 126,
+            "rank": 127,
             "flags": [],
             "score": {
                 "model": 1,
@@ -51286,7 +51769,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 127,
+            "rank": 128,
             "flags": [],
             "score": {
                 "model": 1,
@@ -51418,142 +51901,6 @@
                 "push": {
                     "at": "2026-03-26T22:03:55+00:00",
                     "years": 0.6,
-                    "level": null
-                },
-                "push_unmeasured": null
-            },
-            "baseline": null,
-            "gate": {
-                "reaches_fail_on": false,
-                "fails": false,
-                "exempt_by": null,
-                "by": [],
-                "basis": null
-            }
-        },
-        {
-            "package": "laminas/laminas-code",
-            "version": "4.7.1",
-            "branch": "4.x",
-            "installed_php": {
-                "requires": ">=7.4, <8.2",
-                "target_runs": false,
-                "project_allows": true
-            },
-            "verdict": "ok",
-            "priority": "none",
-            "lead": null,
-            "rank": 128,
-            "flags": [],
-            "score": {
-                "model": 1,
-                "total": 0,
-                "exact": 0,
-                "accepted": [],
-                "text": "0"
-            },
-            "next_step": null,
-            "security": {
-                "status": "clear",
-                "check": "complete",
-                "complete": true,
-                "unchecked_reason": null,
-                "records": 0,
-                "feeds": [
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 0,
-                        "reason": null
-                    }
-                ],
-                "ignored": [],
-                "ignored_count": 0
-            },
-            "checks_missing": [],
-            "checks_skipped": [],
-            "unchecked_accepted": [],
-            "maintenance_judged": true,
-            "metadata": {
-                "status": "read",
-                "reason": null,
-                "message": null
-            },
-            "activity": {
-                "status": "read",
-                "reason": null,
-                "forge": "github",
-                "host": "github.com",
-                "repo": "laminas/laminas-code",
-                "event": "push",
-                "archived": false,
-                "fetched_at": "2026-09-14T18:49:09+00:00",
-                "cached_at": null
-            },
-            "allowlist": null,
-            "abandoned_ignored": null,
-            "from_composer_repository": true,
-            "origin": {
-                "kind": "packagist",
-                "registry": "packagist.org",
-                "package_url": "https://packagist.org/packages/laminas/laminas-code",
-                "local": false
-            },
-            "replacement": null,
-            "replacement_url": null,
-            "note": null,
-            "libyears_unmeasured": null,
-            "libyears_at_least": false,
-            "direct": true,
-            "dev": false,
-            "reach": "direct",
-            "chain": [
-                "laminas/laminas-code"
-            ],
-            "depth": 0,
-            "depth_unmeasured": null,
-            "named_in": [
-                "require"
-            ],
-            "direct_dependents": [
-                "doctrine/doctrine-migrations-bundle",
-                "doctrine/migrations",
-                "friendsofphp/proxy-manager-lts",
-                "laminas/laminas-code",
-                "symfony/proxy-manager-bridge"
-            ],
-            "signals": [],
-            "evidence": "",
-            "allowlist_reason": null,
-            "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": 2.95,
-            "age": {
-                "installed": {
-                    "at": "2022-11-21T01:32:31+00:00",
-                    "years": 3.9,
-                    "dated_by": null
-                },
-                "installed_unmeasured": null,
-                "release": {
-                    "version": "4.17.0",
-                    "at": "2025-11-01T09:38:14+00:00",
-                    "years": 0.9,
-                    "level": null,
-                    "dated_by": null
-                },
-                "release_unmeasured": null,
-                "branch_release": {
-                    "version": "4.17.0",
-                    "at": "2025-11-01T09:38:14+00:00",
-                    "years": 0.9,
-                    "level": null,
-                    "dated_by": null
-                },
-                "branch_release_unmeasured": null,
-                "push": {
-                    "at": "2026-09-08T13:11:10+00:00",
-                    "years": 0.1,
                     "level": null
                 },
                 "push_unmeasured": null

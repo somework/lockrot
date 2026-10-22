@@ -768,6 +768,21 @@
                 "at": "2026-02-04T18:08:13+00:00"
             },
             {
+                "package": "laminas/laminas-code",
+                "reading": "age.release.at",
+                "at": "2025-11-01T09:38:14+00:00"
+            },
+            {
+                "package": "laminas/laminas-code",
+                "reading": "age.branch_release.at",
+                "at": "2025-11-01T09:38:14+00:00"
+            },
+            {
+                "package": "laminas/laminas-code",
+                "reading": "age.push.at",
+                "at": "2026-09-08T13:11:10+00:00"
+            },
+            {
                 "package": "endroid/qr-code",
                 "reading": "age.release.at",
                 "at": "2026-02-05T07:01:58+00:00"
@@ -971,6 +986,21 @@
                 "package": "sebastian/version",
                 "reading": "S8.data.newest_release",
                 "at": "2026-10-04T05:51:14+00:00"
+            },
+            {
+                "package": "friendsoftwig/twigcs",
+                "reading": "age.release.at",
+                "at": "2026-01-23T11:42:09+00:00"
+            },
+            {
+                "package": "friendsoftwig/twigcs",
+                "reading": "age.branch_release.at",
+                "at": "2026-01-23T11:42:09+00:00"
+            },
+            {
+                "package": "friendsoftwig/twigcs",
+                "reading": "age.push.at",
+                "at": "2026-01-23T11:42:49+00:00"
             },
             {
                 "package": "phpdocumentor/reflection-common",
@@ -1258,21 +1288,6 @@
                 "at": "2026-02-13T21:23:35+00:00"
             },
             {
-                "package": "friendsoftwig/twigcs",
-                "reading": "age.release.at",
-                "at": "2026-01-23T11:42:09+00:00"
-            },
-            {
-                "package": "friendsoftwig/twigcs",
-                "reading": "age.branch_release.at",
-                "at": "2026-01-23T11:42:09+00:00"
-            },
-            {
-                "package": "friendsoftwig/twigcs",
-                "reading": "age.push.at",
-                "at": "2026-01-23T11:42:49+00:00"
-            },
-            {
                 "package": "html2text/html2text",
                 "reading": "age.release.at",
                 "at": "2024-08-20T02:43:29+00:00"
@@ -1331,21 +1346,6 @@
                 "package": "jms/serializer-bundle",
                 "reading": "age.push.at",
                 "at": "2026-03-26T22:03:55+00:00"
-            },
-            {
-                "package": "laminas/laminas-code",
-                "reading": "age.release.at",
-                "at": "2025-11-01T09:38:14+00:00"
-            },
-            {
-                "package": "laminas/laminas-code",
-                "reading": "age.branch_release.at",
-                "at": "2025-11-01T09:38:14+00:00"
-            },
-            {
-                "package": "laminas/laminas-code",
-                "reading": "age.push.at",
-                "at": "2026-09-08T13:11:10+00:00"
             },
             {
                 "package": "lcobucci/jwt",
@@ -8276,23 +8276,23 @@
     },
     "server_mask": "http://127.0.0.1:<port> reads http://127.0.0.1",
     "files": {
-        "t0/report.json": "3219449c9342f7b626b439077e2b102a6a7c7bb6f5a1998754ddb1180827ef46",
-        "lockrot-baseline.json": "e341e32e57bad95d3b1aa662bbb7c6ea9217f5062ad55788814610c993042150",
-        "check/report.json": "4bca1da402a440ede34f9ce48a01adc6898102810eb457be5c3d2d39c2fcba48",
-        "check/report.table.txt": "a5666bc6fe4c789ab501d22d24075a4634796782ec1dff9cbfa3c9f8f2394d7e",
-        "check/report.md": "a7fa0fc9fc531b4bbf53141e18a688995ba764a2a0c08aebd65f6d06a19dace9",
-        "check/report.github.txt": "71275822a89bcf6f62631ad8dc88d3b64751e21f83bae34dfed93a88be011dca",
-        "check/report.gitlab.json": "58a929f52c38dbc1b1db296ec1c4c928d95a8c16a99a691ae97d14232729a92f",
-        "check/report.sarif.json": "df0432f1b7464c9905e024277f03f69c268837f50b6074dc2f6f941abda52a01",
-        "check/report.bundle.json": "b7663be6d8c2ef66b7fe8ec2e2152175351d21899d35b3ec0f9cdafbb53732eb",
-        "check/explain/javibravo--simpleue.json": "d4823e9b617ec4b90970172395abe13f2904d1da46f27a853db5b745bd8942d4",
-        "check/explain/mnapoli--piwik-twig-extension.json": "d756060f03a0539d056a61a820946dd8e529d15386b08df046f834f98002828c",
-        "check/explain/spomky-labs--otphp.json": "608336cee7eb5a2c178a40a333cbb209b4e586bee951768c9b78f99a2f640268",
-        "check/explain/symfony--web-server-bundle.json": "bee8ded7b5cb5f1bd060b71e0f8291589cb3be0ee1a733a23da6d4ee6dfa8f1f",
-        "check/explain/willdurand--jsonp-callback-validator.json": "b9a2defdb8c3d4cb9c86b57b376e3d65c0add1270a4368b7f417ddc53c1f9957",
-        "check/gates-left-behind-vulnerable-high.json": "bd701e35f20c3e048d3f23648b7a9bd2c43bccd0ff4bd7c64d455302164b8de7",
-        "check/gates-left-behind-vulnerable-high.sarif.json": "0ac3ec8be37bdc1358a54eec6a394f2d1f8562176397530efef61377ed1f607b",
-        "regenerate/lockrot-baseline.json": "089841caa85602f5e033a50ded61a7369ec7de8a319bc1e864b0f389e7827c58",
-        "regenerate/report.json": "b55c048a9eacb612913ff2f971600ad4cac1d38e1ada203d7508ab7980a16552"
+        "t0/report.json": "b6090911f39e87c19c5b855d633a84a35b9c2505a4682750cb4bb38f4ea9f607",
+        "lockrot-baseline.json": "0a2540c7d924b35522590c21c8abd666862259f1a6f7f8a831ac68acd58e2d50",
+        "check/report.json": "aa3b032bc7ba7a35d2c212834d451f7c3d9332b42944acf6446690819631a3c1",
+        "check/report.table.txt": "70af3daae3dfbd9f7292019e25bfe4835246c2520ab0f5ca171184866ceff949",
+        "check/report.md": "02cb5a058e6c3484dfe44402d402426028f150f4f811369b64c145092deaaf2e",
+        "check/report.github.txt": "b186165d6c51bb33c64754dca26e68d3be91666209b92306eb823d9446c68c13",
+        "check/report.gitlab.json": "e3e80db3ca81c2507c9147a56e6fd793aae77982a817abe37fe67abf3a70acf6",
+        "check/report.sarif.json": "dba63bd271574ea8ef7e0f34f94e6a9342e359cc5362bffc0dd0c3b2156994d9",
+        "check/report.bundle.json": "92eb9bbfa8ec993b73c80059519c0586df8a1492cf7f17c57d3c68405e64beec",
+        "check/explain/javibravo--simpleue.json": "a0ef19c24a5ab87d2d02f1560819080408edc251cda72a4fa69e80b9a540f8d2",
+        "check/explain/mnapoli--piwik-twig-extension.json": "a705daabd06f6e7b146bb770279a58b3d37a4c16becbbdb16feac0aebbd5aeda",
+        "check/explain/spomky-labs--otphp.json": "f3285f35748f3b476635718ec55f3cc996c63415c3663fb00f345f32ce985922",
+        "check/explain/symfony--web-server-bundle.json": "adefee6ab9ea8b1d77c9c35467c0172a60f2181dbd2996100bdc7bab9d3a2e4f",
+        "check/explain/willdurand--jsonp-callback-validator.json": "edcd55d9e5e5548ffaa5c145643bd925311b52cf5450ba0ce90a2e8948e3f1b0",
+        "check/gates-left-behind-vulnerable-high.json": "8fd7f1633ea733603264dcfe45f6be923f76e35dd353ec36dcdd532c6da00747",
+        "check/gates-left-behind-vulnerable-high.sarif.json": "ed4801dc411ab8612a470fc0970ec41387accc18791abc544aa21aca4bb04a2e",
+        "regenerate/lockrot-baseline.json": "bca7c23ed220491afdf5b8952fbb7f59ea258b1bf832bb2f9a71661878c87e8c",
+        "regenerate/report.json": "a38aff2e69bea298bf0d882c85f27a1c012e4a0ae36e2fdadecaf54c565b8d6c"
     }
 }

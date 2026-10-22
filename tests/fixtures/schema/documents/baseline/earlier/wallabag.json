@@ -10,6 +10,15 @@
  "score_model_id": 1,
  "fix_model": 1,
  "findings": {
+  "bacon/bacon-qr-code": {
+   "version": "2.0.8",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
   "bdunogier/guzzle-site-authenticator": {
    "version": "1.1.0",
    "first_seen": "2026-09-24",
@@ -95,7 +104,7 @@
    "version": "3.9.7",
    "first_seen": "2026-09-24",
    "flags": {
-    "abandoned": {
+    "left-behind": {
      "known_since": "2026-09-24"
     }
    }
@@ -477,6 +486,15 @@
     }
    }
   },
+  "laminas/laminas-code": {
+   "version": "4.7.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "capped": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
   "lcobucci/clock": {
    "version": "2.0.0",
    "first_seen": "2026-09-24",
@@ -491,15 +509,6 @@
    "first_seen": "2026-09-24",
    "flags": {
     "left-behind": {
-     "known_since": "2026-09-24"
-    }
-   }
-  },
-  "lexik/form-filter-bundle": {
-   "version": "v7.0.3",
-   "first_seen": "2026-09-24",
-   "flags": {
-    "abandoned": {
      "known_since": "2026-09-24"
     }
    }
@@ -548,6 +557,18 @@
    "first_seen": "2026-09-24",
    "flags": {
     "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "php-http/guzzle5-adapter": {
+   "version": "2.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    },
+    "capped": {
      "known_since": "2026-09-24"
     }
    }
@@ -653,15 +674,6 @@
    "first_seen": "2026-09-24",
    "flags": {
     "abandoned": {
-     "known_since": "2026-09-24"
-    }
-   }
-  },
-  "smalot/pdfparser": {
-   "version": "v1.1.0",
-   "first_seen": "2026-09-24",
-   "flags": {
-    "left-behind": {
      "known_since": "2026-09-24"
     }
    }
@@ -777,6 +789,15 @@
     }
    }
   },
+  "symfony/event-dispatcher-contracts": {
+   "version": "v1.10.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
   "symfony/form": {
    "version": "v4.4.48",
    "first_seen": "2026-09-24",
@@ -863,17 +884,6 @@
     }
    }
   },
-  "symfony/polyfill-intl-idn": {
-   "version": "v1.33.0",
-   "first_seen": "2026-09-24",
-   "advisories": {
-    "PKSA-dwsq-ppd2-mb1x": {
-     "known_since": "2026-09-24",
-     "severity": "low",
-     "fix_kind": "update"
-    }
-   }
-  },
   "symfony/property-access": {
    "version": "v4.4.44",
    "first_seen": "2026-09-24",
@@ -896,7 +906,7 @@
    "version": "v2.1.4",
    "first_seen": "2026-09-24",
    "flags": {
-    "abandoned": {
+    "left-behind": {
      "known_since": "2026-09-24"
     }
    }
@@ -1016,6 +1026,22 @@
     }
    }
   },
+  "symfony/yaml": {
+   "version": "v5.3.14",
+   "first_seen": "2026-09-24",
+   "advisories": {
+    "PKSA-b14r-zh1d-vdrc": {
+     "known_since": "2026-09-24",
+     "severity": "low",
+     "fix_kind": "update"
+    },
+    "PKSA-ft77-7h5f-p3r6": {
+     "known_since": "2026-09-24",
+     "severity": "low",
+     "fix_kind": "update"
+    }
+   }
+  },
   "thecodingmachine/safe": {
    "version": "v1.3.3",
    "first_seen": "2026-09-24",
@@ -1115,15 +1141,6 @@
     }
    }
   },
-  "wallabag/phpepub": {
-   "version": "4.0.10",
-   "first_seen": "2026-09-24",
-   "flags": {
-    "stale": {
-     "known_since": "2026-09-24"
-    }
-   }
-  },
   "willdurand/jsonp-callback-validator": {
    "version": "v1.1.0",
    "first_seen": "2026-09-24",
@@ -1137,7 +1154,7 @@
    "version": "3.1.0",
    "first_seen": "2026-09-24",
    "flags": {
-    "abandoned": {
+    "stale": {
      "known_since": "2026-09-24"
     }
    }

@@ -843,6 +843,7 @@
    "left-behind",
    "old-promise",
    "stale",
+   "capped",
    "vulnerable"
   ],
   "verdicts": [
@@ -870,7 +871,8 @@
    "S7",
    "S8",
    "S9",
-   "S10"
+   "S10",
+   "S11"
   ],
   "fail_on": "high",
   "fail_on_source": "option",

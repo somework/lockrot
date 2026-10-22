@@ -1,0 +1,2449 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/advisory/PKSA-8cfg-tzhf-fr83",
+                            "name": "advisory/PKSA-8cfg-tzhf-fr83",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-8cfg-tzhf-fr83 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: critical severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "9.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-x678-4z45-v3d5",
+                            "name": "advisory/PKSA-x678-4z45-v3d5",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-x678-4z45-v3d5 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: critical severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "9.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-285y-y5bt-kvd9",
+                            "name": "advisory/PKSA-285y-y5bt-kvd9",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-285y-y5bt-kvd9 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-64jn-3d9t-gncx",
+                            "name": "advisory/PKSA-64jn-3d9t-gncx",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-64jn-3d9t-gncx affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-bcnb-9tc9-bjb8",
+                            "name": "advisory/PKSA-bcnb-9tc9-bjb8",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-bcnb-9tc9-bjb8 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-dbrb-pvhs-h3st",
+                            "name": "advisory/PKSA-dbrb-pvhs-h3st",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-dbrb-pvhs-h3st affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-dqzt-yst9-1w9y",
+                            "name": "advisory/PKSA-dqzt-yst9-1w9y",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-dqzt-yst9-1w9y affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-gst3-cdk3-bpqt",
+                            "name": "advisory/PKSA-gst3-cdk3-bpqt",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-gst3-cdk3-bpqt affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-gz3f-3cz3-3wsw",
+                            "name": "advisory/PKSA-gz3f-3cz3-3wsw",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-gz3f-3cz3-3wsw affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-jw5c-q9nd-tzj9",
+                            "name": "advisory/PKSA-jw5c-q9nd-tzj9",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-jw5c-q9nd-tzj9 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-m9cr-9614-rsf7",
+                            "name": "advisory/PKSA-m9cr-9614-rsf7",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-m9cr-9614-rsf7 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-mkg2-1wyw-57y7",
+                            "name": "advisory/PKSA-mkg2-1wyw-57y7",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-mkg2-1wyw-57y7 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-r22k-87hv-mfk4",
+                            "name": "advisory/PKSA-r22k-87hv-mfk4",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-r22k-87hv-mfk4 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-x13r-n4wc-4gcr",
+                            "name": "advisory/PKSA-x13r-n4wc-4gcr",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-x13r-n4wc-4gcr affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-xk3k-rd1m-pxmg",
+                            "name": "advisory/PKSA-xk3k-rd1m-pxmg",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-xk3k-rd1m-pxmg affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-xp7t-fbrb-qjv4",
+                            "name": "advisory/PKSA-xp7t-fbrb-qjv4",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-xp7t-fbrb-qjv4 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-ybqb-vyrq-8pdt",
+                            "name": "advisory/PKSA-ybqb-vyrq-8pdt",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-ybqb-vyrq-8pdt affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-4ckb-wpj6-c29d",
+                            "name": "advisory/PKSA-4ckb-wpj6-c29d",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-4ckb-wpj6-c29d affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-7f9v-sb8k-krfb",
+                            "name": "advisory/PKSA-7f9v-sb8k-krfb",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-7f9v-sb8k-krfb affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-7jd6-nb49-bz4v",
+                            "name": "advisory/PKSA-7jd6-nb49-bz4v",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-7jd6-nb49-bz4v affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-8b16-mcgz-h4cz",
+                            "name": "advisory/PKSA-8b16-mcgz-h4cz",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-8b16-mcgz-h4cz affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-dvbq-8ft2-ngrw",
+                            "name": "advisory/PKSA-dvbq-8ft2-ngrw",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-dvbq-8ft2-ngrw affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-hznc-gbby-6w16",
+                            "name": "advisory/PKSA-hznc-gbby-6w16",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-hznc-gbby-6w16 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-jtdk-dcr5-f11n",
+                            "name": "advisory/PKSA-jtdk-dcr5-f11n",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-jtdk-dcr5-f11n affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-m4hk-rk8p-4t5p",
+                            "name": "advisory/PKSA-m4hk-rk8p-4t5p",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-m4hk-rk8p-4t5p affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-nm34-xhtz-ww9p",
+                            "name": "advisory/PKSA-nm34-xhtz-ww9p",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-nm34-xhtz-ww9p affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-p1pj-q951-6f1x",
+                            "name": "advisory/PKSA-p1pj-q951-6f1x",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-p1pj-q951-6f1x affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-s99r-9yxm-hjvt",
+                            "name": "advisory/PKSA-s99r-9yxm-hjvt",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-s99r-9yxm-hjvt affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
+            "results": [
+                {
+                    "ruleId": "lockrot/advisory/PKSA-8cfg-tzhf-fr83",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 95.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2026-34084 (critical advisory): PhpSpreadsheet has SSRF/RCE in IOFactory::load when $filename is user controlled. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-8cfg-tzhf-fr83"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "mautic/core-lib",
+                            "phpoffice/phpspreadsheet"
+                        ],
+                        "depth": 1,
+                        "direct_dependents": [
+                            "mautic/core-lib"
+                        ],
+                        "signal_ids": [
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2022-04-24T13:53:10+00:00",
+                                "years": 4.4,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "3.10.8",
+                                "at": "2026-09-17T04:27:19+00:00",
+                                "years": 0,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "1.30.7",
+                                "at": "2026-09-17T03:56:23+00:00",
+                                "years": 0,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-10-01T11:02:51+00:00",
+                                "years": 0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "advisory": "PKSA-8cfg-tzhf-fr83",
+                        "cve": "CVE-2026-34084",
+                        "severity": "critical",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.30.7",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 32,
+                        "deciding": true,
+                        "term": {
+                            "part": "security",
+                            "flag": "vulnerable",
+                            "role": "security",
+                            "advisory": "PKSA-8cfg-tzhf-fr83",
+                            "severity": "critical",
+                            "fix_kind": "update",
+                            "weight": 32,
+                            "multiplier": 1,
+                            "points": 32,
+                            "contribution": 32
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-x678-4z45-v3d5",
+                    "ruleIndex": 1,
+                    "level": "warning",
+                    "rank": 95.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2026-45034 (critical advisory): PHPSpreadsheet has a patch bypass for CVE-2026-34084. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-x678-4z45-v3d5"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-x678-4z45-v3d5",
+                        "cve": "CVE-2026-45034",
+                        "severity": "critical",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.30.7",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 32,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-285y-y5bt-kvd9",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-56366 (high advisory): PhpSpreadsheet allows unauthorized Reflected XSS in the Accounting.php file. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-285y-y5bt-kvd9"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-285y-y5bt-kvd9",
+                        "cve": "CVE-2024-56366",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.8",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-64jn-3d9t-gncx",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2025-54370 (high advisory): PhpSpreadsheet vulnerable to SSRF when reading and displaying a processed HTML document in the browser. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-64jn-3d9t-gncx"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-64jn-3d9t-gncx",
+                        "cve": "CVE-2025-54370",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.30.0",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-bcnb-9tc9-bjb8",
+                    "ruleIndex": 4,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-56408 (high advisory): PhpSpreadsheet allows unauthorized Reflected XSS in `Convert-Online.php` file. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-bcnb-9tc9-bjb8"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-bcnb-9tc9-bjb8",
+                        "cve": "CVE-2024-56408",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.8",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-dbrb-pvhs-h3st",
+                    "ruleIndex": 5,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-47873 (high advisory): XmlScanner bypass leads to XXE. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-dbrb-pvhs-h3st"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-dbrb-pvhs-h3st",
+                        "cve": "CVE-2024-47873",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.4",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-dqzt-yst9-1w9y",
+                    "ruleIndex": 6,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2026-59931 (high advisory): PHPSpreadsheet: SSRF bypass via HTTP redirect in WEBSERVICE() domain whitelist. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-dqzt-yst9-1w9y"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-dqzt-yst9-1w9y",
+                        "cve": "CVE-2026-59931",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.30.7",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-gst3-cdk3-bpqt",
+                    "ruleIndex": 7,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-48917 (high advisory): XXE in PHPSpreadsheet's XLSX reader. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-gst3-cdk3-bpqt"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-gst3-cdk3-bpqt",
+                        "cve": "CVE-2024-48917",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.4",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-gz3f-3cz3-3wsw",
+                    "ruleIndex": 8,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2026-40902 (high advisory): PhpSpreadsheet has CPU Denial of Service via Unbounded Row Number in XLSX Row Dimensions. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-gz3f-3cz3-3wsw"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-gz3f-3cz3-3wsw",
+                        "cve": "CVE-2026-40902",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.30.7",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-jw5c-q9nd-tzj9",
+                    "ruleIndex": 9,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-56365 (high advisory): PhpSpreadsheet allows unauthorized Reflected XSS in the constructor of the Downloader class. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-jw5c-q9nd-tzj9"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-jw5c-q9nd-tzj9",
+                        "cve": "CVE-2024-56365",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.8",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-m9cr-9614-rsf7",
+                    "ruleIndex": 10,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2026-59932 (high advisory): PHPSpreadsheet: Gnumeric reader unbounded gzip expansion causes memory exhaustion. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-m9cr-9614-rsf7"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-m9cr-9614-rsf7",
+                        "cve": "CVE-2026-59932",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.30.7",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-mkg2-1wyw-57y7",
+                    "ruleIndex": 11,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-45293 (high advisory): XXE in PHPSpreadsheet's XLSX reader. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-mkg2-1wyw-57y7"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-mkg2-1wyw-57y7",
+                        "cve": "CVE-2024-45293",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.1",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-r22k-87hv-mfk4",
+                    "ruleIndex": 12,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2026-59933 (high advisory): PHPSpreadsheet: XLS/OLE sector-chain self-loop causes memory exhaustion. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-r22k-87hv-mfk4"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-r22k-87hv-mfk4",
+                        "cve": "CVE-2026-59933",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.30.7",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-x13r-n4wc-4gcr",
+                    "ruleIndex": 13,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2026-40863 (high advisory): PhpSpreadsheet has CPU Denial of Service via Unbounded Row Index in SpreadsheetML XML Reader. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-x13r-n4wc-4gcr"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-x13r-n4wc-4gcr",
+                        "cve": "CVE-2026-40863",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.30.7",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-xk3k-rd1m-pxmg",
+                    "ruleIndex": 14,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-45290 (high advisory): PhpSpreadsheet allows absolute path traversal and Server-Side Request Forgery when opening XLSX file. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-xk3k-rd1m-pxmg"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-xk3k-rd1m-pxmg",
+                        "cve": "CVE-2024-45290",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.2",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-xp7t-fbrb-qjv4",
+                    "ruleIndex": 15,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-45048 (high advisory): XXE in PHPSpreadsheet encoding is returned. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-xp7t-fbrb-qjv4"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-xp7t-fbrb-qjv4",
+                        "cve": "CVE-2024-45048",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.1",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-ybqb-vyrq-8pdt",
+                    "ruleIndex": 16,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-56409 (high advisory): PhpSpreadsheet allows unauthorized Reflected XSS in Currency.php file. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-ybqb-vyrq-8pdt"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-ybqb-vyrq-8pdt",
+                        "cve": "CVE-2024-56409",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.8",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-4ckb-wpj6-c29d",
+                    "ruleIndex": 17,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-56410 (medium advisory): PhpSpreadsheet has a Cross-Site Scripting (XSS) vulnerability in custom properties. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-4ckb-wpj6-c29d"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-4ckb-wpj6-c29d",
+                        "cve": "CVE-2024-56410",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.8",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-7f9v-sb8k-krfb",
+                    "ruleIndex": 18,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-45291 (medium advisory): PhpSpreadsheet allows absolute path traversal and Server-Side Request Forgery in HTML writer when embedding images is enabled. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-7f9v-sb8k-krfb"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-7f9v-sb8k-krfb",
+                        "cve": "CVE-2024-45291",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.2",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-7jd6-nb49-bz4v",
+                    "ruleIndex": 19,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-56412 (medium advisory): PhpSpreadsheet allows bypass XSS sanitizer using the javascript protocol and special characters. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-7jd6-nb49-bz4v"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-7jd6-nb49-bz4v",
+                        "cve": "CVE-2024-56412",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.8",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-8b16-mcgz-h4cz",
+                    "ruleIndex": 20,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2025-23210 (medium advisory): PhpSpreadsheet allows bypassing of XSS sanitizer using the javascript protocol and special characters. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-8b16-mcgz-h4cz"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-8b16-mcgz-h4cz",
+                        "cve": "CVE-2025-23210",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.9",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-dvbq-8ft2-ngrw",
+                    "ruleIndex": 21,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-45060 (medium advisory): PhpSpreadsheet has an Unauthenticated Cross-Site-Scripting (XSS) in sample file. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-dvbq-8ft2-ngrw"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-dvbq-8ft2-ngrw",
+                        "cve": "CVE-2024-45060",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.2",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-hznc-gbby-6w16",
+                    "ruleIndex": 22,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2026-40296 (medium advisory): PhpSpreadsheet has XSS via number format code with @ text placeholder bypasses htmlspecialchars in HTML writer. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-hznc-gbby-6w16"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-hznc-gbby-6w16",
+                        "cve": "CVE-2026-40296",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.30.7",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-jtdk-dcr5-f11n",
+                    "ruleIndex": 23,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2026-35453 (medium advisory): PhpSpreadsheet has XSS via NumberFormat @ Text Substitution in HTML Writer. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-jtdk-dcr5-f11n"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-jtdk-dcr5-f11n",
+                        "cve": "CVE-2026-35453",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.30.7",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-m4hk-rk8p-4t5p",
+                    "ruleIndex": 24,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-45046 (medium advisory): PhpSpreadsheet HTML writer is vulnerable to Cross-Site Scripting via style information. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-m4hk-rk8p-4t5p"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-m4hk-rk8p-4t5p",
+                        "cve": "CVE-2024-45046",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.1",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-nm34-xhtz-ww9p",
+                    "ruleIndex": 25,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-56411 (medium advisory): PhpSpreadsheet has a Cross-Site Scripting (XSS) vulnerability of the hyperlink base in the HTML page header. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-nm34-xhtz-ww9p"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-nm34-xhtz-ww9p",
+                        "cve": "CVE-2024-56411",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.8",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-p1pj-q951-6f1x",
+                    "ruleIndex": 26,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2024-45292 (medium advisory): PhpSpreadsheet HTML writer is vulnerable to Cross-Site Scripting via JavaScript hyperlinks. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-p1pj-q951-6f1x"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-p1pj-q951-6f1x",
+                        "cve": "CVE-2024-45292",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.2",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-s99r-9yxm-hjvt",
+                    "ruleIndex": 27,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "phpoffice/phpspreadsheet 1.23.0 is affected by CVE-2025-22131 (medium advisory): Cross-Site Scripting (XSS) vulnerability in generateNavigation() function in PhpSpreadsheet. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "phpoffice/phpspreadsheet",
+                        "lockrot/advisory": "PKSA-s99r-9yxm-hjvt"
+                    },
+                    "properties": {
+                        "package": "phpoffice/phpspreadsheet",
+                        "version": "1.23.0",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-s99r-9yxm-hjvt",
+                        "cve": "CVE-2025-22131",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "1.29.8",
+                            "newest": "1.30.7",
+                            "on_installed_branch": true,
+                            "php": ">=7.4.0 <8.5.0",
+                            "admits_target_php": true,
+                            "admits_project_php": null,
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 1,
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": true,
+                            "tripped_by": [
+                                "fail_on"
+                            ],
+                            "fail_on_applied": true,
+                            "reaching": 1,
+                            "failing": 1,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 1
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    },
+                    "toolExecutionNotifications": [
+                        {
+                            "level": "note",
+                            "message": {
+                                "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 1,
+                            "records": 31
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

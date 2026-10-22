@@ -677,7 +677,7 @@ final class Analyzer
                 $ranges[$advisory->id()] = $advisory->affectedRange();
             }
         }
-        $subject = new MoveSubject($finding->package(), $finding->version(), $finding->isDirect(), $finding->directDependents(), $floor->php(PhpFloor::TARGET), $floor->lowestAsString());
+        $subject = new MoveSubject($finding->package(), $finding->version(), $finding->isDirect(), $finding->directDependents(), $floor->php(PhpFloor::TARGET), $floor->lowestAsString(), $this->signals->phpCap()->newest());
         $context = new MoveContext(
             $finding,
             $subject,
@@ -693,6 +693,7 @@ final class Analyzer
             FixFinder::otherVersionRanges($facts->advisories(), $every),
             $details->advisoriesComplete()
         );
+        $context = $context->withPhpCap($this->signals->phpCap());
         if ($checks !== null) {
             $context = $context->withChecks($checks);
         }

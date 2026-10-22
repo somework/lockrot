@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "phpoffice/phpspreadsheet 1.23.0 \u2014 finding critical (32 = vulnerable 32 [critical advisory]) \u2014 vulnerable: 28 advisories: 2 critical, 15 high, 11 medium \u2014 all fixed on 1.x; worst: CVE-2026-34084 PhpSpreadsheet has SSRF/RCE in IOFactory::load when $filename is user controlled. Do: composer update phpoffice/phpspreadsheet (gets 1.30.7) \u2014 clears 28 advisories; it stops below the newest PHP, so capped would count. (via mautic/core-lib)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "d5d35d96d5ce98e1fc7dee8be02aa2c309ed0a305c8e933a8fab98bcb0352edb",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 11
+            }
+        }
+    }
+]

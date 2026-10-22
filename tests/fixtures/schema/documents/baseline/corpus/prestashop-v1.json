@@ -556,6 +556,9 @@
    "flags": {
     "left-behind": {
      "known_since": "2026-10-01"
+    },
+    "capped": {
+     "known_since": "2026-10-01"
     }
    }
   },

@@ -348,6 +348,7 @@ final class JsonSchemaConformanceTest extends TestCase
         // S10 rides on the fixtures that carry an undated newest release — symfony/polyfill-* in
         // wallabag's lock, whose tags are cut by a monorepo and share their commit.
         $expected[] = Signal::S10;
+        $expected[] = Signal::S11;
 
         self::assertSame($expected, array_keys($seen));
     }
@@ -424,7 +425,7 @@ final class JsonSchemaConformanceTest extends TestCase
 
                 break;
             case 'block':
-                $entry->blocks = array_merge(self::items($entry->blocks), ['S11']);
+                $entry->blocks = array_merge(self::items($entry->blocks), ['S12']);
 
                 break;
             case 'floor_source':

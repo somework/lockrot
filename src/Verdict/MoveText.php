@@ -33,6 +33,7 @@ final class MoveText
     private const ADDS = [
         MoveFact::RELEASED_BEFORE_GA => "it was released before your target PHP's major",
         MoveFact::BRANCH_NOT_RELEASING => 'that line no longer releases while a higher line does',
+        MoveFact::STOPS_BELOW_NEWEST_PHP => 'it stops below the newest PHP',
     ];
 
     public static function render(Move $move): string
@@ -98,7 +99,7 @@ final class MoveText
 
                 return 'test it on PHP '.$subject->targetPhp().($latest !== null && $latest->isInstalled() ? ' — '.$latest->version().' is its newest release' : '');
             case Move::UPDATE:
-                return self::update($move).' (gets '.$move->newest().')'.self::clears($move);
+                return self::update($move).' (gets '.$move->newest().')'.self::clears($move).self::adds($move);
             case Move::REQUIRE:
             case Move::RAISE_PHP:
                 return self::requirement($move, $subject);
@@ -112,6 +113,9 @@ final class MoveText
                 return 'no tagged release to move to; review the snapshot, or replace it';
             case Move::NO_MOVE:
                 $reason = $move->reason() ?? '';
+                if ($reason === 'no_release_admits') {
+                    return 'no move: no release above '.$subject->version().' admits PHP '.$subject->newestPhp();
+                }
 
                 return (self::NO_MOVE[$reason] ?? $reason).($reason === 'metadata_not_read' && $move->source() === FlagSet::PINNED ? '; review the snapshot' : '');
             default:
@@ -166,12 +170,7 @@ final class MoveText
         if ($latest !== null && $latest->relation() === 'older') {
             $text .= ', older than your snapshot ('.substr((string) $latest->snapshotTime(), 0, 10).'); review, or replace';
         }
-        $text .= self::phpClause($move, $subject, false);
-        foreach (self::addsByBasis($move) as $basis => $ids) {
-            $text .= '; '.(self::ADDS[$basis] ?? $basis).', so '.implode(' and ', $ids).' would count';
-        }
-
-        return $text;
+        return $text.self::phpClause($move, $subject, false).self::adds($move);
     }
 
     private static function requirement(Move $move, MoveSubject $subject): string
@@ -185,7 +184,18 @@ final class MoveText
             $text = $raise.'move '.$subject->package().' to '.$move->constraint().($via === '' ? '' : ' through '.$via);
         }
 
-        return $text.self::clears($move).self::phpClause($move, $subject, true);
+        return $text.self::clears($move).self::adds($move).self::phpClause($move, $subject, true);
+    }
+
+    /** One clause per basis of `adds[]`: what the move raises that would count. */
+    private static function adds(Move $move): string
+    {
+        $text = '';
+        foreach (self::addsByBasis($move) as $basis => $ids) {
+            $text .= '; '.(self::ADDS[$basis] ?? $basis).', so '.implode(' and ', $ids).' would count';
+        }
+
+        return $text;
     }
 
     private static function blocked(Move $move, MoveSubject $subject): string

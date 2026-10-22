@@ -113,6 +113,7 @@ final class BaselineTest extends TestCase
                 'acme/abandoned' => ['version' => '1.0.0', 'first_seen' => '2026-01-15', 'flags' => [
                     'abandoned' => ['known_since' => '2026-01-15'], 'silent' => ['known_since' => '2026-01-15'], 'pinned' => ['known_since' => '2026-01-15'],
                     'left-behind' => ['known_since' => '2026-01-15'], 'old-promise' => ['known_since' => '2026-01-15'], 'stale' => ['known_since' => '2026-01-15'],
+                    'capped' => ['known_since' => '2026-01-15'],
                 ]],
             ],
         ], JsonPath::decoded($baseline->toArray()));

@@ -18,6 +18,7 @@ use Lockrot\Score\Standing;
 use Lockrot\Signal\Data\AbandonedData;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
+use Lockrot\Signal\Data\CappedData;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\Data\NoPushData;
@@ -656,7 +657,27 @@ final class Finding
             $s3Unread = $s3Unread || \in_array(Signal::S3, $check->blocks(), true);
         }
 
-        return new ScoreContext($this->maintenanceJudged, $details->advisoriesComplete(), $livenessComplete, $s3Unread, ReleaseBranch::of($this->version) === null && !$this->maintenanceJudged);
+        return new ScoreContext($this->maintenanceJudged, $details->advisoriesComplete(), $livenessComplete, $s3Unread, ReleaseBranch::of($this->version) === null && (!$this->maintenanceJudged || self::tagMayBeLeftBehind($details->moves()->nextStep())));
+    }
+
+    /**
+     * The `tag` move lands on a row where S8's rule fires or cannot be dated: a tag there can be
+     * left behind, so the score without `pinned` is a lower bound.
+     */
+    private static function tagMayBeLeftBehind(?Move $move): bool
+    {
+        foreach ($move === null ? [] : array_merge([$move], $move->also()) as $step) {
+            if ($step->kind() !== Move::TAG) {
+                continue;
+            }
+            foreach (array_merge($step->adds(), $step->unverified()) as $fact) {
+                if ($fact->kind() === MoveFact::FLAG && $fact->id() === FlagSet::LEFT_BEHIND) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -768,6 +789,10 @@ final class Finding
                 $s5 = self::dataIn($signals, OldPromiseData::class);
 
                 return ['unit' => 'php', 'value' => $s5 === null ? null : $s5->writtenForPhp(), 'source' => null];
+            case FlagSet::CAPPED:
+                $s11 = self::dataIn($signals, CappedData::class);
+
+                return ['unit' => 'php_minor', 'value' => $s11 === null ? null : $s11->stopsAt(), 'source' => null];
             default:
                 $s2 = self::dataIn($signals, NoReleaseData::class);
                 $s4 = self::dataIn($signals, NoPushData::class);

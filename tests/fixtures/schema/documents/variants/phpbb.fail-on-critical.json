@@ -38,6 +38,7 @@
    "left-behind",
    "old-promise",
    "stale",
+   "capped",
    "vulnerable"
   ],
   "verdicts": [
@@ -65,7 +66,8 @@
    "S7",
    "S8",
    "S9",
-   "S10"
+   "S10",
+   "S11"
   ],
   "fix_model": 1,
   "text_grammar": 1,
@@ -79,6 +81,7 @@
     "left-behind",
     "old-promise",
     "stale",
+    "capped",
     "vulnerable"
    ],
    "parts": [
@@ -90,7 +93,8 @@
       "pinned",
       "left-behind",
       "old-promise",
-      "stale"
+      "stale",
+      "capped"
      ],
      "combine": "lead_plus_share"
     },
@@ -230,9 +234,10 @@
      "band": "medium",
      "can_corroborate": true,
      "corroborating_points": 2,
-     "max_maintenance": 8,
+     "max_maintenance": 10,
      "max_maintenance_flags": [
-      "stale"
+      "stale",
+      "capped"
      ],
      "raised_by": [
       "S2",
@@ -244,6 +249,27 @@
      ],
      "basis": {
       "v013_base": "medium",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "capped",
+     "part": "maintenance",
+     "points": 8,
+     "band": "medium",
+     "can_corroborate": true,
+     "corroborating_points": 2,
+     "max_maintenance": 8,
+     "max_maintenance_flags": [
+      "capped"
+     ],
+     "raised_by": [
+      "S11"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": null,
       "points": "band_floor"
      },
      "points_from": null
@@ -440,6 +466,14 @@
       "threshold": "push-warn-years",
       "below": "release-warn-years"
      }
+    },
+    {
+     "id": "php_bound",
+     "flag_ids": [
+      "old-promise",
+      "capped"
+     ],
+     "holds_unless": null
     }
    ],
    "sort": [
@@ -745,7 +779,7 @@
   "score_rules_used": {
    "counted": 6,
    "lead-first": 24,
-   "corroborating-share": 13,
+   "corroborating-share": 16,
    "advisory-points": 10,
    "no-reachable-fix-multiplier": 0,
    "security-max": 7,
@@ -926,7 +960,7 @@
  "activity_cache_age_hours": 1.6,
  "packages_checked": 40,
  "packages_flagged": 26,
- "packages_multi_flag": 16,
+ "packages_multi_flag": 19,
  "include_dev": false,
  "not_from_composer_repository": 0,
  "packages_unchecked_accepted": 0,
@@ -1035,6 +1069,20 @@
     "high": 0,
     "medium": 0,
     "low": 2
+   }
+  },
+  "capped": {
+   "carrying": 3,
+   "leading": 0,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 2,
+    "medium": 0,
+    "low": 1
    }
   },
   "vulnerable": {
@@ -9403,7 +9451,7 @@
     {
      "id": "S7",
      "level": "info",
-     "summary": "pulls in 3 flagged packages: zendframework/zend-code (abandoned), zendframework/zend-eventmanager (abandoned), ocramius/proxy-manager (stale)",
+     "summary": "pulls in 3 flagged packages: zendframework/zend-code (abandoned · capped), zendframework/zend-eventmanager (abandoned · capped), ocramius/proxy-manager (stale · capped)",
      "data": {
       "flagged": 3,
       "packages": [
@@ -9417,7 +9465,8 @@
         "verdict": "high",
         "lead": "abandoned",
         "flag_ids": [
-         "abandoned"
+         "abandoned",
+         "capped"
         ]
        },
        {
@@ -9431,7 +9480,8 @@
         "verdict": "high",
         "lead": "abandoned",
         "flag_ids": [
-         "abandoned"
+         "abandoned",
+         "capped"
         ]
        },
        {
@@ -9443,7 +9493,8 @@
         "verdict": "low",
         "lead": "stale",
         "flag_ids": [
-         "stale"
+         "stale",
+         "capped"
         ]
        }
       ]
@@ -9521,6 +9572,755 @@
    }
   },
   {
+   "package": "zendframework/zend-code",
+   "version": "3.4.1",
+   "branch": "3.x",
+   "installed_php": {
+    "requires": "^7.1",
+    "target_runs": false,
+    "project_allows": true
+   },
+   "verdict": "high",
+   "priority": "high",
+   "lead": "abandoned",
+   "rank": 20,
+   "flags": [
+    {
+     "id": "abandoned",
+     "role": "lead",
+     "baseline": null,
+     "signal_ids": [
+      "S1",
+      "S3",
+      "S2",
+      "S4"
+     ],
+     "degree": {
+      "reasons": [
+       "marked",
+       "archived"
+      ],
+      "liveness_complete": true
+     },
+     "headline": {
+      "unit": "reason",
+      "value": "archived",
+      "source": null
+     },
+     "summary": "marked abandoned by its registry, replacement: laminas/laminas-code; its repository is archived on GitHub; last release 2019-12-10 (6.8 years ago); last push 2020-01-29 (6.7 years ago)"
+    },
+    {
+     "id": "capped",
+     "role": "corroborating",
+     "baseline": null,
+     "signal_ids": [
+      "S11"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "php_minor",
+      "value": "7.4",
+      "source": null
+     },
+     "summary": "requires php ^7.1: it stops at 7.4, so the newest PHP, 8.5, is excluded"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 17,
+    "exact": 17,
+    "rounded_down": false,
+    "band": {
+     "floor": 16,
+     "next": "critical",
+     "to_next": 15
+    },
+    "decided_by": "maintenance",
+    "parts": {
+     "maintenance": {
+      "status": "counted",
+      "contribution": 17,
+      "alone": {
+       "total": 17,
+       "verdict": "high"
+      }
+     },
+     "security": {
+      "status": "clear",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      },
+      "of": 0,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "maintenance",
+      "flag": "abandoned",
+      "role": "lead",
+      "weight": 32,
+      "divisor": 1,
+      "points": 32,
+      "contribution": 16
+     },
+     {
+      "part": "maintenance",
+      "flag": "capped",
+      "role": "corroborating",
+      "weight": 8,
+      "divisor": 4,
+      "points": 2,
+      "contribution": 1
+     }
+    ],
+    "modifiers": [
+     {
+      "reason": "transitive",
+      "applies_to": "maintenance",
+      "divide_by": 2,
+      "before": 34,
+      "after": 17
+     }
+    ],
+    "accepted": [],
+    "without": [
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "abandoned"
+      },
+      "revealed": [
+       {
+        "flag": "silent",
+        "role": "lead"
+       }
+      ],
+      "total": 17,
+      "verdict": "high",
+      "lead": "silent",
+      "deciding_advisory": null,
+      "at_least": false
+     },
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "capped"
+      },
+      "revealed": [],
+      "total": 16,
+      "verdict": "high",
+      "lead": "abandoned",
+      "deciding_advisory": null,
+      "at_least": false
+     }
+    ],
+    "text": "17 = (abandoned 32 + capped 2 [¼ of 8]) ÷ 2 transitive"
+   },
+   "next_step": {
+    "kind": "replace",
+    "source": "abandoned",
+    "merged": [],
+    "fix_kind": null,
+    "reason": null,
+    "replacement": {
+     "package": "laminas/laminas-code",
+     "suggestion": "laminas/laminas-code",
+     "url": "https://packagist.org/packages/laminas/laminas-code",
+     "named_by": "repository",
+     "finding": null
+    },
+    "quiet_years": null,
+    "to_branch": null,
+    "version": null,
+    "newest": null,
+    "constraint": null,
+    "latest": null,
+    "php_check": null,
+    "crosses_major": null,
+    "held_by": [],
+    "clears": [],
+    "unverified": [],
+    "adds": [],
+    "leaves": [
+     {
+      "kind": "flag",
+      "id": "abandoned"
+     },
+     {
+      "kind": "flag",
+      "id": "capped"
+     }
+    ],
+    "clears_all": false,
+    "if_applied": null,
+    "check": null,
+    "composer_moves_because": [
+     "transitive"
+    ],
+    "commands": [],
+    "through": [
+     {
+      "package": "symfony/proxy-manager-bridge",
+      "installed_version": "v3.4.47",
+      "installed_requires": false,
+      "newest_stable": {
+       "version": "v6.4.28",
+       "released": "2025-11-02T18:11:54+00:00"
+      },
+      "newest_requires": null,
+      "newest_requires_unmeasured": "through_other_package"
+     }
+    ],
+    "also": [],
+    "text": "replace with laminas/laminas-code (named by its registry); it comes in through symfony/proxy-manager-bridge: replace or update that package"
+   },
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "zendframework/zend-code",
+    "event": "push",
+    "archived": true,
+    "fetched_at": "2026-10-01T16:05:47+00:00",
+    "cached_at": "2026-10-01T16:05:47+00:00"
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/zendframework/zend-code",
+    "local": false
+   },
+   "replacement": "laminas/laminas-code",
+   "replacement_url": "https://packagist.org/packages/laminas/laminas-code",
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "symfony/proxy-manager-bridge",
+    "ocramius/proxy-manager",
+    "zendframework/zend-code"
+   ],
+   "depth": 2,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "symfony/proxy-manager-bridge"
+   ],
+   "signals": [
+    {
+     "id": "S1",
+     "level": "high",
+     "summary": "marked abandoned by its repository, replacement: laminas/laminas-code",
+     "data": {
+      "replacement": "laminas/laminas-code",
+      "marked_by": "repository",
+      "replacement_url": "https://packagist.org/packages/laminas/laminas-code"
+     }
+    },
+    {
+     "id": "S2",
+     "level": "high",
+     "summary": "last release 2019-12-10 (6.8 years ago)",
+     "data": {
+      "last_release": "2019-12-10T19:21:15+00:00",
+      "last_version": "3.4.1",
+      "years": 6.8,
+      "dated_by": null
+     }
+    },
+    {
+     "id": "S3",
+     "level": "high",
+     "summary": "repository archived on GitHub",
+     "data": {
+      "repo": "zendframework/zend-code",
+      "host": "github.com",
+      "forge": "github"
+     }
+    },
+    {
+     "id": "S4",
+     "level": "high",
+     "summary": "last push 2020-01-29 (6.7 years ago)",
+     "data": {
+      "last_push": "2020-01-29T14:45:04+00:00",
+      "repo": "zendframework/zend-code",
+      "host": "github.com",
+      "years": 6.7,
+      "forge": "github",
+      "event": "push"
+     }
+    },
+    {
+     "id": "S11",
+     "level": "warn",
+     "summary": "php \"^7.1\" stops at 7.4; the newest PHP, 8.5, is excluded",
+     "data": {
+      "newest_php": "8.5",
+      "newest_php_source": "known",
+      "requires": "^7.1",
+      "stops_at": "7.4",
+      "excludes_target": true,
+      "admits_newest": null
+     }
+    }
+   ],
+   "evidence": "abandoned: marked abandoned by its registry, replacement: laminas/laminas-code; its repository is archived on GitHub; last release 2019-12-10 (6.8 years ago); last push 2020-01-29 (6.7 years ago); capped: requires php ^7.1: it stops at 7.4, so the newest PHP, 8.5, is excluded",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:41:20+00:00",
+   "libyears": 0,
+   "age": {
+    "installed": {
+     "at": "2019-12-10T19:21:15+00:00",
+     "years": 6.8,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "3.4.1",
+     "at": "2019-12-10T19:21:15+00:00",
+     "years": 6.8,
+     "level": "high",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "3.4.1",
+     "at": "2019-12-10T19:21:15+00:00",
+     "years": 6.8,
+     "level": "high",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2020-01-29T14:45:04+00:00",
+     "years": 6.7,
+     "level": "high"
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "zendframework/zend-eventmanager",
+   "version": "3.2.1",
+   "branch": "3.x",
+   "installed_php": {
+    "requires": "^5.6 || ^7.0",
+    "target_runs": false,
+    "project_allows": true
+   },
+   "verdict": "high",
+   "priority": "high",
+   "lead": "abandoned",
+   "rank": 21,
+   "flags": [
+    {
+     "id": "abandoned",
+     "role": "lead",
+     "baseline": null,
+     "signal_ids": [
+      "S1",
+      "S3",
+      "S2",
+      "S4"
+     ],
+     "degree": {
+      "reasons": [
+       "marked",
+       "archived"
+      ],
+      "liveness_complete": true
+     },
+     "headline": {
+      "unit": "reason",
+      "value": "archived",
+      "source": null
+     },
+     "summary": "marked abandoned by its registry, replacement: laminas/laminas-eventmanager; its repository is archived on GitHub; last release 2018-04-25 (8.4 years ago); last push 2020-01-29 (6.7 years ago)"
+    },
+    {
+     "id": "capped",
+     "role": "corroborating",
+     "baseline": null,
+     "signal_ids": [
+      "S11"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "php_minor",
+      "value": "7.4",
+      "source": null
+     },
+     "summary": "requires php ^5.6 || ^7.0: it stops at 7.4, so the newest PHP, 8.5, is excluded"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 17,
+    "exact": 17,
+    "rounded_down": false,
+    "band": {
+     "floor": 16,
+     "next": "critical",
+     "to_next": 15
+    },
+    "decided_by": "maintenance",
+    "parts": {
+     "maintenance": {
+      "status": "counted",
+      "contribution": 17,
+      "alone": {
+       "total": 17,
+       "verdict": "high"
+      }
+     },
+     "security": {
+      "status": "clear",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      },
+      "of": 0,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "maintenance",
+      "flag": "abandoned",
+      "role": "lead",
+      "weight": 32,
+      "divisor": 1,
+      "points": 32,
+      "contribution": 16
+     },
+     {
+      "part": "maintenance",
+      "flag": "capped",
+      "role": "corroborating",
+      "weight": 8,
+      "divisor": 4,
+      "points": 2,
+      "contribution": 1
+     }
+    ],
+    "modifiers": [
+     {
+      "reason": "transitive",
+      "applies_to": "maintenance",
+      "divide_by": 2,
+      "before": 34,
+      "after": 17
+     }
+    ],
+    "accepted": [],
+    "without": [
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "abandoned"
+      },
+      "revealed": [
+       {
+        "flag": "silent",
+        "role": "lead"
+       }
+      ],
+      "total": 17,
+      "verdict": "high",
+      "lead": "silent",
+      "deciding_advisory": null,
+      "at_least": false
+     },
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "capped"
+      },
+      "revealed": [],
+      "total": 16,
+      "verdict": "high",
+      "lead": "abandoned",
+      "deciding_advisory": null,
+      "at_least": false
+     }
+    ],
+    "text": "17 = (abandoned 32 + capped 2 [¼ of 8]) ÷ 2 transitive"
+   },
+   "next_step": {
+    "kind": "replace",
+    "source": "abandoned",
+    "merged": [],
+    "fix_kind": null,
+    "reason": null,
+    "replacement": {
+     "package": "laminas/laminas-eventmanager",
+     "suggestion": "laminas/laminas-eventmanager",
+     "url": "https://packagist.org/packages/laminas/laminas-eventmanager",
+     "named_by": "repository",
+     "finding": null
+    },
+    "quiet_years": null,
+    "to_branch": null,
+    "version": null,
+    "newest": null,
+    "constraint": null,
+    "latest": null,
+    "php_check": null,
+    "crosses_major": null,
+    "held_by": [],
+    "clears": [],
+    "unverified": [],
+    "adds": [],
+    "leaves": [
+     {
+      "kind": "flag",
+      "id": "abandoned"
+     },
+     {
+      "kind": "flag",
+      "id": "capped"
+     }
+    ],
+    "clears_all": false,
+    "if_applied": null,
+    "check": null,
+    "composer_moves_because": [
+     "transitive"
+    ],
+    "commands": [],
+    "through": [
+     {
+      "package": "symfony/proxy-manager-bridge",
+      "installed_version": "v3.4.47",
+      "installed_requires": false,
+      "newest_stable": {
+       "version": "v6.4.28",
+       "released": "2025-11-02T18:11:54+00:00"
+      },
+      "newest_requires": null,
+      "newest_requires_unmeasured": "through_other_package"
+     }
+    ],
+    "also": [],
+    "text": "replace with laminas/laminas-eventmanager (named by its registry); it comes in through symfony/proxy-manager-bridge: replace or update that package"
+   },
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "zendframework/zend-eventmanager",
+    "event": "push",
+    "archived": true,
+    "fetched_at": "2026-10-01T16:05:47+00:00",
+    "cached_at": "2026-10-01T16:05:47+00:00"
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/zendframework/zend-eventmanager",
+    "local": false
+   },
+   "replacement": "laminas/laminas-eventmanager",
+   "replacement_url": "https://packagist.org/packages/laminas/laminas-eventmanager",
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "symfony/proxy-manager-bridge",
+    "ocramius/proxy-manager",
+    "zendframework/zend-code",
+    "zendframework/zend-eventmanager"
+   ],
+   "depth": 3,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "symfony/proxy-manager-bridge"
+   ],
+   "signals": [
+    {
+     "id": "S1",
+     "level": "high",
+     "summary": "marked abandoned by its repository, replacement: laminas/laminas-eventmanager",
+     "data": {
+      "replacement": "laminas/laminas-eventmanager",
+      "marked_by": "repository",
+      "replacement_url": "https://packagist.org/packages/laminas/laminas-eventmanager"
+     }
+    },
+    {
+     "id": "S2",
+     "level": "high",
+     "summary": "last release 2018-04-25 (8.4 years ago)",
+     "data": {
+      "last_release": "2018-04-25T15:33:34+00:00",
+      "last_version": "3.2.1",
+      "years": 8.4,
+      "dated_by": null
+     }
+    },
+    {
+     "id": "S3",
+     "level": "high",
+     "summary": "repository archived on GitHub",
+     "data": {
+      "repo": "zendframework/zend-eventmanager",
+      "host": "github.com",
+      "forge": "github"
+     }
+    },
+    {
+     "id": "S4",
+     "level": "high",
+     "summary": "last push 2020-01-29 (6.7 years ago)",
+     "data": {
+      "last_push": "2020-01-29T15:15:43+00:00",
+      "repo": "zendframework/zend-eventmanager",
+      "host": "github.com",
+      "years": 6.7,
+      "forge": "github",
+      "event": "push"
+     }
+    },
+    {
+     "id": "S11",
+     "level": "warn",
+     "summary": "php \"^5.6 || ^7.0\" stops at 7.4; the newest PHP, 8.5, is excluded",
+     "data": {
+      "newest_php": "8.5",
+      "newest_php_source": "known",
+      "requires": "^5.6 || ^7.0",
+      "stops_at": "7.4",
+      "excludes_target": true,
+      "admits_newest": null
+     }
+    }
+   ],
+   "evidence": "abandoned: marked abandoned by its registry, replacement: laminas/laminas-eventmanager; its repository is archived on GitHub; last release 2018-04-25 (8.4 years ago); last push 2020-01-29 (6.7 years ago); capped: requires php ^5.6 || ^7.0: it stops at 7.4, so the newest PHP, 8.5, is excluded",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:41:20+00:00",
+   "libyears": 0,
+   "age": {
+    "installed": {
+     "at": "2018-04-25T15:33:34+00:00",
+     "years": 8.4,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "3.2.1",
+     "at": "2018-04-25T15:33:34+00:00",
+     "years": 8.4,
+     "level": "high",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "3.2.1",
+     "at": "2018-04-25T15:33:34+00:00",
+     "years": 8.4,
+     "level": "high",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2020-01-29T15:15:43+00:00",
+     "years": 6.7,
+     "level": "high"
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
    "package": "google/recaptcha",
    "version": "1.2.4",
    "branch": "1.x",
@@ -9532,7 +10332,7 @@
    "verdict": "high",
    "priority": "high",
    "lead": "old-promise",
-   "rank": 20,
+   "rank": 22,
    "flags": [
     {
      "id": "old-promise",
@@ -9774,613 +10574,6 @@
      "at": "2026-09-23T21:34:18+00:00",
      "years": 0,
      "level": null
-    },
-    "push_unmeasured": null
-   },
-   "baseline": null,
-   "gate": {
-    "reaches_fail_on": false,
-    "fails": false,
-    "exempt_by": null,
-    "by": [],
-    "basis": null
-   }
-  },
-  {
-   "package": "zendframework/zend-code",
-   "version": "3.4.1",
-   "branch": "3.x",
-   "installed_php": {
-    "requires": "^7.1",
-    "target_runs": false,
-    "project_allows": true
-   },
-   "verdict": "high",
-   "priority": "high",
-   "lead": "abandoned",
-   "rank": 21,
-   "flags": [
-    {
-     "id": "abandoned",
-     "role": "lead",
-     "baseline": null,
-     "signal_ids": [
-      "S1",
-      "S3",
-      "S2",
-      "S4"
-     ],
-     "degree": {
-      "reasons": [
-       "marked",
-       "archived"
-      ],
-      "liveness_complete": true
-     },
-     "headline": {
-      "unit": "reason",
-      "value": "archived",
-      "source": null
-     },
-     "summary": "marked abandoned by its registry, replacement: laminas/laminas-code; its repository is archived on GitHub; last release 2019-12-10 (6.8 years ago); last push 2020-01-29 (6.7 years ago)"
-    }
-   ],
-   "score": {
-    "model": 1,
-    "total": 16,
-    "exact": 16,
-    "rounded_down": false,
-    "band": {
-     "floor": 16,
-     "next": "critical",
-     "to_next": 16
-    },
-    "decided_by": "maintenance",
-    "parts": {
-     "maintenance": {
-      "status": "counted",
-      "contribution": 16,
-      "alone": {
-       "total": 16,
-       "verdict": "high"
-      }
-     },
-     "security": {
-      "status": "clear",
-      "contribution": 0,
-      "alone": {
-       "total": 0,
-       "verdict": null
-      },
-      "of": 0,
-      "tied": []
-     }
-    },
-    "terms": [
-     {
-      "part": "maintenance",
-      "flag": "abandoned",
-      "role": "lead",
-      "weight": 32,
-      "divisor": 1,
-      "points": 32,
-      "contribution": 16
-     }
-    ],
-    "modifiers": [
-     {
-      "reason": "transitive",
-      "applies_to": "maintenance",
-      "divide_by": 2,
-      "before": 32,
-      "after": 16
-     }
-    ],
-    "accepted": [],
-    "without": [],
-    "text": "16 = abandoned 32 ÷ 2 transitive"
-   },
-   "next_step": {
-    "kind": "replace",
-    "source": "abandoned",
-    "merged": [],
-    "fix_kind": null,
-    "reason": null,
-    "replacement": {
-     "package": "laminas/laminas-code",
-     "suggestion": "laminas/laminas-code",
-     "url": "https://packagist.org/packages/laminas/laminas-code",
-     "named_by": "repository",
-     "finding": null
-    },
-    "quiet_years": null,
-    "to_branch": null,
-    "version": null,
-    "newest": null,
-    "constraint": null,
-    "latest": null,
-    "php_check": null,
-    "crosses_major": null,
-    "held_by": [],
-    "clears": [],
-    "unverified": [],
-    "adds": [],
-    "leaves": [
-     {
-      "kind": "flag",
-      "id": "abandoned"
-     }
-    ],
-    "clears_all": false,
-    "if_applied": null,
-    "check": null,
-    "composer_moves_because": [
-     "transitive"
-    ],
-    "commands": [],
-    "through": [
-     {
-      "package": "symfony/proxy-manager-bridge",
-      "installed_version": "v3.4.47",
-      "installed_requires": false,
-      "newest_stable": {
-       "version": "v6.4.28",
-       "released": "2025-11-02T18:11:54+00:00"
-      },
-      "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
-     }
-    ],
-    "also": [],
-    "text": "replace with laminas/laminas-code (named by its registry); it comes in through symfony/proxy-manager-bridge: replace or update that package"
-   },
-   "security": {
-    "status": "clear",
-    "check": "complete",
-    "complete": true,
-    "unchecked_reason": null,
-    "records": 0,
-    "feeds": [
-     {
-      "composer_repository": "composer repo (https://repo.packagist.org)",
-      "registry": "packagist.org",
-      "answer": "answered",
-      "records": 0,
-      "reason": null
-     }
-    ],
-    "ignored": [],
-    "ignored_count": 0
-   },
-   "checks_missing": [],
-   "checks_skipped": [],
-   "unchecked_accepted": [],
-   "maintenance_judged": true,
-   "metadata": {
-    "status": "read",
-    "reason": null,
-    "message": null
-   },
-   "activity": {
-    "status": "read",
-    "reason": null,
-    "forge": "github",
-    "host": "github.com",
-    "repo": "zendframework/zend-code",
-    "event": "push",
-    "archived": true,
-    "fetched_at": "2026-10-01T16:05:47+00:00",
-    "cached_at": "2026-10-01T16:05:47+00:00"
-   },
-   "allowlist": null,
-   "abandoned_ignored": null,
-   "from_composer_repository": true,
-   "origin": {
-    "kind": "packagist",
-    "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/zendframework/zend-code",
-    "local": false
-   },
-   "replacement": "laminas/laminas-code",
-   "replacement_url": "https://packagist.org/packages/laminas/laminas-code",
-   "note": null,
-   "libyears_unmeasured": null,
-   "libyears_at_least": false,
-   "direct": false,
-   "dev": false,
-   "reach": "transitive",
-   "chain": [
-    "symfony/proxy-manager-bridge",
-    "ocramius/proxy-manager",
-    "zendframework/zend-code"
-   ],
-   "depth": 2,
-   "depth_unmeasured": null,
-   "named_in": [],
-   "direct_dependents": [
-    "symfony/proxy-manager-bridge"
-   ],
-   "signals": [
-    {
-     "id": "S1",
-     "level": "high",
-     "summary": "marked abandoned by its repository, replacement: laminas/laminas-code",
-     "data": {
-      "replacement": "laminas/laminas-code",
-      "marked_by": "repository",
-      "replacement_url": "https://packagist.org/packages/laminas/laminas-code"
-     }
-    },
-    {
-     "id": "S2",
-     "level": "high",
-     "summary": "last release 2019-12-10 (6.8 years ago)",
-     "data": {
-      "last_release": "2019-12-10T19:21:15+00:00",
-      "last_version": "3.4.1",
-      "years": 6.8,
-      "dated_by": null
-     }
-    },
-    {
-     "id": "S3",
-     "level": "high",
-     "summary": "repository archived on GitHub",
-     "data": {
-      "repo": "zendframework/zend-code",
-      "host": "github.com",
-      "forge": "github"
-     }
-    },
-    {
-     "id": "S4",
-     "level": "high",
-     "summary": "last push 2020-01-29 (6.7 years ago)",
-     "data": {
-      "last_push": "2020-01-29T14:45:04+00:00",
-      "repo": "zendframework/zend-code",
-      "host": "github.com",
-      "years": 6.7,
-      "forge": "github",
-      "event": "push"
-     }
-    }
-   ],
-   "evidence": "abandoned: marked abandoned by its registry, replacement: laminas/laminas-code; its repository is archived on GitHub; last release 2019-12-10 (6.8 years ago); last push 2020-01-29 (6.7 years ago)",
-   "allowlist_reason": null,
-   "data_date": "2026-10-01T17:41:20+00:00",
-   "libyears": 0,
-   "age": {
-    "installed": {
-     "at": "2019-12-10T19:21:15+00:00",
-     "years": 6.8,
-     "dated_by": null
-    },
-    "installed_unmeasured": null,
-    "release": {
-     "version": "3.4.1",
-     "at": "2019-12-10T19:21:15+00:00",
-     "years": 6.8,
-     "level": "high",
-     "dated_by": null
-    },
-    "release_unmeasured": null,
-    "branch_release": {
-     "version": "3.4.1",
-     "at": "2019-12-10T19:21:15+00:00",
-     "years": 6.8,
-     "level": "high",
-     "dated_by": null
-    },
-    "branch_release_unmeasured": null,
-    "push": {
-     "at": "2020-01-29T14:45:04+00:00",
-     "years": 6.7,
-     "level": "high"
-    },
-    "push_unmeasured": null
-   },
-   "baseline": null,
-   "gate": {
-    "reaches_fail_on": false,
-    "fails": false,
-    "exempt_by": null,
-    "by": [],
-    "basis": null
-   }
-  },
-  {
-   "package": "zendframework/zend-eventmanager",
-   "version": "3.2.1",
-   "branch": "3.x",
-   "installed_php": {
-    "requires": "^5.6 || ^7.0",
-    "target_runs": false,
-    "project_allows": true
-   },
-   "verdict": "high",
-   "priority": "high",
-   "lead": "abandoned",
-   "rank": 22,
-   "flags": [
-    {
-     "id": "abandoned",
-     "role": "lead",
-     "baseline": null,
-     "signal_ids": [
-      "S1",
-      "S3",
-      "S2",
-      "S4"
-     ],
-     "degree": {
-      "reasons": [
-       "marked",
-       "archived"
-      ],
-      "liveness_complete": true
-     },
-     "headline": {
-      "unit": "reason",
-      "value": "archived",
-      "source": null
-     },
-     "summary": "marked abandoned by its registry, replacement: laminas/laminas-eventmanager; its repository is archived on GitHub; last release 2018-04-25 (8.4 years ago); last push 2020-01-29 (6.7 years ago)"
-    }
-   ],
-   "score": {
-    "model": 1,
-    "total": 16,
-    "exact": 16,
-    "rounded_down": false,
-    "band": {
-     "floor": 16,
-     "next": "critical",
-     "to_next": 16
-    },
-    "decided_by": "maintenance",
-    "parts": {
-     "maintenance": {
-      "status": "counted",
-      "contribution": 16,
-      "alone": {
-       "total": 16,
-       "verdict": "high"
-      }
-     },
-     "security": {
-      "status": "clear",
-      "contribution": 0,
-      "alone": {
-       "total": 0,
-       "verdict": null
-      },
-      "of": 0,
-      "tied": []
-     }
-    },
-    "terms": [
-     {
-      "part": "maintenance",
-      "flag": "abandoned",
-      "role": "lead",
-      "weight": 32,
-      "divisor": 1,
-      "points": 32,
-      "contribution": 16
-     }
-    ],
-    "modifiers": [
-     {
-      "reason": "transitive",
-      "applies_to": "maintenance",
-      "divide_by": 2,
-      "before": 32,
-      "after": 16
-     }
-    ],
-    "accepted": [],
-    "without": [],
-    "text": "16 = abandoned 32 ÷ 2 transitive"
-   },
-   "next_step": {
-    "kind": "replace",
-    "source": "abandoned",
-    "merged": [],
-    "fix_kind": null,
-    "reason": null,
-    "replacement": {
-     "package": "laminas/laminas-eventmanager",
-     "suggestion": "laminas/laminas-eventmanager",
-     "url": "https://packagist.org/packages/laminas/laminas-eventmanager",
-     "named_by": "repository",
-     "finding": null
-    },
-    "quiet_years": null,
-    "to_branch": null,
-    "version": null,
-    "newest": null,
-    "constraint": null,
-    "latest": null,
-    "php_check": null,
-    "crosses_major": null,
-    "held_by": [],
-    "clears": [],
-    "unverified": [],
-    "adds": [],
-    "leaves": [
-     {
-      "kind": "flag",
-      "id": "abandoned"
-     }
-    ],
-    "clears_all": false,
-    "if_applied": null,
-    "check": null,
-    "composer_moves_because": [
-     "transitive"
-    ],
-    "commands": [],
-    "through": [
-     {
-      "package": "symfony/proxy-manager-bridge",
-      "installed_version": "v3.4.47",
-      "installed_requires": false,
-      "newest_stable": {
-       "version": "v6.4.28",
-       "released": "2025-11-02T18:11:54+00:00"
-      },
-      "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
-     }
-    ],
-    "also": [],
-    "text": "replace with laminas/laminas-eventmanager (named by its registry); it comes in through symfony/proxy-manager-bridge: replace or update that package"
-   },
-   "security": {
-    "status": "clear",
-    "check": "complete",
-    "complete": true,
-    "unchecked_reason": null,
-    "records": 0,
-    "feeds": [
-     {
-      "composer_repository": "composer repo (https://repo.packagist.org)",
-      "registry": "packagist.org",
-      "answer": "answered",
-      "records": 0,
-      "reason": null
-     }
-    ],
-    "ignored": [],
-    "ignored_count": 0
-   },
-   "checks_missing": [],
-   "checks_skipped": [],
-   "unchecked_accepted": [],
-   "maintenance_judged": true,
-   "metadata": {
-    "status": "read",
-    "reason": null,
-    "message": null
-   },
-   "activity": {
-    "status": "read",
-    "reason": null,
-    "forge": "github",
-    "host": "github.com",
-    "repo": "zendframework/zend-eventmanager",
-    "event": "push",
-    "archived": true,
-    "fetched_at": "2026-10-01T16:05:47+00:00",
-    "cached_at": "2026-10-01T16:05:47+00:00"
-   },
-   "allowlist": null,
-   "abandoned_ignored": null,
-   "from_composer_repository": true,
-   "origin": {
-    "kind": "packagist",
-    "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/zendframework/zend-eventmanager",
-    "local": false
-   },
-   "replacement": "laminas/laminas-eventmanager",
-   "replacement_url": "https://packagist.org/packages/laminas/laminas-eventmanager",
-   "note": null,
-   "libyears_unmeasured": null,
-   "libyears_at_least": false,
-   "direct": false,
-   "dev": false,
-   "reach": "transitive",
-   "chain": [
-    "symfony/proxy-manager-bridge",
-    "ocramius/proxy-manager",
-    "zendframework/zend-code",
-    "zendframework/zend-eventmanager"
-   ],
-   "depth": 3,
-   "depth_unmeasured": null,
-   "named_in": [],
-   "direct_dependents": [
-    "symfony/proxy-manager-bridge"
-   ],
-   "signals": [
-    {
-     "id": "S1",
-     "level": "high",
-     "summary": "marked abandoned by its repository, replacement: laminas/laminas-eventmanager",
-     "data": {
-      "replacement": "laminas/laminas-eventmanager",
-      "marked_by": "repository",
-      "replacement_url": "https://packagist.org/packages/laminas/laminas-eventmanager"
-     }
-    },
-    {
-     "id": "S2",
-     "level": "high",
-     "summary": "last release 2018-04-25 (8.4 years ago)",
-     "data": {
-      "last_release": "2018-04-25T15:33:34+00:00",
-      "last_version": "3.2.1",
-      "years": 8.4,
-      "dated_by": null
-     }
-    },
-    {
-     "id": "S3",
-     "level": "high",
-     "summary": "repository archived on GitHub",
-     "data": {
-      "repo": "zendframework/zend-eventmanager",
-      "host": "github.com",
-      "forge": "github"
-     }
-    },
-    {
-     "id": "S4",
-     "level": "high",
-     "summary": "last push 2020-01-29 (6.7 years ago)",
-     "data": {
-      "last_push": "2020-01-29T15:15:43+00:00",
-      "repo": "zendframework/zend-eventmanager",
-      "host": "github.com",
-      "years": 6.7,
-      "forge": "github",
-      "event": "push"
-     }
-    }
-   ],
-   "evidence": "abandoned: marked abandoned by its registry, replacement: laminas/laminas-eventmanager; its repository is archived on GitHub; last release 2018-04-25 (8.4 years ago); last push 2020-01-29 (6.7 years ago)",
-   "allowlist_reason": null,
-   "data_date": "2026-10-01T17:41:20+00:00",
-   "libyears": 0,
-   "age": {
-    "installed": {
-     "at": "2018-04-25T15:33:34+00:00",
-     "years": 8.4,
-     "dated_by": null
-    },
-    "installed_unmeasured": null,
-    "release": {
-     "version": "3.2.1",
-     "at": "2018-04-25T15:33:34+00:00",
-     "years": 8.4,
-     "level": "high",
-     "dated_by": null
-    },
-    "release_unmeasured": null,
-    "branch_release": {
-     "version": "3.2.1",
-     "at": "2018-04-25T15:33:34+00:00",
-     "years": 8.4,
-     "level": "high",
-     "dated_by": null
-    },
-    "branch_release_unmeasured": null,
-    "push": {
-     "at": "2020-01-29T15:15:43+00:00",
-     "years": 6.7,
-     "level": "high"
     },
     "push_unmeasured": null
    },
@@ -11084,25 +11277,40 @@
       "source": "release"
      },
      "summary": "last release 2022-03-05 (4.6 years ago)"
+    },
+    {
+     "id": "capped",
+     "role": "corroborating",
+     "baseline": null,
+     "signal_ids": [
+      "S11"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "php_minor",
+      "value": "7.4",
+      "source": null
+     },
+     "summary": "requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded"
     }
    ],
    "score": {
     "model": 1,
-    "total": 4,
-    "exact": 4,
+    "total": 5,
+    "exact": 5,
     "rounded_down": false,
     "band": {
      "floor": 1,
      "next": "medium",
-     "to_next": 4
+     "to_next": 3
     },
     "decided_by": "maintenance",
     "parts": {
      "maintenance": {
       "status": "counted",
-      "contribution": 4,
+      "contribution": 5,
       "alone": {
-       "total": 4,
+       "total": 5,
        "verdict": "low"
       }
      },
@@ -11126,6 +11334,15 @@
       "divisor": 1,
       "points": 8,
       "contribution": 4
+     },
+     {
+      "part": "maintenance",
+      "flag": "capped",
+      "role": "corroborating",
+      "weight": 8,
+      "divisor": 4,
+      "points": 2,
+      "contribution": 1
      }
     ],
     "modifiers": [
@@ -11133,13 +11350,38 @@
       "reason": "transitive",
       "applies_to": "maintenance",
       "divide_by": 2,
-      "before": 8,
-      "after": 4
+      "before": 10,
+      "after": 5
      }
     ],
     "accepted": [],
-    "without": [],
-    "text": "4 = stale 8 ÷ 2 transitive"
+    "without": [
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "stale"
+      },
+      "revealed": [],
+      "total": 4,
+      "verdict": "low",
+      "lead": "capped",
+      "deciding_advisory": null,
+      "at_least": false
+     },
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "capped"
+      },
+      "revealed": [],
+      "total": 4,
+      "verdict": "low",
+      "lead": "stale",
+      "deciding_advisory": null,
+      "at_least": false
+     }
+    ],
+    "text": "5 = (stale 8 + capped 2 [¼ of 8]) ÷ 2 transitive"
    },
    "next_step": {
     "kind": "no-move",
@@ -11164,6 +11406,10 @@
      {
       "kind": "flag",
       "id": "stale"
+     },
+     {
+      "kind": "flag",
+      "id": "capped"
      }
     ],
     "clears_all": false,
@@ -11270,9 +11516,22 @@
       "years": 4.6,
       "dated_by": null
      }
+    },
+    {
+     "id": "S11",
+     "level": "warn",
+     "summary": "php \"^7.2.0\" stops at 7.4; the newest PHP, 8.5, is excluded",
+     "data": {
+      "newest_php": "8.5",
+      "newest_php_source": "known",
+      "requires": "^7.2.0",
+      "stops_at": "7.4",
+      "excludes_target": true,
+      "admits_newest": null
+     }
     }
    ],
-   "evidence": "stale: last release 2022-03-05 (4.6 years ago)",
+   "evidence": "stale: last release 2022-03-05 (4.6 years ago); capped: requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:41:20+00:00",
    "libyears": 0,

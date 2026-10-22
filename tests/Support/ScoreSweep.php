@@ -35,7 +35,7 @@ final class ScoreSweep
     public const GOLDEN = __DIR__.'/../fixtures/score/sweep-rows.txt.gz';
     public const GOLDEN_SHA256 = __DIR__.'/../fixtures/score/sweep-rows.txt.sha256';
 
-    public const AXES = ['base' => 47612, 'unreached' => 23806, 'under' => 35712, 'under_entry' => 35712, 'accepted' => 91264];
+    public const AXES = ['base' => 71420, 'unreached' => 35710, 'under' => 53568, 'under_entry' => 53568, 'accepted' => 148800];
 
     /** The default suite reads every SAMPLE-th row of each axis. */
     public const SAMPLE = 1000;
@@ -56,11 +56,11 @@ final class ScoreSweep
         foreach ([null, 'abandoned', 'silent', 'stale'] as $live) {
             foreach ([false, true] as $pinned) {
                 foreach ([false, true] as $leftBehind) {
-                    foreach ([false, true] as $oldPromise) {
+                    foreach ([null, 'old-promise', 'capped'] as $phpBound) {
                         foreach (self::advisorySets() as $advisories) {
                             foreach ([true, false] as $direct) {
                                 foreach ([false, true] as $dev) {
-                                    $flags = array_values(array_filter([$live, $pinned ? 'pinned' : null, $leftBehind ? 'left-behind' : null, $oldPromise ? 'old-promise' : null]));
+                                    $flags = array_values(array_filter([$live, $pinned ? 'pinned' : null, $leftBehind ? 'left-behind' : null, $phpBound]));
                                     if (($flags === [] && $advisories === []) || ($pinned && $leftBehind)) {
                                         continue;
                                     }
@@ -196,6 +196,8 @@ final class ScoreSweep
                 return [new Signal(Signal::LEVEL_HIGH, 'branch left behind', SignalDataStub::of(Signal::S8, []))];
             case 'old-promise':
                 return [new Signal(Signal::LEVEL_HIGH, 'old promise', SignalDataStub::of(Signal::S5, []))];
+            case 'capped':
+                return [new Signal(Signal::LEVEL_WARN, 'php cap', SignalDataStub::of(Signal::S11, []))];
         }
         throw new \InvalidArgumentException('no signal raises '.$flag);
     }

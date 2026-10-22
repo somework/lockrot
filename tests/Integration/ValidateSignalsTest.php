@@ -29,6 +29,7 @@ final class ValidateSignalsTest extends TestCase
         'S8' => ['branch', 'branch_last_release', 'branch_last_version', 'years', 'newest_branch', 'newest_version', 'newest_release', 'newest_php', 'newest_within_reach', 'newest_years', 'floor_php', 'floor_source', 'reachable_branch', 'reachable_version', 'reachable_release', 'reachable_php', 'reachable_admits', 'reachable_years', 'suggested_constraint', 'dated_by'],
         'S9' => ['advisories', 'releases_read', 'complete'],
         'S10' => ['unchecked', 'blocks'],
+        'S11' => ['newest_php', 'newest_php_source', 'requires', 'stops_at', 'excludes_target', 'admits_newest'],
     ];
     private const S7_PACKAGE = ['package', 'chain', 'verdict', 'lead', 'flag_ids'];
     private const S10_ENTRY = ['check', 'reason', 'blocks'];

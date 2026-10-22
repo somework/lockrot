@@ -80,6 +80,15 @@
       silent       last release 2020-04-24 (6.5 years ago); last push 2020-04-28 (6.5 years ago)
       old-promise  released 2020-04-24 for PHP 7 (php "\>=7.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
+  php-http/guzzle5-adapter 2.0.0  direct  ·  abandoned (baseline) · capped (baseline)
+      34 = abandoned 32 + capped 2 [¼ of 8] (baseline: known)
+      gate 0 = min(34, 2 × 0) (the new facts bound it); new: 0
+      do: replace with php-http/guzzle7-adapter (named by its registry)
+      abandoned    marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived
+                   on GitHub; last release 2019-02-05 (7.7 years ago)
+      capped       requires php ^7.0: it stops at 7.4, so the newest PHP, 8.5, is excluded
+      pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned ·
+      old-promise)
   lexik/form-filter-bundle v7.0.3  direct  ·  abandoned (baseline)
       32 = abandoned 32 (baseline: known)
       gate 0 = min(32, 2 × 0) (the new facts bound it); new: 0
@@ -87,14 +96,6 @@
       abandoned    marked abandoned by its registry, replacement: spiriitlabs/form-filter-bundle; its repository is
                    archived on GitHub; last release 2023-05-19 (3.4 years ago)
       pulls in 2 flagged packages: doctrine/cache (abandoned), doctrine/instantiator (left-behind)
-  php-http/guzzle5-adapter 2.0.0  direct  ·  abandoned (baseline)
-      32 = abandoned 32 (baseline: known)
-      gate 0 = min(32, 2 × 0) (the new facts bound it); new: 0
-      do: replace with php-http/guzzle7-adapter (named by its registry)
-      abandoned    marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived
-                   on GitHub; last release 2019-02-05 (7.7 years ago)
-      pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned ·
-      old-promise)
   php-http/message-factory 1.1.0  direct  ·  abandoned (baseline)
       32 = abandoned 32 (baseline: known)
       gate 0 = min(32, 2 × 0) (the new facts bound it); new: 0
@@ -411,40 +412,43 @@
       checks missing: S2 (undated releases)
   scheb/2fa-backup-code v5.13.2  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
-      do: raise require.php to \>=8.2, then require scheb/2fa-backup-code ^6.13 — clears left-behind; 6.x needs php
-          ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by
-          composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not
-          checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it
+      do: raise require.php to \>=8.2, then require scheb/2fa-backup-code ^6.13 — clears left-behind; it stops below
+          the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a
+          major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own
+          requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock
+          itself), so it holds only if Composer resolves it
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php
                    ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php \>=7.4; no releasing branch within reach
       checks missing: S2 (undated releases)
   scheb/2fa-bundle v5.13.2  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
-      do: raise require.php to \>=8.2, then require scheb/2fa-bundle ^6.13 — clears left-behind; 6.x needs php ~8.2.0
-          || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json
-          (requires ^5.13.2) and scheb/2fa-backup-code v5.13.2 (requires self.version; itself left-behind) and
-          scheb/2fa-email v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-google-authenticator v5.13.2
-          (requires self.version; itself left-behind) and scheb/2fa-qr-code v5.13.2 (requires self.version; itself
-          abandoned) and scheb/2fa-trusted-device v5.13.2 (requires self.version; itself left-behind); the packages that
-          hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not
-          checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it
+      do: raise require.php to \>=8.2, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the
+          newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major
+          raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and scheb/2fa-backup-code v5.13.2
+          (requires self.version; itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version; itself
+          left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version; itself left-behind) and
+          scheb/2fa-qr-code v5.13.2 (requires self.version; itself abandoned) and scheb/2fa-trusted-device v5.13.2
+          (requires self.version; itself left-behind); the packages that hold it may need to move too; a new major
+          brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer
+          refuses the lock itself), so it holds only if Composer resolves it
       left-behind  branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php
                    ~8.4.0 || ~8.5.0 above the project's php \>=7.4; no releasing branch within reach
   scheb/2fa-email v5.13.2  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
-      do: raise require.php to \>=8.2, then require scheb/2fa-email ^6.13 — clears left-behind; 6.x needs php ~8.2.0 ||
-          ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json
-          (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with
-          Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it
+      do: raise require.php to \>=8.2, then require scheb/2fa-email ^6.13 — clears left-behind; it stops below the
+          newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major
+          raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own
+          requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock
+          itself), so it holds only if Composer resolves it
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-06-08), needs php
                    ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php \>=7.4; no releasing branch within reach
   scheb/2fa-google-authenticator v5.13.2  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
-      do: raise require.php to \>=8.2, then require scheb/2fa-google-authenticator ^6.13 — clears left-behind; 6.x
-          needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held
-          by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve;
-          not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves
-          it
+      do: raise require.php to \>=8.2, then require scheb/2fa-google-authenticator ^6.13 — clears left-behind; it stops
+          below the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4
+          (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its
+          own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock
+          itself), so it holds only if Composer resolves it
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php
                    ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php \>=7.4; no releasing branch within reach
       pulls in 2 flagged packages: spomky-labs/otphp (left-behind · vulnerable), thecodingmachine/safe (left-behind ·
@@ -452,10 +456,11 @@
       checks missing: S2 (undated releases)
   scheb/2fa-trusted-device v5.13.2  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
-      do: raise require.php to \>=8.2, then require scheb/2fa-trusted-device ^6.13 — clears left-behind; 6.x needs php
-          ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by
-          composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not
-          checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it
+      do: raise require.php to \>=8.2, then require scheb/2fa-trusted-device ^6.13 — clears left-behind; it stops below
+          the newest PHP, so capped would count; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a
+          major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own
+          requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock
+          itself), so it holds only if Composer resolves it
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php
                    ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php \>=7.4; no releasing branch within reach
       pulls in 1 flagged package: lcobucci/clock (left-behind)
@@ -726,7 +731,7 @@
       age: installed v5.4.47 released 2024-11-10 (1.9 years ago), its newest release; last push 2024-11-13 (1.9
            years ago)
 
-<options=bold><fg=yellow>medium (22)</fg=yellow></options=bold>
+<options=bold><fg=yellow>medium (23)</fg=yellow></options=bold>
   guzzlehttp/psr7 2.8.0  direct  ·  vulnerable
       8 = vulnerable 8 [medium advisory] (baseline: new package)
       do: composer update 'guzzlehttp/psr7:^2.12.3' (gets 2.13.1) — clears 4 advisories; not checked with Composer's
@@ -791,6 +796,15 @@
       8 = stale 8 (baseline: new package)
       do: —
       stale        last release 2023-06-19 (3.3 years ago)
+  laminas/laminas-code 4.7.1  direct  ·  capped (baseline)
+      8 = capped 8 (baseline: known)
+      gate 0 = min(8, 2 × 0) (the new facts bound it); new: 0
+      do: raise require.php to \>=8.2, then require laminas/laminas-code ^4.17.0 — clears capped; 4.x needs php ~8.2.0
+          || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked
+          with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it
+      capped       requires php \>=7.4, \<8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded
+      age: installed 4.7.1 released 2022-11-21 (3.9 years ago); 4.x last released 4.17.0 2025-11-01 (0.9 years
+           ago), its newest release; last push 2026-09-08 (0.1 years ago)
   pragmarx/recovery v0.2.1  direct  ·  stale (baseline)
       8 = stale 8 (baseline: known)
       gate 0 = min(8, 2 × 0) (the new facts bound it); new: 0
@@ -963,10 +977,10 @@
       do: —
       stale        last release 2022-01-30 (4.7 years ago); last push 2023-08-03 (3.2 years ago)
 
-210 packages checked · 112 flagged: critical 15 · high 69 · medium 22 · low 6
-flags: abandoned 27 · silent 10 · pinned 1 · left-behind 54 · old-promise 18 · stale 12 · vulnerable 20 ·
-29 packages carry more than one
-depth: 51 of 112 flagged packages are named by no line of composer.json · direct 60 · 1 hop 31 · 2 hops 14 ·
+210 packages checked · 113 flagged: critical 15 · high 69 · medium 23 · low 6
+flags: abandoned 27 · silent 10 · pinned 1 · left-behind 54 · old-promise 18 · stale 12 · capped 2 ·
+vulnerable 20 · 30 packages carry more than one
+depth: 51 of 113 flagged packages are named by no line of composer.json · direct 61 · 1 hop 31 · 2 hops 14 ·
 3 hops 5 · 4 hops 2 ·
 deepest: hoa/ustring and hoa/zformat, 4 hops (kphoen/rulerz › hoa/ruler › hoa/compiler › hoa/regex › hoa/ustring) ·
 1 more is named only in require-dev, which this run did not walk (pass --dev)
@@ -980,7 +994,7 @@ pagerfanta/doctrine-orm-adapter 3 · … and 31 more
 advisories: 210 packages asked · composer repo (http://127.0.0.1) answered (193 on record for 49 packages)
 moves: not checked, because Composer's solver refuses the lock itself (see the moves_not_checked note)
 php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer checks it at 7.4.29 from config.platform.php; php-http/guzzle5-adapter excludes 8.0
-baseline: 47 known · 61 new · 6 worsened · 2 stale (lockrot-baseline.json)
+baseline: 48 known · 61 new · 6 worsened · 2 stale (lockrot-baseline.json)
 <fg=red>gate: fails · --fail-on=high · 46 findings fail it; 38 reach it and are known to the baseline ·</fg=red>
 <fg=red>target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for

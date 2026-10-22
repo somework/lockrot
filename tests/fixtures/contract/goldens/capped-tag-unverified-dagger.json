@@ -1,0 +1,21 @@
+{
+    "score_text": "18 = pinned 16 + capped 2 [¼ of 8]",
+    "next_step_text": "require a tag — the newest is 4.0.5 (2026-04-15); not checked: capped",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: newest release 4.0.5 2026-04-15 (0.5 years ago); last push 2026-09-22 (less than three weeks ago)",
+    "explain_age": [
+        "installed  dev-masternot read (a branch snapshot has no release branch)",
+        "its branch           not read (a branch snapshot has no release branch)",
+        "newest     4.0.5     2026-04-15   0.5 years ago                 below release-warn-years 3",
+        "last push            2026-09-22   less than three weeks ago     below push-warn-years 3",
+        "libyears not measured: a branch snapshot has no release branch"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer require 'matomo/referrer-spam-list:^4.0.5'"
+    ],
+    "commands_cmd": [
+        "composer require \"matomo/referrer-spam-list:^4.0.5\""
+    ]
+}

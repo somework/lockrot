@@ -42,8 +42,9 @@ final class ServiceFactory
      * @param ?Deadline                 $deadline     install-time budget, null for no limit
      * @param ?string                   $projectPhp   the project's `require.php`, or null when the manifest has none, see {@see \Lockrot\Signal\PhpFloor}
      * @param (\Closure(): MoveChecks)|null $checks the move check of the run (docs/verdicts.md#the-move-check), null for none
+     * @param ?string                   $platformPhp  the lock's `platform.php`, see {@see \Lockrot\Signal\PhpCap}
      */
-    public static function createAnalyzer(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer
+    public static function createAnalyzer(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null, ?string $platformPhp = null): Analyzer
     {
         $deadline ??= Deadline::never();
         $http = self::createHttp($io, $config, $lockrot, $clock, $deadline);
@@ -59,7 +60,7 @@ final class ServiceFactory
             new ActivityFetchPlanner($auth),
             RepoLocator::fromConfig($config),
             BuiltinAllowlist::load(),
-            SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load(), $projectPhp),
+            SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load(), $projectPhp, $platformPhp),
             $clock,
             $lockrot->offline(),
             new RepositoryAdvisoryLoader($repositories, $lockrot->offline(), $deadline, AdvisoryIgnore::fromConfig($config), $lockrot->advisoryLookup(), $lockrot->advisoryLookupSource()),

@@ -44,7 +44,7 @@ and every byte is ASCII.
 | # | Field | Written as |
 |---|---|---|
 | 1 | axis | the axis |
-| 2 | flags | the maintenance flags in enumeration order (liveness word, `pinned`, `left-behind`, `old-promise`), joined by `,` |
+| 2 | flags | the maintenance flags in enumeration order (liveness word, `pinned`, `left-behind`, then `old-promise` or `capped`), joined by `,` |
 | 3 | advisories | `severity:fix_kind` per advisory, joined by `,`. The ids are `A0`, `A1` in that order |
 | 4 | reach | `direct`, `transitive` or `unreached` |
 | 5 | dev | `1` or `0` |

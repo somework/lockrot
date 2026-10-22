@@ -38,6 +38,7 @@
    "left-behind",
    "old-promise",
    "stale",
+   "capped",
    "vulnerable"
   ],
   "verdicts": [
@@ -65,7 +66,8 @@
    "S7",
    "S8",
    "S9",
-   "S10"
+   "S10",
+   "S11"
   ],
   "fix_model": 1,
   "text_grammar": 1,
@@ -79,6 +81,7 @@
     "left-behind",
     "old-promise",
     "stale",
+    "capped",
     "vulnerable"
    ],
    "parts": [
@@ -90,7 +93,8 @@
       "pinned",
       "left-behind",
       "old-promise",
-      "stale"
+      "stale",
+      "capped"
      ],
      "combine": "lead_plus_share"
     },
@@ -230,9 +234,10 @@
      "band": "medium",
      "can_corroborate": true,
      "corroborating_points": 2,
-     "max_maintenance": 8,
+     "max_maintenance": 10,
      "max_maintenance_flags": [
-      "stale"
+      "stale",
+      "capped"
      ],
      "raised_by": [
       "S2",
@@ -244,6 +249,27 @@
      ],
      "basis": {
       "v013_base": "medium",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "capped",
+     "part": "maintenance",
+     "points": 8,
+     "band": "medium",
+     "can_corroborate": true,
+     "corroborating_points": 2,
+     "max_maintenance": 8,
+     "max_maintenance_flags": [
+      "capped"
+     ],
+     "raised_by": [
+      "S11"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": null,
       "points": "band_floor"
      },
      "points_from": null
@@ -440,6 +466,14 @@
       "threshold": "push-warn-years",
       "below": "release-warn-years"
      }
+    },
+    {
+     "id": "php_bound",
+     "flag_ids": [
+      "old-promise",
+      "capped"
+     ],
+     "holds_unless": null
     }
    ],
    "sort": [
@@ -969,6 +1003,20 @@
     "low": 0
    }
   },
+  "capped": {
+   "carrying": 0,
+   "leading": 0,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+   }
+  },
   "vulnerable": {
    "carrying": 1,
    "leading": null,
@@ -1342,7 +1390,8 @@
        "verdict": "critical",
        "lead": "abandoned",
        "flag_ids": [
-        "abandoned"
+        "abandoned",
+        "capped"
        ],
        "replacement": "php-http/guzzle7-adapter",
        "next_step": {
@@ -1709,7 +1758,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -1789,7 +1839,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -1869,7 +1920,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -1949,7 +2001,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -2029,7 +2082,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -2109,7 +2163,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -2189,7 +2244,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -2269,7 +2325,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -2349,7 +2406,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -2429,7 +2487,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -2509,7 +2568,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -2589,7 +2649,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -2669,7 +2730,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {
@@ -2749,7 +2811,8 @@
             "verdict": "critical",
             "lead": "abandoned",
             "flag_ids": [
-             "abandoned"
+             "abandoned",
+             "capped"
             ],
             "replacement": "php-http/guzzle7-adapter",
             "next_step": {

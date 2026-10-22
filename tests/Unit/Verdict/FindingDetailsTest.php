@@ -291,6 +291,10 @@ final class FindingDetailsTest extends TestCase
             $activity('not_from_composer_repository'),
             ['check' => 'release_metadata', 'reason' => 'not_from_composer_repository', 'blocks' => ['S2', 'S8']],
         ]];
+        yield 'not from a Composer repository, beside S11' => [F::looked(F::facts(F::package(['fromComposerRepository' => false])), ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY), null, [new Signal(Signal::LEVEL_WARN, 'capped', SignalDataStub::of(Signal::S11, []))], [
+            $activity('not_from_composer_repository'),
+            ['check' => 'release_metadata', 'reason' => 'not_from_composer_repository', 'blocks' => ['S2', 'S8', 'S11']],
+        ]];
         yield 'a branch snapshot' => [F::facts(F::package(['version' => 'dev-main']), $metadata, F::activity(false, null)), null, [], [['check' => 'release_branch', 'reason' => 'branch_snapshot', 'blocks' => ['S8']]]];
         $gitlab = new RepositoryActivity(new RepoRef(RepoRef::GITLAB, 'gitlab.com', 'group/pkg'), null, null, new \DateTimeImmutable(F::NOW));
         yield 'a read without the archived flag' => [(new PackageFacts(F::package(), $metadata, null, []))->withActivityLookup(ActivityLookup::read($gitlab)), null, [], [['check' => 'repository_archived', 'reason' => 'no_token', 'blocks' => ['S3']]]];

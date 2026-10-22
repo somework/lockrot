@@ -782,6 +782,7 @@ final class FindingTest extends TestCase
         yield 'archived' => [[new Signal(Signal::LEVEL_HIGH, 'archived', SignalDataStub::of(Signal::S3, []))], FlagSet::ABANDONED, ['unit' => 'reason', 'value' => 'archived', 'source' => null]];
         yield 'pinned' => [[new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['reason' => 'branch_snapshot']))], FlagSet::PINNED, ['unit' => 'reason', 'value' => 'branch_snapshot', 'source' => null]];
         yield 'an old promise' => [[new Signal(Signal::LEVEL_WARN, 'old promise', SignalDataStub::of(Signal::S5, ['written_for_php' => 7]))], FlagSet::OLD_PROMISE, ['unit' => 'php', 'value' => 7, 'source' => null]];
+        yield 'capped' => [[new Signal(Signal::LEVEL_WARN, 'capped', SignalDataStub::of(Signal::S11, ['stops_at' => '8.1']))], FlagSet::CAPPED, ['unit' => 'php_minor', 'value' => '8.1', 'source' => null]];
         yield 'stale by its release' => [[$s2(Signal::LEVEL_WARN, 5.4)], FlagSet::STALE, ['unit' => 'years', 'value' => 5.4, 'source' => 'release']];
         yield 'stale by whole years' => [[$s2(Signal::LEVEL_WARN, 6.0)], FlagSet::STALE, ['unit' => 'years', 'value' => 6.0, 'source' => 'release']];
         yield 'the release is older' => [[$s2(Signal::LEVEL_HIGH, 5.4), $s4(Signal::LEVEL_HIGH, 4.7)], FlagSet::SILENT, ['unit' => 'years', 'value' => 5.4, 'source' => 'release']];

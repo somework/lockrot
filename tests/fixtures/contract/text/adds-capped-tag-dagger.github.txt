@@ -1,0 +1,5 @@
+::error file=composer.lock,line=4,title=lockrot%3A high — pinned::matomo/referrer-spam-list dev-master: 16 = pinned 16. Do: require a tag — the newest is 4.0.5 (2026-04-15); 4.x needs php >=7.2 <8.5, which require.php allows; it stops below the newest PHP, so capped would count. pinned: pinned to branch snapshot dev-master.
+flags: pinned 1
+depth: every flagged package is named in composer.json · direct 1
+php: the lock installs on PHP 7.2 to 8.5
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

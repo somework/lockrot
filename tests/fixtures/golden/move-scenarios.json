@@ -709,7 +709,8 @@
                         "verdict": "low",
                         "lead": "stale",
                         "flag_ids": [
-                            "stale"
+                            "stale",
+                            "capped"
                         ],
                         "replacement": null,
                         "next_step": {
@@ -3958,7 +3959,8 @@
                     "verdict": "low",
                     "lead": "stale",
                     "flag_ids": [
-                        "stale"
+                        "stale",
+                        "capped"
                     ]
                 }
             },
@@ -3995,7 +3997,7 @@
             "commands": [],
             "through": [],
             "also": [],
-            "text": "replace with h/old (named by its registry; itself low: stale)"
+            "text": "replace with h/old (named by its registry; itself low: stale \u00b7 capped)"
         }
     },
     "two advisories that no single release fixes": {

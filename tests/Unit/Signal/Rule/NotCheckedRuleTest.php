@@ -17,6 +17,9 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\PhpCap;
+use Lockrot\Signal\PhpFloor;
+use Lockrot\Signal\Rule\CappedRule;
 use Lockrot\Signal\Rule\LeftBehindRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
@@ -86,6 +89,23 @@ final class NotCheckedRuleTest extends TestCase
             ['check' => 'release_metadata', 'reason' => 'not_from_composer_repository', 'blocks' => [Signal::S2, Signal::S8]],
             ['check' => 'repository_activity', 'reason' => 'not_from_composer_repository', 'blocks' => [Signal::S3, Signal::S4]],
         ], JsonPath::decoded($signal->data())['unchecked']);
+    }
+
+    /** S11 fires from the lock alone, so unread metadata leaves only its `admits_newest` unread. */
+    public function testUnreadMetadataBlocksS11ExactlyWhenS11Fires(): void
+    {
+        $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), new CappedRule(new PhpCap(['7.4', '8.0', '8.4', '8.5']), new PhpFloor('8.4')));
+        $facts = static fn (?string $php): PackageFacts => (new PackageFacts(F::package(['fromComposerRepository' => false, 'php' => $php]), null, null, []))
+            ->withActivityLookup(ActivityLookup::notRead(ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, LocatedRepository::none(null)));
+
+        $capped = $rule->evaluate($facts('^7.0'));
+        $open = $rule->evaluate($facts('>=7.4'));
+
+        self::assertNotNull($capped);
+        self::assertNotNull($open);
+        self::assertSame([Signal::S2, Signal::S8, Signal::S11], JsonPath::arrayAt(JsonPath::decoded($capped->data()), ['unchecked', 0, 'blocks']));
+        self::assertSame([Signal::S2, Signal::S8], JsonPath::arrayAt(JsonPath::decoded($open->data()), ['unchecked', 0, 'blocks']));
+        self::assertStringStartsWith('release metadata not checked (lockrot cannot tell which repository serves it), so S2 and S8 could not be read', $capped->summary());
     }
 
     /** @return iterable<string, array{LockedPackage, string}> */

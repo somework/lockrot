@@ -24,13 +24,14 @@ final class FlagSet
     public const LEFT_BEHIND = 'left-behind';
     public const OLD_PROMISE = 'old-promise';
     public const STALE = 'stale';
+    public const CAPPED = 'capped';
     public const VULNERABLE = 'vulnerable';
 
     /** `degree.reasons` of `abandoned`, in this order. */
     public const MARKED = 'marked';
     public const ARCHIVED = 'archived';
 
-    private const RAISES = [Signal::S5 => self::OLD_PROMISE, Signal::S6 => self::PINNED, Signal::S8 => self::LEFT_BEHIND];
+    private const RAISES = [Signal::S5 => self::OLD_PROMISE, Signal::S6 => self::PINNED, Signal::S8 => self::LEFT_BEHIND, Signal::S11 => self::CAPPED];
 
     /** @var array<string, string> the level of each signal that fired, by id */
     private array $signals;
@@ -67,7 +68,7 @@ final class FlagSet
     }
 
     /**
-     * @param list<Signal>   $signals    the finding's signals: S1 to S6 and S8 raise flags, the others none
+     * @param list<Signal>   $signals    the finding's signals: S1 to S6, S8 and S11 raise flags, the others none
      * @param list<CountedAdvisory> $advisories the counted advisories: they raise `vulnerable`, which no entry accepts
      */
     public static function fromSignals(array $signals, ?AllowlistEntry $entry, array $advisories): self
@@ -106,7 +107,7 @@ final class FlagSet
 
     /**
      * Whether the entry lists no flags. Such an entry makes a score-0 package `finished` with
-     * nothing fired. An entry that names all six flags does not: it accepts flags, not the package.
+     * nothing fired. An entry that names every maintenance flag does not: it accepts flags, not the package.
      */
     public function acceptsWholePackage(): bool
     {

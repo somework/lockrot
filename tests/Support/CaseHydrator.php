@@ -587,7 +587,8 @@ final class CaseHydrator
         $phpLock = \is_array($inputs['php_lock'] ?? null) ? $inputs['php_lock'] : [];
         $overrides = ['packages' => self::sectionEntries($phpLock['packages'] ?? null), 'packages-dev' => self::sectionEntries($phpLock['packages-dev'] ?? null)];
         $names = array_column(array_merge(...array_values($overrides)), 'name');
-        $lock = ['packages' => self::byName($out, $overrides['packages'], $names), 'packages-dev' => self::byName($dev, $overrides['packages-dev'], $names)];
+        $existing = array_column(array_merge($out, $dev), null, 'name');
+        $lock = ['packages' => self::byName($out, $overrides['packages'], $names, $existing), 'packages-dev' => self::byName($dev, $overrides['packages-dev'], $names, $existing)];
         if (($phpLock['has_dev_key'] ?? true) === false) {
             unset($lock['packages-dev']);
         }
@@ -615,17 +616,21 @@ final class CaseHydrator
     /**
      * The entries of one lock section, with the `_php_lock` entries of that section added. An entry
      * that `_php_lock` overrides in either section leaves its own section, so a moved package is
-     * listed once.
+     * listed once. The `_php_lock` entry replaces only the keys it gives: the package keeps its
+     * repository and its time.
      *
-     * @param list<array<mixed, mixed>> $entries
-     * @param list<array<mixed, mixed>> $extra
-     * @param list<mixed>               $overridden the names of every `_php_lock` entry
+     * @param list<array<mixed, mixed>>          $entries
+     * @param list<array<mixed, mixed>>          $extra
+     * @param list<mixed>                        $overridden the names of every `_php_lock` entry
+     * @param array<array-key, array<mixed, mixed>> $existing   every entry of the lock, by name
      *
      * @return list<array<mixed, mixed>>
      */
-    private static function byName(array $entries, array $extra, array $overridden): array
+    private static function byName(array $entries, array $extra, array $overridden, array $existing): array
     {
-        return array_merge(array_values(array_filter($entries, static fn (array $entry): bool => !\in_array($entry['name'] ?? null, $overridden, true))), $extra);
+        $kept = array_values(array_filter($entries, static fn (array $entry): bool => !\in_array($entry['name'] ?? null, $overridden, true)));
+
+        return array_merge($kept, array_map(static fn (array $entry): array => $entry + ($existing[\is_string($entry['name'] ?? null) ? $entry['name'] : ''] ?? []), $extra));
     }
 
     /**

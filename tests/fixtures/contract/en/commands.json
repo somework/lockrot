@@ -115,11 +115,31 @@
             "argv": [
                 "composer",
                 "require",
+                "matomo/referrer-spam-list:^4.0.5"
+            ],
+            "posix": "composer require 'matomo/referrer-spam-list:^4.0.5'",
+            "cmd": "composer require \"matomo/referrer-spam-list:^4.0.5\"",
+            "powershell": "composer --% require \"matomo/referrer-spam-list:^4.0.5\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "pagerfanta/twig:^4.9"
             ],
             "posix": "composer require 'pagerfanta/twig:^4.9'",
             "cmd": "composer require \"pagerfanta/twig:^4.9\"",
             "powershell": "composer --% require \"pagerfanta/twig:^4.9\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "pelago/emogrifier:^7.3"
+            ],
+            "posix": "composer require 'pelago/emogrifier:^7.3'",
+            "cmd": "composer require \"pelago/emogrifier:^7.3\"",
+            "powershell": "composer --% require \"pelago/emogrifier:^7.3\""
         },
         {
             "argv": [
@@ -131,6 +151,28 @@
             "posix": "composer require 'php:>=7.2.5' --no-update",
             "cmd": "composer require \"php:>=7.2.5\" --no-update",
             "powershell": "composer --% require \"php:>=7.2.5\" --no-update"
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "php:>=7.3",
+                "--no-update"
+            ],
+            "posix": "composer require 'php:>=7.3' --no-update",
+            "cmd": "composer require \"php:>=7.3\" --no-update",
+            "powershell": "composer --% require \"php:>=7.3\" --no-update"
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "php:>=8.0",
+                "--no-update"
+            ],
+            "posix": "composer require 'php:>=8.0' --no-update",
+            "cmd": "composer require \"php:>=8.0\" --no-update",
+            "powershell": "composer --% require \"php:>=8.0\" --no-update"
         },
         {
             "argv": [
@@ -153,6 +195,16 @@
             "posix": "composer require 'php:>=8.2' --no-update",
             "cmd": "composer require \"php:>=8.2\" --no-update",
             "powershell": "composer --% require \"php:>=8.2\" --no-update"
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "scheb/2fa-bundle:^6.13"
+            ],
+            "posix": "composer require 'scheb/2fa-bundle:^6.13'",
+            "cmd": "composer require \"scheb/2fa-bundle:^6.13\"",
+            "powershell": "composer --% require \"scheb/2fa-bundle:^6.13\""
         },
         {
             "argv": [
@@ -368,6 +420,16 @@
             "argv": [
                 "composer",
                 "update",
+                "phpoffice/phpspreadsheet"
+            ],
+            "posix": "composer update phpoffice/phpspreadsheet",
+            "cmd": "composer update phpoffice/phpspreadsheet",
+            "powershell": "composer --% update phpoffice/phpspreadsheet"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
                 "robrichards/xmlseclibs"
             ],
             "posix": "composer update robrichards/xmlseclibs",
@@ -466,6 +528,17 @@
             "posix": "composer why-not guzzlehttp/guzzle 8.2.0",
             "cmd": "composer why-not guzzlehttp/guzzle 8.2.0",
             "powershell": "composer --% why-not guzzlehttp/guzzle 8.2.0"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/proxy-manager-bridge",
+                "v6.4.28"
+            ],
+            "posix": "composer why-not symfony/proxy-manager-bridge v6.4.28",
+            "cmd": "composer why-not symfony/proxy-manager-bridge v6.4.28",
+            "powershell": "composer --% why-not symfony/proxy-manager-bridge v6.4.28"
         },
         {
             "argv": [

@@ -9,6 +9,7 @@ use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\ArchivedRule;
+use Lockrot\Signal\Rule\CappedRule;
 use Lockrot\Signal\Rule\LeftBehindRule;
 use Lockrot\Signal\Rule\NoPushRule;
 use Lockrot\Signal\Rule\NoReleaseRule;
@@ -22,6 +23,7 @@ final class SignalSet
     /** @var list<SignalRule> */
     private array $rules;
     private PhpFloor $floor;
+    private PhpCap $cap;
     private Thresholds $thresholds;
     private ?\DateTimeImmutable $targetMajorGa = null;
 
@@ -33,16 +35,19 @@ final class SignalSet
     {
         $this->rules = $rules;
         $this->floor = $floor ?? new PhpFloor(null);
+        $this->cap = PhpCap::none();
         $this->thresholds = new Thresholds();
     }
 
     /**
      * @param ?string $projectPhp the project's own `require.php`, the other floor S8 keeps to
      *                            ({@see PhpFloor}), null when composer.json has none
+     * @param ?string $platformPhp the lock's `platform.php`, which sets R ({@see PhpCap}) without a `require.php`
      */
-    public static function default(Clock $clock, Thresholds $thresholds, string $targetPhp, PhpReleaseDates $dates, ?string $projectPhp = null): self
+    public static function default(Clock $clock, Thresholds $thresholds, string $targetPhp, PhpReleaseDates $dates, ?string $projectPhp = null, ?string $platformPhp = null): self
     {
         $floor = new PhpFloor($targetPhp, $projectPhp);
+        $cap = new PhpCap($dates->minors($clock), $projectPhp, $platformPhp);
 
         $set = new self([
             new AbandonedRule(),
@@ -53,9 +58,11 @@ final class SignalSet
             new PinnedRule(),
             new LeftBehindRule($clock, $thresholds, $floor),
             new AdvisoryRule(),
-            new NotCheckedRule(new LeftBehindRule($clock, $thresholds, $floor)),
+            new NotCheckedRule(new LeftBehindRule($clock, $thresholds, $floor), new CappedRule($cap, $floor)),
+            new CappedRule($cap, $floor),
         ], $floor);
         $set->thresholds = $thresholds;
+        $set->cap = $cap;
         $set->targetMajorGa = $dates->gaDate(explode('.', PhpReleaseDates::minorOf($targetPhp))[0].'.0');
 
         return $set;
@@ -75,6 +82,11 @@ final class SignalSet
     public function phpFloor(): PhpFloor
     {
         return $this->floor;
+    }
+
+    public function phpCap(): PhpCap
+    {
+        return $this->cap;
     }
 
     /** @return list<Signal> */

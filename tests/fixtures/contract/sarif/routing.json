@@ -276,6 +276,7 @@
                                         "lead": "pinned",
                                         "flag_ids": [
                                             "pinned",
+                                            "capped",
                                             "vulnerable"
                                         ],
                                         "replacement": null,
@@ -374,6 +375,7 @@
                                         "lead": "pinned",
                                         "flag_ids": [
                                             "pinned",
+                                            "capped",
                                             "vulnerable"
                                         ],
                                         "replacement": null,

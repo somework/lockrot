@@ -219,6 +219,19 @@
                                     "$ref": "#/definitions/date"
                                 }
                             }
+                        },
+                        "capped": {
+                            "description": "One counted maintenance flag that the entry knows.",
+                            "type": "object",
+                            "required": [
+                                "known_since"
+                            ],
+                            "properties": {
+                                "known_since": {
+                                    "description": "The date it first became known. A regeneration keeps it. The file stores no headline, degree or points, because a stored years value changes on every regeneration of an unchanged lock.",
+                                    "$ref": "#/definitions/date"
+                                }
+                            }
                         }
                     },
                     "additionalProperties": false

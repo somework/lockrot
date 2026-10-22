@@ -124,7 +124,7 @@ final class FlagSetTest extends TestCase
         $staleOldPromise = [['S2', 'warn'], ['S5', 'high']];
         yield 'an entry that lists stale' => [$staleOldPromise, ['stale'], ['stale'], ['old-promise'], ['stale']];
         yield 'an entry that lists nothing that fired' => [$staleOldPromise, ['pinned'], [], ['old-promise', 'stale'], ['pinned']];
-        yield 'a whole-package entry' => [$staleOldPromise, null, ['old-promise', 'stale'], [], ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale']];
+        yield 'a whole-package entry' => [$staleOldPromise, null, ['old-promise', 'stale'], [], ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped']];
         yield 'abandoned covers silent and stale' => [$staleOldPromise, ['abandoned'], ['stale'], ['old-promise'], ['abandoned', 'silent', 'stale']];
         yield 'silent covers stale' => [$staleOldPromise, ['silent'], ['stale'], ['old-promise'], ['silent', 'stale']];
         yield 'an accepted flag before a counted one' => [[['S6', 'high'], ['S5', 'high']], ['pinned'], ['pinned'], ['old-promise'], ['pinned']];

@@ -159,6 +159,9 @@
    "flags": {
     "pinned": {
      "known_since": "2026-10-01"
+    },
+    "capped": {
+     "known_since": "2026-10-01"
     }
    }
   },
@@ -283,6 +286,9 @@
    "first_seen": "2026-10-01",
    "flags": {
     "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "capped": {
      "known_since": "2026-10-01"
     }
    }
@@ -544,6 +550,9 @@
    "flags": {
     "left-behind": {
      "known_since": "2026-10-01"
+    },
+    "capped": {
+     "known_since": "2026-10-01"
     }
    }
   },
@@ -740,6 +749,9 @@
      "known_since": "2026-10-01"
     },
     "stale": {
+     "known_since": "2026-10-01"
+    },
+    "capped": {
      "known_since": "2026-10-01"
     }
    }

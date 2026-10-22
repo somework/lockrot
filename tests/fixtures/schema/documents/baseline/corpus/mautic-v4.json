@@ -601,6 +601,9 @@
    "flags": {
     "pinned": {
      "known_since": "2026-10-01"
+    },
+    "capped": {
+     "known_since": "2026-10-01"
     }
    },
    "advisories": {

@@ -639,7 +639,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -768,7 +769,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -885,7 +887,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -1002,7 +1005,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -1119,7 +1123,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -1236,7 +1241,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -1353,7 +1359,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -1470,7 +1477,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -1587,7 +1595,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -1704,7 +1713,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -1821,7 +1831,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -1938,7 +1949,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -2055,7 +2067,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {
@@ -2172,7 +2185,8 @@
                                         "verdict": "critical",
                                         "lead": "abandoned",
                                         "flag_ids": [
-                                            "abandoned"
+                                            "abandoned",
+                                            "capped"
                                         ],
                                         "replacement": "php-http/guzzle7-adapter",
                                         "next_step": {

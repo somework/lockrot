@@ -18,6 +18,7 @@ final class Verdict
     public const LEFT_BEHIND = 'left-behind';
     public const OLD_PROMISE = 'old-promise';
     public const STALE = 'stale';
+    public const CAPPED = 'capped';
     public const UNKNOWN = 'unknown';
     public const FINISHED = 'finished';
     public const OK = 'ok';

@@ -59,8 +59,8 @@ Nothing is added to these sets, removed from them or reordered within 1.x:
 
 - Verdicts, worst first: `critical`, `high`, `medium`, `low`, `unknown`, `finished`, `ok`.
 - Grades, highest first: `critical`, `high`, `medium`, `low`.
-- Flags, in flag order: `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`, `vulnerable`.
-- The maintenance flags, in flag order: `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`.
+- Flags, in flag order: `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`, `capped`, `vulnerable`.
+- The maintenance flags, in flag order: `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`, `capped`.
 - The `priority` alias, highest first: `critical`, `high`, `medium`, `low`, `none`.
 - Score parts: `run.score_model.parts[].id` and a flag's `part`: `maintenance`, `security`.
 - A score term's `part`: `maintenance`, `security`.
@@ -72,7 +72,7 @@ Nothing is added to these sets, removed from them or reordered within 1.x:
 - `security.move_in`: `next_step`, `also`.
 - A finding's standing against the baseline: `known`, `new`, `worsened`.
 - The `kind` of a move's fact and of a rerun's `remove`: `flag`, `advisory`.
-- A flag's `headline.unit`: `years`, `php`, `reason`, `advisories`.
+- A flag's `headline.unit`: `years`, `php`, `php_minor`, `reason`, `advisories`.
 - A flag's `headline.source`: `release`, `push`, `branch`.
 - A holder's `source`, in `held_by[]`: `root`, `package`.
 - A holder's `link`, in `held_by[]`: `require`, `require-dev`, `conflict`, `replace`, `root-require`, `platform`.
@@ -100,6 +100,8 @@ Nothing is added to these sets, removed from them or reordered within 1.x:
 - The `link` of a PHP window link, in `run.php_window`: `require`, `conflict`.
 - The `target` of a PHP window link, in `run.php_window`: `php`, `php-64bit`.
 - `run.php_window.host_requires`: `php-debug`, `php-ipv6`, `php-zts`.
+- S11's `newest_php_source`: `known`, `require_php`, `platform_php`.
+- S11's `admits_newest.blocking`: `project`, `target`.
 
 The document number `lockrot.schema` is `2` for all of 1.x. A new value in a closed set needs
 report-3 and lockrot 2.0. [verdicts.md](verdicts.md#the-nine-verdicts) says what each value means.

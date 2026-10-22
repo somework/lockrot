@@ -547,6 +547,9 @@
    "flags": {
     "pinned": {
      "known_since": "2026-09-24"
+    },
+    "capped": {
+     "known_since": "2026-09-24"
     }
    },
    "advisories": {

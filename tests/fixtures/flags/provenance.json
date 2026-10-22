@@ -1,11 +1,19 @@
 {
- "pr": "7a",
+ "pr": "7b",
  "source": {
-  "cases.json": "8a17bb350e1c042a1816c8123297d38a2edd873a80f187aea7e1882c892e1f3d",
-  "model_run_date": "2026-10-21"
+  "cases.json": "d7cbe8c3602f7270c21167968b18cf053027869278d1ef07d3691a706665415c",
+  "model_run_date": "2026-10-22"
  },
  "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",
- "dropped": [],
+ "page_goldens": {
+  "sha256": "7e87c6da8003f933f5e70d6e46041902e4b9e96414ecc87d541688132c2f83d5",
+  "rendered": "the model's goldens, rendered again by the model with run.php_window.target_fix null"
+ },
+ "dropped": [
+  "cases[].run.php_window.target_fix",
+  "documents.run.php_window.target_fix",
+  "run.php_window.target_fix"
+ ],
  "reverted": {},
  "cases_without_inputs": [
   "psr-log",
@@ -19,6 +27,25 @@
   "scope-registries‡",
   "no-feed‡",
   "unparseable-version‡",
+  "capped-raise-php",
+  "capped-update‡",
+  "capped-require‡",
+  "capped-require-higher‡",
+  "capped-held-update‡",
+  "capped-snapshot-alias‡",
+  "capped-snapshot-dev‡",
+  "capped-platform‡",
+  "capped-accepted‡",
+  "capped-dev‡",
+  "capped-blocked‡",
+  "capped-project-blocked‡",
+  "capped-no-release‡",
+  "capped-unread‡",
+  "capped-known‡",
+  "capped-new‡",
+  "capped-money‡",
+  "capped-nette‡",
+  "capped-htmlpurifier‡",
   "host-accepted‡",
   "host-accept-expired‡",
   "no-feed-accepted‡",

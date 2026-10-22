@@ -29,6 +29,25 @@
                             }
                         },
                         {
+                            "id": "lockrot/capped",
+                            "name": "capped",
+                            "shortDescription": {
+                                "text": "capped: The installed version's php constraint stops below the newest PHP the project allows"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version's php requirement has an upper bound below the newest PHP minor that the project allows."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
                             "id": "lockrot/advisory/PKSA-j4xy-fb9q-x9h7",
                             "name": "advisory/PKSA-j4xy-fb9q-x9h7",
                             "shortDescription": {
@@ -149,7 +168,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "mautic/core-lib 4.3.x-dev \u2014 finding critical, 32 = pinned 16 + vulnerable 16 [high advisory] \u2014 pinned: pinned to branch snapshot 4.3.x-dev. Do: no move: it is installed from a local path (your own package)."
+                        "text": "mautic/core-lib 4.3.x-dev \u2014 finding critical, 34 = pinned 16 + capped 2 [\u00bc of 8] + vulnerable 16 [high advisory] \u2014 pinned: pinned to branch snapshot 4.3.x-dev. Do: no move: it is installed from a local path (your own package)."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "mautic/core-lib"
@@ -160,11 +179,12 @@
                         "verdict": "critical",
                         "priority": "critical",
                         "lead": "pinned",
-                        "score_total": 32,
-                        "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+                        "score_total": 34,
+                        "score_text": "34 = pinned 16 + capped 2 [\u00bc of 8] + vulnerable 16 [high advisory]",
                         "score_model_id": 1,
                         "flag_ids": [
                             "pinned",
+                            "capped",
                             "vulnerable"
                         ],
                         "direct": true,
@@ -184,7 +204,8 @@
                         "signal_ids": [
                             "S6",
                             "S7",
-                            "S9"
+                            "S9",
+                            "S11"
                         ],
                         "age": {
                             "installed": null,
@@ -221,8 +242,62 @@
                     ]
                 },
                 {
-                    "ruleId": "lockrot/advisory/PKSA-j4xy-fb9q-x9h7",
+                    "ruleId": "lockrot/capped",
                     "ruleIndex": 1,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "mautic/core-lib 4.3.x-dev \u2014 finding critical, 34 = pinned 16 + capped 2 [\u00bc of 8] + vulnerable 16 [high advisory] \u2014 capped: requires php >=7.4.0 <8.1: it stops at 8.0, so the newest PHP, 8.5, is excluded. Do: no move: it is installed from a local path (your own package)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "mautic/core-lib"
+                    },
+                    "properties": {
+                        "package": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "pinned",
+                        "score_total": 34,
+                        "score_text": "34 = pinned 16 + capped 2 [\u00bc of 8] + vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "pinned",
+                            "capped",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": null,
+                        "baseline_status": null,
+                        "error_by": [],
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "capped",
+                            "role": "corroborating",
+                            "weight": 8,
+                            "divisor": 4,
+                            "points": 2,
+                            "contribution": 2
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 693
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-j4xy-fb9q-x9h7",
+                    "ruleIndex": 2,
                     "level": "error",
                     "rank": 80.0,
                     "message": {
@@ -238,11 +313,12 @@
                         "verdict": "critical",
                         "priority": "critical",
                         "lead": "pinned",
-                        "score_total": 32,
-                        "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+                        "score_total": 34,
+                        "score_text": "34 = pinned 16 + capped 2 [\u00bc of 8] + vulnerable 16 [high advisory]",
                         "score_model_id": 1,
                         "flag_ids": [
                             "pinned",
+                            "capped",
                             "vulnerable"
                         ],
                         "direct": true,
@@ -262,7 +338,8 @@
                         "signal_ids": [
                             "S6",
                             "S7",
-                            "S9"
+                            "S9",
+                            "S11"
                         ],
                         "age": {
                             "installed": null,
@@ -320,7 +397,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-81ww-1p5d-6c6k",
-                    "ruleIndex": 2,
+                    "ruleIndex": 3,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -336,11 +413,12 @@
                         "verdict": "critical",
                         "priority": "critical",
                         "lead": "pinned",
-                        "score_total": 32,
-                        "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+                        "score_total": 34,
+                        "score_text": "34 = pinned 16 + capped 2 [\u00bc of 8] + vulnerable 16 [high advisory]",
                         "score_model_id": 1,
                         "flag_ids": [
                             "pinned",
+                            "capped",
                             "vulnerable"
                         ],
                         "direct": true,
@@ -382,7 +460,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-bxhd-1cmh-djg9",
-                    "ruleIndex": 3,
+                    "ruleIndex": 4,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -398,11 +476,12 @@
                         "verdict": "critical",
                         "priority": "critical",
                         "lead": "pinned",
-                        "score_total": 32,
-                        "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+                        "score_total": 34,
+                        "score_text": "34 = pinned 16 + capped 2 [\u00bc of 8] + vulnerable 16 [high advisory]",
                         "score_model_id": 1,
                         "flag_ids": [
                             "pinned",
+                            "capped",
                             "vulnerable"
                         ],
                         "direct": true,
@@ -444,7 +523,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-krjy-6tb4-skgg",
-                    "ruleIndex": 4,
+                    "ruleIndex": 5,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -460,11 +539,12 @@
                         "verdict": "critical",
                         "priority": "critical",
                         "lead": "pinned",
-                        "score_total": 32,
-                        "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+                        "score_total": 34,
+                        "score_text": "34 = pinned 16 + capped 2 [\u00bc of 8] + vulnerable 16 [high advisory]",
                         "score_model_id": 1,
                         "flag_ids": [
                             "pinned",
+                            "capped",
                             "vulnerable"
                         ],
                         "direct": true,
@@ -506,7 +586,7 @@
                 },
                 {
                     "ruleId": "lockrot/advisory/PKSA-ydwx-2n98-5dyf",
-                    "ruleIndex": 5,
+                    "ruleIndex": 6,
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
@@ -522,11 +602,12 @@
                         "verdict": "critical",
                         "priority": "critical",
                         "lead": "pinned",
-                        "score_total": 32,
-                        "score_text": "32 = pinned 16 + vulnerable 16 [high advisory]",
+                        "score_total": 34,
+                        "score_text": "34 = pinned 16 + capped 2 [\u00bc of 8] + vulnerable 16 [high advisory]",
                         "score_model_id": 1,
                         "flag_ids": [
                             "pinned",
+                            "capped",
                             "vulnerable"
                         ],
                         "direct": true,

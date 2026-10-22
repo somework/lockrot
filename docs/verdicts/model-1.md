@@ -41,16 +41,18 @@ maintenance flags.
 |---|---|
 | `abandoned`, `silent` | 32 |
 | `pinned`, `left-behind`, `old-promise` | 16 |
-| `stale` | 8 |
+| `stale`, `capped` | 8 |
 
 ## Each other maintenance flag adds a quarter {#score-corroborating-share}
 
 `kind: share`, `share: 1/4`.
 
 Every counted maintenance flag after the lead adds a quarter of its points: 4 for a 16-point flag,
-2 for `stale`. The six maintenance flags describe one fact from six sides, so a second flag
-confirms the first and does not count again in full. Maintenance never leaves the band of its
-lead: the most a lead of 32 reaches is 40, and the most a lead of 16 reaches is 22.
+2 for an 8-point flag. The seven maintenance flags describe one fact from seven sides, so a second
+flag confirms the first and does not count again in full. Maintenance never leaves the band of its
+lead: the most a lead of 32 reaches is 40, the most a lead of 16 reaches is 22, and the most a lead
+of 8 reaches is 10. These maxima follow `run.score_model.exclusive_groups`, the flags that never
+fire together, such as `old-promise` and `capped`.
 
 Example: `left-behind` leads, and `old-promise` adds 4 of its 16 points:
 `20 = left-behind 16 + old-promise 4 [¼ of 16]`.
@@ -199,8 +201,8 @@ Example: a package that scores 36, with a new high advisory worth 16, has a gate
 A flag that the baseline entry records covers itself and every flag after it in flag order. So a
 flag above the recorded ones is new, and a flag below them is not.
 
-Example: an entry that records `left-behind` covers a later `old-promise` and `stale`, and not
-`pinned`.
+Example: an entry that records `left-behind` covers a later `old-promise`, `stale` and `capped`,
+and not `pinned`.
 
 ## Related
 

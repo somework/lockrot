@@ -61,7 +61,7 @@ final class CoverageTest extends TestCase
                 $this->record($name, $schema, $schema, '#', json_decode((string) file_get_contents(substr($path, -3) === '.gz' ? 'compress.zlib://'.$path : $path)));
             }
         }
-        self::assertSame([Schemas::REPORT => 267, Schemas::EXPLAIN => 183, Schemas::BASELINE => 138, Schemas::CONFIG => 77], $counts, 'tests/fixtures/schema/documents/provenance.json');
+        self::assertSame([Schemas::REPORT => 314, Schemas::EXPLAIN => 230, Schemas::BASELINE => 138, Schemas::CONFIG => 79], $counts, 'tests/fixtures/schema/documents/provenance.json');
 
         $shared = [];
         foreach ((array) $schemas[Schemas::EXPLAIN]->definitions as $definition => $node) {
@@ -296,7 +296,7 @@ final class CoverageTest extends TestCase
             [self::D.'alsoMove/properties/kind', ['replace', 'find-alternative', 'tag', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-single-fix'],
                 'an also[] move shares the move kinds, and every corpus and case also[] move is the security move beside a maintenance lead. next_step carries each other kind'],
             [self::D.'alsoMove/properties/composer_moves_because/items', ['holders', 'transitive', 'unreached'], 'as alsoMove.kind: next_step.composer_moves_because carries every value'],
-            [self::D.'alsoMove/properties/reason/oneOf/0', ['package_quiet', 'no_higher_release', 'higher_undated', 'releases_unknown', 'affected_range_unknown', 'metadata_not_read', 'local_package'],
+            [self::D.'alsoMove/properties/reason/oneOf/0', ['package_quiet', 'no_higher_release', 'higher_undated', 'releases_unknown', 'affected_range_unknown', 'metadata_not_read', 'local_package', 'no_release_admits'],
                 'as alsoMove.kind: a no-move reason belongs to a maintenance move, which no also[] move is'],
             [self::D.'holder/oneOf/0/properties/next_step/oneOf/0/properties/kind', ['replace', 'find-alternative', 'tag', 'update', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'],
                 "a holder's next_step copies the holding finding's own kind, and the finding's own next_step carries every other kind"],

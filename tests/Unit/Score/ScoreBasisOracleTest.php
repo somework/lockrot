@@ -336,7 +336,7 @@ final class ScoreBasisOracleTest extends TestCase
         yield 'nothing fired, no release metadata' => [[], false, null, false, 'unknown'];
         yield 'the entry accepts a fired flag' => [[['S2', 'warn']], true, ['stale'], false, 'finished'];
         yield 'the entry accepts the whole package' => [[], true, null, false, 'finished'];
-        yield 'the entry names every maintenance flag and none fired' => [[], true, ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale'], true, 'ok'];
+        yield 'the entry names every maintenance flag and none fired' => [[], true, ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped'], true, 'ok'];
         yield 'the entry accepts nothing that fired' => [[], true, ['pinned'], true, 'ok'];
     }
 

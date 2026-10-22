@@ -945,6 +945,22 @@
     },
     {
         "type": "issue",
+        "check_name": "lockrot/capped",
+        "description": "lcobucci/clock 3.3.1 \u2014 finding low (4 = capped 8 \u00f7 2 transitive) \u2014 capped: requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded. Do: composer update lcobucci/clock (gets 3.6.0) \u2014 clears capped. (via lcobucci/jwt, scheb/2fa-trusted-device)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "11cd3a78e04d8d3a4bf510cd2952b88b4917a50e58e46cea34ac6b08a66b4c5e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
         "check_name": "lockrot/stale",
         "description": "phpdocumentor/reflection-common 2.2.0 \u2014 finding low (4 = stale 8 \u00f7 2 transitive) \u2014 stale: last release 2020-06-27 (6.2 years ago). Do: \u2014. (via nelmio/api-doc-bundle)",
         "categories": [

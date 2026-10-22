@@ -192,8 +192,10 @@ final class FindingDetails
     private static function skippedChecks(PackageFacts $facts, array $signals, ?string $advisoryReason, array $accepted): array
     {
         $inS10 = [];
+        $capped = false;
         foreach ($signals as $signal) {
             $data = $signal->data();
+            $capped = $capped || $signal->id() === Signal::S11;
             if ($data instanceof NotCheckedData) {
                 foreach ($data->checks() as $gap) {
                     $inS10[] = $gap->check();
@@ -218,7 +220,7 @@ final class FindingDetails
             $skipped[] = $acceptedSkips['release_metadata'];
         } elseif ($facts->metadataStatus() !== PackageFacts::METADATA_READ) {
             if (!\in_array('release_metadata', $inS10, true)) {
-                $skipped[] = new Check('release_metadata', $facts->metadataStatus(), [Signal::S2, Signal::S8]);
+                $skipped[] = new Check('release_metadata', $facts->metadataStatus(), $capped ? [Signal::S2, Signal::S8, Signal::S11] : [Signal::S2, Signal::S8]);
             }
         } elseif (ReleaseBranch::of($facts->package()->version()) === null) {
             $skipped[] = new Check('release_branch', 'branch_snapshot', [Signal::S8]);

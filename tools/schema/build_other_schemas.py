@@ -36,8 +36,8 @@ D1 = R1['definitions']
 DRAFT = 'http://json-schema.org/draft-04/schema#'
 
 # vocabularies
-FLAGS = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable']
-MAINT = FLAGS[:6]
+FLAGS = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped', 'vulnerable']
+MAINT = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped']
 VERDICTS = ['critical', 'high', 'medium', 'low', 'unknown', 'finished', 'ok']
 GRADES = VERDICTS[:4]
 ZERO_WORDS = ['unknown', 'finished', 'ok']
@@ -46,11 +46,11 @@ FIX_KINDS = ['update', 'upgrade', 'raise-php', 'unknown', 'blocked', 'none']
 MOVE_KINDS = ['replace', 'find-alternative', 'tag', 'require', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix']
 TARGET_SOURCES = ['option', 'env', 'config', 'platform', 'runtime']
 # kept by hand: FailOnSchemaAgreementTest compares it with FailOn::allowed()
-FAIL_ON_VALUES = ['none', 'critical', 'high', 'medium', 'low', 'abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale',
+FAIL_ON_VALUES = ['none', 'critical', 'high', 'medium', 'low', 'abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped',
                   'vulnerable', 'vulnerable-medium', 'vulnerable-high', 'vulnerable-critical', 'unchecked']
 REASON = '^[a-z][a-z0-9_]*$'           # reason-like open values (underscores), the repo's style
 FLAGLIKE = '^[a-z][a-z0-9-]*$'         # flag-like open values keep hyphens (raise-php)
-SIGNAL_IDS = ['S%d' % i for i in range(1, 11)]
+SIGNAL_IDS = ['S%d' % i for i in range(1, 12)]
 PROSE = 'prose, not contract; key on the fields'
 
 
@@ -167,7 +167,7 @@ def shared_definitions():
                                  'never this word (§2.1).', 'type': 'string', 'enum': ['info', 'warn', 'high']}
     D['flagId'] = closed('A flag id, in the frozen flag order used by lists, sums, pills, gates and baseline coverage (§2.1). A closed set: '
                          'changing it is a report-3 event.', FLAGS)
-    D['maintenanceFlag'] = closed('One of the six maintenance flags, in flag order: every flag but `vulnerable` (§2.1). `lead`, an allowlist\'s '
+    D['maintenanceFlag'] = closed('One of the seven maintenance flags, in flag order: every flag but `vulnerable` (§2.1). `lead`, an allowlist\'s '
                                   '`flag_ids` and a baseline\'s stored flags take only these.', MAINT)
     D['verdict'] = closed('The verdict: a grade (`critical high medium low`, from the score\'s band) or, at score 0, the word that says why '
                           'nothing counts (`unknown`: no repository metadata; `finished`: an allowlist entry applies; `ok`: otherwise). Closed (§4.1).', VERDICTS)
@@ -193,8 +193,9 @@ def shared_definitions():
         'basis': openset('What was checked: `branch_releasing` (left-behind: the branch released within release-warn-years), '
                          '`released_after_ga` (old-promise: the lowest admitted release came out after the target major\'s GA), '
                          '`outside_range` (an advisory: no admitted version is in its affected range), `tags_only` (pinned: the '
-                         'constraint admits only tags). An open set: read an unknown basis as "checked another way".',
-                         ['branch_releasing', 'released_after_ga', 'outside_range', 'tags_only']),
+                         'constraint admits only tags), `admits_newest_php` (capped: the release the move installs admits the newest PHP that '
+                         'require.php allows). An open set: read an unknown basis as "checked another way".',
+                         ['branch_releasing', 'released_after_ga', 'outside_range', 'tags_only', 'admits_newest_php']),
     })
     D['phpCheck'] = obj('The php facts of a move or of `security.gets` (§5.3): what the release needs, and whether the project\'s require.php and the '
                         'target admit it. Every sentence prints its php clause only when `requires` is set.', {
@@ -387,7 +388,7 @@ def add_relations_round2(D):
     relate(D['withoutRow'], 'Only a removed flag can reveal a liveness word: a row that removes an advisory reveals none.',
            [P(remove=P(kind=E('flag'))), P(remove=P(kind=E('advisory')), revealed=EMPTY)])
     gv = D['gateValue']
-    relate(gv, ['A value\'s kind follows the value: the four grades are `grade`, the six maintenance flags `flag`, `vulnerable` and `vulnerable-<severity>` `vulnerable`, '
+    relate(gv, ['A value\'s kind follows the value: the four grades are `grade`, the seven maintenance flags `flag`, `vulnerable` and `vulnerable-<severity>` `vulnerable`, '
                 '`unchecked` `unchecked`; a value or a kind this schema does not list is not constrained.'],
            [P(value=E(*GRADES), kind=E('grade')), P(value=E(*MAINT), kind=E('flag')), P(value={'pattern': '^vulnerable(-[a-z]+)?$'}, kind=E('vulnerable')),
             P(value=E('unchecked'), kind=E('unchecked')), P(kind=NOT('grade', 'flag', 'vulnerable', 'unchecked')),
@@ -395,7 +396,7 @@ def add_relations_round2(D):
 
 
 NEXT_FLOOR = {'low': 8, 'medium': 16, 'high': 32}
-WEIGHT_M1 = {'abandoned': 32, 'silent': 32, 'pinned': 16, 'left-behind': 16, 'old-promise': 16, 'stale': 8}
+WEIGHT_M1 = {'abandoned': 32, 'silent': 32, 'pinned': 16, 'left-behind': 16, 'old-promise': 16, 'stale': 8, 'capped': 8}
 SEV_M1 = {'critical': 32, 'high': 16, 'medium': 8, 'unrated': 8, 'low': 2}
 MODEL_NOT_1 = P(score=P(model=NOT(1)))
 
@@ -454,7 +455,7 @@ def add_relations_round3(D):
             P(security=P(worst=E('medium', 'unrated', 'low')), signals=NONE(P(id=E('S9'), level=E('high'))))],
            [P(score={'not': {'required': ['terms']}}), P(evidence={'minLength': 1})])
     sg = D['scoreGraded']
-    relate(sg, ['Under score model 1 each term carries model 1\'s weight for its flag (abandoned 32, silent 32, pinned 16, left-behind 16, old-promise 16, stale 8) '
+    relate(sg, ['Under score model 1 each term carries model 1\'s weight for its flag (abandoned 32, silent 32, pinned 16, left-behind 16, old-promise 16, stale 8, capped 8) '
                 'or for its severity (critical 32, high 16, medium 8, unrated 8, low 2).',
                 'Under score model 1 a `lead` term divides by 1 and a `corroborating` term by 4; a role this schema does not list is not constrained.'],
            [P(model=NOT(1)), P(terms={'items': {'anyOf': [P(part=E('maintenance'), flag=E(m), weight=E(w)) for m, w in WEIGHT_M1.items()]
@@ -470,7 +471,7 @@ def add_relations_round3(D):
            [P(status=NOT('known')), P(status=E('known'), advisories_now=P(new=E(0), re_rated=E(0), fix_lost=E(0)))])
     # four more rules that draft-04 can say
     SIG_OF = {'abandoned': ['S1', 'S3', 'S2', 'S4'], 'silent': ['S2', 'S4'], 'stale': ['S2', 'S4'], 'pinned': ['S6'], 'left-behind': ['S8'],
-              'old-promise': ['S5'], 'vulnerable': ['S9']}
+              'old-promise': ['S5'], 'capped': ['S11'], 'vulnerable': ['S9']}
     relate(f, ['An accepted flag fired: each `score.accepted[].flag` has its `flags[]` entry.',
                '`metadata.reason` and `.message` are null when the metadata was read, and an `unavailable` status names its reason (MetadataFailure classifies every failure).'],
            *([[{'allOf': [{'anyOf': [P(score=P(accepted=NONE(P(flag=E(m))))), P(flags=CONTAINS(P(id=E(m))))]} for m in MAINT]}]]),
@@ -478,7 +479,7 @@ def add_relations_round3(D):
             P(metadata=P(status=NOT('read', 'unavailable')))])
     fl_ = D.get('findingFlag')
     if fl_ is not None:
-        relate(fl_, 'A flag names only the signals that raise or date it: abandoned S1 S3 S2 S4, silent and stale S2 S4, pinned S6, left-behind S8, old-promise S5, vulnerable S9; a signal id this schema does not list is not constrained.',
+        relate(fl_, 'A flag names only the signals that raise or date it: abandoned S1 S3 S2 S4, silent and stale S2 S4, pinned S6, left-behind S8, old-promise S5, capped S11, vulnerable S9; a signal id this schema does not list is not constrained.',
                [P(id=E(k), signal_ids={'items': {'anyOf': [E(*v), NOT(*SIGNAL_IDS)]}}) for k, v in SIG_OF.items()])  # a later signal id is free
     relate(D['scoreGraded'], ['A graded score has at least one term.', 'Under score model 1 every halving divides by 2.'],
            [P(terms=dict(MIN1, description='At least one term.'))], [P(model=NOT(1)), P(modifiers={'items': P(divide_by=E(2))})])
@@ -786,7 +787,7 @@ def config_schema():
     lst = '^\\s*' + tok + '\\s*(,\\s*' + tok + '\\s*)*$'
     s['properties']['fail-on'] = {
         'description': ('When the run fails. `none` is the default and must stand alone. A grade (`critical high medium low`) fails when the band of the gate score '
-                        'is at or above it. A maintenance flag (`abandoned silent pinned left-behind old-promise stale`) fails on a counted flag at or above it in flag order '
+                        'is at or above it. A maintenance flag (`abandoned silent pinned left-behind old-promise stale capped`) fails on a counted flag at or above it in flag order '
                         'that the baseline does not cover, as the verdict gate of 0.13 did. A raw advisory severity (`vulnerable`, `vulnerable-medium`, '
                         '`vulnerable-high`, `vulnerable-critical`) fails on a counted advisory at or above it that the baseline does not know. `vulnerable` means any '
                         'severity, so `vulnerable-low` is not a value. `unchecked` fails on S10. A list holds at most one value per kind. lockrot trims and lower-cases '

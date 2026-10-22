@@ -14,7 +14,7 @@ use Lockrot\Verdict\CommandArgument;
  */
 final class RootRecount
 {
-    private const FLAG_ORDER = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable'];
+    private const FLAG_ORDER = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'capped', 'vulnerable'];
     private const GRADES = ['critical', 'high', 'medium', 'low'];
     private const SEVERITIES = ['critical', 'high', 'medium', 'unrated', 'low'];
     private const FIX_KINDS = ['update', 'upgrade', 'raise-php', 'unknown', 'blocked', 'none'];

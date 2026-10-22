@@ -139,6 +139,9 @@
    "flags": {
     "stale": {
      "known_since": "2026-10-01"
+    },
+    "capped": {
+     "known_since": "2026-10-01"
     }
    }
   },
@@ -481,6 +484,9 @@
    "flags": {
     "abandoned": {
      "known_since": "2026-10-01"
+    },
+    "capped": {
+     "known_since": "2026-10-01"
     }
    }
   },
@@ -489,6 +495,9 @@
    "first_seen": "2026-10-01",
    "flags": {
     "abandoned": {
+     "known_since": "2026-10-01"
+    },
+    "capped": {
      "known_since": "2026-10-01"
     }
    }

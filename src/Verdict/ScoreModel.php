@@ -20,10 +20,10 @@ final class ScoreModel
     public const ID = 1;
     public const SCORE_TEXT_GRAMMAR = 1;
 
-    public const FLAG_ORDER = [FlagSet::ABANDONED, FlagSet::SILENT, FlagSet::PINNED, FlagSet::LEFT_BEHIND, FlagSet::OLD_PROMISE, FlagSet::STALE, FlagSet::VULNERABLE];
+    public const FLAG_ORDER = [FlagSet::ABANDONED, FlagSet::SILENT, FlagSet::PINNED, FlagSet::LEFT_BEHIND, FlagSet::OLD_PROMISE, FlagSet::STALE, FlagSet::CAPPED, FlagSet::VULNERABLE];
 
     /** The maintenance flags in flag order. Their points never increase along it. */
-    public const POINTS = [FlagSet::ABANDONED => 32, FlagSet::SILENT => 32, FlagSet::PINNED => 16, FlagSet::LEFT_BEHIND => 16, FlagSet::OLD_PROMISE => 16, FlagSet::STALE => 8];
+    public const POINTS = [FlagSet::ABANDONED => 32, FlagSet::SILENT => 32, FlagSet::PINNED => 16, FlagSet::LEFT_BEHIND => 16, FlagSet::OLD_PROMISE => 16, FlagSet::STALE => 8, FlagSet::CAPPED => 8];
 
     /** @var array<string, list<string>> the signals that raise each flag: a removed flag removes them */
     public const RAISED_BY = [
@@ -33,6 +33,7 @@ final class ScoreModel
         FlagSet::LEFT_BEHIND => ['S8'],
         FlagSet::OLD_PROMISE => ['S5'],
         FlagSet::STALE => ['S2', 'S4'],
+        FlagSet::CAPPED => ['S11'],
         FlagSet::VULNERABLE => ['S9'],
     ];
 
@@ -71,6 +72,7 @@ final class ScoreModel
         ['id' => 'branch', 'flag_ids' => [FlagSet::PINNED, FlagSet::LEFT_BEHIND], 'holds_unless' => null],
         ['id' => 'release_age', 'flag_ids' => [FlagSet::SILENT, FlagSet::LEFT_BEHIND], 'holds_unless' => null],
         ['id' => 'release_push', 'flag_ids' => [FlagSet::LEFT_BEHIND, FlagSet::STALE], 'holds_unless' => ['threshold' => 'push-warn-years', 'below' => 'release-warn-years']],
+        ['id' => 'php_bound', 'flag_ids' => [FlagSet::OLD_PROMISE, FlagSet::CAPPED], 'holds_unless' => null],
     ];
 
     /**
@@ -83,7 +85,8 @@ final class ScoreModel
         FlagSet::PINNED => [22, [FlagSet::PINNED, FlagSet::OLD_PROMISE, FlagSet::STALE]],
         FlagSet::LEFT_BEHIND => [20, [FlagSet::LEFT_BEHIND, FlagSet::OLD_PROMISE]],
         FlagSet::OLD_PROMISE => [18, [FlagSet::OLD_PROMISE, FlagSet::STALE]],
-        FlagSet::STALE => [8, [FlagSet::STALE]],
+        FlagSet::STALE => [10, [FlagSet::STALE, FlagSet::CAPPED]],
+        FlagSet::CAPPED => [8, [FlagSet::CAPPED]],
     ];
 
     /** abandoned + pinned + old-promise + a critical advisory that nothing fixes. ScoreModelTest derives it. */
@@ -95,7 +98,7 @@ final class ScoreModel
         FlagSet::STALE => ['release-warn-years', 'push-warn-years'],
     ];
 
-    private const V013_BASE = [FlagSet::ABANDONED => 'critical', FlagSet::SILENT => 'critical', FlagSet::PINNED => 'high', FlagSet::LEFT_BEHIND => 'high', FlagSet::OLD_PROMISE => 'high', FlagSet::STALE => 'medium'];
+    private const V013_BASE = [FlagSet::ABANDONED => 'critical', FlagSet::SILENT => 'critical', FlagSet::PINNED => 'high', FlagSet::LEFT_BEHIND => 'high', FlagSet::OLD_PROMISE => 'high', FlagSet::STALE => 'medium', FlagSet::CAPPED => null];
 
     /** The band of a total, null at 0. */
     public static function band(int $total): ?string

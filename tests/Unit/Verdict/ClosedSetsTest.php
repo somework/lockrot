@@ -16,6 +16,7 @@ use Lockrot\Lock\PackageOrigin;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Rule\PinnedRule;
+use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\ClosedSets;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
@@ -214,9 +215,9 @@ final class ClosedSetsTest extends TestCase
      */
     public function testTheSignalIdsAreLockrotsOwnAndTheSchemasListThem(): void
     {
-        $ids = ClosedSets::signalIds();
+        $ids = self::report1SignalIds();
         self::assertNotEmpty($ids);
-        foreach ($ids as $id) {
+        foreach (ClosedSets::signalIds() as $id) {
             self::assertMatchesRegularExpression('/^S[1-9][0-9]*$/', $id);
         }
 
@@ -226,6 +227,33 @@ final class ClosedSetsTest extends TestCase
         self::assertSame(['$ref' => '#/definitions/signalId'], JsonPath::arrayAt($report, ['definitions', 's10', 'properties', 'blocks', 'items']));
         self::assertSame(['$ref' => '#/definitions/signalId'], JsonPath::arrayAt($report, ['definitions', 's10', 'properties', 'unchecked', 'items', 'properties', 'blocks', 'items']));
 
+        self::assertSame($ids, self::signalBranches($report));
+
+        $explain = self::schema(Schemas::EXPLAIN, 1);
+        self::assertSame(JsonPath::arrayAt($report, ['definitions', 'signalId']), JsonPath::arrayAt($explain, ['definitions', 'signalId']), 'the explain schema spells signalId as the report does');
+        self::assertSame(['$ref' => '#/definitions/signalId'], JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'signals', 'items', 'properties', 'id']));
+    }
+
+    /** report-2 names every id of lockrot's three times, as report-1 names its own. */
+    public function testReport2ListsEverySignalIdOfLockrot(): void
+    {
+        $report = self::schema(Schemas::REPORT, 2);
+
+        self::assertSame(ClosedSets::signalIds(), JsonPath::arrayAt($report, ['definitions', 'signalId', KnownValues::KEYWORD]));
+        self::assertSame(ClosedSets::signalIds(), self::signalBranches($report));
+    }
+
+    /**
+     * The id of each typed `anyOf` branch of `signal`, after checking that the last branch is a
+     * `not` over the same ids and that each branch types its own signal's data.
+     *
+     * @param array<mixed, mixed> $report
+     *
+     * @return list<string>
+     */
+    private static function signalBranches(array $report): array
+    {
+        $ids = JsonPath::arrayAt($report, ['definitions', 'signalId', KnownValues::KEYWORD]);
         $anyOf = JsonPath::arrayAt($report, ['definitions', 'signal', 'anyOf']);
         $unknown = array_pop($anyOf);
         self::assertIsArray($unknown, 'the last branch');
@@ -244,11 +272,19 @@ final class ClosedSetsTest extends TestCase
                 'anyOf branch '.$index.' types its own signal\'s data'
             );
         }
-        self::assertSame($ids, $branches);
 
-        $explain = self::schema(Schemas::EXPLAIN, 1);
-        self::assertSame(JsonPath::arrayAt($report, ['definitions', 'signalId']), JsonPath::arrayAt($explain, ['definitions', 'signalId']), 'the explain schema spells signalId as the report does');
-        self::assertSame(['$ref' => '#/definitions/signalId'], JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'signals', 'items', 'properties', 'id']));
+        return $branches;
+    }
+
+    /**
+     * The signal ids that report-1 and explain-1 know: S11 is report-2's, and lockrot writes no
+     * report-1 since report-2.
+     *
+     * @return list<string>
+     */
+    private static function report1SignalIds(): array
+    {
+        return array_values(array_diff(ClosedSets::signalIds(), [Signal::S11]));
     }
 
     /**
@@ -267,7 +303,7 @@ final class ClosedSetsTest extends TestCase
         $branchRow = ['definitions', 'metadata', 'properties', 'branches', 'items', 'properties'];
 
         $open = [
-            'report-1 #/definitions/signalId' => [JsonPath::arrayAt($report, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds(), 'signal ids'],
+            'report-1 #/definitions/signalId' => [JsonPath::arrayAt($report, ['definitions', 'signalId']), self::SIGNAL_ID, self::report1SignalIds(), 'signal ids'],
             'report-1 #/definitions/s10/properties/unchecked/items/properties/check' => [JsonPath::arrayAt($report, array_merge($s10Entry, ['check'])), self::WORD, ['repository_activity', 'release_dates'], "S10's `check` and `reason`"],
             'report-1 #/definitions/s10/properties/unchecked/items/properties/reason' => [
                 JsonPath::arrayAt($report, array_merge($s10Entry, ['reason'])),
@@ -290,7 +326,7 @@ final class ClosedSetsTest extends TestCase
             'explain-1 #/definitions/metadata/properties/branches/items/properties/php_blocked_by/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['php_blocked_by', 'oneOf', 0])), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET], "the explanation's `php_blocked_by`"],
             'explain-1 #/definitions/metadata/properties/branches/items/properties/misses_target_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_target_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_target_php`'],
             'explain-1 #/definitions/metadata/properties/branches/items/properties/misses_project_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_project_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_project_php`'],
-            'explain-1 #/definitions/signalId' => [JsonPath::arrayAt($explain, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds(), 'signal ids'],
+            'explain-1 #/definitions/signalId' => [JsonPath::arrayAt($explain, ['definitions', 'signalId']), self::SIGNAL_ID, self::report1SignalIds(), 'signal ids'],
             'report-1 #/definitions/originKind' => [JsonPath::arrayAt($report, ['definitions', 'originKind']), self::ORIGIN_KIND, PackageOrigin::KINDS, self::ORIGIN_VOCABULARY],
             'report-1 #/definitions/originRegistry/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'originRegistry', 'oneOf', 0]), self::HOST, PackageOrigin::REGISTRIES, self::ORIGIN_VOCABULARY],
             'explain-1 #/definitions/originKind' => [JsonPath::arrayAt($explain, ['definitions', 'originKind']), self::ORIGIN_KIND, PackageOrigin::KINDS, self::ORIGIN_VOCABULARY],

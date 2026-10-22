@@ -77,6 +77,9 @@ final class FlagSentenceTest extends TestCase
         yield 'an old promise' => [FlagSet::OLD_PROMISE, [Signal::S5 => [
             'released' => '2016-05-01T10:00:00+00:00', 'written_for_php' => 7, 'php_constraint' => '>=5.6', 'target_major' => '8.0', 'ga_date' => '2020-11-26', 'target_php' => '8.4',
         ]], 'released 2016-05-01 for PHP 7 (php ">=5.6"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested'];
+        yield 'capped below the newest PHP' => [FlagSet::CAPPED, [Signal::S11 => ['newest_php' => '8.5', 'newest_php_source' => 'known', 'requires' => '^7.0', 'stops_at' => '7.4']], 'requires php ^7.0: it stops at 7.4, so the newest PHP, 8.5, is excluded'];
+        yield 'capped below what require.php allows' => [FlagSet::CAPPED, [Signal::S11 => ['newest_php' => '8.3', 'newest_php_source' => 'require_php', 'requires' => '8.1 - 8.2', 'stops_at' => '8.2']], 'requires php 8.1 - 8.2: it stops at 8.2, so 8.3, the newest PHP that require.php allows, is excluded'];
+        yield 'capped below what the lock\'s platform allows' => [FlagSet::CAPPED, [Signal::S11 => ['newest_php' => '8.3', 'newest_php_source' => 'platform_php', 'requires' => '8.1 - 8.2', 'stops_at' => '8.2']], 'requires php 8.1 - 8.2: it stops at 8.2, so 8.3, the newest PHP that the lock\'s platform allows, is excluded'];
         yield 'pinned to a branch snapshot' => [FlagSet::PINNED, [Signal::S6 => ['reason' => 'branch_snapshot', 'version' => 'dev-main']], 'pinned to branch snapshot dev-main'];
         yield 'pinned with no tagged release' => [FlagSet::PINNED, [Signal::S6 => ['reason' => 'no_stable_release', 'version' => '1.0.0-beta1']], 'pinned to 1.0.0-beta1'];
         yield 'whole years' => [FlagSet::STALE, [Signal::S2 => ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5]], 'last release 2021-05-05 (5.0 years ago)'];

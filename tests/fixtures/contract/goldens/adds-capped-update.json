@@ -1,0 +1,21 @@
+{
+    "score_text": "32 = vulnerable 32 [critical advisory]",
+    "next_step_text": "composer update phpoffice/phpspreadsheet (gets 1.30.7) — clears 28 advisories; it stops below the newest PHP, so capped would count",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 1.23.0 released 2022-04-24 (4.4 years ago); 1.x last released 1.30.7 2026-09-17 (less than three weeks ago); newest release 3.10.8 2026-09-17 (less than three weeks ago); last push 2026-10-01 (less than three weeks ago)",
+    "explain_age": [
+        "installed  1.23.0    2022-04-24   4.4 years ago",
+        "1.x        1.30.7    2026-09-17   less than three weeks ago     below release-warn-years 3",
+        "newest     3.10.8    2026-09-17   less than three weeks ago     below release-warn-years 3",
+        "last push            2026-10-01   less than three weeks ago     below push-warn-years 3",
+        "libyears 4.4 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer update phpoffice/phpspreadsheet"
+    ],
+    "commands_cmd": [
+        "composer update phpoffice/phpspreadsheet"
+    ]
+}
