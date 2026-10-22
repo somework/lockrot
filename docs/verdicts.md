@@ -656,8 +656,9 @@ Limits of the check:
 - It solves at `config.platform.php` when that version is in the target PHP's minor, else at the
   newest patch of the target minor (`8.4.99`). Composer reads `8.4` as `8.4.0`. It keeps every
   other `config.platform` override.
-- It offers the tagged releases of a package, and its dev versions only when it has no tagged
-  release. A move to a dev snapshot is not a move that lockrot proposes.
+- It offers the tagged releases of a package. It offers the dev versions too when the package has
+  no tagged release, or when composer.json's `minimum-stability` or a stability flag admits `dev`
+  for it, as Composer does. A move to a dev snapshot is not a move that lockrot proposes.
 - On Composer 2.9 and later, it removes the versions that an advisory affects, as Composer does in
   an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
   severities and the blocking of abandoned packages. It blocks every name that the update can move,

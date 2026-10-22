@@ -50,7 +50,7 @@ final class MoveCheckers
                 $notFromComposerRepository[] = $package->name();
             }
         }
-        $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline);
+        $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline, $root->getMinimumStability(), $root->getStabilityFlags());
         $solver = new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], $overrides), $source, []);
 
         $blocking = AdvisoryBlocking::fromConfig($config);

@@ -108,7 +108,7 @@ final class BaselinedScenario
     public static function record(string $name, bool $cli = false): array
     {
         $scenario = new self($name, $cli);
-        $scenario->server = $scenario->server();
+        $scenario->server = self::repositoryServer($name);
         $scenario->server->start();
         $scenario->github = $scenario->githubAnswers();
         try {
@@ -380,13 +380,15 @@ final class BaselinedScenario
         ))->withMoveChecks($checks);
     }
 
-    private function server(): FixtureRepositoryServer
+    /** The scenario's Composer repository, not started: the recorded answers of both locks' names, and their advisories. */
+    public static function repositoryServer(string $name): FixtureRepositoryServer
     {
-        $http = self::FIXTURES.'baselined/'.$this->name.'/http/';
-        $locks = [self::FIXTURES.$this->scenario['before'].'/composer.lock', self::FIXTURES.$this->scenario['after'].'/composer.lock'];
+        $scenario = self::SCENARIOS[$name];
+        $http = self::FIXTURES.'baselined/'.$name.'/http/';
+        $locks = [self::FIXTURES.$scenario['before'].'/composer.lock', self::FIXTURES.$scenario['after'].'/composer.lock'];
         $server = FixtureRepositoryServer::fromLockFiles($locks, self::FIXTURES.'http/p2', [], [['https://repo.packagist.org/p2/', $http.'p2']]);
         $advisories = [];
-        foreach ([$this->scenario['before'], $this->scenario['after']] as $side) {
+        foreach ([$scenario['before'], $scenario['after']] as $side) {
             $recorded = is_file($http.'advisories/'.basename((string) $side).'.json') ? $http.'advisories/' : self::FIXTURES.'http/advisories/';
             $result = HttpResult::fromEnvelopeJson('https://packagist.org/api/security-advisories/', (string) file_get_contents($recorded.basename((string) $side).'.json'));
             $answer = $result === null ? null : json_decode((string) $result->body(), true);
