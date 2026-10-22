@@ -38,6 +38,7 @@
       "left-behind",
       "old-promise",
       "stale",
+      "capped",
       "vulnerable"
     ],
     "verdicts": [
@@ -65,7 +66,8 @@
       "S7",
       "S8",
       "S9",
-      "S10"
+      "S10",
+      "S11"
     ],
     "fix_model": 1,
     "text_grammar": 1,
@@ -79,6 +81,7 @@
         "left-behind",
         "old-promise",
         "stale",
+        "capped",
         "vulnerable"
       ],
       "parts": [
@@ -90,7 +93,8 @@
             "pinned",
             "left-behind",
             "old-promise",
-            "stale"
+            "stale",
+            "capped"
           ],
           "combine": "lead_plus_share"
         },
@@ -230,9 +234,10 @@
           "band": "medium",
           "can_corroborate": true,
           "corroborating_points": 2,
-          "max_maintenance": 8,
+          "max_maintenance": 10,
           "max_maintenance_flags": [
-            "stale"
+            "stale",
+            "capped"
           ],
           "raised_by": [
             "S2",
@@ -244,6 +249,27 @@
           ],
           "basis": {
             "v013_base": "medium",
+            "points": "band_floor"
+          },
+          "points_from": null
+        },
+        {
+          "id": "capped",
+          "part": "maintenance",
+          "points": 8,
+          "band": "medium",
+          "can_corroborate": true,
+          "corroborating_points": 2,
+          "max_maintenance": 8,
+          "max_maintenance_flags": [
+            "capped"
+          ],
+          "raised_by": [
+            "S11"
+          ],
+          "thresholds": [],
+          "basis": {
+            "v013_base": null,
             "points": "band_floor"
           },
           "points_from": null
@@ -440,6 +466,14 @@
             "threshold": "push-warn-years",
             "below": "release-warn-years"
           }
+        },
+        {
+          "id": "php_bound",
+          "flag_ids": [
+            "old-promise",
+            "capped"
+          ],
+          "holds_unless": null
         }
       ],
       "sort": [
@@ -778,7 +812,370 @@
         }
       ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+      "platform_override": null,
+      "host_requires": [],
+      "with_dev": {
+        "minors": [
+          "8.1",
+          "8.2",
+          "8.3",
+          "8.4",
+          "8.5"
+        ],
+        "gaps": false,
+        "lower_edge": {
+          "php": "8.1.0",
+          "set_by": [
+            {
+              "name": null,
+              "version": null,
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1.0",
+              "dev": false
+            },
+            {
+              "name": "geoip2/geoip2",
+              "version": "v3.4.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "laravel/serializable-closure",
+              "version": "v2.0.16",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.1",
+              "dev": false
+            },
+            {
+              "name": "matomo/matomo-php-tracker",
+              "version": "4.0.1",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.1",
+              "dev": false
+            },
+            {
+              "name": "maxmind/web-service-common",
+              "version": "v0.11.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "monolog/monolog",
+              "version": "3.11.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/console",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/deprecation-contracts",
+              "version": "v3.7.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/error-handler",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/event-dispatcher",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/event-dispatcher-contracts",
+              "version": "v3.7.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-foundation",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-kernel",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/monolog-bridge",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/process",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/service-contracts",
+              "version": "v3.7.3",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/string",
+              "version": "v6.4.43",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/var-dumper",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "twig/twig",
+              "version": "v3.28.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1.0",
+              "dev": false
+            },
+            {
+              "name": "wikimedia/less.php",
+              "version": "v5.5.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            }
+          ]
+        },
+        "upper_edge": null,
+        "closest": null
+      },
+      "without_dev": {
+        "minors": [
+          "8.1",
+          "8.2",
+          "8.3",
+          "8.4",
+          "8.5"
+        ],
+        "gaps": false,
+        "lower_edge": {
+          "php": "8.1.0",
+          "set_by": [
+            {
+              "name": null,
+              "version": null,
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1.0",
+              "dev": false
+            },
+            {
+              "name": "geoip2/geoip2",
+              "version": "v3.4.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "laravel/serializable-closure",
+              "version": "v2.0.16",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.1",
+              "dev": false
+            },
+            {
+              "name": "matomo/matomo-php-tracker",
+              "version": "4.0.1",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.1",
+              "dev": false
+            },
+            {
+              "name": "maxmind/web-service-common",
+              "version": "v0.11.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "monolog/monolog",
+              "version": "3.11.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/console",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/deprecation-contracts",
+              "version": "v3.7.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/error-handler",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/event-dispatcher",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/event-dispatcher-contracts",
+              "version": "v3.7.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-foundation",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-kernel",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/monolog-bridge",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/process",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/service-contracts",
+              "version": "v3.7.3",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/string",
+              "version": "v6.4.43",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/var-dumper",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "twig/twig",
+              "version": "v3.28.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1.0",
+              "dev": false
+            },
+            {
+              "name": "wikimedia/less.php",
+              "version": "v5.5.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            }
+          ]
+        },
+        "upper_edge": null,
+        "closest": null
+      },
+      "target": {
+        "php": "8.4.99",
+        "inside": true
+      },
+      "target_fix": null
+    }
   },
   "activity_cache_oldest_at": "2026-10-14T00:00:00+00:00",
   "activity_cache_age_hours": 0,
@@ -892,6 +1289,20 @@
         "critical": 0,
         "high": 1,
         "medium": 1,
+        "low": 0
+      }
+    },
+    "capped": {
+      "carrying": 0,
+      "leading": 0,
+      "accepted": {
+        "all": 0,
+        "in_graded": 0
+      },
+      "by_verdict": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
         "low": 0
       }
     },

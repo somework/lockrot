@@ -38,6 +38,7 @@
       "left-behind",
       "old-promise",
       "stale",
+      "capped",
       "vulnerable"
     ],
     "verdicts": [
@@ -65,7 +66,8 @@
       "S7",
       "S8",
       "S9",
-      "S10"
+      "S10",
+      "S11"
     ],
     "fix_model": 1,
     "text_grammar": 1,
@@ -79,6 +81,7 @@
         "left-behind",
         "old-promise",
         "stale",
+        "capped",
         "vulnerable"
       ],
       "parts": [
@@ -90,7 +93,8 @@
             "pinned",
             "left-behind",
             "old-promise",
-            "stale"
+            "stale",
+            "capped"
           ],
           "combine": "lead_plus_share"
         },
@@ -230,9 +234,10 @@
           "band": "medium",
           "can_corroborate": true,
           "corroborating_points": 2,
-          "max_maintenance": 8,
+          "max_maintenance": 10,
           "max_maintenance_flags": [
-            "stale"
+            "stale",
+            "capped"
           ],
           "raised_by": [
             "S2",
@@ -244,6 +249,27 @@
           ],
           "basis": {
             "v013_base": "medium",
+            "points": "band_floor"
+          },
+          "points_from": null
+        },
+        {
+          "id": "capped",
+          "part": "maintenance",
+          "points": 8,
+          "band": "medium",
+          "can_corroborate": true,
+          "corroborating_points": 2,
+          "max_maintenance": 8,
+          "max_maintenance_flags": [
+            "capped"
+          ],
+          "raised_by": [
+            "S11"
+          ],
+          "thresholds": [],
+          "basis": {
+            "v013_base": null,
             "points": "band_floor"
           },
           "points_from": null
@@ -440,6 +466,14 @@
             "threshold": "push-warn-years",
             "below": "release-warn-years"
           }
+        },
+        {
+          "id": "php_bound",
+          "flag_ids": [
+            "old-promise",
+            "capped"
+          ],
+          "holds_unless": null
         }
       ],
       "sort": [
@@ -744,18 +778,18 @@
     },
     "score_rules_used": {
       "counted": 8,
-      "lead-first": 34,
+      "lead-first": 40,
       "corroborating-share": 5,
       "advisory-points": 1,
       "no-reachable-fix-multiplier": 0,
       "security-max": 1,
-      "divide-reach": 21,
+      "divide-reach": 23,
       "security-exempt-from-reach": 0,
       "sum": 0,
       "divide-dev": 0,
       "floor-once": 0,
-      "band-floors": 35,
-      "zero-verdicts": 193,
+      "band-floors": 41,
+      "zero-verdicts": 187,
       "sort": null,
       "gate-bounded-new": 0,
       "baseline-cover": 0
@@ -778,12 +812,1441 @@
         }
       ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+      "platform_override": null,
+      "host_requires": [],
+      "with_dev": {
+        "minors": [
+          "8.1",
+          "8.2"
+        ],
+        "gaps": false,
+        "lower_edge": {
+          "php": "8.1.0",
+          "set_by": [
+            {
+              "name": null,
+              "version": null,
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "api-platform/core",
+              "version": "v3.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "doctrine/event-manager",
+              "version": "2.0.1",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.1",
+              "dev": false
+            },
+            {
+              "name": "doctrine/instantiator",
+              "version": "2.0.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.1",
+              "dev": false
+            },
+            {
+              "name": "egulias/email-validator",
+              "version": "4.0.2",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "geoip2/geoip2",
+              "version": "v3.3.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "laminas/laminas-code",
+              "version": "4.16.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+              "dev": false
+            },
+            {
+              "name": "lcobucci/clock",
+              "version": "3.0.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~8.1.0 || ~8.2.0",
+              "dev": false
+            },
+            {
+              "name": "lcobucci/jwt",
+              "version": "5.3.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0",
+              "dev": false
+            },
+            {
+              "name": "league/uri",
+              "version": "7.5.1",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.1",
+              "dev": false
+            },
+            {
+              "name": "league/uri-interfaces",
+              "version": "7.5.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.1",
+              "dev": false
+            },
+            {
+              "name": "maxmind/web-service-common",
+              "version": "v0.11.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "prestashop/autoload",
+              "version": "v1.0.2",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "prestashop/ps_apiresources",
+              "version": "dev-41542-extra-property-definition-endpoints",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "prestashop/ps_distributionapiclient",
+              "version": "v2.1.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "prestashop/ps_linklist",
+              "version": "v7.0.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1.0",
+              "dev": false
+            },
+            {
+              "name": "prestashop/ps_onepagecheckout",
+              "version": "v0.6.2",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "prestashop/translationtools-bundle",
+              "version": "v6.1.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/asset",
+              "version": "v6.4.34",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/cache",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/cache-contracts",
+              "version": "v3.7.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/clock",
+              "version": "v6.4.30",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/config",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/console",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/css-selector",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/debug-bundle",
+              "version": "v6.4.35",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/dependency-injection",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/deprecation-contracts",
+              "version": "v3.7.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/doctrine-bridge",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/doctrine-messenger",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/dom-crawler",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/dotenv",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/error-handler",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/event-dispatcher",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/event-dispatcher-contracts",
+              "version": "v3.7.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/expression-language",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/filesystem",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/finder",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/form",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/framework-bundle",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-client",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-client-contracts",
+              "version": "v3.7.3",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-foundation",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-kernel",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/intl",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/lock",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/mailer",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/messenger",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/mime",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/monolog-bridge",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/monolog-bundle",
+              "version": "v3.11.2",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/options-resolver",
+              "version": "v6.4.30",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/password-hasher",
+              "version": "v6.4.32",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/process",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/property-access",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/property-info",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/proxy-manager-bridge",
+              "version": "v6.4.28",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/psr-http-message-bridge",
+              "version": "v6.4.32",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/routing",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-bundle",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-core",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-csrf",
+              "version": "v6.4.31",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-http",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/serializer",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/service-contracts",
+              "version": "v3.7.3",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/string",
+              "version": "v6.4.43",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/templating",
+              "version": "v6.4.24",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/translation",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/translation-contracts",
+              "version": "v3.7.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/twig-bridge",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/twig-bundle",
+              "version": "v6.4.43",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/ux-icons",
+              "version": "v2.36.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/ux-twig-component",
+              "version": "v2.36.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/validator",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/var-dumper",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/var-exporter",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/web-link",
+              "version": "v6.4.32",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/web-profiler-bundle",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/yaml",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "twig/extra-bundle",
+              "version": "v3.24.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1.0",
+              "dev": false
+            },
+            {
+              "name": "twig/string-extra",
+              "version": "v3.24.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1.0",
+              "dev": false
+            },
+            {
+              "name": "twig/twig",
+              "version": "v3.27.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1.0",
+              "dev": false
+            }
+          ]
+        },
+        "upper_edge": {
+          "excludes": "8.3",
+          "set_by": [
+            {
+              "name": "ezyang/htmlpurifier",
+              "version": "v4.16.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0",
+              "dev": false
+            },
+            {
+              "name": "lcobucci/clock",
+              "version": "3.0.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~8.1.0 || ~8.2.0",
+              "dev": false
+            }
+          ]
+        },
+        "closest": null
+      },
+      "without_dev": {
+        "minors": [
+          "8.1",
+          "8.2"
+        ],
+        "gaps": false,
+        "lower_edge": {
+          "php": "8.1.0",
+          "set_by": [
+            {
+              "name": null,
+              "version": null,
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "api-platform/core",
+              "version": "v3.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "doctrine/event-manager",
+              "version": "2.0.1",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.1",
+              "dev": false
+            },
+            {
+              "name": "doctrine/instantiator",
+              "version": "2.0.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.1",
+              "dev": false
+            },
+            {
+              "name": "egulias/email-validator",
+              "version": "4.0.2",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "geoip2/geoip2",
+              "version": "v3.3.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "laminas/laminas-code",
+              "version": "4.16.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+              "dev": false
+            },
+            {
+              "name": "lcobucci/clock",
+              "version": "3.0.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~8.1.0 || ~8.2.0",
+              "dev": false
+            },
+            {
+              "name": "lcobucci/jwt",
+              "version": "5.3.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0",
+              "dev": false
+            },
+            {
+              "name": "league/uri",
+              "version": "7.5.1",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.1",
+              "dev": false
+            },
+            {
+              "name": "league/uri-interfaces",
+              "version": "7.5.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.1",
+              "dev": false
+            },
+            {
+              "name": "maxmind/web-service-common",
+              "version": "v0.11.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "prestashop/autoload",
+              "version": "v1.0.2",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "prestashop/ps_apiresources",
+              "version": "dev-41542-extra-property-definition-endpoints",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "prestashop/ps_distributionapiclient",
+              "version": "v2.1.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "prestashop/ps_linklist",
+              "version": "v7.0.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1.0",
+              "dev": false
+            },
+            {
+              "name": "prestashop/ps_onepagecheckout",
+              "version": "v0.6.2",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "prestashop/translationtools-bundle",
+              "version": "v6.1.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/asset",
+              "version": "v6.4.34",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/cache",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/cache-contracts",
+              "version": "v3.7.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/clock",
+              "version": "v6.4.30",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/config",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/console",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/css-selector",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/debug-bundle",
+              "version": "v6.4.35",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/dependency-injection",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/deprecation-contracts",
+              "version": "v3.7.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/doctrine-bridge",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/doctrine-messenger",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/dom-crawler",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/dotenv",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/error-handler",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/event-dispatcher",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/event-dispatcher-contracts",
+              "version": "v3.7.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/expression-language",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/filesystem",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/finder",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/form",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/framework-bundle",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-client",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-client-contracts",
+              "version": "v3.7.3",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-foundation",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-kernel",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/intl",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/lock",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/mailer",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/messenger",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/mime",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/monolog-bridge",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/monolog-bundle",
+              "version": "v3.11.2",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/options-resolver",
+              "version": "v6.4.30",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/password-hasher",
+              "version": "v6.4.32",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/process",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/property-access",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/property-info",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/proxy-manager-bridge",
+              "version": "v6.4.28",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/psr-http-message-bridge",
+              "version": "v6.4.32",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/routing",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-bundle",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-core",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-csrf",
+              "version": "v6.4.31",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-http",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/serializer",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/service-contracts",
+              "version": "v3.7.3",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/string",
+              "version": "v6.4.43",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/templating",
+              "version": "v6.4.24",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/translation",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/translation-contracts",
+              "version": "v3.7.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/twig-bridge",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/twig-bundle",
+              "version": "v6.4.43",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/ux-icons",
+              "version": "v2.36.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/ux-twig-component",
+              "version": "v2.36.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/validator",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/var-dumper",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/var-exporter",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/web-link",
+              "version": "v6.4.32",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/web-profiler-bundle",
+              "version": "v6.4.44",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "symfony/yaml",
+              "version": "v6.4.45",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1",
+              "dev": false
+            },
+            {
+              "name": "twig/extra-bundle",
+              "version": "v3.24.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1.0",
+              "dev": false
+            },
+            {
+              "name": "twig/string-extra",
+              "version": "v3.24.0",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1.0",
+              "dev": false
+            },
+            {
+              "name": "twig/twig",
+              "version": "v3.27.1",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.1.0",
+              "dev": false
+            }
+          ]
+        },
+        "upper_edge": {
+          "excludes": "8.3",
+          "set_by": [
+            {
+              "name": "ezyang/htmlpurifier",
+              "version": "v4.16.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0",
+              "dev": false
+            },
+            {
+              "name": "lcobucci/clock",
+              "version": "3.0.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~8.1.0 || ~8.2.0",
+              "dev": false
+            }
+          ]
+        },
+        "closest": null
+      },
+      "target": {
+        "php": "8.4.99",
+        "inside": false
+      },
+      "target_fix": {
+        "packages": [
+          {
+            "name": "ezyang/htmlpurifier",
+            "version": "v4.16.0",
+            "link": "require",
+            "target": "php",
+            "constraint": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0",
+            "dev": false
+          },
+          {
+            "name": "lcobucci/clock",
+            "version": "3.0.0",
+            "link": "require",
+            "target": "php",
+            "constraint": "~8.1.0 || ~8.2.0",
+            "dev": false
+          },
+          {
+            "name": "lcobucci/jwt",
+            "version": "5.3.0",
+            "link": "require",
+            "target": "php",
+            "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0",
+            "dev": false
+          },
+          {
+            "name": "pelago/emogrifier",
+            "version": "v7.2.0",
+            "link": "require",
+            "target": "php",
+            "constraint": "~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+            "dev": false
+          }
+        ],
+        "command": null,
+        "check": "not_checked",
+        "reason": null,
+        "held_by": [],
+        "platform_step": false
+      }
+    }
   },
   "activity_cache_oldest_at": "2026-10-14T00:00:00+00:00",
   "activity_cache_age_hours": 0,
   "packages_checked": 228,
-  "packages_flagged": 35,
+  "packages_flagged": 41,
   "packages_multi_flag": 5,
   "include_dev": false,
   "not_from_composer_repository": 2,
@@ -792,11 +2255,11 @@
   "counts": {
     "critical": 4,
     "high": 7,
-    "medium": 20,
-    "low": 4,
+    "medium": 24,
+    "low": 6,
     "unknown": 1,
     "finished": 21,
-    "ok": 171
+    "ok": 165
   },
   "abandoned": {
     "total": 4,
@@ -806,9 +2269,9 @@
   "priorities": {
     "critical": 4,
     "high": 7,
-    "medium": 20,
-    "low": 4,
-    "none": 193
+    "medium": 24,
+    "low": 6,
+    "none": 187
   },
   "flags": {
     "abandoned": {
@@ -895,6 +2358,20 @@
         "low": 4
       }
     },
+    "capped": {
+      "carrying": 6,
+      "leading": 6,
+      "accepted": {
+        "all": 0,
+        "in_graded": 0
+      },
+      "by_verdict": {
+        "critical": 0,
+        "high": 0,
+        "medium": 4,
+        "low": 2
+      }
+    },
     "vulnerable": {
       "carrying": 1,
       "leading": null,
@@ -941,11 +2418,19 @@
       "flagged": 1
     },
     {
+      "package": "league/oauth2-server",
+      "flagged": 1
+    },
+    {
       "package": "matthiasmullie/minify",
       "flagged": 1
     },
     {
       "package": "prestashop/ps_facetedsearch",
+      "flagged": 1
+    },
+    {
+      "package": "symfony/proxy-manager-bridge",
       "flagged": 1
     }
   ],
@@ -954,122 +2439,43 @@
   },
   "unattributed": [],
   "rot_depth": {
-    "flagged": 35,
-    "measured": 35,
+    "flagged": 41,
+    "measured": 41,
     "unmeasured": {
       "unreached": 0,
       "no_composer_json": 0
     },
     "by_reach": {
-      "direct": 22,
-      "transitive": 13,
+      "direct": 26,
+      "transitive": 15,
       "unreached": 0
     },
-    "not_in_composer_json": 13,
+    "not_in_composer_json": 15,
     "require_dev_not_walked": 0,
-    "production": 35,
+    "production": 41,
     "development": 0,
     "by_depth": [
       {
         "depth": 0,
-        "flagged": 22
+        "flagged": 26
       },
       {
         "depth": 1,
-        "flagged": 13
+        "flagged": 14
+      },
+      {
+        "depth": 2,
+        "flagged": 1
       }
     ],
-    "max_depth": 1,
+    "max_depth": 2,
     "deepest": [
       {
-        "package": "doctrine/annotations",
+        "package": "laminas/laminas-code",
         "chain": [
-          "doctrine/doctrine-bundle",
-          "doctrine/annotations"
-        ]
-      },
-      {
-        "package": "doctrine/collections",
-        "chain": [
-          "doctrine/orm",
-          "doctrine/collections"
-        ]
-      },
-      {
-        "package": "intervention/httpauth",
-        "chain": [
-          "mrclay/minify",
-          "intervention/httpauth"
-        ]
-      },
-      {
-        "package": "ircmaxell/security-lib",
-        "chain": [
-          "ircmaxell/random-lib",
-          "ircmaxell/security-lib"
-        ]
-      },
-      {
-        "package": "marcusschwarz/lesserphp",
-        "chain": [
-          "mrclay/minify",
-          "marcusschwarz/lesserphp"
-        ]
-      },
-      {
-        "package": "markbaker/complex",
-        "chain": [
-          "phpoffice/phpspreadsheet",
-          "markbaker/complex"
-        ]
-      },
-      {
-        "package": "markbaker/matrix",
-        "chain": [
-          "phpoffice/phpspreadsheet",
-          "markbaker/matrix"
-        ]
-      },
-      {
-        "package": "matthiasmullie/path-converter",
-        "chain": [
-          "matthiasmullie/minify",
-          "matthiasmullie/path-converter"
-        ]
-      },
-      {
-        "package": "mrclay/jsmin-php",
-        "chain": [
-          "mrclay/minify",
-          "mrclay/jsmin-php"
-        ]
-      },
-      {
-        "package": "mrclay/props-dic",
-        "chain": [
-          "mrclay/minify",
-          "mrclay/props-dic"
-        ]
-      },
-      {
-        "package": "tubalmartin/cssmin",
-        "chain": [
-          "mrclay/minify",
-          "tubalmartin/cssmin"
-        ]
-      },
-      {
-        "package": "willdurand/jsonp-callback-validator",
-        "chain": [
-          "friendsofsymfony/jsrouting-bundle",
-          "willdurand/jsonp-callback-validator"
-        ]
-      },
-      {
-        "package": "willdurand/negotiation",
-        "chain": [
-          "api-platform/core",
-          "willdurand/negotiation"
+          "symfony/proxy-manager-bridge",
+          "friendsofphp/proxy-manager-lts",
+          "laminas/laminas-code"
         ]
       }
     ]
@@ -6323,6 +7729,268 @@
       }
     },
     {
+      "package": "ezyang/htmlpurifier",
+      "version": "v4.16.0",
+      "branch": "4.x",
+      "installed_php": {
+        "requires": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0",
+        "target_runs": false,
+        "project_allows": true
+      },
+      "verdict": "medium",
+      "priority": "medium",
+      "lead": "capped",
+      "rank": 18,
+      "flags": [
+        {
+          "id": "capped",
+          "role": "lead",
+          "baseline": null,
+          "signal_ids": [
+            "S11"
+          ],
+          "degree": null,
+          "headline": {
+            "unit": "php_minor",
+            "value": "8.2",
+            "source": null
+          },
+          "summary": "requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0: it stops at 8.2, so the newest PHP, 8.5, is excluded"
+        }
+      ],
+      "score": {
+        "model": 1,
+        "total": 8,
+        "exact": 8,
+        "rounded_down": false,
+        "band": {
+          "floor": 8,
+          "next": "high",
+          "to_next": 8
+        },
+        "decided_by": "maintenance",
+        "parts": {
+          "maintenance": {
+            "status": "counted",
+            "contribution": 8,
+            "alone": {
+              "total": 8,
+              "verdict": "medium"
+            }
+          },
+          "security": {
+            "status": "clear",
+            "contribution": 0,
+            "alone": {
+              "total": 0,
+              "verdict": null
+            },
+            "of": 0,
+            "tied": []
+          }
+        },
+        "terms": [
+          {
+            "part": "maintenance",
+            "flag": "capped",
+            "role": "lead",
+            "weight": 8,
+            "divisor": 1,
+            "points": 8,
+            "contribution": 8
+          }
+        ],
+        "modifiers": [],
+        "accepted": [],
+        "without": [],
+        "text": "8 = capped 8"
+      },
+      "next_step": {
+        "kind": "update",
+        "source": "capped",
+        "merged": [],
+        "fix_kind": null,
+        "reason": null,
+        "replacement": null,
+        "quiet_years": null,
+        "to_branch": "4.x",
+        "version": "v4.19.1",
+        "newest": "v4.19.1",
+        "constraint": null,
+        "latest": null,
+        "php_check": {
+          "requires": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+          "project_allows": true,
+          "target_runs": true,
+          "raise_to": null,
+          "raise_size": null
+        },
+        "crosses_major": false,
+        "held_by": [],
+        "clears": [
+          {
+            "kind": "flag",
+            "id": "capped",
+            "basis": "admits_newest_php"
+          }
+        ],
+        "unverified": [],
+        "adds": [],
+        "leaves": [],
+        "clears_all": true,
+        "if_applied": {
+          "total": 0,
+          "verdict": "ok",
+          "lead": null,
+          "deciding_advisory": null,
+          "at_most": false,
+          "assumes": [
+            "clears_hold"
+          ]
+        },
+        "check": null,
+        "composer_moves_because": [],
+        "commands": [
+          [
+            "composer",
+            "update",
+            "ezyang/htmlpurifier"
+          ]
+        ],
+        "through": [],
+        "also": [],
+        "text": "composer update ezyang/htmlpurifier (gets v4.19.1) — clears capped"
+      },
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 4,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (https://repo.packagist.org)",
+            "registry": "packagist.org",
+            "answer": "answered",
+            "records": 4,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [],
+      "checks_skipped": [],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "read",
+        "reason": null,
+        "forge": "github",
+        "host": "github.com",
+        "repo": "ezyang/htmlpurifier",
+        "event": "push",
+        "archived": false,
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
+      },
+      "allowlist": null,
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/ezyang/htmlpurifier",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": null,
+      "libyears_at_least": false,
+      "direct": true,
+      "dev": false,
+      "reach": "direct",
+      "chain": [
+        "ezyang/htmlpurifier"
+      ],
+      "depth": 0,
+      "depth_unmeasured": null,
+      "named_in": [
+        "require"
+      ],
+      "direct_dependents": [
+        "ezyang/htmlpurifier",
+        "phpoffice/phpspreadsheet"
+      ],
+      "signals": [
+        {
+          "id": "S11",
+          "level": "warn",
+          "summary": "php \"~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0\" stops at 8.2; the newest PHP, 8.5, is excluded",
+          "data": {
+            "newest_php": "8.5",
+            "newest_php_source": "known",
+            "requires": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0",
+            "stops_at": "8.2",
+            "excludes_target": true,
+            "admits_newest": {
+              "version": "v4.19.1",
+              "branch": "4.x",
+              "blocking": null
+            }
+          }
+        }
+      ],
+      "evidence": "capped: requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0: it stops at 8.2, so the newest PHP, 8.5, is excluded",
+      "allowlist_reason": null,
+      "data_date": "2026-10-14T00:00:00+00:00",
+      "libyears": 3.99,
+      "age": {
+        "installed": {
+          "at": "2022-09-18T07:06:19+00:00",
+          "years": 4.1,
+          "dated_by": null
+        },
+        "installed_unmeasured": null,
+        "release": {
+          "version": "v4.19.1",
+          "at": "2026-09-15T15:42:51+00:00",
+          "years": 0.1,
+          "level": null,
+          "dated_by": null
+        },
+        "release_unmeasured": null,
+        "branch_release": {
+          "version": "v4.19.1",
+          "at": "2026-09-15T15:42:51+00:00",
+          "years": 0.1,
+          "level": null,
+          "dated_by": null
+        },
+        "branch_release_unmeasured": null,
+        "push": {
+          "at": "2026-10-05T14:24:02+00:00",
+          "years": 0,
+          "level": null
+        },
+        "push_unmeasured": null
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    },
+    {
       "package": "ircmaxell/password-compat",
       "version": "v1.0.4",
       "branch": "1.x",
@@ -6334,7 +8002,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "stale",
-      "rank": 18,
+      "rank": 19,
       "flags": [
         {
           "id": "stale",
@@ -6558,6 +8226,836 @@
       }
     },
     {
+      "package": "lcobucci/jwt",
+      "version": "5.3.0",
+      "branch": "5.x",
+      "installed_php": {
+        "requires": "~8.1.0 || ~8.2.0 || ~8.3.0",
+        "target_runs": false,
+        "project_allows": true
+      },
+      "verdict": "medium",
+      "priority": "medium",
+      "lead": "capped",
+      "rank": 20,
+      "flags": [
+        {
+          "id": "capped",
+          "role": "lead",
+          "baseline": null,
+          "signal_ids": [
+            "S11"
+          ],
+          "degree": null,
+          "headline": {
+            "unit": "php_minor",
+            "value": "8.3",
+            "source": null
+          },
+          "summary": "requires php ~8.1.0 || ~8.2.0 || ~8.3.0: it stops at 8.3, so the newest PHP, 8.5, is excluded"
+        }
+      ],
+      "score": {
+        "model": 1,
+        "total": 8,
+        "exact": 8,
+        "rounded_down": false,
+        "band": {
+          "floor": 8,
+          "next": "high",
+          "to_next": 8
+        },
+        "decided_by": "maintenance",
+        "parts": {
+          "maintenance": {
+            "status": "counted",
+            "contribution": 8,
+            "alone": {
+              "total": 8,
+              "verdict": "medium"
+            }
+          },
+          "security": {
+            "status": "clear",
+            "contribution": 0,
+            "alone": {
+              "total": 0,
+              "verdict": null
+            },
+            "of": 0,
+            "tied": []
+          }
+        },
+        "terms": [
+          {
+            "part": "maintenance",
+            "flag": "capped",
+            "role": "lead",
+            "weight": 8,
+            "divisor": 1,
+            "points": 8,
+            "contribution": 8
+          }
+        ],
+        "modifiers": [],
+        "accepted": [],
+        "without": [],
+        "text": "8 = capped 8"
+      },
+      "next_step": {
+        "kind": "raise-php",
+        "source": "capped",
+        "merged": [],
+        "fix_kind": null,
+        "reason": null,
+        "replacement": null,
+        "quiet_years": null,
+        "to_branch": "5.x",
+        "version": "5.6.1",
+        "newest": "5.6.1",
+        "constraint": "^5.6.1",
+        "latest": null,
+        "php_check": {
+          "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+          "project_allows": false,
+          "target_runs": true,
+          "raise_to": ">=8.2",
+          "raise_size": "minor"
+        },
+        "crosses_major": false,
+        "held_by": [],
+        "clears": [
+          {
+            "kind": "flag",
+            "id": "capped",
+            "basis": "admits_newest_php"
+          }
+        ],
+        "unverified": [],
+        "adds": [],
+        "leaves": [],
+        "clears_all": true,
+        "if_applied": {
+          "total": 0,
+          "verdict": "ok",
+          "lead": null,
+          "deciding_advisory": null,
+          "at_most": false,
+          "assumes": [
+            "clears_hold"
+          ]
+        },
+        "check": null,
+        "composer_moves_because": [],
+        "commands": [
+          [
+            "composer",
+            "require",
+            "php:>=8.2",
+            "--no-update"
+          ],
+          [
+            "composer",
+            "require",
+            "lcobucci/jwt:^5.6.1"
+          ]
+        ],
+        "through": [],
+        "also": [],
+        "text": "raise require.php to >=8.2, then require lcobucci/jwt ^5.6.1 — clears capped; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 8.1 (a minor raise); the target php 8.4 runs it"
+      },
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 1,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (https://repo.packagist.org)",
+            "registry": "packagist.org",
+            "answer": "answered",
+            "records": 1,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [],
+      "checks_skipped": [],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "read",
+        "reason": null,
+        "forge": "github",
+        "host": "github.com",
+        "repo": "lcobucci/jwt",
+        "event": "push",
+        "archived": false,
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
+      },
+      "allowlist": null,
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/lcobucci/jwt",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": null,
+      "libyears_at_least": false,
+      "direct": true,
+      "dev": false,
+      "reach": "direct",
+      "chain": [
+        "lcobucci/jwt"
+      ],
+      "depth": 0,
+      "depth_unmeasured": null,
+      "named_in": [
+        "require"
+      ],
+      "direct_dependents": [
+        "lcobucci/jwt",
+        "league/oauth2-server"
+      ],
+      "signals": [
+        {
+          "id": "S11",
+          "level": "warn",
+          "summary": "php \"~8.1.0 || ~8.2.0 || ~8.3.0\" stops at 8.3; the newest PHP, 8.5, is excluded",
+          "data": {
+            "newest_php": "8.5",
+            "newest_php_source": "known",
+            "requires": "~8.1.0 || ~8.2.0 || ~8.3.0",
+            "stops_at": "8.3",
+            "excludes_target": true,
+            "admits_newest": {
+              "version": "5.6.1",
+              "branch": "5.x",
+              "blocking": "project"
+            }
+          }
+        }
+      ],
+      "evidence": "capped: requires php ~8.1.0 || ~8.2.0 || ~8.3.0: it stops at 8.3, so the newest PHP, 8.5, is excluded",
+      "allowlist_reason": null,
+      "data_date": "2026-10-14T00:00:00+00:00",
+      "libyears": 2.5,
+      "age": {
+        "installed": {
+          "at": "2024-04-11T23:07:54+00:00",
+          "years": 2.5,
+          "dated_by": null
+        },
+        "installed_unmeasured": null,
+        "release": {
+          "version": "5.6.1",
+          "at": "2026-10-10T09:42:14+00:00",
+          "years": 0,
+          "level": null,
+          "dated_by": null
+        },
+        "release_unmeasured": null,
+        "branch_release": {
+          "version": "5.6.1",
+          "at": "2026-10-10T09:42:14+00:00",
+          "years": 0,
+          "level": null,
+          "dated_by": null
+        },
+        "branch_release_unmeasured": null,
+        "push": {
+          "at": "2026-10-14T00:29:47+00:00",
+          "years": 0,
+          "level": null
+        },
+        "push_unmeasured": null
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    },
+    {
+      "package": "pelago/emogrifier",
+      "version": "v7.2.0",
+      "branch": "7.x",
+      "installed_php": {
+        "requires": "~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+        "target_runs": false,
+        "project_allows": true
+      },
+      "verdict": "medium",
+      "priority": "medium",
+      "lead": "capped",
+      "rank": 21,
+      "flags": [
+        {
+          "id": "capped",
+          "role": "lead",
+          "baseline": null,
+          "signal_ids": [
+            "S11"
+          ],
+          "degree": null,
+          "headline": {
+            "unit": "php_minor",
+            "value": "8.3",
+            "source": null
+          },
+          "summary": "requires php ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0: it stops at 8.3, so the newest PHP, 8.5, is excluded"
+        }
+      ],
+      "score": {
+        "model": 1,
+        "total": 8,
+        "exact": 8,
+        "rounded_down": false,
+        "band": {
+          "floor": 8,
+          "next": "high",
+          "to_next": 8
+        },
+        "decided_by": "maintenance",
+        "parts": {
+          "maintenance": {
+            "status": "counted",
+            "contribution": 8,
+            "alone": {
+              "total": 8,
+              "verdict": "medium"
+            }
+          },
+          "security": {
+            "status": "clear",
+            "contribution": 0,
+            "alone": {
+              "total": 0,
+              "verdict": null
+            },
+            "of": 0,
+            "tied": []
+          }
+        },
+        "terms": [
+          {
+            "part": "maintenance",
+            "flag": "capped",
+            "role": "lead",
+            "weight": 8,
+            "divisor": 1,
+            "points": 8,
+            "contribution": 8
+          }
+        ],
+        "modifiers": [],
+        "accepted": [],
+        "without": [],
+        "text": "8 = capped 8"
+      },
+      "next_step": {
+        "kind": "require",
+        "source": "capped",
+        "merged": [],
+        "fix_kind": null,
+        "reason": null,
+        "replacement": null,
+        "quiet_years": null,
+        "to_branch": "8.x",
+        "version": "v8.3.0",
+        "newest": "v8.3.0",
+        "constraint": "^8.3.0",
+        "latest": null,
+        "php_check": {
+          "requires": "^7.3.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 || ~8.6.0",
+          "project_allows": true,
+          "target_runs": true,
+          "raise_to": null,
+          "raise_size": null
+        },
+        "crosses_major": true,
+        "held_by": [],
+        "clears": [
+          {
+            "kind": "flag",
+            "id": "capped",
+            "basis": "admits_newest_php"
+          }
+        ],
+        "unverified": [],
+        "adds": [],
+        "leaves": [],
+        "clears_all": true,
+        "if_applied": {
+          "total": 0,
+          "verdict": "ok",
+          "lead": null,
+          "deciding_advisory": null,
+          "at_most": false,
+          "assumes": [
+            "clears_hold",
+            "composer_resolves"
+          ]
+        },
+        "check": null,
+        "composer_moves_because": [
+          "crosses_major"
+        ],
+        "commands": [
+          [
+            "composer",
+            "require",
+            "pelago/emogrifier:^8.3.0"
+          ]
+        ],
+        "through": [],
+        "also": [],
+        "text": "require pelago/emogrifier ^8.3.0 — clears capped; 8.x needs php ^7.3.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 || ~8.6.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+      },
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 0,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (https://repo.packagist.org)",
+            "registry": "packagist.org",
+            "answer": "answered",
+            "records": 0,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [],
+      "checks_skipped": [],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "read",
+        "reason": null,
+        "forge": "github",
+        "host": "github.com",
+        "repo": "MyIntervals/emogrifier",
+        "event": "push",
+        "archived": false,
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
+      },
+      "allowlist": null,
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/pelago/emogrifier",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": null,
+      "libyears_at_least": false,
+      "direct": true,
+      "dev": false,
+      "reach": "direct",
+      "chain": [
+        "pelago/emogrifier"
+      ],
+      "depth": 0,
+      "depth_unmeasured": null,
+      "named_in": [
+        "require"
+      ],
+      "direct_dependents": [
+        "pelago/emogrifier"
+      ],
+      "signals": [
+        {
+          "id": "S11",
+          "level": "warn",
+          "summary": "php \"~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0\" stops at 8.3; the newest PHP, 8.5, is excluded",
+          "data": {
+            "newest_php": "8.5",
+            "newest_php_source": "known",
+            "requires": "~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+            "stops_at": "8.3",
+            "excludes_target": true,
+            "admits_newest": {
+              "version": "v8.3.0",
+              "branch": "8.x",
+              "blocking": null
+            }
+          }
+        }
+      ],
+      "evidence": "capped: requires php ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0: it stops at 8.3, so the newest PHP, 8.5, is excluded",
+      "allowlist_reason": null,
+      "data_date": "2026-10-14T00:00:00+00:00",
+      "libyears": 2.85,
+      "age": {
+        "installed": {
+          "at": "2023-12-06T02:00:20+00:00",
+          "years": 2.9,
+          "dated_by": null
+        },
+        "installed_unmeasured": null,
+        "release": {
+          "version": "v8.3.0",
+          "at": "2026-10-11T12:29:58+00:00",
+          "years": 0,
+          "level": null,
+          "dated_by": null
+        },
+        "release_unmeasured": null,
+        "branch_release": {
+          "version": "v7.3.0",
+          "at": "2024-10-28T16:12:26+00:00",
+          "years": 2,
+          "level": null,
+          "dated_by": null
+        },
+        "branch_release_unmeasured": null,
+        "push": {
+          "at": "2026-10-11T23:16:14+00:00",
+          "years": 0,
+          "level": null
+        },
+        "push_unmeasured": null
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    },
+    {
+      "package": "phpoffice/phpspreadsheet",
+      "version": "1.30.6",
+      "branch": "1.x",
+      "installed_php": {
+        "requires": ">=7.4.0 <8.5.0",
+        "target_runs": true,
+        "project_allows": true
+      },
+      "verdict": "medium",
+      "priority": "medium",
+      "lead": "capped",
+      "rank": 22,
+      "flags": [
+        {
+          "id": "capped",
+          "role": "lead",
+          "baseline": null,
+          "signal_ids": [
+            "S11"
+          ],
+          "degree": null,
+          "headline": {
+            "unit": "php_minor",
+            "value": "8.4",
+            "source": null
+          },
+          "summary": "requires php >=7.4.0 <8.5.0: it stops at 8.4, so the newest PHP, 8.5, is excluded"
+        }
+      ],
+      "score": {
+        "model": 1,
+        "total": 8,
+        "exact": 8,
+        "rounded_down": false,
+        "band": {
+          "floor": 8,
+          "next": "high",
+          "to_next": 8
+        },
+        "decided_by": "maintenance",
+        "parts": {
+          "maintenance": {
+            "status": "counted",
+            "contribution": 8,
+            "alone": {
+              "total": 8,
+              "verdict": "medium"
+            }
+          },
+          "security": {
+            "status": "clear",
+            "contribution": 0,
+            "alone": {
+              "total": 0,
+              "verdict": null
+            },
+            "of": 0,
+            "tied": []
+          }
+        },
+        "terms": [
+          {
+            "part": "maintenance",
+            "flag": "capped",
+            "role": "lead",
+            "weight": 8,
+            "divisor": 1,
+            "points": 8,
+            "contribution": 8
+          }
+        ],
+        "modifiers": [],
+        "accepted": [],
+        "without": [],
+        "text": "8 = capped 8"
+      },
+      "next_step": {
+        "kind": "require",
+        "source": "capped",
+        "merged": [],
+        "fix_kind": null,
+        "reason": null,
+        "replacement": null,
+        "quiet_years": null,
+        "to_branch": "2.x",
+        "version": "2.4.8",
+        "newest": "2.4.8",
+        "constraint": "^2.4.8",
+        "latest": null,
+        "php_check": {
+          "requires": ">=8.1.0 <8.6.0",
+          "project_allows": true,
+          "target_runs": true,
+          "raise_to": null,
+          "raise_size": null
+        },
+        "crosses_major": true,
+        "held_by": [],
+        "clears": [
+          {
+            "kind": "flag",
+            "id": "capped",
+            "basis": "admits_newest_php"
+          }
+        ],
+        "unverified": [],
+        "adds": [],
+        "leaves": [],
+        "clears_all": true,
+        "if_applied": {
+          "total": 0,
+          "verdict": "ok",
+          "lead": null,
+          "deciding_advisory": null,
+          "at_most": false,
+          "assumes": [
+            "clears_hold",
+            "composer_resolves"
+          ]
+        },
+        "check": null,
+        "composer_moves_because": [
+          "crosses_major"
+        ],
+        "commands": [
+          [
+            "composer",
+            "require",
+            "phpoffice/phpspreadsheet:^2.4.8"
+          ]
+        ],
+        "through": [],
+        "also": [],
+        "text": "require phpoffice/phpspreadsheet ^2.4.8 — clears capped; 2.x needs php >=8.1.0 <8.6.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+      },
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 31,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (https://repo.packagist.org)",
+            "registry": "packagist.org",
+            "answer": "answered",
+            "records": 31,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [],
+      "checks_skipped": [],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "read",
+        "reason": null,
+        "forge": "github",
+        "host": "github.com",
+        "repo": "PHPOffice/PhpSpreadsheet",
+        "event": "push",
+        "archived": false,
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
+      },
+      "allowlist": null,
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/phpoffice/phpspreadsheet",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": null,
+      "libyears_at_least": false,
+      "direct": true,
+      "dev": false,
+      "reach": "direct",
+      "chain": [
+        "phpoffice/phpspreadsheet"
+      ],
+      "depth": 0,
+      "depth_unmeasured": null,
+      "named_in": [
+        "require"
+      ],
+      "direct_dependents": [
+        "phpoffice/phpspreadsheet"
+      ],
+      "signals": [
+        {
+          "id": "S7",
+          "level": "info",
+          "summary": "pulls in 2 flagged packages: markbaker/complex (stale), markbaker/matrix (stale)",
+          "data": {
+            "flagged": 2,
+            "packages": [
+              {
+                "package": "markbaker/complex",
+                "chain": [
+                  "phpoffice/phpspreadsheet",
+                  "markbaker/complex"
+                ],
+                "verdict": "low",
+                "lead": "stale",
+                "flag_ids": [
+                  "stale"
+                ]
+              },
+              {
+                "package": "markbaker/matrix",
+                "chain": [
+                  "phpoffice/phpspreadsheet",
+                  "markbaker/matrix"
+                ],
+                "verdict": "low",
+                "lead": "stale",
+                "flag_ids": [
+                  "stale"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "S11",
+          "level": "warn",
+          "summary": "php \">=7.4.0 <8.5.0\" stops at 8.4; the newest PHP, 8.5, is excluded",
+          "data": {
+            "newest_php": "8.5",
+            "newest_php_source": "known",
+            "requires": ">=7.4.0 <8.5.0",
+            "stops_at": "8.4",
+            "excludes_target": false,
+            "admits_newest": {
+              "version": "2.4.8",
+              "branch": "2.x",
+              "blocking": null
+            }
+          }
+        }
+      ],
+      "evidence": "capped: requires php >=7.4.0 <8.5.0: it stops at 8.4, so the newest PHP, 8.5, is excluded",
+      "allowlist_reason": null,
+      "data_date": "2026-10-14T00:00:00+00:00",
+      "libyears": 0.18,
+      "age": {
+        "installed": {
+          "at": "2026-07-12T19:59:31+00:00",
+          "years": 0.3,
+          "dated_by": null
+        },
+        "installed_unmeasured": null,
+        "release": {
+          "version": "3.10.8",
+          "at": "2026-09-17T04:27:19+00:00",
+          "years": 0.1,
+          "level": null,
+          "dated_by": null
+        },
+        "release_unmeasured": null,
+        "branch_release": {
+          "version": "1.30.7",
+          "at": "2026-09-17T03:56:23+00:00",
+          "years": 0.1,
+          "level": null,
+          "dated_by": null
+        },
+        "branch_release_unmeasured": null,
+        "push": {
+          "at": "2026-10-12T20:19:37+00:00",
+          "years": 0,
+          "level": null
+        },
+        "push_unmeasured": null
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    },
+    {
       "package": "prestashop/decimal",
       "version": "1.5.0",
       "branch": "1.x",
@@ -6569,7 +9067,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "stale",
-      "rank": 19,
+      "rank": 23,
       "flags": [
         {
           "id": "stale",
@@ -6818,7 +9316,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "stale",
-      "rank": 20,
+      "rank": 24,
       "flags": [
         {
           "id": "stale",
@@ -7053,7 +9551,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "stale",
-      "rank": 21,
+      "rank": 25,
       "flags": [
         {
           "id": "stale",
@@ -7288,7 +9786,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "stale",
-      "rank": 22,
+      "rank": 26,
       "flags": [
         {
           "id": "stale",
@@ -7523,7 +10021,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "stale",
-      "rank": 23,
+      "rank": 27,
       "flags": [
         {
           "id": "stale",
@@ -7758,7 +10256,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "stale",
-      "rank": 24,
+      "rank": 28,
       "flags": [
         {
           "id": "stale",
@@ -7993,7 +10491,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "stale",
-      "rank": 25,
+      "rank": 29,
       "flags": [
         {
           "id": "stale",
@@ -8228,7 +10726,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "stale",
-      "rank": 26,
+      "rank": 30,
       "flags": [
         {
           "id": "stale",
@@ -8463,7 +10961,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "stale",
-      "rank": 27,
+      "rank": 31,
       "flags": [
         {
           "id": "stale",
@@ -8698,7 +11196,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "stale",
-      "rank": 28,
+      "rank": 32,
       "flags": [
         {
           "id": "stale",
@@ -8933,7 +11431,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "left-behind",
-      "rank": 29,
+      "rank": 33,
       "flags": [
         {
           "id": "left-behind",
@@ -9248,7 +11746,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "left-behind",
-      "rank": 30,
+      "rank": 34,
       "flags": [
         {
           "id": "left-behind",
@@ -9543,7 +12041,7 @@
       "verdict": "medium",
       "priority": "medium",
       "lead": "left-behind",
-      "rank": 31,
+      "rank": 35,
       "flags": [
         {
           "id": "left-behind",
@@ -9823,6 +12321,581 @@
       }
     },
     {
+      "package": "laminas/laminas-code",
+      "version": "4.16.0",
+      "branch": "4.x",
+      "installed_php": {
+        "requires": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+        "target_runs": true,
+        "project_allows": true
+      },
+      "verdict": "low",
+      "priority": "low",
+      "lead": "capped",
+      "rank": 36,
+      "flags": [
+        {
+          "id": "capped",
+          "role": "lead",
+          "baseline": null,
+          "signal_ids": [
+            "S11"
+          ],
+          "degree": null,
+          "headline": {
+            "unit": "php_minor",
+            "value": "8.4",
+            "source": null
+          },
+          "summary": "requires php ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded"
+        }
+      ],
+      "score": {
+        "model": 1,
+        "total": 4,
+        "exact": 4,
+        "rounded_down": false,
+        "band": {
+          "floor": 1,
+          "next": "medium",
+          "to_next": 4
+        },
+        "decided_by": "maintenance",
+        "parts": {
+          "maintenance": {
+            "status": "counted",
+            "contribution": 4,
+            "alone": {
+              "total": 4,
+              "verdict": "low"
+            }
+          },
+          "security": {
+            "status": "clear",
+            "contribution": 0,
+            "alone": {
+              "total": 0,
+              "verdict": null
+            },
+            "of": 0,
+            "tied": []
+          }
+        },
+        "terms": [
+          {
+            "part": "maintenance",
+            "flag": "capped",
+            "role": "lead",
+            "weight": 8,
+            "divisor": 1,
+            "points": 8,
+            "contribution": 4
+          }
+        ],
+        "modifiers": [
+          {
+            "reason": "transitive",
+            "applies_to": "maintenance",
+            "divide_by": 2,
+            "before": 8,
+            "after": 4
+          }
+        ],
+        "accepted": [],
+        "without": [],
+        "text": "4 = capped 8 ÷ 2 transitive"
+      },
+      "next_step": {
+        "kind": "raise-php",
+        "source": "capped",
+        "merged": [],
+        "fix_kind": null,
+        "reason": null,
+        "replacement": null,
+        "quiet_years": null,
+        "to_branch": "4.x",
+        "version": "4.17.0",
+        "newest": "4.17.0",
+        "constraint": "^4.17.0",
+        "latest": null,
+        "php_check": {
+          "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+          "project_allows": false,
+          "target_runs": true,
+          "raise_to": ">=8.2",
+          "raise_size": "minor"
+        },
+        "crosses_major": false,
+        "held_by": [],
+        "clears": [
+          {
+            "kind": "flag",
+            "id": "capped",
+            "basis": "admits_newest_php"
+          }
+        ],
+        "unverified": [],
+        "adds": [],
+        "leaves": [],
+        "clears_all": true,
+        "if_applied": {
+          "total": 0,
+          "verdict": "ok",
+          "lead": null,
+          "deciding_advisory": null,
+          "at_most": false,
+          "assumes": [
+            "clears_hold",
+            "composer_resolves"
+          ]
+        },
+        "check": null,
+        "composer_moves_because": [
+          "transitive"
+        ],
+        "commands": [
+          [
+            "composer",
+            "require",
+            "php:>=8.2",
+            "--no-update"
+          ]
+        ],
+        "through": [
+          {
+            "package": "symfony/proxy-manager-bridge",
+            "installed_version": "v6.4.28",
+            "installed_requires": false,
+            "newest_stable": {
+              "version": "v6.4.28",
+              "released": "2025-11-02T18:11:54+00:00"
+            },
+            "newest_requires": null,
+            "newest_requires_unmeasured": "through_other_package"
+          }
+        ],
+        "also": [],
+        "text": "raise require.php to >=8.2, then move laminas/laminas-code to ^4.17.0 through symfony/proxy-manager-bridge — clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; what requires it must allow it"
+      },
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 0,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (https://repo.packagist.org)",
+            "registry": "packagist.org",
+            "answer": "answered",
+            "records": 0,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [],
+      "checks_skipped": [],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "read",
+        "reason": null,
+        "forge": "github",
+        "host": "github.com",
+        "repo": "laminas/laminas-code",
+        "event": "push",
+        "archived": false,
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
+      },
+      "allowlist": null,
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/laminas/laminas-code",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": null,
+      "libyears_at_least": false,
+      "direct": false,
+      "dev": false,
+      "reach": "transitive",
+      "chain": [
+        "symfony/proxy-manager-bridge",
+        "friendsofphp/proxy-manager-lts",
+        "laminas/laminas-code"
+      ],
+      "depth": 2,
+      "depth_unmeasured": null,
+      "named_in": [],
+      "direct_dependents": [
+        "symfony/proxy-manager-bridge"
+      ],
+      "signals": [
+        {
+          "id": "S11",
+          "level": "warn",
+          "summary": "php \"~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0\" stops at 8.4; the newest PHP, 8.5, is excluded",
+          "data": {
+            "newest_php": "8.5",
+            "newest_php_source": "known",
+            "requires": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+            "stops_at": "8.4",
+            "excludes_target": false,
+            "admits_newest": {
+              "version": "4.17.0",
+              "branch": "4.x",
+              "blocking": "project"
+            }
+          }
+        }
+      ],
+      "evidence": "capped: requires php ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded",
+      "allowlist_reason": null,
+      "data_date": "2026-10-14T00:00:00+00:00",
+      "libyears": 0.95,
+      "age": {
+        "installed": {
+          "at": "2024-11-20T13:15:13+00:00",
+          "years": 1.9,
+          "dated_by": null
+        },
+        "installed_unmeasured": null,
+        "release": {
+          "version": "4.17.0",
+          "at": "2025-11-01T09:38:14+00:00",
+          "years": 0.9,
+          "level": null,
+          "dated_by": null
+        },
+        "release_unmeasured": null,
+        "branch_release": {
+          "version": "4.17.0",
+          "at": "2025-11-01T09:38:14+00:00",
+          "years": 0.9,
+          "level": null,
+          "dated_by": null
+        },
+        "branch_release_unmeasured": null,
+        "push": {
+          "at": "2026-10-12T04:24:47+00:00",
+          "years": 0,
+          "level": null
+        },
+        "push_unmeasured": null
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    },
+    {
+      "package": "lcobucci/clock",
+      "version": "3.0.0",
+      "branch": "3.x",
+      "installed_php": {
+        "requires": "~8.1.0 || ~8.2.0",
+        "target_runs": false,
+        "project_allows": true
+      },
+      "verdict": "low",
+      "priority": "low",
+      "lead": "capped",
+      "rank": 37,
+      "flags": [
+        {
+          "id": "capped",
+          "role": "lead",
+          "baseline": null,
+          "signal_ids": [
+            "S11"
+          ],
+          "degree": null,
+          "headline": {
+            "unit": "php_minor",
+            "value": "8.2",
+            "source": null
+          },
+          "summary": "requires php ~8.1.0 || ~8.2.0: it stops at 8.2, so the newest PHP, 8.5, is excluded"
+        }
+      ],
+      "score": {
+        "model": 1,
+        "total": 4,
+        "exact": 4,
+        "rounded_down": false,
+        "band": {
+          "floor": 1,
+          "next": "medium",
+          "to_next": 4
+        },
+        "decided_by": "maintenance",
+        "parts": {
+          "maintenance": {
+            "status": "counted",
+            "contribution": 4,
+            "alone": {
+              "total": 4,
+              "verdict": "low"
+            }
+          },
+          "security": {
+            "status": "clear",
+            "contribution": 0,
+            "alone": {
+              "total": 0,
+              "verdict": null
+            },
+            "of": 0,
+            "tied": []
+          }
+        },
+        "terms": [
+          {
+            "part": "maintenance",
+            "flag": "capped",
+            "role": "lead",
+            "weight": 8,
+            "divisor": 1,
+            "points": 8,
+            "contribution": 4
+          }
+        ],
+        "modifiers": [
+          {
+            "reason": "transitive",
+            "applies_to": "maintenance",
+            "divide_by": 2,
+            "before": 8,
+            "after": 4
+          }
+        ],
+        "accepted": [],
+        "without": [],
+        "text": "4 = capped 8 ÷ 2 transitive"
+      },
+      "next_step": {
+        "kind": "raise-php",
+        "source": "capped",
+        "merged": [],
+        "fix_kind": null,
+        "reason": null,
+        "replacement": null,
+        "quiet_years": null,
+        "to_branch": "3.x",
+        "version": "3.6.0",
+        "newest": "3.6.0",
+        "constraint": "^3.6.0",
+        "latest": null,
+        "php_check": {
+          "requires": "~8.4.0 || ~8.5.0",
+          "project_allows": false,
+          "target_runs": true,
+          "raise_to": ">=8.4",
+          "raise_size": "minor"
+        },
+        "crosses_major": false,
+        "held_by": [],
+        "clears": [
+          {
+            "kind": "flag",
+            "id": "capped",
+            "basis": "admits_newest_php"
+          }
+        ],
+        "unverified": [],
+        "adds": [],
+        "leaves": [],
+        "clears_all": true,
+        "if_applied": {
+          "total": 0,
+          "verdict": "ok",
+          "lead": null,
+          "deciding_advisory": null,
+          "at_most": false,
+          "assumes": [
+            "clears_hold",
+            "composer_resolves"
+          ]
+        },
+        "check": null,
+        "composer_moves_because": [
+          "transitive"
+        ],
+        "commands": [
+          [
+            "composer",
+            "require",
+            "php:>=8.4",
+            "--no-update"
+          ],
+          [
+            "composer",
+            "why-not",
+            "league/oauth2-server",
+            "9.4.1"
+          ]
+        ],
+        "through": [
+          {
+            "package": "league/oauth2-server",
+            "installed_version": "8.5.5",
+            "installed_requires": true,
+            "newest_stable": {
+              "version": "9.4.1",
+              "released": "2026-06-25T15:24:07+00:00"
+            },
+            "newest_requires": false,
+            "newest_requires_unmeasured": null
+          }
+        ],
+        "also": [],
+        "text": "raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through league/oauth2-server — clears capped; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; what requires it must allow it; the newest release of league/oauth2-server (9.4.1) no longer requires it"
+      },
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 0,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (https://repo.packagist.org)",
+            "registry": "packagist.org",
+            "answer": "answered",
+            "records": 0,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [],
+      "checks_skipped": [],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "read",
+        "reason": null,
+        "forge": "github",
+        "host": "github.com",
+        "repo": "lcobucci/clock",
+        "event": "push",
+        "archived": false,
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
+      },
+      "allowlist": null,
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/lcobucci/clock",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": null,
+      "libyears_at_least": false,
+      "direct": false,
+      "dev": false,
+      "reach": "transitive",
+      "chain": [
+        "league/oauth2-server",
+        "lcobucci/clock"
+      ],
+      "depth": 1,
+      "depth_unmeasured": null,
+      "named_in": [],
+      "direct_dependents": [
+        "league/oauth2-server"
+      ],
+      "signals": [
+        {
+          "id": "S11",
+          "level": "warn",
+          "summary": "php \"~8.1.0 || ~8.2.0\" stops at 8.2; the newest PHP, 8.5, is excluded",
+          "data": {
+            "newest_php": "8.5",
+            "newest_php_source": "known",
+            "requires": "~8.1.0 || ~8.2.0",
+            "stops_at": "8.2",
+            "excludes_target": true,
+            "admits_newest": {
+              "version": "3.6.0",
+              "branch": "3.x",
+              "blocking": "project"
+            }
+          }
+        }
+      ],
+      "evidence": "capped: requires php ~8.1.0 || ~8.2.0: it stops at 8.2, so the newest PHP, 8.5, is excluded",
+      "allowlist_reason": null,
+      "data_date": "2026-10-14T00:00:00+00:00",
+      "libyears": 3.32,
+      "age": {
+        "installed": {
+          "at": "2022-12-19T15:00:24+00:00",
+          "years": 3.8,
+          "dated_by": null
+        },
+        "installed_unmeasured": null,
+        "release": {
+          "version": "3.6.0",
+          "at": "2026-04-13T21:30:16+00:00",
+          "years": 0.5,
+          "level": null,
+          "dated_by": null
+        },
+        "release_unmeasured": null,
+        "branch_release": {
+          "version": "3.6.0",
+          "at": "2026-04-13T21:30:16+00:00",
+          "years": 0.5,
+          "level": null,
+          "dated_by": null
+        },
+        "branch_release_unmeasured": null,
+        "push": {
+          "at": "2026-10-09T01:44:55+00:00",
+          "years": 0,
+          "level": null
+        },
+        "push_unmeasured": null
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    },
+    {
       "package": "markbaker/complex",
       "version": "3.0.2",
       "branch": "3.x",
@@ -9834,7 +12907,7 @@
       "verdict": "low",
       "priority": "low",
       "lead": "stale",
-      "rank": 32,
+      "rank": 38,
       "flags": [
         {
           "id": "stale",
@@ -10102,7 +13175,7 @@
       "verdict": "low",
       "priority": "low",
       "lead": "stale",
-      "rank": 33,
+      "rank": 39,
       "flags": [
         {
           "id": "stale",
@@ -10356,7 +13429,7 @@
       "verdict": "low",
       "priority": "low",
       "lead": "stale",
-      "rank": 34,
+      "rank": 40,
       "flags": [
         {
           "id": "stale",
@@ -10624,7 +13697,7 @@
       "verdict": "low",
       "priority": "low",
       "lead": "stale",
-      "rank": 35,
+      "rank": 41,
       "flags": [
         {
           "id": "stale",
@@ -10892,7 +13965,7 @@
       "verdict": "unknown",
       "priority": "none",
       "lead": null,
-      "rank": 36,
+      "rank": 42,
       "flags": [],
       "score": {
         "model": 1,
@@ -11057,7 +14130,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 37,
+      "rank": 43,
       "flags": [],
       "score": {
         "model": 1,
@@ -11213,7 +14286,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 38,
+      "rank": 44,
       "flags": [],
       "score": {
         "model": 1,
@@ -11345,7 +14418,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 39,
+      "rank": 45,
       "flags": [],
       "score": {
         "model": 1,
@@ -11478,7 +14551,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 40,
+      "rank": 46,
       "flags": [],
       "score": {
         "model": 1,
@@ -11610,7 +14683,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 41,
+      "rank": 47,
       "flags": [],
       "score": {
         "model": 1,
@@ -11765,7 +14838,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 42,
+      "rank": 48,
       "flags": [],
       "score": {
         "model": 1,
@@ -11910,139 +14983,6 @@
       }
     },
     {
-      "package": "ezyang/htmlpurifier",
-      "version": "v4.16.0",
-      "branch": "4.x",
-      "installed_php": {
-        "requires": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0",
-        "target_runs": false,
-        "project_allows": true
-      },
-      "verdict": "ok",
-      "priority": "none",
-      "lead": null,
-      "rank": 43,
-      "flags": [],
-      "score": {
-        "model": 1,
-        "total": 0,
-        "exact": 0,
-        "accepted": [],
-        "text": "0"
-      },
-      "next_step": null,
-      "security": {
-        "status": "clear",
-        "check": "complete",
-        "complete": true,
-        "unchecked_reason": null,
-        "records": 4,
-        "feeds": [
-          {
-            "composer_repository": "composer repo (https://repo.packagist.org)",
-            "registry": "packagist.org",
-            "answer": "answered",
-            "records": 4,
-            "reason": null
-          }
-        ],
-        "ignored": [],
-        "ignored_count": 0
-      },
-      "checks_missing": [],
-      "checks_skipped": [],
-      "unchecked_accepted": [],
-      "maintenance_judged": true,
-      "metadata": {
-        "status": "read",
-        "reason": null,
-        "message": null
-      },
-      "activity": {
-        "status": "read",
-        "reason": null,
-        "forge": "github",
-        "host": "github.com",
-        "repo": "ezyang/htmlpurifier",
-        "event": "push",
-        "archived": false,
-        "fetched_at": "2026-10-14T00:00:00+00:00",
-        "cached_at": "2026-10-14T00:00:00+00:00"
-      },
-      "allowlist": null,
-      "abandoned_ignored": null,
-      "from_composer_repository": true,
-      "origin": {
-        "kind": "packagist",
-        "registry": "packagist.org",
-        "package_url": "https://packagist.org/packages/ezyang/htmlpurifier",
-        "local": false
-      },
-      "replacement": null,
-      "replacement_url": null,
-      "note": null,
-      "libyears_unmeasured": null,
-      "libyears_at_least": false,
-      "direct": true,
-      "dev": false,
-      "reach": "direct",
-      "chain": [
-        "ezyang/htmlpurifier"
-      ],
-      "depth": 0,
-      "depth_unmeasured": null,
-      "named_in": [
-        "require"
-      ],
-      "direct_dependents": [
-        "ezyang/htmlpurifier",
-        "phpoffice/phpspreadsheet"
-      ],
-      "signals": [],
-      "evidence": "",
-      "allowlist_reason": null,
-      "data_date": "2026-10-14T00:00:00+00:00",
-      "libyears": 3.99,
-      "age": {
-        "installed": {
-          "at": "2022-09-18T07:06:19+00:00",
-          "years": 4.1,
-          "dated_by": null
-        },
-        "installed_unmeasured": null,
-        "release": {
-          "version": "v4.19.1",
-          "at": "2026-09-15T15:42:51+00:00",
-          "years": 0.1,
-          "level": null,
-          "dated_by": null
-        },
-        "release_unmeasured": null,
-        "branch_release": {
-          "version": "v4.19.1",
-          "at": "2026-09-15T15:42:51+00:00",
-          "years": 0.1,
-          "level": null,
-          "dated_by": null
-        },
-        "branch_release_unmeasured": null,
-        "push": {
-          "at": "2026-10-05T14:24:02+00:00",
-          "years": 0,
-          "level": null
-        },
-        "push_unmeasured": null
-      },
-      "baseline": null,
-      "gate": {
-        "reaches_fail_on": false,
-        "fails": false,
-        "exempt_by": null,
-        "by": [],
-        "basis": null
-      }
-    },
-    {
       "package": "friendsofsymfony/jsrouting-bundle",
       "version": "3.5.2",
       "branch": "3.x",
@@ -12054,7 +14994,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 44,
+      "rank": 49,
       "flags": [],
       "score": {
         "model": 1,
@@ -12210,7 +15150,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 45,
+      "rank": 50,
       "flags": [],
       "score": {
         "model": 1,
@@ -12331,139 +15271,6 @@
       }
     },
     {
-      "package": "lcobucci/jwt",
-      "version": "5.3.0",
-      "branch": "5.x",
-      "installed_php": {
-        "requires": "~8.1.0 || ~8.2.0 || ~8.3.0",
-        "target_runs": false,
-        "project_allows": true
-      },
-      "verdict": "ok",
-      "priority": "none",
-      "lead": null,
-      "rank": 46,
-      "flags": [],
-      "score": {
-        "model": 1,
-        "total": 0,
-        "exact": 0,
-        "accepted": [],
-        "text": "0"
-      },
-      "next_step": null,
-      "security": {
-        "status": "clear",
-        "check": "complete",
-        "complete": true,
-        "unchecked_reason": null,
-        "records": 1,
-        "feeds": [
-          {
-            "composer_repository": "composer repo (https://repo.packagist.org)",
-            "registry": "packagist.org",
-            "answer": "answered",
-            "records": 1,
-            "reason": null
-          }
-        ],
-        "ignored": [],
-        "ignored_count": 0
-      },
-      "checks_missing": [],
-      "checks_skipped": [],
-      "unchecked_accepted": [],
-      "maintenance_judged": true,
-      "metadata": {
-        "status": "read",
-        "reason": null,
-        "message": null
-      },
-      "activity": {
-        "status": "read",
-        "reason": null,
-        "forge": "github",
-        "host": "github.com",
-        "repo": "lcobucci/jwt",
-        "event": "push",
-        "archived": false,
-        "fetched_at": "2026-10-14T00:00:00+00:00",
-        "cached_at": "2026-10-14T00:00:00+00:00"
-      },
-      "allowlist": null,
-      "abandoned_ignored": null,
-      "from_composer_repository": true,
-      "origin": {
-        "kind": "packagist",
-        "registry": "packagist.org",
-        "package_url": "https://packagist.org/packages/lcobucci/jwt",
-        "local": false
-      },
-      "replacement": null,
-      "replacement_url": null,
-      "note": null,
-      "libyears_unmeasured": null,
-      "libyears_at_least": false,
-      "direct": true,
-      "dev": false,
-      "reach": "direct",
-      "chain": [
-        "lcobucci/jwt"
-      ],
-      "depth": 0,
-      "depth_unmeasured": null,
-      "named_in": [
-        "require"
-      ],
-      "direct_dependents": [
-        "lcobucci/jwt",
-        "league/oauth2-server"
-      ],
-      "signals": [],
-      "evidence": "",
-      "allowlist_reason": null,
-      "data_date": "2026-10-14T00:00:00+00:00",
-      "libyears": 2.5,
-      "age": {
-        "installed": {
-          "at": "2024-04-11T23:07:54+00:00",
-          "years": 2.5,
-          "dated_by": null
-        },
-        "installed_unmeasured": null,
-        "release": {
-          "version": "5.6.1",
-          "at": "2026-10-10T09:42:14+00:00",
-          "years": 0,
-          "level": null,
-          "dated_by": null
-        },
-        "release_unmeasured": null,
-        "branch_release": {
-          "version": "5.6.1",
-          "at": "2026-10-10T09:42:14+00:00",
-          "years": 0,
-          "level": null,
-          "dated_by": null
-        },
-        "branch_release_unmeasured": null,
-        "push": {
-          "at": "2026-10-14T00:29:47+00:00",
-          "years": 0,
-          "level": null
-        },
-        "push_unmeasured": null
-      },
-      "baseline": null,
-      "gate": {
-        "reaches_fail_on": false,
-        "fails": false,
-        "exempt_by": null,
-        "by": [],
-        "basis": null
-      }
-    },
-    {
       "package": "league/oauth2-server",
       "version": "8.5.5",
       "branch": "8.x",
@@ -12475,7 +15282,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 47,
+      "rank": 51,
       "flags": [],
       "score": {
         "model": 1,
@@ -12551,7 +15358,30 @@
       "direct_dependents": [
         "league/oauth2-server"
       ],
-      "signals": [],
+      "signals": [
+        {
+          "id": "S7",
+          "level": "info",
+          "summary": "pulls in 1 flagged package: lcobucci/clock (capped)",
+          "data": {
+            "flagged": 1,
+            "packages": [
+              {
+                "package": "lcobucci/clock",
+                "chain": [
+                  "league/oauth2-server",
+                  "lcobucci/clock"
+                ],
+                "verdict": "low",
+                "lead": "capped",
+                "flag_ids": [
+                  "capped"
+                ]
+              }
+            ]
+          }
+        }
+      ],
       "evidence": "",
       "allowlist_reason": null,
       "data_date": "2026-10-14T00:00:00+00:00",
@@ -12607,7 +15437,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 48,
+      "rank": 52,
       "flags": [],
       "score": {
         "model": 1,
@@ -12763,7 +15593,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 49,
+      "rank": 53,
       "flags": [],
       "score": {
         "model": 1,
@@ -12895,7 +15725,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 50,
+      "rank": 54,
       "flags": [],
       "score": {
         "model": 1,
@@ -13029,7 +15859,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 51,
+      "rank": 55,
       "flags": [],
       "score": {
         "model": 1,
@@ -13162,7 +15992,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 52,
+      "rank": 56,
       "flags": [],
       "score": {
         "model": 1,
@@ -13283,305 +16113,6 @@
       }
     },
     {
-      "package": "pelago/emogrifier",
-      "version": "v7.2.0",
-      "branch": "7.x",
-      "installed_php": {
-        "requires": "~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
-        "target_runs": false,
-        "project_allows": true
-      },
-      "verdict": "ok",
-      "priority": "none",
-      "lead": null,
-      "rank": 53,
-      "flags": [],
-      "score": {
-        "model": 1,
-        "total": 0,
-        "exact": 0,
-        "accepted": [],
-        "text": "0"
-      },
-      "next_step": null,
-      "security": {
-        "status": "clear",
-        "check": "complete",
-        "complete": true,
-        "unchecked_reason": null,
-        "records": 0,
-        "feeds": [
-          {
-            "composer_repository": "composer repo (https://repo.packagist.org)",
-            "registry": "packagist.org",
-            "answer": "answered",
-            "records": 0,
-            "reason": null
-          }
-        ],
-        "ignored": [],
-        "ignored_count": 0
-      },
-      "checks_missing": [],
-      "checks_skipped": [],
-      "unchecked_accepted": [],
-      "maintenance_judged": true,
-      "metadata": {
-        "status": "read",
-        "reason": null,
-        "message": null
-      },
-      "activity": {
-        "status": "read",
-        "reason": null,
-        "forge": "github",
-        "host": "github.com",
-        "repo": "MyIntervals/emogrifier",
-        "event": "push",
-        "archived": false,
-        "fetched_at": "2026-10-14T00:00:00+00:00",
-        "cached_at": "2026-10-14T00:00:00+00:00"
-      },
-      "allowlist": null,
-      "abandoned_ignored": null,
-      "from_composer_repository": true,
-      "origin": {
-        "kind": "packagist",
-        "registry": "packagist.org",
-        "package_url": "https://packagist.org/packages/pelago/emogrifier",
-        "local": false
-      },
-      "replacement": null,
-      "replacement_url": null,
-      "note": null,
-      "libyears_unmeasured": null,
-      "libyears_at_least": false,
-      "direct": true,
-      "dev": false,
-      "reach": "direct",
-      "chain": [
-        "pelago/emogrifier"
-      ],
-      "depth": 0,
-      "depth_unmeasured": null,
-      "named_in": [
-        "require"
-      ],
-      "direct_dependents": [
-        "pelago/emogrifier"
-      ],
-      "signals": [],
-      "evidence": "",
-      "allowlist_reason": null,
-      "data_date": "2026-10-14T00:00:00+00:00",
-      "libyears": 2.85,
-      "age": {
-        "installed": {
-          "at": "2023-12-06T02:00:20+00:00",
-          "years": 2.9,
-          "dated_by": null
-        },
-        "installed_unmeasured": null,
-        "release": {
-          "version": "v8.3.0",
-          "at": "2026-10-11T12:29:58+00:00",
-          "years": 0,
-          "level": null,
-          "dated_by": null
-        },
-        "release_unmeasured": null,
-        "branch_release": {
-          "version": "v7.3.0",
-          "at": "2024-10-28T16:12:26+00:00",
-          "years": 2,
-          "level": null,
-          "dated_by": null
-        },
-        "branch_release_unmeasured": null,
-        "push": {
-          "at": "2026-10-11T23:16:14+00:00",
-          "years": 0,
-          "level": null
-        },
-        "push_unmeasured": null
-      },
-      "baseline": null,
-      "gate": {
-        "reaches_fail_on": false,
-        "fails": false,
-        "exempt_by": null,
-        "by": [],
-        "basis": null
-      }
-    },
-    {
-      "package": "phpoffice/phpspreadsheet",
-      "version": "1.30.6",
-      "branch": "1.x",
-      "installed_php": {
-        "requires": ">=7.4.0 <8.5.0",
-        "target_runs": true,
-        "project_allows": true
-      },
-      "verdict": "ok",
-      "priority": "none",
-      "lead": null,
-      "rank": 54,
-      "flags": [],
-      "score": {
-        "model": 1,
-        "total": 0,
-        "exact": 0,
-        "accepted": [],
-        "text": "0"
-      },
-      "next_step": null,
-      "security": {
-        "status": "clear",
-        "check": "complete",
-        "complete": true,
-        "unchecked_reason": null,
-        "records": 31,
-        "feeds": [
-          {
-            "composer_repository": "composer repo (https://repo.packagist.org)",
-            "registry": "packagist.org",
-            "answer": "answered",
-            "records": 31,
-            "reason": null
-          }
-        ],
-        "ignored": [],
-        "ignored_count": 0
-      },
-      "checks_missing": [],
-      "checks_skipped": [],
-      "unchecked_accepted": [],
-      "maintenance_judged": true,
-      "metadata": {
-        "status": "read",
-        "reason": null,
-        "message": null
-      },
-      "activity": {
-        "status": "read",
-        "reason": null,
-        "forge": "github",
-        "host": "github.com",
-        "repo": "PHPOffice/PhpSpreadsheet",
-        "event": "push",
-        "archived": false,
-        "fetched_at": "2026-10-14T00:00:00+00:00",
-        "cached_at": "2026-10-14T00:00:00+00:00"
-      },
-      "allowlist": null,
-      "abandoned_ignored": null,
-      "from_composer_repository": true,
-      "origin": {
-        "kind": "packagist",
-        "registry": "packagist.org",
-        "package_url": "https://packagist.org/packages/phpoffice/phpspreadsheet",
-        "local": false
-      },
-      "replacement": null,
-      "replacement_url": null,
-      "note": null,
-      "libyears_unmeasured": null,
-      "libyears_at_least": false,
-      "direct": true,
-      "dev": false,
-      "reach": "direct",
-      "chain": [
-        "phpoffice/phpspreadsheet"
-      ],
-      "depth": 0,
-      "depth_unmeasured": null,
-      "named_in": [
-        "require"
-      ],
-      "direct_dependents": [
-        "phpoffice/phpspreadsheet"
-      ],
-      "signals": [
-        {
-          "id": "S7",
-          "level": "info",
-          "summary": "pulls in 2 flagged packages: markbaker/complex (stale), markbaker/matrix (stale)",
-          "data": {
-            "flagged": 2,
-            "packages": [
-              {
-                "package": "markbaker/complex",
-                "chain": [
-                  "phpoffice/phpspreadsheet",
-                  "markbaker/complex"
-                ],
-                "verdict": "low",
-                "lead": "stale",
-                "flag_ids": [
-                  "stale"
-                ]
-              },
-              {
-                "package": "markbaker/matrix",
-                "chain": [
-                  "phpoffice/phpspreadsheet",
-                  "markbaker/matrix"
-                ],
-                "verdict": "low",
-                "lead": "stale",
-                "flag_ids": [
-                  "stale"
-                ]
-              }
-            ]
-          }
-        }
-      ],
-      "evidence": "",
-      "allowlist_reason": null,
-      "data_date": "2026-10-14T00:00:00+00:00",
-      "libyears": 0.18,
-      "age": {
-        "installed": {
-          "at": "2026-07-12T19:59:31+00:00",
-          "years": 0.3,
-          "dated_by": null
-        },
-        "installed_unmeasured": null,
-        "release": {
-          "version": "3.10.8",
-          "at": "2026-09-17T04:27:19+00:00",
-          "years": 0.1,
-          "level": null,
-          "dated_by": null
-        },
-        "release_unmeasured": null,
-        "branch_release": {
-          "version": "1.30.7",
-          "at": "2026-09-17T03:56:23+00:00",
-          "years": 0.1,
-          "level": null,
-          "dated_by": null
-        },
-        "branch_release_unmeasured": null,
-        "push": {
-          "at": "2026-10-12T20:19:37+00:00",
-          "years": 0,
-          "level": null
-        },
-        "push_unmeasured": null
-      },
-      "baseline": null,
-      "gate": {
-        "reaches_fail_on": false,
-        "fails": false,
-        "exempt_by": null,
-        "by": [],
-        "basis": null
-      }
-    },
-    {
       "package": "prestashop/autoload",
       "version": "v1.0.2",
       "branch": "1.x",
@@ -13593,7 +16124,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 55,
+      "rank": 57,
       "flags": [],
       "score": {
         "model": 1,
@@ -13725,7 +16256,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 56,
+      "rank": 58,
       "flags": [],
       "score": {
         "model": 1,
@@ -13857,7 +16388,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 57,
+      "rank": 59,
       "flags": [],
       "score": {
         "model": 1,
@@ -13989,7 +16520,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 58,
+      "rank": 60,
       "flags": [],
       "score": {
         "model": 1,
@@ -14122,7 +16653,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 59,
+      "rank": 61,
       "flags": [],
       "score": {
         "model": 1,
@@ -14254,7 +16785,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 60,
+      "rank": 62,
       "flags": [],
       "score": {
         "model": 1,
@@ -14386,7 +16917,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 61,
+      "rank": 63,
       "flags": [],
       "score": {
         "model": 1,
@@ -14518,7 +17049,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 62,
+      "rank": 64,
       "flags": [],
       "score": {
         "model": 1,
@@ -14650,7 +17181,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 63,
+      "rank": 65,
       "flags": [],
       "score": {
         "model": 1,
@@ -14782,7 +17313,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 64,
+      "rank": 66,
       "flags": [],
       "score": {
         "model": 1,
@@ -14914,7 +17445,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 65,
+      "rank": 67,
       "flags": [],
       "score": {
         "model": 1,
@@ -15046,7 +17577,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 66,
+      "rank": 68,
       "flags": [],
       "score": {
         "model": 1,
@@ -15178,7 +17709,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 67,
+      "rank": 69,
       "flags": [],
       "score": {
         "model": 1,
@@ -15310,7 +17841,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 68,
+      "rank": 70,
       "flags": [],
       "score": {
         "model": 1,
@@ -15442,7 +17973,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 69,
+      "rank": 71,
       "flags": [],
       "score": {
         "model": 1,
@@ -15574,7 +18105,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 70,
+      "rank": 72,
       "flags": [],
       "score": {
         "model": 1,
@@ -15706,7 +18237,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 71,
+      "rank": 73,
       "flags": [],
       "score": {
         "model": 1,
@@ -15838,7 +18369,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 72,
+      "rank": 74,
       "flags": [],
       "score": {
         "model": 1,
@@ -15970,7 +18501,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 73,
+      "rank": 75,
       "flags": [],
       "score": {
         "model": 1,
@@ -16102,7 +18633,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 74,
+      "rank": 76,
       "flags": [],
       "score": {
         "model": 1,
@@ -16234,7 +18765,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 75,
+      "rank": 77,
       "flags": [],
       "score": {
         "model": 1,
@@ -16366,7 +18897,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 76,
+      "rank": 78,
       "flags": [],
       "score": {
         "model": 1,
@@ -16498,7 +19029,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 77,
+      "rank": 79,
       "flags": [],
       "score": {
         "model": 1,
@@ -16630,7 +19161,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 78,
+      "rank": 80,
       "flags": [],
       "score": {
         "model": 1,
@@ -16762,7 +19293,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 79,
+      "rank": 81,
       "flags": [],
       "score": {
         "model": 1,
@@ -16894,7 +19425,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 80,
+      "rank": 82,
       "flags": [],
       "score": {
         "model": 1,
@@ -17049,7 +19580,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 81,
+      "rank": 83,
       "flags": [],
       "score": {
         "model": 1,
@@ -17181,7 +19712,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 82,
+      "rank": 84,
       "flags": [],
       "score": {
         "model": 1,
@@ -17313,7 +19844,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 83,
+      "rank": 85,
       "flags": [],
       "score": {
         "model": 1,
@@ -17445,7 +19976,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 84,
+      "rank": 86,
       "flags": [],
       "score": {
         "model": 1,
@@ -17577,7 +20108,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 85,
+      "rank": 87,
       "flags": [],
       "score": {
         "model": 1,
@@ -17709,7 +20240,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 86,
+      "rank": 88,
       "flags": [],
       "score": {
         "model": 1,
@@ -17841,7 +20372,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 87,
+      "rank": 89,
       "flags": [],
       "score": {
         "model": 1,
@@ -17973,7 +20504,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 88,
+      "rank": 90,
       "flags": [],
       "score": {
         "model": 1,
@@ -18105,7 +20636,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 89,
+      "rank": 91,
       "flags": [],
       "score": {
         "model": 1,
@@ -18237,7 +20768,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 90,
+      "rank": 92,
       "flags": [],
       "score": {
         "model": 1,
@@ -18369,7 +20900,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 91,
+      "rank": 93,
       "flags": [],
       "score": {
         "model": 1,
@@ -18501,7 +21032,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 92,
+      "rank": 94,
       "flags": [],
       "score": {
         "model": 1,
@@ -18633,7 +21164,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 93,
+      "rank": 95,
       "flags": [],
       "score": {
         "model": 1,
@@ -18765,7 +21296,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 94,
+      "rank": 96,
       "flags": [],
       "score": {
         "model": 1,
@@ -18897,7 +21428,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 95,
+      "rank": 97,
       "flags": [],
       "score": {
         "model": 1,
@@ -19029,7 +21560,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 96,
+      "rank": 98,
       "flags": [],
       "score": {
         "model": 1,
@@ -19161,7 +21692,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 97,
+      "rank": 99,
       "flags": [],
       "score": {
         "model": 1,
@@ -19293,7 +21824,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 98,
+      "rank": 100,
       "flags": [],
       "score": {
         "model": 1,
@@ -19425,7 +21956,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 99,
+      "rank": 101,
       "flags": [],
       "score": {
         "model": 1,
@@ -19557,7 +22088,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 100,
+      "rank": 102,
       "flags": [],
       "score": {
         "model": 1,
@@ -19689,7 +22220,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 101,
+      "rank": 103,
       "flags": [],
       "score": {
         "model": 1,
@@ -19821,7 +22352,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 102,
+      "rank": 104,
       "flags": [],
       "score": {
         "model": 1,
@@ -19953,7 +22484,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 103,
+      "rank": 105,
       "flags": [],
       "score": {
         "model": 1,
@@ -20085,7 +22616,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 104,
+      "rank": 106,
       "flags": [],
       "score": {
         "model": 1,
@@ -20217,7 +22748,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 105,
+      "rank": 107,
       "flags": [],
       "score": {
         "model": 1,
@@ -20349,7 +22880,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 106,
+      "rank": 108,
       "flags": [],
       "score": {
         "model": 1,
@@ -20481,7 +23012,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 107,
+      "rank": 109,
       "flags": [],
       "score": {
         "model": 1,
@@ -20613,7 +23144,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 108,
+      "rank": 110,
       "flags": [],
       "score": {
         "model": 1,
@@ -20745,7 +23276,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 109,
+      "rank": 111,
       "flags": [],
       "score": {
         "model": 1,
@@ -20877,7 +23408,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 110,
+      "rank": 112,
       "flags": [],
       "score": {
         "model": 1,
@@ -21009,7 +23540,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 111,
+      "rank": 113,
       "flags": [],
       "score": {
         "model": 1,
@@ -21141,7 +23672,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 112,
+      "rank": 114,
       "flags": [],
       "score": {
         "model": 1,
@@ -21273,7 +23804,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 113,
+      "rank": 115,
       "flags": [],
       "score": {
         "model": 1,
@@ -21405,7 +23936,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 114,
+      "rank": 116,
       "flags": [],
       "score": {
         "model": 1,
@@ -21537,7 +24068,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 115,
+      "rank": 117,
       "flags": [],
       "score": {
         "model": 1,
@@ -21669,7 +24200,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 116,
+      "rank": 118,
       "flags": [],
       "score": {
         "model": 1,
@@ -21801,7 +24332,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 117,
+      "rank": 119,
       "flags": [],
       "score": {
         "model": 1,
@@ -21934,7 +24465,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 118,
+      "rank": 120,
       "flags": [],
       "score": {
         "model": 1,
@@ -22066,7 +24597,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 119,
+      "rank": 121,
       "flags": [],
       "score": {
         "model": 1,
@@ -22205,7 +24736,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 120,
+      "rank": 122,
       "flags": [],
       "score": {
         "model": 1,
@@ -22346,7 +24877,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 121,
+      "rank": 123,
       "flags": [],
       "score": {
         "model": 1,
@@ -22482,7 +25013,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 122,
+      "rank": 124,
       "flags": [],
       "score": {
         "model": 1,
@@ -22614,7 +25145,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 123,
+      "rank": 125,
       "flags": [],
       "score": {
         "model": 1,
@@ -22758,7 +25289,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 124,
+      "rank": 126,
       "flags": [],
       "score": {
         "model": 1,
@@ -22891,7 +25422,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 125,
+      "rank": 127,
       "flags": [],
       "score": {
         "model": 1,
@@ -23023,7 +25554,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 126,
+      "rank": 128,
       "flags": [],
       "score": {
         "model": 1,
@@ -23155,7 +25686,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 127,
+      "rank": 129,
       "flags": [],
       "score": {
         "model": 1,
@@ -23287,7 +25818,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 128,
+      "rank": 130,
       "flags": [],
       "score": {
         "model": 1,
@@ -23432,7 +25963,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 129,
+      "rank": 131,
       "flags": [],
       "score": {
         "model": 1,
@@ -23580,7 +26111,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 130,
+      "rank": 132,
       "flags": [],
       "score": {
         "model": 1,
@@ -23712,7 +26243,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 131,
+      "rank": 133,
       "flags": [],
       "score": {
         "model": 1,
@@ -23856,7 +26387,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 132,
+      "rank": 134,
       "flags": [],
       "score": {
         "model": 1,
@@ -23995,7 +26526,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 133,
+      "rank": 135,
       "flags": [],
       "score": {
         "model": 1,
@@ -24127,7 +26658,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 134,
+      "rank": 136,
       "flags": [],
       "score": {
         "model": 1,
@@ -24264,7 +26795,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 135,
+      "rank": 137,
       "flags": [],
       "score": {
         "model": 1,
@@ -24398,7 +26929,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 136,
+      "rank": 138,
       "flags": [],
       "score": {
         "model": 1,
@@ -24544,7 +27075,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 137,
+      "rank": 139,
       "flags": [],
       "score": {
         "model": 1,
@@ -24688,7 +27219,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 138,
+      "rank": 140,
       "flags": [],
       "score": {
         "model": 1,
@@ -24820,7 +27351,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 139,
+      "rank": 141,
       "flags": [],
       "score": {
         "model": 1,
@@ -24952,7 +27483,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 140,
+      "rank": 142,
       "flags": [],
       "score": {
         "model": 1,
@@ -25084,7 +27615,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 141,
+      "rank": 143,
       "flags": [],
       "score": {
         "model": 1,
@@ -25217,7 +27748,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 142,
+      "rank": 144,
       "flags": [],
       "score": {
         "model": 1,
@@ -25350,7 +27881,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 143,
+      "rank": 145,
       "flags": [],
       "score": {
         "model": 1,
@@ -25482,7 +28013,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 144,
+      "rank": 146,
       "flags": [],
       "score": {
         "model": 1,
@@ -25615,7 +28146,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 145,
+      "rank": 147,
       "flags": [],
       "score": {
         "model": 1,
@@ -25751,7 +28282,7 @@
       "verdict": "finished",
       "priority": "none",
       "lead": null,
-      "rank": 146,
+      "rank": 148,
       "flags": [],
       "score": {
         "model": 1,
@@ -25881,7 +28412,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 147,
+      "rank": 149,
       "flags": [],
       "score": {
         "model": 1,
@@ -26013,7 +28544,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 148,
+      "rank": 150,
       "flags": [],
       "score": {
         "model": 1,
@@ -26150,7 +28681,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 149,
+      "rank": 151,
       "flags": [],
       "score": {
         "model": 1,
@@ -26288,7 +28819,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 150,
+      "rank": 152,
       "flags": [],
       "score": {
         "model": 1,
@@ -26364,7 +28895,31 @@
       "direct_dependents": [
         "symfony/proxy-manager-bridge"
       ],
-      "signals": [],
+      "signals": [
+        {
+          "id": "S7",
+          "level": "info",
+          "summary": "pulls in 1 flagged package: laminas/laminas-code (capped)",
+          "data": {
+            "flagged": 1,
+            "packages": [
+              {
+                "package": "laminas/laminas-code",
+                "chain": [
+                  "symfony/proxy-manager-bridge",
+                  "friendsofphp/proxy-manager-lts",
+                  "laminas/laminas-code"
+                ],
+                "verdict": "low",
+                "lead": "capped",
+                "flag_ids": [
+                  "capped"
+                ]
+              }
+            ]
+          }
+        }
+      ],
       "evidence": "",
       "allowlist_reason": null,
       "data_date": "2026-10-14T00:00:00+00:00",
@@ -26420,7 +28975,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 151,
+      "rank": 153,
       "flags": [],
       "score": {
         "model": 1,
@@ -26552,7 +29107,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 152,
+      "rank": 154,
       "flags": [],
       "score": {
         "model": 1,
@@ -26690,7 +29245,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 153,
+      "rank": 155,
       "flags": [],
       "score": {
         "model": 1,
@@ -26822,7 +29377,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 154,
+      "rank": 156,
       "flags": [],
       "score": {
         "model": 1,
@@ -26957,7 +29512,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 155,
+      "rank": 157,
       "flags": [],
       "score": {
         "model": 1,
@@ -27090,7 +29645,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 156,
+      "rank": 158,
       "flags": [],
       "score": {
         "model": 1,
@@ -27223,7 +29778,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 157,
+      "rank": 159,
       "flags": [],
       "score": {
         "model": 1,
@@ -27357,7 +29912,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 158,
+      "rank": 160,
       "flags": [],
       "score": {
         "model": 1,
@@ -27502,7 +30057,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 159,
+      "rank": 161,
       "flags": [],
       "score": {
         "model": 1,
@@ -27634,7 +30189,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 160,
+      "rank": 162,
       "flags": [],
       "score": {
         "model": 1,
@@ -27766,7 +30321,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 161,
+      "rank": 163,
       "flags": [],
       "score": {
         "model": 1,
@@ -27901,7 +30456,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 162,
+      "rank": 164,
       "flags": [],
       "score": {
         "model": 1,
@@ -28033,7 +30588,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 163,
+      "rank": 165,
       "flags": [],
       "score": {
         "model": 1,
@@ -28165,7 +30720,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 164,
+      "rank": 166,
       "flags": [],
       "score": {
         "model": 1,
@@ -28297,7 +30852,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 165,
+      "rank": 167,
       "flags": [],
       "score": {
         "model": 1,
@@ -28443,7 +30998,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 166,
+      "rank": 168,
       "flags": [],
       "score": {
         "model": 1,
@@ -28590,7 +31145,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 167,
+      "rank": 169,
       "flags": [],
       "score": {
         "model": 1,
@@ -28723,7 +31278,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 168,
+      "rank": 170,
       "flags": [],
       "score": {
         "model": 1,
@@ -28855,7 +31410,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 169,
+      "rank": 171,
       "flags": [],
       "score": {
         "model": 1,
@@ -28987,7 +31542,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 170,
+      "rank": 172,
       "flags": [],
       "score": {
         "model": 1,
@@ -29119,7 +31674,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 171,
+      "rank": 173,
       "flags": [],
       "score": {
         "model": 1,
@@ -29251,7 +31806,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 172,
+      "rank": 174,
       "flags": [],
       "score": {
         "model": 1,
@@ -29383,7 +31938,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 173,
+      "rank": 175,
       "flags": [],
       "score": {
         "model": 1,
@@ -29515,7 +32070,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 174,
+      "rank": 176,
       "flags": [],
       "score": {
         "model": 1,
@@ -29655,7 +32210,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 175,
+      "rank": 177,
       "flags": [],
       "score": {
         "model": 1,
@@ -29787,7 +32342,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 176,
+      "rank": 178,
       "flags": [],
       "score": {
         "model": 1,
@@ -29918,7 +32473,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 177,
+      "rank": 179,
       "flags": [],
       "score": {
         "model": 1,
@@ -30050,7 +32605,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 178,
+      "rank": 180,
       "flags": [],
       "score": {
         "model": 1,
@@ -30184,7 +32739,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 179,
+      "rank": 181,
       "flags": [],
       "score": {
         "model": 1,
@@ -30320,7 +32875,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 180,
+      "rank": 182,
       "flags": [],
       "score": {
         "model": 1,
@@ -30455,7 +33010,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 181,
+      "rank": 183,
       "flags": [],
       "score": {
         "model": 1,
@@ -30588,7 +33143,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 182,
+      "rank": 184,
       "flags": [],
       "score": {
         "model": 1,
@@ -30720,7 +33275,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 183,
+      "rank": 185,
       "flags": [],
       "score": {
         "model": 1,
@@ -30854,7 +33409,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 184,
+      "rank": 186,
       "flags": [],
       "score": {
         "model": 1,
@@ -30988,7 +33543,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 185,
+      "rank": 187,
       "flags": [],
       "score": {
         "model": 1,
@@ -31119,7 +33674,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 186,
+      "rank": 188,
       "flags": [],
       "score": {
         "model": 1,
@@ -31250,7 +33805,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 187,
+      "rank": 189,
       "flags": [],
       "score": {
         "model": 1,
@@ -31356,269 +33911,6 @@
         "push": {
           "at": "2025-10-28T10:29:59+00:00",
           "years": 1,
-          "level": null
-        },
-        "push_unmeasured": null
-      },
-      "baseline": null,
-      "gate": {
-        "reaches_fail_on": false,
-        "fails": false,
-        "exempt_by": null,
-        "by": [],
-        "basis": null
-      }
-    },
-    {
-      "package": "laminas/laminas-code",
-      "version": "4.16.0",
-      "branch": "4.x",
-      "installed_php": {
-        "requires": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
-        "target_runs": true,
-        "project_allows": true
-      },
-      "verdict": "ok",
-      "priority": "none",
-      "lead": null,
-      "rank": 188,
-      "flags": [],
-      "score": {
-        "model": 1,
-        "total": 0,
-        "exact": 0,
-        "accepted": [],
-        "text": "0"
-      },
-      "next_step": null,
-      "security": {
-        "status": "clear",
-        "check": "complete",
-        "complete": true,
-        "unchecked_reason": null,
-        "records": 0,
-        "feeds": [
-          {
-            "composer_repository": "composer repo (https://repo.packagist.org)",
-            "registry": "packagist.org",
-            "answer": "answered",
-            "records": 0,
-            "reason": null
-          }
-        ],
-        "ignored": [],
-        "ignored_count": 0
-      },
-      "checks_missing": [],
-      "checks_skipped": [],
-      "unchecked_accepted": [],
-      "maintenance_judged": true,
-      "metadata": {
-        "status": "read",
-        "reason": null,
-        "message": null
-      },
-      "activity": {
-        "status": "read",
-        "reason": null,
-        "forge": "github",
-        "host": "github.com",
-        "repo": "laminas/laminas-code",
-        "event": "push",
-        "archived": false,
-        "fetched_at": "2026-10-14T00:00:00+00:00",
-        "cached_at": "2026-10-14T00:00:00+00:00"
-      },
-      "allowlist": null,
-      "abandoned_ignored": null,
-      "from_composer_repository": true,
-      "origin": {
-        "kind": "packagist",
-        "registry": "packagist.org",
-        "package_url": "https://packagist.org/packages/laminas/laminas-code",
-        "local": false
-      },
-      "replacement": null,
-      "replacement_url": null,
-      "note": null,
-      "libyears_unmeasured": null,
-      "libyears_at_least": false,
-      "direct": false,
-      "dev": false,
-      "reach": "transitive",
-      "chain": [
-        "symfony/proxy-manager-bridge",
-        "friendsofphp/proxy-manager-lts",
-        "laminas/laminas-code"
-      ],
-      "depth": 2,
-      "depth_unmeasured": null,
-      "named_in": [],
-      "direct_dependents": [
-        "symfony/proxy-manager-bridge"
-      ],
-      "signals": [],
-      "evidence": "",
-      "allowlist_reason": null,
-      "data_date": "2026-10-14T00:00:00+00:00",
-      "libyears": 0.95,
-      "age": {
-        "installed": {
-          "at": "2024-11-20T13:15:13+00:00",
-          "years": 1.9,
-          "dated_by": null
-        },
-        "installed_unmeasured": null,
-        "release": {
-          "version": "4.17.0",
-          "at": "2025-11-01T09:38:14+00:00",
-          "years": 0.9,
-          "level": null,
-          "dated_by": null
-        },
-        "release_unmeasured": null,
-        "branch_release": {
-          "version": "4.17.0",
-          "at": "2025-11-01T09:38:14+00:00",
-          "years": 0.9,
-          "level": null,
-          "dated_by": null
-        },
-        "branch_release_unmeasured": null,
-        "push": {
-          "at": "2026-10-12T04:24:47+00:00",
-          "years": 0,
-          "level": null
-        },
-        "push_unmeasured": null
-      },
-      "baseline": null,
-      "gate": {
-        "reaches_fail_on": false,
-        "fails": false,
-        "exempt_by": null,
-        "by": [],
-        "basis": null
-      }
-    },
-    {
-      "package": "lcobucci/clock",
-      "version": "3.0.0",
-      "branch": "3.x",
-      "installed_php": {
-        "requires": "~8.1.0 || ~8.2.0",
-        "target_runs": false,
-        "project_allows": true
-      },
-      "verdict": "ok",
-      "priority": "none",
-      "lead": null,
-      "rank": 189,
-      "flags": [],
-      "score": {
-        "model": 1,
-        "total": 0,
-        "exact": 0,
-        "accepted": [],
-        "text": "0"
-      },
-      "next_step": null,
-      "security": {
-        "status": "clear",
-        "check": "complete",
-        "complete": true,
-        "unchecked_reason": null,
-        "records": 0,
-        "feeds": [
-          {
-            "composer_repository": "composer repo (https://repo.packagist.org)",
-            "registry": "packagist.org",
-            "answer": "answered",
-            "records": 0,
-            "reason": null
-          }
-        ],
-        "ignored": [],
-        "ignored_count": 0
-      },
-      "checks_missing": [],
-      "checks_skipped": [],
-      "unchecked_accepted": [],
-      "maintenance_judged": true,
-      "metadata": {
-        "status": "read",
-        "reason": null,
-        "message": null
-      },
-      "activity": {
-        "status": "read",
-        "reason": null,
-        "forge": "github",
-        "host": "github.com",
-        "repo": "lcobucci/clock",
-        "event": "push",
-        "archived": false,
-        "fetched_at": "2026-10-14T00:00:00+00:00",
-        "cached_at": "2026-10-14T00:00:00+00:00"
-      },
-      "allowlist": null,
-      "abandoned_ignored": null,
-      "from_composer_repository": true,
-      "origin": {
-        "kind": "packagist",
-        "registry": "packagist.org",
-        "package_url": "https://packagist.org/packages/lcobucci/clock",
-        "local": false
-      },
-      "replacement": null,
-      "replacement_url": null,
-      "note": null,
-      "libyears_unmeasured": null,
-      "libyears_at_least": false,
-      "direct": false,
-      "dev": false,
-      "reach": "transitive",
-      "chain": [
-        "league/oauth2-server",
-        "lcobucci/clock"
-      ],
-      "depth": 1,
-      "depth_unmeasured": null,
-      "named_in": [],
-      "direct_dependents": [
-        "league/oauth2-server"
-      ],
-      "signals": [],
-      "evidence": "",
-      "allowlist_reason": null,
-      "data_date": "2026-10-14T00:00:00+00:00",
-      "libyears": 3.32,
-      "age": {
-        "installed": {
-          "at": "2022-12-19T15:00:24+00:00",
-          "years": 3.8,
-          "dated_by": null
-        },
-        "installed_unmeasured": null,
-        "release": {
-          "version": "3.6.0",
-          "at": "2026-04-13T21:30:16+00:00",
-          "years": 0.5,
-          "level": null,
-          "dated_by": null
-        },
-        "release_unmeasured": null,
-        "branch_release": {
-          "version": "3.6.0",
-          "at": "2026-04-13T21:30:16+00:00",
-          "years": 0.5,
-          "level": null,
-          "dated_by": null
-        },
-        "branch_release_unmeasured": null,
-        "push": {
-          "at": "2026-10-09T01:44:55+00:00",
-          "years": 0,
           "level": null
         },
         "push_unmeasured": null

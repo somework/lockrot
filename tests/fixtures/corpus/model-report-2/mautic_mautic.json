@@ -38,6 +38,7 @@
       "left-behind",
       "old-promise",
       "stale",
+      "capped",
       "vulnerable"
     ],
     "verdicts": [
@@ -65,7 +66,8 @@
       "S7",
       "S8",
       "S9",
-      "S10"
+      "S10",
+      "S11"
     ],
     "fix_model": 1,
     "text_grammar": 1,
@@ -79,6 +81,7 @@
         "left-behind",
         "old-promise",
         "stale",
+        "capped",
         "vulnerable"
       ],
       "parts": [
@@ -90,7 +93,8 @@
             "pinned",
             "left-behind",
             "old-promise",
-            "stale"
+            "stale",
+            "capped"
           ],
           "combine": "lead_plus_share"
         },
@@ -230,9 +234,10 @@
           "band": "medium",
           "can_corroborate": true,
           "corroborating_points": 2,
-          "max_maintenance": 8,
+          "max_maintenance": 10,
           "max_maintenance_flags": [
-            "stale"
+            "stale",
+            "capped"
           ],
           "raised_by": [
             "S2",
@@ -244,6 +249,27 @@
           ],
           "basis": {
             "v013_base": "medium",
+            "points": "band_floor"
+          },
+          "points_from": null
+        },
+        {
+          "id": "capped",
+          "part": "maintenance",
+          "points": 8,
+          "band": "medium",
+          "can_corroborate": true,
+          "corroborating_points": 2,
+          "max_maintenance": 8,
+          "max_maintenance_flags": [
+            "capped"
+          ],
+          "raised_by": [
+            "S11"
+          ],
+          "thresholds": [],
+          "basis": {
+            "v013_base": null,
             "points": "band_floor"
           },
           "points_from": null
@@ -440,6 +466,14 @@
             "threshold": "push-warn-years",
             "below": "release-warn-years"
           }
+        },
+        {
+          "id": "php_bound",
+          "flag_ids": [
+            "old-promise",
+            "capped"
+          ],
+          "holds_unless": null
         }
       ],
       "sort": [
@@ -744,18 +778,18 @@
     },
     "score_rules_used": {
       "counted": 10,
-      "lead-first": 23,
+      "lead-first": 24,
       "corroborating-share": 5,
       "advisory-points": 1,
       "no-reachable-fix-multiplier": 0,
       "security-max": 0,
-      "divide-reach": 31,
+      "divide-reach": 32,
       "security-exempt-from-reach": 1,
       "sum": 0,
       "divide-dev": 0,
       "floor-once": 0,
-      "band-floors": 24,
-      "zero-verdicts": 169,
+      "band-floors": 25,
+      "zero-verdicts": 168,
       "sort": null,
       "gate-bounded-new": 0,
       "baseline-cover": 0
@@ -778,12 +812,921 @@
         }
       ]
     },
-    "move_check": null
+    "move_check": null,
+    "php_window": {
+      "platform_override": null,
+      "host_requires": [],
+      "with_dev": {
+        "minors": [
+          "8.2",
+          "8.3"
+        ],
+        "gaps": false,
+        "lower_edge": {
+          "php": "8.2.0",
+          "set_by": [
+            {
+              "name": "api-platform/core",
+              "version": "v4.3.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "mautic/core-lib",
+              "version": "7.0.0-dev",
+              "link": "require",
+              "target": "php",
+              "constraint": "~8.2",
+              "dev": false
+            },
+            {
+              "name": "phpoffice/phpspreadsheet",
+              "version": "5.9.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/asset",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/asset-mapper",
+              "version": "v7.4.13",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/cache",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/clock",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/config",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/console",
+              "version": "v7.4.18",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/dependency-injection",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/doctrine-bridge",
+              "version": "v7.4.9",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/doctrine-messenger",
+              "version": "v7.4.6",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/dotenv",
+              "version": "v7.4.11",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/error-handler",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/event-dispatcher",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/expression-language",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/filesystem",
+              "version": "v7.4.18",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/finder",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/form",
+              "version": "v7.4.9",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/framework-bundle",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-client",
+              "version": "v7.4.9",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-foundation",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-kernel",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/intl",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/lock",
+              "version": "v7.4.9",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/mailer",
+              "version": "v7.4.12",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/messenger",
+              "version": "v7.4.12",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/mime",
+              "version": "v7.4.13",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/monolog-bridge",
+              "version": "v7.4.12",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/options-resolver",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/password-hasher",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/process",
+              "version": "v7.4.18",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/property-access",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/property-info",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/rate-limiter",
+              "version": "v7.4.10",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/routing",
+              "version": "v7.4.13",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-bundle",
+              "version": "v7.4.12",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-core",
+              "version": "v7.4.12",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-csrf",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-http",
+              "version": "v7.4.13",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/serializer",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/stopwatch",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/string",
+              "version": "v7.4.15",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/translation",
+              "version": "v7.4.10",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/twig-bridge",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/twig-bundle",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/type-info",
+              "version": "v7.4.9",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/validator",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/var-dumper",
+              "version": "v7.4.15",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/var-exporter",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/web-link",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/yaml",
+              "version": "v7.4.15",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            }
+          ]
+        },
+        "upper_edge": {
+          "excludes": "8.4",
+          "set_by": [
+            {
+              "name": "ezyang/htmlpurifier",
+              "version": "v4.17.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+              "dev": false
+            }
+          ]
+        },
+        "closest": null
+      },
+      "without_dev": {
+        "minors": [
+          "8.2",
+          "8.3"
+        ],
+        "gaps": false,
+        "lower_edge": {
+          "php": "8.2.0",
+          "set_by": [
+            {
+              "name": "api-platform/core",
+              "version": "v4.3.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "mautic/core-lib",
+              "version": "7.0.0-dev",
+              "link": "require",
+              "target": "php",
+              "constraint": "~8.2",
+              "dev": false
+            },
+            {
+              "name": "phpoffice/phpspreadsheet",
+              "version": "5.9.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "^8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/asset",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/asset-mapper",
+              "version": "v7.4.13",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/cache",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/clock",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/config",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/console",
+              "version": "v7.4.18",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/dependency-injection",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/doctrine-bridge",
+              "version": "v7.4.9",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/doctrine-messenger",
+              "version": "v7.4.6",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/dotenv",
+              "version": "v7.4.11",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/error-handler",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/event-dispatcher",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/expression-language",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/filesystem",
+              "version": "v7.4.18",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/finder",
+              "version": "v7.4.17",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/form",
+              "version": "v7.4.9",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/framework-bundle",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-client",
+              "version": "v7.4.9",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-foundation",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/http-kernel",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/intl",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/lock",
+              "version": "v7.4.9",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/mailer",
+              "version": "v7.4.12",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/messenger",
+              "version": "v7.4.12",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/mime",
+              "version": "v7.4.13",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/monolog-bridge",
+              "version": "v7.4.12",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/options-resolver",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/password-hasher",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/process",
+              "version": "v7.4.18",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/property-access",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/property-info",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/rate-limiter",
+              "version": "v7.4.10",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/routing",
+              "version": "v7.4.13",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-bundle",
+              "version": "v7.4.12",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-core",
+              "version": "v7.4.12",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-csrf",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/security-http",
+              "version": "v7.4.13",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/serializer",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/stopwatch",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/string",
+              "version": "v7.4.15",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/translation",
+              "version": "v7.4.10",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/twig-bridge",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/twig-bundle",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/type-info",
+              "version": "v7.4.9",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/validator",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/var-dumper",
+              "version": "v7.4.15",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/var-exporter",
+              "version": "v7.4.14",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/web-link",
+              "version": "v7.4.8",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            },
+            {
+              "name": "symfony/yaml",
+              "version": "v7.4.15",
+              "link": "require",
+              "target": "php",
+              "constraint": ">=8.2",
+              "dev": false
+            }
+          ]
+        },
+        "upper_edge": {
+          "excludes": "8.4",
+          "set_by": [
+            {
+              "name": "ezyang/htmlpurifier",
+              "version": "v4.17.0",
+              "link": "require",
+              "target": "php",
+              "constraint": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+              "dev": false
+            }
+          ]
+        },
+        "closest": null
+      },
+      "target": {
+        "php": "8.4.99",
+        "inside": false
+      },
+      "target_fix": {
+        "packages": [
+          {
+            "name": "ezyang/htmlpurifier",
+            "version": "v4.17.0",
+            "link": "require",
+            "target": "php",
+            "constraint": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+            "dev": false
+          }
+        ],
+        "command": null,
+        "check": "not_checked",
+        "reason": null,
+        "held_by": [],
+        "platform_step": false
+      }
+    }
   },
   "activity_cache_oldest_at": "2026-10-14T00:00:00+00:00",
   "activity_cache_age_hours": 0,
   "packages_checked": 193,
-  "packages_flagged": 24,
+  "packages_flagged": 25,
   "packages_multi_flag": 5,
   "include_dev": false,
   "not_from_composer_repository": 1,
@@ -793,10 +1736,10 @@
     "critical": 0,
     "high": 6,
     "medium": 11,
-    "low": 7,
+    "low": 8,
     "unknown": 0,
     "finished": 25,
-    "ok": 144
+    "ok": 143
   },
   "abandoned": {
     "total": 2,
@@ -807,8 +1750,8 @@
     "critical": 0,
     "high": 6,
     "medium": 11,
-    "low": 7,
-    "none": 169
+    "low": 8,
+    "none": 168
   },
   "flags": {
     "abandoned": {
@@ -895,6 +1838,20 @@
         "low": 6
       }
     },
+    "capped": {
+      "carrying": 1,
+      "leading": 1,
+      "accepted": {
+        "all": 0,
+        "in_graded": 0
+      },
+      "by_verdict": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 1
+      }
+    },
     "vulnerable": {
       "carrying": 1,
       "leading": null,
@@ -910,7 +1867,7 @@
   "exposure": [
     {
       "package": "mautic/core-lib",
-      "flagged": 22
+      "flagged": 23
     }
   ],
   "exposure_rule": {
@@ -918,20 +1875,20 @@
   },
   "unattributed": [],
   "rot_depth": {
-    "flagged": 24,
-    "measured": 24,
+    "flagged": 25,
+    "measured": 25,
     "unmeasured": {
       "unreached": 0,
       "no_composer_json": 0
     },
     "by_reach": {
       "direct": 2,
-      "transitive": 22,
+      "transitive": 23,
       "unreached": 0
     },
-    "not_in_composer_json": 22,
+    "not_in_composer_json": 23,
     "require_dev_not_walked": 0,
-    "production": 24,
+    "production": 25,
     "development": 0,
     "by_depth": [
       {
@@ -940,7 +1897,7 @@
       },
       {
         "depth": 1,
-        "flagged": 8
+        "flagged": 9
       },
       {
         "depth": 2,
@@ -2007,9 +2964,9 @@
         {
           "id": "S7",
           "level": "info",
-          "summary": "pulls in 22 flagged packages: mustangostang/spyc (silent · old-promise), composer/package-versions-deprecated (abandoned), doctrine/cache (abandoned), gaufrette/extras (silent), knplabs/gaufrette (left-behind · old-promise) and 17 more",
+          "summary": "pulls in 23 flagged packages: mustangostang/spyc (silent · old-promise), composer/package-versions-deprecated (abandoned), doctrine/cache (abandoned), gaufrette/extras (silent), knplabs/gaufrette (left-behind · old-promise) and 18 more",
           "data": {
-            "flagged": 22,
+            "flagged": 23,
             "packages": [
               {
                 "package": "mustangostang/spyc",
@@ -2215,6 +3172,18 @@
                 "lead": null,
                 "flag_ids": [
                   "vulnerable"
+                ]
+              },
+              {
+                "package": "ezyang/htmlpurifier",
+                "chain": [
+                  "mautic/core-lib",
+                  "ezyang/htmlpurifier"
+                ],
+                "verdict": "low",
+                "lead": "capped",
+                "flag_ids": [
+                  "capped"
                 ]
               },
               {
@@ -6938,6 +7907,283 @@
       }
     },
     {
+      "package": "ezyang/htmlpurifier",
+      "version": "v4.17.0",
+      "branch": "4.x",
+      "installed_php": {
+        "requires": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+        "target_runs": false,
+        "project_allows": null
+      },
+      "verdict": "low",
+      "priority": "low",
+      "lead": "capped",
+      "rank": 19,
+      "flags": [
+        {
+          "id": "capped",
+          "role": "lead",
+          "baseline": null,
+          "signal_ids": [
+            "S11"
+          ],
+          "degree": null,
+          "headline": {
+            "unit": "php_minor",
+            "value": "8.3",
+            "source": null
+          },
+          "summary": "requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0: it stops at 8.3, so the newest PHP, 8.5, is excluded"
+        }
+      ],
+      "score": {
+        "model": 1,
+        "total": 4,
+        "exact": 4,
+        "rounded_down": false,
+        "band": {
+          "floor": 1,
+          "next": "medium",
+          "to_next": 4
+        },
+        "decided_by": "maintenance",
+        "parts": {
+          "maintenance": {
+            "status": "counted",
+            "contribution": 4,
+            "alone": {
+              "total": 4,
+              "verdict": "low"
+            }
+          },
+          "security": {
+            "status": "clear",
+            "contribution": 0,
+            "alone": {
+              "total": 0,
+              "verdict": null
+            },
+            "of": 0,
+            "tied": []
+          }
+        },
+        "terms": [
+          {
+            "part": "maintenance",
+            "flag": "capped",
+            "role": "lead",
+            "weight": 8,
+            "divisor": 1,
+            "points": 8,
+            "contribution": 4
+          }
+        ],
+        "modifiers": [
+          {
+            "reason": "transitive",
+            "applies_to": "maintenance",
+            "divide_by": 2,
+            "before": 8,
+            "after": 4
+          }
+        ],
+        "accepted": [],
+        "without": [],
+        "text": "4 = capped 8 ÷ 2 transitive"
+      },
+      "next_step": {
+        "kind": "update",
+        "source": "capped",
+        "merged": [],
+        "fix_kind": null,
+        "reason": null,
+        "replacement": null,
+        "quiet_years": null,
+        "to_branch": "4.x",
+        "version": "v4.19.1",
+        "newest": "v4.19.1",
+        "constraint": null,
+        "latest": null,
+        "php_check": {
+          "requires": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+          "project_allows": null,
+          "target_runs": true,
+          "raise_to": null,
+          "raise_size": null
+        },
+        "crosses_major": false,
+        "held_by": [],
+        "clears": [
+          {
+            "kind": "flag",
+            "id": "capped",
+            "basis": "admits_newest_php"
+          }
+        ],
+        "unverified": [],
+        "adds": [],
+        "leaves": [],
+        "clears_all": true,
+        "if_applied": {
+          "total": 0,
+          "verdict": "ok",
+          "lead": null,
+          "deciding_advisory": null,
+          "at_most": false,
+          "assumes": [
+            "clears_hold"
+          ]
+        },
+        "check": null,
+        "composer_moves_because": [],
+        "commands": [
+          [
+            "composer",
+            "update",
+            "ezyang/htmlpurifier"
+          ]
+        ],
+        "through": [
+          {
+            "package": "mautic/core-lib",
+            "installed_version": "7.0.0-dev",
+            "installed_requires": null,
+            "newest_stable": null,
+            "newest_requires": null,
+            "newest_requires_unmeasured": "not_from_composer_repository"
+          }
+        ],
+        "also": [],
+        "text": "composer update ezyang/htmlpurifier (gets v4.19.1) — clears capped"
+      },
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 4,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (https://repo.packagist.org)",
+            "registry": "packagist.org",
+            "answer": "answered",
+            "records": 4,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [],
+      "checks_skipped": [],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "read",
+        "reason": null,
+        "forge": "github",
+        "host": "github.com",
+        "repo": "ezyang/htmlpurifier",
+        "event": "push",
+        "archived": false,
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
+      },
+      "allowlist": null,
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/ezyang/htmlpurifier",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": null,
+      "libyears_at_least": false,
+      "direct": false,
+      "dev": false,
+      "reach": "transitive",
+      "chain": [
+        "mautic/core-lib",
+        "ezyang/htmlpurifier"
+      ],
+      "depth": 1,
+      "depth_unmeasured": null,
+      "named_in": [],
+      "direct_dependents": [
+        "mautic/core-lib"
+      ],
+      "signals": [
+        {
+          "id": "S11",
+          "level": "warn",
+          "summary": "php \"~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0\" stops at 8.3; the newest PHP, 8.5, is excluded",
+          "data": {
+            "newest_php": "8.5",
+            "newest_php_source": "known",
+            "requires": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+            "stops_at": "8.3",
+            "excludes_target": true,
+            "admits_newest": {
+              "version": "v4.19.1",
+              "branch": "4.x",
+              "blocking": null
+            }
+          }
+        }
+      ],
+      "evidence": "capped: requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0: it stops at 8.3, so the newest PHP, 8.5, is excluded",
+      "allowlist_reason": null,
+      "data_date": "2026-10-14T00:00:00+00:00",
+      "libyears": 2.83,
+      "age": {
+        "installed": {
+          "at": "2023-11-17T15:01:25+00:00",
+          "years": 2.9,
+          "dated_by": null
+        },
+        "installed_unmeasured": null,
+        "release": {
+          "version": "v4.19.1",
+          "at": "2026-09-15T15:42:51+00:00",
+          "years": 0.1,
+          "level": null,
+          "dated_by": null
+        },
+        "release_unmeasured": null,
+        "branch_release": {
+          "version": "v4.19.1",
+          "at": "2026-09-15T15:42:51+00:00",
+          "years": 0.1,
+          "level": null,
+          "dated_by": null
+        },
+        "branch_release_unmeasured": null,
+        "push": {
+          "at": "2026-10-05T14:24:02+00:00",
+          "years": 0,
+          "level": null
+        },
+        "push_unmeasured": null
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    },
+    {
       "package": "markbaker/complex",
       "version": "3.0.2",
       "branch": "3.x",
@@ -6949,7 +8195,7 @@
       "verdict": "low",
       "priority": "low",
       "lead": "stale",
-      "rank": 19,
+      "rank": 20,
       "flags": [
         {
           "id": "stale",
@@ -7215,7 +8461,7 @@
       "verdict": "low",
       "priority": "low",
       "lead": "stale",
-      "rank": 20,
+      "rank": 21,
       "flags": [
         {
           "id": "stale",
@@ -7467,7 +8713,7 @@
       "verdict": "low",
       "priority": "low",
       "lead": "stale",
-      "rank": 21,
+      "rank": 22,
       "flags": [
         {
           "id": "stale",
@@ -7719,7 +8965,7 @@
       "verdict": "low",
       "priority": "low",
       "lead": "stale",
-      "rank": 22,
+      "rank": 23,
       "flags": [
         {
           "id": "stale",
@@ -7970,7 +9216,7 @@
       "verdict": "low",
       "priority": "low",
       "lead": "stale",
-      "rank": 23,
+      "rank": 24,
       "flags": [
         {
           "id": "stale",
@@ -8236,7 +9482,7 @@
       "verdict": "low",
       "priority": "low",
       "lead": "stale",
-      "rank": 24,
+      "rank": 25,
       "flags": [
         {
           "id": "stale",
@@ -8502,7 +9748,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 25,
+      "rank": 26,
       "flags": [],
       "score": {
         "model": 1,
@@ -8634,7 +9880,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 26,
+      "rank": 27,
       "flags": [],
       "score": {
         "model": 1,
@@ -8765,7 +10011,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 27,
+      "rank": 28,
       "flags": [],
       "score": {
         "model": 1,
@@ -8897,7 +10143,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 28,
+      "rank": 29,
       "flags": [],
       "score": {
         "model": 1,
@@ -9028,7 +10274,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 29,
+      "rank": 30,
       "flags": [],
       "score": {
         "model": 1,
@@ -9159,7 +10405,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 30,
+      "rank": 31,
       "flags": [],
       "score": {
         "model": 1,
@@ -9290,7 +10536,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 31,
+      "rank": 32,
       "flags": [],
       "score": {
         "model": 1,
@@ -9422,7 +10668,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 32,
+      "rank": 33,
       "flags": [],
       "score": {
         "model": 1,
@@ -9554,7 +10800,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 33,
+      "rank": 34,
       "flags": [],
       "score": {
         "model": 1,
@@ -9685,7 +10931,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 34,
+      "rank": 35,
       "flags": [],
       "score": {
         "model": 1,
@@ -9817,7 +11063,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 35,
+      "rank": 36,
       "flags": [],
       "score": {
         "model": 1,
@@ -9949,7 +11195,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 36,
+      "rank": 37,
       "flags": [],
       "score": {
         "model": 1,
@@ -10081,7 +11327,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 37,
+      "rank": 38,
       "flags": [],
       "score": {
         "model": 1,
@@ -10213,7 +11459,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 38,
+      "rank": 39,
       "flags": [],
       "score": {
         "model": 1,
@@ -10345,7 +11591,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 39,
+      "rank": 40,
       "flags": [],
       "score": {
         "model": 1,
@@ -10477,7 +11723,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 40,
+      "rank": 41,
       "flags": [],
       "score": {
         "model": 1,
@@ -10609,7 +11855,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 41,
+      "rank": 42,
       "flags": [],
       "score": {
         "model": 1,
@@ -10740,7 +11986,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 42,
+      "rank": 43,
       "flags": [],
       "score": {
         "model": 1,
@@ -10871,7 +12117,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 43,
+      "rank": 44,
       "flags": [],
       "score": {
         "model": 1,
@@ -11003,7 +12249,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 44,
+      "rank": 45,
       "flags": [],
       "score": {
         "model": 1,
@@ -11134,7 +12380,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 45,
+      "rank": 46,
       "flags": [],
       "score": {
         "model": 1,
@@ -11265,7 +12511,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 46,
+      "rank": 47,
       "flags": [],
       "score": {
         "model": 1,
@@ -11396,7 +12642,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 47,
+      "rank": 48,
       "flags": [],
       "score": {
         "model": 1,
@@ -11528,7 +12774,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 48,
+      "rank": 49,
       "flags": [],
       "score": {
         "model": 1,
@@ -11660,7 +12906,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 49,
+      "rank": 50,
       "flags": [],
       "score": {
         "model": 1,
@@ -11792,7 +13038,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 50,
+      "rank": 51,
       "flags": [],
       "score": {
         "model": 1,
@@ -11924,7 +13170,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 51,
+      "rank": 52,
       "flags": [],
       "score": {
         "model": 1,
@@ -12056,7 +13302,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 52,
+      "rank": 53,
       "flags": [],
       "score": {
         "model": 1,
@@ -12187,7 +13433,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 53,
+      "rank": 54,
       "flags": [],
       "score": {
         "model": 1,
@@ -12319,7 +13565,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 54,
+      "rank": 55,
       "flags": [],
       "score": {
         "model": 1,
@@ -12451,7 +13697,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 55,
+      "rank": 56,
       "flags": [],
       "score": {
         "model": 1,
@@ -12583,7 +13829,7 @@
       "verdict": "ok",
       "priority": "none",
       "lead": null,
-      "rank": 56,
+      "rank": 57,
       "flags": [],
       "score": {
         "model": 1,
@@ -12689,137 +13935,6 @@
         "push": {
           "at": "2025-11-10T10:02:20+00:00",
           "years": 0.9,
-          "level": null
-        },
-        "push_unmeasured": null
-      },
-      "baseline": null,
-      "gate": {
-        "reaches_fail_on": false,
-        "fails": false,
-        "exempt_by": null,
-        "by": [],
-        "basis": null
-      }
-    },
-    {
-      "package": "ezyang/htmlpurifier",
-      "version": "v4.17.0",
-      "branch": "4.x",
-      "installed_php": {
-        "requires": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
-        "target_runs": false,
-        "project_allows": null
-      },
-      "verdict": "ok",
-      "priority": "none",
-      "lead": null,
-      "rank": 57,
-      "flags": [],
-      "score": {
-        "model": 1,
-        "total": 0,
-        "exact": 0,
-        "accepted": [],
-        "text": "0"
-      },
-      "next_step": null,
-      "security": {
-        "status": "clear",
-        "check": "complete",
-        "complete": true,
-        "unchecked_reason": null,
-        "records": 4,
-        "feeds": [
-          {
-            "composer_repository": "composer repo (https://repo.packagist.org)",
-            "registry": "packagist.org",
-            "answer": "answered",
-            "records": 4,
-            "reason": null
-          }
-        ],
-        "ignored": [],
-        "ignored_count": 0
-      },
-      "checks_missing": [],
-      "checks_skipped": [],
-      "unchecked_accepted": [],
-      "maintenance_judged": true,
-      "metadata": {
-        "status": "read",
-        "reason": null,
-        "message": null
-      },
-      "activity": {
-        "status": "read",
-        "reason": null,
-        "forge": "github",
-        "host": "github.com",
-        "repo": "ezyang/htmlpurifier",
-        "event": "push",
-        "archived": false,
-        "fetched_at": "2026-10-14T00:00:00+00:00",
-        "cached_at": "2026-10-14T00:00:00+00:00"
-      },
-      "allowlist": null,
-      "abandoned_ignored": null,
-      "from_composer_repository": true,
-      "origin": {
-        "kind": "packagist",
-        "registry": "packagist.org",
-        "package_url": "https://packagist.org/packages/ezyang/htmlpurifier",
-        "local": false
-      },
-      "replacement": null,
-      "replacement_url": null,
-      "note": null,
-      "libyears_unmeasured": null,
-      "libyears_at_least": false,
-      "direct": false,
-      "dev": false,
-      "reach": "transitive",
-      "chain": [
-        "mautic/core-lib",
-        "ezyang/htmlpurifier"
-      ],
-      "depth": 1,
-      "depth_unmeasured": null,
-      "named_in": [],
-      "direct_dependents": [
-        "mautic/core-lib"
-      ],
-      "signals": [],
-      "evidence": "",
-      "allowlist_reason": null,
-      "data_date": "2026-10-14T00:00:00+00:00",
-      "libyears": 2.83,
-      "age": {
-        "installed": {
-          "at": "2023-11-17T15:01:25+00:00",
-          "years": 2.9,
-          "dated_by": null
-        },
-        "installed_unmeasured": null,
-        "release": {
-          "version": "v4.19.1",
-          "at": "2026-09-15T15:42:51+00:00",
-          "years": 0.1,
-          "level": null,
-          "dated_by": null
-        },
-        "release_unmeasured": null,
-        "branch_release": {
-          "version": "v4.19.1",
-          "at": "2026-09-15T15:42:51+00:00",
-          "years": 0.1,
-          "level": null,
-          "dated_by": null
-        },
-        "branch_release_unmeasured": null,
-        "push": {
-          "at": "2026-10-05T14:24:02+00:00",
-          "years": 0,
           "level": null
         },
         "push_unmeasured": null
