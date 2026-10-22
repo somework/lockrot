@@ -25,8 +25,20 @@ interface MoveChecker
     /** @param array<string, string> $inline name => constraint: one `composer update` of every name */
     public function combined(array $inline): CheckOutcome;
 
+    /**
+     * One update of the names at the solve's php, with no constraint, each hold with its target
+     * (`run.php_window.target_fix`). It takes the baseline's reason when the baseline was not
+     * checked, and ignores a refused baseline.
+     *
+     * @param non-empty-list<string> $names
+     */
+    public function solveAt(array $names): CheckOutcome;
+
     /** The php version that the solve runs at, as Composer's problem text names it; null when nothing solves. */
     public function platformPhp(): ?string;
+
+    /** `config.platform.php` of Composer's merged config, null when it names none or when nothing solves. */
+    public function configuredPhp(): ?string;
 
     /** The version of the Composer that solves, null when nothing solves. */
     public function composerVersion(): ?string;

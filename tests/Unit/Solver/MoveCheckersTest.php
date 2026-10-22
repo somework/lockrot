@@ -64,6 +64,18 @@ final class MoveCheckersTest extends TestCase
         self::assertSame('8.4.3', $checker->platformPhp());
     }
 
+    /** `target_fix.platform_step` reads the configured php: the solve runs at the target minor's newest patch instead. */
+    public function testTheProjectsMoveCheckKeepsAConfiguredPlatformPhpOutsideTheTargetMinor(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['platform' => ['php' => '7.4.29']]]);
+
+        $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
+
+        self::assertSame(['8.4.99', '7.4.29'], [$checker->platformPhp(), $checker->configuredPhp()]);
+        self::assertNull(MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), new Config(false), [], '8.4', false, Deadline::never())->configuredPhp());
+    }
+
     /** A locked package without a Composer repository's notification-url keeps its locked version only, in packages-dev too. */
     public function testTheProjectsMoveCheckChecksNoMoveOfALockedPackageThatNoComposerRepositoryServes(): void
     {

@@ -208,6 +208,83 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->jsonSerialize());
     }
 
+    /** wallabag 2.6.14 at 8.4: the root requires guzzle5-adapter ^2.0, and its one 2.x release requires php ^7.0. */
+    public function testAnUnlockThatNoReleaseAdmitsIsRefusedAndTheRootRequirementKeepsItsTarget(): void
+    {
+        $checker = self::checker(
+            ['acme/adapter' => '^2.0'],
+            [['name' => 'acme/adapter', 'version' => '2.0.0', 'require' => ['php' => '^7.0']]],
+            ['acme/adapter' => [['version' => '2.0.0', 'require' => ['php' => '^7.0']]]]
+        );
+
+        $outcome = $checker->solveAt(['acme/adapter']);
+
+        self::assertSame(['result' => 'refused', 'form' => null, 'reason' => null], $outcome->check()->jsonSerialize());
+        self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'acme/adapter', 'constraint' => '^2.0'], self::rows($outcome->holds()));
+        self::assertContains(['source' => 'package', 'package' => 'acme/adapter', 'version' => '2.0.0', 'link' => 'platform', 'target' => 'php', 'constraint' => '^7.0'], self::rows($outcome->holds()));
+    }
+
+    public function testAnUnlockWhoseNewerReleaseAdmitsTheSolvesPhpResolvesInlineAlthoughTheBaselineIsRefused(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['php' => '<8.4']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['php' => '<8.4']], ['version' => '1.1.0', 'require' => ['php' => '>=8.1']]]]
+        );
+
+        $outcome = $checker->solveAt(['acme/lib']);
+
+        self::assertSame(MoveCheck::REFUSED, $checker->baseline()->check()->result());
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null], $outcome->check()->jsonSerialize());
+    }
+
+    /** monica at 8.5: the newer release needs a dependency that a root requirement keeps, so only `-W` moves it. */
+    public function testAnUnlockWhoseNewerReleaseNeedsARootRequirementMovedResolvesOnlyWithAllDependencies(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/dep' => '^1.0 || ^2.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['php' => '<8.4', 'acme/dep' => '^1.0']], ['name' => 'acme/dep', 'version' => '1.0.0']],
+            [
+                'acme/lib' => [['version' => '1.0.0', 'require' => ['php' => '<8.4', 'acme/dep' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/dep' => '^2.0']]],
+                'acme/dep' => [['version' => '1.0.0'], ['version' => '2.0.0']],
+            ]
+        );
+
+        self::assertSame(['result' => 'resolves', 'form' => 'with-all-dependencies', 'reason' => null], $checker->solveAt(['acme/lib'])->check()->jsonSerialize());
+    }
+
+    public function testAnUnlockTakesTheReasonOfABaselineThatWasNotChecked(): void
+    {
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [['version' => '1.1.0']]]), []);
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::inSeconds(-1.0));
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'install_time_budget'], $checker->solveAt(['acme/lib'])->check()->jsonSerialize());
+    }
+
+    public function testAnUnlockOfAPackageThatNoComposerRepositoryServesIsNotChecked(): void
+    {
+        $solver = new ComposerSolver(self::root(['acme/own' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/own', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource([]), []);
+        $checker = new SolverChecker($solver, ['acme/own'], '8.4.99', false, Deadline::never());
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'not_from_composer_repository'], $checker->solveAt(['acme/lib', 'acme/own'])->check()->jsonSerialize());
+    }
+
+    /**
+     * @dataProvider unloadedNames
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('unloadedNames')]
+    public function testAnUnlockOfAPackageTheSourceCouldNotLoadIsNotChecked(string $failure, string $reason): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/other' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['php' => '<8.4']], ['name' => 'acme/other', 'version' => '1.0.0', 'require' => ['php' => '<8.4']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['php' => '<8.4']], ['version' => '1.1.0']]],
+            ['acme/other' => $failure]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason], $checker->solveAt(['acme/lib', 'acme/other'])->check()->jsonSerialize());
+    }
+
     /** @return iterable<string, array{string, string}> */
     public static function unloadedNames(): iterable
     {

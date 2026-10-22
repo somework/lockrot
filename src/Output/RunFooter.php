@@ -9,9 +9,12 @@ use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\Report2Root;
 use Lockrot\Analyzer\SecurityTotals;
+use Lockrot\Analyzer\TargetFix;
 use Lockrot\Data\Advisory\AdvisoryRepository;
+use Lockrot\Security\Holder;
 use Lockrot\Security\Severity;
 use Lockrot\Solver\MoveCheck;
+use Lockrot\Verdict\MoveText;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\ShellCommand;
 
@@ -215,10 +218,11 @@ final class RunFooter
     }
 
     /**
-     * The `php:` line of `run.php_window`: the minors the lock installs on, the PHP that Composer
-     * checks it at, and the links that exclude the next minor. Null when the window is null.
+     * The `php:` line of `run.php_window`: the minors the lock installs on, then the update that
+     * admits an excluded target (`target_fix`), or else the PHP that Composer checks the lock at
+     * and the links that set the edge which matters. Null when the window is null.
      *
-     * @param callable(string): string $name
+     * @param callable(string): string $name marks a package name or a command as the format marks code
      */
     public static function phpWindow(Report $report, callable $name): ?string
     {
@@ -233,29 +237,106 @@ final class RunFooter
         $clause = $with === null || $with['minors'] === $without['minors']
             ? 'the lock installs '.self::installsOn($without['minors'], $known)
             : 'without require-dev the lock installs '.self::installsOn($without['minors'], $known).', and with require-dev '.self::installsOn($with['minors'], $known);
+        $target = $window->targetMinor();
+        $fix = $data['target_fix'];
+        if ($fix !== null && TargetFix::isRootCeiling($fix)) {
+            return 'php: '.$clause.'; your target, '.$target.', is excluded: '.self::ceilingWords($fix['held_by']);
+        }
         if (!$data['target']['inside']) {
-            $clause .= ', so your target, '.$window->targetMinor().', is excluded';
+            $clause .= ', so your target, '.$target.', is excluded';
+        }
+        if ($fix !== null) {
+            return 'php: '.$clause.'; '.self::fixWords($fix, $target, $name);
         }
         $parts = [$clause];
         if ($data['platform_override'] !== null) {
             $parts[] = 'Composer checks it at '.$data['platform_override'].' from config.platform.php';
         }
-        $analysed = $report->includesDev() && $with !== null ? $with : $without;
-        $edge = $analysed['upper_edge'];
+        $edge = self::edgeWords($window, $report->includesDev(), $name);
         if ($edge !== null) {
-            $setters = [];
-            foreach ($edge['set_by'] as $req) {
-                $setter = self::setter($req, $name);
-                if (!\in_array($setter, $setters, true)) {
-                    $setters[] = $setter;
-                }
-            }
-            if ($setters !== []) {
-                $parts[] = self::names($setters).(\count($setters) === 1 ? ' excludes ' : ' exclude ').$edge['excludes'];
-            }
+            $parts[] = $edge;
         }
 
         return 'php: '.implode('; ', $parts);
+    }
+
+    /**
+     * The setters of the lowest edge when the target lies below it, else those of the highest edge
+     * of the set that the run analysed.
+     *
+     * @param callable(string): string $name
+     */
+    private static function edgeWords(PhpWindow $window, bool $includesDev, callable $name): ?string
+    {
+        $data = $window->toArray();
+        $lowest = ($data['with_dev'] ?? $data['without_dev'])['lower_edge'];
+        if ($lowest !== null && $window->targetBelowLowest()) {
+            $setters = self::setters($lowest['set_by'], $name);
+
+            return $setters === [] ? null : self::names($setters).(\count($setters) === 1 ? ' sets' : ' set').' the lowest PHP, '.$lowest['php'];
+        }
+        $edge = ($includesDev && $data['with_dev'] !== null ? $data['with_dev'] : $data['without_dev'])['upper_edge'];
+        if ($edge === null) {
+            return null;
+        }
+        $setters = self::setters($edge['set_by'], $name);
+
+        return $setters === [] ? null : self::names($setters).(\count($setters) === 1 ? ' excludes ' : ' exclude ').$edge['excludes'];
+    }
+
+    /**
+     * @param list<array{name: ?string, link: string, target: string, dev: bool}> $reqs
+     * @param callable(string): string                                             $name
+     *
+     * @return list<string> each setter once
+     */
+    private static function setters(array $reqs, callable $name): array
+    {
+        $setters = [];
+        foreach ($reqs as $req) {
+            $setter = self::setter($req, $name);
+            if (!\in_array($setter, $setters, true)) {
+                $setters[] = $setter;
+            }
+        }
+
+        return $setters;
+    }
+
+    /**
+     * The `target_fix` clause (§7.0): Composer's answer to the update of the listed packages.
+     *
+     * @param array{packages: list<array{name: ?string}>, command: ?list<string>, check: string, reason: ?string, held_by: list<Holder>, platform_step: bool} $fix
+     * @param callable(string): string                                                                                                               $name
+     */
+    private static function fixWords(array $fix, string $target, callable $name): string
+    {
+        $count = \count(array_unique(array_column($fix['packages'], 'name')));
+        $them = $count === 1 ? 'the package that excludes it' : 'the '.$count.' packages that exclude it';
+        switch ($fix['check']) {
+            case MoveCheck::RESOLVES:
+                $command = $name((string) ShellCommand::posix((array) $fix['command']));
+
+                return $fix['platform_step']
+                    ? 'set config.platform.php to your PHP '.$target." release, then Composer's solver resolves: ".$command
+                    : "Composer's solver at PHP ".$target.' resolves: '.$command;
+            case MoveCheck::REFUSED:
+                $holds = array_map(static fn (Holder $hold): string => ($hold->source() === Holder::ROOT ? 'composer.json' : $name((string) $hold->package()).' '.$hold->version()).' '.MoveText::linkWords($hold, $name), $fix['held_by']);
+
+                return "Composer's solver at PHP ".$target.' refuses the update of '.$them.($holds === [] ? '' : ': '.implode(' and ', $holds));
+            default:
+                return 'the update of '.$them.' is not checked ('.($fix['reason'] === null ? 'the run checked no move' : MoveCheck::reasonWords($fix['reason'])).')';
+        }
+    }
+
+    /**
+     * "require.php allows only ~8.1.0", "conflict.php excludes >=8.4", joined with "and".
+     *
+     * @param list<Holder> $holds
+     */
+    private static function ceilingWords(array $holds): string
+    {
+        return implode(' and ', array_map(static fn (Holder $hold): string => $hold->link().'.'.$hold->target().($hold->link() === Holder::CONFLICT ? ' excludes ' : ' allows only ').$hold->constraint(), $holds));
     }
 
     /**

@@ -31,6 +31,7 @@ final class SolverChecker implements MoveChecker
     /** @var list<string> */
     private array $notFromComposerRepository;
     private string $platformPhp;
+    private ?string $configuredPhp;
     private bool $blocksAdvisories;
     private Deadline $deadline;
     private ?PoolAdvisories $advisories;
@@ -43,9 +44,11 @@ final class SolverChecker implements MoveChecker
     /**
      * @param list<string> $notFromComposerRepository the locked names that no Composer repository serves
      * @param string       $platformPhp              the php version that the solve runs at, as config.platform writes it
+     * @param ?string      $configuredPhp            `config.platform.php` of Composer's merged config
      */
-    public function __construct(ComposerSolver $solver, array $notFromComposerRepository, string $platformPhp, bool $blocksAdvisories, Deadline $deadline, ?PoolAdvisories $advisories = null)
+    public function __construct(ComposerSolver $solver, array $notFromComposerRepository, string $platformPhp, bool $blocksAdvisories, Deadline $deadline, ?PoolAdvisories $advisories = null, ?string $configuredPhp = null)
     {
+        $this->configuredPhp = $configuredPhp;
         $this->advisories = $advisories;
         $this->solver = $solver;
         $this->scan = new HoldScan($solver->root(), $solver->locked());
@@ -107,6 +110,11 @@ final class SolverChecker implements MoveChecker
         return $this->platformPhp;
     }
 
+    public function configuredPhp(): ?string
+    {
+        return $this->configuredPhp;
+    }
+
     public function composerVersion(): string
     {
         return ComposerFeatures::version();
@@ -135,6 +143,24 @@ final class SolverChecker implements MoveChecker
         return $clone;
     }
 
+    public function solveAt(array $names): CheckOutcome
+    {
+        $baseline = $this->baseline()->check();
+        if (!$baseline->isResolved() && !$baseline->isRefused()) {
+            return new CheckOutcome($baseline);
+        }
+        if (array_intersect($names, $this->notFromComposerRepository) !== []) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::NOT_FROM_COMPOSER_REPOSITORY));
+        }
+        $tried = $this->forms(SolveRequest::unlock($names), ...$names);
+        if ($tried instanceof CheckOutcome) {
+            return $tried;
+        }
+        [$form, $solution] = $tried;
+
+        return $form === null ? new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds())) : new CheckOutcome(MoveCheck::resolves($form));
+    }
+
     private function solve(MoveQuery $query): CheckOutcome
     {
         $unchecked = $this->unchecked();
@@ -144,22 +170,38 @@ final class SolverChecker implements MoveChecker
         if (\in_array($query->package(), $this->notFromComposerRepository, true)) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::NOT_FROM_COMPOSER_REPOSITORY));
         }
-        $request = $query->request();
-        $inline = $this->attempt($request->withTransitive(SolveRequest::LISTED), $query->package());
-        if (!$inline instanceof Solution || $inline->resolves()) {
-            return $inline instanceof Solution ? $this->resolved(MoveCheck::INLINE, $inline, $query) : $inline;
+        $tried = $this->forms($query->request(), $query->package());
+        if ($tried instanceof CheckOutcome) {
+            return $tried;
         }
+        [$form, $solution] = $tried;
+
+        return $form === null ? $this->refusal($solution, $query) : $this->resolved($form, $solution, $query);
+    }
+
+    /**
+     * The request as listed, then `-w`, then `-W`: the first form that resolves and its solution,
+     * a null form and the last refusal, or the outcome of a solve that did not run.
+     *
+     * @return array{0: MoveCheck::INLINE|MoveCheck::WITH_DEPENDENCIES|MoveCheck::WITH_ALL_DEPENDENCIES|null, 1: Solution}|CheckOutcome
+     */
+    private function forms(SolveRequest $request, string ...$moved)
+    {
+        $last = null;
         // `-W` frees more packages than `-w`, and Composer 2.9 and later then block more of their
         // locked versions, so `-W` can refuse a move that `-w` resolves: each form is asked in turn.
-        foreach ([SolveRequest::WITH_DEPENDENCIES => MoveCheck::WITH_DEPENDENCIES, SolveRequest::WITH_ALL_DEPENDENCIES => MoveCheck::WITH_ALL_DEPENDENCIES] as $transitive => $form) {
-            $solution = $this->attempt($request->withTransitive($transitive), $query->package());
-            if (!$solution instanceof Solution || $solution->resolves()) {
-                return $solution instanceof Solution ? $this->resolved($form, $solution, $query) : $solution;
+        foreach ([SolveRequest::LISTED => MoveCheck::INLINE, SolveRequest::WITH_DEPENDENCIES => MoveCheck::WITH_DEPENDENCIES, SolveRequest::WITH_ALL_DEPENDENCIES => MoveCheck::WITH_ALL_DEPENDENCIES] as $transitive => $form) {
+            $solution = $this->attempt($request->withTransitive($transitive), ...$moved);
+            if (!$solution instanceof Solution) {
+                return $solution;
             }
-            $inline = $solution;
+            if ($solution->resolves()) {
+                return [$form, $solution];
+            }
+            $last = $solution;
         }
 
-        return $this->refusal($inline, $query);
+        return [null, $last];
     }
 
     /** A move is not checked while the baseline does not resolve: for the baseline's reason, or because it is refused. */
@@ -179,7 +221,7 @@ final class SolverChecker implements MoveChecker
      *
      * @return Solution|CheckOutcome
      */
-    private function attempt(SolveRequest $request, string $moved)
+    private function attempt(SolveRequest $request, string ...$moved)
     {
         if ($this->deadline->isPast()) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::INSTALL_TIME_BUDGET));
@@ -188,7 +230,7 @@ final class SolverChecker implements MoveChecker
         if ($this->failed($solution)) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::SOLVER_ERROR));
         }
-        $unloaded = $solution->resolves() ? null : $this->notLoaded($solution, $moved);
+        $unloaded = $solution->resolves() ? null : $this->notLoaded($solution, ...$moved);
 
         return $unloaded === null ? $solution : new CheckOutcome(MoveCheck::notChecked($unloaded));
     }

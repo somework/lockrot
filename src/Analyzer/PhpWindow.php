@@ -7,11 +7,14 @@ namespace Lockrot\Analyzer;
 use Composer\Package\AliasPackage;
 use Composer\Package\Link;
 use Composer\Package\PackageInterface;
+use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\VersionParser;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Security\Holder;
+use Lockrot\Solver\MoveChecker;
 use Lockrot\Solver\MoveCheckers;
 
 /**
@@ -23,7 +26,8 @@ use Lockrot\Solver\MoveCheckers;
  * @phpstan-type Req array{name: ?string, version: ?string, link: string, target: string, constraint: string, dev: bool}
  * @phpstan-type Window array{minors: list<string>, gaps: bool, lower_edge: ?array{php: string, set_by: list<Req>}, upper_edge: ?array{excludes: string, set_by: list<Req>}, closest: ?array{minors: list<string>, set_by: list<Req>}}
  * @phpstan-type PhpLink array{0: Req, 1: ConstraintInterface}
- * @phpstan-type Data array{platform_override: ?string, host_requires: list<string>, with_dev: ?Window, without_dev: Window, target: array{php: string, inside: bool}}
+ * @phpstan-type Fix array{packages: list<Req>, command: ?list<string>, check: string, reason: ?string, held_by: list<Holder>, platform_step: bool}
+ * @phpstan-type Data array{platform_override: ?string, host_requires: list<string>, with_dev: ?Window, without_dev: Window, target: array{php: string, inside: bool}, target_fix: ?Fix}
  */
 final class PhpWindow implements \JsonSerializable
 {
@@ -39,16 +43,26 @@ final class PhpWindow implements \JsonSerializable
     private string $targetMinor;
     /** @var list<string> */
     private array $knownMinors;
+    /** @var list<Req> */
+    private array $targetFailing;
+    /** @var list<string> */
+    private array $skippedNames;
+    private ?string $projectPlatformPhp;
 
     /**
      * @param Data         $data
      * @param list<string> $knownMinors
+     * @param list<Req>    $targetFailing the links that fail at `target.php`, on the set that `target.inside` reads
+     * @param list<string> $skippedNames  {@see LockFile::skippedNames()}
      */
-    private function __construct(array $data, string $targetMinor, array $knownMinors)
+    private function __construct(array $data, string $targetMinor, array $knownMinors, array $targetFailing, array $skippedNames, ?string $projectPlatformPhp)
     {
         $this->data = $data;
         $this->targetMinor = $targetMinor;
         $this->knownMinors = $knownMinors;
+        $this->targetFailing = $targetFailing;
+        $this->skippedNames = $skippedNames;
+        $this->projectPlatformPhp = $projectPlatformPhp;
     }
 
     /**
@@ -103,14 +117,48 @@ final class PhpWindow implements \JsonSerializable
         foreach ($sets as $set => $links) {
             $windows[$set] = $links === null ? null : self::setWindow($links, $knownMinors, $targetMinor, $targetPoint);
         }
+        $targetFailing = self::failing($sets['with_dev'] ?? $sets['without_dev'], $targetPoint);
 
         return new self([
             'platform_override' => $lock->platformOverridePhp(),
             'host_requires' => $hosts,
             'with_dev' => $windows['with_dev'],
             'without_dev' => $windows['without_dev'],
-            'target' => ['php' => $targetPoint, 'inside' => self::failing($sets['with_dev'] ?? $sets['without_dev'], $targetPoint) === []],
-        ], $targetMinor, $knownMinors);
+            'target' => ['php' => $targetPoint, 'inside' => $targetFailing === []],
+            'target_fix' => null,
+        ], $targetMinor, $knownMinors, $targetFailing, $lock->skippedNames(), $project->platformPhp());
+    }
+
+    /**
+     * `target_fix`: one update of the packages that exclude the target, and Composer's answer to
+     * it. It stays null while the target is inside the window or below its lowest edge.
+     *
+     * @param ?MoveChecker $checker the run's move check, null when the run checks no move
+     */
+    public function withTargetFix(?MoveChecker $checker): self
+    {
+        if ($this->data['target']['inside'] || $this->targetBelowLowest()) {
+            return $this;
+        }
+        $configured = ($checker === null ? null : $checker->configuredPhp()) ?? $this->projectPlatformPhp;
+        $platformStep = $configured !== null && MoveCheckers::platformPhp($this->targetMinor, $configured) !== $configured;
+        $copy = clone $this;
+        $copy->data['target_fix'] = TargetFix::of($this->targetFailing, $this->skippedNames, $platformStep, $checker);
+
+        return $copy;
+    }
+
+    /** Whether `target.php` lies below `lower_edge.php` of the set that `target.inside` reads. */
+    public function targetBelowLowest(): bool
+    {
+        $lowest = ($this->data['with_dev'] ?? $this->data['without_dev'])['lower_edge'];
+
+        return $lowest !== null && Comparator::lessThan(self::normalized($this->data['target']['php']), self::normalized($lowest['php']));
+    }
+
+    private static function normalized(string $php): string
+    {
+        return (new VersionParser())->normalize($php);
     }
 
     /**
