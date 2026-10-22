@@ -8,7 +8,7 @@ declare(strict_types=1);
 //   php tools/corpus/expected-diff.php <base commit> [--allow <json path>]... [--allow-line <prefix>]...
 //
 // Each `--allow` names a JSON path of report-2 that may differ, as an fnmatch() pattern, and each `--allow-line` the
-// prefix of a text line that this checkout may add. Findings are compared by package (`findings.<package>.…`), so a
+// prefix of a text line that this checkout may add or change. Findings are compared by package (`findings.<package>.…`), so a
 // finding that a change grades does not move the others. Every other difference of the json document and of the table, markdown and github outputs fails
 // the run with exit 1. The base is a `git archive` of the commit with this checkout's vendor/ beside it, so both sides run
 // the same dependencies. Both sides run bin/lockrot, the move check included.
@@ -183,8 +183,8 @@ function paths($base, $head, string $at): array
 }
 
 /**
- * The lines that the head adds with an allowed prefix, and every other change, when the head's text without those lines
- * must equal the base's text.
+ * The lines with an allowed prefix that the head adds or changes, and every other change, when both texts without the
+ * lines of an allowed prefix must be equal.
  *
  * @param list<string> $allowed
  *
@@ -192,22 +192,35 @@ function paths($base, $head, string $at): array
  */
 function lineChanges(string $base, string $head, array $allowed): array
 {
-    $added = [];
-    $kept = [];
-    foreach (explode("\n", $head) as $line) {
+    $prefixOf = static function (string $line) use ($allowed): ?string {
         $prefix = null;
         foreach ($allowed as $candidate) {
             if (strncmp($line, $candidate, strlen($candidate)) === 0) {
                 $prefix = $candidate;
             }
         }
+
+        return $prefix;
+    };
+    $baseLines = [];
+    $baseAllowed = [];
+    foreach (explode("\n", $base) as $line) {
+        if ($prefixOf($line) === null) {
+            $baseLines[] = $line;
+        } else {
+            $baseAllowed[] = $line;
+        }
+    }
+    $added = [];
+    $kept = [];
+    foreach (explode("\n", $head) as $line) {
+        $prefix = $prefixOf($line);
         if ($prefix === null) {
             $kept[] = $line;
-        } else {
+        } elseif (!in_array($line, $baseAllowed, true)) {
             $added[] = $prefix;
         }
     }
-    $baseLines = explode("\n", $base);
     if ($kept === $baseLines) {
         return [$added, []];
     }
