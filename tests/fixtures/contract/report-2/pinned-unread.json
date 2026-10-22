@@ -871,6 +871,24 @@
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {

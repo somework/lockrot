@@ -202,7 +202,7 @@ final class FindingRelationsTest extends TestCase
     public function testTheEnginePageDocumentsHoldEveryRelation(): void
     {
         $paths = array_merge(glob(self::CONTRACT.'page/*.json') ?: [], glob(self::DOCUMENTS.'page/snipe-it.*.json') ?: []);
-        self::assertCount(2, $paths);
+        self::assertCount(3, $paths);
         $broken = [];
         foreach ($paths as $path) {
             $document = JsonPath::decodeFile($path);

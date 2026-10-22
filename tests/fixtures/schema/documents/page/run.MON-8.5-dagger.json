@@ -917,6 +917,46 @@
    "target": {
     "php": "8.5.99",
     "inside": false
+   },
+   "target_fix": {
+    "packages": [
+     {
+      "name": "moneyphp/money",
+      "version": "v4.7.1",
+      "link": "require",
+      "target": "php",
+      "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+      "dev": false
+     },
+     {
+      "name": "nette/schema",
+      "version": "v1.3.2",
+      "link": "require",
+      "target": "php",
+      "constraint": "8.1 - 8.4",
+      "dev": false
+     },
+     {
+      "name": "brianium/paratest",
+      "version": "v7.8.4",
+      "link": "require",
+      "target": "php",
+      "constraint": "~8.2.0 || ~8.3.0 || ~8.4.0",
+      "dev": true
+     }
+    ],
+    "command": [
+     "composer",
+     "update",
+     "moneyphp/money",
+     "nette/schema",
+     "brianium/paratest",
+     "--with-all-dependencies"
+    ],
+    "check": "resolves",
+    "reason": null,
+    "held_by": [],
+    "platform_step": false
    }
   }
  },

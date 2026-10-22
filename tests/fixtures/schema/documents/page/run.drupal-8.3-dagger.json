@@ -1041,6 +1041,93 @@
    "target": {
     "php": "8.3.99",
     "inside": false
+   },
+   "target_fix": {
+    "packages": [
+     {
+      "name": "laminas/laminas-diactoros",
+      "version": "2.8.0",
+      "link": "require",
+      "target": "php",
+      "constraint": "^7.3 || ~8.0.0 || ~8.1.0",
+      "dev": false
+     },
+     {
+      "name": "laminas/laminas-escaper",
+      "version": "2.9.0",
+      "link": "require",
+      "target": "php",
+      "constraint": "^7.3 || ~8.0.0 || ~8.1.0",
+      "dev": false
+     },
+     {
+      "name": "laminas/laminas-feed",
+      "version": "2.15.0",
+      "link": "require",
+      "target": "php",
+      "constraint": "^7.3 || ~8.0.0 || ~8.1.0",
+      "dev": false
+     },
+     {
+      "name": "laminas/laminas-stdlib",
+      "version": "3.6.1",
+      "link": "require",
+      "target": "php",
+      "constraint": "^7.3 || ~8.0.0 || ~8.1.0",
+      "dev": false
+     }
+    ],
+    "command": null,
+    "check": "refused",
+    "reason": null,
+    "held_by": [
+     {
+      "source": "root",
+      "package": null,
+      "version": null,
+      "link": "root-require",
+      "target": "drupal/core-recommended",
+      "constraint": "^9.3",
+      "holder": null
+     },
+     {
+      "source": "root",
+      "package": null,
+      "version": null,
+      "link": "root-require",
+      "target": "drupal/trusted_redirect",
+      "constraint": "^1.9",
+      "holder": null
+     },
+     {
+      "source": "package",
+      "package": "drupal/core",
+      "version": "9.3.14",
+      "link": "require",
+      "target": "laminas/laminas-diactoros",
+      "constraint": "^2.1",
+      "holder": null
+     },
+     {
+      "source": "package",
+      "package": "drupal/core-recommended",
+      "version": "9.3.14",
+      "link": "require",
+      "target": "laminas/laminas-diactoros",
+      "constraint": "2.8.0",
+      "holder": null
+     },
+     {
+      "source": "package",
+      "package": "drupal/trusted_redirect",
+      "version": "1.9.0",
+      "link": "require",
+      "target": "drupal/core",
+      "constraint": "^8 || ^9",
+      "holder": null
+     }
+    ],
+    "platform_step": false
    }
   }
  },

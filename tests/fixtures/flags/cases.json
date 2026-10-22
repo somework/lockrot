@@ -1,5 +1,5 @@
 {
- "pr": "7b",
+ "pr": "7c",
  "cases": [
   {
    "id": "A",
@@ -877,7 +877,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -3971,7 +3972,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -6090,7 +6092,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -7615,7 +7618,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -9102,6 +9106,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -11155,7 +11177,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -12880,7 +12903,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -14333,7 +14357,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -15633,7 +15658,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -17209,7 +17235,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -19869,7 +19896,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -22043,7 +22071,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -24379,6 +24408,33 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "csa/guzzle-bundle",
+        "version": "dev-compat-php",
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.1",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.1.3",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -28318,6 +28374,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "mautic/core-lib",
+        "version": "4.3.x-dev",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4.0 <8.1",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -30817,7 +30890,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -33010,7 +33084,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -34183,7 +34258,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -35629,6 +35705,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.1.3",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -37216,7 +37310,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -40740,7 +40835,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -42097,6 +42193,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -43395,7 +43509,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -44967,7 +45082,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -47742,7 +47858,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -49314,7 +49431,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -50756,7 +50874,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -52145,7 +52264,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -53713,6 +53833,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "php-http/guzzle5-adapter",
+        "version": "2.0.0",
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.0",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -57744,7 +57881,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -59848,7 +59986,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -61436,6 +61575,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "mautic/core-lib",
+        "version": "4.3.x-dev",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4.0 <8.1",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -63998,7 +64154,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -65361,7 +65518,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -67061,7 +67219,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -68459,6 +68618,33 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "csa/guzzle-bundle",
+        "version": "dev-compat-php",
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.1",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.1.3",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -73429,6 +73615,33 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "joomla/filter",
+        "version": "2.0.5",
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5|~8.0.0|~8.1.0",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -75137,7 +75350,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -77420,7 +77634,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -78984,7 +79199,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -80448,7 +80664,8 @@
      "target": {
       "php": "8.0.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -82788,7 +83005,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -85875,7 +86093,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -88407,7 +88626,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -89973,7 +90193,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -92157,7 +92378,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -93676,7 +93898,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -95628,6 +95851,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -97701,6 +97942,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -98831,6 +99090,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -100888,7 +101165,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -102435,7 +102713,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -103984,7 +104263,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -106115,7 +106395,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -108545,6 +108826,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -109900,6 +110199,33 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "joomla/filter",
+        "version": "2.0.5",
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5|~8.0.0|~8.1.0",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -111637,6 +111963,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -112777,6 +113121,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -113944,7 +114306,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -115423,6 +115786,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -117419,7 +117800,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -118917,7 +119299,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -120703,6 +121086,41 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "joomla/filter",
+        "version": "2.0.5",
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5|~8.0.0|~8.1.0",
+        "dev": false
+       },
+       {
+        "name": "joomla/string",
+        "version": "2.0.1",
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5|~8.0.0|~8.1.0",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -122430,7 +122848,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -124069,6 +124488,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -125623,7 +126060,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -126831,7 +127269,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -128143,7 +128582,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -132174,7 +132614,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -134566,7 +135007,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -136648,7 +137090,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -138048,7 +138491,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -139503,7 +139947,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [],
@@ -141104,7 +141549,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -142716,7 +143162,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -144370,6 +144817,41 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "web-auth/metadata-service",
+        "version": "v2.1.7",
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.1",
+        "dev": false
+       },
+       {
+        "name": "web-auth/webauthn-lib",
+        "version": "v2.1.7",
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -145999,7 +146481,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -147874,7 +148357,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -149386,7 +149870,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -150923,7 +151408,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -152455,7 +152941,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [],
@@ -153575,7 +154062,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -155109,7 +155597,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -156668,7 +157157,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -157911,7 +158401,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -159327,7 +159818,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -160880,7 +161372,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -162489,7 +162982,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -163850,7 +164344,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -165399,7 +165894,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -166956,7 +167452,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -169353,7 +169850,8 @@
      "target": {
       "php": "8.4.99",
       "inside": false
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -170512,6 +171010,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -171647,6 +172163,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -172771,6 +173305,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "mautic/core-lib",
+        "version": "4.3.x-dev",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4.0 <8.1",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -184982,6 +185533,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.1",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -186268,6 +186836,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.1",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -187547,6 +188132,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.1",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -188826,6 +189428,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.1",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -190113,6 +190732,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.1",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -191408,6 +192044,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.x-dev",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -192710,6 +193363,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "dev-main",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -193992,6 +194662,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.1",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -195267,6 +195954,33 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "pelago/emogrifier",
+        "version": "v2.2.0",
+        "link": "require",
+        "target": "php",
+        "constraint": "^5.5.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.1.3",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -197098,6 +197812,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.1",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -198278,6 +199009,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "mautic/core-lib",
+        "version": "4.3.x-dev",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4.0 <8.1",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -210478,6 +211226,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.1",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": true
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -211776,7 +212541,8 @@
      "target": {
       "php": "7.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -213036,7 +213802,8 @@
      "target": {
       "php": "7.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -214300,6 +215067,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.1",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -215550,6 +216334,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.1",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -216803,6 +217604,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.1",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -218144,6 +218962,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "ocramius/proxy-manager",
+        "version": "2.2.4",
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.0",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -219833,6 +220668,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "ocramius/proxy-manager",
+        "version": "2.2.4",
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.0",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -221565,6 +222417,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "laminas/laminas-code",
+        "version": "4.7.1",
+        "link": "require",
+        "target": "php",
+        "constraint": ">=7.4, <8.2",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -222890,7 +223759,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [],
@@ -226346,7 +227216,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [],
@@ -227913,7 +228784,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -229479,7 +230351,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -230946,7 +231819,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -232475,7 +233349,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -233763,7 +234638,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -235082,6 +235958,23 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [
+       {
+        "name": "ezyang/htmlpurifier",
+        "version": "v4.17.0",
+        "link": "require",
+        "target": "php",
+        "constraint": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+        "dev": false
+       }
+      ],
+      "command": null,
+      "check": "not_checked",
+      "reason": null,
+      "held_by": [],
+      "platform_step": false
      }
     }
    },
@@ -236348,7 +237241,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -237933,7 +238827,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -239517,7 +240412,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -241103,7 +241999,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [],
@@ -242313,7 +243210,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -243410,7 +244308,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -244552,6 +245451,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -245674,6 +246591,24 @@
      "target": {
       "php": "8.4.99",
       "inside": false
+     },
+     "target_fix": {
+      "packages": [],
+      "command": null,
+      "check": "refused",
+      "reason": null,
+      "held_by": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "require",
+        "target": "php",
+        "constraint": "^7.2.5",
+        "holder": null
+       }
+      ],
+      "platform_step": false
      }
     }
    },
@@ -246926,7 +247861,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -248658,7 +249594,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -250771,7 +251708,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -252870,7 +253808,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -255650,7 +256589,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -257167,7 +258107,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -259285,7 +260226,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -262395,7 +263337,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -264513,7 +265456,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [
@@ -266615,7 +267559,8 @@
      "target": {
       "php": "8.4.99",
       "inside": true
-     }
+     },
+     "target_fix": null
     }
    },
    "synthetic_inputs": [

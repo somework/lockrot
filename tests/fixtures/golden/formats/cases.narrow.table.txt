@@ -695,7 +695,7 @@ genealabs/laravel-model-caching 1 · jfcherng/php-diff 1 ·
 … and 6 more
 advisories: 51 packages asked ·
 packagist.org answered (271 on record for 20 packages)
-php: the lock installs on no PHP, so your target, 8.4, is excluded
+php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 9 packages that exclude it is not checked (the run checked no move)
 baseline: 3 known · 40 new · 4 worsened ·
 0 stale (lockrot-baseline.json)
 gate: fails · --fail-on=high,unchecked ·

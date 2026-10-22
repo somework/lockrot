@@ -11,6 +11,6 @@ depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 ·
 libyears: 0.0 behind across the one package · 0.0 from direct requirements · furthest behind ocramius/proxy-manager 2.2.4 at 0.0
 pulled in by: `symfony/proxy-manager-bridge` 1
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
-php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; `ocramius/proxy-manager` excludes 8.0
+php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
 
 <sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

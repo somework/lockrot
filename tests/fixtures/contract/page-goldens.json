@@ -1337,7 +1337,7 @@
       "gate_link_rows": 1,
       "state_lines": [
         "Incomplete data: no advisory check ran. What this run could not see",
-        "PHP: this lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded. The PHP window"
+        "PHP: this lock installs on PHP 7.2 to 7.4 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
       ],
       "waffle_caption": "0 of 1 package flagged · 1 ok · 0 allowlisted",
       "lead_scope": null,
@@ -1408,7 +1408,7 @@
       "run_notes": [
         "security advisories not checked (offline): no finding is graded for an advisory, and each next step's score after the move assumes its versions carry none"
       ],
-      "php_line": "php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php excludes 8.0",
+      "php_line": "php: the lock installs on PHP 7.2 to 7.4; your target, 8.4, is excluded: require.php allows only ^7.2.5",
       "php_rows": [
         "PHP window, with require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 · 8.0 excluded by require.php ^7.2.5",
         "PHP window, without require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 · 8.0 excluded by require.php ^7.2.5"
@@ -1434,7 +1434,7 @@
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [
-        "PHP: this lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded. The PHP window"
+        "PHP: this lock installs on PHP 7.2 to 7.4 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
       ],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
       "lead_scope": "1 in production · 1 required directly",
@@ -1550,7 +1550,7 @@
       "run_notes": [
         "Composer is set not to block an install or an update on security advisories (policy.advisories: false); lockrot still checks and counts them."
       ],
-      "php_line": "php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php excludes 8.0",
+      "php_line": "php: the lock installs on PHP 7.2 to 7.4; your target, 8.4, is excluded: require.php allows only ^7.2.5",
       "php_rows": [
         "PHP window, with require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 and joomla/filter ^7.2.5|~8.0.0|~8.1.0 · 8.0 excluded by require.php ^7.2.5",
         "PHP window, without require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 and joomla/filter ^7.2.5|~8.0.0|~8.1.0 · 8.0 excluded by require.php ^7.2.5"
@@ -1576,7 +1576,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 84,
       "state_lines": [
-        "PHP: this lock installs on PHP 7.4, so your target, 8.4, is excluded · Composer checks it at 7.4.29, the PHP that the lock records from config.platform.php, not the PHP of the machine · 2 packages stop below the newest PHP, 8.5. The PHP window"
+        "PHP: this lock installs on PHP 7.4, so your target, 8.4, is excluded · 3 packages exclude 8.4: laminas/laminas-code, php-http/guzzle5-adapter and friendsoftwig/twigcs (require-dev) · not checked (the run checked no move). The PHP window"
       ],
       "waffle_caption": "111 of 210 packages flagged · 80 ok · 19 allowlisted",
       "lead_scope": "all 111 in production · 61 required directly, 50 pulled in",
@@ -3231,7 +3231,7 @@
         }
       ],
       "run_notes": [],
-      "php_line": "php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer checks it at 7.4.29 from config.platform.php; php-http/guzzle5-adapter excludes 8.0",
+      "php_line": "php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; the update of the 3 packages that exclude it is not checked (the run checked no move)",
       "php_rows": [
         "PHP window, with require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
         "PHP window, without require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
@@ -4609,7 +4609,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [
-        "PHP: this lock installs on PHP 7.1 to 7.4, so your target, 8.4, is excluded. The PHP window"
+        "PHP: this lock installs on PHP 7.1 to 7.4 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
       ],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
       "lead_scope": "1 in production · 1 required directly",
@@ -4747,7 +4747,7 @@
         }
       ],
       "run_notes": [],
-      "php_line": "php: the lock installs on PHP 7.1 to 7.4, so your target, 8.4, is excluded; require.php and csa/guzzle-bundle exclude 8.0",
+      "php_line": "php: the lock installs on PHP 7.1 to 7.4; your target, 8.4, is excluded: require.php allows only ^7.1.3",
       "php_rows": [
         "PHP window, with require-dev: 7.1 to 7.4 · lowest 7.1.3, set by require.php ^7.1.3 · 8.0 excluded by require.php ^7.1.3 and csa/guzzle-bundle ^7.1",
         "PHP window, without require-dev: 7.1 to 7.4 · lowest 7.1.3, set by require.php ^7.1.3 · 8.0 excluded by require.php ^7.1.3 and csa/guzzle-bundle ^7.1"
@@ -5246,7 +5246,7 @@
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [
-        "PHP: this lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded. The PHP window",
+        "PHP: this lock installs on PHP 7.2 to 7.4 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window",
         "extra.lockrot.ignore accepts maintenance flags, not advisories · 1 package it lists still counts for advisories. The run note"
       ],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
@@ -5361,7 +5361,7 @@
       "run_notes": [
         "extra.lockrot.ignore[] no longer hides advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision"
       ],
-      "php_line": "php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php excludes 8.0",
+      "php_line": "php: the lock installs on PHP 7.2 to 7.4; your target, 8.4, is excluded: require.php allows only ^7.2.5",
       "php_rows": [
         "PHP window, with require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 and symfony/yaml >=7.2.5 · 8.0 excluded by require.php ^7.2.5",
         "PHP window, without require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 and symfony/yaml >=7.2.5 · 8.0 excluded by require.php ^7.2.5"
@@ -5387,7 +5387,7 @@
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [
-        "PHP: this lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded. The PHP window"
+        "PHP: this lock installs on PHP 7.2 to 7.4 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
       ],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
       "lead_scope": "1 dev-only · 1 pulled in",
@@ -5495,7 +5495,7 @@
       ],
       "advisory_groups": [],
       "run_notes": [],
-      "php_line": "php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php excludes 8.0",
+      "php_line": "php: the lock installs on PHP 7.2 to 7.4; your target, 8.4, is excluded: require.php allows only ^7.2.5",
       "php_rows": [
         "PHP window, with require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 · 8.0 excluded by require.php ^7.2.5",
         "PHP window, without require-dev: 7.2 to 7.4 · lowest 7.2.5, set by require.php ^7.2.5 · 8.0 excluded by require.php ^7.2.5"
@@ -6024,7 +6024,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [
-        "PHP: without require-dev this lock installs on PHP 8.1 to 8.3, and with require-dev on no PHP (8.1 to 8.3 are excluded only by acme/string 1.0.0 >=8.4.1), so your target, 8.4, is excluded. The PHP window"
+        "PHP: without require-dev this lock installs on PHP 8.1 to 8.3, and with require-dev on no PHP (8.1 to 8.3 are excluded only by acme/string 1.0.0 >=8.4.1) · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
       ],
       "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
@@ -6405,7 +6405,7 @@
         }
       ],
       "run_notes": [],
-      "php_line": "php: without require-dev the lock installs on PHP 8.1 to 8.3, and with require-dev on no PHP, so your target, 8.4, is excluded; require.php and acme/installer exclude 8.4",
+      "php_line": "php: without require-dev the lock installs on PHP 8.1 to 8.3, and with require-dev on no PHP; your target, 8.4, is excluded: require.php allows only ~8.1.0 || ~8.2.0 || ~8.3.0",
       "php_rows": [
         "PHP window, with require-dev: none · 8.1 to 8.3 are excluded only by acme/string 1.0.0 >=8.4.1",
         "PHP window, without require-dev: 8.1 to 8.3 · lowest 8.1.0, set by require.php ~8.1.0 || ~8.2.0 || ~8.3.0 and acme/installer ~8.1.0 || ~8.2.0 || ~8.3.0 · 8.4 excluded by require.php ~8.1.0 || ~8.2.0 || ~8.3.0 and acme/installer ~8.1.0 || ~8.2.0 || ~8.3.0"
@@ -10410,7 +10410,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 31,
       "state_lines": [
-        "PHP: this lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded · 2 packages stop below the newest PHP, 8.5. The PHP window"
+        "PHP: this lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded · 3 packages exclude 8.5: moneyphp/money, nette/schema and brianium/paratest (require-dev) · Composer's solver at PHP 8.5 resolves this update: composer update moneyphp/money nette/schema brianium/paratest --with-all-dependencies. The PHP window"
       ],
       "waffle_caption": "56 of 181 packages flagged · 104 ok · 21 allowlisted",
       "lead_scope": "all 56 in production · 25 required directly, 31 pulled in",
@@ -11466,7 +11466,7 @@
         }
       ],
       "run_notes": [],
-      "php_line": "php: the lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded; moneyphp/money and nette/schema exclude 8.5",
+      "php_line": "php: the lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded; Composer's solver at PHP 8.5 resolves: composer update moneyphp/money nette/schema brianium/paratest --with-all-dependencies",
       "php_rows": [
         "PHP window, with require-dev: 8.3 to 8.4 · lowest 8.3.0, set by require.php ^8.3 · 8.5 excluded by brianium/paratest ~8.2.0 || ~8.3.0 || ~8.4.0, moneyphp/money ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and nette/schema 8.1 - 8.4",
         "PHP window, without require-dev: 8.3 to 8.4 · lowest 8.3.0, set by require.php ^8.3 · 8.5 excluded by moneyphp/money ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and nette/schema 8.1 - 8.4"
@@ -12128,7 +12128,7 @@
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [
-        "PHP: without require-dev this lock installs on PHP 8.2 to 8.3, and with require-dev on no PHP (8.2 to 8.3 are excluded only by symfony/string v8.1.2 >=8.4.1), so your target, 8.4, is excluded. The PHP window"
+        "PHP: without require-dev this lock installs on PHP 8.2 to 8.3, and with require-dev on no PHP (8.2 to 8.3 are excluded only by symfony/string v8.1.2 >=8.4.1) · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
       ],
       "waffle_caption": "0 of 1 package flagged · 1 ok · 0 allowlisted",
       "lead_scope": null,
@@ -12185,7 +12185,7 @@
       "signals_key": [],
       "advisory_groups": [],
       "run_notes": [],
-      "php_line": "php: without require-dev the lock installs on PHP 8.2 to 8.3, and with require-dev on no PHP, so your target, 8.4, is excluded; require.php and laminas/laminas-skeleton-installer exclude 8.4",
+      "php_line": "php: without require-dev the lock installs on PHP 8.2 to 8.3, and with require-dev on no PHP; your target, 8.4, is excluded: require.php allows only ~8.1.0 || ~8.2.0 || ~8.3.0",
       "php_rows": [
         "PHP window, with require-dev: none · 8.2 to 8.3 are excluded only by symfony/string v8.1.2 >=8.4.1",
         "PHP window, without require-dev: 8.2 to 8.3 · lowest 8.2.0, set by laminas/laminas-component-installer ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, laminas/laminas-development-mode ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, laminas/laminas-escaper ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 and 7 more · 8.4 excluded by require.php ~8.1.0 || ~8.2.0 || ~8.3.0 and laminas/laminas-skeleton-installer ~8.1.0 || ~8.2.0 || ~8.3.0"
@@ -12211,7 +12211,7 @@
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [
-        "PHP: this lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded. The PHP window"
+        "PHP: this lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded · 4 packages exclude 8.3: laminas/laminas-diactoros, laminas/laminas-escaper, laminas/laminas-feed and 1 more · Composer's solver at PHP 8.3 refuses their update: composer.json requires drupal/core-recommended ^9.3 and composer.json requires drupal/trusted_redirect ^1.9 and drupal/core 9.3.14 requires laminas/laminas-diactoros ^2.1 and drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 and drupal/trusted_redirect 1.9.0 requires drupal/core ^8 || ^9. The PHP window"
       ],
       "waffle_caption": "0 of 1 package flagged · 1 ok · 0 allowlisted",
       "lead_scope": null,
@@ -12268,7 +12268,7 @@
       "signals_key": [],
       "advisory_groups": [],
       "run_notes": [],
-      "php_line": "php: the lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded; laminas/laminas-diactoros, laminas/laminas-escaper, laminas/laminas-feed and 1 more exclude 8.2",
+      "php_line": "php: the lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded; Composer's solver at PHP 8.3 refuses the update of the 4 packages that exclude it: composer.json requires drupal/core-recommended ^9.3 and composer.json requires drupal/trusted_redirect ^1.9 and drupal/core 9.3.14 requires laminas/laminas-diactoros ^2.1 and drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 and drupal/trusted_redirect 1.9.0 requires drupal/core ^8 || ^9",
       "php_rows": [
         "PHP window, with require-dev: 7.3 to 8.1 · lowest 7.3.0, set by drupal/core >=7.3.0, drupal/core-composer-scaffold >=7.3.0, drupal/core-project-message >=7.3.0 and 4 more · 8.2 excluded by laminas/laminas-diactoros ^7.3 || ~8.0.0 || ~8.1.0, laminas/laminas-escaper ^7.3 || ~8.0.0 || ~8.1.0, laminas/laminas-feed ^7.3 || ~8.0.0 || ~8.1.0 and 1 more",
         "PHP window, without require-dev: 7.3 to 8.1 · lowest 7.3.0, set by drupal/core >=7.3.0, drupal/core-composer-scaffold >=7.3.0, drupal/core-project-message >=7.3.0 and 4 more · 8.2 excluded by laminas/laminas-diactoros ^7.3 || ~8.0.0 || ~8.1.0, laminas/laminas-escaper ^7.3 || ~8.0.0 || ~8.1.0, laminas/laminas-feed ^7.3 || ~8.0.0 || ~8.1.0 and 1 more"
@@ -14048,7 +14048,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 31,
       "state_lines": [
-        "PHP: this lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded · 2 packages stop below the newest PHP, 8.5. The PHP window"
+        "PHP: this lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded · 3 packages exclude 8.5: moneyphp/money, nette/schema and brianium/paratest (require-dev) · set config.platform.php to your PHP 8.5 release, then Composer's solver resolves this update: composer update moneyphp/money nette/schema brianium/paratest --with-all-dependencies. The PHP window"
       ],
       "waffle_caption": "56 of 181 packages flagged · 104 ok · 21 allowlisted",
       "lead_scope": "all 56 in production · 25 required directly, 31 pulled in",
@@ -15104,7 +15104,7 @@
         }
       ],
       "run_notes": [],
-      "php_line": "php: the lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded; moneyphp/money and nette/schema exclude 8.5",
+      "php_line": "php: the lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded; set config.platform.php to your PHP 8.5 release, then Composer's solver resolves: composer update moneyphp/money nette/schema brianium/paratest --with-all-dependencies",
       "php_rows": [
         "PHP window, with require-dev: 8.3 to 8.4 · lowest 8.3.0, set by require.php ^8.3 · 8.5 excluded by brianium/paratest ~8.2.0 || ~8.3.0 || ~8.4.0, moneyphp/money ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and nette/schema 8.1 - 8.4",
         "PHP window, without require-dev: 8.3 to 8.4 · lowest 8.3.0, set by require.php ^8.3 · 8.5 excluded by moneyphp/money ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and nette/schema 8.1 - 8.4"
@@ -15876,7 +15876,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 46,
       "state_lines": [
-        "PHP: this lock installs on PHP 7.4, so your target, 8.4, is excluded · Composer checks it at 7.4.29, the PHP that the lock records from config.platform.php, not the PHP of the machine · 2 packages stop below the newest PHP, 8.5. The PHP window",
+        "PHP: this lock installs on PHP 7.4, so your target, 8.4, is excluded · 3 packages exclude 8.4: laminas/laminas-code, php-http/guzzle5-adapter and friendsoftwig/twigcs (require-dev) · Composer's solver at PHP 8.4 refuses their update: composer.json requires php-http/guzzle5-adapter ^2.0. The PHP window",
         "Against lockrot-baseline.json: 61 new · 6 worsened · 48 known · 2 entries for packages that left the lock: behat/transliterator, true/punycode."
       ],
       "waffle_caption": "113 of 210 packages flagged · 78 ok · 19 allowlisted",
@@ -17579,7 +17579,7 @@
       "run_notes": [
         "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code 4.7.1 requires php >=7.4, <8.2."
       ],
-      "php_line": "php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer checks it at 7.4.29 from config.platform.php; php-http/guzzle5-adapter excludes 8.0",
+      "php_line": "php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of the 3 packages that exclude it: composer.json requires php-http/guzzle5-adapter ^2.0",
       "php_rows": [
         "PHP window, with require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
         "PHP window, without require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
@@ -19222,7 +19222,7 @@
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [
-        "PHP: this lock installs on PHP 7.3 to 8.0, so your target, 8.4, is excluded. The PHP window"
+        "PHP: this lock installs on PHP 7.3 to 8.0 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
       ],
       "waffle_caption": null,
       "lead_scope": null,
@@ -19247,7 +19247,7 @@
       "signals_key": [],
       "advisory_groups": [],
       "run_notes": [],
-      "php_line": "php: the lock installs on PHP 7.3 to 8.0, so your target, 8.4, is excluded; require.php excludes 8.1",
+      "php_line": "php: the lock installs on PHP 7.3 to 8.0; your target, 8.4, is excluded: require.php allows only >=7.3.0 <8.1",
       "php_rows": [
         "PHP window, with require-dev: 7.3 to 8.0 · lowest 7.3.0, set by require.php >=7.3.0 <8.1 · 8.1 excluded by require.php >=7.3.0 <8.1",
         "PHP window, without require-dev: 7.3 to 8.0 · lowest 7.3.0, set by require.php >=7.3.0 <8.1 · 8.1 excluded by require.php >=7.3.0 <8.1"

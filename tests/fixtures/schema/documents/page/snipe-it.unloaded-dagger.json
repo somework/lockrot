@@ -1735,7 +1735,8 @@
    "target": {
     "php": "8.4.99",
     "inside": true
-   }
+   },
+   "target_fix": null
   },
   "score_rules_used": {
    "counted": 9,

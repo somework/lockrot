@@ -903,6 +903,23 @@
    "target": {
     "php": "8.4.99",
     "inside": false
+   },
+   "target_fix": {
+    "packages": [
+     {
+      "name": "ezyang/htmlpurifier",
+      "version": "v4.17.0",
+      "link": "require",
+      "target": "php",
+      "constraint": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+      "dev": false
+     }
+    ],
+    "command": null,
+    "check": "not_checked",
+    "reason": null,
+    "held_by": [],
+    "platform_step": false
    }
   }
  },

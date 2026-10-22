@@ -38,6 +38,7 @@
             "left-behind",
             "old-promise",
             "stale",
+            "capped",
             "vulnerable"
         ],
         "verdicts": [
@@ -65,7 +66,8 @@
             "S7",
             "S8",
             "S9",
-            "S10"
+            "S10",
+            "S11"
         ],
         "fix_model": 1,
         "text_grammar": 1,
@@ -79,6 +81,7 @@
                 "left-behind",
                 "old-promise",
                 "stale",
+                "capped",
                 "vulnerable"
             ],
             "parts": [
@@ -90,7 +93,8 @@
                         "pinned",
                         "left-behind",
                         "old-promise",
-                        "stale"
+                        "stale",
+                        "capped"
                     ],
                     "combine": "lead_plus_share"
                 },
@@ -230,9 +234,10 @@
                     "band": "medium",
                     "can_corroborate": true,
                     "corroborating_points": 2,
-                    "max_maintenance": 8,
+                    "max_maintenance": 10,
                     "max_maintenance_flags": [
-                        "stale"
+                        "stale",
+                        "capped"
                     ],
                     "raised_by": [
                         "S2",
@@ -244,6 +249,27 @@
                     ],
                     "basis": {
                         "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
                         "points": "band_floor"
                     },
                     "points_from": null
@@ -440,6 +466,14 @@
                         "threshold": "push-warn-years",
                         "below": "release-warn-years"
                     }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
                 }
             ],
             "sort": [
@@ -1089,18 +1123,18 @@
         },
         "score_rules_used": {
             "counted": 7,
-            "lead-first": 45,
+            "lead-first": 49,
             "corroborating-share": 8,
             "advisory-points": 16,
             "no-reachable-fix-multiplier": 0,
             "security-max": 12,
-            "divide-reach": 49,
+            "divide-reach": 53,
             "security-exempt-from-reach": 14,
-            "sum": 9,
+            "sum": 10,
             "divide-dev": 0,
             "floor-once": 0,
-            "band-floors": 52,
-            "zero-verdicts": 45,
+            "band-floors": 55,
+            "zero-verdicts": 42,
             "sort": null,
             "gate-bounded-new": 0,
             "baseline-cover": 0
@@ -1109,8 +1143,8 @@
     "activity_cache_oldest_at": "2026-10-22T00:00:00+00:00",
     "activity_cache_age_hours": 0,
     "packages_checked": 97,
-    "packages_flagged": 52,
-    "packages_multi_flag": 17,
+    "packages_flagged": 55,
+    "packages_multi_flag": 18,
     "include_dev": false,
     "not_from_composer_repository": 0,
     "packages_unchecked_accepted": 0,
@@ -1119,10 +1153,10 @@
         "critical": 2,
         "high": 18,
         "medium": 30,
-        "low": 2,
+        "low": 5,
         "unknown": 0,
         "finished": 13,
-        "ok": 32
+        "ok": 29
     },
     "abandoned": {
         "total": 5,
@@ -1133,8 +1167,8 @@
         "critical": 2,
         "high": 18,
         "medium": 30,
-        "low": 2,
-        "none": 45
+        "low": 5,
+        "none": 42
     },
     "flags": {
         "abandoned": {
@@ -1221,6 +1255,20 @@
                 "low": 1
             }
         },
+        "capped": {
+            "carrying": 4,
+            "leading": 4,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 1,
+                "medium": 0,
+                "low": 3
+            }
+        },
         "vulnerable": {
             "carrying": 16,
             "leading": null,
@@ -1236,31 +1284,31 @@
     "exposure": [
         {
             "package": "drupal/lupus_ce_renderer",
-            "flagged": 33
+            "flagged": 36
         },
         {
             "package": "drupal/admin_toolbar",
-            "flagged": 32
+            "flagged": 35
         },
         {
             "package": "drupal/core-recommended",
-            "flagged": 32
+            "flagged": 35
         },
         {
             "package": "drupal/paragraphs",
-            "flagged": 32
+            "flagged": 35
         },
         {
             "package": "drupal/pathauto",
-            "flagged": 32
+            "flagged": 35
         },
         {
             "package": "drupal/rest_menu_items",
-            "flagged": 32
+            "flagged": 35
         },
         {
             "package": "drupal/trusted_redirect",
-            "flagged": 32
+            "flagged": 35
         },
         {
             "package": "drush/drush",
@@ -1272,20 +1320,20 @@
     },
     "unattributed": [],
     "rot_depth": {
-        "flagged": 52,
-        "measured": 52,
+        "flagged": 55,
+        "measured": 55,
         "unmeasured": {
             "unreached": 0,
             "no_composer_json": 0
         },
         "by_reach": {
             "direct": 4,
-            "transitive": 48,
+            "transitive": 51,
             "unreached": 0
         },
-        "not_in_composer_json": 48,
+        "not_in_composer_json": 51,
         "require_dev_not_walked": 0,
-        "production": 52,
+        "production": 55,
         "development": 0,
         "by_depth": [
             {
@@ -1294,7 +1342,7 @@
             },
             {
                 "depth": 1,
-                "flagged": 43
+                "flagged": 46
             },
             {
                 "depth": 2,
@@ -19645,6 +19693,767 @@
             }
         },
         {
+            "package": "laminas/laminas-diactoros",
+            "version": "2.8.0",
+            "branch": "2.x",
+            "installed_php": {
+                "requires": "^7.3 || ~8.0.0 || ~8.1.0",
+                "target_runs": false,
+                "project_allows": null
+            },
+            "verdict": "high",
+            "priority": "high",
+            "lead": "capped",
+            "rank": 6,
+            "flags": [
+                {
+                    "id": "capped",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S11"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "php_minor",
+                        "value": "8.1",
+                        "source": null
+                    },
+                    "summary": "requires php ^7.3 || ~8.0.0 || ~8.1.0: it stops at 8.1, so the newest PHP, 8.5, is excluded"
+                },
+                {
+                    "id": "vulnerable",
+                    "role": "security",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S9"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "advisories",
+                        "value": 2,
+                        "source": null
+                    },
+                    "summary": "2 advisories: 1 high, 1 medium \u2014 all fixed on 2.x (upgrade); worst: CVE-2023-29530 HTTP Multiline Header Termination"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 20,
+                "exact": 20,
+                "rounded_down": false,
+                "band": {
+                    "floor": 16,
+                    "next": "critical",
+                    "to_next": 12
+                },
+                "decided_by": "security",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 4,
+                        "alone": {
+                            "total": 4,
+                            "verdict": "low"
+                        }
+                    },
+                    "security": {
+                        "status": "counted",
+                        "contribution": 16,
+                        "alone": {
+                            "total": 16,
+                            "verdict": "high"
+                        },
+                        "of": 2,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "capped",
+                        "role": "lead",
+                        "weight": 8,
+                        "divisor": 1,
+                        "points": 8,
+                        "contribution": 4
+                    },
+                    {
+                        "part": "security",
+                        "flag": "vulnerable",
+                        "role": "security",
+                        "advisory": "PKSA-yg4s-vh6g-jnyh",
+                        "severity": "high",
+                        "fix_kind": "upgrade",
+                        "weight": 16,
+                        "multiplier": 1,
+                        "points": 16,
+                        "contribution": 16
+                    }
+                ],
+                "modifiers": [
+                    {
+                        "reason": "transitive",
+                        "applies_to": "maintenance",
+                        "divide_by": 2,
+                        "before": 8,
+                        "after": 4
+                    }
+                ],
+                "accepted": [],
+                "without": [
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "capped"
+                        },
+                        "revealed": [],
+                        "total": 16,
+                        "verdict": "high",
+                        "lead": null,
+                        "deciding_advisory": "PKSA-yg4s-vh6g-jnyh",
+                        "at_least": false
+                    },
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "vulnerable"
+                        },
+                        "revealed": [],
+                        "total": 4,
+                        "verdict": "low",
+                        "lead": "capped",
+                        "deciding_advisory": null,
+                        "at_least": false
+                    },
+                    {
+                        "remove": {
+                            "kind": "advisory",
+                            "id": "PKSA-yg4s-vh6g-jnyh"
+                        },
+                        "revealed": [],
+                        "total": 12,
+                        "verdict": "medium",
+                        "lead": "capped",
+                        "deciding_advisory": "PKSA-wdyb-c3m7-9v88",
+                        "at_least": false
+                    }
+                ],
+                "text": "20 = capped 8 \u00f7 2 transitive + vulnerable 16 [high advisory]"
+            },
+            "next_step": {
+                "kind": "require",
+                "source": "vulnerable",
+                "merged": [],
+                "fix_kind": "upgrade",
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "2.x",
+                "version": "2.26.0",
+                "newest": "2.26.0",
+                "constraint": "^2.26.0",
+                "latest": null,
+                "php_check": {
+                    "requires": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+                    "project_allows": null,
+                    "target_runs": true,
+                    "raise_to": null,
+                    "raise_size": null
+                },
+                "crosses_major": false,
+                "held_by": [
+                    {
+                        "source": "package",
+                        "package": "drupal/core-recommended",
+                        "version": "9.3.14",
+                        "link": "require",
+                        "target": null,
+                        "constraint": "2.8.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "10.x",
+                                "constraint": "^10.3.9",
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "clears": [
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-yg4s-vh6g-jnyh",
+                        "basis": "outside_range"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-wdyb-c3m7-9v88",
+                        "basis": "outside_range"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [
+                    {
+                        "kind": "flag",
+                        "id": "capped"
+                    }
+                ],
+                "clears_all": false,
+                "if_applied": {
+                    "total": 4,
+                    "verdict": "low",
+                    "lead": "capped",
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold",
+                        "composer_resolves"
+                    ]
+                },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
+                "composer_moves_because": [
+                    "holders"
+                ],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "drupal/core-recommended",
+                        "11.4.11"
+                    ]
+                ],
+                "through": [
+                    {
+                        "package": "drupal/admin_toolbar",
+                        "installed_version": "3.1.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/core-recommended",
+                        "installed_version": "9.3.14",
+                        "installed_requires": true,
+                        "newest_stable": {
+                            "version": "11.4.11",
+                            "released": "2026-10-21T10:18:50+00:00"
+                        },
+                        "newest_requires": false,
+                        "newest_requires_unmeasured": null
+                    },
+                    {
+                        "package": "drupal/lupus_ce_renderer",
+                        "installed_version": "2.0.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/paragraphs",
+                        "installed_version": "1.14.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/pathauto",
+                        "installed_version": "1.10.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/rest_menu_items",
+                        "installed_version": "3.0.2",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/trusted_redirect",
+                        "installed_version": "1.9.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    }
+                ],
+                "also": [
+                    {
+                        "kind": "require",
+                        "source": "capped",
+                        "merged": [],
+                        "fix_kind": null,
+                        "reason": null,
+                        "replacement": null,
+                        "quiet_years": null,
+                        "to_branch": "3.x",
+                        "version": "3.9.0",
+                        "newest": "3.9.0",
+                        "constraint": "^3.9.0",
+                        "latest": null,
+                        "php_check": {
+                            "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                            "project_allows": null,
+                            "target_runs": true,
+                            "raise_to": null,
+                            "raise_size": null
+                        },
+                        "crosses_major": true,
+                        "held_by": [
+                            {
+                                "source": "package",
+                                "package": "drupal/core",
+                                "version": "9.3.14",
+                                "link": "require",
+                                "target": null,
+                                "constraint": "^2.1",
+                                "holder": {
+                                    "verdict": "critical",
+                                    "lead": "left-behind",
+                                    "flag_ids": [
+                                        "left-behind",
+                                        "vulnerable"
+                                    ],
+                                    "replacement": null,
+                                    "next_step": {
+                                        "kind": "require",
+                                        "to_branch": "10.x",
+                                        "constraint": "^10.6.19",
+                                        "check": {
+                                            "result": "not_checked",
+                                            "form": null,
+                                            "reason": "baseline_refused"
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "source": "package",
+                                "package": "drupal/core-recommended",
+                                "version": "9.3.14",
+                                "link": "require",
+                                "target": null,
+                                "constraint": "2.8.0",
+                                "holder": {
+                                    "verdict": "high",
+                                    "lead": null,
+                                    "flag_ids": [
+                                        "vulnerable"
+                                    ],
+                                    "replacement": null,
+                                    "next_step": {
+                                        "kind": "require",
+                                        "to_branch": "10.x",
+                                        "constraint": "^10.3.9",
+                                        "check": {
+                                            "result": "not_checked",
+                                            "form": null,
+                                            "reason": "baseline_refused"
+                                        }
+                                    }
+                                }
+                            }
+                        ],
+                        "clears": [
+                            {
+                                "kind": "flag",
+                                "id": "capped",
+                                "basis": "admits_newest_php"
+                            },
+                            {
+                                "kind": "advisory",
+                                "id": "PKSA-yg4s-vh6g-jnyh",
+                                "basis": "outside_range"
+                            },
+                            {
+                                "kind": "advisory",
+                                "id": "PKSA-wdyb-c3m7-9v88",
+                                "basis": "outside_range"
+                            }
+                        ],
+                        "unverified": [],
+                        "adds": [],
+                        "leaves": [],
+                        "clears_all": true,
+                        "if_applied": {
+                            "total": 0,
+                            "verdict": "ok",
+                            "lead": null,
+                            "deciding_advisory": null,
+                            "at_most": false,
+                            "assumes": [
+                                "clears_hold",
+                                "composer_resolves"
+                            ]
+                        },
+                        "check": {
+                            "result": "not_checked",
+                            "form": null,
+                            "reason": "baseline_refused"
+                        },
+                        "composer_moves_because": [
+                            "holders",
+                            "crosses_major"
+                        ],
+                        "commands": [],
+                        "text": "move laminas/laminas-diactoros to ^3.9.0 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 4 more \u2014 clears capped and 2 advisories; 3.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0; the target php 8.3 runs it; held by drupal/core 9.3.14 (requires ^2.1; itself left-behind) and drupal/core-recommended 9.3.14 (requires 2.8.0; itself high: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                    }
+                ],
+                "text": "move laminas/laminas-diactoros to ^2.26.0 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 4 more \u2014 clears 2 advisories; 2.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0; the target php 8.3 runs it; capped stays; held by drupal/core-recommended 9.3.14 (requires 2.8.0; itself high: vulnerable); the packages that hold it may need to move too; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+            },
+            "security": {
+                "status": "vulnerable",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 2,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1/mirror/0)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    },
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 2,
+                        "reason": null
+                    }
+                ],
+                "worst": "high",
+                "counts": {
+                    "critical": 0,
+                    "high": 1,
+                    "medium": 1,
+                    "unrated": 0,
+                    "low": 0
+                },
+                "ignored": [],
+                "ignored_count": 0,
+                "fix_kind": "upgrade",
+                "installed_branch_fixes": {
+                    "fixed": 2,
+                    "unknown": 0,
+                    "of": 2,
+                    "fix_kind": "upgrade",
+                    "lowest": "2.26.0",
+                    "newest": "2.26.0",
+                    "held_by": [
+                        {
+                            "source": "package",
+                            "package": "drupal/core-recommended",
+                            "version": "9.3.14",
+                            "link": "require",
+                            "target": null,
+                            "constraint": "2.8.0",
+                            "holder": {
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ],
+                                "replacement": null,
+                                "next_step": {
+                                    "kind": "require",
+                                    "to_branch": "10.x",
+                                    "constraint": "^10.3.9",
+                                    "check": {
+                                        "result": "not_checked",
+                                        "form": null,
+                                        "reason": "baseline_refused"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "if_applied": {
+                        "total": 4,
+                        "verdict": "low",
+                        "at_most": false,
+                        "assumes": [
+                            "clears_hold",
+                            "composer_resolves"
+                        ]
+                    },
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
+                    }
+                },
+                "move_in": "next_step",
+                "gets": null,
+                "partial": null
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "laminas/laminas-diactoros",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-10-22T00:00:00+00:00",
+                "cached_at": "2026-10-22T00:00:00+00:00"
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/laminas/laminas-diactoros",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": false,
+            "dev": false,
+            "reach": "transitive",
+            "chain": [
+                "drupal/core-recommended",
+                "laminas/laminas-diactoros"
+            ],
+            "depth": 1,
+            "depth_unmeasured": null,
+            "named_in": [],
+            "direct_dependents": [
+                "drupal/admin_toolbar",
+                "drupal/core-recommended",
+                "drupal/lupus_ce_renderer",
+                "drupal/paragraphs",
+                "drupal/pathauto",
+                "drupal/rest_menu_items",
+                "drupal/trusted_redirect"
+            ],
+            "signals": [
+                {
+                    "id": "S9",
+                    "level": "high",
+                    "summary": "2 security advisories affect 2.8.0 (CVE-2023-29530, CVE-2022-31109); fixed in 2.26.0",
+                    "data": {
+                        "advisories": [
+                            {
+                                "id": "PKSA-yg4s-vh6g-jnyh",
+                                "cve": "CVE-2023-29530",
+                                "title": "HTTP Multiline Header Termination",
+                                "link": "https://github.com/advisories/GHSA-xv3h-4844-9h36",
+                                "reported_at": "2023-04-24T22:42:39+00:00",
+                                "severity": "high",
+                                "severity_published": "high",
+                                "affected_versions": ">=2.25.0,<2.25.2|>=2.24.0,<2.24.2|=2.23.0|=2.22.0|=2.21.0|=2.20.0|=2.19.0|<2.18.1",
+                                "counted": true,
+                                "points": 16,
+                                "deciding": true,
+                                "fix": {
+                                    "kind": "upgrade",
+                                    "to_branch": "2.x",
+                                    "version": "2.26.0",
+                                    "newest": "2.26.0",
+                                    "on_installed_branch": true,
+                                    "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
+                                    "held_by": [
+                                        {
+                                            "source": "package",
+                                            "package": "drupal/core-recommended",
+                                            "version": "9.3.14",
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "2.8.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": null,
+                                                "flag_ids": [
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "10.x",
+                                                    "constraint": "^10.3.9",
+                                                    "check": {
+                                                        "result": "not_checked",
+                                                        "form": null,
+                                                        "reason": "baseline_refused"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-wdyb-c3m7-9v88",
+                                "cve": "CVE-2022-31109",
+                                "title": "Diactoros before 2.11.1 vulnerable to HTTP Host Header Attack.",
+                                "link": "https://github.com/advisories/GHSA-8274-h5jp-97vr",
+                                "reported_at": "2022-07-25T19:29:00+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": "<2.11.1",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "upgrade",
+                                    "to_branch": "2.x",
+                                    "version": "2.26.0",
+                                    "newest": "2.26.0",
+                                    "on_installed_branch": true,
+                                    "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
+                                    "held_by": [
+                                        {
+                                            "source": "package",
+                                            "package": "drupal/core-recommended",
+                                            "version": "9.3.14",
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "2.8.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": null,
+                                                "flag_ids": [
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "10.x",
+                                                    "constraint": "^10.3.9",
+                                                    "check": {
+                                                        "result": "not_checked",
+                                                        "form": null,
+                                                        "reason": "baseline_refused"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            }
+                        ],
+                        "releases_read": true,
+                        "complete": true
+                    }
+                },
+                {
+                    "id": "S11",
+                    "level": "warn",
+                    "summary": "php \"^7.3 || ~8.0.0 || ~8.1.0\" stops at 8.1; the newest PHP, 8.5, is excluded",
+                    "data": {
+                        "newest_php": "8.5",
+                        "newest_php_source": "known",
+                        "requires": "^7.3 || ~8.0.0 || ~8.1.0",
+                        "stops_at": "8.1",
+                        "excludes_target": true,
+                        "admits_newest": {
+                            "version": "3.9.0",
+                            "branch": "3.x",
+                            "blocking": null
+                        }
+                    }
+                }
+            ],
+            "evidence": "capped: requires php ^7.3 || ~8.0.0 || ~8.1.0: it stops at 8.1, so the newest PHP, 8.5, is excluded; vulnerable: 2 advisories: 1 high, 1 medium \u2014 all fixed on 2.x (upgrade); worst: CVE-2023-29530 HTTP Multiline Header Termination",
+            "allowlist_reason": null,
+            "data_date": "2026-10-22T00:00:00+00:00",
+            "libyears": 5.04,
+            "age": {
+                "installed": {
+                    "at": "2021-09-22T03:54:36+00:00",
+                    "years": 5.1,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "3.9.0",
+                    "at": "2026-10-08T08:19:47+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "2.26.0",
+                    "at": "2023-10-29T16:17:44+00:00",
+                    "years": 3,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-10-21T21:42:13+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": true,
+                "fails": true,
+                "exempt_by": null,
+                "by": [
+                    {
+                        "value": "high",
+                        "kind": "grade",
+                        "facts": [
+                            {
+                                "kind": "advisory",
+                                "id": "PKSA-yg4s-vh6g-jnyh"
+                            }
+                        ]
+                    }
+                ],
+                "basis": null
+            }
+        },
+        {
             "package": "drupal/core-recommended",
             "version": "9.3.14",
             "branch": "9.x",
@@ -19656,7 +20465,7 @@
             "verdict": "high",
             "priority": "high",
             "lead": null,
-            "rank": 6,
+            "rank": 7,
             "flags": [
                 {
                     "id": "left-behind",
@@ -19993,9 +20802,9 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 32 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 27 more",
+                    "summary": "pulls in 35 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 30 more",
                     "data": {
-                        "flagged": 32,
+                        "flagged": 35,
                         "packages": [
                             {
                                 "package": "drupal/core",
@@ -20068,8 +20877,9 @@
                                     "laminas/laminas-diactoros"
                                 ],
                                 "verdict": "high",
-                                "lead": null,
+                                "lead": "capped",
                                 "flag_ids": [
+                                    "capped",
                                     "vulnerable"
                                 ]
                             },
@@ -20377,6 +21187,42 @@
                                 "lead": null,
                                 "flag_ids": [
                                     "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-escaper",
+                                "chain": [
+                                    "drupal/core-recommended",
+                                    "laminas/laminas-escaper"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-feed",
+                                "chain": [
+                                    "drupal/core-recommended",
+                                    "laminas/laminas-feed"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-stdlib",
+                                "chain": [
+                                    "drupal/core-recommended",
+                                    "laminas/laminas-stdlib"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
                                 ]
                             },
                             {
@@ -20695,576 +21541,6 @@
                             {
                                 "kind": "advisory",
                                 "id": "PKSA-4txt-syt7-f859"
-                            }
-                        ]
-                    }
-                ],
-                "basis": null
-            }
-        },
-        {
-            "package": "laminas/laminas-diactoros",
-            "version": "2.8.0",
-            "branch": "2.x",
-            "installed_php": {
-                "requires": "^7.3 || ~8.0.0 || ~8.1.0",
-                "target_runs": false,
-                "project_allows": null
-            },
-            "verdict": "high",
-            "priority": "high",
-            "lead": null,
-            "rank": 7,
-            "flags": [
-                {
-                    "id": "vulnerable",
-                    "role": "security",
-                    "baseline": null,
-                    "signal_ids": [
-                        "S9"
-                    ],
-                    "degree": null,
-                    "headline": {
-                        "unit": "advisories",
-                        "value": 2,
-                        "source": null
-                    },
-                    "summary": "2 advisories: 1 high, 1 medium \u2014 all fixed on 2.x (upgrade); worst: CVE-2023-29530 HTTP Multiline Header Termination"
-                }
-            ],
-            "score": {
-                "model": 1,
-                "total": 16,
-                "exact": 16,
-                "rounded_down": false,
-                "band": {
-                    "floor": 16,
-                    "next": "critical",
-                    "to_next": 16
-                },
-                "decided_by": "security",
-                "parts": {
-                    "maintenance": {
-                        "status": "none",
-                        "contribution": 0,
-                        "alone": {
-                            "total": 0,
-                            "verdict": null
-                        }
-                    },
-                    "security": {
-                        "status": "counted",
-                        "contribution": 16,
-                        "alone": {
-                            "total": 16,
-                            "verdict": "high"
-                        },
-                        "of": 2,
-                        "tied": []
-                    }
-                },
-                "terms": [
-                    {
-                        "part": "security",
-                        "flag": "vulnerable",
-                        "role": "security",
-                        "advisory": "PKSA-yg4s-vh6g-jnyh",
-                        "severity": "high",
-                        "fix_kind": "upgrade",
-                        "weight": 16,
-                        "multiplier": 1,
-                        "points": 16,
-                        "contribution": 16
-                    }
-                ],
-                "modifiers": [
-                    {
-                        "reason": "transitive",
-                        "applies_to": "maintenance",
-                        "divide_by": 2,
-                        "before": 0,
-                        "after": 0
-                    }
-                ],
-                "accepted": [],
-                "without": [
-                    {
-                        "remove": {
-                            "kind": "advisory",
-                            "id": "PKSA-yg4s-vh6g-jnyh"
-                        },
-                        "revealed": [],
-                        "total": 8,
-                        "verdict": "medium",
-                        "lead": null,
-                        "deciding_advisory": "PKSA-wdyb-c3m7-9v88",
-                        "at_least": false
-                    }
-                ],
-                "text": "16 = vulnerable 16 [high advisory]"
-            },
-            "next_step": {
-                "kind": "require",
-                "source": "vulnerable",
-                "merged": [],
-                "fix_kind": "upgrade",
-                "reason": null,
-                "replacement": null,
-                "quiet_years": null,
-                "to_branch": "2.x",
-                "version": "2.26.0",
-                "newest": "2.26.0",
-                "constraint": "^2.26.0",
-                "latest": null,
-                "php_check": {
-                    "requires": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
-                    "project_allows": null,
-                    "target_runs": true,
-                    "raise_to": null,
-                    "raise_size": null
-                },
-                "crosses_major": false,
-                "held_by": [
-                    {
-                        "source": "package",
-                        "package": "drupal/core-recommended",
-                        "version": "9.3.14",
-                        "link": "require",
-                        "target": null,
-                        "constraint": "2.8.0",
-                        "holder": {
-                            "verdict": "high",
-                            "lead": null,
-                            "flag_ids": [
-                                "vulnerable"
-                            ],
-                            "replacement": null,
-                            "next_step": {
-                                "kind": "require",
-                                "to_branch": "10.x",
-                                "constraint": "^10.3.9",
-                                "check": {
-                                    "result": "not_checked",
-                                    "form": null,
-                                    "reason": "baseline_refused"
-                                }
-                            }
-                        }
-                    }
-                ],
-                "clears": [
-                    {
-                        "kind": "advisory",
-                        "id": "PKSA-yg4s-vh6g-jnyh",
-                        "basis": "outside_range"
-                    },
-                    {
-                        "kind": "advisory",
-                        "id": "PKSA-wdyb-c3m7-9v88",
-                        "basis": "outside_range"
-                    }
-                ],
-                "unverified": [],
-                "adds": [],
-                "leaves": [],
-                "clears_all": true,
-                "if_applied": {
-                    "total": 0,
-                    "verdict": "ok",
-                    "lead": null,
-                    "deciding_advisory": null,
-                    "at_most": false,
-                    "assumes": [
-                        "clears_hold",
-                        "composer_resolves"
-                    ]
-                },
-                "check": {
-                    "result": "not_checked",
-                    "form": null,
-                    "reason": "baseline_refused"
-                },
-                "composer_moves_because": [
-                    "holders"
-                ],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "drupal/core-recommended",
-                        "11.4.11"
-                    ]
-                ],
-                "through": [
-                    {
-                        "package": "drupal/admin_toolbar",
-                        "installed_version": "3.1.0",
-                        "installed_requires": false,
-                        "newest_stable": null,
-                        "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
-                    },
-                    {
-                        "package": "drupal/core-recommended",
-                        "installed_version": "9.3.14",
-                        "installed_requires": true,
-                        "newest_stable": {
-                            "version": "11.4.11",
-                            "released": "2026-10-21T10:18:50+00:00"
-                        },
-                        "newest_requires": false,
-                        "newest_requires_unmeasured": null
-                    },
-                    {
-                        "package": "drupal/lupus_ce_renderer",
-                        "installed_version": "2.0.0",
-                        "installed_requires": false,
-                        "newest_stable": null,
-                        "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
-                    },
-                    {
-                        "package": "drupal/paragraphs",
-                        "installed_version": "1.14.0",
-                        "installed_requires": false,
-                        "newest_stable": null,
-                        "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
-                    },
-                    {
-                        "package": "drupal/pathauto",
-                        "installed_version": "1.10.0",
-                        "installed_requires": false,
-                        "newest_stable": null,
-                        "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
-                    },
-                    {
-                        "package": "drupal/rest_menu_items",
-                        "installed_version": "3.0.2",
-                        "installed_requires": false,
-                        "newest_stable": null,
-                        "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
-                    },
-                    {
-                        "package": "drupal/trusted_redirect",
-                        "installed_version": "1.9.0",
-                        "installed_requires": false,
-                        "newest_stable": null,
-                        "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
-                    }
-                ],
-                "also": [],
-                "text": "move laminas/laminas-diactoros to ^2.26.0 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 4 more \u2014 clears 2 advisories; 2.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0; the target php 8.3 runs it; held by drupal/core-recommended 9.3.14 (requires 2.8.0; itself high: vulnerable); the packages that hold it may need to move too; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
-            },
-            "security": {
-                "status": "vulnerable",
-                "check": "complete",
-                "complete": true,
-                "unchecked_reason": null,
-                "records": 2,
-                "feeds": [
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1/mirror/0)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 0,
-                        "reason": null
-                    },
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 2,
-                        "reason": null
-                    }
-                ],
-                "worst": "high",
-                "counts": {
-                    "critical": 0,
-                    "high": 1,
-                    "medium": 1,
-                    "unrated": 0,
-                    "low": 0
-                },
-                "ignored": [],
-                "ignored_count": 0,
-                "fix_kind": "upgrade",
-                "installed_branch_fixes": {
-                    "fixed": 2,
-                    "unknown": 0,
-                    "of": 2,
-                    "fix_kind": "upgrade",
-                    "lowest": "2.26.0",
-                    "newest": "2.26.0",
-                    "held_by": [
-                        {
-                            "source": "package",
-                            "package": "drupal/core-recommended",
-                            "version": "9.3.14",
-                            "link": "require",
-                            "target": null,
-                            "constraint": "2.8.0",
-                            "holder": {
-                                "verdict": "high",
-                                "lead": null,
-                                "flag_ids": [
-                                    "vulnerable"
-                                ],
-                                "replacement": null,
-                                "next_step": {
-                                    "kind": "require",
-                                    "to_branch": "10.x",
-                                    "constraint": "^10.3.9",
-                                    "check": {
-                                        "result": "not_checked",
-                                        "form": null,
-                                        "reason": "baseline_refused"
-                                    }
-                                }
-                            }
-                        }
-                    ],
-                    "if_applied": {
-                        "total": 0,
-                        "verdict": "ok",
-                        "at_most": false,
-                        "assumes": [
-                            "clears_hold",
-                            "composer_resolves"
-                        ]
-                    },
-                    "check": {
-                        "result": "not_checked",
-                        "form": null,
-                        "reason": "baseline_refused"
-                    }
-                },
-                "move_in": "next_step",
-                "gets": null,
-                "partial": null
-            },
-            "checks_missing": [],
-            "checks_skipped": [],
-            "unchecked_accepted": [],
-            "maintenance_judged": true,
-            "metadata": {
-                "status": "read",
-                "reason": null,
-                "message": null
-            },
-            "activity": {
-                "status": "read",
-                "reason": null,
-                "forge": "github",
-                "host": "github.com",
-                "repo": "laminas/laminas-diactoros",
-                "event": "push",
-                "archived": false,
-                "fetched_at": "2026-10-22T00:00:00+00:00",
-                "cached_at": "2026-10-22T00:00:00+00:00"
-            },
-            "allowlist": null,
-            "abandoned_ignored": null,
-            "from_composer_repository": true,
-            "origin": {
-                "kind": "packagist",
-                "registry": "packagist.org",
-                "package_url": "https://packagist.org/packages/laminas/laminas-diactoros",
-                "local": false
-            },
-            "replacement": null,
-            "replacement_url": null,
-            "note": null,
-            "libyears_unmeasured": null,
-            "libyears_at_least": false,
-            "direct": false,
-            "dev": false,
-            "reach": "transitive",
-            "chain": [
-                "drupal/core-recommended",
-                "laminas/laminas-diactoros"
-            ],
-            "depth": 1,
-            "depth_unmeasured": null,
-            "named_in": [],
-            "direct_dependents": [
-                "drupal/admin_toolbar",
-                "drupal/core-recommended",
-                "drupal/lupus_ce_renderer",
-                "drupal/paragraphs",
-                "drupal/pathauto",
-                "drupal/rest_menu_items",
-                "drupal/trusted_redirect"
-            ],
-            "signals": [
-                {
-                    "id": "S9",
-                    "level": "high",
-                    "summary": "2 security advisories affect 2.8.0 (CVE-2023-29530, CVE-2022-31109); fixed in 2.26.0",
-                    "data": {
-                        "advisories": [
-                            {
-                                "id": "PKSA-yg4s-vh6g-jnyh",
-                                "cve": "CVE-2023-29530",
-                                "title": "HTTP Multiline Header Termination",
-                                "link": "https://github.com/advisories/GHSA-xv3h-4844-9h36",
-                                "reported_at": "2023-04-24T22:42:39+00:00",
-                                "severity": "high",
-                                "severity_published": "high",
-                                "affected_versions": ">=2.25.0,<2.25.2|>=2.24.0,<2.24.2|=2.23.0|=2.22.0|=2.21.0|=2.20.0|=2.19.0|<2.18.1",
-                                "counted": true,
-                                "points": 16,
-                                "deciding": true,
-                                "fix": {
-                                    "kind": "upgrade",
-                                    "to_branch": "2.x",
-                                    "version": "2.26.0",
-                                    "newest": "2.26.0",
-                                    "on_installed_branch": true,
-                                    "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
-                                    "admits_target_php": true,
-                                    "admits_project_php": null,
-                                    "held_by": [
-                                        {
-                                            "source": "package",
-                                            "package": "drupal/core-recommended",
-                                            "version": "9.3.14",
-                                            "link": "require",
-                                            "target": null,
-                                            "constraint": "2.8.0",
-                                            "holder": {
-                                                "verdict": "high",
-                                                "lead": null,
-                                                "flag_ids": [
-                                                    "vulnerable"
-                                                ],
-                                                "replacement": null,
-                                                "next_step": {
-                                                    "kind": "require",
-                                                    "to_branch": "10.x",
-                                                    "constraint": "^10.3.9",
-                                                    "check": {
-                                                        "result": "not_checked",
-                                                        "form": null,
-                                                        "reason": "baseline_refused"
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    ],
-                                    "reason": null
-                                },
-                                "baseline": null
-                            },
-                            {
-                                "id": "PKSA-wdyb-c3m7-9v88",
-                                "cve": "CVE-2022-31109",
-                                "title": "Diactoros before 2.11.1 vulnerable to HTTP Host Header Attack.",
-                                "link": "https://github.com/advisories/GHSA-8274-h5jp-97vr",
-                                "reported_at": "2022-07-25T19:29:00+00:00",
-                                "severity": "medium",
-                                "severity_published": "medium",
-                                "affected_versions": "<2.11.1",
-                                "counted": true,
-                                "points": 8,
-                                "deciding": false,
-                                "fix": {
-                                    "kind": "upgrade",
-                                    "to_branch": "2.x",
-                                    "version": "2.26.0",
-                                    "newest": "2.26.0",
-                                    "on_installed_branch": true,
-                                    "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
-                                    "admits_target_php": true,
-                                    "admits_project_php": null,
-                                    "held_by": [
-                                        {
-                                            "source": "package",
-                                            "package": "drupal/core-recommended",
-                                            "version": "9.3.14",
-                                            "link": "require",
-                                            "target": null,
-                                            "constraint": "2.8.0",
-                                            "holder": {
-                                                "verdict": "high",
-                                                "lead": null,
-                                                "flag_ids": [
-                                                    "vulnerable"
-                                                ],
-                                                "replacement": null,
-                                                "next_step": {
-                                                    "kind": "require",
-                                                    "to_branch": "10.x",
-                                                    "constraint": "^10.3.9",
-                                                    "check": {
-                                                        "result": "not_checked",
-                                                        "form": null,
-                                                        "reason": "baseline_refused"
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    ],
-                                    "reason": null
-                                },
-                                "baseline": null
-                            }
-                        ],
-                        "releases_read": true,
-                        "complete": true
-                    }
-                }
-            ],
-            "evidence": "vulnerable: 2 advisories: 1 high, 1 medium \u2014 all fixed on 2.x (upgrade); worst: CVE-2023-29530 HTTP Multiline Header Termination",
-            "allowlist_reason": null,
-            "data_date": "2026-10-22T00:00:00+00:00",
-            "libyears": 5.04,
-            "age": {
-                "installed": {
-                    "at": "2021-09-22T03:54:36+00:00",
-                    "years": 5.1,
-                    "dated_by": null
-                },
-                "installed_unmeasured": null,
-                "release": {
-                    "version": "3.9.0",
-                    "at": "2026-10-08T08:19:47+00:00",
-                    "years": 0,
-                    "level": null,
-                    "dated_by": null
-                },
-                "release_unmeasured": null,
-                "branch_release": {
-                    "version": "2.26.0",
-                    "at": "2023-10-29T16:17:44+00:00",
-                    "years": 3,
-                    "level": null,
-                    "dated_by": null
-                },
-                "branch_release_unmeasured": null,
-                "push": {
-                    "at": "2026-10-21T21:42:13+00:00",
-                    "years": 0,
-                    "level": null
-                },
-                "push_unmeasured": null
-            },
-            "baseline": null,
-            "gate": {
-                "reaches_fail_on": true,
-                "fails": true,
-                "exempt_by": null,
-                "by": [
-                    {
-                        "value": "high",
-                        "kind": "grade",
-                        "facts": [
-                            {
-                                "kind": "advisory",
-                                "id": "PKSA-yg4s-vh6g-jnyh"
                             }
                         ]
                     }
@@ -28687,9 +28963,9 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 32 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 27 more",
+                    "summary": "pulls in 35 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 30 more",
                     "data": {
-                        "flagged": 32,
+                        "flagged": 35,
                         "packages": [
                             {
                                 "package": "drupal/core",
@@ -28767,8 +29043,9 @@
                                     "laminas/laminas-diactoros"
                                 ],
                                 "verdict": "high",
-                                "lead": null,
+                                "lead": "capped",
                                 "flag_ids": [
+                                    "capped",
                                     "vulnerable"
                                 ]
                             },
@@ -29111,6 +29388,47 @@
                                 "lead": null,
                                 "flag_ids": [
                                     "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-escaper",
+                                "chain": [
+                                    "drupal/paragraphs",
+                                    "drupal/core",
+                                    "laminas/laminas-feed",
+                                    "laminas/laminas-escaper"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-feed",
+                                "chain": [
+                                    "drupal/paragraphs",
+                                    "drupal/core",
+                                    "laminas/laminas-feed"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-stdlib",
+                                "chain": [
+                                    "drupal/paragraphs",
+                                    "drupal/core",
+                                    "laminas/laminas-feed",
+                                    "laminas/laminas-stdlib"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
                                 ]
                             },
                             {
@@ -41873,6 +42191,1134 @@
             }
         },
         {
+            "package": "laminas/laminas-escaper",
+            "version": "2.9.0",
+            "branch": "2.x",
+            "installed_php": {
+                "requires": "^7.3 || ~8.0.0 || ~8.1.0",
+                "target_runs": false,
+                "project_allows": null
+            },
+            "verdict": "low",
+            "priority": "low",
+            "lead": "capped",
+            "rank": 52,
+            "flags": [
+                {
+                    "id": "capped",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S11"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "php_minor",
+                        "value": "8.1",
+                        "source": null
+                    },
+                    "summary": "requires php ^7.3 || ~8.0.0 || ~8.1.0: it stops at 8.1, so the newest PHP, 8.5, is excluded"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 4,
+                "exact": 4,
+                "rounded_down": false,
+                "band": {
+                    "floor": 1,
+                    "next": "medium",
+                    "to_next": 4
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 4,
+                        "alone": {
+                            "total": 4,
+                            "verdict": "low"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "capped",
+                        "role": "lead",
+                        "weight": 8,
+                        "divisor": 1,
+                        "points": 8,
+                        "contribution": 4
+                    }
+                ],
+                "modifiers": [
+                    {
+                        "reason": "transitive",
+                        "applies_to": "maintenance",
+                        "divide_by": 2,
+                        "before": 8,
+                        "after": 4
+                    }
+                ],
+                "accepted": [],
+                "without": [],
+                "text": "4 = capped 8 \u00f7 2 transitive"
+            },
+            "next_step": {
+                "kind": "require",
+                "source": "capped",
+                "merged": [],
+                "fix_kind": null,
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "2.x",
+                "version": "2.18.0",
+                "newest": "2.18.0",
+                "constraint": "^2.18.0",
+                "latest": null,
+                "php_check": {
+                    "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                    "project_allows": null,
+                    "target_runs": true,
+                    "raise_to": null,
+                    "raise_size": null
+                },
+                "crosses_major": false,
+                "held_by": [
+                    {
+                        "source": "package",
+                        "package": "drupal/core-recommended",
+                        "version": "9.3.14",
+                        "link": "require",
+                        "target": null,
+                        "constraint": "2.9.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "10.x",
+                                "constraint": "^10.3.9",
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "clears": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "basis": "admits_newest_php"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold",
+                        "composer_resolves"
+                    ]
+                },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
+                "composer_moves_because": [
+                    "holders"
+                ],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "drupal/core-recommended",
+                        "11.4.11"
+                    ]
+                ],
+                "through": [
+                    {
+                        "package": "drupal/admin_toolbar",
+                        "installed_version": "3.1.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/core-recommended",
+                        "installed_version": "9.3.14",
+                        "installed_requires": true,
+                        "newest_stable": {
+                            "version": "11.4.11",
+                            "released": "2026-10-21T10:18:50+00:00"
+                        },
+                        "newest_requires": false,
+                        "newest_requires_unmeasured": null
+                    },
+                    {
+                        "package": "drupal/lupus_ce_renderer",
+                        "installed_version": "2.0.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/paragraphs",
+                        "installed_version": "1.14.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/pathauto",
+                        "installed_version": "1.10.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/rest_menu_items",
+                        "installed_version": "3.0.2",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/trusted_redirect",
+                        "installed_version": "1.9.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    }
+                ],
+                "also": [],
+                "text": "move laminas/laminas-escaper to ^2.18.0 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 4 more \u2014 clears capped; 2.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0; the target php 8.3 runs it; held by drupal/core-recommended 9.3.14 (requires 2.9.0; itself high: vulnerable); the packages that hold it may need to move too; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1/mirror/0)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    },
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "laminas/laminas-escaper",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-10-22T00:00:00+00:00",
+                "cached_at": "2026-10-22T00:00:00+00:00"
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/laminas/laminas-escaper",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": false,
+            "dev": false,
+            "reach": "transitive",
+            "chain": [
+                "drupal/core-recommended",
+                "laminas/laminas-escaper"
+            ],
+            "depth": 1,
+            "depth_unmeasured": null,
+            "named_in": [],
+            "direct_dependents": [
+                "drupal/admin_toolbar",
+                "drupal/core-recommended",
+                "drupal/lupus_ce_renderer",
+                "drupal/paragraphs",
+                "drupal/pathauto",
+                "drupal/rest_menu_items",
+                "drupal/trusted_redirect"
+            ],
+            "signals": [
+                {
+                    "id": "S11",
+                    "level": "warn",
+                    "summary": "php \"^7.3 || ~8.0.0 || ~8.1.0\" stops at 8.1; the newest PHP, 8.5, is excluded",
+                    "data": {
+                        "newest_php": "8.5",
+                        "newest_php_source": "known",
+                        "requires": "^7.3 || ~8.0.0 || ~8.1.0",
+                        "stops_at": "8.1",
+                        "excludes_target": true,
+                        "admits_newest": {
+                            "version": "2.18.0",
+                            "branch": "2.x",
+                            "blocking": null
+                        }
+                    }
+                }
+            ],
+            "evidence": "capped: requires php ^7.3 || ~8.0.0 || ~8.1.0: it stops at 8.1, so the newest PHP, 8.5, is excluded",
+            "allowlist_reason": null,
+            "data_date": "2026-10-22T00:00:00+00:00",
+            "libyears": 4.12,
+            "age": {
+                "installed": {
+                    "at": "2021-09-02T17:10:53+00:00",
+                    "years": 5.1,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "2.18.0",
+                    "at": "2025-10-14T18:31:13+00:00",
+                    "years": 1,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "2.18.0",
+                    "at": "2025-10-14T18:31:13+00:00",
+                    "years": 1,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-10-21T22:38:45+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
+            "package": "laminas/laminas-feed",
+            "version": "2.15.0",
+            "branch": "2.x",
+            "installed_php": {
+                "requires": "^7.3 || ~8.0.0 || ~8.1.0",
+                "target_runs": false,
+                "project_allows": null
+            },
+            "verdict": "low",
+            "priority": "low",
+            "lead": "capped",
+            "rank": 53,
+            "flags": [
+                {
+                    "id": "capped",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S11"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "php_minor",
+                        "value": "8.1",
+                        "source": null
+                    },
+                    "summary": "requires php ^7.3 || ~8.0.0 || ~8.1.0: it stops at 8.1, so the newest PHP, 8.5, is excluded"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 4,
+                "exact": 4,
+                "rounded_down": false,
+                "band": {
+                    "floor": 1,
+                    "next": "medium",
+                    "to_next": 4
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 4,
+                        "alone": {
+                            "total": 4,
+                            "verdict": "low"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "capped",
+                        "role": "lead",
+                        "weight": 8,
+                        "divisor": 1,
+                        "points": 8,
+                        "contribution": 4
+                    }
+                ],
+                "modifiers": [
+                    {
+                        "reason": "transitive",
+                        "applies_to": "maintenance",
+                        "divide_by": 2,
+                        "before": 8,
+                        "after": 4
+                    }
+                ],
+                "accepted": [],
+                "without": [],
+                "text": "4 = capped 8 \u00f7 2 transitive"
+            },
+            "next_step": {
+                "kind": "require",
+                "source": "capped",
+                "merged": [],
+                "fix_kind": null,
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "2.x",
+                "version": "2.26.3",
+                "newest": "2.26.3",
+                "constraint": "^2.26.3",
+                "latest": null,
+                "php_check": {
+                    "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                    "project_allows": null,
+                    "target_runs": true,
+                    "raise_to": null,
+                    "raise_size": null
+                },
+                "crosses_major": false,
+                "held_by": [
+                    {
+                        "source": "package",
+                        "package": "drupal/core-recommended",
+                        "version": "9.3.14",
+                        "link": "require",
+                        "target": null,
+                        "constraint": "2.15.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "10.x",
+                                "constraint": "^10.3.9",
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "clears": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "basis": "admits_newest_php"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold",
+                        "composer_resolves"
+                    ]
+                },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
+                "composer_moves_because": [
+                    "holders"
+                ],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "drupal/core-recommended",
+                        "11.4.11"
+                    ]
+                ],
+                "through": [
+                    {
+                        "package": "drupal/admin_toolbar",
+                        "installed_version": "3.1.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/core-recommended",
+                        "installed_version": "9.3.14",
+                        "installed_requires": true,
+                        "newest_stable": {
+                            "version": "11.4.11",
+                            "released": "2026-10-21T10:18:50+00:00"
+                        },
+                        "newest_requires": false,
+                        "newest_requires_unmeasured": null
+                    },
+                    {
+                        "package": "drupal/lupus_ce_renderer",
+                        "installed_version": "2.0.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/paragraphs",
+                        "installed_version": "1.14.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/pathauto",
+                        "installed_version": "1.10.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/rest_menu_items",
+                        "installed_version": "3.0.2",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/trusted_redirect",
+                        "installed_version": "1.9.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    }
+                ],
+                "also": [],
+                "text": "move laminas/laminas-feed to ^2.26.3 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 4 more \u2014 clears capped; 2.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0; the target php 8.3 runs it; held by drupal/core-recommended 9.3.14 (requires 2.15.0; itself high: vulnerable); the packages that hold it may need to move too; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1/mirror/0)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    },
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "laminas/laminas-feed",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-10-22T00:00:00+00:00",
+                "cached_at": "2026-10-22T00:00:00+00:00"
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/laminas/laminas-feed",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": false,
+            "dev": false,
+            "reach": "transitive",
+            "chain": [
+                "drupal/core-recommended",
+                "laminas/laminas-feed"
+            ],
+            "depth": 1,
+            "depth_unmeasured": null,
+            "named_in": [],
+            "direct_dependents": [
+                "drupal/admin_toolbar",
+                "drupal/core-recommended",
+                "drupal/lupus_ce_renderer",
+                "drupal/paragraphs",
+                "drupal/pathauto",
+                "drupal/rest_menu_items",
+                "drupal/trusted_redirect"
+            ],
+            "signals": [
+                {
+                    "id": "S11",
+                    "level": "warn",
+                    "summary": "php \"^7.3 || ~8.0.0 || ~8.1.0\" stops at 8.1; the newest PHP, 8.5, is excluded",
+                    "data": {
+                        "newest_php": "8.5",
+                        "newest_php_source": "known",
+                        "requires": "^7.3 || ~8.0.0 || ~8.1.0",
+                        "stops_at": "8.1",
+                        "excludes_target": true,
+                        "admits_newest": {
+                            "version": "2.26.3",
+                            "branch": "2.x",
+                            "blocking": null
+                        }
+                    }
+                }
+            ],
+            "evidence": "capped: requires php ^7.3 || ~8.0.0 || ~8.1.0: it stops at 8.1, so the newest PHP, 8.5, is excluded",
+            "allowlist_reason": null,
+            "data_date": "2026-10-22T00:00:00+00:00",
+            "libyears": 5.03,
+            "age": {
+                "installed": {
+                    "at": "2021-09-20T18:11:11+00:00",
+                    "years": 5.1,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "2.26.3",
+                    "at": "2026-10-03T12:45:16+00:00",
+                    "years": 0.1,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "2.26.3",
+                    "at": "2026-10-03T12:45:16+00:00",
+                    "years": 0.1,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-10-21T21:43:38+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
+            "package": "laminas/laminas-stdlib",
+            "version": "3.6.1",
+            "branch": "3.x",
+            "installed_php": {
+                "requires": "^7.3 || ~8.0.0 || ~8.1.0",
+                "target_runs": false,
+                "project_allows": null
+            },
+            "verdict": "low",
+            "priority": "low",
+            "lead": "capped",
+            "rank": 54,
+            "flags": [
+                {
+                    "id": "capped",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S11"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "php_minor",
+                        "value": "8.1",
+                        "source": null
+                    },
+                    "summary": "requires php ^7.3 || ~8.0.0 || ~8.1.0: it stops at 8.1, so the newest PHP, 8.5, is excluded"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 4,
+                "exact": 4,
+                "rounded_down": false,
+                "band": {
+                    "floor": 1,
+                    "next": "medium",
+                    "to_next": 4
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 4,
+                        "alone": {
+                            "total": 4,
+                            "verdict": "low"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "capped",
+                        "role": "lead",
+                        "weight": 8,
+                        "divisor": 1,
+                        "points": 8,
+                        "contribution": 4
+                    }
+                ],
+                "modifiers": [
+                    {
+                        "reason": "transitive",
+                        "applies_to": "maintenance",
+                        "divide_by": 2,
+                        "before": 8,
+                        "after": 4
+                    }
+                ],
+                "accepted": [],
+                "without": [],
+                "text": "4 = capped 8 \u00f7 2 transitive"
+            },
+            "next_step": {
+                "kind": "require",
+                "source": "capped",
+                "merged": [],
+                "fix_kind": null,
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "3.x",
+                "version": "3.21.0",
+                "newest": "3.21.0",
+                "constraint": "^3.21.0",
+                "latest": null,
+                "php_check": {
+                    "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                    "project_allows": null,
+                    "target_runs": true,
+                    "raise_to": null,
+                    "raise_size": null
+                },
+                "crosses_major": false,
+                "held_by": [
+                    {
+                        "source": "package",
+                        "package": "drupal/core-recommended",
+                        "version": "9.3.14",
+                        "link": "require",
+                        "target": null,
+                        "constraint": "3.6.1",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "10.x",
+                                "constraint": "^10.3.9",
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "clears": [
+                    {
+                        "kind": "flag",
+                        "id": "capped",
+                        "basis": "admits_newest_php"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold",
+                        "composer_resolves"
+                    ]
+                },
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
+                "composer_moves_because": [
+                    "holders"
+                ],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "drupal/core-recommended",
+                        "11.4.11"
+                    ]
+                ],
+                "through": [
+                    {
+                        "package": "drupal/admin_toolbar",
+                        "installed_version": "3.1.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/core-recommended",
+                        "installed_version": "9.3.14",
+                        "installed_requires": true,
+                        "newest_stable": {
+                            "version": "11.4.11",
+                            "released": "2026-10-21T10:18:50+00:00"
+                        },
+                        "newest_requires": false,
+                        "newest_requires_unmeasured": null
+                    },
+                    {
+                        "package": "drupal/lupus_ce_renderer",
+                        "installed_version": "2.0.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/paragraphs",
+                        "installed_version": "1.14.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/pathauto",
+                        "installed_version": "1.10.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/rest_menu_items",
+                        "installed_version": "3.0.2",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    },
+                    {
+                        "package": "drupal/trusted_redirect",
+                        "installed_version": "1.9.0",
+                        "installed_requires": false,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    }
+                ],
+                "also": [],
+                "text": "move laminas/laminas-stdlib to ^3.21.0 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 4 more \u2014 clears capped; 3.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0; the target php 8.3 runs it; held by drupal/core-recommended 9.3.14 (requires 3.6.1; itself high: vulnerable); the packages that hold it may need to move too; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1/mirror/0)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    },
+                    {
+                        "composer_repository": "composer repo (http://127.0.0.1)",
+                        "registry": null,
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "laminas/laminas-stdlib",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-10-22T00:00:00+00:00",
+                "cached_at": "2026-10-22T00:00:00+00:00"
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/laminas/laminas-stdlib",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": false,
+            "dev": false,
+            "reach": "transitive",
+            "chain": [
+                "drupal/core-recommended",
+                "laminas/laminas-stdlib"
+            ],
+            "depth": 1,
+            "depth_unmeasured": null,
+            "named_in": [],
+            "direct_dependents": [
+                "drupal/admin_toolbar",
+                "drupal/core-recommended",
+                "drupal/lupus_ce_renderer",
+                "drupal/paragraphs",
+                "drupal/pathauto",
+                "drupal/rest_menu_items",
+                "drupal/trusted_redirect"
+            ],
+            "signals": [
+                {
+                    "id": "S11",
+                    "level": "warn",
+                    "summary": "php \"^7.3 || ~8.0.0 || ~8.1.0\" stops at 8.1; the newest PHP, 8.5, is excluded",
+                    "data": {
+                        "newest_php": "8.5",
+                        "newest_php_source": "known",
+                        "requires": "^7.3 || ~8.0.0 || ~8.1.0",
+                        "stops_at": "8.1",
+                        "excludes_target": true,
+                        "admits_newest": {
+                            "version": "3.21.0",
+                            "branch": "3.x",
+                            "blocking": null
+                        }
+                    }
+                }
+            ],
+            "evidence": "capped: requires php ^7.3 || ~8.0.0 || ~8.1.0: it stops at 8.1, so the newest PHP, 8.5, is excluded",
+            "allowlist_reason": null,
+            "data_date": "2026-10-22T00:00:00+00:00",
+            "libyears": 3.92,
+            "age": {
+                "installed": {
+                    "at": "2021-11-10T11:33:52+00:00",
+                    "years": 4.9,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "3.21.0",
+                    "at": "2025-10-11T18:13:12+00:00",
+                    "years": 1,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "3.21.0",
+                    "at": "2025-10-11T18:13:12+00:00",
+                    "years": 1,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-10-21T21:45:45+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
             "package": "pear/pear_exception",
             "version": "v1.0.2",
             "branch": "1.x",
@@ -41884,7 +43330,7 @@
             "verdict": "low",
             "priority": "low",
             "lead": "stale",
-            "rank": 52,
+            "rank": 55,
             "flags": [
                 {
                     "id": "stale",
@@ -42199,7 +43645,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 53,
+            "rank": 56,
             "flags": [],
             "score": {
                 "model": 1,
@@ -42302,9 +43748,9 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 32 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 27 more",
+                    "summary": "pulls in 35 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 30 more",
                     "data": {
-                        "flagged": 32,
+                        "flagged": 35,
                         "packages": [
                             {
                                 "package": "drupal/core",
@@ -42382,8 +43828,9 @@
                                     "laminas/laminas-diactoros"
                                 ],
                                 "verdict": "high",
-                                "lead": null,
+                                "lead": "capped",
                                 "flag_ids": [
+                                    "capped",
                                     "vulnerable"
                                 ]
                             },
@@ -42729,6 +44176,47 @@
                                 ]
                             },
                             {
+                                "package": "laminas/laminas-escaper",
+                                "chain": [
+                                    "drupal/admin_toolbar",
+                                    "drupal/core",
+                                    "laminas/laminas-feed",
+                                    "laminas/laminas-escaper"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-feed",
+                                "chain": [
+                                    "drupal/admin_toolbar",
+                                    "drupal/core",
+                                    "laminas/laminas-feed"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-stdlib",
+                                "chain": [
+                                    "drupal/admin_toolbar",
+                                    "drupal/core",
+                                    "laminas/laminas-feed",
+                                    "laminas/laminas-stdlib"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
                                 "package": "pear/pear_exception",
                                 "chain": [
                                     "drupal/admin_toolbar",
@@ -42811,7 +44299,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 54,
+            "rank": 57,
             "flags": [],
             "score": {
                 "model": 1,
@@ -42968,7 +44456,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 55,
+            "rank": 58,
             "flags": [],
             "score": {
                 "model": 1,
@@ -43125,7 +44613,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 56,
+            "rank": 59,
             "flags": [],
             "score": {
                 "model": 1,
@@ -43228,9 +44716,9 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 33 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 28 more",
+                    "summary": "pulls in 36 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 31 more",
                     "data": {
-                        "flagged": 33,
+                        "flagged": 36,
                         "packages": [
                             {
                                 "package": "drupal/core",
@@ -43308,8 +44796,9 @@
                                     "laminas/laminas-diactoros"
                                 ],
                                 "verdict": "high",
-                                "lead": null,
+                                "lead": "capped",
                                 "flag_ids": [
+                                    "capped",
                                     "vulnerable"
                                 ]
                             },
@@ -43667,6 +45156,47 @@
                                 ]
                             },
                             {
+                                "package": "laminas/laminas-escaper",
+                                "chain": [
+                                    "drupal/lupus_ce_renderer",
+                                    "drupal/core",
+                                    "laminas/laminas-feed",
+                                    "laminas/laminas-escaper"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-feed",
+                                "chain": [
+                                    "drupal/lupus_ce_renderer",
+                                    "drupal/core",
+                                    "laminas/laminas-feed"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-stdlib",
+                                "chain": [
+                                    "drupal/lupus_ce_renderer",
+                                    "drupal/core",
+                                    "laminas/laminas-feed",
+                                    "laminas/laminas-stdlib"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
                                 "package": "pear/pear_exception",
                                 "chain": [
                                     "drupal/lupus_ce_renderer",
@@ -43749,7 +45279,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 57,
+            "rank": 60,
             "flags": [],
             "score": {
                 "model": 1,
@@ -43852,9 +45382,9 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 32 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 27 more",
+                    "summary": "pulls in 35 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 30 more",
                     "data": {
-                        "flagged": 32,
+                        "flagged": 35,
                         "packages": [
                             {
                                 "package": "drupal/core",
@@ -43932,8 +45462,9 @@
                                     "laminas/laminas-diactoros"
                                 ],
                                 "verdict": "high",
-                                "lead": null,
+                                "lead": "capped",
                                 "flag_ids": [
+                                    "capped",
                                     "vulnerable"
                                 ]
                             },
@@ -44276,6 +45807,47 @@
                                 "lead": null,
                                 "flag_ids": [
                                     "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-escaper",
+                                "chain": [
+                                    "drupal/pathauto",
+                                    "drupal/core",
+                                    "laminas/laminas-feed",
+                                    "laminas/laminas-escaper"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-feed",
+                                "chain": [
+                                    "drupal/pathauto",
+                                    "drupal/core",
+                                    "laminas/laminas-feed"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-stdlib",
+                                "chain": [
+                                    "drupal/pathauto",
+                                    "drupal/core",
+                                    "laminas/laminas-feed",
+                                    "laminas/laminas-stdlib"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
                                 ]
                             },
                             {
@@ -44361,7 +45933,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 58,
+            "rank": 61,
             "flags": [],
             "score": {
                 "model": 1,
@@ -44464,9 +46036,9 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 32 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 27 more",
+                    "summary": "pulls in 35 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 30 more",
                     "data": {
-                        "flagged": 32,
+                        "flagged": 35,
                         "packages": [
                             {
                                 "package": "drupal/core",
@@ -44544,8 +46116,9 @@
                                     "laminas/laminas-diactoros"
                                 ],
                                 "verdict": "high",
-                                "lead": null,
+                                "lead": "capped",
                                 "flag_ids": [
+                                    "capped",
                                     "vulnerable"
                                 ]
                             },
@@ -44888,6 +46461,47 @@
                                 "lead": null,
                                 "flag_ids": [
                                     "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-escaper",
+                                "chain": [
+                                    "drupal/rest_menu_items",
+                                    "drupal/core",
+                                    "laminas/laminas-feed",
+                                    "laminas/laminas-escaper"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-feed",
+                                "chain": [
+                                    "drupal/rest_menu_items",
+                                    "drupal/core",
+                                    "laminas/laminas-feed"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-stdlib",
+                                "chain": [
+                                    "drupal/rest_menu_items",
+                                    "drupal/core",
+                                    "laminas/laminas-feed",
+                                    "laminas/laminas-stdlib"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
                                 ]
                             },
                             {
@@ -44973,7 +46587,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 59,
+            "rank": 62,
             "flags": [],
             "score": {
                 "model": 1,
@@ -45076,9 +46690,9 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 32 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 27 more",
+                    "summary": "pulls in 35 flagged packages: drupal/core (left-behind \u00b7 vulnerable), twig/twig (vulnerable), guzzlehttp/guzzle (left-behind \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable), symfony/process (left-behind \u00b7 vulnerable) and 30 more",
                     "data": {
-                        "flagged": 32,
+                        "flagged": 35,
                         "packages": [
                             {
                                 "package": "drupal/core",
@@ -45156,8 +46770,9 @@
                                     "laminas/laminas-diactoros"
                                 ],
                                 "verdict": "high",
-                                "lead": null,
+                                "lead": "capped",
                                 "flag_ids": [
+                                    "capped",
                                     "vulnerable"
                                 ]
                             },
@@ -45503,6 +47118,47 @@
                                 ]
                             },
                             {
+                                "package": "laminas/laminas-escaper",
+                                "chain": [
+                                    "drupal/trusted_redirect",
+                                    "drupal/core",
+                                    "laminas/laminas-feed",
+                                    "laminas/laminas-escaper"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-feed",
+                                "chain": [
+                                    "drupal/trusted_redirect",
+                                    "drupal/core",
+                                    "laminas/laminas-feed"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
+                                "package": "laminas/laminas-stdlib",
+                                "chain": [
+                                    "drupal/trusted_redirect",
+                                    "drupal/core",
+                                    "laminas/laminas-feed",
+                                    "laminas/laminas-stdlib"
+                                ],
+                                "verdict": "low",
+                                "lead": "capped",
+                                "flag_ids": [
+                                    "capped"
+                                ]
+                            },
+                            {
                                 "package": "pear/pear_exception",
                                 "chain": [
                                     "drupal/trusted_redirect",
@@ -45585,7 +47241,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 60,
+            "rank": 63,
             "flags": [],
             "score": {
                 "model": 1,
@@ -45730,7 +47386,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 61,
+            "rank": 64,
             "flags": [],
             "score": {
                 "model": 1,
@@ -45869,7 +47525,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 62,
+            "rank": 65,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46008,7 +47664,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 63,
+            "rank": 66,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46175,7 +47831,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 64,
+            "rank": 67,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46342,7 +47998,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 65,
+            "rank": 68,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46506,7 +48162,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 66,
+            "rank": 69,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46673,7 +48329,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 67,
+            "rank": 70,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46838,7 +48494,7 @@
             "verdict": "ok",
             "priority": "none",
             "lead": null,
-            "rank": 68,
+            "rank": 71,
             "flags": [],
             "score": {
                 "model": 1,
@@ -46951,438 +48607,6 @@
                 "push": {
                     "at": "2023-12-16T13:43:30+00:00",
                     "years": 2.8,
-                    "level": null
-                },
-                "push_unmeasured": null
-            },
-            "baseline": null,
-            "gate": {
-                "reaches_fail_on": false,
-                "fails": false,
-                "exempt_by": null,
-                "by": [],
-                "basis": null
-            }
-        },
-        {
-            "package": "laminas/laminas-escaper",
-            "version": "2.9.0",
-            "branch": "2.x",
-            "installed_php": {
-                "requires": "^7.3 || ~8.0.0 || ~8.1.0",
-                "target_runs": false,
-                "project_allows": null
-            },
-            "verdict": "ok",
-            "priority": "none",
-            "lead": null,
-            "rank": 69,
-            "flags": [],
-            "score": {
-                "model": 1,
-                "total": 0,
-                "exact": 0,
-                "accepted": [],
-                "text": "0"
-            },
-            "next_step": null,
-            "security": {
-                "status": "clear",
-                "check": "complete",
-                "complete": true,
-                "unchecked_reason": null,
-                "records": 0,
-                "feeds": [
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1/mirror/0)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 0,
-                        "reason": null
-                    },
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 0,
-                        "reason": null
-                    }
-                ],
-                "ignored": [],
-                "ignored_count": 0
-            },
-            "checks_missing": [],
-            "checks_skipped": [],
-            "unchecked_accepted": [],
-            "maintenance_judged": true,
-            "metadata": {
-                "status": "read",
-                "reason": null,
-                "message": null
-            },
-            "activity": {
-                "status": "read",
-                "reason": null,
-                "forge": "github",
-                "host": "github.com",
-                "repo": "laminas/laminas-escaper",
-                "event": "push",
-                "archived": false,
-                "fetched_at": "2026-10-22T00:00:00+00:00",
-                "cached_at": "2026-10-22T00:00:00+00:00"
-            },
-            "allowlist": null,
-            "abandoned_ignored": null,
-            "from_composer_repository": true,
-            "origin": {
-                "kind": "packagist",
-                "registry": "packagist.org",
-                "package_url": "https://packagist.org/packages/laminas/laminas-escaper",
-                "local": false
-            },
-            "replacement": null,
-            "replacement_url": null,
-            "note": null,
-            "libyears_unmeasured": null,
-            "libyears_at_least": false,
-            "direct": false,
-            "dev": false,
-            "reach": "transitive",
-            "chain": [
-                "drupal/core-recommended",
-                "laminas/laminas-escaper"
-            ],
-            "depth": 1,
-            "depth_unmeasured": null,
-            "named_in": [],
-            "direct_dependents": [
-                "drupal/admin_toolbar",
-                "drupal/core-recommended",
-                "drupal/lupus_ce_renderer",
-                "drupal/paragraphs",
-                "drupal/pathauto",
-                "drupal/rest_menu_items",
-                "drupal/trusted_redirect"
-            ],
-            "signals": [],
-            "evidence": "",
-            "allowlist_reason": null,
-            "data_date": "2026-10-22T00:00:00+00:00",
-            "libyears": 4.12,
-            "age": {
-                "installed": {
-                    "at": "2021-09-02T17:10:53+00:00",
-                    "years": 5.1,
-                    "dated_by": null
-                },
-                "installed_unmeasured": null,
-                "release": {
-                    "version": "2.18.0",
-                    "at": "2025-10-14T18:31:13+00:00",
-                    "years": 1,
-                    "level": null,
-                    "dated_by": null
-                },
-                "release_unmeasured": null,
-                "branch_release": {
-                    "version": "2.18.0",
-                    "at": "2025-10-14T18:31:13+00:00",
-                    "years": 1,
-                    "level": null,
-                    "dated_by": null
-                },
-                "branch_release_unmeasured": null,
-                "push": {
-                    "at": "2026-10-21T22:38:45+00:00",
-                    "years": 0,
-                    "level": null
-                },
-                "push_unmeasured": null
-            },
-            "baseline": null,
-            "gate": {
-                "reaches_fail_on": false,
-                "fails": false,
-                "exempt_by": null,
-                "by": [],
-                "basis": null
-            }
-        },
-        {
-            "package": "laminas/laminas-feed",
-            "version": "2.15.0",
-            "branch": "2.x",
-            "installed_php": {
-                "requires": "^7.3 || ~8.0.0 || ~8.1.0",
-                "target_runs": false,
-                "project_allows": null
-            },
-            "verdict": "ok",
-            "priority": "none",
-            "lead": null,
-            "rank": 70,
-            "flags": [],
-            "score": {
-                "model": 1,
-                "total": 0,
-                "exact": 0,
-                "accepted": [],
-                "text": "0"
-            },
-            "next_step": null,
-            "security": {
-                "status": "clear",
-                "check": "complete",
-                "complete": true,
-                "unchecked_reason": null,
-                "records": 0,
-                "feeds": [
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1/mirror/0)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 0,
-                        "reason": null
-                    },
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 0,
-                        "reason": null
-                    }
-                ],
-                "ignored": [],
-                "ignored_count": 0
-            },
-            "checks_missing": [],
-            "checks_skipped": [],
-            "unchecked_accepted": [],
-            "maintenance_judged": true,
-            "metadata": {
-                "status": "read",
-                "reason": null,
-                "message": null
-            },
-            "activity": {
-                "status": "read",
-                "reason": null,
-                "forge": "github",
-                "host": "github.com",
-                "repo": "laminas/laminas-feed",
-                "event": "push",
-                "archived": false,
-                "fetched_at": "2026-10-22T00:00:00+00:00",
-                "cached_at": "2026-10-22T00:00:00+00:00"
-            },
-            "allowlist": null,
-            "abandoned_ignored": null,
-            "from_composer_repository": true,
-            "origin": {
-                "kind": "packagist",
-                "registry": "packagist.org",
-                "package_url": "https://packagist.org/packages/laminas/laminas-feed",
-                "local": false
-            },
-            "replacement": null,
-            "replacement_url": null,
-            "note": null,
-            "libyears_unmeasured": null,
-            "libyears_at_least": false,
-            "direct": false,
-            "dev": false,
-            "reach": "transitive",
-            "chain": [
-                "drupal/core-recommended",
-                "laminas/laminas-feed"
-            ],
-            "depth": 1,
-            "depth_unmeasured": null,
-            "named_in": [],
-            "direct_dependents": [
-                "drupal/admin_toolbar",
-                "drupal/core-recommended",
-                "drupal/lupus_ce_renderer",
-                "drupal/paragraphs",
-                "drupal/pathauto",
-                "drupal/rest_menu_items",
-                "drupal/trusted_redirect"
-            ],
-            "signals": [],
-            "evidence": "",
-            "allowlist_reason": null,
-            "data_date": "2026-10-22T00:00:00+00:00",
-            "libyears": 5.03,
-            "age": {
-                "installed": {
-                    "at": "2021-09-20T18:11:11+00:00",
-                    "years": 5.1,
-                    "dated_by": null
-                },
-                "installed_unmeasured": null,
-                "release": {
-                    "version": "2.26.3",
-                    "at": "2026-10-03T12:45:16+00:00",
-                    "years": 0.1,
-                    "level": null,
-                    "dated_by": null
-                },
-                "release_unmeasured": null,
-                "branch_release": {
-                    "version": "2.26.3",
-                    "at": "2026-10-03T12:45:16+00:00",
-                    "years": 0.1,
-                    "level": null,
-                    "dated_by": null
-                },
-                "branch_release_unmeasured": null,
-                "push": {
-                    "at": "2026-10-21T21:43:38+00:00",
-                    "years": 0,
-                    "level": null
-                },
-                "push_unmeasured": null
-            },
-            "baseline": null,
-            "gate": {
-                "reaches_fail_on": false,
-                "fails": false,
-                "exempt_by": null,
-                "by": [],
-                "basis": null
-            }
-        },
-        {
-            "package": "laminas/laminas-stdlib",
-            "version": "3.6.1",
-            "branch": "3.x",
-            "installed_php": {
-                "requires": "^7.3 || ~8.0.0 || ~8.1.0",
-                "target_runs": false,
-                "project_allows": null
-            },
-            "verdict": "ok",
-            "priority": "none",
-            "lead": null,
-            "rank": 71,
-            "flags": [],
-            "score": {
-                "model": 1,
-                "total": 0,
-                "exact": 0,
-                "accepted": [],
-                "text": "0"
-            },
-            "next_step": null,
-            "security": {
-                "status": "clear",
-                "check": "complete",
-                "complete": true,
-                "unchecked_reason": null,
-                "records": 0,
-                "feeds": [
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1/mirror/0)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 0,
-                        "reason": null
-                    },
-                    {
-                        "composer_repository": "composer repo (http://127.0.0.1)",
-                        "registry": null,
-                        "answer": "answered",
-                        "records": 0,
-                        "reason": null
-                    }
-                ],
-                "ignored": [],
-                "ignored_count": 0
-            },
-            "checks_missing": [],
-            "checks_skipped": [],
-            "unchecked_accepted": [],
-            "maintenance_judged": true,
-            "metadata": {
-                "status": "read",
-                "reason": null,
-                "message": null
-            },
-            "activity": {
-                "status": "read",
-                "reason": null,
-                "forge": "github",
-                "host": "github.com",
-                "repo": "laminas/laminas-stdlib",
-                "event": "push",
-                "archived": false,
-                "fetched_at": "2026-10-22T00:00:00+00:00",
-                "cached_at": "2026-10-22T00:00:00+00:00"
-            },
-            "allowlist": null,
-            "abandoned_ignored": null,
-            "from_composer_repository": true,
-            "origin": {
-                "kind": "packagist",
-                "registry": "packagist.org",
-                "package_url": "https://packagist.org/packages/laminas/laminas-stdlib",
-                "local": false
-            },
-            "replacement": null,
-            "replacement_url": null,
-            "note": null,
-            "libyears_unmeasured": null,
-            "libyears_at_least": false,
-            "direct": false,
-            "dev": false,
-            "reach": "transitive",
-            "chain": [
-                "drupal/core-recommended",
-                "laminas/laminas-stdlib"
-            ],
-            "depth": 1,
-            "depth_unmeasured": null,
-            "named_in": [],
-            "direct_dependents": [
-                "drupal/admin_toolbar",
-                "drupal/core-recommended",
-                "drupal/lupus_ce_renderer",
-                "drupal/paragraphs",
-                "drupal/pathauto",
-                "drupal/rest_menu_items",
-                "drupal/trusted_redirect"
-            ],
-            "signals": [],
-            "evidence": "",
-            "allowlist_reason": null,
-            "data_date": "2026-10-22T00:00:00+00:00",
-            "libyears": 3.92,
-            "age": {
-                "installed": {
-                    "at": "2021-11-10T11:33:52+00:00",
-                    "years": 4.9,
-                    "dated_by": null
-                },
-                "installed_unmeasured": null,
-                "release": {
-                    "version": "3.21.0",
-                    "at": "2025-10-11T18:13:12+00:00",
-                    "years": 1,
-                    "level": null,
-                    "dated_by": null
-                },
-                "release_unmeasured": null,
-                "branch_release": {
-                    "version": "3.21.0",
-                    "at": "2025-10-11T18:13:12+00:00",
-                    "years": 1,
-                    "level": null,
-                    "dated_by": null
-                },
-                "branch_release_unmeasured": null,
-                "push": {
-                    "at": "2026-10-21T21:45:45+00:00",
-                    "years": 0,
                     "level": null
                 },
                 "push_unmeasured": null

@@ -4,5 +4,5 @@
 flags: capped 1 · vulnerable 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 5 advisories: 1 high, 4 medium
-php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; mautic/core-lib excludes 8.1
+php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
 gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

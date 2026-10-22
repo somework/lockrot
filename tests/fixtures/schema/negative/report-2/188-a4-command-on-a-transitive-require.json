@@ -891,6 +891,23 @@
    "target": {
     "php": "8.4.99",
     "inside": false
+   },
+   "target_fix": {
+    "packages": [
+     {
+      "name": "mautic/core-lib",
+      "version": "4.3.x-dev",
+      "link": "require",
+      "target": "php",
+      "constraint": ">=7.4.0 <8.1",
+      "dev": false
+     }
+    ],
+    "command": null,
+    "check": "not_checked",
+    "reason": null,
+    "held_by": [],
+    "platform_step": false
    }
   }
  },

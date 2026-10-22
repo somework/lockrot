@@ -862,7 +862,8 @@ export const d_A_baselined_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -2904,7 +2905,8 @@ export const d_A_blocked_dagger = {
             "target": {
                 "php": "8.0.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -4775,7 +4777,8 @@ export const d_A_gate_critical = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -7230,7 +7233,8 @@ export const d_A_gate_vulnerable = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -9699,7 +9703,8 @@ export const d_A_php_star_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -12148,7 +12153,8 @@ export const d_A = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -14603,7 +14609,8 @@ export const d_B_accepted_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 1,
@@ -16218,7 +16225,8 @@ export const d_B_also_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -17921,7 +17929,8 @@ export const d_B_baselined_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -19623,7 +19632,8 @@ export const d_B_dev_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -21262,7 +21272,8 @@ export const d_B_gate_flag = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -22898,7 +22909,8 @@ export const d_B_gate_list = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -24533,7 +24545,8 @@ export const d_B_gate_none = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -26147,7 +26160,8 @@ export const d_B_offline_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -27672,7 +27686,8 @@ export const d_B_offline_high_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -29189,7 +29204,8 @@ export const d_B = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -30820,7 +30836,8 @@ export const d_C_baselined_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -32354,7 +32371,8 @@ export const d_C_bitbucket_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -33842,7 +33860,8 @@ export const d_C_gitlab_hosted_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -35347,7 +35366,8 @@ export const d_C_offline_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -36886,7 +36906,8 @@ export const d_C_tokenless_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -38380,7 +38401,8 @@ export const d_C = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -39868,7 +39890,8 @@ export const d_D_partial_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 1,
@@ -41289,7 +41312,8 @@ export const d_D = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -42765,6 +42789,24 @@ export const d_E_ignored_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -44361,6 +44403,24 @@ export const d_E_ignored_whole_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -45983,6 +46043,24 @@ export const d_E = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -47557,7 +47635,8 @@ export const d_F = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -49070,7 +49149,8 @@ export const d_G_tag_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -50565,7 +50645,8 @@ export const d_G = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -52041,7 +52122,8 @@ export const d_abandoned_audit_ignore_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -53541,7 +53623,8 @@ export const d_abandoned_ignore_unreadable_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -55037,7 +55120,8 @@ export const d_adds_capped_raise_php = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -56468,7 +56552,8 @@ export const d_adds_capped_require_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -57902,7 +57987,8 @@ export const d_adds_capped_tag_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -59310,7 +59396,8 @@ export const d_adds_capped_update = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -61848,7 +61935,8 @@ export const d_affected_range_unknown_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -63339,6 +63427,24 @@ export const d_cache_subscriber = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.1.3",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -64893,6 +64999,23 @@ export const d_capped_covered_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "ocramius/proxy-manager",
+                        "version": "2.2.4",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.0",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "not_checked",
+                "reason": null,
+                "held_by": [],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -66396,6 +66519,23 @@ export const d_capped_local_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": ">=7.4.0 <8.1",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "not_checked",
+                "reason": null,
+                "held_by": [],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -69639,6 +69779,33 @@ export const d_capped_require_php = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "pelago/emogrifier",
+                        "version": "v2.2.0",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^5.5.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.1.3",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -71158,7 +71325,8 @@ export const d_capped_tag_unverified_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -72616,7 +72784,8 @@ export const d_commonmark = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -74919,7 +75088,8 @@ export const d_composite = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -80670,7 +80840,8 @@ export const d_either_critical_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -82358,7 +82529,8 @@ export const d_either_low_dev_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -83894,7 +84066,8 @@ export const d_fail_on_config_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -85519,7 +85692,8 @@ export const d_fail_on_default_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -87128,7 +87302,8 @@ export const d_feeds_drupal_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -89038,7 +89213,8 @@ export const d_flysystem = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -90709,7 +90885,8 @@ export const d_gitlab_anon_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -92249,6 +92426,23 @@ export const d_guzzle_5 = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "php-http/guzzle5-adapter",
+                        "version": "2.0.0",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.0",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "not_checked",
+                "reason": null,
+                "held_by": [],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -95163,6 +95357,33 @@ export const d_guzzle_mixed = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "csa/guzzle-bundle",
+                        "version": "dev-compat-php",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.1",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.1.3",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -98773,7 +98994,8 @@ export const d_guzzle = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -100621,7 +100843,8 @@ export const d_hoa_tokenless_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -102143,7 +102366,8 @@ export const d_hoa = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -103723,6 +103947,41 @@ export const d_holder_vuln_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "joomla/filter",
+                        "version": "2.0.5",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5|~8.0.0|~8.1.0",
+                        "dev": false
+                    },
+                    {
+                        "name": "joomla/string",
+                        "version": "2.0.1",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5|~8.0.0|~8.1.0",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -105182,7 +105441,8 @@ export const d_ignored_marking_archived_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -106701,7 +106961,8 @@ export const d_ignored_marking_only_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -107990,7 +108251,8 @@ export const d_ignored_marking_partial_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 1,
@@ -109342,7 +109604,8 @@ export const d_ignored_marking_stale_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -110754,7 +111017,8 @@ export const d_ignored_marking_unchecked_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -112369,6 +112633,41 @@ export const d_installed_php_halved = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "web-auth/metadata-service",
+                        "version": "v2.1.7",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.1",
+                        "dev": false
+                    },
+                    {
+                        "name": "web-auth/webauthn-lib",
+                        "version": "v2.1.7",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -113920,6 +114219,33 @@ export const d_joomla_filter = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "joomla/filter",
+                        "version": "2.0.5",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5|~8.0.0|~8.1.0",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -115409,6 +115735,23 @@ export const d_local_path_advisory = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": ">=7.4.0 <8.1",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "not_checked",
+                "reason": null,
+                "held_by": [],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -118620,7 +118963,8 @@ export const d_lock_only_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -120133,7 +120477,8 @@ export const d_long_range_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -121646,7 +121991,8 @@ export const d_many_dependents = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -123534,7 +123880,8 @@ export const d_move_check_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -125053,7 +125400,8 @@ export const d_not_found_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -126597,7 +126945,8 @@ export const d_ok_unchecked = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -127883,7 +128232,8 @@ export const d_op_update = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -129314,7 +129664,8 @@ export const d_pagerfanta = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -130783,7 +131134,8 @@ export const d_partial_op_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -132571,7 +132923,8 @@ export const d_partial = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -134535,7 +134888,8 @@ export const d_php_edge_equal_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -135961,7 +136315,8 @@ export const d_php_edge_lower_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -137416,7 +137771,8 @@ export const d_php_edge_upper_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -138845,7 +139201,8 @@ export const d_php_null = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -140305,6 +140662,24 @@ export const d_pinned_unread = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -141757,6 +142132,33 @@ export const d_policy_off_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "joomla/filter",
+                        "version": "2.0.5",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5|~8.0.0|~8.1.0",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -143224,7 +143626,8 @@ export const d_psr7 = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -145058,7 +145461,8 @@ export const d_replace_graded = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -146475,7 +146879,8 @@ export const d_replace_text = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -147915,7 +148320,8 @@ export const d_require_dev_name_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -149771,6 +150177,24 @@ export const d_rounded_dev_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -151279,6 +151703,23 @@ export const d_routing = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": ">=7.4.0 <8.1",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "not_checked",
+                "reason": null,
+                "held_by": [],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -152981,7 +153422,8 @@ export const d_silent = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -154460,7 +154902,8 @@ export const d_snapshot_alias = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -155900,7 +156343,8 @@ export const d_snapshot_dead_line_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -157346,7 +157790,8 @@ export const d_snapshot_undated_line_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -158783,7 +159228,8 @@ export const d_stale_accepted_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 1,
@@ -160133,6 +160579,23 @@ export const d_stale_capped = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "ocramius/proxy-manager",
+                        "version": "2.2.4",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.0",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "not_checked",
+                "reason": null,
+                "held_by": [],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -161602,7 +162065,8 @@ export const d_stale_only = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -162979,7 +163443,8 @@ export const d_tie_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -164676,6 +165141,33 @@ export const d_twig_1 = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "csa/guzzle-bundle",
+                        "version": "dev-compat-php",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.1",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.1.3",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -167578,7 +168070,8 @@ export const d_twig_dev_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -169491,7 +169984,8 @@ export const d_unknown_origin = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -170818,7 +171312,8 @@ export const d_unknown = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -172166,6 +172661,24 @@ export const d_unrated_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -173723,7 +174236,8 @@ export const d_unreached_dev_dagger = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -175129,7 +175643,8 @@ export const d_unreached_move = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -176603,7 +177118,8 @@ export const d_unreached = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -178006,7 +178522,8 @@ export const d_wp_config = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -179403,6 +179920,23 @@ export const d_xmlseclibs = {
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": ">=7.4.0 <8.1",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "not_checked",
+                "reason": null,
+                "held_by": [],
+                "platform_step": false
             }
         },
         "score_rules_used": {
@@ -181638,7 +182172,8 @@ export const d_yaml_3_4 = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
@@ -183305,7 +183840,8 @@ export const d_zero_n = {
             "target": {
                 "php": "8.4.99",
                 "inside": true
-            }
+            },
+            "target_fix": null
         },
         "score_rules_used": {
             "counted": 0,
