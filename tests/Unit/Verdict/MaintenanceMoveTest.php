@@ -167,7 +167,7 @@ final class MaintenanceMoveTest extends TestCase
     /**
      * The move of a/b when `capped` leads: its S11 names `admits_newest`.
      *
-     * @param array<string, string>  $releases by version, the php that each requires
+     * @param array<string, ?string> $releases by version, the php that each requires, null for none
      * @param array<string, string>  $require  composer.json's `require`
      * @param ?string                $installedPhp the lock entry's `require.php`
      */
