@@ -49,11 +49,17 @@ final class TargetFix
         if ($checker === null || $names === []) {
             return $fix;
         }
-        $lower = array_map('strtolower', $names);
+        // Ruling T5: no solve runs while the baseline is not checked, so its reason wins over the names'.
+        $baseline = $checker->baseline()->check();
+        if (!$baseline->isResolved() && !$baseline->isRefused()) {
+            return array_replace($fix, ['reason' => $baseline->reason()]);
+        }
+        // Composer and the move check name a package in lower case. The command keeps the lock's spelling.
+        $lower = array_values(array_unique(array_map('strtolower', $names)));
         if (array_intersect($lower, $skippedNames) !== []) {
             return array_replace($fix, ['reason' => MoveCheck::UNLOADED_NAME]);
         }
-        $outcome = $checker->solveAt($names);
+        $outcome = $checker->solveAt($lower);
         $check = $outcome->check();
         if ($check->isResolved()) {
             $option = MoveCheck::OPTIONS[$check->form() ?? MoveCheck::INLINE] ?? null;

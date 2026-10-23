@@ -4,16 +4,25 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Analyzer;
 
+use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\RootPackage;
+use Composer\Package\RootPackageInterface;
+use Composer\Repository\PlatformRepository;
 use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\TargetFix;
 use Lockrot\Clock;
 use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\Holder;
+use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveChecker;
+use Lockrot\Solver\SolverChecker;
 use Lockrot\Solver\UncheckedMoves;
+use Lockrot\Solver\VersionSource;
+use Lockrot\Tests\Support\ArrayVersionSource;
 use Lockrot\Tests\Support\RecordedMoveChecker;
 use PHPUnit\Framework\TestCase;
 
@@ -145,6 +154,45 @@ final class TargetFixTest extends TestCase
         $fix = self::fix($lock, [], self::recorded(['result' => 'resolves', 'form' => 'inline']));
 
         self::assertSame(['not_checked', 'unloaded_name'], [$fix['check'], $fix['reason']]);
+    }
+
+    /** Ruling T5: the baseline's reason wins over `unloaded_name`, which applies only where a solve would run. */
+    public function testABaselineThatWasNotCheckedGivesItsReasonOverAnInvalidListedName(): void
+    {
+        $lock = ['packages' => [['name' => '--with-all-dependencies', 'version' => '1.0.0', 'require' => ['php' => '<8.4']]], 'packages-dev' => []];
+
+        $fix = self::fix($lock, [], new UncheckedMoves(MoveCheck::OFFLINE));
+
+        self::assertSame(['not_checked', 'offline'], [$fix['check'], $fix['reason']]);
+    }
+
+    /** G1: Composer names a package in lower case, so the solve takes the lowered name and the command the lock's. */
+    public function testAMixedCaseNameThatNoComposerRepositoryServesIsNotChecked(): void
+    {
+        $lock = ['packages' => [['name' => 'Acme/Legacy', 'version' => '1.0.0', 'require' => ['php' => '<8.4']]], 'packages-dev' => []];
+
+        $fix = self::fix($lock, [], self::solving($lock, ['acme/legacy'], new ArrayVersionSource([])));
+
+        self::assertSame(['Acme/Legacy'], array_column($fix['packages'], 'name'));
+        self::assertSame(['not_checked', 'not_from_composer_repository', []], [$fix['check'], $fix['reason'], $fix['held_by']]);
+    }
+
+    public function testAMixedCaseNameThatTheSourceFailedToLoadIsNotChecked(): void
+    {
+        $lock = ['packages' => [['name' => 'Acme/Legacy', 'version' => '1.0.0', 'require' => ['php' => '<8.4']]], 'packages-dev' => []];
+
+        $fix = self::fix($lock, [], self::solving($lock, [], new ArrayVersionSource([], ['acme/legacy' => VersionSource::OFFLINE])));
+
+        self::assertSame(['not_checked', 'offline'], [$fix['check'], $fix['reason']]);
+    }
+
+    public function testAMixedCaseNameKeepsTheLocksSpellingInTheCommand(): void
+    {
+        $lock = ['packages' => [['name' => 'Acme/Legacy', 'version' => '1.0.0', 'require' => ['php' => '<8.4']]], 'packages-dev' => []];
+
+        $fix = self::fix($lock, [], self::solving($lock, [], new ArrayVersionSource(['acme/legacy' => [['version' => '1.0.0', 'require' => ['php' => '<8.4']], ['version' => '1.1.0']]])));
+
+        self::assertSame(['resolves', ['composer', 'update', 'Acme/Legacy']], [$fix['check'], $fix['command']]);
     }
 
     public function testASkippedNameThatExcludesNothingLeavesTheSolve(): void
@@ -284,6 +332,21 @@ final class TargetFixTest extends TestCase
     private static function recorded(array $check): RecordedMoveChecker
     {
         return new RecordedMoveChecker(['target_fix' => $check], []);
+    }
+
+    /**
+     * Composer's own solve at PHP 8.4.99, over a root that requires each locked package at `*`.
+     *
+     * @param array{packages: list<array{name: string, version: string}>} $lock
+     * @param list<string>                                               $notFromComposerRepository
+     */
+    private static function solving(array $lock, array $notFromComposerRepository, VersionSource $source): SolverChecker
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => array_fill_keys(array_column($lock['packages'], 'name'), '*')], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $solver = new ComposerSolver($root, LockFile::fromArray($lock)->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, []);
+
+        return new SolverChecker($solver, $notFromComposerRepository, '8.4.99', false, Deadline::never());
     }
 
     private static function resolving(): RecordedMoveChecker
