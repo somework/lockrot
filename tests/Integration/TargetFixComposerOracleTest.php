@@ -18,10 +18,10 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Gate G-D for `target_fix`: the packages that it lists are the ones that Composer was asked to
- * update, its check and command follow the first form that Composer resolved, and a root ceiling
- * is a lock that Composer refuses in every form (tests/fixtures/target-fix-oracle/README.md). It
- * runs no Composer. It covers nothing, so that a mutant is killed by the tests that state the rules.
+ * Gate G-D for `target_fix` (tests/fixtures/target-fix-oracle/README.md). Its packages are the ones
+ * that Composer was asked to update. Its check and command follow the first form that Composer
+ * resolved. A root ceiling is a lock that Composer refuses in every form. The test runs no Composer.
+ * It covers nothing, so that only the tests that state the rules kill a mutant.
  *
  * @coversNothing
  *
@@ -38,9 +38,9 @@ final class TargetFixComposerOracleTest extends TestCase
     private const RECORDED_ON = '2026-10-22T00:00:00+00:00';
 
     /**
-     * Each lock with the packages that Composer was asked to update, and Composer's answer: the
-     * root ceiling when the first problem is the root's own php requirement, else the first form
-     * that resolved, or a refusal.
+     * Each lock with the packages that Composer was asked to update, and Composer's answer. The
+     * answer is the root ceiling when the first problem is the root's own php requirement. Else it
+     * is the first form that resolved, or a refusal.
      *
      * @return iterable<string, array{0: string, 1: string, 2: list<string>, 3: array{ceiling: bool, check: string, command: ?list<string>, resolved: ?string}}>
      */

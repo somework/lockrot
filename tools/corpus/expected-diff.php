@@ -208,7 +208,7 @@ function lineChanges(string $base, string $head, array $allowed): array
         if ($prefixOf($line) === null) {
             $baseLines[] = $line;
         } else {
-            $baseAllowed[] = $line;
+            $baseAllowed[$line] = ($baseAllowed[$line] ?? 0) + 1;
         }
     }
     $added = [];
@@ -217,7 +217,9 @@ function lineChanges(string $base, string $head, array $allowed): array
         $prefix = $prefixOf($line);
         if ($prefix === null) {
             $kept[] = $line;
-        } elseif (!in_array($line, $baseAllowed, true)) {
+        } elseif (($baseAllowed[$line] ?? 0) > 0) {
+            --$baseAllowed[$line];
+        } else {
             $added[] = $prefix;
         }
     }

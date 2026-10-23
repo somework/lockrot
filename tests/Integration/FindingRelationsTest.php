@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Lockrot\Tests\Support\Contract\EnginePage;
 use Lockrot\Tests\Support\FindingRelations;
 use Lockrot\Tests\Support\ItemRelations;
 use Lockrot\Tests\Support\JsonPath;
@@ -201,8 +202,12 @@ final class FindingRelationsTest extends TestCase
     /** The page documents of lockrot's own runs, and the ‡ documents derived from them, hold every relation. */
     public function testTheEnginePageDocumentsHoldEveryRelation(): void
     {
-        $paths = array_merge(glob(self::CONTRACT.'page/*.json') ?: [], glob(self::DOCUMENTS.'page/snipe-it.*.json') ?: []);
-        self::assertCount(3, $paths);
+        $derived = glob(self::DOCUMENTS.'page/snipe-it.*.json') ?: [];
+        $paths = array_merge(glob(self::CONTRACT.'page/*.json') ?: [], $derived);
+        self::assertNotSame([], $derived);
+        foreach (array_keys(EnginePage::CASES) as $case) {
+            self::assertContains(self::CONTRACT.'page/'.$case.'.json', $paths);
+        }
         $broken = [];
         foreach ($paths as $path) {
             $document = JsonPath::decodeFile($path);

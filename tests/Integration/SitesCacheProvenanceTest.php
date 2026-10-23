@@ -12,8 +12,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * tests/fixtures/corpus/sites/ holds the recorded answers of the site engine page cases
  * (`Lockrot\Tests\Support\Contract\EnginePage::CASES`). Its digest is the one that
- * corpus/sites.provenance.json names, as `CorpusProvenanceTest` checks the corpus cache, so a
- * re-recorded answer cannot pass for the recorded one.
+ * corpus/sites.provenance.json names. A re-recorded answer then cannot pass for the recorded one,
+ * as `CorpusProvenanceTest` checks for the corpus cache.
  *
  * @coversNothing
  *
