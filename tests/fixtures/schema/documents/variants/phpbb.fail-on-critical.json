@@ -1230,6 +1230,21 @@
   "exempt": {
    "baseline": 0
   },
+  "standing": {
+   "known": 0,
+   "new": 0,
+   "worsened": 0,
+   "none": 7
+  },
+  "failing_packages": [
+   "twig/twig",
+   "symfony/http-foundation",
+   "symfony/process",
+   "guzzlehttp/guzzle",
+   "symfony/debug",
+   "bantu/ini-get-wrapper",
+   "composer/package-versions-deprecated"
+  ],
   "failing_by": [
    {
     "value": "critical",

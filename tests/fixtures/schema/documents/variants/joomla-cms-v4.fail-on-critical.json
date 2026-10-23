@@ -1800,6 +1800,16 @@
   "exempt": {
    "baseline": 0
   },
+  "standing": {
+   "known": 0,
+   "new": 0,
+   "worsened": 0,
+   "none": 2
+  },
+  "failing_packages": [
+   "joomla/ldap",
+   "maximebf/debugbar"
+  ],
   "failing_by": [
    {
     "value": "critical",

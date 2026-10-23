@@ -1208,6 +1208,45 @@
   "exempt": {
    "baseline": 0
   },
+  "standing": {
+   "known": 0,
+   "new": 0,
+   "worsened": 0,
+   "none": 31
+  },
+  "failing_packages": [
+   "mtdowling/jmespath.php",
+   "pragmarx/random",
+   "web-token/jwt-key-mgmt",
+   "web-token/jwt-signature-algorithm-ecdsa",
+   "web-token/jwt-signature-algorithm-eddsa",
+   "web-token/jwt-signature-algorithm-rsa",
+   "xantios/mimey",
+   "guzzlehttp/guzzle",
+   "laravel/framework",
+   "aws/aws-sdk-php",
+   "league/commonmark",
+   "phpseclib/phpseclib",
+   "symfony/http-foundation",
+   "symfony/mime",
+   "symfony/process",
+   "web-token/jwt-library",
+   "vectorface/whip",
+   "werk365/etagconditionals",
+   "bacon/bacon-qr-code",
+   "erusev/parsedown",
+   "intervention/image",
+   "laravel/cashier",
+   "laravolt/avatar",
+   "rinvex/countries",
+   "sentry/sentry-laravel",
+   "stevebauman/location",
+   "thecodingmachine/safe",
+   "vinkla/hashids",
+   "doctrine/cache",
+   "php-http/message-factory",
+   "web-auth/metadata-service"
+  ],
   "failing_by": [
    {
     "value": "high",

@@ -404,10 +404,6 @@ final class Report
     public function findingRows(?Gate $gate = null): array
     {
         $gate ??= $this->gate();
-        $standings = [];
-        foreach ($gate === null ? [] : $gate->standings() as $at => $standing) {
-            $standings[$this->findings[$at]->package()] = $standing;
-        }
         $rows = [];
         foreach ($this->sorted() as $at => $finding) {
             $baseline = $this->baseline === null ? null : $this->baseline->standingOf($finding->package());
@@ -415,7 +411,7 @@ final class Report
             $lead = array_search('lead', array_keys($row), true) + 1;
             $rows[$finding->package()] = \array_slice($row, 0, $lead, true) + ['rank' => $at + 1] + \array_slice($row, $lead, null, true) + [
                 'baseline' => $baseline,
-                'gate' => $standings[$finding->package()] ?? new GateStanding(false, false, null),
+                'gate' => ($gate === null ? null : $gate->standingOf($finding->package())) ?? new GateStanding(false, false, null),
             ];
         }
 

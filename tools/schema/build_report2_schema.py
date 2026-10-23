@@ -1637,6 +1637,11 @@ defs['rootGate'] = obj("The run's gate (report-1's, §6.2) plus the finding coun
     'failing': COUNT('Findings whose `gate.fails` is true.'),
     'exempt': obj('Findings that reach and are exempt, by `exempt_by` value.', {'baseline': COUNT('Exempt by the baseline.')},
                   additionalProperties=INT0),
+    'standing': obj(("Findings whose `gate.reaches_fail_on` is true, by `baseline.status`. `none` counts those with a null `baseline`: no baseline was read, "
+                     "or the baseline gives the finding no standing. The four counts add up to `reaching`."),
+                    {'known': COUNT('Reaching findings with `baseline.status` known.'), 'new': COUNT('Reaching findings with `baseline.status` new.'),
+                     'worsened': COUNT('Reaching findings with `baseline.status` worsened.'), 'none': COUNT('Reaching findings with a null `baseline`.')}),
+    'failing_packages': arr("The `package` of each finding whose `gate.fails` is true, in `findings` order. It holds as many names as `failing`.", ref('packageName'), uniqueItems=True),
     'failing_by': arr(("One entry per `run.gates` value, in its order: how many findings fail that value (their `gate.by[]` names it). Zero counts are written. "
                        "`[]` when `run.gates` is `[]`."), ref('gateValueFailing')),
     'not_applied': arr(("What the gate could not judge, so it failed open: advisories that a grade or vulnerable value could not read because nothing checked them. "
@@ -2024,6 +2029,10 @@ ROOT_RELATIONS += [
      'anyOf': [_P(run=_P(gates={'maxItems': 0}), gate=_P(failing_by={'maxItems': 0})), _P(run=_P(gates={'minItems': 1}), gate=_P(failing_by={'minItems': 1}))]},
     {'description': "Where fail-on is not applied, no value of `gate.failing_by` counts a failing finding.",
      'anyOf': [_P(gate=_P(fail_on_applied=_E(True))), _P(gate=_P(failing_by={'items': _P(failing=_E(0))}))]},
+    {'description': "`gate.failing_packages` is empty exactly when `gate.failing` is 0.",
+     'anyOf': [_P(gate=_P(failing=_E(0), failing_packages={'maxItems': 0})), _P(gate=_P(failing={'minimum': 1}, failing_packages={'minItems': 1}))]},
+    {'description': "With no baseline read (the root `baseline` null), every reaching finding counts in `gate.standing.none`.",
+     'anyOf': [_P(baseline={'type': 'object'}), _P(gate=_P(standing=_P(known=_E(0), new=_E(0), worsened=_E(0))))]},
 ]
 schema = {
     '$schema': 'http://json-schema.org/draft-04/schema#',
