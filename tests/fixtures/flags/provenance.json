@@ -1,7 +1,7 @@
 {
  "pr": "7c",
  "source": {
-  "cases.json": "d7cbe8c3602f7270c21167968b18cf053027869278d1ef07d3691a706665415c",
+  "cases.json": "81da8113ba3db929f064c90d49c1156014b5ad251014f744c43467b2049a8455",
   "model_run_date": "2026-10-23"
  },
  "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",
@@ -27,9 +27,11 @@
   "capped-update‡",
   "capped-require‡",
   "capped-require-higher‡",
+  "capped-recapped‡",
   "capped-held-update‡",
   "capped-snapshot-alias‡",
   "capped-snapshot-dev‡",
+  "capped-snapshot-backport‡",
   "capped-platform‡",
   "capped-accepted‡",
   "capped-dev‡",
