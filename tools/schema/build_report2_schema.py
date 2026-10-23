@@ -953,7 +953,7 @@ defs['s11'] = sig_data(("S11 (§5.10): the installed release's `require.php` has
     'requires': d("The installed release's `require.php`, as `installed_php.requires`.", {'type': 'string', 'minLength': 1}),
     'stops_at': d('The newest known PHP minor that `requires` admits.', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}),
     'excludes_target': d('Exactly `installed_php.target_runs` false: no patch of the target minor meets `requires`.', {'type': 'boolean'}),
-    'admits_newest': nul(("The newest release of the lowest branch whose newest release admits `newest_php` in its `require.php`. The releases "
+    'admits_newest': nul(("The newest release of the lowest branch whose newest release admits `newest_php` in its `require.php` or states no php. The releases "
                           "above the installed one count, and https://lockrot.dev/verdicts/#capped says which count above a snapshot. Null when none admits "
                           "`newest_php`, or when lockrot did not read the release metadata."), obj('A release that admits the newest PHP.', {
         'version': d('The release.', {'type': 'string', 'minLength': 1}),

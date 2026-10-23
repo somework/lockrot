@@ -17009,7 +17009,7 @@
                     "type": "boolean"
                 },
                 "admits_newest": {
-                    "description": "The newest release of the lowest branch whose newest release admits `newest_php` in its `require.php`. The releases above the installed one count, and https://lockrot.dev/verdicts/#capped says which count above a snapshot. Null when none admits `newest_php`, or when lockrot did not read the release metadata.",
+                    "description": "The newest release of the lowest branch whose newest release admits `newest_php` in its `require.php` or states no php. The releases above the installed one count, and https://lockrot.dev/verdicts/#capped says which count above a snapshot. Null when none admits `newest_php`, or when lockrot did not read the release metadata.",
                     "oneOf": [
                         {
                             "description": "A release that admits the newest PHP.",

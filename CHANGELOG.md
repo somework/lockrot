@@ -41,8 +41,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `require.php` stops below the newest PHP minor that the project's root php allows. It comes after
   `stale` in flag order, so `--fail-on=stale` and a baseline entry that records `stale` keep their
   reach. Its move goes to the newest release of the lowest branch whose newest release admits that
-  PHP. A grade gate at `medium` or `low` can fail on a package that 0.13 passed. Action: run once
-  without a gate. ([Capped](docs/verdicts.md#capped))
+  PHP or states no php. A grade gate at `medium` or `low` can fail on a package that 0.13 passed.
+  Action: run once without a gate. ([Capped](docs/verdicts.md#capped))
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
   is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
