@@ -39,6 +39,8 @@ final class RepositoryVersions implements VersionSource
     private array $loaded = [];
     /** @var array<string, string> */
     private array $failures = [];
+    /** @var array<string, null> the names whose every version loaded: a failed request keeps them */
+    private array $complete = [];
     /** @var array<key-of<BasePackage::STABILITIES>, BasePackage::STABILITY_*> */
     private array $acceptable;
     /** @var array<string, BasePackage::STABILITY_*> */
@@ -100,9 +102,9 @@ final class RepositoryVersions implements VersionSource
             $this->loadTogether($pending);
         } catch (\Exception $e) {
             // A transport failure or an answer that does not parse (Seld\JsonLint\ParsingException).
-            // An admitted name's tags without its dev versions are a partial pool: it loads again alone.
+            // A name that has not finished loading, such as an admitted name with its tags only, loads again alone.
             foreach (array_keys($pending) as $name) {
-                if ($this->loaded[$name] === [] || $this->admitsDev($name)) {
+                if (!\array_key_exists($name, $this->complete)) {
                     $this->loaded[$name] = $this->loadOne($name);
                 }
             }
@@ -132,7 +134,12 @@ final class RepositoryVersions implements VersionSource
                 }
                 $listed = array_intersect_key($pending, array_filter($this->loaded));
                 $pending = array_diff_key($pending, $listed);
-                $tagged = array_filter($listed, fn (string $name): bool => $this->admitsDev($name), \ARRAY_FILTER_USE_KEY);
+                if ($stabilities === self::DEV) {
+                    $this->complete += $tagged + $listed;
+                } else {
+                    $tagged = array_filter($listed, fn (string $name): bool => $this->admitsDev($name), \ARRAY_FILTER_USE_KEY);
+                    $this->complete += array_diff_key($listed, $tagged);
+                }
             }
         }
         if ($this->offline) {
