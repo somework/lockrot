@@ -102,7 +102,7 @@ final class RepositoryVersions implements VersionSource
             $this->loadTogether($pending);
         } catch (\Exception $e) {
             // A transport failure or an answer that does not parse (Seld\JsonLint\ParsingException).
-            // A name that has not finished loading, such as an admitted name with its tags only, loads again alone.
+            // A name with versions still to load, such as an admitted name with its tags only, loads again alone.
             foreach (array_keys($pending) as $name) {
                 if (!\array_key_exists($name, $this->complete)) {
                     $this->loaded[$name] = $this->loadOne($name);
