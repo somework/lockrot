@@ -175,7 +175,7 @@ final class CappedRuleTest extends TestCase
     /** 4.6.0 lies below the 4.7 line of a `4.7.x-dev` snapshot, so it is no move up even though it admits 8.5. */
     public function testAboveABranchAliasSnapshotAReleaseBelowItsLineDoesNotCount(): void
     {
-        $signal = self::rule()->evaluate(self::facts('4.7.x-dev', '>=7.4, <8.2', [['4.6.0', '>=8.1'], ['4.7.0', '>=7.4, <8.2']]));
+        $signal = self::rule()->evaluate(self::facts('4.7.x-dev', '>=7.4, <8.2', [['4.6.0', '>=8.1']]));
 
         self::assertNotNull($signal);
         self::assertNull(JsonPath::decoded($signal->data())['admits_newest']);
@@ -225,6 +225,22 @@ final class CappedRuleTest extends TestCase
         self::assertSame('4.17.0', JsonPath::stringAt(JsonPath::decoded($signal->data()), ['admits_newest', 'version']));
     }
 
+    public function testAboveADevSnapshotAReleaseDatedAtItsTimeSetsTheBranch(): void
+    {
+        $signal = self::rule()->evaluate(self::facts('dev-main', '>=7.4, <8.2', [['3.6.0', '>=7.4', '2025-02-01'], ['4.13.0', '>=7.4, <8.2', '2024-06-01'], ['4.17.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0', '2025-05-01']], '2024-06-01T00:00:00+00:00'));
+
+        self::assertNotNull($signal);
+        self::assertSame('4.17.0', JsonPath::stringAt(JsonPath::decoded($signal->data()), ['admits_newest', 'version']));
+    }
+
+    public function testAboveADevSnapshotAnUndatedReleaseSetsNoBranch(): void
+    {
+        $signal = self::rule()->evaluate(self::facts('dev-main', '>=7.4, <8.2', [['3.6.0', '>=7.4', '2025-02-01'], ['5.0.0', '>=7.4, <8.2', null]], '2024-06-01T00:00:00+00:00'));
+
+        self::assertNotNull($signal);
+        self::assertSame('3.6.0', JsonPath::stringAt(JsonPath::decoded($signal->data()), ['admits_newest', 'version']));
+    }
+
     public function testAboveADevSnapshotWithNoEarlierReleaseEveryLaterReleaseCounts(): void
     {
         $signal = self::rule()->evaluate(self::facts('dev-main', '>=7.4, <8.2', [['3.6.0', '>=7.4', '2025-02-01'], ['4.17.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0', '2025-05-01']], '2024-06-01T00:00:00+00:00'));
@@ -265,7 +281,7 @@ final class CappedRuleTest extends TestCase
     /**
      * a/b at $version with $php, beside its releases. Null releases leave the metadata unread.
      *
-     * @param list<array{0: string, 1: ?string, 2?: string}>|null $releases [version, require.php, date]
+     * @param list<array{0: string, 1: ?string, 2?: ?string}>|null $releases [version, require.php, date]: 2024-01-01 when omitted, none when null
      * @param array<string, mixed>                                $extra    the lock entry's `extra`
      */
     private static function facts(string $version, ?string $php, ?array $releases = null, ?string $time = null, array $extra = []): PackageFacts
@@ -278,7 +294,8 @@ final class CappedRuleTest extends TestCase
         }
         $packages = [];
         foreach ($releases as $release) {
-            $package = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $release[0], 'time' => ($release[2] ?? '2024-01-01').'T00:00:00+00:00'] + ($release[1] === null ? [] : ['require' => ['php' => $release[1]]]));
+            $date = \array_key_exists(2, $release) ? $release[2] : '2024-01-01';
+            $package = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $release[0]] + ($date === null ? [] : ['time' => $date.'T00:00:00+00:00']) + ($release[1] === null ? [] : ['require' => ['php' => $release[1]]]));
             self::assertInstanceOf(BasePackage::class, $package);
             $packages[] = $package;
         }
