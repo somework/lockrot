@@ -157,6 +157,7 @@ final class RepositoryVersions implements VersionSource
         }
         $failed = false;
         foreach ($this->repositories as $repository) {
+            $versions = [];
             try {
                 $versions = self::named($repository->loadPackages([$name => null], self::STABLE, []), $name);
                 if ($versions === [] || $this->admitsDev($name)) {
@@ -164,6 +165,10 @@ final class RepositoryVersions implements VersionSource
                 }
             } catch (\Exception $e) {
                 $failed = true;
+                // The first repository that lists the name wins: its tags without its dev versions are no answer.
+                if ($versions !== []) {
+                    break;
+                }
                 continue;
             }
             if ($versions !== []) {

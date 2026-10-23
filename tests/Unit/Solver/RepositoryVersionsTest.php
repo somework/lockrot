@@ -187,6 +187,34 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([null, null, VersionSource::BUDGET], [$versions->failure('acme/lib'), $versions->failure('acme/other'), $versions->failure('acme/next')]);
     }
 
+    /** G3: the first repository that lists the name wins, so a failed dev request there fails the name. */
+    public function testAnAdmittedNameWhoseDevRequestFailsWhereItsTagsAreListedIsFailed(): void
+    {
+        $first = new class ([self::package('acme/lib', '1.0.0')]) extends ComposerRepository {
+            /** @var list<BasePackage> */
+            private array $served;
+
+            /** @param list<BasePackage> $served */
+            public function __construct(array $served)
+            {
+                $this->served = $served;
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                if (isset($acceptableStabilities['dev'])) {
+                    throw new TransportException('The "https://repo.example.org/p2/acme/lib~dev.json" file could not be downloaded');
+                }
+
+                return ['namesFound' => ['acme/lib'], 'packages' => $this->served];
+            }
+        };
+        $versions = new RepositoryVersions([$first, self::recording(['acme/lib' => ['2.0.0', 'dev-main']])], [], false, Deadline::never(), 'dev', []);
+
+        self::assertSame([], $versions->versions('acme/lib'));
+        self::assertSame(VersionSource::FAILED, $versions->failure('acme/lib'));
+    }
+
     public function testANameThatLoadsAloneUnderAStableRootLoadsItsDevVersionsOnlyWithoutATag(): void
     {
         $versions = new RepositoryVersions([self::recording(['acme/tagged' => ['1.0.0', 'dev-main'], 'acme/branch' => ['dev-main']], ['acme/bad'])], [], false, Deadline::never(), 'stable', []);
