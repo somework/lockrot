@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "fb140544ede7f77ec9aa1bfa9e542f2f8260be59bb32ca79e641fc45a2c1bb73",
+        "tests/fixtures/flags/cases.json": "9abbc8a39abf5fe0a32532c8178aa33afb10b5e473c595e1deb2fa01bbc5513d",
         "tests/fixtures/flags/composite.json": "24a587b002cffa128399bcceb3365b6917878f2b7b27b8b8d02c0fb7984b2a39",
-        "tests/fixtures/flags/provenance.json": "020c2058fede3dd5584f6a88f28410cda88bd53f38fc8c9c8989093ee586e1a4"
+        "tests/fixtures/flags/provenance.json": "c5ff7081751761c51a92d22ec136da2c7d847976020c021416106a0882ffbef8"
     },
     "version_mask": {
         "paths": [
@@ -43,9 +43,11 @@
         "capped-update‡",
         "capped-require‡",
         "capped-require-higher‡",
+        "capped-recapped‡",
         "capped-held-update‡",
         "capped-snapshot-alias‡",
         "capped-snapshot-dev‡",
+        "capped-snapshot-backport‡",
         "capped-platform‡",
         "capped-accepted‡",
         "capped-dev‡",
