@@ -893,6 +893,33 @@
    "target": {
     "php": "8.4.99",
     "inside": false
+   },
+   "target_fix": {
+    "packages": [
+     {
+      "name": "acme/installer",
+      "version": "1.0.0",
+      "link": "require",
+      "target": "php",
+      "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0",
+      "dev": false
+     }
+    ],
+    "command": null,
+    "check": "refused",
+    "reason": null,
+    "held_by": [
+     {
+      "source": "root",
+      "package": null,
+      "version": null,
+      "link": "require",
+      "target": "php",
+      "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0",
+      "holder": null
+     }
+    ],
+    "platform_step": false
    }
   }
  },

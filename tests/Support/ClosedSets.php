@@ -63,8 +63,8 @@ final class ClosedSets
             'The `kind` of a move\'s fact and of a rerun\'s `remove`' => [$definition('factKind')],
             'A flag\'s `headline.unit`' => [$definition('headline', 'properties', 'unit')],
             'A flag\'s `headline.source`' => [$definition('headline', 'properties', 'source', 'oneOf', '0')],
-            'A holder\'s `source`, in `held_by[]`' => [$definition('heldBy', 'properties', 'source')],
-            'A holder\'s `link`, in `held_by[]`' => [$definition('heldBy', 'properties', 'link')],
+            'A holder\'s `source`, in `held_by[]` and `run.php_window.target_fix.held_by`' => [$definition('heldBy', 'properties', 'source')],
+            'A holder\'s `link`, in `held_by[]` and `run.php_window.target_fix.held_by`' => [$definition('heldBy', 'properties', 'link')],
             'A move\'s `composer_moves_because`' => [$definition('move', 'properties', 'composer_moves_because', 'items')],
             'A move check\'s `result`' => [$definition('moveCheck', 'oneOf', '0', 'properties', 'result')],
             '`run.move_check.baseline`' => [$definition('run', 'properties', 'move_check', 'oneOf', '0', 'properties', 'baseline')],
@@ -91,6 +91,9 @@ final class ClosedSets
             '`run.php_window.host_requires`' => [$definition('run', 'properties', 'php_window', 'oneOf', '0', 'properties', 'host_requires', 'items')],
             'S11\'s `newest_php_source`' => [$definition('s11', 'properties', 'newest_php_source')],
             'S11\'s `admits_newest.blocking`' => [$definition('s11', 'properties', 'admits_newest', 'oneOf', '0', 'properties', 'blocking', 'oneOf', '0')],
+            '`run.php_window.target_fix.check`' => [$definition('targetFix', 'properties', 'check')],
+            'The `link` of a `run.php_window.target_fix.packages[]` entry' => [$definition('targetFix', 'properties', 'packages', 'items', 'properties', 'link')],
+            'The `target` of a `run.php_window.target_fix.packages[]` entry' => [$definition('targetFix', 'properties', 'packages', 'items', 'properties', 'target')],
         ];
     }
 

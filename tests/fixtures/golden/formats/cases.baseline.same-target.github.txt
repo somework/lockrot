@@ -53,5 +53,5 @@ flags: abandoned 7 · silent 1 · pinned 5 · left-behind 16 · old-promise 12 �
 depth: 18 of 46 flagged packages are named by no line of composer.json · direct 27 · 1 hop 13 · 2 hops 2 · 4 hops 1 · unreached 3 · deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs) · 1 more is named only in require-dev, which this run did not walk (pass --dev)
 security: 17 vulnerable packages · 86 advisories: 3 critical, 27 high, 40 medium, 3 unrated, 13 low
 update now: composer update phpoffice/phpspreadsheet robrichards/xmlseclibs league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn
-php: the lock installs on no PHP, so your target, 8.4, is excluded
+php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 9 packages that exclude it is not checked (the run checked no move)
 gate: fails · --fail-on=high,unchecked · 29 findings fail it (high 28, unchecked 3); 2 reach it and are known to the baseline · target php 8.4 (--target-php)

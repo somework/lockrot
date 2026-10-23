@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Security;
 
+use Composer\Semver\VersionParser;
 use Lockrot\Verdict\GradedPackage;
 
 /**
@@ -115,7 +116,8 @@ final class Holder implements \JsonSerializable
 
     /**
      * Each entry once, in `held_by[]`'s order. Two entries that differ only in the version keep the
-     * first: the solver can name a newer release of the moved package than the scan does.
+     * first: the solver can name a newer release of the moved package than the scan does. A stable
+     * version still wins over a dev version, which Composer installs only without the tag (T4).
      *
      * @param list<self> $holders
      *
@@ -125,11 +127,19 @@ final class Holder implements \JsonSerializable
     {
         $kept = [];
         foreach ($holders as $holder) {
-            $kept[implode("\0", $holder->order())] ??= $holder;
+            $key = implode("\0", $holder->order());
+            if (!isset($kept[$key]) || ($kept[$key]->stability() === 'dev' && $holder->stability() === 'stable')) {
+                $kept[$key] = $holder;
+            }
         }
         usort($kept, static fn (self $a, self $b): int => $a->order() <=> $b->order());
 
         return $kept;
+    }
+
+    private function stability(): ?string
+    {
+        return $this->version === null ? null : VersionParser::parseStability($this->version);
     }
 
     /**

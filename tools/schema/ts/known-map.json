@@ -3111,7 +3111,11 @@
   "name": "PhpWindowReqLink",
   "pointer": "#/definitions/phpWindowReq/properties/link",
   "pointers": [
-   "#/definitions/phpWindowReq/properties/link"
+   "#/definitions/phpWindowReq/properties/link",
+   "#/definitions/targetFix/anyOf/0/properties/packages/items/properties/link",
+   "#/definitions/targetFix/anyOf/1/properties/packages/items/properties/link",
+   "#/definitions/targetFix/properties/packages/items/properties/link",
+   "#/definitions/targetFix/anyOf/3/properties/packages/items/properties/link"
   ],
   "values": [
    "require",
@@ -3124,11 +3128,114 @@
   "name": "PhpWindowReqTarget",
   "pointer": "#/definitions/phpWindowReq/properties/target",
   "pointers": [
-   "#/definitions/phpWindowReq/properties/target"
+   "#/definitions/phpWindowReq/properties/target",
+   "#/definitions/targetFix/anyOf/0/properties/packages/items/properties/target",
+   "#/definitions/targetFix/anyOf/1/properties/packages/items/properties/target",
+   "#/definitions/targetFix/properties/packages/items/properties/target",
+   "#/definitions/targetFix/anyOf/2/properties/held_by/items/properties/target",
+   "#/definitions/targetFix/anyOf/3/properties/packages/items/properties/target"
   ],
   "values": [
    "php",
    "php-64bit"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "TargetFixCheck",
+  "pointer": "#/definitions/targetFix/properties/check",
+  "pointers": [
+   "#/definitions/targetFix/properties/check"
+  ],
+  "values": [
+   "resolves",
+   "refused",
+   "not_checked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "TargetFixReason",
+  "pointer": "#/definitions/targetFix/properties/reason/oneOf/0",
+  "pointers": [
+   "#/definitions/targetFix/properties/reason/oneOf/0",
+   "#/definitions/targetFix/anyOf/0/properties/reason/oneOf/0",
+   "#/definitions/targetFix/anyOf/1/properties/reason/oneOf/0",
+   "#/definitions/targetFix/anyOf/2/properties/reason/oneOf/0"
+  ],
+  "values": [
+   "unloaded_name",
+   "offline",
+   "install_time_budget",
+   "not_from_composer_repository",
+   "no_composer_json",
+   "composer_json_invalid",
+   "solver_error"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "TargetFixCheck2",
+  "pointer": "#/definitions/targetFix/anyOf/0/properties/check",
+  "pointers": [
+   "#/definitions/targetFix/anyOf/0/properties/check"
+  ],
+  "values": [
+   "resolves"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "TargetFixCheck3",
+  "pointer": "#/definitions/targetFix/anyOf/1/properties/check",
+  "pointers": [
+   "#/definitions/targetFix/anyOf/1/properties/check",
+   "#/definitions/targetFix/anyOf/2/properties/check"
+  ],
+  "values": [
+   "refused"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "TargetFixHeldByItemSource",
+  "pointer": "#/definitions/targetFix/anyOf/2/properties/held_by/items/properties/source",
+  "pointers": [
+   "#/definitions/targetFix/anyOf/2/properties/held_by/items/properties/source"
+  ],
+  "values": [
+   "root"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "TargetFixHeldByItemLink",
+  "pointer": "#/definitions/targetFix/anyOf/2/properties/held_by/items/properties/link",
+  "pointers": [
+   "#/definitions/targetFix/anyOf/2/properties/held_by/items/properties/link"
+  ],
+  "values": [
+   "require",
+   "require-dev",
+   "conflict"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "TargetFixCheck4",
+  "pointer": "#/definitions/targetFix/anyOf/3/properties/check",
+  "pointers": [
+   "#/definitions/targetFix/anyOf/3/properties/check"
+  ],
+  "values": [
+   "not_checked"
   ],
   "open": false,
   "integer": false

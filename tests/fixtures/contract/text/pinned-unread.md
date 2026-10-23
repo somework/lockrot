@@ -10,7 +10,7 @@ flags: pinned 1
 depth: every flagged package is named in composer.json · direct 1
 libyears: the one package could not be measured
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
-php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php excludes 8.0
+php: the lock installs on PHP 7.2 to 7.4; your target, 8.4, is excluded: require.php allows only ^7.2.5
 
 - note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 

@@ -11,6 +11,6 @@ depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 1 advisory: 1 medium
 libyears: 2.1 behind across the one package · 2.1 from direct requirements · furthest behind joomla/filter 2.0.5 at 2.1
 advisories: 1 package asked · packagist.org answered (2 on record for 1 package)
-php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php excludes 8.0
+php: the lock installs on PHP 7.2 to 7.4; your target, 8.4, is excluded: require.php allows only ^7.2.5
 
 <sub>4 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

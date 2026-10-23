@@ -1,0 +1,11 @@
+{
+    "path": "sites",
+    "read_by": "the site cases of Lockrot\\Tests\\Support\\Contract\\EnginePage::CASES, through their `http` key",
+    "fixtures": ["tests/fixtures/sites/drupal-site"],
+    "recorded": "2026-10-22",
+    "recorder": "GITHUB_TOKEN=$(gh auth token) bin/record-fixtures --gitlab-domain=git.drupalcode.org --into=tests/fixtures/corpus/sites tests/fixtures/sites/drupal-site",
+    "composer": "2.10.3",
+    "files": 223,
+    "sha256": "614d9ae231cb1d479e7ba927aa3e6949796d6bc4c0bd327f92de3af7e37e6367",
+    "sha256_of": "the lines \"<sha256>  <path below the directory>\", one per file, sorted by path"
+}

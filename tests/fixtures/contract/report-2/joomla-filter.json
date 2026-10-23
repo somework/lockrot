@@ -887,6 +887,33 @@
             "target": {
                 "php": "8.4.99",
                 "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "joomla/filter",
+                        "version": "2.0.5",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5|~8.0.0|~8.1.0",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.2.5",
+                        "holder": null
+                    }
+                ],
+                "platform_step": false
             }
         },
         "score_rules_used": {

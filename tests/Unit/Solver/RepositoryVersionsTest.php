@@ -82,6 +82,156 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame(['dev-main'], self::pretty($versions->versions('acme/lib')));
     }
 
+    public function testATaggedNameLoadsNoDevVersionsUnderARootThatAdmitsOnlyStable(): void
+    {
+        $repository = self::recording(['acme/lib' => ['1.0.0', 'dev-main']]);
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::never(), 'stable', []);
+
+        self::assertSame(['1.0.0'], self::pretty($versions->versions('acme/lib')));
+        self::assertSame([[['acme/lib'], 'stable']], $repository->asked);
+    }
+
+    /** Composer's repository loads the `~dev` file of each name that the root admits at `dev`. */
+    public function testATaggedNameLoadsItsDevVersionsUnderARootWhoseMinimumStabilityIsDev(): void
+    {
+        $repository = self::recording(['acme/lib' => ['1.0.0', 'dev-main'], 'acme/branch' => ['dev-main']]);
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::never(), 'dev', []);
+
+        $loaded = $versions->versionsOf(['acme/lib', 'acme/branch']);
+
+        self::assertSame(['acme/lib' => ['1.0.0', 'dev-main'], 'acme/branch' => ['dev-main']], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+        self::assertSame([[['acme/lib', 'acme/branch'], 'stable'], [['acme/branch', 'acme/lib'], 'dev']], $repository->asked);
+    }
+
+    public function testAStabilityFlagAtDevAdmitsTheDevVersionsOfItsNameOnly(): void
+    {
+        $repository = self::recording(['acme/flagged' => ['1.0.0', 'dev-main'], 'acme/beta' => ['1.0.0', 'dev-main'], 'acme/plain' => ['1.0.0', 'dev-main']]);
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::never(), 'stable', ['acme/flagged' => BasePackage::STABILITY_DEV, 'acme/beta' => BasePackage::STABILITY_BETA]);
+
+        $loaded = $versions->versionsOf(['acme/flagged', 'acme/beta', 'acme/plain']);
+
+        self::assertSame(['acme/flagged' => ['1.0.0', 'dev-main'], 'acme/beta' => ['1.0.0'], 'acme/plain' => ['1.0.0']], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+    }
+
+    /** The dev versions come from the repository that lists the tagged ones, as a canonical repository shadows the later ones. */
+    public function testTheDevVersionsOfAnAdmittedNameComeFromTheRepositoryThatListsItsTaggedRelease(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['1.0.0', 'dev-main']]), self::recording(['acme/lib' => ['2.0.0', 'dev-other']])], [], false, Deadline::never(), 'dev', []);
+
+        self::assertSame(['1.0.0', 'dev-main'], self::pretty($versions->versions('acme/lib')));
+    }
+
+    /** A failed dev request of several names loads each admitted name alone: its tags alone are a partial pool. */
+    public function testAFailedDevRequestOfSeveralNamesLoadsEachAdmittedNameAlone(): void
+    {
+        $served = [self::package('acme/lib', '1.0.0'), self::package('acme/lib', 'dev-main'), self::package('acme/other', '1.0.0'), self::package('acme/other', 'dev-main')];
+        $repository = new class ($served) extends ComposerRepository {
+            /** @var list<BasePackage> */
+            private array $served;
+
+            /** @param list<BasePackage> $served */
+            public function __construct(array $served)
+            {
+                $this->served = $served;
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                if (isset($acceptableStabilities['dev']) && \count($packageNameMap) > 1) {
+                    throw new TransportException('The "https://repo.example.org/p2/acme/lib~dev.json" file could not be downloaded');
+                }
+                $packages = array_values(array_filter($this->served, static fn (BasePackage $package): bool => \array_key_exists($package->getName(), $packageNameMap) && isset($acceptableStabilities[$package->getStability()])));
+
+                return ['namesFound' => array_map(static fn (BasePackage $package): string => $package->getName(), $packages), 'packages' => $packages];
+            }
+        };
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::never(), 'dev', []);
+
+        $loaded = $versions->versionsOf(['acme/lib', 'acme/other']);
+
+        self::assertSame(['acme/lib' => ['1.0.0', 'dev-main'], 'acme/other' => ['1.0.0', 'dev-main']], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+        self::assertSame([null, null], [$versions->failure('acme/lib'), $versions->failure('acme/other')]);
+    }
+
+    /** A name whose tags and dev versions both loaded keeps them when a later request fails, though the budget runs out. */
+    public function testAFailedRequestKeepsTheVersionsOfANameThatFinishedLoading(): void
+    {
+        $clock = new class () {
+            public float $now = 0.0;
+        };
+        $first = self::recording(['acme/lib' => ['1.0.0', 'dev-main']]);
+        $second = self::recording([], ['acme/next'], static function () use ($clock): void {
+            $clock->now = 10.0;
+        });
+        $versions = new RepositoryVersions([$first, $second], [], false, Deadline::inSeconds(5.0, static fn (): float => $clock->now), 'dev', []);
+
+        $loaded = $versions->versionsOf(['acme/lib', 'acme/next']);
+
+        self::assertSame(['1.0.0', 'dev-main'], self::pretty($loaded['acme/lib']));
+        self::assertSame([null, VersionSource::BUDGET], [$versions->failure('acme/lib'), $versions->failure('acme/next')]);
+    }
+
+    public function testAFailedRequestKeepsTheVersionsThatEveryEarlierRepositoryLoaded(): void
+    {
+        $clock = new class () {
+            public float $now = 0.0;
+        };
+        $third = self::recording([], ['acme/next'], static function () use ($clock): void {
+            $clock->now = 10.0;
+        });
+        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['1.0.0']]), self::recording(['acme/other' => ['2.0.0']]), $third], [], false, Deadline::inSeconds(5.0, static fn (): float => $clock->now), 'stable', []);
+
+        $loaded = $versions->versionsOf(['acme/lib', 'acme/other', 'acme/next']);
+
+        self::assertSame(['acme/lib' => ['1.0.0'], 'acme/other' => ['2.0.0'], 'acme/next' => []], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+        self::assertSame([null, null, VersionSource::BUDGET], [$versions->failure('acme/lib'), $versions->failure('acme/other'), $versions->failure('acme/next')]);
+    }
+
+    /** G3: the first repository that lists the name wins, so a failed dev request there fails the name. */
+    public function testAnAdmittedNameWhoseDevRequestFailsWhereItsTagsAreListedIsFailed(): void
+    {
+        $first = new class ([self::package('acme/lib', '1.0.0')]) extends ComposerRepository {
+            /** @var list<BasePackage> */
+            private array $served;
+
+            /** @param list<BasePackage> $served */
+            public function __construct(array $served)
+            {
+                $this->served = $served;
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                if (isset($acceptableStabilities['dev'])) {
+                    throw new TransportException('The "https://repo.example.org/p2/acme/lib~dev.json" file could not be downloaded');
+                }
+
+                return ['namesFound' => ['acme/lib'], 'packages' => $this->served];
+            }
+        };
+        $versions = new RepositoryVersions([$first, self::recording(['acme/lib' => ['2.0.0', 'dev-main']])], [], false, Deadline::never(), 'dev', []);
+
+        self::assertSame([], $versions->versions('acme/lib'));
+        self::assertSame(VersionSource::FAILED, $versions->failure('acme/lib'));
+    }
+
+    public function testANameThatLoadsAloneUnderAStableRootLoadsItsDevVersionsOnlyWithoutATag(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/tagged' => ['1.0.0', 'dev-main'], 'acme/branch' => ['dev-main']], ['acme/bad'])], [], false, Deadline::never(), 'stable', []);
+
+        $loaded = $versions->versionsOf(['acme/tagged', 'acme/branch', 'acme/bad']);
+
+        self::assertSame(['1.0.0'], self::pretty($loaded['acme/tagged']));
+        self::assertSame(['dev-main'], self::pretty($loaded['acme/branch']));
+    }
+
+    public function testANameThatLoadsAloneAfterAFailedRequestLoadsItsDevVersionsWhenTheRootAdmitsThem(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/good' => ['1.0.0', 'dev-main']], ['acme/bad'])], [], false, Deadline::never(), 'dev', []);
+
+        self::assertSame(['1.0.0', 'dev-main'], self::pretty($versions->versionsOf(['acme/good', 'acme/bad'])['acme/good']));
+    }
+
     /** A repository that fails is skipped whole: its dev versions are not read in place of the tagged ones. */
     public function testARepositoryWhoseLoadFailsIsSkippedForTheNextOne(): void
     {

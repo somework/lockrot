@@ -9,16 +9,19 @@ use Lockrot\Tests\Support\VersionMask;
 
 /**
  * The page cases whose moves Composer's solver checked (SPEC-0.14.md §7.9.7). Each is bin/lockrot's
- * report-2 of an app of tests/fixtures/apps, on the recorded answers of tests/fixtures/corpus/cache/.
+ * report-2 of a fixture lock, on the recorded answers of its `http` directory under tests/fixtures/:
+ * corpus/cache/ for an app, corpus/sites/ for a site (corpus/sites.provenance.json).
  * A model case document holds no move check, so only these cases show a ready move.
  * tools/report/record --engine-pages writes them to tests/fixtures/contract/page/.
  */
 final class EnginePage
 {
     public const DIRECTORY = ContractBundle::DIRECTORY.'/'.ContractBundle::ENGINE_PAGES;
-    /** @var array<string, array{app: string, today: string, arguments: list<string>}> by case id */
+    /** @var array<string, array{fixture: string, http: string, today: string, arguments: list<string>}> by case id, the paths under tests/fixtures/ */
     public const CASES = [
-        'snipe-it' => ['app' => 'grokability_snipe-it', 'today' => '2026-10-14T00:00:00+00:00', 'arguments' => ['--target-php=8.4', '--all', '--fail-on=high', '--format=json']],
+        'snipe-it' => ['fixture' => 'apps/grokability_snipe-it', 'http' => 'corpus/cache', 'today' => '2026-10-14T00:00:00+00:00', 'arguments' => ['--target-php=8.4', '--all', '--fail-on=high', '--format=json']],
+        // `target_fix` refused at 8.3 by advisory blocking (SPEC-0.14.md §5.9).
+        'drupal-site' => ['fixture' => 'sites/drupal-site', 'http' => 'corpus/sites', 'today' => '2026-10-22T00:00:00+00:00', 'arguments' => ['--target-php=8.3', '--all', '--fail-on=high', '--format=json']],
     ];
     private const FIXTURES = __DIR__.'/../../fixtures/';
     private const ENTRY = __DIR__.'/../../../bin/lockrot';
@@ -30,8 +33,8 @@ final class EnginePage
             throw new \InvalidArgumentException('no engine page case '.$id);
         }
         $case = self::CASES[$id];
-        $app = self::FIXTURES.'apps/'.$case['app'];
-        $run = FixtureCliRun::forRecording($app, self::FIXTURES.'corpus/cache');
+        $app = self::FIXTURES.$case['fixture'];
+        $run = FixtureCliRun::forRecording($app, self::FIXTURES.$case['http']);
         try {
             $process = $run->run(self::ENTRY, $app, $case['today'], $case['arguments']);
         } finally {

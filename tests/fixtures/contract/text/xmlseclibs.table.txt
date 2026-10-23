@@ -30,7 +30,7 @@ libyears: 6.0 behind across 1 of 2 packages · 0.0 from direct requirements ·
 furthest behind robrichards/xmlseclibs 3.1.1 at 6.0
 pulled in by: mautic/core-lib 1
 advisories: 2 packages asked · packagist.org answered (9 on record for 2 packages)
-php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; mautic/core-lib excludes 8.1
+php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
 <fg=red>gate: fails · --fail-on=high · 2 findings fail it · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

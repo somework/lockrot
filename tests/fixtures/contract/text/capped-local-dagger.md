@@ -11,7 +11,7 @@ depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 5 advisories: 1 high, 4 medium
 libyears: the one package could not be measured
 advisories: 1 package asked · packagist.org answered (230 on record for 44 packages)
-php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; `mautic/core-lib` excludes 8.1
+php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
 
 - note: 2 packages are not from a Composer repository: their release metadata and repository activity were not read
 - note: extra.lockrot.ignore\[\] accepts maintenance flags only, not advisories: mautic/core-lib: 5 counted advisories; accept them in Composer's audit policy if that is the decision

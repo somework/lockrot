@@ -17,7 +17,8 @@ use Lockrot\Solver\MoveQuery;
  * case's move. A test can record `*`: the answer to every request that it does not record,
  * `combined`: the answer to the combined update, and `baseline`: the answer to the lock itself. Both
  * resolve when the case records none. `combined <name> <name>` answers the combined update of
- * exactly those names, in the order of the request.
+ * exactly those names, in the order of the request. `target_fix` answers {@see solveAt()}, the
+ * model's ‡ input `_target_fix`, and is `not_checked` when the case records none.
  */
 final class RecordedMoveChecker implements MoveChecker
 {
@@ -76,10 +77,23 @@ final class RecordedMoveChecker implements MoveChecker
         return $check === null ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : self::outcome($check);
     }
 
+    public function solveAt(array $names): CheckOutcome
+    {
+        $check = $this->checks['target_fix'] ?? null;
+
+        return $check === null ? new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME)) : self::outcome($check);
+    }
+
     /** A case can record the solve's php, `php`, in `inputs.move_check`. */
     public function platformPhp(): ?string
     {
         return self::text($this->run, 'php');
+    }
+
+    /** A case can record `config.platform.php`, `config_php`, in `inputs.move_check`. */
+    public function configuredPhp(): ?string
+    {
+        return self::text($this->run, 'config_php');
     }
 
     public function composerVersion(): ?string

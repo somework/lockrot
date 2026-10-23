@@ -12,7 +12,7 @@ security: 1 vulnerable package · 2 advisories: 2 medium
 libyears: 4.5 behind across the one package · 0.0 from direct requirements · furthest behind symfony/routing v4.4.41 at 4.5
 pulled in by: `mautic/core-lib` 1
 advisories: 1 package asked · packagist.org answered (13 on record for 4 packages)
-php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; `mautic/core-lib` excludes 8.1
+php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
 
 - note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 

@@ -6,9 +6,10 @@ declare(strict_types=1);
 // with the recorded answers of tests/fixtures/corpus/cache/ and one clock. It fails on any change outside its allow list.
 //
 //   php tools/corpus/expected-diff.php <base commit> [--allow <json path>]... [--allow-line <prefix>]...
+//   php tools/corpus/expected-diff.php --selftest
 //
 // Each `--allow` names a JSON path of report-2 that may differ, as an fnmatch() pattern, and each `--allow-line` the
-// prefix of a text line that this checkout may add. Findings are compared by package (`findings.<package>.…`), so a
+// prefix of a text line that this checkout may add or change, but not drop. Findings are compared by package (`findings.<package>.…`), so a
 // finding that a change grades does not move the others. Every other difference of the json document and of the table, markdown and github outputs fails
 // the run with exit 1. The base is a `git archive` of the commit with this checkout's vendor/ beside it, so both sides run
 // the same dependencies. Both sides run bin/lockrot, the move check included.
@@ -26,6 +27,9 @@ const OPTIONS = ['--target-php=8.4', '--all', '--fail-on=high'];
 const TEXT = ['table' => 'table.txt', 'markdown' => 'report.md', 'github' => 'github.txt'];
 
 $argv = $_SERVER['argv'];
+if (($argv[1] ?? '') === '--selftest') {
+    exit(selftest());
+}
 $base = $argv[1] ?? '';
 $allowPaths = [];
 $allowLines = [];
@@ -183,8 +187,8 @@ function paths($base, $head, string $at): array
 }
 
 /**
- * The lines that the head adds with an allowed prefix, and every other change, when the head's text without those lines
- * must equal the base's text.
+ * The lines with an allowed prefix that the head adds or changes, and every other change, when both texts without the
+ * lines of an allowed prefix must be equal.
  *
  * @param list<string> $allowed
  *
@@ -192,29 +196,85 @@ function paths($base, $head, string $at): array
  */
 function lineChanges(string $base, string $head, array $allowed): array
 {
-    $added = [];
-    $kept = [];
-    foreach (explode("\n", $head) as $line) {
+    $prefixOf = static function (string $line) use ($allowed): ?string {
         $prefix = null;
         foreach ($allowed as $candidate) {
             if (strncmp($line, $candidate, strlen($candidate)) === 0) {
                 $prefix = $candidate;
             }
         }
+
+        return $prefix;
+    };
+    $baseLines = [];
+    $baseAllowed = [];
+    foreach (explode("\n", $base) as $line) {
+        if ($prefixOf($line) === null) {
+            $baseLines[] = $line;
+        } else {
+            $baseAllowed[$line] = ($baseAllowed[$line] ?? 0) + 1;
+        }
+    }
+    $added = [];
+    $kept = [];
+    foreach (explode("\n", $head) as $line) {
+        $prefix = $prefixOf($line);
         if ($prefix === null) {
             $kept[] = $line;
+        } elseif (($baseAllowed[$line] ?? 0) > 0) {
+            --$baseAllowed[$line];
         } else {
             $added[] = $prefix;
         }
     }
-    $baseLines = explode("\n", $base);
+    // A base line of an allowed prefix that the head lacks is changed while the head adds a line of that prefix, else dropped.
+    $dropped = [];
+    $unmatched = [];
+    foreach ($baseAllowed as $line => $count) {
+        $prefix = (string) $prefixOf($line);
+        for (; $count > 0; --$count) {
+            $unmatched[$prefix][] = $line;
+        }
+    }
+    foreach ($unmatched as $prefix => $lines) {
+        // A numeric prefix is an integer key here and a string in $added.
+        foreach (array_slice($lines, count(array_keys($added, (string) $prefix, true))) as $line) {
+            $dropped[] = '- '.$line;
+        }
+    }
     if ($kept === $baseLines) {
-        return [$added, []];
+        return [$added, $dropped];
     }
     $other = [];
     foreach (array_merge(array_diff($kept, $baseLines), array_diff($baseLines, $kept)) as $line) {
         $other[] = (in_array($line, $kept, true) ? '+ ' : '- ').$line;
     }
 
-    return [$added, $other === [] ? ['the lines are reordered'] : $other];
+    return [$added, array_merge($other === [] ? ['the lines are reordered'] : $other, $dropped)];
+}
+
+/** The cases of lineChanges(), with the prefix `php: ` unless a case names its own: exit 0 when each gives its expected changes, else 1. */
+function selftest(): int
+{
+    $cases = [
+        'an unchanged allowed line' => ["a\nphp: x\nb", "a\nphp: x\nb", [[], []]],
+        'a changed allowed line' => ["a\nphp: x\nb", "a\nphp: y\nb", [['php: '], []]],
+        'an added allowed line' => ["a\nb", "a\nphp: y\nb", [['php: '], []]],
+        'a second copy of an allowed line' => ["php: x", "php: x\nphp: x", [['php: '], []]],
+        'a dropped allowed line' => ["a\nphp: x\nb", "a\nb", [[], ['- php: x']]],
+        'a changed line outside the prefix' => ["a\nb", "a\nc", [[], ['+ c', '- b']]],
+        'a changed line of a numeric prefix' => ["a\n0a", "a\n0b", [['0'], []], ['0']],
+    ];
+    $failed = 0;
+    foreach ($cases as $name => $case) {
+        [$base, $head, $expected] = $case;
+        $actual = lineChanges($base, $head, $case[3] ?? ['php: ']);
+        if ($actual !== $expected) {
+            ++$failed;
+            fwrite(STDERR, sprintf("expected-diff selftest: %s: expected %s, got %s\n", $name, json_encode($expected), json_encode($actual)));
+        }
+    }
+    fwrite(STDOUT, sprintf("expected-diff selftest: %d cases, %d failed\n", count($cases), $failed));
+
+    return $failed === 0 ? 0 : 1;
 }

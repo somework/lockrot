@@ -34,7 +34,17 @@ final class UncheckedMoves implements MoveChecker
         return new CheckOutcome(MoveCheck::notChecked($this->reason));
     }
 
+    public function solveAt(array $names): CheckOutcome
+    {
+        return new CheckOutcome(MoveCheck::notChecked($this->reason));
+    }
+
     public function platformPhp(): ?string
+    {
+        return null;
+    }
+
+    public function configuredPhp(): ?string
     {
         return null;
     }

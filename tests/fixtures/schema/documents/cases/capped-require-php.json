@@ -889,6 +889,33 @@
    "target": {
     "php": "8.4.99",
     "inside": false
+   },
+   "target_fix": {
+    "packages": [
+     {
+      "name": "pelago/emogrifier",
+      "version": "v2.2.0",
+      "link": "require",
+      "target": "php",
+      "constraint": "^5.5.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0",
+      "dev": false
+     }
+    ],
+    "command": null,
+    "check": "refused",
+    "reason": null,
+    "held_by": [
+     {
+      "source": "root",
+      "package": null,
+      "version": null,
+      "link": "require",
+      "target": "php",
+      "constraint": "^7.1.3",
+      "holder": null
+     }
+    ],
+    "platform_step": false
    }
   }
  },

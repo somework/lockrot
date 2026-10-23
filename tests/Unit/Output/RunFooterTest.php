@@ -16,9 +16,11 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\RunFooter;
 use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\MoveChecker;
 use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\RecordedMoveChecker;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\MoveChecks;
@@ -155,7 +157,7 @@ final class RunFooterTest extends TestCase
     {
         $line = self::phpLine(['packages' => [self::package('acme/a', ['php' => '7.1.* || >=8.1'])], 'packages-dev' => []], ['require' => ['php' => '>=8.2'], 'require-dev' => ['php' => '>=7.1']], '7.4');
 
-        self::assertSame('php: without require-dev the lock installs on PHP 8.2 to 8.5, and with require-dev on PHP 7.1 and 8.1 to 8.5, so your target, 7.4, is excluded', $line);
+        self::assertSame('php: without require-dev the lock installs on PHP 8.2 to 8.5, and with require-dev on PHP 7.1 and 8.1 to 8.5, so your target, 7.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)', $line);
     }
 
     public function testThePhpLineNamesTheOverrideAndAtMostThreeSettersOfTheUpperEdge(): void
@@ -170,16 +172,16 @@ final class RunFooterTest extends TestCase
     {
         $line = self::phpLine(['packages' => [self::package('acme/a', ['php' => '<8.0']), self::package('acme/b', ['php' => '>=8.1'])]], [], '8.4');
 
-        self::assertSame('php: the lock installs on no PHP, so your target, 8.4, is excluded', $line);
+        self::assertSame('php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)', $line);
     }
 
     public function testThePhpLineReadsTheUpperEdgeOfTheSetThatTheRunAnalysed(): void
     {
         $lock = ['packages' => [], 'packages-dev' => [self::package('acme/tool', ['php' => '<8.3'])]];
-        $window = 'php: without require-dev the lock installs on PHP 5.3 to 8.5, and with require-dev on PHP 5.3 to 8.2, so your target, 8.4, is excluded';
+        $window = 'php: without require-dev the lock installs on PHP 5.3 to 8.5, and with require-dev on PHP 5.3 to 8.2';
 
-        self::assertSame($window, self::phpLine($lock, [], '8.4'));
-        self::assertSame($window.'; acme/tool excludes 8.3', self::phpLine($lock, [], '8.4', true));
+        self::assertSame($window, self::phpLine($lock, [], '8.2'));
+        self::assertSame($window.'; acme/tool excludes 8.3', self::phpLine($lock, [], '8.2', true));
     }
 
     public function testThePhpLineNamesEachRootLinkByItsSection(): void
@@ -187,6 +189,119 @@ final class RunFooterTest extends TestCase
         $line = self::phpLine(['packages' => [], 'packages-dev' => []], ['require' => ['php-64bit' => '<8.4'], 'require-dev' => ['php' => '<8.4'], 'conflict' => ['php' => '>=8.4']], '8.3', true);
 
         self::assertSame('php: the lock installs on PHP 5.3 to 8.3; conflict.php, require-dev.php and require.php-64bit exclude 8.4', $line);
+    }
+
+    /** wallabag 2.6.14 at 8.4 (§7.0): the fix replaces the override and edge clauses. */
+    public function testThePhpLineOfARefusedFixNamesTheCountAndEachHold(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php' => '<8.4']), self::package('acme/b', ['php' => '<8.4'])], 'packages-dev' => [], 'platform-overrides' => ['php' => '8.3.0']];
+        $holds = [
+            ['source' => 'root', 'link' => 'root-require', 'target' => 'acme/a', 'constraint' => '^1.0'],
+            ['source' => 'package', 'package' => 'acme/c', 'version' => '2.0.0', 'link' => 'require', 'target' => 'acme/b', 'constraint' => '1.0.0'],
+        ];
+
+        $line = self::phpLine($lock, [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'refused', 'holds' => $holds]], []));
+
+        self::assertSame("php: the lock installs on PHP 5.3 to 8.3, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of the 2 packages that exclude it: composer.json requires acme/a ^1.0 and acme/c 2.0.0 requires acme/b 1.0.0", $line);
+    }
+
+    public function testThePhpLineOfARefusalWithNoHoldEndsAfterThePackageThatExcludesTheTarget(): void
+    {
+        $line = self::phpLine(['packages' => [self::package('acme/a', ['php' => '<8.4'])], 'packages-dev' => []], [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'refused']], []));
+
+        self::assertSame("php: the lock installs on PHP 5.3 to 8.3, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of the package that excludes it", $line);
+    }
+
+    /** monica at 8.5: the command as the move commands render it. */
+    public function testThePhpLineOfAResolvingFixPrintsTheCommand(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php' => '<8.5'])], 'packages-dev' => [self::package('acme/tool', ['php' => '<8.5'])]];
+
+        $line = self::phpLine($lock, [], '8.5', false, new RecordedMoveChecker(['target_fix' => ['result' => 'resolves', 'form' => 'with-all-dependencies']], []));
+
+        self::assertSame("php: the lock installs on PHP 5.3 to 8.4, so your target, 8.5, is excluded; Composer's solver at PHP 8.5 resolves: composer update acme/a acme/tool --with-all-dependencies", $line);
+    }
+
+    /** M5: config.platform.php outside the target minor needs its own step first. */
+    public function testThePhpLineOfAResolvingFixNamesThePlatformStep(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php' => '<8.5'])], 'packages-dev' => []];
+
+        $line = self::phpLine($lock, ['config' => ['platform' => ['php' => '8.4.12']]], '8.5', false, new RecordedMoveChecker(['target_fix' => ['result' => 'resolves', 'form' => 'inline']], []));
+
+        self::assertSame('php: the lock installs on PHP 5.3 to 8.4, so your target, 8.5, is excluded; set config.platform.php to your PHP 8.5 release, then Composer\'s solver resolves: composer update acme/a', $line);
+    }
+
+    public function testThePlatformStepAddsNoWordsToARefusedFix(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php' => '<8.5'])], 'packages-dev' => []];
+
+        $line = self::phpLine($lock, ['config' => ['platform' => ['php' => '7.4.29']]], '8.5', false, new RecordedMoveChecker(['target_fix' => ['result' => 'refused']], []));
+
+        self::assertStringEndsWith("; Composer's solver at PHP 8.5 refuses the update of the package that excludes it", (string) $line);
+    }
+
+    public function testThePhpLineOfAFixThatWasNotCheckedGivesTheReason(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php' => '<8.4']), self::package('acme/b', ['php' => '<8.4'])], 'packages-dev' => []];
+
+        $offline = self::phpLine($lock, [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'not_checked', 'reason' => 'offline']], []));
+        $unchecked = self::phpLine($lock, [], '8.4', false, null);
+
+        self::assertStringEndsWith("; the update of the 2 packages that exclude it is not checked (a package it needs is not in Composer's cache)", (string) $offline);
+        self::assertStringEndsWith('; the update of the 2 packages that exclude it is not checked (the run checked no move)', (string) $unchecked);
+    }
+
+    /** The laminas skeleton at 8.4: the root ceiling names each root link that excludes the target. */
+    public function testThePhpLineOfTheRootCeilingNamesEachRootLink(): void
+    {
+        $require = self::phpLine(['packages' => [], 'packages-dev' => []], ['require' => ['php' => '~8.1.0 || ~8.2.0 || ~8.3.0']], '8.4', false, null);
+        $both = self::phpLine(['packages' => [], 'packages-dev' => []], ['require-dev' => ['php' => '<8.4'], 'conflict' => ['php' => '>=8.4.50']], '8.4', false, null);
+
+        self::assertSame('php: the lock installs on PHP 8.1 to 8.3; your target, 8.4, is excluded: require.php allows only ~8.1.0 || ~8.2.0 || ~8.3.0', $require);
+        self::assertSame('php: the lock installs on PHP 5.3 to 8.3; your target, 8.4, is excluded: require-dev.php allows only <8.4 and conflict.php excludes >=8.4.50', $both);
+    }
+
+    /** drupal-site at 7.2: below the lowest edge, the line names that edge's setters. */
+    public function testThePhpLineOfATargetBelowTheLowestEdgeNamesItsSetters(): void
+    {
+        $one = self::phpLine(['packages' => [self::package('acme/a', ['php' => '>=7.3'])], 'packages-dev' => []], [], '7.2', false, null);
+        $two = self::phpLine(['packages' => [self::package('acme/a', ['php' => '>=7.3']), self::package('acme/b', ['php' => '>=7.3.5'])], 'packages-dev' => []], [], '7.2', false, null);
+
+        self::assertSame('php: the lock installs on PHP 7.3 to 8.5, so your target, 7.2, is excluded; acme/a sets the lowest PHP, 7.3.0', $one);
+        self::assertSame('php: the lock installs on PHP 7.3 to 8.5, so your target, 7.2, is excluded; acme/b sets the lowest PHP, 7.3.5', $two);
+    }
+
+    public function testThePhpLineCountsAPackageWithTwoPhpLinksOnce(): void
+    {
+        $line = self::phpLine(['packages' => [self::package('acme/a', ['php' => '<8.4', 'php-64bit' => '<8.4'])], 'packages-dev' => []], [], '8.4', false, null);
+
+        self::assertStringEndsWith('; the update of the package that excludes it is not checked (the run checked no move)', (string) $line);
+    }
+
+    /** The lowest edge that excludes the target is the one of the set with require-dev. */
+    public function testThePhpLineNamesTheSettersOfTheLowestEdgeWithRequireDev(): void
+    {
+        $line = self::phpLine(['packages' => [], 'packages-dev' => [self::package('acme/tool', ['php' => '>=7.3'])]], [], '7.2', false, null);
+
+        self::assertSame('php: without require-dev the lock installs on PHP 5.3 to 8.5, and with require-dev on PHP 7.3 to 8.5, so your target, 7.2, is excluded; acme/tool sets the lowest PHP, 7.3.0', $line);
+    }
+
+    /** markdown marks each package name and the command as code: the line hands them to the format's marker. */
+    public function testThePhpLineHandsThePackageNamesAndTheCommandToTheMarker(): void
+    {
+        $holds = [['source' => 'package', 'package' => 'acme/c', 'version' => '2.0.0', 'link' => 'require', 'target' => 'acme/a', 'constraint' => '1.0.0']];
+        $at = new \DateTimeImmutable(self::AT);
+        $lock = ['packages' => [self::package('acme/a', ['php' => '<8.4'])], 'packages-dev' => []];
+        $window = PhpWindow::of(LockFile::fromArray($lock), ProjectConfig::fromArray([]), '8.4', PhpReleaseDates::load()->minors(new Clock($at)));
+        self::assertNotNull($window);
+        $mark = static fn (string $code): string => '['.$code.']';
+
+        $refused = RunFooter::phpWindow((new Report([], [], $at, 0, 0))->withPhpWindow($window->withTargetFix(new RecordedMoveChecker(['target_fix' => ['result' => 'refused', 'holds' => $holds]], []))), $mark);
+        $resolves = RunFooter::phpWindow((new Report([], [], $at, 0, 0))->withPhpWindow($window->withTargetFix(new RecordedMoveChecker(['target_fix' => ['result' => 'resolves', 'form' => 'inline']], []))), $mark);
+
+        self::assertStringEndsWith(': [acme/c] 2.0.0 requires [acme/a] 1.0.0', (string) $refused);
+        self::assertStringEndsWith(': [composer update acme/a]', (string) $resolves);
     }
 
     public function testThereIsNoPhpLineWithoutAWindow(): void
@@ -198,11 +313,11 @@ final class RunFooterTest extends TestCase
      * @param array<string, mixed> $lock
      * @param array<string, mixed> $composer
      */
-    private static function phpLine(array $lock, array $composer, string $target, bool $includeDev = false): ?string
+    private static function phpLine(array $lock, array $composer, string $target, bool $includeDev = false, ?MoveChecker $checker = null): ?string
     {
         $at = new \DateTimeImmutable(self::AT);
         $window = PhpWindow::of(LockFile::fromArray($lock), ProjectConfig::fromArray($composer), $target, PhpReleaseDates::load()->minors(new Clock($at)));
-        $report = (new Report([], [], $at, 0, 0, null, null, $includeDev))->withPhpWindow($window);
+        $report = (new Report([], [], $at, 0, 0, null, null, $includeDev))->withPhpWindow($window === null ? null : $window->withTargetFix($checker));
 
         return RunFooter::phpWindow($report, [self::class, 'asWritten']);
     }

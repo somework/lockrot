@@ -1,19 +1,15 @@
 {
- "pr": "7b",
+ "pr": "7c",
  "source": {
   "cases.json": "d7cbe8c3602f7270c21167968b18cf053027869278d1ef07d3691a706665415c",
-  "model_run_date": "2026-10-22"
+  "model_run_date": "2026-10-23"
  },
  "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",
  "page_goldens": {
-  "sha256": "7e87c6da8003f933f5e70d6e46041902e4b9e96414ecc87d541688132c2f83d5",
-  "rendered": "the model's goldens, rendered again by the model with run.php_window.target_fix null"
+  "sha256": "c9ac03aa901f304a93a1ecb79af806578a26741fc1a5a37bfe601704ec178bd7",
+  "rendered": "the model's goldens"
  },
- "dropped": [
-  "cases[].run.php_window.target_fix",
-  "documents.run.php_window.target_fix",
-  "run.php_window.target_fix"
- ],
+ "dropped": [],
  "reverted": {},
  "cases_without_inputs": [
   "psr-log",

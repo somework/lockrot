@@ -41,7 +41,8 @@ final class MoveCheckers
                 $overrides[$name] = $version;
             }
         }
-        $php = self::platformPhp($targetPhp, \is_string($overrides['php'] ?? null) ? $overrides['php'] : null);
+        $configured = \is_string($overrides['php'] ?? null) ? $overrides['php'] : null;
+        $php = self::platformPhp($targetPhp, $configured);
         $overrides['php'] = $php;
         $notFromComposerRepository = [];
         foreach ($lock->packages(true) as $package) {
@@ -49,13 +50,13 @@ final class MoveCheckers
                 $notFromComposerRepository[] = $package->name();
             }
         }
-        $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline);
+        $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline, $root->getMinimumStability(), $root->getStabilityFlags());
         $solver = new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], $overrides), $source, []);
 
         $blocking = AdvisoryBlocking::fromConfig($config);
         $lookup = new RepositoryAdvisoryLoader($repositories, $offline, $deadline);
 
-        return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): array => $lookup->records($names, $complete)));
+        return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): array => $lookup->records($names, $complete)), $configured);
     }
 
     /**

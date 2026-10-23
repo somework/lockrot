@@ -17,6 +17,18 @@ final class SolveRequestTest extends TestCase
         self::assertSame(['acme/a' => 'acme/a'], SolveRequest::require('acme/a', ['acme/a' => '^2.0', 'php' => '>=8.1'])->allow());
     }
 
+    /** `run.php_window.target_fix`: no inline constraint, and each hold keeps its target. */
+    public function testAnUnlockAllowsEachNameWithNoConstraintAndMovesNoName(): void
+    {
+        $request = SolveRequest::unlock(['acme/a', 'acme/b']);
+
+        self::assertSame(['acme/a' => 'acme/a', 'acme/b' => 'acme/b'], $request->allow());
+        self::assertSame([[], [], SolveRequest::LISTED], [$request->inline(), $request->rootChanges(), $request->transitive()]);
+        self::assertSame([], $request->moved());
+        self::assertSame([], $request->withTransitive(SolveRequest::WITH_ALL_DEPENDENCIES)->moved());
+        self::assertSame(['acme/a' => 'acme/a'], SolveRequest::update(['acme/a' => '^1.1'])->moved());
+    }
+
     public function testACopyWithOtherRootChangesOrAnotherTransitiveModeLeavesTheRequestAsItWas(): void
     {
         $request = SolveRequest::update(['acme/a' => '^1.1']);

@@ -272,8 +272,9 @@ final class Analyzer
             $graded[$finding->package()] = GradedPackage::of($finding);
         }
         $findings = array_map(static fn (Finding $finding): Finding => $finding->withHolders($graded), $findings);
+        $window = PhpWindow::of($lock, $project, $this->signals->phpFloor()->php(PhpFloor::TARGET) ?? PhpReleaseDates::minorOf(\PHP_VERSION), PhpReleaseDates::load()->minors($this->clock), $checks === null ? null : $checks->checker()->platformPhp());
         $report = (new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev, $advisories->coverage()))
-            ->withPhpWindow(PhpWindow::of($lock, $project, $this->signals->phpFloor()->php(PhpFloor::TARGET) ?? PhpReleaseDates::minorOf(\PHP_VERSION), PhpReleaseDates::load()->minors($this->clock), $checks === null ? null : $checks->checker()->platformPhp()));
+            ->withPhpWindow($window === null ? null : $window->withTargetFix($checks === null ? null : $checks->checker()));
         if ($checks !== null) {
             $report = $report->withMoveChecks(new MoveCheckRun($checks->checker()->composerVersion(), $checks->checker()->blocksAdvisories(), $checks->checker()->baseline()->check()), UpdateNow::of($report->sorted(), $checks));
             $error = $checks->checker()->solverError();

@@ -1967,7 +1967,8 @@
    "target": {
     "php": "8.2.0",
     "inside": true
-   }
+   },
+   "target_fix": null
   }
  },
  "activity_cache_oldest_at": "2026-10-01T16:04:05+00:00",

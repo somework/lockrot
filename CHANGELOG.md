@@ -92,6 +92,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   installs, with require-dev and without, and the links that set each edge. The minors and edges
   assume no override, and `platform_override` names the lock's `platform-overrides.php`. The text
   formats print it as a `php:` line. ([The PHP window](docs/verdicts.md#the-php-window))
+- **json, table, markdown, github:** `run.php_window.target_fix` names the packages that exclude
+  the target PHP, and the answer of Composer's solver to their update at the target: the command,
+  the holds of a refusal, or the root links that no update can change. The `php:` line prints it.
+  ([The update that admits the target](docs/verdicts.md#the-update-that-admits-the-target))
 - **All formats:** the run notes `update_now_not_checked`, `move_check_failed` and
   `package_name_invalid`. lockrot skips a lock entry whose name is no Composer package name.
   ([Run notes](docs/notes.md#package_name_invalid))

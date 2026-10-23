@@ -874,6 +874,49 @@
                 "target": {
                     "php": "8.4.99",
                     "inside": false
+                },
+                "target_fix": {
+                    "packages": [
+                        {
+                            "name": "laminas/laminas-code",
+                            "version": "4.7.1",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.4, <8.2",
+                            "dev": false
+                        },
+                        {
+                            "name": "php-http/guzzle5-adapter",
+                            "version": "2.0.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.0",
+                            "dev": false
+                        },
+                        {
+                            "name": "friendsoftwig/twigcs",
+                            "version": "v6.1.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0",
+                            "dev": true
+                        }
+                    ],
+                    "command": null,
+                    "check": "refused",
+                    "reason": null,
+                    "held_by": [
+                        {
+                            "source": "root",
+                            "package": null,
+                            "version": null,
+                            "link": "root-require",
+                            "target": "php-http/guzzle5-adapter",
+                            "constraint": "^2.0",
+                            "holder": null
+                        }
+                    ],
+                    "platform_step": true
                 }
             },
             "score_rules_used": {

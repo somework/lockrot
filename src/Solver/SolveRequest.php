@@ -32,6 +32,7 @@ final class SolveRequest
     private array $rootChanges;
     /** @var self::LISTED|self::WITH_DEPENDENCIES|self::WITH_ALL_DEPENDENCIES */
     private int $transitive;
+    private bool $keepsTargets = false;
 
     /**
      * @param array<string, string>                                       $allow       the update allow list, name => name
@@ -72,6 +73,24 @@ final class SolveRequest
         return new self([$package => $package], [], $rootChanges, self::LISTED);
     }
 
+    /**
+     * An update of the names at the solve's php, with no constraint: `run.php_window.target_fix`.
+     * It moves no name, so each hold that Composer's refusal names keeps its target.
+     *
+     * @param list<string> $names
+     */
+    public static function unlock(array $names): self
+    {
+        $allow = [];
+        foreach ($names as $name) {
+            $allow[$name] = $name;
+        }
+        $request = new self($allow, [], [], self::LISTED);
+        $request->keepsTargets = true;
+
+        return $request;
+    }
+
     /** @param array<string, string> $rootChanges name => constraint, beside the inline constraints */
     public function withRootChanges(array $rootChanges): self
     {
@@ -94,6 +113,12 @@ final class SolveRequest
     public function allow(): array
     {
         return $this->allow;
+    }
+
+    /** @return array<string, string> name => name: a link to one of them has no target in a hold ({@see ProblemHolds}) */
+    public function moved(): array
+    {
+        return $this->keepsTargets ? [] : $this->allow;
     }
 
     /** @return array<string, string> */

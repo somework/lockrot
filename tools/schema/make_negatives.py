@@ -837,6 +837,18 @@ def _(d): d['run']['php_window']['without_dev']['lower_edge']['set_by'][0]['link
 def _(d): d['run']['php_window']['without_dev']['upper_edge'] = {'excludes': '8.6', 'set_by': []}
 @case('run-php-window-host-feature-unknown', 'composite', 'run.php_window')
 def _(d): d['run']['php_window']['host_requires'] = ['php-gd']
+# target_fix: every key is written, platform_step is a boolean (M5), and a root ceiling holds root links only (F4)
+@case('run-php-window-target-fix-missing', 'E', 'run.php_window')
+def _(d): del d['run']['php_window']['target_fix']
+@case('target-fix-platform-step-missing', 'E', 'run.php_window.target_fix')
+def _(d): del d['run']['php_window']['target_fix']['platform_step']
+@case('target-fix-platform-step-a-string', 'E', 'run.php_window.target_fix.platform_step')
+def _(d): d['run']['php_window']['target_fix']['platform_step'] = 'yes'
+@case('target-fix-root-ceiling-platform-hold', 'E', 'run.php_window.target_fix')
+def _(d): d['run']['php_window']['target_fix']['held_by'][0]['link'] = 'platform'
+# a run that checks no move names no reason for a fix that is not checked
+@case('target-fix-reason-without-move-check', 'routing', 'run')
+def _(d): d['run']['php_window']['target_fix']['reason'] = 'offline'
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)

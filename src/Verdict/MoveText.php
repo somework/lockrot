@@ -291,8 +291,12 @@ final class MoveText
         return $holder->package().' '.$holder->version().' ('.implode('; ', $bits).')';
     }
 
-    /** `requires ^1.0`, `conflicts with <5.3`, `requires symfony/console ^4.4`: the link and its target. */
-    private static function linkWords(Holder $holder): string
+    /**
+     * `requires ^1.0`, `conflicts with <5.3`, `requires symfony/console ^4.4`: the link and its target.
+     *
+     * @param ?callable(string): string $name marks the target as the format marks a package name
+     */
+    public static function linkWords(Holder $holder, ?callable $name = null): string
     {
         $target = $holder->target();
         if ($holder->link() === Holder::ROOT_REQUIRE && $target === null) {
@@ -303,7 +307,7 @@ final class MoveText
         }
         $verb = ['conflict' => 'conflicts with ', 'replace' => 'replaces '][$holder->link()] ?? 'requires ';
 
-        return $verb.($target === null ? '' : $target.' ').$holder->constraint();
+        return $verb.($target === null ? '' : ($name === null ? $target : $name($target)).' ').$holder->constraint();
     }
 
     private static function because(string $reason, Move $move, MoveSubject $subject): string

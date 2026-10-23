@@ -62,7 +62,7 @@ security: 17 vulnerable packages · 86 advisories: 3 critical, 27 high, 40 mediu
 libyears: at least 116.4 behind across 41 of 51 packages · 67.8 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: `mautic/core-lib` 5 · `guzzlehttp/guzzle` 2 · `akaunting/laravel-apexcharts` 1 · `genealabs/laravel-model-caching` 1 · `jfcherng/php-diff` 1 · … and 6 more
 advisories: 51 packages asked · packagist.org answered (271 on record for 20 packages)
-php: the lock installs on no PHP, so your target, 8.4, is excluded
+php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 9 packages that exclude it is not checked (the run checked no move)
 
 **Update now:** `composer update phpoffice/phpspreadsheet robrichards/xmlseclibs league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn`
 

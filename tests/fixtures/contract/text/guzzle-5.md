@@ -11,6 +11,6 @@ depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 14 advisories: 6 high, 8 medium
 libyears: 6.9 behind across the one package · 6.9 from direct requirements · furthest behind guzzlehttp/guzzle 5.3.4 at 6.9
 advisories: 1 package asked · packagist.org answered (15 on record for 1 package)
-php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; `php-http/guzzle5-adapter` excludes 8.0
+php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
 
 <sub>5 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

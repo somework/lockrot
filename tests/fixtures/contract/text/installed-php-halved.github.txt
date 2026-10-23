@@ -1,5 +1,5 @@
 ::error file=composer.lock,line=4,title=lockrot%3A high — abandoned · left-behind::web-auth/metadata-service v2.1.7: 18 = (abandoned 32 + left-behind 4 [¼ of 16]) ÷ 2 transitive. Do: replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it. abandoned: marked abandoned by its registry, replacement: web-auth/webauthn-lib. left-behind: branch 2.x last released 2019-09-04 (7.1 years ago); 4.x released 4.9.1 (2024-07-11). (via web-auth/webauthn-lib)
 flags: abandoned 1 · left-behind 1 · 1 package carries more than one
 depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: web-auth/metadata-service, 1 hop (web-auth/webauthn-lib › web-auth/metadata-service)
-php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; require.php, web-auth/metadata-service and web-auth/webauthn-lib exclude 8.0
+php: the lock installs on PHP 7.2 to 7.4; your target, 8.4, is excluded: require.php allows only ^7.2.5
 gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

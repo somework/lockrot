@@ -109,7 +109,8 @@ grows in minor releases. These are the ones that a reader meets most:
   notes
 - in report-2, the `registry` and `reason` of `security.feeds[]` and of
   `run.advisory_lookup.repositories[]`
-- in report-2, the `reason` of a move's `check` and of `run.move_check`
+- in report-2, the `reason` of a move's `check`, of `run.move_check` and of
+  `run.php_window.target_fix`
 - in report-2, the words of `run.score_model`
 - the configuration's `format`, and format names wherever lockrot writes one.
 
@@ -310,7 +311,7 @@ shapes leave out the parts that do not apply. A score of 0 carries only `model`,
 | `score_rules_used` | object | Rule id → the number of findings on which the rule changed or decided a number. Null for `sort` |
 | `advisory_lookup` | object | `scope` and `scope_source`, the packages asked and not asked, and each Composer repository that can publish advisories, with its `outcome` ([Which advisories count](verdicts.md#which-advisories-count)) |
 | `move_check` | object or null | Which Composer checked the moves (`composer`), and whether it blocked the versions that an advisory affects. `baseline` says whether Composer's solver resolves or refuses the lock itself, with `reason` when lockrot did not check it. Null when the run checked no move ([The move check](verdicts.md#the-move-check)) |
-| `php_window` | object or null | The PHP minors on which the lock installs, with require-dev (`with_dev`) and without (`without_dev`), and the links that set each edge. It also holds the lock's `platform-overrides.php` and the host features that a requirement names. `target` says whether the window admits the target PHP. Null when the window is unknowable ([The PHP window](verdicts.md#the-php-window)) |
+| `php_window` | object or null | The PHP minors on which the lock installs, with require-dev (`with_dev`) and without (`without_dev`), and the links that set each edge. It also holds the lock's `platform-overrides.php` and the host features that a requirement names. `target` says whether the window admits the target PHP. `target_fix` names the update of the packages that exclude the target, and the answer of Composer's solver to it. Null when the window is unknowable ([The PHP window](verdicts.md#the-php-window)) |
 
 ### The gate
 

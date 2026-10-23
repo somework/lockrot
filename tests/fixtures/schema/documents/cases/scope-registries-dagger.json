@@ -861,7 +861,8 @@
    "target": {
     "php": "8.4.99",
     "inside": false
-   }
+   },
+   "target_fix": null
   }
  },
  "activity_cache_oldest_at": null,
