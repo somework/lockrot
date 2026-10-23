@@ -1,8 +1,8 @@
 {
  "pr": "7c",
  "source": {
-  "cases.json": "d7cbe8c3602f7270c21167968b18cf053027869278d1ef07d3691a706665415c",
-  "model_run_date": "2026-10-23"
+  "cases.json": "e2476df48bfd5da8d0bbeb0b111b7563f6e8291c92f1887e5f13f5c45c4eeaf7",
+  "model_run_date": "2026-10-24"
  },
  "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",
  "page_goldens": {
@@ -27,9 +27,12 @@
   "capped-update‡",
   "capped-require‡",
   "capped-require-higher‡",
+  "capped-recapped‡",
+  "capped-no-php-newest‡",
   "capped-held-update‡",
   "capped-snapshot-alias‡",
   "capped-snapshot-dev‡",
+  "capped-snapshot-backport‡",
   "capped-platform‡",
   "capped-accepted‡",
   "capped-dev‡",

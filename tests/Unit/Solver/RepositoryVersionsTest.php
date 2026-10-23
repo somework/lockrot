@@ -9,15 +9,28 @@ use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
+use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Deadline;
 use Lockrot\Solver\RepositoryVersions;
 use Lockrot\Solver\VersionSource;
+use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\RecordingComposerRepository;
 use PHPUnit\Framework\TestCase;
 use Seld\JsonLint\ParsingException;
 
 final class RepositoryVersionsTest extends TestCase
 {
+    /** @var list<string> */
+    private array $tempDirs = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->tempDirs as $dir) {
+            self::removeTree($dir);
+        }
+        $this->tempDirs = [];
+    }
+
     /** A repository answer that does not parse is a failed load of that name, never a stopped run. */
     public function testANameWhoseRepositoryAnswerDoesNotParseFailsToLoad(): void
     {
@@ -249,6 +262,73 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([[], VersionSource::OFFLINE], [$offline->versions('acme/lib'), $offline->failure('acme/lib')]);
     }
 
+    /** Offline, Composer reads a `~dev` file that its cache lacks as a 404: that is no answer, not a name without dev versions (ruling G4). */
+    public function testOfflineAnAdmittedNameWhoseDevFileComposerHasNotCachedIsOffline(): void
+    {
+        $server = $this->server(['acme/lib' => ['1.0.0'], 'acme/lib~dev' => ['dev-main']]);
+        $server->start();
+        try {
+            self::assertSame(['1.0.0'], self::pretty((new RepositoryVersions($server->repositories(), [], false, Deadline::never()))->versions('acme/lib')));
+            putenv('COMPOSER_DISABLE_NETWORK=1');
+            try {
+                $offline = new RepositoryVersions($server->repositories(), [], true, Deadline::never(), 'dev', []);
+
+                self::assertSame([[], VersionSource::OFFLINE], [$offline->versions('acme/lib'), $offline->failure('acme/lib')]);
+            } finally {
+                putenv('COMPOSER_DISABLE_NETWORK');
+            }
+        } finally {
+            $server->stop();
+        }
+    }
+
+    public function testOfflineAnAdmittedNameWhoseDevFileComposerHasCachedLoadsItsDevVersions(): void
+    {
+        $server = $this->server(['acme/lib' => ['1.0.0'], 'acme/lib~dev' => ['dev-main']]);
+        $server->start();
+        try {
+            (new RepositoryVersions($server->repositories(), [], false, Deadline::never(), 'dev', []))->versions('acme/lib');
+            putenv('COMPOSER_DISABLE_NETWORK=1');
+            try {
+                $offline = new RepositoryVersions($server->repositories(), [], true, Deadline::never(), 'dev', []);
+
+                self::assertEqualsCanonicalizing(['1.0.0', 'dev-main'], self::pretty($offline->versions('acme/lib')));
+                self::assertNull($offline->failure('acme/lib'));
+            } finally {
+                putenv('COMPOSER_DISABLE_NETWORK');
+            }
+        } finally {
+            $server->stop();
+        }
+    }
+
+    public function testOnlineAnAdmittedNameWhoseRepositoryHasNoDevFileLoadsItsTags(): void
+    {
+        $server = $this->server(['acme/lib' => ['1.0.0']]);
+        $server->start();
+        try {
+            $versions = new RepositoryVersions($server->repositories(), [], false, Deadline::never(), 'dev', []);
+
+            self::assertSame([['1.0.0'], null], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib')]);
+        } finally {
+            $server->stop();
+        }
+    }
+
+    public function testOfflineAnAdmittedNameThatLoadsAloneWithoutADevAnswerIsOffline(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['1.0.0']], ['acme/bad'])], [], true, Deadline::never(), 'dev', []);
+
+        self::assertSame([[], VersionSource::OFFLINE], [$versions->versionsOf(['acme/lib', 'acme/bad'])['acme/lib'], $versions->failure('acme/lib')]);
+    }
+
+    public function testOnlineAnAdmittedNameThatLoadsAloneWithoutADevAnswerKeepsItsTags(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['1.0.0']], ['acme/bad'])], [], false, Deadline::never(), 'dev', []);
+
+        self::assertSame([['1.0.0'], null], [self::pretty($versions->versionsOf(['acme/lib', 'acme/bad'])['acme/lib']), $versions->failure('acme/lib')]);
+    }
+
     public function testEachRepositoryIsAskedForTheNamesTogetherOncePerStability(): void
     {
         $first = self::recording(['acme/tagged' => ['1.0.0'], 'acme/branch' => ['dev-main']]);
@@ -453,5 +533,37 @@ final class RepositoryVersionsTest extends TestCase
     private static function pretty(array $packages): array
     {
         return array_map(static fn (BasePackage $package): string => $package->getPrettyVersion(), $packages);
+    }
+
+    /**
+     * A repository server for the given p2 files, each file name with its versions.
+     *
+     * @param array<string, list<string>> $versionsByFile
+     */
+    private function server(array $versionsByFile): FixtureRepositoryServer
+    {
+        $dir = sys_get_temp_dir().'/lockrot-repository-versions-'.bin2hex(random_bytes(8));
+        self::assertTrue(mkdir($dir.'/envelopes', 0777, true));
+        $this->tempDirs[] = $dir;
+        $names = [];
+        foreach ($versionsByFile as $file => $versions) {
+            $name = (string) preg_replace('{~dev$}', '', $file);
+            $names[$name] = ['name' => $name, 'version' => '1.0.0'];
+            $entries = array_map(static fn (string $version): array => ['name' => $name, 'version' => $version, 'type' => 'library'], $versions);
+            file_put_contents(RecordedHttpClient::pathFor($dir.'/envelopes', 'https://repo.packagist.org/p2/'.$file.'.json'), (string) json_encode(['status' => 200, 'fetched_at' => '2026-10-08T00:00:00+00:00', 'body' => json_encode(['packages' => [$name => $entries]]), 'error' => null]));
+        }
+        file_put_contents($dir.'/composer.lock', (string) json_encode(['packages' => array_values($names)]));
+
+        return FixtureRepositoryServer::fromLockFiles([$dir.'/composer.lock'], $dir.'/envelopes');
+    }
+
+    private static function removeTree(string $dir): void
+    {
+        $entries = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($entries as $entry) {
+            \assert($entry instanceof \SplFileInfo);
+            $entry->isDir() ? rmdir($entry->getPathname()) : unlink($entry->getPathname());
+        }
+        rmdir($dir);
     }
 }

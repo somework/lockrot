@@ -136,6 +136,9 @@ final class RepositoryVersions implements VersionSource
                 $pending = array_diff_key($pending, $listed);
                 if ($stabilities === self::DEV) {
                     $this->complete += $tagged + $listed;
+                    foreach (array_keys($tagged) as $name) {
+                        $this->failOfflineWithoutDevFile($name, $result);
+                    }
                 } else {
                     $tagged = array_filter($listed, fn (string $name): bool => $this->admitsDev($name), \ARRAY_FILTER_USE_KEY);
                     $this->complete += array_diff_key($listed, $tagged);
@@ -161,7 +164,11 @@ final class RepositoryVersions implements VersionSource
             try {
                 $versions = self::named($repository->loadPackages([$name => null], self::STABLE, []), $name);
                 if ($versions === [] || $this->admitsDev($name)) {
-                    $versions = array_merge($versions, self::named($repository->loadPackages([$name => null], self::DEV, []), $name));
+                    $dev = $repository->loadPackages([$name => null], self::DEV, []);
+                    if ($versions !== [] && $this->failOfflineWithoutDevFile($name, $dev)) {
+                        return [];
+                    }
+                    $versions = array_merge($versions, self::named($dev, $name));
                 }
             } catch (\Exception $e) {
                 $failed = true;
@@ -192,6 +199,24 @@ final class RepositoryVersions implements VersionSource
     private static function named(array $result, string $name): array
     {
         return array_values(array_filter($result['packages'], static fn (BasePackage $package): bool => $package->getName() === $name));
+    }
+
+    /**
+     * Offline, Composer reads a `~dev` file that its cache lacks as a 404, and its answer leaves the
+     * name out of `namesFound`. The tags alone are then no answer, so the name is OFFLINE
+     * (docs/verdicts.md#the-move-check).
+     *
+     * @param array{namesFound: array<string>} $result the dev answer of the repository that lists the name's tags
+     */
+    private function failOfflineWithoutDevFile(string $name, array $result): bool
+    {
+        if (!$this->offline || \in_array($name, $result['namesFound'], true)) {
+            return false;
+        }
+        $this->failures[$name] = self::OFFLINE;
+        $this->loaded[$name] = [];
+
+        return true;
     }
 
     private function admitsDev(string $name): bool

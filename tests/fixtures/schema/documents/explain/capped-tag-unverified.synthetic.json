@@ -300,7 +300,11 @@
      "requires": ">=7.2 <8.5",
      "stops_at": "8.4",
      "excludes_target": false,
-     "admits_newest": null
+     "admits_newest": {
+      "version": "4.0.5",
+      "branch": "4.x",
+      "blocking": null
+     }
     }
    }
   ],

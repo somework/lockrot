@@ -52,8 +52,10 @@ final class CappedRule implements SignalRule
     }
 
     /**
-     * The newest release that admits R on the lowest branch that has one. A release that states no
-     * php is no answer and does not count.
+     * The newest release of the lowest branch whose newest release admits R or states no php.
+     * Composer installs a branch's newest release, so an older one that admits R under a newer cap
+     * is no answer. Composer installs a release with no php on any PHP. A php that does not parse
+     * is no answer.
      *
      * @return ?array{version: string, branch: string, blocking: ?string}
      */
@@ -61,28 +63,28 @@ final class CappedRule implements SignalRule
     {
         $metadata = $facts->metadata();
         $releases = $metadata === null ? null : $metadata->releasesAbove();
-        $admitting = [];
+        $newestOf = [];
         foreach (self::above($facts->package(), $releases ?? []) as $release) {
             $branch = ReleaseBranch::of($release->normalized());
-            if ($branch !== null && $this->cap->admitsNewest($release->php()) === true) {
-                $admitting[] = [$release, $branch];
+            if ($branch !== null) {
+                $newestOf[$branch] = $release;
             }
         }
-        if ($admitting === []) {
-            return null;
-        }
-        [$newest, $lowest] = $admitting[0];
-        foreach ($admitting as [$release, $branch]) {
-            $newest = $branch === $lowest ? $release : $newest;
+        foreach ($newestOf as $branch => $release) {
+            $php = $release->php();
+            if ($php === null || $php === '' || $this->cap->admitsNewest($php) === true) {
+                return ['version' => $release->pretty(), 'branch' => ReleaseBranch::label((string) $branch), 'blocking' => $this->floor->blocking($php)];
+            }
         }
 
-        return ['version' => $newest->pretty(), 'branch' => ReleaseBranch::label($lowest), 'blocking' => $this->floor->blocking($newest->php())];
+        return null;
     }
 
     /**
      * The releases above the installed one, ascending. Above a snapshot they count from `X.Y.0` of
-     * an `X.Y.x-dev` or branch-aliased snapshot, else from the lock entry's `time`. Counting every
-     * release could name a downgrade, as v0.6.0 below php-http/guzzle5-adapter 2.0.0.
+     * an `X.Y.x-dev` or branch-aliased snapshot. Above a `dev-<name>` snapshot they count from the
+     * lock entry's `time`, on the branch of the highest release dated at or before it or higher.
+     * Counting every release could name a downgrade, as v0.6.0 below php-http/guzzle5-adapter 2.0.0.
      *
      * @param list<StableRelease> $releases {@see \Lockrot\Data\Repository\PackageMetadata::releasesAbove()}
      *
@@ -100,14 +102,37 @@ final class CappedRule implements SignalRule
         }
         $from = self::aliasFrom(array_merge([$installed], $package->aliasVersions()));
         $after = $package->time();
+        $floor = $after === null ? null : self::branchAt($releases, $after);
 
-        return array_filter($releases, static function (StableRelease $release) use ($from, $after): bool {
+        return array_filter($releases, static function (StableRelease $release) use ($from, $after, $floor): bool {
             if ($from !== null) {
                 return Comparator::greaterThanOrEqualTo($release->normalized(), $from);
             }
+            if ($after === null || $release->at() === null || $release->at() <= $after) {
+                return false;
+            }
+            $branch = ReleaseBranch::of($release->normalized());
 
-            return $after !== null && $release->at() !== null && $release->at() > $after;
+            return $floor === null || ($branch !== null && !ReleaseBranch::isAbove($floor, $branch));
         });
+    }
+
+    /**
+     * The branch of the highest release dated at or before $at, null when none is.
+     *
+     * @param list<StableRelease> $releases ascending
+     */
+    private static function branchAt(array $releases, \DateTimeImmutable $at): ?string
+    {
+        $floor = null;
+        foreach ($releases as $release) {
+            $branch = ReleaseBranch::of($release->normalized());
+            if ($branch !== null && $release->at() !== null && $release->at() <= $at) {
+                $floor = $branch;
+            }
+        }
+
+        return $floor;
     }
 
     /**

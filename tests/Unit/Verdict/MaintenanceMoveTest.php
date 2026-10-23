@@ -119,6 +119,21 @@ final class MaintenanceMoveTest extends TestCase
         self::assertSame(self::shape($inside), self::shape($outside));
     }
 
+    /** Composer installs a release that states no php on any PHP, so nothing blocks the move to it. */
+    public function testACappedPackageUpdatesToAReleaseThatStatesNoPhpOnItsBranch(): void
+    {
+        $draft = self::capped(['4.7.1' => '>=7.4, <8.2', '4.18.0' => null], '4.18.0', '4.x', '8.4', '>=7.4');
+
+        self::assertSame([Move::UPDATE, '4.x', null], [$draft->kind(), self::branch($draft), $draft->constraint()]);
+    }
+
+    public function testACappedPackageRequiresAReleaseThatStatesNoPhpOnAHigherBranch(): void
+    {
+        $draft = self::capped(['4.7.1' => '>=7.4, <8.2', '5.0.0' => null], '5.0.0', '5.x', '8.4', '>=7.4');
+
+        self::assertSame([Move::REQUIRE, '5.x', '^5.0.0'], [$draft->kind(), self::branch($draft), $draft->constraint()]);
+    }
+
     public function testACappedPackageWithNoReleaseThatAdmitsTheNewestPhpHasNoMove(): void
     {
         $draft = self::capped(['2.0.0' => '^7.0', '2.1.0' => '^7.0'], null, null, '8.4', null, [], '2.0.0');
@@ -152,7 +167,7 @@ final class MaintenanceMoveTest extends TestCase
     /**
      * The move of a/b when `capped` leads: its S11 names `admits_newest`.
      *
-     * @param array<string, string>  $releases by version, the php that each requires
+     * @param array<string, ?string> $releases by version, the php that each requires, null for none
      * @param array<string, string>  $require  composer.json's `require`
      * @param ?string                $installedPhp the lock entry's `require.php`
      */
@@ -160,7 +175,7 @@ final class MaintenanceMoveTest extends TestCase
     {
         $packages = [];
         foreach ($releases as $version => $php) {
-            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => (string) $version, 'time' => '2025-01-01T00:00:00+00:00', 'require' => ['php' => $php]]);
+            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => (string) $version, 'time' => '2025-01-01T00:00:00+00:00'] + ($php === null ? [] : ['require' => ['php' => $php]]));
             self::assertInstanceOf(BasePackage::class, $release);
             $packages[] = $release;
         }

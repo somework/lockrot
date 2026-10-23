@@ -40,8 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
   `require.php` stops below the newest PHP minor that the project's root php allows. It comes after
   `stale` in flag order, so `--fail-on=stale` and a baseline entry that records `stale` keep their
-  reach. A grade gate at `medium` or `low` can fail on a package that 0.13 passed. Action: run once
-  without a gate. ([Capped](docs/verdicts.md#capped))
+  reach. Its move goes to the newest release of the lowest branch whose newest release admits that
+  PHP or states no php. A grade gate at `medium` or `low` can fail on a package that 0.13 passed.
+  Action: run once without a gate. ([Capped](docs/verdicts.md#capped))
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
   is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
@@ -87,7 +88,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and prints no `update` or `require` step. An `update` step names its constraint inline, and a move
   that needs its dependencies adds `--with-dependencies` or `--with-all-dependencies`. `held_by[]`
   gains the links `root-require`, `platform` and `replace` and the field `target`, and
-  `run.move_check` names the Composer that solved. ([The move check](docs/verdicts.md#the-move-check))
+  `run.move_check` names the Composer that solved. Under `--offline`, a package that composer.json
+  admits at `dev` needs its `~dev` file in Composer's cache, else the move is `not_checked` with
+  `offline`. ([The move check](docs/verdicts.md#the-move-check))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
   installs, with require-dev and without, and the links that set each edge. The minors and edges
   assume no override, and `platform_override` names the lock's `platform-overrides.php`. The text

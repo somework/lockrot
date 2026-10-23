@@ -129,7 +129,7 @@ final class CappedMoveTest extends TestCase
         self::assertStringStartsWith('require a/b ^2.0 — clears capped;', $move->text());
     }
 
-    /** A release that states no php is no answer: the move cannot clear `capped`. */
+    /** With no php on the release, lockrot has no php to test: the move cannot clear `capped`. */
     public function testAMoveToAReleaseThatStatesNoPhpLeavesCappedUnverified(): void
     {
         [$row, $context] = self::context([[Signal::S11, []]], ['2.0.0' => null]);
