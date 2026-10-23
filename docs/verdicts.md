@@ -670,7 +670,9 @@ Limits of the check:
   [stability flag](https://getcomposer.org/doc/04-schema.md#package-links) admits `dev` for the
   package, and so does the check. A move to a dev snapshot is
   not a move that lockrot proposes. With `--offline`, such a package needs its `~dev` file in
-  Composer's cache. Without that file, the move is not checked (`check.reason` `offline`).
+  Composer's cache. Without that file, the move is not checked (`check.reason` `offline`). A
+  repository with v1 `providers` and no `metadata-url` gives the same answer for such a package
+  with no dev version. Packagist and Private Packagist serve `metadata-url`.
 - On Composer 2.9 and later, it removes the versions that an advisory affects, as Composer does in
   an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
   severities and the blocking of abandoned packages. It blocks every name that the update can move,

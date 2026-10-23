@@ -955,7 +955,8 @@ defs['s11'] = sig_data(("S11 (§5.10): the installed release's `require.php` has
     'excludes_target': d('Exactly `installed_php.target_runs` false: no patch of the target minor meets `requires`.', {'type': 'boolean'}),
     'admits_newest': nul(("The newest release of the lowest branch whose newest release admits `newest_php` in its `require.php`, among the stable "
                           "releases above the installed one; above a snapshot, those from X.Y.0 of an `X.Y.x-dev` or aliased snapshot, else those dated "
-                          "after the lock entry's `time`, on the branch of the highest release dated at or before that `time` or on a higher branch. "
+                          "after the lock entry's `time`, on the branch of the highest release dated at or before that `time` or on a higher branch, "
+                          "and every later stable release when no release is dated at or before that `time`. "
                           "Null when none does, or when the release metadata was not read."), obj('A release that admits the newest PHP.', {
         'version': d('The release.', {'type': 'string', 'minLength': 1}),
         'branch': ref('branchLabel'),
