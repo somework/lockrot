@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Signal\Rule;
 
-use Composer\Package\BasePackage;
+use Composer\Package\Link;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\Package;
+use Composer\Semver\Constraint\MatchAllConstraint;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockFile;
 use Lockrot\Signal\PackageFacts;
@@ -117,17 +119,34 @@ final class CappedRuleTest extends TestCase
         self::assertNull(JsonPath::decoded($signal->data())['admits_newest']);
     }
 
-    public function testABranchWhoseNewestReleaseStatesNoPhpGivesWayToTheNextBranch(): void
+    /** Composer installs a release that states no php on any PHP, so 4.18.0 answers for 4.x (case `capped-no-php-newest‡`). */
+    public function testABranchWhoseNewestReleaseStatesNoPhpIsTheAnswerWithNothingBlocking(): void
     {
         $signal = self::rule()->evaluate(self::facts('4.7.1', '>=7.4, <8.2', [['4.17.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0'], ['4.18.0', null], ['5.0.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0']]));
 
         self::assertNotNull($signal);
-        self::assertSame('5.0.0', JsonPath::stringAt(JsonPath::decoded($signal->data()), ['admits_newest', 'version']));
+        self::assertSame(['version' => '4.18.0', 'branch' => '4.x', 'blocking' => null], JsonPath::decoded($signal->data())['admits_newest']);
+    }
+
+    public function testABranchWhoseNewestReleaseStatesAnEmptyPhpIsTheAnswerWithNothingBlocking(): void
+    {
+        $signal = self::rule()->evaluate(self::facts('4.7.1', '>=7.4, <8.2', [['4.17.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0'], ['4.18.0', ''], ['5.0.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0']]));
+
+        self::assertNotNull($signal);
+        self::assertSame(['version' => '4.18.0', 'branch' => '4.x', 'blocking' => null], JsonPath::decoded($signal->data())['admits_newest']);
+    }
+
+    public function testABranchWhoseNewestReleaseStatesAPhpThatDoesNotParseGivesWayToTheNextBranch(): void
+    {
+        $signal = self::rule()->evaluate(self::facts('4.7.1', '>=7.4, <8.2', [['4.17.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0'], ['4.18.0', '>=8.x.y'], ['5.0.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0']]));
+
+        self::assertNotNull($signal);
+        self::assertSame(['version' => '5.0.0', 'branch' => '5.x', 'blocking' => null], JsonPath::decoded($signal->data())['admits_newest']);
     }
 
     public function testNoReleaseAboveTheInstalledOneAdmitsTheNewestPhpAndOneBelowDoesNotCount(): void
     {
-        $signal = self::rule()->evaluate(self::facts('2.0.0', '^7.0', [['0.6.0', '>=5.4'], ['1.0.0', '>=5.5'], ['2.0.0', '^7.0'], ['2.1.0', '^7.0'], ['2.2.0', null]]));
+        $signal = self::rule()->evaluate(self::facts('2.0.0', '^7.0', [['0.6.0', '>=5.4'], ['1.0.0', '>=5.5'], ['2.0.0', '^7.0'], ['2.1.0', '^7.0'], ['2.2.0', '^7.1']]));
 
         self::assertNotNull($signal);
         self::assertNull(JsonPath::decoded($signal->data())['admits_newest']);
@@ -295,8 +314,12 @@ final class CappedRuleTest extends TestCase
         $packages = [];
         foreach ($releases as $release) {
             $date = \array_key_exists(2, $release) ? $release[2] : '2024-01-01';
-            $package = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $release[0]] + ($date === null ? [] : ['time' => $date.'T00:00:00+00:00']) + ($release[1] === null ? [] : ['require' => ['php' => $release[1]]]));
-            self::assertInstanceOf(BasePackage::class, $package);
+            $package = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $release[0]] + ($date === null ? [] : ['time' => $date.'T00:00:00+00:00']));
+            self::assertInstanceOf(Package::class, $package);
+            if ($release[1] !== null) {
+                // The written php reaches the rule even when Composer's loader refuses it: '' or '>=8.x.y'.
+                $package->setRequires(['php' => new Link('a/b', 'php', new MatchAllConstraint(), Link::TYPE_REQUIRE, $release[1])]);
+            }
             $packages[] = $package;
         }
 

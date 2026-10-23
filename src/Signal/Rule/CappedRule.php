@@ -52,9 +52,10 @@ final class CappedRule implements SignalRule
     }
 
     /**
-     * The newest release of the lowest branch whose newest release admits R. Composer installs a
-     * branch's newest release, so an older one that admits R under a newer cap is no answer. A
-     * release that states no php is no answer either.
+     * The newest release of the lowest branch whose newest release admits R or states no php.
+     * Composer installs a branch's newest release, so an older one that admits R under a newer cap
+     * is no answer. Composer installs a release with no php on any PHP. A php that does not parse
+     * is no answer.
      *
      * @return ?array{version: string, branch: string, blocking: ?string}
      */
@@ -70,8 +71,9 @@ final class CappedRule implements SignalRule
             }
         }
         foreach ($newestOf as $branch => $release) {
-            if ($this->cap->admitsNewest($release->php()) === true) {
-                return ['version' => $release->pretty(), 'branch' => ReleaseBranch::label((string) $branch), 'blocking' => $this->floor->blocking($release->php())];
+            $php = $release->php();
+            if ($php === null || $php === '' || $this->cap->admitsNewest($php) === true) {
+                return ['version' => $release->pretty(), 'branch' => ReleaseBranch::label((string) $branch), 'blocking' => $this->floor->blocking($php)];
             }
         }
 
