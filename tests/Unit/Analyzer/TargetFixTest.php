@@ -156,7 +156,7 @@ final class TargetFixTest extends TestCase
         self::assertSame(['not_checked', 'unloaded_name'], [$fix['check'], $fix['reason']]);
     }
 
-    /** Ruling T5: the baseline's reason wins over `unloaded_name`, which applies only where a solve would run. */
+    /** Ruling T5: the baseline's reason wins over `unloaded_name`, which applies only when a solve can run. */
     public function testABaselineThatWasNotCheckedGivesItsReasonOverAnInvalidListedName(): void
     {
         $lock = ['packages' => [['name' => '--with-all-dependencies', 'version' => '1.0.0', 'require' => ['php' => '<8.4']]], 'packages-dev' => []];

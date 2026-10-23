@@ -55,7 +55,7 @@ final class TargetFix
             return array_replace($fix, ['reason' => $baseline->reason()]);
         }
         // Composer and the move check name a package in lower case. The command keeps the lock's spelling.
-        $lower = array_values(array_unique(array_map('strtolower', $names)));
+        $lower = array_map('strtolower', $names);
         if (array_intersect($lower, $skippedNames) !== []) {
             return array_replace($fix, ['reason' => MoveCheck::UNLOADED_NAME]);
         }

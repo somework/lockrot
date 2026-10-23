@@ -751,8 +751,8 @@ it. It also gives the answer of Composer's solver:
   runs at the target. Before you run the command, set `config.platform.php` to your release of the
   target PHP. The lock's `platform-overrides` does not set it.
 - A listed name that is no Composer package name reaches no solve. `check` is then `not_checked`
-  with the reason `unloaded_name`. When the move check could not check its baseline, the
-  baseline's reason wins.
+  with the reason `unloaded_name`. When the move check does not check its baseline, `reason` is
+  the reason of the baseline, not `unloaded_name`.
 
 `target_fix` is null when the window admits the target, and when the target lies below the lowest
 edge of the set that `target.inside` reads. No update of a package can lower that edge.
