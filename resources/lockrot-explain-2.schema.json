@@ -17009,7 +17009,7 @@
                     "type": "boolean"
                 },
                 "admits_newest": {
-                    "description": "The newest release of the lowest branch whose newest release admits `newest_php` in its `require.php`, among the stable releases above the installed one; above a snapshot, those from X.Y.0 of an `X.Y.x-dev` or aliased snapshot, else those dated after the lock entry's `time`, on the branch of the highest release dated at or before that `time` or on a higher branch, and every later stable release when no release is dated at or before that `time`. Null when none does, or when the release metadata was not read.",
+                    "description": "The newest release of the lowest branch whose newest release admits `newest_php` in its `require.php`. It reads the stable releases above the installed one. Above an `X.Y.x-dev` or aliased snapshot, they count from X.Y.0. Above a `dev-<name>` snapshot, the releases dated after the lock entry's `time` count. Of those, a release counts on the branch of the highest release dated at or before that `time`, or on a higher branch. With no release dated at or before that `time`, every later release counts. Null when none does, or when the release metadata was not read.",
                     "oneOf": [
                         {
                             "description": "A release that admits the newest PHP.",

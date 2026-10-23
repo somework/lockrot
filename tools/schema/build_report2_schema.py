@@ -953,11 +953,11 @@ defs['s11'] = sig_data(("S11 (§5.10): the installed release's `require.php` has
     'requires': d("The installed release's `require.php`, as `installed_php.requires`.", {'type': 'string', 'minLength': 1}),
     'stops_at': d('The newest known PHP minor that `requires` admits.', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}),
     'excludes_target': d('Exactly `installed_php.target_runs` false: no patch of the target minor meets `requires`.', {'type': 'boolean'}),
-    'admits_newest': nul(("The newest release of the lowest branch whose newest release admits `newest_php` in its `require.php`, among the stable "
-                          "releases above the installed one; above a snapshot, those from X.Y.0 of an `X.Y.x-dev` or aliased snapshot, else those dated "
-                          "after the lock entry's `time`, on the branch of the highest release dated at or before that `time` or on a higher branch, "
-                          "and every later stable release when no release is dated at or before that `time`. "
-                          "Null when none does, or when the release metadata was not read."), obj('A release that admits the newest PHP.', {
+    'admits_newest': nul(("The newest release of the lowest branch whose newest release admits `newest_php` in its `require.php`. It reads the "
+                          "stable releases above the installed one. Above an `X.Y.x-dev` or aliased snapshot, they count from X.Y.0. Above a "
+                          "`dev-<name>` snapshot, the releases dated after the lock entry's `time` count. Of those, a release counts on the branch "
+                          "of the highest release dated at or before that `time`, or on a higher branch. With no release dated at or before that "
+                          "`time`, every later release counts. Null when none does, or when the release metadata was not read."), obj('A release that admits the newest PHP.', {
         'version': d('The release.', {'type': 'string', 'minLength': 1}),
         'branch': ref('branchLabel'),
         'blocking': nul("What holds the release back: `project` (the project's lowest PHP is outside its `require.php`), `target` (no patch of the target minor is inside it); null when nothing does. Closed.",
