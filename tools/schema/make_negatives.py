@@ -846,6 +846,9 @@ def _(d): del d['run']['php_window']['target_fix']['platform_step']
 def _(d): d['run']['php_window']['target_fix']['platform_step'] = 'yes'
 @case('target-fix-root-ceiling-platform-hold', 'E', 'run.php_window.target_fix')
 def _(d): d['run']['php_window']['target_fix']['held_by'][0]['link'] = 'platform'
+# a run that checks no move names no reason for a fix that is not checked
+@case('target-fix-reason-without-move-check', 'routing', 'run')
+def _(d): d['run']['php_window']['target_fix']['reason'] = 'offline'
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
