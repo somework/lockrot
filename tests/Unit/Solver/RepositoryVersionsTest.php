@@ -171,6 +171,22 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([null, VersionSource::BUDGET], [$versions->failure('acme/lib'), $versions->failure('acme/next')]);
     }
 
+    public function testAFailedRequestKeepsTheVersionsThatEveryEarlierRepositoryLoaded(): void
+    {
+        $clock = new class () {
+            public float $now = 0.0;
+        };
+        $third = self::recording([], ['acme/next'], static function () use ($clock): void {
+            $clock->now = 10.0;
+        });
+        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['1.0.0']]), self::recording(['acme/other' => ['2.0.0']]), $third], [], false, Deadline::inSeconds(5.0, static fn (): float => $clock->now), 'stable', []);
+
+        $loaded = $versions->versionsOf(['acme/lib', 'acme/other', 'acme/next']);
+
+        self::assertSame(['acme/lib' => ['1.0.0'], 'acme/other' => ['2.0.0'], 'acme/next' => []], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+        self::assertSame([null, null, VersionSource::BUDGET], [$versions->failure('acme/lib'), $versions->failure('acme/other'), $versions->failure('acme/next')]);
+    }
+
     public function testANameThatLoadsAloneUnderAStableRootLoadsItsDevVersionsOnlyWithoutATag(): void
     {
         $versions = new RepositoryVersions([self::recording(['acme/tagged' => ['1.0.0', 'dev-main'], 'acme/branch' => ['dev-main']], ['acme/bad'])], [], false, Deadline::never(), 'stable', []);
