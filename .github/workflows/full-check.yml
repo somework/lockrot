@@ -10,6 +10,9 @@ name: full-check
 on:
   push:
     branches: ['release/full-check-**']
+# No job of this workflow writes to the repository: the token reads only.
+permissions:
+  contents: read
 jobs:
   subset:
     runs-on: ubuntu-latest
