@@ -237,7 +237,8 @@ function lineChanges(string $base, string $head, array $allowed): array
         }
     }
     foreach ($unmatched as $prefix => $lines) {
-        foreach (array_slice($lines, count(array_keys($added, $prefix, true))) as $line) {
+        // A numeric prefix is an integer key here and a string in $added.
+        foreach (array_slice($lines, count(array_keys($added, (string) $prefix, true))) as $line) {
             $dropped[] = '- '.$line;
         }
     }
@@ -252,7 +253,7 @@ function lineChanges(string $base, string $head, array $allowed): array
     return [$added, array_merge($other === [] ? ['the lines are reordered'] : $other, $dropped)];
 }
 
-/** The cases of lineChanges() with the prefix `php: `: exit 0 when each gives its expected changes, else 1. */
+/** The cases of lineChanges(), with the prefix `php: ` unless a case names its own: exit 0 when each gives its expected changes, else 1. */
 function selftest(): int
 {
     $cases = [
@@ -262,10 +263,12 @@ function selftest(): int
         'a second copy of an allowed line' => ["php: x", "php: x\nphp: x", [['php: '], []]],
         'a dropped allowed line' => ["a\nphp: x\nb", "a\nb", [[], ['- php: x']]],
         'a changed line outside the prefix' => ["a\nb", "a\nc", [[], ['+ c', '- b']]],
+        'a changed line of a numeric prefix' => ["a\n0a", "a\n0b", [['0'], []], ['0']],
     ];
     $failed = 0;
-    foreach ($cases as $name => [$base, $head, $expected]) {
-        $actual = lineChanges($base, $head, ['php: ']);
+    foreach ($cases as $name => $case) {
+        [$base, $head, $expected] = $case;
+        $actual = lineChanges($base, $head, $case[3] ?? ['php: ']);
         if ($actual !== $expected) {
             ++$failed;
             fwrite(STDERR, sprintf("expected-diff selftest: %s: expected %s, got %s\n", $name, json_encode($expected), json_encode($actual)));
