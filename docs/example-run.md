@@ -1287,6 +1287,13 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [],
         "not_applied": [],
         "text": "gate: off · --fail-on=none (default) · target php 8.4 (--target-php)"
