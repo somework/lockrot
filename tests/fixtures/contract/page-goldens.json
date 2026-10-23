@@ -19205,6 +19205,1110 @@
       },
       "sheet_ladder": {}
     },
+    "drupal-site": {
+      "document": "contract/page/drupal-site.json",
+      "title": "lockrot: 55 of 97 packages flagged",
+      "description": "lockrot flagged 55 of 97 packages in composer.lock: 2 critical, 18 high, 30 medium, 5 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for drunomics/lupus-nuxtjs-drupal-stack-example · data as of 2026-10-22 · lockrot 0.14.0 · score model 1 · target PHP 8.3 · this run fails · --fail-on=high",
+        "55 of 97 packages flagged (57%): 2 graded critical, 18 high, 30 medium, 5 low. Flags: abandoned 5, silent 1, left-behind 38, old-promise 8, stale 1, capped 4, vulnerable 16.",
+        "All 55 in production · 4 required directly, 51 pulled in · 122 security advisories on 16 packages (severity: 4 critical, 18 high, 40 medium, 43 unrated, 17 low) · fix by package: 1 composer update, 15 upgrade · 358.1 libyears behind."
+      ],
+      "grade_line": "Project grade: critical · 2 critical findings · 20 of 97 packages high or worse",
+      "figure_line": "55 of 97 packages flagged · 29 ok · 13 allowlisted",
+      "load_line": "664 points on 55 flagged packages · 392 (59 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 20,
+      "state_lines": [
+        "PHP: this lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded · 4 packages exclude 8.3: laminas/laminas-diactoros, laminas/laminas-escaper, laminas/laminas-feed and 1 more · Composer's solver at PHP 8.3 refuses their update: composer.json requires drupal/core-recommended ^9.3 and composer.json requires drupal/trusted_redirect ^1.9 and drupal/core 9.3.14 requires laminas/laminas-diactoros ^2.1 and drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 and drupal/trusted_redirect 1.9.0 requires drupal/core ^8 || ^9. The PHP window"
+      ],
+      "waffle_caption": "55 of 97 packages flagged · 29 ok · 13 allowlisted",
+      "lead_scope": "all 55 in production · 4 required directly, 51 pulled in",
+      "grade_chips": [
+        "critical 2",
+        "high 18",
+        "medium 30",
+        "low 5"
+      ],
+      "waffle": [
+        {
+          "verdict": "critical",
+          "word": "critical",
+          "mark": "fill",
+          "count": 2
+        },
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 18
+        },
+        {
+          "verdict": "medium",
+          "word": "medium",
+          "mark": "fill",
+          "count": 30
+        },
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 5
+        },
+        {
+          "verdict": "finished",
+          "word": "allowlisted",
+          "mark": "ring-dot",
+          "count": 13
+        },
+        {
+          "verdict": "ok",
+          "word": "ok",
+          "mark": "soft",
+          "count": 29
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": "11 of 20 findings that fail the gate are held by other packages. Their holders are in each sheet's Held by.",
+        "held_link": "#view=findings&gate=fails%2Cheld",
+        "held_link_rows": 11,
+        "way_out": "9 need another way out: 3 replace, 3 find an alternative, 3 not checked: Composer refuses the lock itself",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 9,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": "122",
+        "unit": "advisories on 16 packages",
+        "lookup_complete": true,
+        "counted_as": [
+          "unrated, counted as medium"
+        ]
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "critical",
+            "package": "drupal/core",
+            "link": "#view=findings&pkg=drupal%2Fcore",
+            "reach": "transitive",
+            "total": 40,
+            "terms": "left-behind 8 · vulnerable 32",
+            "terms_total": null
+          },
+          {
+            "grade": "critical",
+            "package": "twig/twig",
+            "link": "#view=findings&pkg=twig%2Ftwig",
+            "reach": "transitive",
+            "total": 32,
+            "terms": "vulnerable 32",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "guzzlehttp/guzzle",
+            "link": "#view=findings&pkg=guzzlehttp%2Fguzzle",
+            "reach": "transitive",
+            "total": 24,
+            "terms": "left-behind 8 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "symfony/http-foundation",
+            "link": "#view=findings&pkg=symfony%2Fhttp-foundation",
+            "reach": "transitive",
+            "total": 24,
+            "terms": "left-behind 8 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "symfony/process",
+            "link": "#view=findings&pkg=symfony%2Fprocess",
+            "reach": "transitive",
+            "total": 24,
+            "terms": "left-behind 8 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "laminas/laminas-diactoros",
+            "link": "#view=findings&pkg=laminas%2Flaminas-diactoros",
+            "reach": "transitive",
+            "total": 20,
+            "terms": "capped 4 · vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "stack/builder",
+            "link": "#view=findings&pkg=stack%2Fbuilder",
+            "reach": "transitive",
+            "total": 18,
+            "terms": "abandoned 16 · old-promise 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "webmozart/path-util",
+            "link": "#view=findings&pkg=webmozart%2Fpath-util",
+            "reach": "transitive",
+            "total": 18,
+            "terms": "abandoned 16 · old-promise 2",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "drupal/core-recommended",
+            "link": "#view=findings&pkg=drupal%2Fcore-recommended",
+            "reach": "",
+            "total": 16,
+            "terms": "vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "symfony/mime",
+            "link": "#view=findings&pkg=symfony%2Fmime",
+            "reach": "transitive",
+            "total": 16,
+            "terms": "vulnerable 16",
+            "terms_total": null
+          }
+        ],
+        "rest": "45 more flagged packages hold 432 points",
+        "rest_link": "#view=findings"
+      },
+      "flags_notes": [
+        "18 carry more than one flag · score model 1",
+        "5 abandoned packages, 3 with a replacement",
+        "Accepted by the allowlist: left-behind 1"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 55"
+        ],
+        "rows": [
+          {
+            "package": "drupal/lupus_ce_renderer",
+            "flagged": 36,
+            "link": "#view=radius&pkg=drupal%2Flupus_ce_renderer"
+          },
+          {
+            "package": "drupal/admin_toolbar",
+            "flagged": 35,
+            "link": "#view=radius&pkg=drupal%2Fadmin_toolbar"
+          },
+          {
+            "package": "drupal/core-recommended",
+            "flagged": 35,
+            "link": "#view=radius&pkg=drupal%2Fcore-recommended"
+          },
+          {
+            "package": "drupal/paragraphs",
+            "flagged": 35,
+            "link": "#view=radius&pkg=drupal%2Fparagraphs"
+          },
+          {
+            "package": "drupal/pathauto",
+            "flagged": 35,
+            "link": "#view=radius&pkg=drupal%2Fpathauto"
+          },
+          {
+            "package": "drupal/rest_menu_items",
+            "flagged": 35,
+            "link": "#view=radius&pkg=drupal%2Frest_menu_items"
+          },
+          {
+            "package": "drupal/trusted_redirect",
+            "flagged": 35,
+            "link": "#view=radius&pkg=drupal%2Ftrusted_redirect"
+          },
+          {
+            "package": "drush/drush",
+            "flagged": 25,
+            "link": "#view=radius&pkg=drush%2Fdrush"
+          }
+        ],
+        "count": "8 direct requirements pull in flagged packages.",
+        "overlap": "A flagged package counts under each direct requirement it is reached from, up to 8, so the rows overlap.",
+        "more": null,
+        "shared": null
+      },
+      "depth": {
+        "rows": [
+          "in composer.json 4",
+          "1 hop away 46",
+          "2 hops away 5"
+        ],
+        "sentence": "51 of 55 flagged packages are named by no line of composer.json; the deepest, consolidation/log, consolidation/self-update, dflydev/dot-access-data and 2 more, sit 2 hops from the nearest line."
+      },
+      "libyears": {
+        "figure": "358.05",
+        "bound": "at least",
+        "sub": "over 82 packages · 11.92 from direct requirements",
+        "unmeasured": "Not measured: 4 dated only by a commit its tags share · 11 no date",
+        "top": [
+          [
+            "grasmash/yaml-expander 1.4.0",
+            "8.5",
+            "4.0.0 (2026-06-11)"
+          ],
+          [
+            "grasmash/expander 1.0.0",
+            "8.5",
+            "4.0.0 (2026-06-11)"
+          ],
+          [
+            "dflydev/dot-access-data v1.1.0",
+            "7.5",
+            "v3.0.3 (2024-07-08)"
+          ],
+          [
+            "consolidation/config 1.2.1",
+            "7.1",
+            "3.2.1 (2026-03-28)"
+          ],
+          [
+            "consolidation/filter-via-dot-access-data 1.0.0",
+            "6.8",
+            "2.0.3 (2025-11-14)"
+          ],
+          [
+            "psr/http-message 1.0.1",
+            "6.7",
+            "2.0 (2023-04-04)"
+          ],
+          [
+            "doctrine/lexer 1.2.1",
+            "6.3",
+            "3.0.3 (2026-10-01)"
+          ],
+          [
+            "asm89/stack-cors 1.3.0",
+            "6.1",
+            "v2.4.0 (2026-01-28)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "critical",
+          "count": "2 packages",
+          "gate": "all fail the gate",
+          "major": "2 of 2 moves cross a major"
+        },
+        {
+          "grade": "high",
+          "count": "18 packages",
+          "gate": "all fail the gate",
+          "major": "10 of 12 moves cross a major"
+        },
+        {
+          "grade": "medium",
+          "count": "30 packages",
+          "gate": null,
+          "major": "28 of 30 moves cross a major"
+        },
+        {
+          "grade": "low",
+          "count": "5 packages",
+          "gate": null,
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "drupal/core",
+          "fails_gate": true,
+          "reach": "via drupal/admin_toolbar and 6 more",
+          "held": "held by drupal/core-recommended and 11 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "twig/twig",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 7 more",
+          "held": "held by drupal/core and 2 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 7 more",
+          "held": "held by drupal/core and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/http-foundation",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/process",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 7 more",
+          "held": "held by drupal/core and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "laminas/laminas-diactoros",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core and 1 more",
+          "command": null,
+          "after": "after it: 4, low, if Composer resolves it",
+          "major": null,
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "drupal/core-recommended",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'drupal/core-recommended:^10.3.9'",
+          "after": "after it: 0, finished, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/mime",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core-recommended",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": null,
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "guzzlehttp/psr7",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 7 more",
+          "held": "held by drupal/core-recommended and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "psy/psysh",
+          "fails_gate": true,
+          "reach": "via drush/drush",
+          "held": "held by drush/drush",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new 0.x line",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/routing",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/yaml",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 7 more",
+          "held": "held by drupal/core and 3 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "stack/builder",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "webmozart/path-util",
+          "fails_gate": true,
+          "reach": "via drush/drush",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "composer/installers",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'composer/installers:^2.3'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "drush/drush",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by your composer.json",
+          "command": "composer require 'drush/drush:^13.8'",
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "doctrine/annotations",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "doctrine/reflection",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "pear/console_getopt",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/debug",
+          "fails_gate": true,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "drupal/paragraphs",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'drupal/paragraphs:^1.21.0'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/http-kernel",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core-recommended",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": null,
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/validator",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "asm89/stack-cors",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "consolidation/config",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by drush/drush and 3 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "consolidation/filter-via-dot-access-data",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by drush/drush",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "dflydev/dot-access-data",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by consolidation/config and 3 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "grasmash/expander",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by consolidation/config",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "grasmash/yaml-expander",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by drush/drush",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "chi-teck/drupal-code-generator",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by drush/drush",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "consolidation/log",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by consolidation/robo",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "consolidation/robo",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by drush/drush",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "consolidation/self-update",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by consolidation/robo",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "consolidation/site-alias",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by drush/drush and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "consolidation/site-process",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by drush/drush",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "doctrine/lexer",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by doctrine/annotations and 2 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "drunomics/service-utils",
+          "fails_gate": false,
+          "reach": "via drupal/lupus_ce_renderer",
+          "held": null,
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "egulias/email-validator",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "guzzlehttp/promises",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 7 more",
+          "held": "held by drupal/core-recommended and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "league/container",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by drush/drush and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony-cmf/routing",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/console",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 7 more",
+          "held": "held by drupal/core and 11 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/dependency-injection",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/error-handler",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core-recommended and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/event-dispatcher",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 7 more",
+          "held": "held by drupal/core and 6 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/event-dispatcher-contracts",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 7 more",
+          "held": "held by drupal/core-recommended and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/filesystem",
+          "fails_gate": false,
+          "reach": "via drush/drush",
+          "held": "held by chi-teck/drupal-code-generator and 2 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/psr-http-message-bridge",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/serializer",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/translation",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core and 2 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": "a new major",
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 7 more",
+          "held": "held by drupal/core-recommended",
+          "command": null,
+          "after": "after it: 0, finished, if Composer resolves it",
+          "major": null,
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "laminas/laminas-escaper",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core-recommended",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": null,
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "laminas/laminas-feed",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core-recommended",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": null,
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "laminas/laminas-stdlib",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": "held by drupal/core-recommended",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": null,
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "pear/pear_exception",
+          "fails_gate": false,
+          "reach": "via drupal/core-recommended and 6 more",
+          "held": null,
+          "command": null,
+          "after": null,
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 11,
+        "wayout": 9
+      },
+      "data_caption": "Every row has data as of 2026-10-22",
+      "data_column": false,
+      "signals_key": [
+        "S1 marked abandoned",
+        "S2 release age",
+        "S3 archived repository",
+        "S4 repository activity",
+        "S5 PHP promise",
+        "S7 pulled-in packages",
+        "S8 release branch",
+        "S9 advisories",
+        "S10 unchecked",
+        "S11 PHP cap"
+      ],
+      "advisory_groups": [
+        {
+          "package": "drupal/core",
+          "same_cve_as": [
+            "SA-CORE-2022-012: same CVE as PKSA-hy6y-p19f-b5kf",
+            "SA-CORE-2022-013: same CVE as PKSA-gkkw-qh7h-5181",
+            "SA-CORE-2022-014: same CVE as PKSA-7q72-qds7-4xyv",
+            "SA-CORE-2022-015: same CVE as PKSA-4j5n-cxxv-ptjc",
+            "SA-CORE-2023-005: same CVE as PKSA-h7d4-5mdz-2965",
+            "SA-CORE-2023-006: same CVE as PKSA-my7h-svxh-5q3g",
+            "SA-CORE-2024-003: same CVE as PKSA-yjvc-rnsz-8n3c",
+            "SA-CORE-2024-004: same CVE as PKSA-ts55-c66h-g96n",
+            "SA-CORE-2024-007: same CVE as PKSA-g51h-n1x3-mszr",
+            "SA-CORE-2024-008: same CVE as PKSA-xd2s-f2mt-7tf3",
+            "SA-CORE-2025-001: same CVE as PKSA-s1zc-gcfk-ddw5",
+            "SA-CORE-2025-002: same CVE as PKSA-s6zc-mws4-ngh4",
+            "SA-CORE-2025-003: same CVE as PKSA-ctyc-dmct-npkz",
+            "SA-CORE-2025-006: same CVE as PKSA-xj83-g6g8-41vf",
+            "SA-CORE-2026-001: same CVE as PKSA-7kyj-yy4m-jzhv",
+            "SA-CORE-2026-002: same CVE as PKSA-j351-xv4b-pryh",
+            "SA-CORE-2026-004: same CVE as PKSA-h76q-q9b2-4kdc",
+            "PKSA-42zc-x5ss-z64p: same CVE as SA-CORE-2025-004",
+            "PKSA-bn52-vyzy-rmnm: same CVE as SA-CORE-2025-005",
+            "PKSA-d8tb-wwz2-ctxk: same CVE as SA-CORE-2025-008",
+            "PKSA-dh1f-zjm5-qg8y: same CVE as SA-CORE-2025-007",
+            "PKSA-jthw-vxjy-kxnx: same CVE as SA-CORE-2024-006"
+          ],
+          "fix_notes": [
+            "held by drupal/core-recommended and 11 more",
+            "held by drupal/core-recommended and 1 more",
+            "held by drupal/core-recommended"
+          ]
+        },
+        {
+          "package": "twig/twig",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drupal/core and 2 more",
+            "held by drupal/core-recommended"
+          ]
+        },
+        {
+          "package": "guzzlehttp/guzzle",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drupal/core-recommended",
+            "held by drupal/core and 1 more"
+          ]
+        },
+        {
+          "package": "symfony/http-foundation",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drupal/core and 1 more"
+          ]
+        },
+        {
+          "package": "symfony/process",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drupal/core and 1 more"
+          ]
+        },
+        {
+          "package": "laminas/laminas-diactoros",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drupal/core-recommended"
+          ]
+        },
+        {
+          "package": "drupal/core-recommended",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by your composer.json"
+          ]
+        },
+        {
+          "package": "symfony/mime",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drupal/core-recommended"
+          ]
+        },
+        {
+          "package": "guzzlehttp/psr7",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drupal/core-recommended and 1 more",
+            "held by drupal/core-recommended"
+          ]
+        },
+        {
+          "package": "psy/psysh",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drush/drush"
+          ]
+        },
+        {
+          "package": "symfony/routing",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drupal/core and 1 more"
+          ]
+        },
+        {
+          "package": "symfony/yaml",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drupal/core and 3 more"
+          ]
+        },
+        {
+          "package": "drupal/paragraphs",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/http-kernel",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drupal/core-recommended"
+          ]
+        },
+        {
+          "package": "symfony/validator",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drupal/core and 1 more"
+          ]
+        },
+        {
+          "package": "symfony/polyfill-intl-idn",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by drupal/core-recommended"
+          ]
+        }
+      ],
+      "run_notes": [
+        "Repository activity not checked for 11 packages on hosts lockrot cannot ask: git.drupalcode.org (11). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.",
+        "moves not checked: Composer's solver refuses the lock itself at php 8.3.99, so it would refuse every move: laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0."
+      ],
+      "php_line": "php: the lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded; Composer's solver at PHP 8.3 refuses the update of the 4 packages that exclude it: composer.json requires drupal/core-recommended ^9.3 and composer.json requires drupal/trusted_redirect ^1.9 and drupal/core 9.3.14 requires laminas/laminas-diactoros ^2.1 and drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 and drupal/trusted_redirect 1.9.0 requires drupal/core ^8 || ^9",
+      "php_rows": [
+        "PHP window, with require-dev: 7.3 to 8.1 · lowest 7.3.0, set by drupal/core >=7.3.0, drupal/core-composer-scaffold >=7.3.0, drupal/core-project-message >=7.3.0 and 4 more · 8.2 excluded by laminas/laminas-diactoros ^7.3 || ~8.0.0 || ~8.1.0, laminas/laminas-escaper ^7.3 || ~8.0.0 || ~8.1.0, laminas/laminas-feed ^7.3 || ~8.0.0 || ~8.1.0 and 1 more",
+        "PHP window, without require-dev: 7.3 to 8.1 · lowest 7.3.0, set by drupal/core >=7.3.0, drupal/core-composer-scaffold >=7.3.0, drupal/core-project-message >=7.3.0 and 4 more · 8.2 excluded by laminas/laminas-diactoros ^7.3 || ~8.0.0 || ~8.1.0, laminas/laminas-escaper ^7.3 || ~8.0.0 || ~8.1.0, laminas/laminas-feed ^7.3 || ~8.0.0 || ~8.1.0 and 1 more"
+      ],
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
+    },
     "empty-lock": {
       "document": "report-2/moodle-v3.json",
       "title": "lockrot: composer.lock holds no package",
