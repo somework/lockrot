@@ -6,9 +6,10 @@ declare(strict_types=1);
 // with the recorded answers of tests/fixtures/corpus/cache/ and one clock. It fails on any change outside its allow list.
 //
 //   php tools/corpus/expected-diff.php <base commit> [--allow <json path>]... [--allow-line <prefix>]...
+//   php tools/corpus/expected-diff.php --selftest
 //
 // Each `--allow` names a JSON path of report-2 that may differ, as an fnmatch() pattern, and each `--allow-line` the
-// prefix of a text line that this checkout may add or change. Findings are compared by package (`findings.<package>.…`), so a
+// prefix of a text line that this checkout may add or change, but not drop. Findings are compared by package (`findings.<package>.…`), so a
 // finding that a change grades does not move the others. Every other difference of the json document and of the table, markdown and github outputs fails
 // the run with exit 1. The base is a `git archive` of the commit with this checkout's vendor/ beside it, so both sides run
 // the same dependencies. Both sides run bin/lockrot, the move check included.
@@ -26,6 +27,9 @@ const OPTIONS = ['--target-php=8.4', '--all', '--fail-on=high'];
 const TEXT = ['table' => 'table.txt', 'markdown' => 'report.md', 'github' => 'github.txt'];
 
 $argv = $_SERVER['argv'];
+if (($argv[1] ?? '') === '--selftest') {
+    exit(selftest());
+}
 $base = $argv[1] ?? '';
 $allowPaths = [];
 $allowLines = [];
@@ -223,13 +227,51 @@ function lineChanges(string $base, string $head, array $allowed): array
             $added[] = $prefix;
         }
     }
+    // A base line of an allowed prefix that the head lacks is changed while the head adds a line of that prefix, else dropped.
+    $dropped = [];
+    $unmatched = [];
+    foreach ($baseAllowed as $line => $count) {
+        $prefix = (string) $prefixOf($line);
+        for (; $count > 0; --$count) {
+            $unmatched[$prefix][] = $line;
+        }
+    }
+    foreach ($unmatched as $prefix => $lines) {
+        foreach (array_slice($lines, count(array_keys($added, $prefix, true))) as $line) {
+            $dropped[] = '- '.$line;
+        }
+    }
     if ($kept === $baseLines) {
-        return [$added, []];
+        return [$added, $dropped];
     }
     $other = [];
     foreach (array_merge(array_diff($kept, $baseLines), array_diff($baseLines, $kept)) as $line) {
         $other[] = (in_array($line, $kept, true) ? '+ ' : '- ').$line;
     }
 
-    return [$added, $other === [] ? ['the lines are reordered'] : $other];
+    return [$added, array_merge($other === [] ? ['the lines are reordered'] : $other, $dropped)];
+}
+
+/** The cases of lineChanges() with the prefix `php: `: exit 0 when each gives its expected changes, else 1. */
+function selftest(): int
+{
+    $cases = [
+        'an unchanged allowed line' => ["a\nphp: x\nb", "a\nphp: x\nb", [[], []]],
+        'a changed allowed line' => ["a\nphp: x\nb", "a\nphp: y\nb", [['php: '], []]],
+        'an added allowed line' => ["a\nb", "a\nphp: y\nb", [['php: '], []]],
+        'a second copy of an allowed line' => ["php: x", "php: x\nphp: x", [['php: '], []]],
+        'a dropped allowed line' => ["a\nphp: x\nb", "a\nb", [[], ['- php: x']]],
+        'a changed line outside the prefix' => ["a\nb", "a\nc", [[], ['+ c', '- b']]],
+    ];
+    $failed = 0;
+    foreach ($cases as $name => [$base, $head, $expected]) {
+        $actual = lineChanges($base, $head, ['php: ']);
+        if ($actual !== $expected) {
+            ++$failed;
+            fwrite(STDERR, sprintf("expected-diff selftest: %s: expected %s, got %s\n", $name, json_encode($expected), json_encode($actual)));
+        }
+    }
+    fwrite(STDOUT, sprintf("expected-diff selftest: %d cases, %d failed\n", count($cases), $failed));
+
+    return $failed === 0 ? 0 : 1;
 }
