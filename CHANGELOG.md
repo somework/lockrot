@@ -109,9 +109,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   words below it. Without it an entry accepts them all.
   ([The allowlist](docs/configuration.md#the-allowlist))
 - **All formats:** a `gate:` line says whether the run fails, which `--fail-on` value and source
-  decided it, and how many findings fail each value. json writes `gate.text`, `gate.failing_by` and
-  `gate.not_applied`. A failing run that writes json, sarif, gitlab or html to stdout also prints
-  `lockrot: gate: …` on stderr. Read stdout alone (do not merge `2>&1`).
+  decided it, and how many findings fail each value. json writes the `gate` keys `text`,
+  `failing_by`, `standing`, `failing_packages` and `not_applied`. A failing run that writes json,
+  sarif, gitlab or html to stdout also prints `lockrot: gate: …` on stderr. Read stdout alone,
+  without `2>&1`.
   ([Reading the gate line](docs/ci.md#reading-the-gate-line))
 - **Config, json:** `extra.lockrot.accept-unchecked` accepts a check that lockrot did not run (a
   host it cannot ask, no advisory feed, a package from vcs or an unknown origin) by host,

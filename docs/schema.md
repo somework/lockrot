@@ -324,6 +324,8 @@ findings, by what `run` says.
 | `tripped_by` | array | Each cause once: `strict_network` (it was on and `network_failures` is true) and `fail_on` (some finding's `gate.fails` is true). Empty exactly when `fails` is false. An open set |
 | `fail_on_applied` | boolean | True in a `check` run. False in a `generate_baseline` run, which only `--strict-network` can fail |
 | `reaching`, `failing`, `exempt` | | How many findings reach a value, fail it, and are exempt by the baseline (`exempt.baseline`) |
+| `standing` | object | `{known, new, worsened, none}`: the findings that reach a value, by their `baseline.status`. `none` counts a null `baseline`. The four counts add up to `reaching` |
+| `failing_packages` | array | The `package` of each finding whose `gate.fails` is true, in `findings` order. It holds `failing` names, so it is empty in a `generate_baseline` run |
 | `failing_by` | array | `{value, failing}` per value of `run.gates`, zero counts included |
 | `not_applied` | array | `{check, packages, reason}` per gap that a grade or `vulnerable` value could not read: advisories that lockrot did not check |
 | `text` | string | The [`gate:` line](ci.md#reading-the-gate-line): prose, not contract |
