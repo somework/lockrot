@@ -372,7 +372,8 @@ The shape of one annotation:
 - The output ends with plain log lines, not annotations: `flags:`, `depth:`, `security:`,
   `update now:`, [`php:`](verdicts.md#the-php-window), then the
   [`gate:` line](#reading-the-gate-line). When the lock excludes the target PHP, the `php:` line
-  gives Composer's answer to [the update that can admit it](verdicts.md#the-update-that-admits-the-target).
+  gives Composer's answer to
+  [the update of the packages that exclude it](verdicts.md#the-update-that-admits-the-target).
 
 ## `--format=sarif` {#-formatsarif}
 

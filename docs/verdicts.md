@@ -657,8 +657,10 @@ Limits of the check:
   newest patch of the target minor (`8.4.99`). Composer reads `8.4` as `8.4.0`. It keeps every
   other `config.platform` override.
 - It offers the tagged releases of a package. It offers the dev versions too when the package has
-  no tagged release. Composer also offers them when composer.json's `minimum-stability` or a
-  stability flag admits `dev` for the package, and so does the check. A move to a dev snapshot is
+  no tagged release. Composer also offers them when composer.json's
+  [`minimum-stability`](https://getcomposer.org/doc/04-schema.md#minimum-stability) or a
+  [stability flag](https://getcomposer.org/doc/04-schema.md#package-links) admits `dev` for the
+  package, and so does the check. A move to a dev snapshot is
   not a move that lockrot proposes.
 - On Composer 2.9 and later, it removes the versions that an advisory affects, as Composer does in
   an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
