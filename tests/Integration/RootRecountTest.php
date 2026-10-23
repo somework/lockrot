@@ -15,6 +15,7 @@ use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
@@ -90,7 +91,11 @@ final class RootRecountTest extends TestCase
         }
         self::assertGreaterThan(0, $cases);
         $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('low'), RunSettings::SOURCE_OPTION, null);
-        yield 'the facts that no case has' => self::decode((new Report(self::factsNoCaseHas(), [], new \DateTimeImmutable('2026-01-02T00:00:00+00:00'), 6, 0))->withRun($run));
+        $facts = new Report(self::factsNoCaseHas(), [], new \DateTimeImmutable('2026-01-02T00:00:00+00:00'), 6, 0);
+        yield 'the facts that no case has' => self::decode($facts->withRun($run));
+        // acme/abandoned stands worsened over its recorded stale, and acme/forgotten has no entry, so it is new.
+        $earlier = BaselineEntries::baseline([BaselineEntries::of('acme/abandoned', '1.0.0', 'stale', '2026-01-01')]);
+        yield 'the facts under a baseline that knows less' => self::decode($facts->withBaseline(BaselineComparison::compare($earlier, $facts, 'lockrot-baseline.json', ['acme/abandoned']))->withRun($run));
     }
 
     /**
