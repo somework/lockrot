@@ -657,8 +657,9 @@ Limits of the check:
   newest patch of the target minor (`8.4.99`). Composer reads `8.4` as `8.4.0`. It keeps every
   other `config.platform` override.
 - It offers the tagged releases of a package. It offers the dev versions too when the package has
-  no tagged release, or when composer.json's `minimum-stability` or a stability flag admits `dev`
-  for it, as Composer does. A move to a dev snapshot is not a move that lockrot proposes.
+  no tagged release. Composer also offers them when composer.json's `minimum-stability` or a
+  stability flag admits `dev` for the package, and so does the check. A move to a dev snapshot is
+  not a move that lockrot proposes.
 - On Composer 2.9 and later, it removes the versions that an advisory affects, as Composer does in
   an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
   severities and the blocking of abandoned packages. It blocks every name that the update can move,
@@ -721,8 +722,8 @@ How lockrot reads the window:
   links.
 - `target.inside` says whether the set with require-dev admits the target PHP. When `with_dev` is
   null, `without_dev` decides. While `target.inside` is false, Composer refuses the baseline of
-  [the move check](#the-move-check), and every move is `not_checked`. `target_fix` then names the
-  update that admits the target.
+  [the move check](#the-move-check), and every move is `not_checked`. `target_fix` then gives
+  Composer's answer to one update of the packages that exclude the target.
 
 The window is null when a package or the root provides or replaces `php` or `php-64bit`, or when a
 php link does not parse. It judges no package and changes no move.
@@ -730,7 +731,7 @@ php link does not parse. It judges no package and changes no move.
 #### The update that admits the target {#the-update-that-admits-the-target}
 
 When the window excludes the target PHP, `target_fix` gives one update of the packages that exclude
-it, and the answer of Composer's solver to that update:
+it. It also gives the answer of Composer's solver:
 
 - `packages` lists the package `require` links that fail at `target.php` and the package
   `conflict` links that match it, on the set that `target.inside` reads. Production packages come
@@ -745,8 +746,8 @@ it, and the answer of Composer's solver to that update:
   admit the target, so `check` is `refused` with no solve. `held_by` names each such root link with
   its section: `require`, `require-dev` or `conflict`.
 - `platform_step` is true when `config.platform.php` lies outside the target minor. The solve then
-  runs at the target, so set `config.platform.php` to your release of the target PHP before you run
-  the command. The lock's `platform-overrides` does not set it.
+  runs at the target. Before you run the command, set `config.platform.php` to your release of the
+  target PHP. The lock's `platform-overrides` does not set it.
 - A listed name that is no Composer package name reaches no solve. `check` is then `not_checked`
   with the reason `unloaded_name`.
 
@@ -755,8 +756,8 @@ edge of the set that `target.inside` reads. No update of a package can lower tha
 
 The `php:` line of the table, markdown and github formats prints the window. When the minors of
 `with_dev` differ, the line prints `with_dev` and `without_dev`. The line adds the target when the
-window excludes it. With `target_fix`, the line ends with its answer: the command, the holds of the
-refusal, the root links of the root ceiling, or the reason it was not checked. Without
+window excludes it. With `target_fix`, the line ends with its answer. That is the command, the holds
+of the refusal, the root links of the root ceiling, or the reason that the run did not check it. Without
 `target_fix`, the line adds the PHP of `platform_override` and the links that set one edge. That is
 the lowest edge when the target lies below it, else the edge after the last minor of the analysed
 set. Abridged from the [example run](example-run.md):
