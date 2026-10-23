@@ -229,7 +229,7 @@ final class GateAgreementTest extends TestCase
         $this->same($strict, $run['strict_network'], $what);
         $this->same($mode, $run['mode'], $what);
         $gate = JsonPath::arrayAt($document, ['gate']);
-        $this->same(['fails', 'tripped_by', 'fail_on_applied', 'reaching', 'failing', 'exempt', 'failing_by', 'not_applied', 'text'], array_keys($gate), $what);
+        $this->same(['fails', 'tripped_by', 'fail_on_applied', 'reaching', 'failing', 'exempt', 'standing', 'failing_packages', 'failing_by', 'not_applied', 'text'], array_keys($gate), $what);
         $trippedBy = JsonPath::arrayAt($gate, ['tripped_by']);
         $applied = $gate['fail_on_applied'];
         $this->same($mode === Gate::MODE_CHECK, $applied, $what);
