@@ -2035,6 +2035,28 @@
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 14
+        },
+        "failing_packages": [
+            "mtdowling/jmespath.php",
+            "javiereguiluz/easyslugger",
+            "doctrine/cache",
+            "onnov/detect-encoding",
+            "unicodeveloper/laravel-password",
+            "league/commonmark",
+            "pragmarx/google2fa-laravel",
+            "neitanod/forceutf8",
+            "tmilos/lexer",
+            "tmilos/value",
+            "arietimmerman/laravel-scim-server",
+            "bacon/bacon-qr-code",
+            "doctrine/instantiator",
+            "intervention/image"
+        ],
         "failing_by": [
             {
                 "value": "high",

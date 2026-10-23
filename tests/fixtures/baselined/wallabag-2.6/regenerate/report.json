@@ -1394,6 +1394,13 @@
         "exempt": {
             "baseline": 84
         },
+        "standing": {
+            "known": 84,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",

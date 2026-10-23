@@ -1079,6 +1079,13 @@
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [],
         "not_applied": [],
         "text": "gate: off \u00b7 --fail-on=none (default) \u00b7 target php 8.4 (--target-php)"

@@ -8788,6 +8788,30 @@
                             "exempt": {
                                 "baseline": 40
                             },
+                            "standing": {
+                                "known": 40,
+                                "new": 14,
+                                "worsened": 2,
+                                "none": 0
+                            },
+                            "failing_packages": [
+                                "mnapoli/piwik-twig-extension",
+                                "spomky-labs/otphp",
+                                "grandt/relativepath",
+                                "doctrine/event-manager",
+                                "lcobucci/jwt",
+                                "scheb/2fa-backup-code",
+                                "scheb/2fa-bundle",
+                                "scheb/2fa-email",
+                                "scheb/2fa-google-authenticator",
+                                "scheb/2fa-trusted-device",
+                                "symfony/webpack-encore-bundle",
+                                "smalot/pdfparser",
+                                "symfony/psr-http-message-bridge",
+                                "phpunit/php-file-iterator",
+                                "sebastian/environment",
+                                "sebastian/type"
+                            ],
                             "failing_by": [
                                 {
                                     "value": "left-behind",

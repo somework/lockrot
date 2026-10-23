@@ -1428,6 +1428,34 @@
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 20
+        },
+        "failing_packages": [
+            "drupal/core",
+            "twig/twig",
+            "guzzlehttp/guzzle",
+            "symfony/http-foundation",
+            "symfony/process",
+            "laminas/laminas-diactoros",
+            "drupal/core-recommended",
+            "symfony/mime",
+            "guzzlehttp/psr7",
+            "psy/psysh",
+            "symfony/routing",
+            "symfony/yaml",
+            "stack/builder",
+            "webmozart/path-util",
+            "composer/installers",
+            "drush/drush",
+            "doctrine/annotations",
+            "doctrine/reflection",
+            "pear/console_getopt",
+            "symfony/debug"
+        ],
         "failing_by": [
             {
                 "value": "high",

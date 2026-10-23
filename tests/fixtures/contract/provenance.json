@@ -3,8 +3,8 @@
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
         "tests/fixtures/flags/cases.json": "3c2fd68aa8419440962a7ad739b075ff6d9492dde01826f73f1b5f176032a25f",
-        "tests/fixtures/flags/composite.json": "24a587b002cffa128399bcceb3365b6917878f2b7b27b8b8d02c0fb7984b2a39",
-        "tests/fixtures/flags/provenance.json": "8aa44c9dccd0798d1dd5bac0a598acc40e2d3cb3cdd06bbe126398c50a78fea4"
+        "tests/fixtures/flags/composite.json": "97b982c33c1b4bfe46d41ca53c2d59452b490902ab96ffca5e80e49280731a6f",
+        "tests/fixtures/flags/provenance.json": "95b99f55a17f864cfdebfba61ad4b9695035f88ab2022798e65ea1aefdfbb508"
     },
     "version_mask": {
         "paths": [
