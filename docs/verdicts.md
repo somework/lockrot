@@ -339,12 +339,20 @@ S11's `data`:
 | `newest_php_source` | `known` when R is the newest known minor, `require_php` when composer.json's `require.php` limits it, `platform_php` when the lock's `platform.php` limits it |
 | `requires`, `stops_at` | The installed `require.php`, and the newest known minor that it admits |
 | `excludes_target` | True when the target PHP's minor is outside `requires`: exactly `installed_php.target_runs` false |
-| `admits_newest` | The newest release that admits R, on the lowest branch that has one, with its `branch` and `blocking` (`project`, `target` or null). Null when no release admits R, or when the release metadata was not read |
+| `admits_newest` | The newest release of the lowest branch whose newest release admits R, with its `branch` and `blocking` (`project`, `target` or null). Null when no release admits R, or when the release metadata was not read |
 
 - **Which releases count.** `admits_newest` reads the stable releases above the installed one. A
   release that states no php does not count. Above an `X.Y.x-dev` snapshot or a snapshot with a
   branch alias, the releases count from `X.Y.0`. Above a `dev-<name>` snapshot, only the releases
-  dated after the lock entry's `time` count.
+  dated after the lock entry's `time` count. Of those, only the releases on the branch of the
+  highest release dated at or before that `time` count, or on a higher branch. A backport to a
+  lower branch is a downgrade. With no release dated at or before that `time`, every later release
+  counts.
+
+- **Each branch's newest release.** Composer installs the newest release of a branch, so a branch
+  counts only through its newest release. When that release caps php below R again, the branch is
+  no answer, although an older release on it admits R. When it states no php, the branch is no
+  answer either. Then `admits_newest` comes from the next higher branch.
 
 - **R moves with the GA dates.** When a newer minor gets its GA on or before the run clock, a
   package capped below it gains `capped`. S5 reads the same GA dates.
@@ -661,7 +669,8 @@ Limits of the check:
   [`minimum-stability`](https://getcomposer.org/doc/04-schema.md#minimum-stability) or a
   [stability flag](https://getcomposer.org/doc/04-schema.md#package-links) admits `dev` for the
   package, and so does the check. A move to a dev snapshot is
-  not a move that lockrot proposes.
+  not a move that lockrot proposes. With `--offline`, such a package needs its `~dev` file in
+  Composer's cache. Without that file, the move is not checked (`check.reason` `offline`).
 - On Composer 2.9 and later, it removes the versions that an advisory affects, as Composer does in
   an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
   severities and the blocking of abandoned packages. It blocks every name that the update can move,

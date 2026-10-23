@@ -100,6 +100,31 @@ final class CappedRuleTest extends TestCase
         self::assertSame(['version' => '5.1.0', 'branch' => '5.x', 'blocking' => null], JsonPath::decoded($signal->data())['admits_newest']);
     }
 
+    /** Composer installs a branch's newest release: 4.18.0 caps php at 8.4 again, so 4.x is no answer (case `capped-recapped‡`). */
+    public function testABranchWhoseNewestReleaseCapsPhpAgainGivesWayToTheNextBranch(): void
+    {
+        $signal = self::rule()->evaluate(self::facts('4.7.1', '>=7.4, <8.2', [['4.7.1', '>=7.4, <8.2'], ['4.17.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0'], ['4.18.0', '~8.2.0 || ~8.3.0 || ~8.4.0'], ['5.0.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0']]));
+
+        self::assertNotNull($signal);
+        self::assertSame(['version' => '5.0.0', 'branch' => '5.x', 'blocking' => null], JsonPath::decoded($signal->data())['admits_newest']);
+    }
+
+    public function testWithNoHigherBranchAnOlderReleaseThatAdmitsTheNewestPhpUnderARecapIsNoAnswer(): void
+    {
+        $signal = self::rule()->evaluate(self::facts('4.7.1', '>=7.4, <8.2', [['4.17.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0'], ['4.18.0', '~8.2.0 || ~8.3.0 || ~8.4.0']]));
+
+        self::assertNotNull($signal);
+        self::assertNull(JsonPath::decoded($signal->data())['admits_newest']);
+    }
+
+    public function testABranchWhoseNewestReleaseStatesNoPhpGivesWayToTheNextBranch(): void
+    {
+        $signal = self::rule()->evaluate(self::facts('4.7.1', '>=7.4, <8.2', [['4.17.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0'], ['4.18.0', null], ['5.0.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0']]));
+
+        self::assertNotNull($signal);
+        self::assertSame('5.0.0', JsonPath::stringAt(JsonPath::decoded($signal->data()), ['admits_newest', 'version']));
+    }
+
     public function testNoReleaseAboveTheInstalledOneAdmitsTheNewestPhpAndOneBelowDoesNotCount(): void
     {
         $signal = self::rule()->evaluate(self::facts('2.0.0', '^7.0', [['0.6.0', '>=5.4'], ['1.0.0', '>=5.5'], ['2.0.0', '^7.0'], ['2.1.0', '^7.0'], ['2.2.0', null]]));
@@ -180,6 +205,32 @@ final class CappedRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('4.17.0', JsonPath::stringAt(JsonPath::decoded($signal->data()), ['admits_newest', 'version']));
+    }
+
+    /** A `dev-<name>` snapshot sits at or above 4.x, the branch of 4.13.0, so the 3.6.0 backport is a downgrade (case `capped-snapshot-backport‡`). */
+    public function testAboveADevSnapshotABackportBelowTheBranchOfTheNewestEarlierReleaseDoesNotCount(): void
+    {
+        $signal = self::rule()->evaluate(self::facts('dev-main', '>=7.4, <8.2', [['3.6.0', '>=7.4', '2025-02-01'], ['4.13.0', '>=7.4, <8.2', '2024-03-01'], ['4.17.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0', '2025-05-01']], '2024-06-01T00:00:00+00:00'));
+
+        self::assertNotNull($signal);
+        self::assertSame(['version' => '4.17.0', 'branch' => '4.x', 'blocking' => null], JsonPath::decoded($signal->data())['admits_newest']);
+    }
+
+    /** 3.5.0 is dated after 4.13.0, but the higher version sets the snapshot's branch. */
+    public function testAboveADevSnapshotTheHighestEarlierReleaseSetsTheBranch(): void
+    {
+        $signal = self::rule()->evaluate(self::facts('dev-main', '>=7.4, <8.2', [['3.5.0', '>=7.4, <8.2', '2024-05-01'], ['3.6.0', '>=7.4', '2025-02-01'], ['4.13.0', '>=7.4, <8.2', '2024-03-01'], ['4.17.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0', '2025-05-01']], '2024-06-01T00:00:00+00:00'));
+
+        self::assertNotNull($signal);
+        self::assertSame('4.17.0', JsonPath::stringAt(JsonPath::decoded($signal->data()), ['admits_newest', 'version']));
+    }
+
+    public function testAboveADevSnapshotWithNoEarlierReleaseEveryLaterReleaseCounts(): void
+    {
+        $signal = self::rule()->evaluate(self::facts('dev-main', '>=7.4, <8.2', [['3.6.0', '>=7.4', '2025-02-01'], ['4.17.0', '~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0', '2025-05-01']], '2024-06-01T00:00:00+00:00'));
+
+        self::assertNotNull($signal);
+        self::assertSame('3.6.0', JsonPath::stringAt(JsonPath::decoded($signal->data()), ['admits_newest', 'version']));
     }
 
     public function testAboveADevSnapshotWithoutATimeNoReleaseCounts(): void
