@@ -121,6 +121,38 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame(['1.0.0', 'dev-main'], self::pretty($versions->versions('acme/lib')));
     }
 
+    /** A failed dev request of several names loads each admitted name alone: its tags alone are a partial pool. */
+    public function testAFailedDevRequestOfSeveralNamesLoadsEachAdmittedNameAlone(): void
+    {
+        $served = [self::package('acme/lib', '1.0.0'), self::package('acme/lib', 'dev-main'), self::package('acme/other', '1.0.0'), self::package('acme/other', 'dev-main')];
+        $repository = new class ($served) extends ComposerRepository {
+            /** @var list<BasePackage> */
+            private array $served;
+
+            /** @param list<BasePackage> $served */
+            public function __construct(array $served)
+            {
+                $this->served = $served;
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                if (isset($acceptableStabilities['dev']) && \count($packageNameMap) > 1) {
+                    throw new TransportException('The "https://repo.example.org/p2/acme/lib~dev.json" file could not be downloaded');
+                }
+                $packages = array_values(array_filter($this->served, static fn (BasePackage $package): bool => \array_key_exists($package->getName(), $packageNameMap) && isset($acceptableStabilities[$package->getStability()])));
+
+                return ['namesFound' => array_map(static fn (BasePackage $package): string => $package->getName(), $packages), 'packages' => $packages];
+            }
+        };
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::never(), 'dev', []);
+
+        $loaded = $versions->versionsOf(['acme/lib', 'acme/other']);
+
+        self::assertSame(['acme/lib' => ['1.0.0', 'dev-main'], 'acme/other' => ['1.0.0', 'dev-main']], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+        self::assertSame([null, null], [$versions->failure('acme/lib'), $versions->failure('acme/other')]);
+    }
+
     public function testANameThatLoadsAloneUnderAStableRootLoadsItsDevVersionsOnlyWithoutATag(): void
     {
         $versions = new RepositoryVersions([self::recording(['acme/tagged' => ['1.0.0', 'dev-main'], 'acme/branch' => ['dev-main']], ['acme/bad'])], [], false, Deadline::never(), 'stable', []);

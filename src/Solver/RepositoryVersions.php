@@ -100,8 +100,9 @@ final class RepositoryVersions implements VersionSource
             $this->loadTogether($pending);
         } catch (\Exception $e) {
             // A transport failure or an answer that does not parse (Seld\JsonLint\ParsingException).
+            // An admitted name's tags without its dev versions are a partial pool: it loads again alone.
             foreach (array_keys($pending) as $name) {
-                if ($this->loaded[$name] === []) {
+                if ($this->loaded[$name] === [] || $this->admitsDev($name)) {
                     $this->loaded[$name] = $this->loadOne($name);
                 }
             }
