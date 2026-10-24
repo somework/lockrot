@@ -674,6 +674,9 @@ Limits of the check:
   [stability flag](https://getcomposer.org/doc/04-schema.md#package-links) admits `dev` for the
   package, and so does the check. A move to a dev snapshot is
   not a move that lockrot proposes.
+- It offers a package from a path or VCS repository at its locked version only. Composer reads a
+  path package from its directory in every update, so a root requirement on one does not refuse
+  the baseline.
 - With `--offline`, a package that composer.json admits at `dev` needs its `~dev` file in
   Composer's cache. Without that file, the move is not checked (`check.reason` `offline`). From
   these repositories, such a package with tags and no dev version also reads `not_checked` with
