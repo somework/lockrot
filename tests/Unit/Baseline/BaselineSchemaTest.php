@@ -59,7 +59,7 @@ final class BaselineSchemaTest extends TestCase
     public function testEveryCommittedBaseline2DocumentIsRead(): void
     {
         $paths = glob(self::DOCUMENTS.'*/*.json') ?: [];
-        self::assertCount(138, $paths, 'tests/fixtures/schema/documents/provenance.json');
+        self::assertCount(141, $paths, 'tests/fixtures/schema/documents/provenance.json');
         foreach ($paths as $path) {
             BaselineSchema::validate(self::read($path));
         }
