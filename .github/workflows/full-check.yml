@@ -69,5 +69,7 @@ jobs:
   move-check-oracle:
     runs-on: ubuntu-latest
     steps:
+      # composer update runs package code, and no later step needs the token.
       - uses: actions/checkout@v7
+        with: {persist-credentials: false}
       - uses: ./.github/actions/move-check-oracle
