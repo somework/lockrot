@@ -14,8 +14,8 @@ use Lockrot\Signal\BranchRow;
  * The one producer of a finding's moves (docs/verdicts.md#move): a security move of class
  * `update` leads, else the move of the larger part, a tie to the lower score after it, then
  * security's. Two moves to one branch merge: into the tightest constraint, or into one blocked
- * move. The other part's move follows in `also[]` unless the lead already clears or leaves
- * unverified every fact of that part.
+ * move when neither names a tag. The other part's move follows in `also[]` unless the lead
+ * already clears or leaves unverified every fact of that part.
  *
  * @internal
  */

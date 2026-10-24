@@ -91,8 +91,9 @@ final class ComposerSolver
     }
 
     /**
-     * A copy that offers each name at its locked version only, as a path or VCS repository serves
-     * it: Composer's pool builder never loads a package from the lock's own repository.
+     * A copy that offers each name at its locked version only, in place of the path or VCS
+     * repository that serves it: Composer's pool builder never loads a package from the lock's own
+     * repository.
      *
      * @param list<string> $names
      */
@@ -327,7 +328,8 @@ final class ComposerSolver
     }
 
     /**
-     * Copies of the packages and their aliases: a package keeps the repository that holds it.
+     * Copies of the packages and their branch aliases: a package keeps the repository that holds
+     * it. A root alias comes from composer.json, as the pool builder adds it, never from the lock.
      *
      * @param array<BasePackage> $packages
      *
@@ -345,7 +347,7 @@ final class ComposerSolver
             }
         }
         foreach ($packages as $package) {
-            $base = $package instanceof AliasPackage ? ($bases[spl_object_id($package->getAliasOf())] ?? null) : null;
+            $base = $package instanceof AliasPackage && !$package->isRootPackageAlias() ? ($bases[spl_object_id($package->getAliasOf())] ?? null) : null;
             if ($base instanceof CompletePackage) {
                 $copies[] = new CompleteAliasPackage($base, $package->getVersion(), $package->getPrettyVersion());
             }

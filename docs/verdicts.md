@@ -605,7 +605,8 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 - **Which move leads.** An `update` that fixes an advisory always leads. Otherwise the move of the
   larger part of the score leads, and the other part's move follows in `next_step.also[]`. Two
   moves to one branch merge into one, with the tightest constraint. Two `blocked` moves to one
-  branch merge too. A `blocked` move never merges with a move that runs on the target PHP.
+  branch merge too, unless one of them names a tag. A `blocked` move never merges with a move that
+  runs on the target PHP.
 
 - **What it clears.** `next_step.clears[]` names only what lockrot checked for every version the
   constraint admits. `unverified[]` names what it could not check, and `leaves[]` what the move
