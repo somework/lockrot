@@ -4199,7 +4199,7 @@ flags
 repository metadata
      branch   highest tag   released     php        fixes
      8.x      8.0.1         2026-07-04   ^8.1       1 of 1 · composer update (lowest fix); after it: 0, ok; Composer's solver resolves it
-   * 7.x      7.15.2        2026-07-03   ^7.2.5 || ^8.0 1 of 1 · upgrade; held by composer.json and guzzlehttp/guzzle; after it: 0, ok; Composer's solver refuses it
+   * 7.x      7.15.2        2026-07-03   ^7.2.5 || ^8.0 1 of 1 · upgrade; held by composer.json and guzzlehttp/guzzle 7.15.2, the release this move installs; after it: 0, ok; Composer's solver refuses it
 
 == case mc-replan-major‡
 guzzlehttp/guzzle 7.10.0 — high: vulnerable
@@ -4231,7 +4231,7 @@ flags
 repository metadata
      branch   highest tag   released     php        fixes
      8.x      8.0.1         2026-07-04   ^8.1       1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok; Composer's solver resolves it
-   * 7.x      7.15.2        2026-07-03   ^7.2.5 || ^8.0 1 of 1 · upgrade; held by composer.json and guzzlehttp/guzzle; after it: 0, ok; Composer's solver refuses it
+   * 7.x      7.15.2        2026-07-03   ^7.2.5 || ^8.0 1 of 1 · upgrade; held by composer.json and guzzlehttp/guzzle 7.15.2, the release this move installs; after it: 0, ok; Composer's solver refuses it
 
 == case mc-package-hold‡
 symfony/mailer v6.4.27 — high: vulnerable
@@ -4249,7 +4249,7 @@ score     16 = vulnerable 16 [high advisory]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0) and symfony/mailer v6.4.40 (requires acme/ml-transport ^2.0; itself high: vulnerable); the packages that hold it may need to move too; Composer's solver refuses it against the lock
+do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, the release this move installs (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock
           clears PKSA-28rh-rzzn-djk4
 
 flags
@@ -4262,7 +4262,7 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json and acme/ml-widget and symfony/mailer; after it: 0, ok; Composer's solver refuses it
+   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json and symfony/mailer v6.4.40, the release this move installs and acme/ml-widget; after it: 0, ok; Composer's solver refuses it
 
 == case mc-pass-cap‡
 symfony/mailer v6.4.27 — high: vulnerable
@@ -4280,7 +4280,7 @@ score     16 = vulnerable 16 [high advisory]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0) and symfony/mailer v6.4.40 (requires acme/ml-transport ^2.0; itself high: vulnerable); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it
+do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, the release this move installs (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it
           clears PKSA-28rh-rzzn-djk4
 
 flags
@@ -4293,7 +4293,7 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json and acme/ml-widget and symfony/mailer; after it: 0, ok, if Composer resolves it
+   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json and symfony/mailer v6.4.40, the release this move installs and acme/ml-widget; after it: 0, ok, if Composer resolves it
 
 == case mc-raise-php‡
 symfony/yaml v6.4.26 — high: vulnerable

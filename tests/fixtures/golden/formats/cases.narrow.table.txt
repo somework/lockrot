@@ -237,12 +237,12 @@ high (20)
           advisory; 6.x needs php >=8.1, which require.php
           allows; the target php 8.4 runs it; held by
           composer.json (requires ^6.4) and composer.json
-          (requires acme/ml-widget ^1.0) and acme/ml-widget
-          1.0.0 (conflicts with acme/ml-transport >=2.0) and
-          symfony/mailer v6.4.40 (requires acme/ml-transport
-          ^2.0; itself high: vulnerable); the packages that
-          hold it may need to move too; Composer's solver
-          refuses it against the lock
+          (requires acme/ml-widget ^1.0) and symfony/mailer
+          v6.4.40, the release this move installs (requires
+          acme/ml-transport ^2.0) and acme/ml-widget 1.0.0
+          (conflicts with acme/ml-transport >=2.0); the
+          packages that hold it may need to move too;
+          Composer's solver refuses it against the lock
       vulnerable   1 advisory: 1 high — all fixed on 6.x
                    (upgrade); advisory: CVE-2026-45068
                    Argument Injection in SendmailTransport

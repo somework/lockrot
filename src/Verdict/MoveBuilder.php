@@ -47,7 +47,7 @@ final class MoveBuilder
         }
         $phpCheck = null;
         if ($row !== null && (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) || $draft->source() === FlagSet::PINNED)) {
-            $phpCheck = PhpCheck::of($lower === null ? $row->php() : $lower->php(), $context->floor());
+            $phpCheck = PhpCheck::of($row->php(), $context->floor());
         }
         $latest = $draft->latest();
         if ($kind === Move::TAG) {

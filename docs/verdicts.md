@@ -621,6 +621,11 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 
 - **A new major.** A move to a higher branch says that a new major brings its own requirements.
 
+- **A PHP that composer.json pins.** When `run.php_window.platform_override` lies outside the minor
+  of the target PHP, Composer refuses the commands of a move. The line of each move with commands
+  then starts with "First set config.platform.php to your PHP <target> release: composer.json sets
+  it to <version>." The commands stay the same.
+
 The `update now:` footer line lists every package whose `update` move Composer's solver resolves
 with the constraint inline, with one command for all of them.
 
@@ -647,6 +652,10 @@ holds. JSON writes the answer as the move's `check`.
     - `require` or `conflict` of the target release, or a `conflict` that composer.json declares.
     - `replace`: a package that replaces `target`, or the moved package when `target` is null.
       Composer installs only one of the two.
+
+    A hold of the package's own release reads `<package> <version>, the release this move installs`,
+    then its link. It has no verdict, because the verdict of the package is that of the installed
+    release. The text lists it after the holds of composer.json and before the other holds.
 
 - **A refusal that names no hold.** The release is `blocked`, so the advisory counts as having no
   reachable fix. The text says that Composer names no hold.
@@ -786,7 +795,8 @@ edge of the set that `target.inside` reads. No update of a package can lower tha
 The `php:` line of the table, markdown and github formats prints the window. When the minors of
 `with_dev` differ, the line prints `with_dev` and `without_dev`. The line adds the target when the
 window excludes it. With `target_fix`, the line ends with its answer. That is the command, the holds
-of the refusal, the root links of the root ceiling, or the reason that the run did not check it. Without
+of the refusal, the root links of the root ceiling, or the reason that the run did not check it. A
+root hold on a package of `packages-dev` ends with "(require-dev)". Without
 `target_fix`, the line adds the PHP of `platform_override` and the links that set one edge. That is
 the lowest edge when the target lies below it, else the edge after the last minor of the analysed
 set. Abridged from the [example run](example-run.md):

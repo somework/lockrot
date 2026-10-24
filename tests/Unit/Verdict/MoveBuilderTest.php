@@ -106,6 +106,27 @@ final class MoveBuilderTest extends TestCase
         self::assertSame([['composer', 'require', 'php:>=8.1', '--no-update'], ['composer', 'require', 'a/b:^2.0']], $move->commands());
     }
 
+    /** SPEC §5.6: `php_check` reads the newest release on the move's branch, not the lowest one that the constraint admits. */
+    public function testThePhpCheckOfARaiseReadsTheNewestReleaseOnTheBranch(): void
+    {
+        $facts = self::factsOf([['2.0.0', '2026-01-01', '>=8.2'], ['2.1.0', '2026-02-01', '>=8.0']]);
+        $floor = new PhpFloor('8.4', '>=7.4');
+        $row = BranchRow::all($facts, $floor, Clock::fixed(self::NOW))[0];
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
+        $context = new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', null), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+        self::assertNotNull($lower);
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::RAISE_PHP, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+        $check = $move->phpCheck();
+
+        self::assertSame('2.0.0', $move->version());
+        self::assertNotNull($check);
+        self::assertSame(['>=8.0', '>=8.0'], [$check->requires(), $check->raiseTo()]);
+        self::assertSame(['composer', 'require', 'php:>=8.0', '--no-update'], $move->commands()[0]);
+    }
+
     /** composer.json does not require a/b: a resolved request becomes `composer update` with the constraint inline. */
     public function testATransitiveRequireThatComposerResolvesBecomesAnInlineUpdate(): void
     {
@@ -196,6 +217,21 @@ final class MoveBuilderTest extends TestCase
     private static function row(): BranchRow
     {
         return BranchRow::all(self::facts(null), new PhpFloor('8.4'), Clock::fixed(self::NOW))[0];
+    }
+
+    /** @param list<array{string, string, string}> $releases each release of a/b: its version, date and php */
+    private static function factsOf(array $releases): PackageFacts
+    {
+        $packages = [];
+        foreach ($releases as [$version, $date, $php]) {
+            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $version, 'time' => $date.'T00:00:00+00:00', 'require' => ['php' => $php]]);
+            self::assertInstanceOf(BasePackage::class, $release);
+            $packages[] = $release;
+        }
+        $locked = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]])->find('a/b');
+        self::assertNotNull($locked);
+
+        return new PackageFacts($locked, PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::NOW), '1.0.0.0'), null, []);
     }
 
     /** @param ?string $php the php that release 2.0.0 requires */

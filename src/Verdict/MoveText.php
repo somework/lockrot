@@ -44,7 +44,7 @@ final class MoveText
         if (\in_array($kind, array_merge(Move::ROW_KINDS, [Move::TAG]), true)) {
             $text .= self::leaves($move).self::unverified($move);
         }
-        $holders = array_map([self::class, 'holderWords'], $move->heldBy());
+        $holders = array_map(static fn (Holder $holder): string => self::holderWords($holder, $subject), self::inTextOrder($move->heldBy(), $subject->package()));
         if ($holders !== []) {
             $text .= '; held by '.implode(' and ', $holders);
         }
@@ -56,7 +56,18 @@ final class MoveText
             $text .= '; '.$through;
         }
 
-        return $text.self::checked($move->check());
+        return self::platformStep($move, $subject).$text.self::checked($move->check());
+    }
+
+    /** SPEC §5.6: Composer refuses the commands while composer.json pins a PHP outside the target minor. */
+    private static function platformStep(Move $move, MoveSubject $subject): string
+    {
+        $platform = $subject->platformOutsideTarget();
+        if ($platform === null || $move->commands() === []) {
+            return '';
+        }
+
+        return 'First set config.platform.php to your PHP '.$subject->targetPhp().' release: composer.json sets it to '.$platform.'. ';
     }
 
     /** D10: what Composer's solver said about the move, or why lockrot did not ask it. */
@@ -276,11 +287,15 @@ final class MoveText
         return $ids === [] ? '' : '; not checked: '.implode(', ', $ids);
     }
 
-    private static function holderWords(Holder $holder): string
+    private static function holderWords(Holder $holder, MoveSubject $subject): string
     {
         $link = self::linkWords($holder);
         if ($holder->source() === Holder::ROOT) {
             return 'composer.json ('.$link.')';
+        }
+        // The finding's own release: its grade and flags are the installed version's, not this one's.
+        if ($holder->package() === $subject->package()) {
+            return $holder->package().' '.$holder->version().', the release this move installs ('.$link.')';
         }
         $bits = [$link];
         $finding = $holder->finding();
@@ -289,6 +304,24 @@ final class MoveText
         }
 
         return $holder->package().' '.$holder->version().' ('.implode('; ', $bits).')';
+    }
+
+    /**
+     * The root holds, then the holds of the package's own release, then the other holds, each group
+     * in `held_by[]` order.
+     *
+     * @param list<Holder> $holders
+     *
+     * @return list<Holder>
+     */
+    public static function inTextOrder(array $holders, string $package): array
+    {
+        $groups = [[], [], []];
+        foreach ($holders as $holder) {
+            $groups[$holder->source() === Holder::ROOT ? 0 : ($holder->package() === $package ? 1 : 2)][] = $holder;
+        }
+
+        return array_merge(...$groups);
     }
 
     /**

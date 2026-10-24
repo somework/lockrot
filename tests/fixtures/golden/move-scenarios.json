@@ -3278,11 +3278,11 @@
             "constraint": "^2.0.0",
             "latest": null,
             "php_check": {
-                "requires": ">=7.2",
-                "project_allows": true,
+                "requires": ">=8.1",
+                "project_allows": false,
                 "target_runs": true,
-                "raise_to": null,
-                "raise_size": null
+                "raise_to": ">=8.1",
+                "raise_size": "major"
             },
             "crosses_major": true,
             "held_by": [
@@ -3326,12 +3326,18 @@
                 [
                     "composer",
                     "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
                     "a/b:^2.0.0"
                 ]
             ],
             "through": [],
             "also": [],
-            "text": "require a/b ^2.0.0 \u2014 clears the advisory; 2.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=8.1, then require a/b ^2.0.0 \u2014 clears the advisory; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": {

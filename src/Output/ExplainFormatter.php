@@ -19,6 +19,7 @@ use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Signal;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\MoveText;
 use Lockrot\Verdict\ScoreModel;
 
 /**
@@ -392,7 +393,7 @@ final class ExplainFormatter
         foreach (\array_slice($rows, 0, Explanation::BRANCH_ROWS) as $row) {
             $released = $row['highest_released'] === null ? ($row['highest_commit_date'] === null ? 'undated' : 'commit '.$row['highest_commit_date']->format('Y-m-d')) : $row['highest_released']->format('Y-m-d');
             $moves = $finding->details()->moves();
-            $cell = isset($fixes[$row['branch']]) ? self::fixesCell($fixes[$row['branch']], $moves->rowIfApplied($row['branch']), $moves->rowCheck($row['branch']), $row['branch'] === $moveBranch) : '';
+            $cell = isset($fixes[$row['branch']]) ? self::fixesCell($fixes[$row['branch']], $moves->rowIfApplied($row['branch']), $moves->rowCheck($row['branch']), $row['branch'] === $moveBranch, $finding->package()) : '';
             $lines[] = self::escape(rtrim(\sprintf('   %s %-8s %-13s %-12s %-10s %s', $row['installed'] ? '*' : ' ', $row['branch'], $row['highest'], $released, $row['php'] ?? '—', $cell)));
         }
         if (\count($rows) > Explanation::BRANCH_ROWS) {
@@ -419,7 +420,7 @@ final class ExplainFormatter
     }
 
     /** `{fixed} of {of}`, the fix word, `(lowest fix)` on the move's row, the holders and the score after it. */
-    private static function fixesCell(BranchFixes $row, ?IfApplied $after, ?MoveCheck $check, bool $moveRow): string
+    private static function fixesCell(BranchFixes $row, ?IfApplied $after, ?MoveCheck $check, bool $moveRow, string $package): string
     {
         $cell = $row->fixed().' of '.$row->of();
         $candidate = $row->candidate();
@@ -427,7 +428,8 @@ final class ExplainFormatter
             return $cell;
         }
         $cell .= ' · '.self::FIX_WORDS[$candidate->kind()].($moveRow ? ' (lowest fix)' : '');
-        $holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json' : (string) $holder->package(), $candidate->heldBy());
+        $holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json'
+            : ($holder->package() === $package ? $package.' '.$holder->version().', the release this move installs' : (string) $holder->package()), MoveText::inTextOrder($candidate->heldBy(), $package));
         if ($holders !== []) {
             $cell .= '; held by '.implode(' and ', array_unique($holders));
         }

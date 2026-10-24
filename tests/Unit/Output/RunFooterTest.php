@@ -205,6 +205,20 @@ final class RunFooterTest extends TestCase
         self::assertSame("php: the lock installs on PHP 5.3 to 8.3, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of the 2 packages that exclude it: composer.json requires acme/a ^1.0 and acme/c 2.0.0 requires acme/b 1.0.0", $line);
     }
 
+    /** wallabag 2.6.14 at 8.4 lists friendsoftwig/twigcs from packages-dev among the packages that exclude the target. */
+    public function testARootHoldOnAPackagesDevEntryOfTheFixSaysRequireDev(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php' => '<8.4'])], 'packages-dev' => [self::package('acme/tool', ['php' => '<8.4'])]];
+        $holds = [
+            ['source' => 'root', 'link' => 'root-require', 'target' => 'acme/a', 'constraint' => '^1.0'],
+            ['source' => 'root', 'link' => 'root-require', 'target' => 'acme/tool', 'constraint' => '^2.0'],
+        ];
+
+        $line = self::phpLine($lock, [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'refused', 'holds' => $holds]], []));
+
+        self::assertStringEndsWith('refuses the update of the 2 packages that exclude it: composer.json requires acme/a ^1.0 and composer.json requires acme/tool ^2.0 (require-dev)', (string) $line);
+    }
+
     public function testThePhpLineOfARefusalWithNoHoldEndsAfterThePackageThatExcludesTheTarget(): void
     {
         $line = self::phpLine(['packages' => [self::package('acme/a', ['php' => '<8.4'])], 'packages-dev' => []], [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'refused']], []));

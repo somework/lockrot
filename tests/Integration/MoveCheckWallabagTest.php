@@ -4,47 +4,24 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Composer\Factory;
-use Composer\IO\NullIO;
-use Composer\Package\Loader\RootPackageLoader;
 use Composer\Repository\AdvisoryProviderInterface;
-use Composer\Repository\RepositoryFactory;
-use Lockrot\Allowlist\BuiltinAllowlist;
-use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\MoveCheckRun;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\UpdateNow;
-use Lockrot\Clock;
-use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
-use Lockrot\Data\Forge\ActivityClient;
-use Lockrot\Data\Forge\ActivityFetchPlanner;
-use Lockrot\Data\Forge\ForgeAuth;
-use Lockrot\Data\Forge\RepoLocator;
-use Lockrot\Data\Forge\Tokens;
-use Lockrot\Data\Php\PhpReleaseDates;
-use Lockrot\Data\Repository\RepositoryMetadataLoader;
-use Lockrot\Deadline;
-use Lockrot\Lock\LockFile;
-use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\Holder;
-use Lockrot\Signal\SignalSet;
-use Lockrot\Signal\Thresholds;
 use Lockrot\Solver\HoldScan;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveCheckers;
 use Lockrot\Solver\ProblemHolds;
 use Lockrot\Solver\SolverChecker;
-use Lockrot\Tests\Support\FakeHttpClient;
 use Lockrot\Tests\Support\FindingRelations;
-use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
-use Lockrot\Verdict\MoveChecks;
+use Lockrot\Tests\Support\WallabagSite;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The lock of the external audit: wallabag 2.6.14 at `config.platform.php` 7.4.29, with its own
- * recorded answers (tests/fixtures/sites/wallabag-2.6.14, provenance.json). Composer refuses the
+ * {@see WallabagSite} at the target PHP 7.4. Composer refuses the
  * moves of symfony/monolog-bridge and symfony/yaml, and on 2.9 or later the plain
  * `composer update` of each installs a dev snapshot.
  *
@@ -70,9 +47,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SolverChecker::class)]
 final class MoveCheckWallabagTest extends TestCase
 {
-    private const SITE = __DIR__.'/../fixtures/sites/wallabag-2.6.14/';
-    private const NOW = '2026-10-18T00:00:00+00:00';
-
     private static ?Report $report = null;
 
     public static function setUpBeforeClass(): void
@@ -80,14 +54,7 @@ final class MoveCheckWallabagTest extends TestCase
         if (!interface_exists(AdvisoryProviderInterface::class)) {
             self::markTestSkipped('Composer 2.2 has no AdvisoryProviderInterface: no move reaches a vulnerable package');
         }
-        $server = FixtureRepositoryServer::fromLockFiles([self::SITE.'composer.lock'], self::SITE.'http/p2');
-        $server->withRecordedAdvisoryApi(self::SITE, self::SITE.'http/advisories');
-        $server->start();
-        try {
-            self::$report = self::analyze($server);
-        } finally {
-            $server->stop();
-        }
+        self::$report = WallabagSite::analyze('7.4');
     }
 
     public function testComposerRefusesMonologBridgeAndNamesTheRootRequirementOnHttpKernel(): void
@@ -178,33 +145,5 @@ final class MoveCheckWallabagTest extends TestCase
     private static function holds(array $move): array
     {
         return array_values(array_map(static fn ($hold): array => \is_array($hold) ? array_intersect_key($hold, array_flip(['source', 'link', 'target', 'constraint'])) : [], JsonPath::arrayAt($move, ['held_by'])));
-    }
-
-    private static function analyze(FixtureRepositoryServer $server): Report
-    {
-        $clock = Clock::fixed(self::NOW);
-        $auth = ForgeAuth::withTokens(new Tokens(null, null));
-        $json = JsonPath::decodeFile(self::SITE.'composer.json');
-        $config = $server->config();
-        $config->merge(['config' => ['platform' => JsonPath::arrayAt($json, ['config', 'platform'])]]);
-        $repositories = $server->repositories();
-        $io = new NullIO();
-        /** @var array<string, mixed> $json */
-        $root = (new RootPackageLoader(RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config)), $config, null, null, $io))->load($json + ['version' => '1.0.0']);
-        $lock = LockFile::fromFile(self::SITE.'composer.lock');
-        $project = ProjectConfig::fromFile(self::SITE.'composer.json');
-        $analyzer = (new Analyzer(
-            new RepositoryMetadataLoader($repositories, $clock),
-            new ActivityClient(new FakeHttpClient(), $auth),
-            new ActivityFetchPlanner($auth),
-            new RepoLocator(),
-            BuiltinAllowlist::load(),
-            SignalSet::default($clock, new Thresholds(), '7.4', PhpReleaseDates::load(), $project->requirePhp()),
-            $clock,
-            false,
-            new RepositoryAdvisoryLoader($repositories)
-        ))->withMoveChecks(MoveChecks::of(MoveCheckers::forProject($root, $lock, $project, $config, $repositories, '7.4', false, Deadline::never())));
-
-        return $analyzer->analyze($lock, $project, false);
     }
 }

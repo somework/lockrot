@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Lockrot\Solver\MoveCheckers;
+
 /**
  * What a move's sentence reads beside the move: the package, how the project reaches it and the
  * run's PHP.
@@ -20,14 +22,17 @@ final class MoveSubject
     private ?string $targetPhp;
     private ?string $projectPhpLowest;
     private ?string $newestPhp;
+    private ?string $platformOverride;
 
     /**
      * @param list<string> $dependents       `direct_dependents`
      * @param ?string      $projectPhpLowest `run.project_php_lowest`
      * @param ?string      $newestPhp        R, the newest PHP minor that the root php allows ({@see \Lockrot\Signal\PhpCap})
+     * @param ?string      $platformOverride `run.php_window.platform_override`
      */
-    public function __construct(string $package, string $version, bool $direct, array $dependents, ?string $targetPhp, ?string $projectPhpLowest, ?string $newestPhp = null)
+    public function __construct(string $package, string $version, bool $direct, array $dependents, ?string $targetPhp, ?string $projectPhpLowest, ?string $newestPhp = null, ?string $platformOverride = null)
     {
+        $this->platformOverride = $platformOverride;
         $this->newestPhp = $newestPhp;
         $this->package = $package;
         $this->version = $version;
@@ -71,5 +76,15 @@ final class MoveSubject
     public function newestPhp(): ?string
     {
         return $this->newestPhp;
+    }
+
+    /** The PHP that `composer install` checks the lock at, when it lies outside the target minor. */
+    public function platformOutsideTarget(): ?string
+    {
+        if ($this->platformOverride === null || $this->targetPhp === null) {
+            return null;
+        }
+
+        return MoveCheckers::platformPhp($this->targetPhp, $this->platformOverride) === $this->platformOverride ? null : $this->platformOverride;
     }
 }
