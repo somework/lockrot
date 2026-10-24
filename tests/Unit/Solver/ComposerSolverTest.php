@@ -286,6 +286,16 @@ final class ComposerSolverTest extends TestCase
         self::assertFalse($solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->resolves());
     }
 
+    /** The copy offers the locked path package, and the solver it comes from still offers no version of it. */
+    public function testALockedOnlyCopyLeavesTheSolverItComesFromAsItWas(): void
+    {
+        $solver = self::solver(['require' => ['acme/core' => '^7.0']], [['name' => 'acme/core', 'version' => '7.0.0', 'dist' => ['type' => 'path', 'url' => 'core', 'reference' => 'abc']]], []);
+
+        $copy = $solver->withLockedOnly(['acme/core']);
+
+        self::assertSame([true, false], [$copy->solve(SolveRequest::baseline())->resolves(), $solver->solve(SolveRequest::baseline())->resolves()]);
+    }
+
     /**
      * @param array<string, mixed>                      $root
      * @param list<array<string, mixed>>                $locked
