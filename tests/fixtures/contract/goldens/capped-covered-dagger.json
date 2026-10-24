@@ -1,7 +1,7 @@
 {
     "score_text": "5 = (stale 8 + capped 2 [¼ of 8]) ÷ 2 transitive",
     "next_step_text": "—",
-    "gate_line": null,
+    "gate_line": "gate 0 = min(5, 2 × 0) (the new facts bound it); new: 0",
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 2.2.4 released 2022-03-05 (4.6 years ago); 2.x last released 2.14.1 2022-03-05 (4.6 years ago), its newest release; last push 2026-09-25 (less than three weeks ago)",
     "explain_age": [
@@ -11,7 +11,7 @@
         "last push            2026-09-25   less than three weeks ago     below push-warn-years 3",
         "libyears 0.0 behind the newest stable release"
     ],
-    "baseline_suffix": null,
+    "baseline_suffix": "(baseline: capped covered by the recorded stale)",
     "commands_posix": [
         "composer why-not symfony/proxy-manager-bridge v6.4.28"
     ],
