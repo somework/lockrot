@@ -121,6 +121,14 @@ jobs:
           else
             vendor/bin/phpunit --group e2e --filter PluginTest
           fi
+  # The tests rows skip MoveCheckComposerOracleTest on a composer/composer other than the one that
+  # recorded train 7d's answers, and the latest rows follow each new Composer release. This job pins
+  # the recorded version, so the oracle test runs on every head. Keep the job name: main's ruleset requires it.
+  move-check-oracle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/move-check-oracle
   quality:
     runs-on: ubuntu-latest
     steps:
