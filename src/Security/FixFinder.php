@@ -153,8 +153,8 @@ final class FixFinder
         }
         $heldBy = Holder::distinct(array_merge($this->links->excluding($package, $release->normalized()), $this->refused->holding($release->normalized())));
         $refused = $this->refused->refuses($release->normalized());
-        // A refusal that names no hold leaves no move that lockrot can name: no reachable fix (SPEC §5.3).
-        if ($this->floor->admitsTarget($release->php()) === false || ($heldBy === [] && $refused)) {
+        // A refusal that names no hold leaves no move that lockrot can name, whatever the links hold: no reachable fix (docs/verdicts.md#the-move-check).
+        if ($this->floor->admitsTarget($release->php()) === false || $this->refused->blocks($release->normalized())) {
             $kind = Fix::BLOCKED;
         } elseif ($this->floor->admitsProject($release->php()) === false) {
             $kind = Fix::RAISE_PHP;

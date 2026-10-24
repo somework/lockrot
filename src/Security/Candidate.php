@@ -88,7 +88,7 @@ final class Candidate
         return $this->kind === Fix::BLOCKED ? Fix::BLOCKED_BY_TARGET : null;
     }
 
-    /** Within one step of the ease order, a refused release comes after every other one (SPEC §5.3). */
+    /** Within one step of the ease order, a refused release comes after every other one. */
     public function easeRank(): int
     {
         return 2 * Fix::easeRank($this->kind, $this->heldBy !== []) + ($this->refused ? 1 : 0);
