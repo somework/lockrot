@@ -49,7 +49,7 @@ final class MoveCheckers
         foreach ($lock->packages(true) as $package) {
             if (!$package->withRepositories($project->repositories())->isFromComposerRepository()) {
                 $notFromComposerRepository[] = $package->name();
-                $fromLock[$package->name()] = array_values($lock->lockedRepository()->findPackages($package->name()));
+                $fromLock[$package->name()] = $lock->lockedRepository()->findPackages($package->name());
             }
         }
         $source = new RepositoryVersions($repositories, $fromLock, $offline, $deadline, $root->getMinimumStability(), $root->getStabilityFlags());
