@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
+use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
+use Composer\Package\CompleteAliasPackage;
+use Composer\Package\CompletePackage;
 use Composer\Package\Version\StabilityFilter;
+use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Deadline;
@@ -31,8 +35,8 @@ final class RepositoryVersions implements VersionSource
 
     /** @var array<ComposerRepository> */
     private array $repositories;
-    /** @var array<string, true> */
-    private array $notFromComposerRepository;
+    /** @var array<string, list<BasePackage>> */
+    private array $fromLock = [];
     private bool $offline;
     private Deadline $deadline;
     /** @var array<string, list<BasePackage>> */
@@ -48,17 +52,21 @@ final class RepositoryVersions implements VersionSource
 
     /**
      * @param list<RepositoryInterface> $repositories              only ComposerRepository instances are asked
-     * @param list<string>              $notFromComposerRepository the locked names that a path, VCS or package repository serves: the lock's version is their only version
+     * @param array<string, list<BasePackage>> $fromLock the lock's packages of each name that a path, VCS or package repository serves: the lock's version is their only version
      * @param string                    $minimumStability          the root's `minimum-stability`
      * @param array<string, BasePackage::STABILITY_*> $stabilityFlags the root's stability flags, by name
      */
-    public function __construct(array $repositories, array $notFromComposerRepository, bool $offline, Deadline $deadline, string $minimumStability = 'stable', array $stabilityFlags = [])
+    public function __construct(array $repositories, array $fromLock, bool $offline, Deadline $deadline, string $minimumStability = 'stable', array $stabilityFlags = [])
     {
         $floor = BasePackage::$stabilities[$minimumStability] ?? BasePackage::STABILITY_STABLE;
         $this->acceptable = array_filter(BasePackage::$stabilities, static fn (int $value): bool => $value <= $floor);
         $this->stabilityFlags = $stabilityFlags;
         $this->repositories = array_filter($repositories, static fn (RepositoryInterface $repository): bool => $repository instanceof ComposerRepository);
-        $this->notFromComposerRepository = array_fill_keys($notFromComposerRepository, true);
+        // A package takes one repository, and the lock's packages have theirs.
+        $owner = new ArrayRepository();
+        foreach ($fromLock as $name => $packages) {
+            $this->fromLock[$name] = self::copies($packages, $owner);
+        }
         $this->offline = $offline;
         $this->deadline = $deadline;
     }
@@ -95,7 +103,8 @@ final class RepositoryVersions implements VersionSource
      */
     private function load(array $names): void
     {
-        $pending = array_diff_key(array_fill_keys($names, null), $this->notFromComposerRepository);
+        $pending = array_diff_key(array_fill_keys($names, null), $this->fromLock);
+        $this->loaded += array_intersect_key($this->fromLock, array_flip($names));
         $this->loaded += array_fill_keys($names, []);
 
         try {
@@ -217,6 +226,38 @@ final class RepositoryVersions implements VersionSource
         $this->loaded[$name] = [];
 
         return true;
+    }
+
+    /**
+     * The packages without their root aliases, which Composer's pool builder adds from the root,
+     * each in the owner repository.
+     *
+     * @param list<BasePackage> $packages
+     *
+     * @return list<BasePackage>
+     */
+    private static function copies(array $packages, ArrayRepository $owner): array
+    {
+        $copies = [];
+        $bases = [];
+        foreach ($packages as $package) {
+            if (!$package instanceof AliasPackage) {
+                $copy = clone $package;
+                $bases[spl_object_id($package)] = $copy;
+                $owner->addPackage($copy);
+                $copies[] = $copy;
+            }
+        }
+        foreach ($packages as $package) {
+            $base = $package instanceof AliasPackage && !$package->isRootPackageAlias() ? ($bases[spl_object_id($package->getAliasOf())] ?? null) : null;
+            if ($base instanceof CompletePackage) {
+                $alias = new CompleteAliasPackage($base, $package->getVersion(), $package->getPrettyVersion());
+                $owner->addPackage($alias);
+                $copies[] = $alias;
+            }
+        }
+
+        return $copies;
     }
 
     private function admitsDev(string $name): bool

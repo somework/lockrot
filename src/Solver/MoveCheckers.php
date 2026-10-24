@@ -45,12 +45,14 @@ final class MoveCheckers
         $php = self::platformPhp($targetPhp, $configured);
         $overrides['php'] = $php;
         $notFromComposerRepository = [];
+        $fromLock = [];
         foreach ($lock->packages(true) as $package) {
             if (!$package->withRepositories($project->repositories())->isFromComposerRepository()) {
                 $notFromComposerRepository[] = $package->name();
+                $fromLock[$package->name()] = array_values($lock->lockedRepository()->findPackages($package->name()));
             }
         }
-        $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline, $root->getMinimumStability(), $root->getStabilityFlags());
+        $source = new RepositoryVersions($repositories, $fromLock, $offline, $deadline, $root->getMinimumStability(), $root->getStabilityFlags());
         $solver = new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], $overrides), $source, []);
 
         $blocking = AdvisoryBlocking::fromConfig($config);
