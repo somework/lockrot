@@ -13,6 +13,8 @@ runs:
         version=$(php -d display_errors=stderr -r 'require "tests/Support/ComposerOracle.php"; echo Lockrot\Tests\Support\ComposerOracle::recordedVersion(json_decode((string) file_get_contents("tests/fixtures/flags/cases.json"), true));')
         echo "The train 7d answers record composer/composer $version." >> "$GITHUB_STEP_SUMMARY"
         composer require --dev --no-update "composer/composer:$version"
+        # Composer 2.9 and later block a composer/composer release once an advisory names it. The job tests lockrot against that library and never runs it.
+        composer config --json policy.advisories.ignore '["composer/composer"]'
         composer update --no-interaction --prefer-dist
     - name: Run the oracle test, where a skip fails
       shell: bash
