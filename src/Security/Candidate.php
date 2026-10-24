@@ -22,18 +22,21 @@ final class Candidate
     private string $kind;
     /** @var list<Holder> */
     private array $heldBy;
+    private bool $refused;
 
     /**
      * @param string                                             $branch {@see ReleaseBranch::of()} of the release
      * @param Fix::UPDATE|Fix::UPGRADE|Fix::RAISE_PHP|Fix::BLOCKED $kind
      * @param list<Holder>                                       $heldBy
+     * @param bool                                               $refused whether the constraint of a refused move admits the release
      */
-    public function __construct(StableRelease $release, string $branch, string $kind, array $heldBy)
+    public function __construct(StableRelease $release, string $branch, string $kind, array $heldBy, bool $refused = false)
     {
         $this->release = $release;
         $this->branch = $branch;
         $this->kind = $kind;
         $this->heldBy = $heldBy;
+        $this->refused = $refused;
     }
 
     /** @param array<string, GradedPackage> $findings by package name */
@@ -85,8 +88,9 @@ final class Candidate
         return $this->kind === Fix::BLOCKED ? Fix::BLOCKED_BY_TARGET : null;
     }
 
+    /** Within one step of the ease order, a refused release comes after every other one (SPEC §5.3). */
     public function easeRank(): int
     {
-        return Fix::easeRank($this->kind, $this->heldBy !== []);
+        return 2 * Fix::easeRank($this->kind, $this->heldBy !== []) + ($this->refused ? 1 : 0);
     }
 }
