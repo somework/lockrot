@@ -32,9 +32,10 @@ use PHPUnit\Framework\TestCase;
  * designed world (`inputs.solver_world`, SPEC-0.14.md §5.6). lockrot's own move checker solves the
  * same requests on the same world, served over HTTP, at the world's `config.platform.php` and with
  * `audit.block-insecure` false. Its result, form and holds equal the CLI's. Its problem text has
- * the CLI's `{cause}` (§6.2). The answers hold for the Composer that recorded them, so the test
- * runs only on the composer/composer version that composer.lock pins. It covers nothing: each solve
- * outlasts a mutant's time limit, and the tests that state the rules kill the mutants.
+ * the CLI's `{cause}` (§6.2). The answers hold for the Composer that recorded them
+ * (`inputs.move_check.composer`), so the test runs only on that composer/composer version. A CI row
+ * that installs another one skips it. It covers nothing: each solve outlasts a mutant's time
+ * limit, and the tests that state the rules kill the mutants.
  *
  * @coversNothing
  *
@@ -44,8 +45,6 @@ use PHPUnit\Framework\TestCase;
 #[Group('covers-nothing')]
 final class MoveCheckComposerOracleTest extends TestCase
 {
-    private const LOCK = __DIR__.'/../../composer.lock';
-
     private ?string $project = null;
 
     protected function tearDown(): void
@@ -56,12 +55,12 @@ final class MoveCheckComposerOracleTest extends TestCase
         }
     }
 
-    /** @return iterable<string, array{array<mixed, mixed>}> */
+    /** @return iterable<string, array{array<mixed, mixed>, string}> */
     public static function worlds(): iterable
     {
         foreach (JsonPath::arrayAt(JsonPath::decodeFile(CaseHydrator::CASES), ['cases']) as $case) {
             if (\is_array($case) && \is_array($case['inputs'] ?? null) && \is_array($case['inputs']['solver_world'] ?? null)) {
-                yield JsonPath::stringAt($case, ['id']) => [$case['inputs']['solver_world']];
+                yield JsonPath::stringAt($case, ['id']) => [$case['inputs']['solver_world'], JsonPath::stringAt($case, ['inputs', 'move_check', 'composer'])];
             }
         }
     }
@@ -75,13 +74,13 @@ final class MoveCheckComposerOracleTest extends TestCase
      * @dataProvider worlds
      *
      * @param array<mixed, mixed> $solverWorld the case's `inputs.solver_world`
+     * @param string              $recordedBy  the Composer version that answered the requests
      */
     #[DataProvider('worlds')]
-    public function testLockrotsSolverGivesEachAnswerOfTheComposerCli(array $solverWorld): void
+    public function testLockrotsSolverGivesEachAnswerOfTheComposerCli(array $solverWorld, string $recordedBy): void
     {
-        $locked = self::lockedComposer();
-        if (Composer::getVersion() !== $locked) {
-            self::markTestSkipped('the answers are those of composer/composer '.$locked.', the version that composer.lock pins, and this run has '.Composer::getVersion());
+        if (Composer::getVersion() !== $recordedBy) {
+            self::markTestSkipped('the answers are those of composer/composer '.$recordedBy.', and this run has '.Composer::getVersion());
         }
         $world = JsonPath::arrayAt($solverWorld, ['world']);
         $answers = JsonPath::arrayAt($solverWorld, ['answers']);
@@ -237,17 +236,5 @@ final class MoveCheckComposerOracleTest extends TestCase
         }
 
         return $out;
-    }
-
-    private static function lockedComposer(): string
-    {
-        foreach (['packages', 'packages-dev'] as $section) {
-            foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::LOCK), [$section]) as $package) {
-                if (\is_array($package) && ($package['name'] ?? null) === 'composer/composer') {
-                    return JsonPath::stringAt($package, ['version']);
-                }
-            }
-        }
-        self::fail('composer.lock locks no composer/composer');
     }
 }
