@@ -30,4 +30,26 @@ final class RefusedMovesTest extends TestCase
         self::assertSame(['acme/app', 'acme/tool', 'acme/other'], array_map(static fn (Holder $holder): ?string => $holder->package(), $refused->holding('2.1.0.0')));
         self::assertSame([], $refused->holding('1.0.0.0'));
     }
+
+    /** The first refusal of a constraint stays: a later one with no hold does not turn it into a block. */
+    public function testASecondRefusalOfOneConstraintKeepsTheFirst(): void
+    {
+        $refused = RefusedMoves::none()
+            ->with('^2.0', [new Holder(Holder::ROOT, 'acme/app', null, Holder::REQUIRE, '^1.0')])
+            ->with('^2.0', []);
+
+        self::assertSame(1, $refused->count());
+        self::assertFalse($refused->blocks('2.0.0.0'));
+        self::assertSame(['acme/app'], array_map(static fn (Holder $holder): ?string => $holder->package(), $refused->holding('2.0.0.0')));
+    }
+
+    /** Only a refusal that names no hold blocks, and only the releases that its constraint admits. */
+    public function testARefusalWithNoHoldBlocksTheReleasesItAdmits(): void
+    {
+        $refused = RefusedMoves::none()
+            ->with('^2.0', [])
+            ->with('^3.0', [new Holder(Holder::ROOT, 'acme/app', null, Holder::REQUIRE, '^1.0')]);
+
+        self::assertSame([true, false, false], [$refused->blocks('2.1.0.0'), $refused->blocks('3.0.0.0'), $refused->blocks('1.0.0.0')]);
+    }
 }

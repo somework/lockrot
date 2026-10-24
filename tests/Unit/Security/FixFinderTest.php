@@ -24,6 +24,7 @@ use Lockrot\Security\PackageFixes;
 use Lockrot\Security\RefusedMoves;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class FixFinderTest extends TestCase
@@ -322,6 +323,112 @@ final class FixFinderTest extends TestCase
 
         self::assertSame([['source' => Holder::ROOT, 'package' => 'acme/app', 'version' => null, 'link' => Holder::REQUIRE, 'constraint' => '<1.1']], self::holders($held->find($facts)->forAdvisory('A')->heldBy()));
         self::assertSame([], $finder->find($facts)->forAdvisory('A')->heldBy());
+    }
+
+    /**
+     * Both candidates are `upgrade`: a conflict holds 1.1.0, and the root's `^1.0` holds 2.0.0.
+     *
+     * @return iterable<string, array{0: string, 1: string}>
+     */
+    public static function refusalsOfTwoUpgrades(): iterable
+    {
+        yield 'a refusal admits the lower release, so the higher one leads' => ['^1.1', '2.0.0'];
+        yield 'no refusal admits a candidate, so the lowest release leads' => ['^3.0', '1.1.0'];
+    }
+
+    /**
+     * @dataProvider refusalsOfTwoUpgrades
+     */
+    #[DataProvider('refusalsOfTwoUpgrades')]
+    public function testARefusedReleaseComesAfterTheOthersOfItsEaseStep(string $refused, string $leads): void
+    {
+        [$lock, $facts] = $this->facts(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['1.1.0', null], ['2.0.0', null]],
+            ['A' => '<1.1.0'],
+            [['name' => 'c/c', 'version' => '1.0.0', 'conflict' => ['a/b' => '1.1.0']]]
+        );
+        $finder = (new FixFinder(new PhpFloor(null, null), LinkIndex::of($lock, ProjectConfig::fromArray(['require' => ['a/b' => '^1.0']]))))
+            ->withRefused(RefusedMoves::none()->with($refused, [new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.0')]));
+
+        $fixes = $finder->find($facts);
+
+        self::assertSame(Fix::UPGRADE, $fixes->forAdvisory('A')->kind());
+        self::assertSame($leads, $fixes->forAdvisory('A')->version());
+        $move = $fixes->move();
+        self::assertNotNull($move);
+        self::assertSame($leads, $move->release()->pretty());
+        self::assertSame(['2.0.0', '1.1.0'], array_map(static fn (BranchFixes $row): ?string => $row->lowest(), $fixes->branches()), 'a row with one candidate keeps it');
+    }
+
+    /** Within the 1.x row, both releases are `upgrade` and a refusal admits only the lower one. */
+    public function testTheRowCandidateSkipsARefusedRelease(): void
+    {
+        [$lock, $facts] = $this->facts(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['1.1.0', null], ['1.2.0', null]],
+            ['A' => '<1.1.0'],
+            [['name' => 'c/c', 'version' => '1.0.0', 'conflict' => ['a/b' => '1.1.0 || 1.2.0']]]
+        );
+        $finder = (new FixFinder(new PhpFloor(null, null), LinkIndex::of($lock, ProjectConfig::empty())))
+            ->withRefused(RefusedMoves::none()->with('~1.1.0', [new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.0')]));
+
+        $fixes = $finder->find($facts);
+
+        self::assertSame('1.2.0', $fixes->branches()[0]->lowest());
+        self::assertSame('1.2.0', $fixes->forAdvisory('A')->version());
+        $unrefused = (new FixFinder(new PhpFloor(null, null), LinkIndex::of($lock, ProjectConfig::empty())))->find($facts)->forAdvisory('A');
+        self::assertSame(['1.1.0', Fix::UPGRADE], [$unrefused->version(), $unrefused->kind()], 'the same links with no refusal: the lowest release');
+    }
+
+    /**
+     * Installed 1.0.0, advisory A `<1.1.0`, target PHP 8.4 and `require.php` `>=7.4`. Each refusal names the root's `^1.0`,
+     * unless its holds are empty.
+     *
+     * @return iterable<string, array{0: list<array{0: string, 1: ?string}>, 1: array<string, string>, 2: array<string, bool>, 3: string, 4: string}>
+     */
+    public static function refusalsAcrossEaseSteps(): iterable
+    {
+        yield 'a refused upgrade beats a free raise-php on another branch' => [
+            [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['2.0.0', '>=8.1']], [], ['^1.1' => true], '1.1.0', Fix::UPGRADE,
+        ];
+        yield 'every candidate refused on two branches: the lowest release' => [
+            [['1.0.0', null], ['1.1.0', null], ['2.0.0', null]], [], ['^1.1' => true, '^2.0' => true], '1.1.0', Fix::UPGRADE,
+        ];
+        yield 'a refused held raise-php comes after an unrefused held one' => [
+            [['1.0.0', '>=7.4'], ['1.1.0', '>=8.1'], ['1.2.0', '>=8.1']], ['a/b' => '1.2.0'], ['~1.1.0' => true], '1.2.0', Fix::RAISE_PHP,
+        ];
+        yield 'a release refused with no hold comes after one that only the target blocks' => [
+            [['1.0.0', null], ['1.1.0', null], ['2.0.0', '>=9.0']], [], ['^1.1' => false], '2.0.0', Fix::BLOCKED,
+        ];
+        yield 'a refusal that names no hold blocks a release that a link holds' => [
+            [['1.0.0', null], ['1.1.0', null]], ['a/b' => '1.1.0'], ['^1.1' => false], '1.1.0', Fix::BLOCKED,
+        ];
+    }
+
+    /**
+     * @dataProvider refusalsAcrossEaseSteps
+     *
+     * @param list<array{0: string, 1: ?string}> $releases [version, php]
+     * @param array<string, string>              $conflict the conflict of c/c
+     * @param array<string, bool>                $refusals refused constraint => whether the refusal names a hold
+     */
+    #[DataProvider('refusalsAcrossEaseSteps')]
+    public function testTheMoveAndTheFixFollowTheEaseOrderWithRefusals(array $releases, array $conflict, array $refusals, string $version, string $kind): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], $releases, ['A' => '<1.1.0'], [['name' => 'c/c', 'version' => '1.0.0', 'conflict' => $conflict]]);
+        $refused = RefusedMoves::none();
+        foreach ($refusals as $constraint => $held) {
+            $refused = $refused->with($constraint, $held ? [new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.0')] : []);
+        }
+        $finder = (new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::fromArray(['require' => ['a/b' => '^1.0']]))))->withRefused($refused);
+
+        $fixes = $finder->find($facts);
+
+        self::assertSame([$version, $kind], [$fixes->forAdvisory('A')->version(), $fixes->forAdvisory('A')->kind()]);
+        $move = $fixes->move();
+        self::assertNotNull($move);
+        self::assertSame([$version, $kind], [$move->release()->pretty(), $move->kind()]);
     }
 
     public function testNoFloorAdmitsEveryRelease(): void

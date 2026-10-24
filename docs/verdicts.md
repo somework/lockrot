@@ -529,8 +529,8 @@ every `conflict`.
 | `none` | No release fixes it | yes |
 
 - A release fixes an advisory when it and every later release on its branch lie outside the
-  advisory's range. S9's `fix.version` is the lowest such release, and `fix.newest` is the
-  branch's newest release.
+  advisory's range. S9's `fix.version` is the first such release in the order that the Limits
+  paragraph gives, and `fix.newest` is the branch's newest release.
 
 - `fix.admits_target_php` and `fix.admits_project_php` are the floor answers of a branch row,
   asked of `fix.php` ([The PHP test](#the-php-test-in-explain)). Null is no answer, never admitted.
@@ -551,8 +551,12 @@ every `conflict`.
 
 Limits: a class reads the lock's links on the package, and Composer's solver checks the move to
 the release ([The move check](#the-move-check)). A refused move holds every release that its
-constraint admits, so its class is `upgrade`, with the holds. The suggested constraint is the
-lowest release that fixes every counted advisory on that branch.
+constraint admits, and an `update` release becomes `upgrade`, with the holds. When the refusal
+names no hold, the release is `blocked`. The fix and the move take the first release in this
+order: `update`, `upgrade`, `raise-php` with no holder, `raise-php` with holders, `blocked`.
+Within one of these steps, a release that no refused constraint admits comes before a refused
+one, and then the lower release comes first. The suggested constraint starts at the release of
+the move.
 
 ### Accepting advisories {#accepting-advisories}
 
