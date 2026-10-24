@@ -127,6 +127,24 @@ final class MoveBuilderTest extends TestCase
         self::assertSame(['composer', 'require', 'php:>=8.0', '--no-update'], $move->commands()[0]);
     }
 
+    /** A later release of an older minor (an LTS line, as composer/composer 2.2 beside 2.10) is not the release that the move installs. */
+    public function testThePhpCheckReadsTheHighestReleaseOnTheBranchNotTheLatestDatedOne(): void
+    {
+        $facts = self::factsOf([['2.0.0', '2026-01-01', '>=8.2'], ['2.5.0', '2026-02-01', '>=8.0'], ['2.1.9', '2026-03-01', '>=5.3']]);
+        $floor = new PhpFloor('8.4', '>=7.4');
+        $row = BranchRow::all($facts, $floor, Clock::fixed(self::NOW))[0];
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
+        $context = new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', null), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+        self::assertNotNull($lower);
+
+        $check = MoveBuilder::build(MoveDraft::of(Move::RAISE_PHP, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context)->phpCheck();
+
+        self::assertNotNull($check);
+        self::assertSame(['>=8.0', '>=8.0'], [$check->requires(), $check->raiseTo()]);
+    }
+
     /** composer.json does not require a/b: a resolved request becomes `composer update` with the constraint inline. */
     public function testATransitiveRequireThatComposerResolvesBecomesAnInlineUpdate(): void
     {
