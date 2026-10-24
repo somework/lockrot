@@ -37,7 +37,7 @@ final class NextStep
         $merged = [];
         $mainRow = $main->row();
         $otherRow = $other === null ? null : $other->row();
-        if ($other !== null && $main->isRowMove() && $other->isRowMove() && $mainRow !== null && $otherRow !== null && $mainRow->branch() === $otherRow->branch()) {
+        if ($other !== null && self::namesBranch($main) && self::namesBranch($other) && $mainRow !== null && $otherRow !== null && $mainRow->branch() === $otherRow->branch()) {
             $main = self::merge($main, $other);
             $merged = [$other->source()];
             $other = null;
@@ -213,6 +213,11 @@ final class NextStep
         $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $other->constraint() : null;
 
         return MoveDraft::of($kind, $main->source())->to($row, $lower, $constraint)->withFixKind($main->fixKind());
+    }
+
+    private static function namesBranch(MoveDraft $draft): bool
+    {
+        return $draft->isRowMove() || $draft->kind() === Move::BLOCKED;
     }
 
     /** The normalized lower bound of a move: its constraint's, else the release it names. */

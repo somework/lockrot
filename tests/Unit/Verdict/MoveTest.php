@@ -194,6 +194,22 @@ final class MoveTest extends TestCase
         self::assertContains('vulnerable', array_merge([$move['source']], JsonPath::arrayAt($move, ['merged'])));
     }
 
+    /** otphp at PHP 7.4: the advisory's fix and the left-behind way out both need 2.x, which the target does not run. */
+    public function testTwoBlockedMovesToOneBranchMergeIntoOneMove(): void
+    {
+        $finding = self::analyse([
+            'advisories' => [self::advisory('PKSA-a', 'high', '<2.0.0')],
+            'run' => ['target_php' => '7.4', 'project_php' => '>=7.4', 'fail_on' => 'high', 'include_dev' => false],
+        ]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        $sources = array_merge([$move['source']], JsonPath::arrayAt($move, ['merged']));
+        sort($sources);
+
+        self::assertSame(['blocked', '2.x', []], [$move['kind'], $move['to_branch'], $move['also']]);
+        self::assertSame(['left-behind', 'vulnerable'], $sources);
+    }
+
     /** twig: PKSA-8zx5 `<=3.26.0` names no exclusive bound, and v3.27.0 clears every advisory. */
     public function testTwigRaisesPhpThenRequiresTheFirstReleaseThatClearsEveryAdvisory(): void
     {
