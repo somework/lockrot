@@ -8276,23 +8276,23 @@
     },
     "server_mask": "http://127.0.0.1:<port> reads http://127.0.0.1",
     "files": {
-        "t0/report.json": "4319d2c8c72ea21604b8f9093d15ab42e18334186597069b7aa5c174401872d9",
+        "t0/report.json": "cf6bc5855d5a2b188fb77af37bfc9cf51872fc24e72d4bf523c8f70046ae59a7",
         "lockrot-baseline.json": "0a2540c7d924b35522590c21c8abd666862259f1a6f7f8a831ac68acd58e2d50",
-        "check/report.json": "8bf8e4ca2119424f66437472e4df27727a0d4e268e541d54b6a9edd80098a471",
+        "check/report.json": "95a635dcf6256bd7ba60b7f6ea8cce6bd5fc9b092a4469c433ff747ae93d8fb5",
         "check/report.table.txt": "70af3daae3dfbd9f7292019e25bfe4835246c2520ab0f5ca171184866ceff949",
         "check/report.md": "02cb5a058e6c3484dfe44402d402426028f150f4f811369b64c145092deaaf2e",
         "check/report.github.txt": "b186165d6c51bb33c64754dca26e68d3be91666209b92306eb823d9446c68c13",
         "check/report.gitlab.json": "e3e80db3ca81c2507c9147a56e6fd793aae77982a817abe37fe67abf3a70acf6",
-        "check/report.sarif.json": "dba63bd271574ea8ef7e0f34f94e6a9342e359cc5362bffc0dd0c3b2156994d9",
-        "check/report.bundle.json": "1a386c74a984aac6eb78a2e03469b4dd8ed01674e1307ef118487391d196a169",
+        "check/report.sarif.json": "b92193ef11cac8575d0ebda51699f3a62e2a2ae60433263080776e708939c99f",
+        "check/report.bundle.json": "fbe9a13779766b3389cf2a4871d711cf0c2ab02b9107bbe1e8216aa5823161ee",
         "check/explain/javibravo--simpleue.json": "a0ef19c24a5ab87d2d02f1560819080408edc251cda72a4fa69e80b9a540f8d2",
         "check/explain/mnapoli--piwik-twig-extension.json": "a705daabd06f6e7b146bb770279a58b3d37a4c16becbbdb16feac0aebbd5aeda",
         "check/explain/spomky-labs--otphp.json": "f3285f35748f3b476635718ec55f3cc996c63415c3663fb00f345f32ce985922",
         "check/explain/symfony--web-server-bundle.json": "adefee6ab9ea8b1d77c9c35467c0172a60f2181dbd2996100bdc7bab9d3a2e4f",
         "check/explain/willdurand--jsonp-callback-validator.json": "edcd55d9e5e5548ffaa5c145643bd925311b52cf5450ba0ce90a2e8948e3f1b0",
-        "check/gates-left-behind-vulnerable-high.json": "b8e0d4052be50b84e35c258ce9a846289e36aafdb19c87478a3d3ccc21ded8a2",
-        "check/gates-left-behind-vulnerable-high.sarif.json": "ed4801dc411ab8612a470fc0970ec41387accc18791abc544aa21aca4bb04a2e",
+        "check/gates-left-behind-vulnerable-high.json": "c4fca6d7e057198845d0eb478189d81f4195143becee7ff356b433721cf15c87",
+        "check/gates-left-behind-vulnerable-high.sarif.json": "71d6ac53ffece184e24b02624141467449411dd8f0faf8b2094e6edd4f29ab2b",
         "regenerate/lockrot-baseline.json": "bca7c23ed220491afdf5b8952fbb7f59ea258b1bf832bb2f9a71661878c87e8c",
-        "regenerate/report.json": "705ef497e05119c6f787a32f0da6ee31e3191149393781b13f612f8c8820fbdd"
+        "regenerate/report.json": "8b68267a6e02d8af6a87e2481d26fa5fbed59df2c2b810d96463998410d4343a"
     }
 }

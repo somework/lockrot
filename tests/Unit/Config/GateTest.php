@@ -104,6 +104,69 @@ final class GateTest extends TestCase
         self::assertSame([false, false, 1, 0, [], [['value' => 'high', 'failing' => 0]]], [$gate->fails(), $gate->failOnApplied(), $gate->reaching(), $gate->failing(), $standing->by(), JsonPath::decoded($gate->failingBy())]);
     }
 
+    /** SPEC §6.2, "`gate.standing` and `gate.failing_packages`". */
+    public function testTheStandingCountsTheReachingFindingsByBaselineStatus(): void
+    {
+        $gate = self::gate(self::standingReport(), 'high,unchecked')->toArray(self::runSettings('high,unchecked'));
+
+        self::assertSame(['known' => 1, 'new' => 1, 'worsened' => 1, 'none' => 1], $gate['standing'], 'a/quiet reaches nothing, a/unread is score 0 with no entry');
+        self::assertSame(4, $gate['reaching']);
+        self::assertSame(['z/worse', 'a/new', 'a/unread'], $gate['failing_packages'], 'the order of sorted(), the score first, and a/known is exempt');
+        self::assertSame(3, $gate['failing']);
+    }
+
+    public function testWithoutABaselineEveryReachingFindingStandsInNone(): void
+    {
+        $report = self::report(self::vulnerable('a/new', ['left-behind'], []), self::vulnerable('a/quiet', ['stale'], []), self::unread('a/unread'));
+        $gate = self::gate($report, 'high,unchecked')->toArray(self::runSettings('high,unchecked'));
+
+        self::assertSame(['known' => 0, 'new' => 0, 'worsened' => 0, 'none' => 2], $gate['standing']);
+        self::assertSame(['a/new', 'a/unread'], $gate['failing_packages']);
+    }
+
+    public function testAGenerateRunCountsTheStandingAndListsNoFailingPackage(): void
+    {
+        $gate = Gate::decide(self::standingReport(), FailOn::parse('high,unchecked'), false, Gate::MODE_GENERATE_BASELINE)->toArray(self::runSettings('high,unchecked'));
+
+        self::assertSame(['known' => 1, 'new' => 1, 'worsened' => 1, 'none' => 1], $gate['standing']);
+        self::assertSame([], $gate['failing_packages']);
+    }
+
+    public function testNothingFailingListsNoFailingPackage(): void
+    {
+        $gate = self::gate(self::report(self::vulnerable('a/quiet', ['stale'], [])), 'high')->toArray(self::runSettings('high'));
+
+        self::assertSame(['known' => 0, 'new' => 0, 'worsened' => 0, 'none' => 0], $gate['standing']);
+        self::assertSame([], $gate['failing_packages']);
+    }
+
+    /**
+     * Under `high,unchecked`: a/known reaches and is exempt, z/worse gained abandoned over its
+     * recorded stale, a/new has no entry, a/quiet reaches nothing, and a/unread is score 0 with S10.
+     */
+    private static function standingReport(): Report
+    {
+        $report = self::report(
+            self::vulnerable('a/known', ['left-behind'], []),
+            self::vulnerable('z/worse', ['abandoned'], []),
+            self::vulnerable('a/quiet', ['stale'], []),
+            self::vulnerable('a/new', ['left-behind'], []),
+            self::unread('a/unread')
+        );
+        $baseline = BaselineEntries::baseline([
+            BaselineEntries::of('a/known', '1.0.0', 'left-behind', '2026-01-01'),
+            BaselineEntries::of('z/worse', '1.0.0', 'stale', '2026-01-01'),
+            BaselineEntries::of('a/quiet', '1.0.0', 'stale', '2026-01-01'),
+        ]);
+
+        return $report->withBaseline(BaselineComparison::compare($baseline, $report, 'b.json', ['a/known', 'z/worse', 'a/quiet', 'a/new', 'a/unread']));
+    }
+
+    private static function unread(string $package): Finding
+    {
+        return (new FindingBuilder())->withPackage($package)->withSignals([self::s10('repository_activity', 'host_not_supported', ['S3', 'S4'])])->withChain([$package])->build();
+    }
+
     public function testAFindingThatCarriesS10FailsUnchecked(): void
     {
         $finding = (new FindingBuilder())->withPackage('a/unread')->withSignals([self::s10('repository_activity', 'host_not_supported', ['S3', 'S4'])])->withChain(['a/unread'])->build();

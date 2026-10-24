@@ -1130,6 +1130,20 @@
   "exempt": {
    "baseline": 0
   },
+  "standing": {
+   "known": 0,
+   "new": 0,
+   "worsened": 0,
+   "none": 6
+  },
+  "failing_packages": [
+   "twig/twig",
+   "symfony/monolog-bridge",
+   "guzzlehttp/guzzle",
+   "symfony/debug",
+   "friendsofsymfony/oauth-server-bundle",
+   "tubalmartin/cssmin"
+  ],
   "failing_by": [
    {
     "value": "high",

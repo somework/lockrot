@@ -8778,6 +8778,25 @@
                             "exempt": {
                                 "baseline": 30
                             },
+                            "standing": {
+                                "known": 30,
+                                "new": 9,
+                                "worsened": 2,
+                                "none": 0
+                            },
+                            "failing_packages": [
+                                "mnapoli/piwik-twig-extension",
+                                "spomky-labs/otphp",
+                                "grandt/relativepath",
+                                "doctrine/event-manager",
+                                "lcobucci/jwt",
+                                "scheb/2fa-backup-code",
+                                "scheb/2fa-bundle",
+                                "scheb/2fa-email",
+                                "scheb/2fa-google-authenticator",
+                                "scheb/2fa-trusted-device",
+                                "symfony/webpack-encore-bundle"
+                            ],
                             "failing_by": [
                                 {
                                     "value": "high",

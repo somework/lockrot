@@ -2881,6 +2881,8 @@
         "reaching",
         "failing",
         "exempt",
+        "standing",
+        "failing_packages",
         "failing_by",
         "not_applied",
         "text"
@@ -2934,6 +2936,46 @@
             "type": "integer",
             "minimum": 0
           }
+        },
+        "standing": {
+          "description": "Findings whose `gate.reaches_fail_on` is true, by `baseline.status`. `none` counts those with a null `baseline`: no baseline was read, or the baseline gives the finding no standing. The four counts add up to `reaching`.",
+          "type": "object",
+          "required": [
+            "known",
+            "new",
+            "worsened",
+            "none"
+          ],
+          "properties": {
+            "known": {
+              "description": "Reaching findings with `baseline.status` known.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "new": {
+              "description": "Reaching findings with `baseline.status` new.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "worsened": {
+              "description": "Reaching findings with `baseline.status` worsened.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "none": {
+              "description": "Reaching findings with a null `baseline`.",
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "failing_packages": {
+          "description": "The `package` of each finding whose `gate.fails` is true, in `findings` order. It holds as many names as `failing`.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          },
+          "uniqueItems": true
         },
         "failing_by": {
           "description": "One entry per `run.gates` value, in its order: how many findings fail that value (their `gate.by[]` names it). Zero counts are written. `[]` when `run.gates` is `[]`.",

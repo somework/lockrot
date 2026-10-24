@@ -849,6 +849,17 @@ def _(d): d['run']['php_window']['target_fix']['held_by'][0]['link'] = 'platform
 # a run that checks no move names no reason for a fix that is not checked
 @case('target-fix-reason-without-move-check', 'routing', 'run')
 def _(d): d['run']['php_window']['target_fix']['reason'] = 'offline'
+# the reaching findings by standing, and the failing findings' names
+@case('38a-failing-packages-missing', 'composite', 'gate.failing_packages')
+def _(d): del d['gate']['failing_packages']
+@case('38a-failing-packages-empty-while-failing', 'composite', '(root)')
+def _(d): d['gate']['failing_packages'] = []
+@case('38a-failing-packages-repeat', 'composite', 'gate.failing_packages')
+def _(d): d['gate']['failing_packages'][1] = d['gate']['failing_packages'][0]
+@case('38a-standing-none-missing', 'composite', 'gate.standing')
+def _(d): del d['gate']['standing']['none']
+@case('38a-standing-known-without-baseline', 'composite', '(root)')
+def _(d): d['gate']['standing']['known'] = 1
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)

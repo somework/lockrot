@@ -274,28 +274,33 @@ final class RootRecount
     /**
      * @param list<array<mixed, mixed>> $findings
      *
-     * @return array{reaching: int, failing: int, exempt: array<string, int>}
+     * @return array{reaching: int, failing: int, exempt: array<string, int>, standing: array<string, int>, failing_packages: list<string>}
      */
     private static function gate(array $findings): array
     {
         $reaching = 0;
         $failing = 0;
         $exempt = ['baseline' => 0];
+        $standing = ['known' => 0, 'new' => 0, 'worsened' => 0, 'none' => 0];
+        $failingPackages = [];
         foreach ($findings as $finding) {
-            $standing = self::map($finding, 'gate');
-            if (($standing['reaches_fail_on'] ?? false) === true) {
+            $gate = self::map($finding, 'gate');
+            if (($gate['reaches_fail_on'] ?? false) === true) {
                 ++$reaching;
+                $status = self::str(self::map($finding, 'baseline'), 'status');
+                ++$standing[$status === '' ? 'none' : $status];
             }
-            if (($standing['fails'] ?? false) === true) {
+            if (($gate['fails'] ?? false) === true) {
                 ++$failing;
+                $failingPackages[] = self::str($finding, 'package');
             }
-            $by = self::str($standing, 'exempt_by');
+            $by = self::str($gate, 'exempt_by');
             if ($by !== '') {
                 $exempt[$by] = ($exempt[$by] ?? 0) + 1;
             }
         }
 
-        return ['reaching' => $reaching, 'failing' => $failing, 'exempt' => $exempt];
+        return ['reaching' => $reaching, 'failing' => $failing, 'exempt' => $exempt, 'standing' => $standing, 'failing_packages' => $failingPackages];
     }
 
     /**

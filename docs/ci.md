@@ -141,9 +141,10 @@ gate: fails · --fail-on=high · 42 findings fail it · target php 8.4 (--target
   check, and the clause says so.
 - Last, the target PHP and its source. `(the running PHP)` says that nothing pinned it.
 
-The JSON report writes the line as `gate.text` and the counts as fields: `gate.failing_by`
-(failing findings per value) and `gate.not_applied` (each gap, with its package count). Key a
-script on the fields. The line is prose.
+The JSON report writes the line as `gate.text` and the gate data as fields: `gate.failing_by`
+(failing findings per value), `gate.standing` (reaching findings by baseline standing),
+`gate.failing_packages` (the package names of the failing findings) and `gate.not_applied` (each
+gap, with its package count). Key a script on the fields. The line is prose.
 
 A run that writes `json`, `sarif`, `gitlab` or `html` to stdout also writes `lockrot: ` and the
 `gate:` line to stderr when the gate fails, so the job log says why the job exits `1`. Read stdout

@@ -1097,6 +1097,15 @@
   "exempt": {
    "baseline": 0
   },
+  "standing": {
+   "known": 0,
+   "new": 0,
+   "worsened": 1,
+   "none": 0
+  },
+  "failing_packages": [
+   "symfony/monolog-bridge"
+  ],
   "failing_by": [
    {
     "value": "high",

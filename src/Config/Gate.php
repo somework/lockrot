@@ -26,7 +26,7 @@ use Lockrot\Verdict\SecurityStanding;
  *
  * @internal
  *
- * @phpstan-type Shape array{fails: bool, tripped_by: list<string>, fail_on_applied: bool, reaching: int, failing: int, exempt: array{baseline: int}, failing_by: list<GateValueFailing>, not_applied: list<GateNotApplied>, text: string}
+ * @phpstan-type Shape array{fails: bool, tripped_by: list<string>, fail_on_applied: bool, reaching: int, failing: int, exempt: array{baseline: int}, standing: array<string, int>, failing_packages: list<string>, failing_by: list<GateValueFailing>, not_applied: list<GateNotApplied>, text: string}
  */
 final class Gate
 {
@@ -44,6 +44,9 @@ final class Gate
     /** What can keep a finding that reaches fail-on from failing the run, as a finding's `gate.exempt_by` writes it. */
     public const EXEMPTIONS = [self::EXEMPT_BASELINE];
 
+    /** The `gate.standing` key of a reaching finding with a null `baseline`. */
+    private const STANDING_NONE = 'none';
+
     /** @var list<string> */
     private array $trippedBy;
     private bool $failOnApplied;
@@ -54,6 +57,10 @@ final class Gate
     private array $notApplied;
     /** @var array<string, GateStanding> by package name */
     private array $byPackage = [];
+    /** @var array<string, int> the reaching findings by `baseline.status`, `none` for a null baseline, all four keys written */
+    private array $standingCounts = [Standing::KNOWN => 0, Standing::NEW_PACKAGE => 0, Standing::WORSENED => 0, self::STANDING_NONE => 0];
+    /** @var list<string> in the order of the report's sorted() */
+    private array $failingPackages = [];
 
     /**
      * @param list<string>         $trippedBy
@@ -85,23 +92,32 @@ final class Gate
         $baseline = $report->baseline();
         $standings = [];
         $byPackage = [];
-        $anyFails = false;
-        foreach ($report->findings() as $finding) {
-            $standing = self::judge($finding, $baseline === null ? null : $baseline->standingOf($finding->package()), $failOn->values(), $applied);
+        $standingCounts = [Standing::KNOWN => 0, Standing::NEW_PACKAGE => 0, Standing::WORSENED => 0, self::STANDING_NONE => 0];
+        $failingPackages = [];
+        foreach ($report->sorted() as $finding) {
+            $against = $baseline === null ? null : $baseline->standingOf($finding->package());
+            $standing = self::judge($finding, $against, $failOn->values(), $applied);
             $standings[] = $standing;
             $byPackage[$finding->package()] = $standing;
-            $anyFails = $anyFails || $standing->fails();
+            if ($standing->reachesFailOn()) {
+                ++$standingCounts[$against === null ? self::STANDING_NONE : $against->status()];
+            }
+            if ($standing->fails()) {
+                $failingPackages[] = $finding->package();
+            }
         }
         $trippedBy = [];
         if ($strictNetwork && $report->hadNetworkFailures()) {
             $trippedBy[] = self::TRIP_STRICT_NETWORK;
         }
-        if ($anyFails) {
+        if ($failingPackages !== []) {
             $trippedBy[] = self::TRIP_FAIL_ON;
         }
 
         $gate = new self($trippedBy, $applied, $standings, $failOn, $applied ? self::notApplied($report->findings(), $failOn) : []);
         $gate->byPackage = $byPackage;
+        $gate->standingCounts = $standingCounts;
+        $gate->failingPackages = $failingPackages;
 
         return $gate;
     }
@@ -236,7 +252,7 @@ final class Gate
         return $standing !== null && $standing->fails();
     }
 
-    /** @return list<GateStanding> one per finding, in the order of the report's findings() */
+    /** @return list<GateStanding> one per finding, in the order of the report's sorted() */
     public function standings(): array
     {
         return $this->standings;
@@ -288,6 +304,8 @@ final class Gate
             'reaching' => $this->reaching(),
             'failing' => $this->failing(),
             'exempt' => ['baseline' => $this->exemptByBaseline()],
+            'standing' => $this->standingCounts,
+            'failing_packages' => $this->failingPackages,
             'failing_by' => $this->failingBy(),
             'not_applied' => $this->notApplied,
             'text' => RunGateText::render($this, $run),

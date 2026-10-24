@@ -1096,6 +1096,15 @@
   "exempt": {
    "baseline": 0
   },
+  "standing": {
+   "known": 0,
+   "new": 0,
+   "worsened": 0,
+   "none": 1
+  },
+  "failing_packages": [
+   "geoip2/geoip2"
+  ],
   "failing_by": [
    {
     "value": "high",

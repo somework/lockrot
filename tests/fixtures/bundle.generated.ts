@@ -1096,6 +1096,15 @@ export const d_A_baselined_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 1,
+            "none": 0
+        },
+        "failing_packages": [
+            "twig/twig"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -3133,6 +3142,15 @@ export const d_A_blocked_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "twig/twig"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -5005,6 +5023,15 @@ export const d_A_gate_critical = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "twig/twig"
+        ],
         "failing_by": [
             {
                 "value": "critical",
@@ -7461,6 +7488,15 @@ export const d_A_gate_vulnerable = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "twig/twig"
+        ],
         "failing_by": [
             {
                 "value": "vulnerable-high",
@@ -9931,6 +9967,15 @@ export const d_A_php_star_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "twig/twig"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -12381,6 +12426,15 @@ export const d_A = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "twig/twig"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -14837,6 +14891,15 @@ export const d_B_accepted_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/monolog-bridge"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -16453,6 +16516,15 @@ export const d_B_also_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/monolog-bridge"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -18163,6 +18235,15 @@ export const d_B_baselined_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 1,
+            "none": 0
+        },
+        "failing_packages": [
+            "symfony/monolog-bridge"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -19860,6 +19941,15 @@ export const d_B_dev_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/monolog-bridge"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -21500,6 +21590,15 @@ export const d_B_gate_flag = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/monolog-bridge"
+        ],
         "failing_by": [
             {
                 "value": "old-promise",
@@ -23137,6 +23236,15 @@ export const d_B_gate_list = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/monolog-bridge"
+        ],
         "failing_by": [
             {
                 "value": "left-behind",
@@ -24771,6 +24879,13 @@ export const d_B_gate_none = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [],
         "not_applied": [],
         "text": "gate: off \u00b7 --fail-on=none \u00b7 target php 8.4 (--target-php)"
@@ -26388,6 +26503,15 @@ export const d_B_offline_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/monolog-bridge"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -27914,6 +28038,15 @@ export const d_B_offline_high_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/monolog-bridge"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -29432,6 +29565,15 @@ export const d_B = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/monolog-bridge"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -31068,6 +31210,13 @@ export const d_C_baselined_dagger = {
         "exempt": {
             "baseline": 1
         },
+        "standing": {
+            "known": 1,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -32599,6 +32748,15 @@ export const d_C_bitbucket_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/debug"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -34088,6 +34246,15 @@ export const d_C_gitlab_hosted_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/debug"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -35594,6 +35761,15 @@ export const d_C_offline_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/debug"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -37134,6 +37310,15 @@ export const d_C_tokenless_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/debug"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -38629,6 +38814,15 @@ export const d_C = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/debug"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -40113,6 +40307,15 @@ export const d_D_partial_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "tubalmartin/cssmin"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -41535,6 +41738,15 @@ export const d_D = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "tubalmartin/cssmin"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -43032,6 +43244,13 @@ export const d_E_ignored_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -44646,6 +44865,13 @@ export const d_E_ignored_whole_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -46286,6 +46512,13 @@ export const d_E = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -47873,6 +48106,13 @@ export const d_F = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -49372,6 +49612,15 @@ export const d_G_tag_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "friendsofsymfony/oauth-server-bundle"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -50868,6 +51117,15 @@ export const d_G = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "friendsofsymfony/oauth-server-bundle"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -52350,6 +52608,15 @@ export const d_abandoned_audit_ignore_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/debug"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -53851,6 +54118,15 @@ export const d_abandoned_ignore_unreadable_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/debug"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -55348,6 +55624,15 @@ export const d_adds_capped_raise_php = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "scheb/2fa-bundle"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -56780,6 +57065,15 @@ export const d_adds_capped_require_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "scheb/2fa-bundle"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -58210,6 +58504,15 @@ export const d_adds_capped_tag_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "matomo/referrer-spam-list"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -59641,6 +59944,15 @@ export const d_adds_capped_update = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "phpoffice/phpspreadsheet"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -62173,6 +62485,13 @@ export const d_affected_range_unknown_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -63667,6 +63986,15 @@ export const d_cache_subscriber = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "guzzlehttp/cache-subscriber"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -65258,6 +65586,13 @@ export const d_capped_covered_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -66758,6 +67093,15 @@ export const d_capped_local_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "mautic/core-lib"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -70033,6 +70377,15 @@ export const d_capped_require_php = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "pelago/emogrifier"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -71548,6 +71901,15 @@ export const d_capped_tag_unverified_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "matomo/referrer-spam-list"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -73041,6 +73403,15 @@ export const d_commonmark = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "league/commonmark"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -75348,6 +75719,20 @@ export const d_composite = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 6
+        },
+        "failing_packages": [
+            "twig/twig",
+            "symfony/monolog-bridge",
+            "guzzlehttp/guzzle",
+            "symfony/debug",
+            "friendsofsymfony/oauth-server-bundle",
+            "tubalmartin/cssmin"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -81072,6 +81457,15 @@ export const d_either_critical_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/debug"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -82771,6 +83165,13 @@ export const d_either_low_dev_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -84298,6 +84699,15 @@ export const d_fail_on_config_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/monolog-bridge"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -85922,6 +86332,13 @@ export const d_fail_on_default_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [],
         "not_applied": [],
         "text": "gate: off \u00b7 --fail-on=none (default) \u00b7 target php 8.4 (--target-php)"
@@ -87534,6 +87951,15 @@ export const d_feeds_drupal_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "twig/twig"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -89465,6 +89891,13 @@ export const d_flysystem = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -91139,6 +91572,15 @@ export const d_gitlab_anon_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "hoa/consistency"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -92674,6 +93116,15 @@ export const d_guzzle_5 = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "guzzlehttp/guzzle"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -95615,6 +96066,15 @@ export const d_guzzle_mixed = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "guzzlehttp/guzzle"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -99226,6 +99686,15 @@ export const d_guzzle = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "guzzlehttp/guzzle"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -101097,6 +101566,15 @@ export const d_hoa_tokenless_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "hoa/consistency"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -102620,6 +103098,15 @@ export const d_hoa = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "hoa/consistency"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -104213,6 +104700,15 @@ export const d_holder_vuln_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "joomla/string"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -105673,6 +106169,15 @@ export const d_ignored_marking_archived_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/debug"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -107181,6 +107686,13 @@ export const d_ignored_marking_only_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -108476,6 +108988,13 @@ export const d_ignored_marking_partial_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -109834,6 +110353,13 @@ export const d_ignored_marking_stale_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -111249,6 +111775,15 @@ export const d_ignored_marking_unchecked_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/debug"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -112916,6 +113451,15 @@ export const d_installed_php_halved = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "web-auth/metadata-service"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -114475,6 +115019,13 @@ export const d_joomla_filter = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -115978,6 +116529,15 @@ export const d_local_path_advisory = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "mautic/core-lib"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -119190,6 +119750,15 @@ export const d_lock_only_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/debug"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -120719,6 +121288,13 @@ export const d_long_range_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -122243,6 +122819,13 @@ export const d_many_dependents = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -124110,6 +124693,13 @@ export const d_move_check_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -125654,6 +126244,15 @@ export const d_not_found_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "hoa/consistency"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -127167,6 +127766,15 @@ export const d_ok_unchecked = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "scheb/2fa-google-authenticator"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -128464,6 +129072,15 @@ export const d_op_update = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "matomo/network"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -129896,6 +130513,15 @@ export const d_pagerfanta = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "pagerfanta/twig"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -131366,6 +131992,15 @@ export const d_partial_op_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "geoip2/geoip2"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -133155,6 +133790,15 @@ export const d_partial = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "laravel/framework"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -135120,6 +135764,15 @@ export const d_php_edge_equal_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "scheb/2fa-bundle"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -136547,6 +137200,15 @@ export const d_php_edge_lower_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "scheb/2fa-bundle"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -138003,6 +138665,15 @@ export const d_php_edge_upper_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "scheb/2fa-bundle"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -139448,6 +140119,13 @@ export const d_php_null = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -140906,6 +141584,15 @@ export const d_pinned_unread = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "tobscure/json-api"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -142388,6 +143075,13 @@ export const d_policy_off_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -143875,6 +144569,15 @@ export const d_psr7 = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "guzzlehttp/psr7"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -145688,6 +146391,15 @@ export const d_replace_graded = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "web-token/jwt-key-mgmt"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -147106,6 +147818,15 @@ export const d_replace_text = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "sensio/framework-extra-bundle"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -148572,6 +149293,13 @@ export const d_require_dev_name_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -150441,6 +151169,13 @@ export const d_rounded_dev_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -151968,6 +152703,15 @@ export const d_routing = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/routing"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -153649,6 +154393,15 @@ export const d_silent = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "yosymfony/toml"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -155144,6 +155897,13 @@ export const d_snapshot_alias = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -156585,6 +157345,13 @@ export const d_snapshot_dead_line_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -158032,6 +158799,13 @@ export const d_snapshot_undated_line_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -159448,6 +160222,13 @@ export const d_stale_accepted_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -160842,6 +161623,13 @@ export const d_stale_capped = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -162290,6 +163078,13 @@ export const d_stale_only = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -163675,6 +164470,15 @@ export const d_tie_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/monolog-bridge"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -165399,6 +166203,15 @@ export const d_twig_1 = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "twig/twig"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -168302,6 +169115,15 @@ export const d_twig_dev_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "twig/twig"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -170206,6 +171028,15 @@ export const d_unknown_origin = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "bower-asset/jquery"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -171532,6 +172363,13 @@ export const d_unknown = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -172910,6 +173748,15 @@ export const d_unrated_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/yaml"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -174461,6 +175308,13 @@ export const d_unreached_dev_dagger = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -175868,6 +176722,13 @@ export const d_unreached_move = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -177340,6 +178201,15 @@ export const d_unreached = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "fgrosse/phpasn1"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -178754,6 +179624,15 @@ export const d_wp_config = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "roots/wp-config"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -180200,6 +181079,16 @@ export const d_xmlseclibs = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 2
+        },
+        "failing_packages": [
+            "mautic/core-lib",
+            "robrichards/xmlseclibs"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -182404,6 +183293,15 @@ export const d_yaml_3_4 = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/yaml"
+        ],
         "failing_by": [
             {
                 "value": "high",
@@ -184065,6 +184963,13 @@ export const d_zero_n = {
         "exempt": {
             "baseline": 0
         },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",

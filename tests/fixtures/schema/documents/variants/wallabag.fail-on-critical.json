@@ -1370,6 +1370,29 @@
   "exempt": {
    "baseline": 0
   },
+  "standing": {
+   "known": 0,
+   "new": 0,
+   "worsened": 0,
+   "none": 15
+  },
+  "failing_packages": [
+   "twig/twig",
+   "guzzlehttp/guzzle",
+   "symfony/http-foundation",
+   "symfony/mime",
+   "symfony/security-http",
+   "javibravo/simpleue",
+   "kphoen/rulerz-bundle",
+   "mnapoli/piwik-twig-extension",
+   "php-http/guzzle5-adapter",
+   "lexik/form-filter-bundle",
+   "php-http/message-factory",
+   "scheb/2fa-qr-code",
+   "sensio/framework-extra-bundle",
+   "symfony/debug",
+   "wallabag/php-mobi"
+  ],
   "failing_by": [
    {
     "value": "critical",
