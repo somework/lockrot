@@ -194,6 +194,71 @@ final class MoveTest extends TestCase
         self::assertContains('vulnerable', array_merge([$move['source']], JsonPath::arrayAt($move, ['merged'])));
     }
 
+    /** otphp at PHP 7.4: the advisory's fix and the left-behind way out both need 2.x, which the target does not run. */
+    public function testTwoBlockedMovesToOneBranchMergeIntoOneMove(): void
+    {
+        $finding = self::analyse([
+            'advisories' => [self::advisory('PKSA-a', 'high', '<2.0.0')],
+            'run' => ['target_php' => '7.4', 'project_php' => '>=7.4', 'fail_on' => 'high', 'include_dev' => false],
+        ]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        $sources = array_merge([$move['source']], JsonPath::arrayAt($move, ['merged']));
+        sort($sources);
+
+        self::assertSame(['blocked', '2.x', []], [$move['kind'], $move['to_branch'], $move['also']]);
+        self::assertSame(['left-behind', 'vulnerable'], $sources);
+    }
+
+    /**
+     * The capped move to 1.9.0 is blocked at PHP 7.4, and the security update to 1.5.0 runs there,
+     * on the same branch: the update leads, and the blocked move takes no part in it.
+     */
+    public function testABlockedMoveDoesNotMergeWithAnUpdateOnItsBranch(): void
+    {
+        $finding = self::analyse([
+            'lock' => [['php' => '>=7.2,<8.0']],
+            'releases' => [self::release('1.0.0', '2019-01-01', '>=7.2,<8.0'), self::release('1.5.0', '2026-01-01', '>=7.2'), self::release('1.9.0', '2026-06-01', '>=8.1')],
+            'advisories' => [self::advisory('PKSA-a', 'high', '<1.5.0')],
+            'run' => ['target_php' => '7.4', 'project_php' => '>=7.4', 'fail_on' => 'high', 'include_dev' => false],
+        ]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['update', 'vulnerable', [], '1.5.0'], [$move['kind'], $move['source'], $move['merged'], $move['version']]);
+    }
+
+    /** A pinned package's blocked move names the tag 0.3.5: it keeps the tag beside the blocked security move to 0.3.x. */
+    public function testABlockedMoveToATagDoesNotMergeWithABlockedMoveOnItsBranch(): void
+    {
+        $finding = self::analyse([
+            'lock' => [['version' => '0.3.x-dev', 'php' => '>=8.1']],
+            'root' => ['require' => ['a/b' => '0.3.x-dev']],
+            'releases' => [self::release('0.3.0', '2025-01-01', '>=8.1'), self::release('0.3.5', '2026-01-01', '>=8.1')],
+            'advisories' => [self::advisory('PKSA-a', 'high', '<0.3.5')],
+            'run' => ['target_php' => '7.4', 'project_php' => '>=7.4', 'fail_on' => 'high', 'include_dev' => false],
+        ]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['blocked', 'vulnerable', [], '0.3.x'], [$move['kind'], $move['source'], $move['merged'], $move['to_branch']]);
+        self::assertSame(['blocked', 'pinned', '0.3.5'], [JsonPath::stringAt($move, ['also', 0, 'kind']), JsonPath::stringAt($move, ['also', 0, 'source']), JsonPath::stringAt($move, ['also', 0, 'latest', 'version'])]);
+    }
+
+    /** With a low advisory, the pinned package's move to the tag leads, and the blocked security move follows it. */
+    public function testABlockedMoveToATagThatLeadsTakesInNoBlockedMoveOnItsBranch(): void
+    {
+        $finding = self::analyse([
+            'lock' => [['version' => '0.3.x-dev', 'php' => '>=8.1']],
+            'root' => ['require' => ['a/b' => '0.3.x-dev']],
+            'releases' => [self::release('0.3.0', '2025-01-01', '>=8.1'), self::release('0.3.5', '2026-01-01', '>=8.1')],
+            'advisories' => [self::advisory('PKSA-a', 'low', '<0.3.5')],
+            'run' => ['target_php' => '7.4', 'project_php' => '>=7.4', 'fail_on' => 'high', 'include_dev' => false],
+        ]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['blocked', 'pinned', [], '0.3.5'], [$move['kind'], $move['source'], $move['merged'], JsonPath::stringAt($move, ['latest', 'version'])]);
+        self::assertSame(['blocked', 'vulnerable'], [JsonPath::stringAt($move, ['also', 0, 'kind']), JsonPath::stringAt($move, ['also', 0, 'source'])]);
+    }
+
     /** twig: PKSA-8zx5 `<=3.26.0` names no exclusive bound, and v3.27.0 clears every advisory. */
     public function testTwigRaisesPhpThenRequiresTheFirstReleaseThatClearsEveryAdvisory(): void
     {

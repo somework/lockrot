@@ -90,7 +90,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   gains the links `root-require`, `platform` and `replace` and the field `target`, and
   `run.move_check` names the Composer that solved. Under `--offline`, a package that composer.json
   admits at `dev` needs its `~dev` file in Composer's cache, else the move is `not_checked` with
-  `offline`. ([The move check](docs/verdicts.md#the-move-check))
+  `offline`. The check offers a package that no Composer repository serves at its locked
+  version only.
+  ([The move check](docs/verdicts.md#the-move-check))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
   installs, with require-dev and without, and the links that set each edge. The minors and edges
   assume no override, and `platform_override` names the lock's `platform-overrides.php`. The text

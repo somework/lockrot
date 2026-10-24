@@ -604,7 +604,9 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 
 - **Which move leads.** An `update` that fixes an advisory always leads. Otherwise the move of the
   larger part of the score leads, and the other part's move follows in `next_step.also[]`. Two
-  moves to one branch merge into one, with the tightest constraint.
+  moves to one branch merge into one, with the tightest constraint. Two `blocked` moves to one
+  branch merge too, unless one of them names a tag. A `blocked` move never merges with a move that
+  runs on the target PHP.
 
 - **What it clears.** `next_step.clears[]` names only what lockrot checked for every version the
   constraint admits. `unverified[]` names what it could not check, and `leaves[]` what the move
@@ -674,6 +676,8 @@ Limits of the check:
   [stability flag](https://getcomposer.org/doc/04-schema.md#package-links) admits `dev` for the
   package, and so does the check. A move to a dev snapshot is
   not a move that lockrot proposes.
+- It offers a package that no Composer repository serves, such as a package from a path or VCS
+  repository, at its locked version only.
 - With `--offline`, a package that composer.json admits at `dev` needs its `~dev` file in
   Composer's cache. Without that file, the move is not checked (`check.reason` `offline`). From
   these repositories, such a package with tags and no dev version also reads `not_checked` with

@@ -286,6 +286,37 @@ final class ComposerSolverTest extends TestCase
         self::assertFalse($solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->resolves());
     }
 
+    /** The copy offers the locked path package, and the solver it comes from still offers no version of it. */
+    public function testALockedOnlyCopyLeavesTheSolverItComesFromAsItWas(): void
+    {
+        $solver = self::solver(['require' => ['acme/core' => '^7.0']], [['name' => 'acme/core', 'version' => '7.0.0', 'dist' => ['type' => 'path', 'url' => 'core', 'reference' => 'abc']]], []);
+
+        $copy = $solver->withLockedOnly(['acme/core']);
+
+        self::assertSame([true, false], [$copy->solve(SolveRequest::baseline())->resolves(), $solver->solve(SolveRequest::baseline())->resolves()]);
+    }
+
+    /**
+     * The lock aliases the path package dev-main as 1.0.0, and composer.json no longer declares the
+     * alias. Composer reads the path package with no alias, so acme/lib's `^1.0` refuses the baseline.
+     */
+    public function testALockedOnlyCopyTakesNoRootAliasFromTheLock(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/core' => 'dev-main', 'acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $root->setMinimumStability('dev');
+        $lock = LockFile::fromArray([
+            'packages' => [
+                ['name' => 'acme/core', 'version' => 'dev-main', 'dist' => ['type' => 'path', 'url' => 'core', 'reference' => 'abc']],
+                ['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0'], 'notification-url' => 'https://packagist.org/downloads/'],
+            ],
+            'aliases' => [['package' => 'acme/core', 'version' => 'dev-main', 'alias' => '1.0.0', 'alias_normalized' => '1.0.0.0']],
+        ]);
+        $solver = (new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']]]]), []))->withLockedOnly(['acme/core']);
+
+        self::assertFalse($solver->solve(SolveRequest::baseline())->resolves());
+    }
+
     /**
      * @param array<string, mixed>                      $root
      * @param list<array<string, mixed>>                $locked

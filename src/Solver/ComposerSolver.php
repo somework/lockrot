@@ -18,9 +18,12 @@ use Composer\Filter\PlatformRequirementFilter\PlatformRequirementFilterInterface
 use Composer\IO\NullIO;
 use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
+use Composer\Package\CompleteAliasPackage;
+use Composer\Package\CompletePackage;
 use Composer\Package\Link;
 use Composer\Package\RootPackageInterface;
 use Composer\Package\Version\VersionParser;
+use Composer\Repository\ArrayRepository;
 use Composer\Repository\LockArrayRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositorySet;
@@ -49,6 +52,7 @@ final class ComposerSolver
     private array $blocked;
     private PlatformRequirementFilterInterface $filter;
     private ?PoolAdvisories $advisories = null;
+    private ?ArrayRepository $lockedOnly = null;
     private string $lastInputs = '';
     /** @phpstan-ignore property.onlyWritten (the last built pool keeps the object ids of its packages taken: {@see SolverInputs}) */
     private Pool $lastBuilt;
@@ -82,6 +86,26 @@ final class ComposerSolver
     {
         $clone = clone $this;
         $clone->advisories = $advisories;
+
+        return $clone;
+    }
+
+    /**
+     * A copy that offers each name at its locked version only, in place of the path or VCS
+     * repository that serves it: Composer's pool builder never loads a package from the lock's own
+     * repository.
+     *
+     * @param list<string> $names
+     */
+    public function withLockedOnly(array $names): self
+    {
+        $clone = clone $this;
+        $clone->lockedOnly = new ArrayRepository();
+        foreach ($names as $name) {
+            foreach (self::copies($this->locked->findPackages($name)) as $package) {
+                $clone->lockedOnly->addPackage($package);
+            }
+        }
 
         return $clone;
     }
@@ -202,6 +226,9 @@ final class ComposerSolver
         }
         $fixedRoot->setRequires([]);
         $set->addRepository(new RootPackageRepository($fixedRoot));
+        if ($this->lockedOnly !== null) {
+            $set->addRepository($this->lockedOnly);
+        }
         $set->addRepository(new LoadedVersions($this->source));
         $set->addRepository($this->locked);
 
@@ -298,6 +325,35 @@ final class ComposerSolver
         $root->setDevRequires($devRequires);
 
         return $root;
+    }
+
+    /**
+     * Copies of the packages and their branch aliases: a package keeps the repository that holds
+     * it. A root alias comes from composer.json, as the pool builder adds it, never from the lock.
+     *
+     * @param array<BasePackage> $packages
+     *
+     * @return list<BasePackage>
+     */
+    private static function copies(array $packages): array
+    {
+        $copies = [];
+        $bases = [];
+        foreach ($packages as $package) {
+            if (!$package instanceof AliasPackage) {
+                $copy = clone $package;
+                $bases[spl_object_id($package)] = $copy;
+                $copies[] = $copy;
+            }
+        }
+        foreach ($packages as $package) {
+            $base = $package instanceof AliasPackage && !$package->isRootPackageAlias() ? ($bases[spl_object_id($package->getAliasOf())] ?? null) : null;
+            if ($base instanceof CompletePackage) {
+                $copies[] = new CompleteAliasPackage($base, $package->getVersion(), $package->getPrettyVersion());
+            }
+        }
+
+        return $copies;
     }
 
     /**
