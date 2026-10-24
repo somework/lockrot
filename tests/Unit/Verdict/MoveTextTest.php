@@ -77,7 +77,7 @@ final class MoveTextTest extends TestCase
 
         $text = MoveText::render($move);
 
-        self::assertSame($step ? 'First set config.platform.php to your PHP '.$target.' release: composer.json sets it to '.$override.'. composer update acme/lib (gets 2.0.0)' : 'composer update acme/lib (gets 2.0.0)', $text);
+        self::assertSame($step ? 'First set config.platform.php to your PHP '.$target.' release: the lock records '.$override.'. composer update acme/lib (gets 2.0.0)' : 'composer update acme/lib (gets 2.0.0)', $text);
     }
 
     public function testAMoveWithoutCommandsTakesNoPlatformStep(): void

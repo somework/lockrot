@@ -63,8 +63,8 @@ final class MoveText
     }
 
     /**
-     * SPEC §5.6: Composer refuses the commands while composer.json pins a PHP outside the target
-     * minor. The sentence and a space, else an empty string.
+     * SPEC §5.6: Composer refuses the commands while the lock records a platform PHP outside the
+     * target minor. The sentence and a space, else an empty string.
      *
      * @param ?string $platformOverride `run.php_window.platform_override`
      */
@@ -74,7 +74,7 @@ final class MoveText
             return '';
         }
 
-        return 'First set config.platform.php to your PHP '.$targetPhp.' release: composer.json sets it to '.$platformOverride.'. ';
+        return 'First set config.platform.php to your PHP '.$targetPhp.' release: the lock records '.$platformOverride.'. ';
     }
 
     /** D10: what Composer's solver said about the move, or why lockrot did not ask it. */

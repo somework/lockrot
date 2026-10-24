@@ -6611,7 +6611,7 @@
                 "commands": [],
                 "through": [],
                 "also": [],
-                "text": "require intervention/image ^3.11 \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.5) and intervention/image 3.11.10 (requires intervention/gif ^4.2; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require intervention/image ^3.11 \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.5) and intervention/image 3.11.10, the release this move installs (requires intervention/gif ^4.2); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",

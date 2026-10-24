@@ -128,7 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Each branch row's `fixes.if_applied` scores a move to that branch. For a package that comes in
   through a dependency, `through[]` says whether that dependency's newest release requires it.
   `--fail-on` and the exit code do not read `next_step`. ([The move](docs/verdicts.md#move))
-- **All formats:** when composer.json pins `config.platform.php` outside the minor of the target
+- **All formats:** when the lock records a `config.platform.php` outside the minor of the target
   PHP, the line of each move with commands and the `update now:` line first say to set it to a
   target PHP release.
   ([The move](docs/verdicts.md#move))

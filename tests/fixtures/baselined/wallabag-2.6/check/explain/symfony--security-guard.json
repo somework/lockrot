@@ -300,7 +300,7 @@
                 }
             ],
             "also": [],
-            "text": "find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update them; the newest release of symfony/security-bundle (v8.1.6) no longer requires it"
+            "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update them; the newest release of symfony/security-bundle (v8.1.6) no longer requires it"
         },
         "security": {
             "status": "clear",

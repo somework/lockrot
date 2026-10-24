@@ -142,7 +142,7 @@ final class InstallSummaryFormatterTest extends TestCase
 
         $lines = self::lines(self::report($findings)->withPhpWindow($window));
 
-        self::assertContains('  update now: First set config.platform.php to your PHP 8.4 release: composer.json sets it to 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn', $lines);
+        self::assertContains('  update now: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn', $lines);
     }
 
     public function testTheUpdateLineCountsOnlyThePackagesThatTheBlockDoesNotShow(): void

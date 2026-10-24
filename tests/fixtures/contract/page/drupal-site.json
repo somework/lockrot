@@ -31756,7 +31756,7 @@
                 "constraint": "^2.0",
                 "latest": null,
                 "php_check": {
-                    "requires": ">=5.5.0",
+                    "requires": ">=7.1.3",
                     "project_allows": null,
                     "target_runs": true,
                     "raise_to": null,
@@ -31842,7 +31842,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move consolidation/filter-via-dot-access-data to ^2.0 through drush/drush \u2014 clears left-behind and old-promise; 2.x needs php >=5.5.0; the target php 8.3 runs it; held by drush/drush 10.6.2 (requires ^1; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "move consolidation/filter-via-dot-access-data to ^2.0 through drush/drush \u2014 clears left-behind and old-promise; 2.x needs php >=7.1.3; the target php 8.3 runs it; held by drush/drush 10.6.2 (requires ^1; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",

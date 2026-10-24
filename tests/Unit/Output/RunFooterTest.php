@@ -226,9 +226,9 @@ final class RunFooterTest extends TestCase
     /** @return iterable<string, array{string, string}> */
     public static function updateNowFormats(): iterable
     {
-        yield 'table' => ['table', 'update now: First set config.platform.php to your PHP 8.4 release: composer.json sets it to 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn'];
-        yield 'markdown' => ['markdown', '**Update now:** First set config.platform.php to your PHP 8.4 release: composer.json sets it to 7.4.29. `composer update symfony/yaml symfony/polyfill-intl-idn`'];
-        yield 'github' => ['github', "\nupdate now: First set config.platform.php to your PHP 8.4 release: composer.json sets it to 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn\n"];
+        yield 'table' => ['table', 'update now: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn'];
+        yield 'markdown' => ['markdown', '**Update now:** First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. `composer update symfony/yaml symfony/polyfill-intl-idn`'];
+        yield 'github' => ['github', "\nupdate now: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn\n"];
     }
 
     /**

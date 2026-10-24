@@ -13,8 +13,8 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The move words of SPEC §5.6 on {@see WallabagSite}, whose composer.json pins
- * `config.platform.php` 7.4.29: inside the minor of the target 7.4, outside that of 8.4.
+ * The move words of SPEC §5.6 on {@see WallabagSite}, whose lock records `config.platform.php`
+ * 7.4.29: inside the minor of the target 7.4, outside that of 8.4.
  *
  * @coversNothing
  *
@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 #[Group('covers-nothing')]
 final class MoveWordsWallabagTest extends TestCase
 {
-    private const PLATFORM_STEP = 'First set config.platform.php to your PHP 8.4 release: composer.json sets it to 7.4.29. ';
+    private const PLATFORM_STEP = 'First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. ';
 
     /** @var array<string, array<mixed, mixed>> each report by its target PHP */
     private static array $reports = [];

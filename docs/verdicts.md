@@ -621,10 +621,10 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 
 - **A new major.** A move to a higher branch says that a new major brings its own requirements.
 
-- **A PHP that composer.json pins.** When `run.php_window.platform_override` lies outside the minor
+- **A PHP that the lock records.** When `run.php_window.platform_override` lies outside the minor
   of the target PHP, Composer refuses the commands of a move. The line of each move with commands
-  then starts with "First set config.platform.php to your PHP <target> release: composer.json sets
-  it to <version>." So does the `update now:` line. The commands stay the same.
+  then starts with "First set config.platform.php to your PHP <target> release: the lock records
+  <version>." So does the `update now:` line. The commands stay the same.
 
 The `update now:` footer line lists every package whose `update` move Composer's solver resolves
 with the constraint inline, with one command for all of them.
