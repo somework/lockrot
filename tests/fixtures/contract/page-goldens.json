@@ -19205,6 +19205,346 @@
       },
       "sheet_ladder": {}
     },
+    "mc-composite‡": {
+      "document": "cases/mc-composite-dagger.json",
+      "title": "lockrot: 6 of 6 packages flagged",
+      "description": "lockrot flagged 6 of 6 packages in composer.lock: 6 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for typo3/cms · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "6 of 6 packages flagged (100%): 6 graded high. Flags: vulnerable 6.",
+        "All 6 in production · all 6 required directly · 6 security advisories on 6 packages (severity: 6 high) · fix by package: 4 composer update, 1 upgrade, 1 php floor raise · 5.8 libyears behind."
+      ],
+      "grade_line": "Project grade: high · 6 high findings · 6 of 6 packages high or worse",
+      "figure_line": "6 of 6 packages flagged · 0 ok · 0 allowlisted",
+      "load_line": "96 points on 6 flagged packages · 96 (100 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 6,
+      "state_lines": [],
+      "waffle_caption": "6 of 6 packages flagged · 0 ok · 0 allowlisted",
+      "lead_scope": "all 6 in production · all 6 required directly",
+      "grade_chips": [
+        "high 6"
+      ],
+      "waffle": [
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 6
+        }
+      ],
+      "ready": {
+        "note": "for findings that fail the gate, in lockrot's rank order",
+        "moves": [
+          {
+            "package": "guzzlehttp/guzzle",
+            "link": "#view=findings&pkg=guzzlehttp%2Fguzzle",
+            "grade": "high",
+            "new_major": true,
+            "command": "composer require 'guzzlehttp/guzzle:^8.0.1'",
+            "clears": "the advisory",
+            "after": {
+              "result": "0, ok",
+              "conditions": [
+                "checked with Composer"
+              ]
+            },
+            "also_holds": null
+          },
+          {
+            "package": "symfony/http-foundation",
+            "link": "#view=findings&pkg=symfony%2Fhttp-foundation",
+            "grade": "high",
+            "new_major": false,
+            "command": "composer update 'symfony/http-foundation:^6.4.41' --with-all-dependencies",
+            "clears": "the advisory",
+            "after": {
+              "result": "0, ok",
+              "conditions": [
+                "checked with Composer"
+              ]
+            },
+            "also_holds": null
+          },
+          {
+            "package": "symfony/routing",
+            "link": "#view=findings&pkg=symfony%2Frouting",
+            "grade": "high",
+            "new_major": false,
+            "command": "composer update 'symfony/routing:^6.4.41' --with-dependencies",
+            "clears": "the advisory",
+            "after": {
+              "result": "0, ok",
+              "conditions": [
+                "checked with Composer"
+              ]
+            },
+            "also_holds": null
+          }
+        ],
+        "more": "All 4 ready to run",
+        "more_link": "#view=findings&gate=fails%2Cready",
+        "more_link_rows": 4,
+        "held_line": "1 of 6 findings that fail the gate is held by other packages. Their holders are in each sheet's Held by.",
+        "held_link": "#view=findings&gate=fails%2Cheld",
+        "held_link_rows": 1,
+        "way_out": "1 needs another way out: 1 raise PHP >=8.2",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 1,
+        "none": null
+      },
+      "security": {
+        "figure": "6",
+        "unit": "advisories on 6 packages",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "high",
+            "package": "guzzlehttp/guzzle",
+            "link": "#view=findings&pkg=guzzlehttp%2Fguzzle",
+            "reach": "",
+            "total": 16,
+            "terms": "vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "symfony/http-foundation",
+            "link": "#view=findings&pkg=symfony%2Fhttp-foundation",
+            "reach": "",
+            "total": 16,
+            "terms": "vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "symfony/mailer",
+            "link": "#view=findings&pkg=symfony%2Fmailer",
+            "reach": "",
+            "total": 16,
+            "terms": "vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "symfony/routing",
+            "link": "#view=findings&pkg=symfony%2Frouting",
+            "reach": "",
+            "total": 16,
+            "terms": "vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "symfony/yaml",
+            "link": "#view=findings&pkg=symfony%2Fyaml",
+            "reach": "",
+            "total": 16,
+            "terms": "vulnerable 16",
+            "terms_total": null
+          },
+          {
+            "grade": "high",
+            "package": "typo3/html-sanitizer",
+            "link": "#view=findings&pkg=typo3%2Fhtml-sanitizer",
+            "reach": "",
+            "total": 16,
+            "terms": "vulnerable 16",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "0 carry more than one flag · score model 1",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": null,
+      "depth": {
+        "rows": [
+          "in composer.json 6"
+        ],
+        "sentence": "All 6 flagged packages are named by a line of composer.json."
+      },
+      "libyears": {
+        "figure": "5.78",
+        "bound": "",
+        "sub": "over 6 packages · 5.78 from direct requirements",
+        "unmeasured": null,
+        "top": [
+          [
+            "typo3/html-sanitizer v2.2.0",
+            "2.0",
+            "v2.3.2 (2026-07-17)"
+          ],
+          [
+            "guzzlehttp/guzzle 7.10.0",
+            "0.9",
+            "8.0.1 (2026-07-11)"
+          ],
+          [
+            "symfony/yaml v6.4.26",
+            "0.8",
+            "v6.4.40 (2026-07-15)"
+          ],
+          [
+            "symfony/mailer v6.4.27",
+            "0.7",
+            "v6.4.40 (2026-07-13)"
+          ],
+          [
+            "symfony/routing v6.4.28",
+            "0.7",
+            "v6.4.41 (2026-07-14)"
+          ],
+          [
+            "symfony/http-foundation v6.4.29",
+            "0.7",
+            "v6.4.41 (2026-07-12)"
+          ]
+        ],
+        "none": null
+      },
+      "findings_groups": [
+        {
+          "grade": "high",
+          "count": "6 packages",
+          "gate": "all fail the gate",
+          "major": "1 of 6 moves cross a major"
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "guzzlehttp/guzzle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'guzzlehttp/guzzle:^8.0.1'",
+          "after": "after it: 0, ok",
+          "major": "a new major",
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/http-foundation",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'symfony/http-foundation:^6.4.41' --with-all-dependencies",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/mailer",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by symfony/mailer and 1 more",
+          "command": null,
+          "after": "after it: 0, ok, if Composer resolves it",
+          "major": null,
+          "ready": false,
+          "held_filter": true
+        },
+        {
+          "package": "symfony/routing",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'symfony/routing:^6.4.41' --with-dependencies",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        },
+        {
+          "package": "symfony/yaml",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer require 'php:>=8.2' --no-update",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": false,
+          "held_filter": false
+        },
+        {
+          "package": "typo3/html-sanitizer",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'typo3/html-sanitizer:^2.3.2'",
+          "after": "after it: 0, ok",
+          "major": null,
+          "ready": true,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 4,
+      "gate_partition": {
+        "ready": 4,
+        "held": 1,
+        "wayout": 1
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "guzzlehttp/guzzle",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/http-foundation",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/mailer",
+          "same_cve_as": [],
+          "fix_notes": [
+            "held by symfony/mailer and 1 more"
+          ]
+        },
+        {
+          "package": "symfony/routing",
+          "same_cve_as": [],
+          "fix_notes": []
+        },
+        {
+          "package": "symfony/yaml",
+          "same_cve_as": [],
+          "fix_notes": [
+            "needs PHP >=8.2"
+          ]
+        },
+        {
+          "package": "typo3/html-sanitizer",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ],
+      "run_notes": [],
+      "php_line": "php: the lock installs on PHP 8.1 to 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1, acme/ml-widget >=8.1, symfony/http-foundation >=8.1 and 3 more",
+        "PHP window, without require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1, acme/ml-widget >=8.1, symfony/http-foundation >=8.1 and 3 more"
+      ],
+      "sheet_moves": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
+    },
     "drupal-site": {
       "document": "contract/page/drupal-site.json",
       "title": "lockrot: 55 of 97 packages flagged",

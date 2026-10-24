@@ -1,0 +1,21 @@
+{
+    "score_text": "16 = vulnerable 16 [high advisory]",
+    "next_step_text": "composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) — clears the advisory; Composer's solver checked it against the lock",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 6 findings fail it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.2 2026-07-17 (0.2 years ago), its newest release; last push 2026-07-17 (0.2 years ago)",
+    "explain_age": [
+        "installed  v2.2.0    2024-07-12   2.2 years ago",
+        "2.x        v2.3.2    2026-07-17   0.2 years ago                 below release-warn-years 3",
+        "newest     v2.3.2    2026-07-17   0.2 years ago                 below release-warn-years 3",
+        "last push            2026-07-17   0.2 years ago                 below push-warn-years 3",
+        "libyears 2.0 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer update 'typo3/html-sanitizer:^2.3.2'"
+    ],
+    "commands_cmd": [
+        "composer update \"typo3/html-sanitizer:^2.3.2\""
+    ]
+}

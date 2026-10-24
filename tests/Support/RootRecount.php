@@ -108,7 +108,7 @@ final class RootRecount
     private static function notes(array $document): array
     {
         $notes = [];
-        foreach (\is_array($document['notes'] ?? null) ? $document['notes'] : [] as $note) {
+        foreach (\is_array($document['note_details'] ?? null) ? $document['note_details'] : [] as $note) {
             if (\is_array($note) && \is_string($note['code'] ?? null)) {
                 $notes[$note['code']] = \is_array($note['data'] ?? null) ? $note['data'] : [];
             }

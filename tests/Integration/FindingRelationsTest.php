@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Lockrot\Tests\Support\Contract\CaseRecording;
 use Lockrot\Tests\Support\Contract\EnginePage;
 use Lockrot\Tests\Support\FindingRelations;
 use Lockrot\Tests\Support\ItemRelations;
@@ -32,14 +33,14 @@ final class FindingRelationsTest extends TestCase
     /** The sets that hold whole reports. A case outside WHOLE_CASES or a coverage variant holds part of one, so I25 cannot read it. */
     private const WHOLE = ['corpus/', 'variants/', 'coverage/baselined/'];
     /** The case documents that hold a whole report: the composite, and each case whose finding comes with its `parents`. */
-    private const WHOLE_CASES = ['cases/commonmark.json', 'cases/composite.json', 'cases/many-dependents.json', 'cases/xmlseclibs.json'];
+    private const WHOLE_CASES = ['cases/commonmark.json', 'cases/composite.json', 'cases/many-dependents.json', 'cases/mc-composite-dagger.json', 'cases/mc-update-now-reduced-dagger.json', 'cases/mc-update-now-refused-dagger.json', 'cases/xmlseclibs.json'];
     private const CASES = __DIR__.'/../fixtures/flags/cases.json';
     private const CONTRACT = __DIR__.'/../fixtures/contract/';
 
     public function testEveryFixtureDocumentHoldsEveryRelation(): void
     {
         $paths = self::documents();
-        self::assertCount(317, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
+        self::assertCount(329, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
         $broken = [];
         foreach (array_merge($paths, [self::COMPOSITE]) as $path) {
             $document = self::read($path);
@@ -177,7 +178,7 @@ final class FindingRelationsTest extends TestCase
         $withParents = [];
         foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CASES), ['cases']) as $case) {
             if (\is_array($case) && isset($case['parents'])) {
-                $withParents[] = 'cases/'.JsonPath::stringAt($case, ['id']).'.json';
+                $withParents[] = 'cases/'.CaseRecording::fileName(JsonPath::stringAt($case, ['id'])).'.json';
             }
         }
         $withParents[] = 'cases/composite.json';

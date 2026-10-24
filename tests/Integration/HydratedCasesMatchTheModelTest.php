@@ -78,7 +78,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'next_step.also[].latest.{is_installed,relation,version}',
             'next_step.also[].php_check.{project_allows,raise_size,raise_to,requires,target_runs}', 'next_step.also[].replacement.{package,url}',
             'next_step.also[].replacement.finding.{flag_ids,verdict}', 'next_step.also[].through[].{newest_requires,package}',
-            'next_step.also[].through[].newest_stable.version', 'depth_unmeasured', 'direct', 'direct_dependents', 'flags[].id',
+            'next_step.also[].through[].newest_stable.version', 'next_step.check.{form,reason,result}', 'next_step.also[].check.{form,reason,result}',
+            'depth_unmeasured', 'direct', 'direct_dependents', 'flags[].id',
             'installed_php.{requires,target_runs}', 'metadata.status', 'origin.kind', 'package', 'replacement', 'score.terms[].flag',
             'signals[].data.advisories[].id', 'version', 'run.{include_dev,project_php_lowest,target_php}',
         ],
@@ -374,6 +375,9 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].held_by[].holder.next_step.constraint' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.kind' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.to_branch' => self::ALSO_HELD,
+        'next_step.also[].check.form' => self::ALSO_CHECK,
+        'next_step.also[].check.reason' => self::ALSO_CHECK,
+        'next_step.also[].check.result' => self::ALSO_CHECK,
     ];
 
     private const ONLY_PSR_LOG = 'Only psr-log accepts a flag on a halved finding, and it carries no branch rows, so the projector gives it no inputs.';
@@ -389,6 +393,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     private const ALSO_THROUGH = 'An also[] move carries no through[] (I14f).';
 
     private const ALSO_HELD = 'No also[] move of a case with inputs is held by a package.';
+
+    private const ALSO_CHECK = 'No case that checks its moves (train 7d, `move-check‡`) has an also[] move.';
 
     private const ACCEPT_UNCHECKED = 'The cases that accept an unchecked check need an accept-unchecked entry of the project, which the hydrator does not take (`unhydrated()`).';
 
@@ -430,6 +436,40 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         $kept = array_values(array_diff(self::paths(self::LINES[$line]), $listed));
 
         self::assertSame(Fields::only($model, $kept), Fields::only($lockrot, $kept), $id.' '.$line.': the recording differs from the model in the fields that the line reads');
+    }
+
+    /** The notes of a train 7d case quote the move check (SPEC-0.14.md §6.2), so the page shows the model's notes. */
+    public function testATrain7dRecordingHasTheModelsRunNotes(): void
+    {
+        $cases = 0;
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(CaseHydrator::CASES), ['cases']) as $case) {
+            self::assertIsArray($case);
+            if (!\is_array($case['inputs'] ?? null) || !\is_array($case['inputs']['solver_world'] ?? null)) {
+                continue;
+            }
+            ++$cases;
+            $id = JsonPath::stringAt($case, ['id']);
+            $report = JsonPath::decodeFile(self::CONTRACT.'report-2/'.CaseRecording::fileName($id).'.json');
+
+            self::assertSame(self::codesAndData(JsonPath::has($case, ['run_notes']) ? JsonPath::arrayAt($case, ['run_notes']) : []), self::codesAndData(JsonPath::arrayAt($report, ['note_details'])), $id.': the recording\'s notes against the model\'s');
+        }
+        self::assertGreaterThan(0, $cases);
+    }
+
+    /**
+     * @param array<mixed, mixed> $notes
+     *
+     * @return list<array{mixed, mixed}>
+     */
+    private static function codesAndData(array $notes): array
+    {
+        $out = [];
+        foreach ($notes as $note) {
+            self::assertIsArray($note);
+            $out[] = [$note['code'] ?? null, $note['data'] ?? null];
+        }
+
+        return $out;
     }
 
     /** Each listed path is one that its line reads, and each list has a reason. */

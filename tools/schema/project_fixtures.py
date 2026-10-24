@@ -42,7 +42,7 @@ DOCS_OUT = os.path.join(REPO, 'tests', 'fixtures', 'schema', 'documents')
 PAGE_GOLDENS_OUT = os.path.join(REPO, 'tests', 'fixtures', 'contract', 'page-goldens.json')
 
 # The pull requests of the 0.14 train that change report-2, in merge order.
-TRAIN = ['4b', '4c', '4d', '4e', '4f', '5', '6a', '6b', '7a', '7b', '7c']
+TRAIN = ['4b', '4c', '4d', '4e', '4f', '5', '6a', '6b', '7a', '7b', '7c', '7d']
 
 # Each change a later pull request makes, keyed by that pull request. A fixture of pull request P
 # undoes every change of a pull request after P.
@@ -467,12 +467,15 @@ def inputs_of(case):
             + [h for r in rows for h in ((r.get('fixes') or {}).get('held_by') or [])])
     root_links = {}
     for h in held:
+        # A hold with a target is a link to that name. A `root-require` hold is the root's `require` of it.
+        name = h['target'] or f['package']
         if h['source'] == 'root':
-            root_links.setdefault(h['link'], {})[f['package']] = h['constraint']
-        else:
+            root_links.setdefault('require' if h['link'] == 'root-require' else h['link'], {})[name] = h['constraint']
+        elif h['package'] != f['package']:
+            # The moved package's own hold is a link of the release that the move asks for, not of a lock entry.
             e = entry(h['package'])
             e['version'] = h['version']
-            e.setdefault(h['link'], {})[f['package']] = h['constraint']
+            e.setdefault(h['link'], {})[name] = h['constraint']
     dependents = {}
     for name, e in through.items():
         newest = e.get('newest_stable')
@@ -512,9 +515,18 @@ def inputs_of(case):
         inputs['allowlist'] = {k: allowlist[k] for k in ('pattern', 'version', 'reason', 'expires')}
     # The move checks that Composer's solver answered, keyed as lockrot keys each request (MoveQuery::key()).
     checks = recorded_checks(f, rows)
+    world = case.get('solver_world')
+    if world is not None:
+        # Composer's answer to every request that the model asked, the baseline and the combined update included:
+        # the hydrator serves only these, and the real-solver test serves the world itself.
+        checks = {k: dict(a, reason=None) for k, a in world['answers'].items()}
+        inputs['solver_world'] = world
+        if world['check_passes'] is not None:
+            inputs['check_passes'] = world['check_passes']
     if checks:
         inputs['checks'] = checks
-        inputs['move_check'] = run['move_check']
+        # The PHP that Composer solved at: the world's `config.platform.php`, which the run notes quote.
+        inputs['move_check'] = run['move_check'] if world is None else dict(run['move_check'], php=world['world']['platform_php'])
     # The lock facts that the case's findings do not carry: the model's ‡ run inputs, in the case's `run_inputs` block.
     run_inputs = case.get('run_inputs') or {}
     if run_inputs.get('_php_lock') is not None:

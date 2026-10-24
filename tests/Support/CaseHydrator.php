@@ -300,7 +300,8 @@ final class CaseHydrator
         $checks = $inputs['checks'];
 
         // The Composer of a recorded check takes an inline constraint on any package, as 2.4 and later do.
-        return new MoveChecks(new RecordedMoveChecker($checks, \is_array($inputs['move_check'] ?? null) ? $inputs['move_check'] : []), true);
+        // A case with a `solver_world` records every request, so another request fails the test.
+        return new MoveChecks(new RecordedMoveChecker($checks, \is_array($inputs['move_check'] ?? null) ? $inputs['move_check'] : [], \is_array($inputs['solver_world'] ?? null)), true);
     }
 
     /**

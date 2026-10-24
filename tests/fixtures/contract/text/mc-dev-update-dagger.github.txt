@@ -1,0 +1,7 @@
+::error file=composer.lock,line=12,title=lockrot%3A high — vulnerable (high advisory)::guzzlehttp/psr7 2.8.0: 16 = vulnerable 16 [high advisory]. Do: composer update 'guzzlehttp/psr7:^2.12.3' (gets 2.12.3) — clears the advisory; Composer's solver checked it against the lock. vulnerable: 1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-59882 guzzlehttp/psr7: Host Confusion via Weak URI Host Validation. (via guzzlehttp/guzzle)
+flags: vulnerable 1
+depth: every flagged package is named in composer.json · 1 hop 1 · deepest: guzzlehttp/psr7, 1 hop (guzzlehttp/guzzle › guzzlehttp/psr7) · 1 more is named only in require-dev, which this run did not walk (pass --dev)
+security: 1 vulnerable package · 1 advisory: 1 high
+update now: composer update 'guzzlehttp/psr7:^2.12.3'
+php: the lock installs on PHP 8.1 to 8.5
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

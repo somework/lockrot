@@ -153,7 +153,8 @@ final class MoveContractTest extends TestCase
             self::assertNotSame([], $clears, 'a rerun only with a non-empty clears');
             self::assertSame($unverified !== [], $ifApplied['at_most'], 'at_most exactly when a fact is unverified');
             self::assertContains('clears_hold', $assumes);
-            self::assertSame($move['held_by'] !== [] || $move['composer_moves_because'] !== [], \in_array('composer_resolves', $assumes, true));
+            $resolves = \is_array($move['check'] ?? null) && ($move['check']['result'] ?? null) === 'resolves';
+            self::assertSame(!$resolves && ($move['held_by'] !== [] || $move['composer_moves_because'] !== []), \in_array('composer_resolves', $assumes, true), 'composer_resolves exactly when Composer must still resolve the move (SPEC-0.14.md §5.6)');
             if ($ifApplied['verdict'] === 'finished') {
                 self::assertNotNull($finding['allowlist'], 'finished only under an allowlist entry');
             }

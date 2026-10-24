@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/routing v6.4.28 \u2014 finding high (16 = vulnerable 16 [high advisory]) \u2014 vulnerable: 1 advisory: 1 high \u2014 all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization. Do: composer update 'symfony/routing:^6.4.41' --with-dependencies (gets v6.4.41) \u2014 clears the advisory; Composer's solver checked it against the lock.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "05a3d623ca7f4e66cfdaff6864d4119f0db78c9c1619f1dc190f77e75e6a3ff7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

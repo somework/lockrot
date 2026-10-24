@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Support\Contract;
 
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Baseline\Baseline;
@@ -81,11 +82,16 @@ final class CaseRecording
         $coverage = new AdvisoryCoverage($lookup->scope(), JsonPath::stringAt(JsonPath::decoded($lookup), ['scope_source']), $lookup->repositories(), $lookup->otherRepositories(), []);
         // A whole report checks the packages it holds. A case finding alone keeps the count of its lock.
         $checked = isset($case['parents']) ? \count($findings) : $full->packagesChecked();
-        $report = (new Report($findings, $full->runNotes(), $full->generatedAt(), $checked, $full->notFromComposerRepository(), null, $full->activityCacheOldestAt(), $full->includesDev(), $coverage))
-            ->withRun(self::run(JsonPath::arrayAt($case, ['run'])))
-            ->withPhpWindow($full->phpWindow());
         $checks = CaseHydrator::moveChecksOf(JsonPath::arrayAt($case, ['inputs']));
         $moveCheck = $full->moveCheck();
+        $notes = $full->runNotes();
+        if ($checks !== null && $moveCheck !== null) {
+            // The case's findings solve their own update now, with its own note.
+            $notes = array_values(array_filter($notes, static fn (RunNote $note): bool => !\in_array($note->code(), [RunNote::UPDATE_NOW_REDUCED, RunNote::UPDATE_NOW_REFUSED, RunNote::UPDATE_NOW_NOT_CHECKED], true)));
+        }
+        $report = (new Report($findings, $notes, $full->generatedAt(), $checked, $full->notFromComposerRepository(), null, $full->activityCacheOldestAt(), $full->includesDev(), $coverage))
+            ->withRun(self::run(JsonPath::arrayAt($case, ['run'])))
+            ->withPhpWindow($full->phpWindow());
         if ($checks !== null && $moveCheck !== null) {
             $report = $report->withMoveChecks($moveCheck, UpdateNow::of($report->sorted(), $checks));
         }
