@@ -7,6 +7,7 @@ namespace Lockrot\Verdict;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Security\Holder;
 use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\MoveCheckers;
 
 /**
  * `next_step.text`, text grammar 1: rendered from the move object, the package and the run alone.
@@ -56,18 +57,24 @@ final class MoveText
             $text .= '; '.$through;
         }
 
-        return self::platformStep($move, $subject).$text.self::checked($move->check());
+        $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride());
+
+        return $step.$text.self::checked($move->check());
     }
 
-    /** SPEC §5.6: Composer refuses the commands while composer.json pins a PHP outside the target minor. */
-    private static function platformStep(Move $move, MoveSubject $subject): string
+    /**
+     * SPEC §5.6: Composer refuses the commands while composer.json pins a PHP outside the target
+     * minor. The sentence and a space, else an empty string.
+     *
+     * @param ?string $platformOverride `run.php_window.platform_override`
+     */
+    public static function platformStep(?string $targetPhp, ?string $platformOverride): string
     {
-        $platform = $subject->platformOutsideTarget();
-        if ($platform === null || $move->commands() === []) {
+        if ($targetPhp === null || $platformOverride === null || MoveCheckers::platformPhp($targetPhp, $platformOverride) === $platformOverride) {
             return '';
         }
 
-        return 'First set config.platform.php to your PHP '.$subject->targetPhp().' release: composer.json sets it to '.$platform.'. ';
+        return 'First set config.platform.php to your PHP '.$targetPhp.' release: composer.json sets it to '.$platformOverride.'. ';
     }
 
     /** D10: what Composer's solver said about the move, or why lockrot did not ask it. */

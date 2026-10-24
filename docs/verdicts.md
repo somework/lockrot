@@ -624,7 +624,7 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 - **A PHP that composer.json pins.** When `run.php_window.platform_override` lies outside the minor
   of the target PHP, Composer refuses the commands of a move. The line of each move with commands
   then starts with "First set config.platform.php to your PHP <target> release: composer.json sets
-  it to <version>." The commands stay the same.
+  it to <version>." So does the `update now:` line. The commands stay the same.
 
 The `update now:` footer line lists every package whose `update` move Composer's solver resolves
 with the constraint inline, with one command for all of them.

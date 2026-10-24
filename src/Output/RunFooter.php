@@ -174,6 +174,14 @@ final class RunFooter
         return $command === null ? null : ShellCommand::posix($command);
     }
 
+    /** The sentence that comes before the `update now:` command, and a space: empty without a pin outside the target minor. */
+    public static function platformStep(Report $report): string
+    {
+        $window = $report->phpWindow();
+
+        return $window === null ? '' : MoveText::platformStep($window->targetMinor(), $window->platformOverride());
+    }
+
     /**
      * `pulled in by: …`: the first names of root `exposure`, then `… and N more`.
      *

@@ -142,7 +142,7 @@ final class TableFormatter implements FormatterInterface
             RunFooter::depth($report, $name),
             RunFooter::security($report, true),
             RunFooter::fixes($report),
-            $updateNow === null ? null : 'update now: '.$updateNow,
+            $updateNow === null ? null : 'update now: '.RunFooter::platformStep($report).$updateNow,
             $report->libyears()->line(),
             RunFooter::exposure($report, $name),
             RunFooter::advisories($report),

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
-use Lockrot\Solver\MoveCheckers;
-
 /**
  * What a move's sentence reads beside the move: the package, how the project reaches it and the
  * run's PHP.
@@ -78,13 +76,8 @@ final class MoveSubject
         return $this->newestPhp;
     }
 
-    /** The PHP that `composer install` checks the lock at, when it lies outside the target minor. */
-    public function platformOutsideTarget(): ?string
+    public function platformOverride(): ?string
     {
-        if ($this->platformOverride === null || $this->targetPhp === null) {
-            return null;
-        }
-
-        return MoveCheckers::platformPhp($this->targetPhp, $this->platformOverride) === $this->platformOverride ? null : $this->platformOverride;
+        return $this->platformOverride;
     }
 }
