@@ -99,7 +99,7 @@ critical (11)
       pulls in 3 flagged packages: web-token/jwt-library (vulnerable), paragonie/sodium_compat (vulnerable), brick/math
       (left-behind)
 
-high (18)
+high (20)
   robrichards/xmlseclibs 3.1.1  via mautic/core-lib  ·  old-promise · vulnerable
       24 = old-promise 16 ÷ 2 transitive + vulnerable 16 [high advisory]
       do: composer update robrichards/xmlseclibs (gets 3.1.5) — clears old-promise and 2 advisories
@@ -122,6 +122,25 @@ high (18)
            weeks ago)
       pulls in 11 flagged packages: league/commonmark (vulnerable), symfony/http-foundation (vulnerable), symfony/mime
       (vulnerable), symfony/process (vulnerable), nesbot/carbon (vulnerable) and 6 more
+  symfony/http-foundation v6.4.29  direct  ·  vulnerable
+      16 = vulnerable 16 [high advisory]
+      do: composer update 'symfony/http-foundation:^6.4.41' --with-all-dependencies (gets v6.4.41) — clears the
+          advisory; Composer's solver checked it against the lock
+      vulnerable   1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48736 IpUtils::PRIVATE_SUBNETS Omits IPv6
+                   Transition Forms (6to4, NAT64, Teredo, IPv4-compatible): SSRF Bypass in NoPrivateNetworkHttpClient
+      age: installed v6.4.29 released 2025-11-08 (0.9 years ago); 6.x last released v6.4.41 2026-07-03 (0.2 years
+           ago), its newest release; last push 2026-10-01 (less than three weeks ago)
+  symfony/mailer v6.4.27  direct  ·  vulnerable
+      16 = vulnerable 16 [high advisory]
+      do: require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the
+          target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0)
+          and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0) and symfony/mailer v6.4.40 (requires
+          acme/ml-transport ^2.0; itself high: vulnerable); the packages that hold it may need to move too; Composer's
+          solver refuses it against the lock
+      vulnerable   1 advisory: 1 high — all fixed on 6.x (upgrade); advisory: CVE-2026-45068 Argument Injection in
+                   SendmailTransport via Dash-Prefixed Recipient Address
+      age: installed v6.4.27 released 2025-10-24 (0.9 years ago); 6.x last released v6.4.40 2026-07-04 (0.2 years
+           ago), its newest release; last push 2026-09-15 (less than three weeks ago)
   league/commonmark 2.9.1  via laravel/framework, laravel/nightwatch, spatie/laravel-markdown  ·  vulnerable
       16 = vulnerable 16 [high advisory]
       do: composer update league/commonmark (gets 2.10.3) — clears 3 advisories
@@ -391,23 +410,23 @@ not flagged (5)
       0
       checks missing: S2 (undated releases)
 
-51 packages checked · 46 flagged: critical 11 · high 18 · medium 12 · low 5
+53 packages checked · 48 flagged: critical 11 · high 20 · medium 12 · low 5
 flags: abandoned 7 · silent 1 · pinned 5 · left-behind 16 · old-promise 12 · stale 8 · capped 3 ·
-vulnerable 17 · 20 packages carry more than one
-depth: 18 of 46 flagged packages are named by no line of composer.json · direct 27 · 1 hop 13 · 2 hops 2 ·
+vulnerable 19 · 20 packages carry more than one
+depth: 18 of 48 flagged packages are named by no line of composer.json · direct 29 · 1 hop 13 · 2 hops 2 ·
 4 hops 1 · unreached 3 ·
 deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs) ·
 1 more is named only in require-dev, which this run did not walk (pass --dev)
-security: 17 vulnerable packages · 86 advisories: 3 critical, 27 high, 40 medium, 3 unrated, 13 low ·
+security: 19 vulnerable packages · 88 advisories: 3 critical, 29 high, 40 medium, 3 unrated, 13 low ·
 packages-dev not checked (pass --dev)
-fix, by package: composer update 6 · upgrade 3 · php floor raise 6 · fix unknown 1 · no fix 1
-update now: composer update phpoffice/phpspreadsheet robrichards/xmlseclibs league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn
-libyears: at least 116.4 behind across 41 of 51 packages · 67.8 from direct requirements ·
+fix, by package: composer update 7 · upgrade 4 · php floor raise 6 · fix unknown 1 · no fix 1
+update now: composer update phpoffice/phpspreadsheet robrichards/xmlseclibs symfony/http-foundation league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn
+libyears: at least 117.7 behind across 43 of 53 packages · 69.1 from direct requirements ·
 furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: mautic/core-lib 5 · guzzlehttp/guzzle 2 · akaunting/laravel-apexcharts 1 ·
 genealabs/laravel-model-caching 1 · jfcherng/php-diff 1 · … and 6 more
-advisories: 51 packages asked · packagist.org answered (271 on record for 20 packages)
+advisories: 53 packages asked · packagist.org answered (286 on record for 22 packages)
 php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 9 packages that exclude it is not checked (the run checked no move)
-gate: fails · --fail-on=high,unchecked · 31 findings fail it (high 29, unchecked 4) · target php 8.4 (--target-php)
+gate: fails · --fail-on=high,unchecked · 33 findings fail it (high 31, unchecked 4) · target php 8.4 (--target-php)
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

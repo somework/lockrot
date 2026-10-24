@@ -478,7 +478,7 @@ final class PageGoldensTest extends TestCase
      * SPEC-0.14.md §7.9.21: the check line of a move card names the place that holds the fix on a
      * refused baseline. Every other reason keeps the words of `next_step.text`.
      */
-    private static function cardReasonWords(string $reason): string
+    public static function cardReasonWords(string $reason): string
     {
         return $reason === MoveCheck::BASELINE_REFUSED ? "Composer's solver refuses the lock itself at the target PHP; see the PHP line in the Overview" : MoveCheck::reasonWords($reason);
     }

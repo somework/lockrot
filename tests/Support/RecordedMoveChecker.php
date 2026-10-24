@@ -11,14 +11,11 @@ use Lockrot\Solver\MoveChecker;
 use Lockrot\Solver\MoveQuery;
 
 /**
- * The move checks that a case records (`inputs.checks`, keyed by {@see MoveQuery::key()}), as
- * Composer's solver answered them. lockrot also asks about moves that it does not publish, so a
- * request that the case does not record is `not_checked`: a published one then differs from the
- * case's move. A test can record `*`: the answer to every request that it does not record,
- * `combined`: the answer to the combined update, and `baseline`: the answer to the lock itself. Both
- * resolve when the case records none. `combined <name> <name>` answers the combined update of
- * exactly those names, in the order of the request. `target_fix` answers {@see solveAt()}, the
- * model's ‡ input `_target_fix`, and is `not_checked` when the case records none.
+ * The move checks that a case records (`inputs.checks`), as Composer's solver answered them, with
+ * their `problem` text. A key is a {@see MoveQuery::key()}, `combined <names>`, `baseline` or
+ * `target_fix` ({@see solveAt()}). `*` and `combined` answer every other request and combined
+ * update, and an absent `baseline` or `combined` resolves. A lenient checker leaves another request
+ * `not_checked`. A strict checker, for a case with a `solver_world`, fails the test on it.
  */
 final class RecordedMoveChecker implements MoveChecker
 {
@@ -26,29 +23,59 @@ final class RecordedMoveChecker implements MoveChecker
     private array $checks;
     /** @var array<mixed, mixed> */
     private array $run;
+    private bool $strict;
 
     /**
-     * @param array<string, array<mixed, mixed>> $checks key => `{result, form, reason, holds}`
+     * @param array<string, array<mixed, mixed>> $checks key => `{result, form, reason, holds, problem}`
      * @param array<mixed, mixed>                $run    the case's `run.move_check`
      */
-    public function __construct(array $checks, array $run)
+    public function __construct(array $checks, array $run, bool $strict = false)
     {
         $this->checks = $checks;
         $this->run = $run;
+        $this->strict = $strict;
     }
 
     public function baseline(): CheckOutcome
     {
-        $check = $this->checks['baseline'] ?? null;
+        $check = $this->recorded('baseline');
 
         return $check === null ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : self::outcome($check);
     }
 
     public function check(MoveQuery $query): CheckOutcome
     {
-        $check = $this->checks[$query->key()] ?? $this->checks['*'] ?? null;
+        if ($this->baselineRefused()) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::BASELINE_REFUSED));
+        }
+        $check = $this->recorded($query->key(), '*');
 
         return $check === null ? new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME)) : self::outcome($check);
+    }
+
+    /** As {@see \Lockrot\Solver\SolverChecker}: Composer refuses the lock itself, so lockrot asks no move of it. */
+    private function baselineRefused(): bool
+    {
+        return (($this->checks['baseline'] ?? [])['result'] ?? null) === MoveCheck::REFUSED;
+    }
+
+    /**
+     * @return array<mixed, mixed>|null
+     *
+     * @throws \LogicException when a strict checker gets a request that the case does not record
+     */
+    private function recorded(string $key, string ...$fallbacks): ?array
+    {
+        foreach (array_merge([$key], $fallbacks) as $candidate) {
+            if (isset($this->checks[$candidate])) {
+                return $this->checks[$candidate];
+            }
+        }
+        if ($this->strict) {
+            throw new \LogicException('the case records no answer to the request "'.$key.'"');
+        }
+
+        return null;
     }
 
     /** @param array<mixed, mixed> $check */
@@ -67,19 +94,24 @@ final class RecordedMoveChecker implements MoveChecker
 
         $outcome = self::checkOf($check);
 
-        return new CheckOutcome($outcome, $holds, null, $outcome->isRefused() ? 'Your requirements could not be resolved to an installable set of packages.' : null);
+        $problem = self::text($check, 'problem') ?? 'Your requirements could not be resolved to an installable set of packages.';
+
+        return new CheckOutcome($outcome, $holds, null, $outcome->isRefused() ? $problem : null);
     }
 
     public function combined(array $inline): CheckOutcome
     {
-        $check = $this->checks['combined '.implode(' ', array_keys($inline))] ?? $this->checks['combined'] ?? null;
+        if ($this->baselineRefused()) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::BASELINE_REFUSED));
+        }
+        $check = $this->recorded('combined '.implode(' ', array_keys($inline)), 'combined');
 
         return $check === null ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : self::outcome($check);
     }
 
     public function solveAt(array $names): CheckOutcome
     {
-        $check = $this->checks['target_fix'] ?? null;
+        $check = $this->recorded('target_fix');
 
         return $check === null ? new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME)) : self::outcome($check);
     }

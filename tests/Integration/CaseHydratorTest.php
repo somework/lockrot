@@ -115,6 +115,125 @@ final class CaseHydratorTest extends TestCase
         self::assertSame([], $invalid, 'every case finding validates');
     }
 
+    /** Every case's lock holds each name once, and its root holds only keys that composer.json defines. */
+    public function testEveryCaseInputHasOneLockEntryPerNameAndAComposerJsonRoot(): void
+    {
+        $cases = JsonPath::arrayAt(JsonPath::decodeFile(CaseHydrator::CASES), ['cases']);
+        self::assertNotSame([], $cases);
+
+        $repeated = [];
+        $strayKeys = [];
+        foreach ($cases as $case) {
+            self::assertIsArray($case);
+            if (!\is_array($case['inputs'] ?? null)) {
+                continue;
+            }
+            $id = JsonPath::stringAt($case, ['id']);
+            $names = [];
+            foreach (JsonPath::arrayAt($case, ['inputs', 'lock']) as $entry) {
+                self::assertIsArray($entry);
+                $names[] = JsonPath::stringAt($entry, ['name']);
+            }
+            if (\count($names) !== \count(array_unique($names))) {
+                $repeated[] = $id;
+            }
+            $root = $case['inputs']['root'];
+            foreach (\is_array($root) ? array_diff(array_keys($root), ['name', 'require', 'require-dev', 'conflict', 'replace', 'repositories', 'config']) : [] as $key) {
+                $strayKeys[] = $id.': '.$key;
+            }
+        }
+
+        self::assertSame([], $repeated, 'cases whose lock repeats a name');
+        self::assertSame([], $strayKeys, 'root keys that composer.json does not define');
+    }
+
+    /**
+     * In a case of train 7d, a hold of the case's own moves with a target names a link of the
+     * case's world: a root requirement of the target, or a locked package's link to it. The
+     * hydrated root and lock hold that link with the world's constraint. A hold of the release
+     * that a move asks for is no link of the lock.
+     */
+    public function testEachTargetHoldOfATrain7dMoveIsALinkOfTheHydratedRootOrLock(): void
+    {
+        $checked = 0;
+        $missing = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(CaseHydrator::CASES), ['cases']) as $case) {
+            self::assertIsArray($case);
+            if (self::arrayOrNone($case, ['inputs', 'solver_world']) === []) {
+                continue;
+            }
+            $id = JsonPath::stringAt($case, ['id']);
+            $inputs = JsonPath::arrayAt($case, ['inputs']);
+            $world = JsonPath::arrayAt($inputs, ['solver_world', 'world']);
+            $next = self::arrayOrNone($case, ['finding', 'next_step']);
+            $holds = self::arrayOrNone($next, ['held_by']);
+            foreach (self::arrayOrNone($next, ['also']) as $also) {
+                self::assertIsArray($also);
+                $holds = array_merge($holds, self::arrayOrNone($also, ['held_by']));
+            }
+            foreach (self::arrayOrNone($case, ['details', 'metadata', 'branches']) as $row) {
+                self::assertIsArray($row);
+                $holds = array_merge($holds, self::arrayOrNone($row, ['fixes', 'held_by']));
+            }
+            foreach ($holds as $hold) {
+                self::assertIsArray($hold);
+                $source = JsonPath::stringAt($hold, ['source']);
+                $link = JsonPath::stringAt($hold, ['link']);
+                $target = \is_string($hold['target'] ?? null) ? $hold['target'] : null;
+                $package = \is_string($hold['package'] ?? null) ? $hold['package'] : '';
+                $locked = $source === 'root' || (self::lockEntry($world, ['lock', 'packages'], $package)['version'] ?? null) === ($hold['version'] ?? null);
+                if ($target === null || !$locked) {
+                    continue;
+                }
+                ++$checked;
+                [$expected, $actual] = $source === 'root'
+                    ? [self::arrayOrNone($world, ['root', 'require'])[$target] ?? null, self::arrayOrNone($inputs, ['root', 'require'])[$target] ?? null]
+                    : [self::arrayOrNone(self::lockEntry($world, ['lock', 'packages'], $package), [$link])[$target] ?? null, self::arrayOrNone(self::lockEntry($inputs, ['lock'], $package), [$link])[$target] ?? null];
+                if ($expected === null || $expected !== $actual) {
+                    $missing[] = \sprintf('%s: %s %s %s %s, world %s, hydrated %s', $id, $source, $package === '' ? 'root' : $package, $link, $target, var_export($expected, true), var_export($actual, true));
+                }
+            }
+        }
+
+        self::assertGreaterThan(0, $checked, 'the train 7d moves have holds with a target on the root or the lock');
+        self::assertSame([], $missing, 'holds whose link the hydrated inputs lack');
+    }
+
+    /**
+     * @param array<mixed, mixed> $data
+     * @param list<string>        $path
+     *
+     * @return array<mixed, mixed> the array at $path, empty when a segment is missing or null
+     */
+    private static function arrayOrNone(array $data, array $path): array
+    {
+        foreach ($path as $key) {
+            if (!\is_array($data[$key] ?? null)) {
+                return [];
+            }
+            $data = $data[$key];
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param array<mixed, mixed> $data
+     * @param list<string>        $path the lock section, a list of entries with a `name`
+     *
+     * @return array<mixed, mixed> the entry of $name, empty when the section has none
+     */
+    private static function lockEntry(array $data, array $path, string $name): array
+    {
+        foreach (self::arrayOrNone($data, $path) as $entry) {
+            if (\is_array($entry) && ($entry['name'] ?? null) === $name) {
+                return $entry;
+            }
+        }
+
+        return [];
+    }
+
     public function testACaseWithoutInputsIsRefused(): void
     {
         $this->expectException(\InvalidArgumentException::class);

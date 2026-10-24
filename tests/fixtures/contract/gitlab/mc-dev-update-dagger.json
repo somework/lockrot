@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "guzzlehttp/psr7 2.8.0 \u2014 finding high (16 = vulnerable 16 [high advisory]) \u2014 vulnerable: 1 advisory: 1 high \u2014 all fixed on 2.x; advisory: CVE-2026-59882 guzzlehttp/psr7: Host Confusion via Weak URI Host Validation. Do: composer update 'guzzlehttp/psr7:^2.12.3' (gets 2.12.3) \u2014 clears the advisory; Composer's solver checked it against the lock. (via guzzlehttp/guzzle)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "c10171721b9318fe4bf2adeb64890d34271083da529a899dcb6d15131dae0ea1",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 12
+            }
+        }
+    }
+]

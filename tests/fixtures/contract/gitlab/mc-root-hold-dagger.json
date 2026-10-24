@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "guzzlehttp/guzzle 7.10.0 \u2014 finding high (16 = vulnerable 16 [high advisory]) \u2014 vulnerable: 1 advisory: 1 high \u2014 all fixed on 7.x (upgrade); advisory: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks. Do: require guzzlehttp/guzzle ^8.0.1 \u2014 clears the advisory; 8.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "fcd305e238194c96b8c24faf6bca1c516bf0637590e0a9e467b249ed1b5b4276",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

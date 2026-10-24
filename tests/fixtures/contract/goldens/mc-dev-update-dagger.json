@@ -1,0 +1,21 @@
+{
+    "score_text": "16 = vulnerable 16 [high advisory]",
+    "next_step_text": "composer update 'guzzlehttp/psr7:^2.12.3' (gets 2.12.3) — clears the advisory; Composer's solver checked it against the lock",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 2.8.0 released 2025-08-23 (1.1 years ago); 2.x last released 2.12.3 2026-07-02 (0.3 years ago), its newest release; last push 2026-08-24 (0.1 years ago)",
+    "explain_age": [
+        "installed  2.8.0     2025-08-23   1.1 years ago",
+        "2.x        2.12.3    2026-07-02   0.3 years ago                 below release-warn-years 3",
+        "newest     2.12.3    2026-07-02   0.3 years ago                 below release-warn-years 3",
+        "last push            2026-08-24   0.1 years ago                 below push-warn-years 3",
+        "libyears 0.9 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer update 'guzzlehttp/psr7:^2.12.3'"
+    ],
+    "commands_cmd": [
+        "composer update \"guzzlehttp/psr7:^2.12.3\""
+    ]
+}

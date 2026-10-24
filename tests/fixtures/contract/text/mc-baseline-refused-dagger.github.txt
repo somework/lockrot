@@ -1,0 +1,7 @@
+::error file=composer.lock,line=4,title=lockrot%3A high — vulnerable (high advisory)::typo3/html-sanitizer v2.2.0: 16 = vulnerable 16 [high advisory]. Do: composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) — clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it. vulnerable: 1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting.
+::notice title=lockrot::moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: typo3/html-sanitizer v2.2.0 requires acme/san-tokens ^2.0.
+flags: vulnerable 1
+depth: every flagged package is named in composer.json · direct 1
+security: 1 vulnerable package · 1 advisory: 1 high
+php: the lock installs on PHP 8.1 to 8.5
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

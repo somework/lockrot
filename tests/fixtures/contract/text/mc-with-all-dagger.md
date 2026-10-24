@@ -1,0 +1,17 @@
+### lockrot: 1 of 1 packages flagged — high 1
+
+**gate: fails** · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)
+
+| Verdict | Package | Version | Flags | Why | Via |
+|---|---|---|---|---|---|
+| **high** | `symfony/http-foundation` | v6.4.29 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** composer update 'symfony/http-foundation:^6.4.41' --with-all-dependencies (gets v6.4.41) — clears the advisory; Composer's solver checked it against the lock<br>*vulnerable:* 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48736 IpUtils::PRIVATE\_SUBNETS Omits IPv6 Transition Forms (6to4, NAT64, Teredo, IPv4-compatible): SSRF Bypass in NoPrivateNetworkHttpClient<br>*age:* installed v6.4.29 released 2025-11-08 (0.9 years ago); 6.x last released v6.4.41 2026-07-03 (0.2 years ago), its newest release; last push 2026-10-01 (less than three weeks ago) | direct |
+
+flags: vulnerable 1
+depth: every flagged package is named in composer.json · direct 1
+security: 1 vulnerable package · 1 advisory: 1 high
+libyears: 0.6 behind across the one package · 0.6 from direct requirements · furthest behind symfony/http-foundation v6.4.29 at 0.6
+advisories: 1 package asked · packagist.org answered (14 on record for 1 package)
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-\* requirements not checked
+php: the lock installs on PHP 8.1 to 8.5
+
+<sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

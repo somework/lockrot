@@ -111,6 +111,29 @@ final class FixtureRepositoryServer
     }
 
     /**
+     * Serves a designed repository: each name's p2 file lists the given releases, each with the
+     * links that it declares.
+     *
+     * @param array<string, list<array<string, mixed>>> $releasesByName name => releases, each `{version, require?, conflict?, replace?, provide?}`
+     */
+    public static function fromReleases(array $releasesByName): self
+    {
+        $docroot = self::freshTempDir('lockrot-fixture-repo-');
+        $cacheDir = self::freshTempDir('lockrot-fixture-cache-');
+        self::writePackagesJson($docroot);
+        file_put_contents($docroot.'/'.self::ROUTER_FILENAME, self::ROUTER_SCRIPT);
+        foreach ($releasesByName as $name => $releases) {
+            $target = $docroot.'/p2/'.$name.'.json';
+            if (!is_dir(\dirname($target)) && !mkdir(\dirname($target), 0777, true) && !is_dir(\dirname($target))) {
+                throw new \RuntimeException('cannot create docroot directory: '.\dirname($target));
+            }
+            self::writeJson($target, ['packages' => [$name => array_map(static fn (array $release): array => ['name' => $name, 'type' => 'library'] + $release, $releases)]]);
+        }
+
+        return new self($docroot, $cacheDir, array_map('strval', array_keys($releasesByName)));
+    }
+
+    /**
      * Turns the fixture into a repository that publishes security advisories the way a Composer
      * repository without an API does: `security-advisories.metadata: true` in `packages.json`, and
      * each advisory list under the `security-advisories` key of the package's own p2 file — which

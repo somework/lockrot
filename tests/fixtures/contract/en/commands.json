@@ -75,6 +75,16 @@
             "argv": [
                 "composer",
                 "require",
+                "guzzlehttp/guzzle:^8.0.1"
+            ],
+            "posix": "composer require 'guzzlehttp/guzzle:^8.0.1'",
+            "cmd": "composer require \"guzzlehttp/guzzle:^8.0.1\"",
+            "powershell": "composer --% require \"guzzlehttp/guzzle:^8.0.1\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "guzzlehttp/guzzle:^8.2"
             ],
             "posix": "composer require 'guzzlehttp/guzzle:^8.2'",
@@ -230,6 +240,16 @@
             "argv": [
                 "composer",
                 "require",
+                "symfony/mailer:^6.4.40"
+            ],
+            "posix": "composer require 'symfony/mailer:^6.4.40'",
+            "cmd": "composer require \"symfony/mailer:^6.4.40\"",
+            "powershell": "composer --% require \"symfony/mailer:^6.4.40\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "symfony/monolog-bridge:^5.4"
             ],
             "posix": "composer require 'symfony/monolog-bridge:^5.4'",
@@ -255,6 +275,16 @@
             "posix": "composer require 'symfony/yaml:^5.4.52'",
             "cmd": "composer require \"symfony/yaml:^5.4.52\"",
             "powershell": "composer --% require \"symfony/yaml:^5.4.52\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "symfony/yaml:^6.4.40"
+            ],
+            "posix": "composer require 'symfony/yaml:^6.4.40'",
+            "cmd": "composer require \"symfony/yaml:^6.4.40\"",
+            "powershell": "composer --% require \"symfony/yaml:^6.4.40\""
         },
         {
             "argv": [
@@ -390,6 +420,16 @@
             "argv": [
                 "composer",
                 "update",
+                "guzzlehttp/psr7:^2.12.3"
+            ],
+            "posix": "composer update 'guzzlehttp/psr7:^2.12.3'",
+            "cmd": "composer update \"guzzlehttp/psr7:^2.12.3\"",
+            "powershell": "composer --% update \"guzzlehttp/psr7:^2.12.3\""
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
                 "laravel/framework"
             ],
             "posix": "composer update laravel/framework",
@@ -440,6 +480,17 @@
             "argv": [
                 "composer",
                 "update",
+                "symfony/http-foundation:^6.4.41",
+                "--with-all-dependencies"
+            ],
+            "posix": "composer update 'symfony/http-foundation:^6.4.41' --with-all-dependencies",
+            "cmd": "composer update \"symfony/http-foundation:^6.4.41\" --with-all-dependencies",
+            "powershell": "composer --% update \"symfony/http-foundation:^6.4.41\" --with-all-dependencies"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
                 "symfony/monolog-bridge"
             ],
             "posix": "composer update symfony/monolog-bridge",
@@ -460,11 +511,52 @@
             "argv": [
                 "composer",
                 "update",
+                "symfony/routing:^6.4.41"
+            ],
+            "posix": "composer update 'symfony/routing:^6.4.41'",
+            "cmd": "composer update \"symfony/routing:^6.4.41\"",
+            "powershell": "composer --% update \"symfony/routing:^6.4.41\""
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "symfony/routing:^6.4.41",
+                "--with-dependencies"
+            ],
+            "posix": "composer update 'symfony/routing:^6.4.41' --with-dependencies",
+            "cmd": "composer update \"symfony/routing:^6.4.41\" --with-dependencies",
+            "powershell": "composer --% update \"symfony/routing:^6.4.41\" --with-dependencies"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
                 "symfony/yaml"
             ],
             "posix": "composer update symfony/yaml",
             "cmd": "composer update symfony/yaml",
             "powershell": "composer --% update symfony/yaml"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "symfony/yaml:^6.4.40"
+            ],
+            "posix": "composer update 'symfony/yaml:^6.4.40'",
+            "cmd": "composer update \"symfony/yaml:^6.4.40\"",
+            "powershell": "composer --% update \"symfony/yaml:^6.4.40\""
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "typo3/html-sanitizer:^2.3.2"
+            ],
+            "posix": "composer update 'typo3/html-sanitizer:^2.3.2'",
+            "cmd": "composer update \"typo3/html-sanitizer:^2.3.2\"",
+            "powershell": "composer --% update \"typo3/html-sanitizer:^2.3.2\""
         },
         {
             "argv": [
