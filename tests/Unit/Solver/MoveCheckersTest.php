@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Solver;
 
 use Composer\Config;
+use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
@@ -104,6 +105,34 @@ final class MoveCheckersTest extends TestCase
         self::assertSame(MoveCheck::RESOLVES, $checker->baseline()->check()->result());
     }
 
+    /** A move that frees its dependencies keeps a locked path package that two locked packages require. */
+    public function testAMoveWithDependenciesKeepsALockedPathPackageThatItsDependenciesRequire(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0', 'acme/x' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $root->setMinimumStability('dev');
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^7.0', 'acme/zeta' => '^1.0']] + $packagist,
+            ['name' => 'acme/zeta', 'version' => '1.0.0'] + $packagist,
+            ['name' => 'acme/x', 'version' => '1.0.0', 'require' => ['acme/core' => '^7.0']] + $packagist,
+            ['name' => 'acme/core', 'version' => '7.0.0-dev', 'dist' => ['type' => 'path', 'url' => 'core', 'reference' => 'abc']],
+        ]]);
+        $loader = new ArrayLoader();
+        $repository = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^7.0', 'acme/zeta' => '^1.0']]),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.1.0', 'require' => ['acme/core' => '^7.0', 'acme/zeta' => '^2.0']]),
+            $loader->load(['name' => 'acme/zeta', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/zeta', 'version' => '2.0.0']),
+            $loader->load(['name' => 'acme/x', 'version' => '1.0.0', 'require' => ['acme/core' => '^7.0']]),
+        ]);
+
+        $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$repository], '8.4', false, Deadline::never());
+        $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame([MoveCheck::RESOLVES, MoveCheck::WITH_DEPENDENCIES], [$check->result(), $check->form()]);
+    }
+
     /** `-W` frees a root requirement that a VCS repository serves: the solve offers its locked version, and no other. */
     public function testAMoveWithAllDependenciesKeepsTheLockedVersionOfAVcsPackageThatItFrees(): void
     {
@@ -122,6 +151,32 @@ final class MoveCheckersTest extends TestCase
             $loader->load(['name' => 'acme/zeta', 'version' => '1.0.0']),
             $loader->load(['name' => 'acme/zeta', 'version' => '2.0.0']),
             $loader->load(['name' => 'acme/vcs', 'version' => '1.1.0', 'require' => ['acme/missing' => '^1.0']]),
+        ]);
+
+        $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$repository], '8.4', false, Deadline::never());
+        $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame([MoveCheck::RESOLVES, MoveCheck::WITH_ALL_DEPENDENCIES], [$check->result(), $check->form()]);
+    }
+
+    /** A locked VCS branch keeps its branch alias, which the root requirement matches. */
+    public function testAMoveWithAllDependenciesKeepsTheBranchAliasOfALockedVcsBranch(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0', 'acme/zeta' => '^1.0 || ^2.0', 'acme/vcs' => '^1.0@dev']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $root->setStabilityFlags(['acme/vcs' => BasePackage::STABILITY_DEV]);
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/vcs' => '^1.0@dev', 'acme/zeta' => '^1.0']] + $packagist,
+            ['name' => 'acme/zeta', 'version' => '1.0.0'] + $packagist,
+            ['name' => 'acme/vcs', 'version' => 'dev-main', 'extra' => ['branch-alias' => ['dev-main' => '1.x-dev']], 'source' => ['type' => 'git', 'url' => 'https://git.example.org/acme/vcs.git', 'reference' => 'abc']],
+        ]]);
+        $loader = new ArrayLoader();
+        $repository = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/vcs' => '^1.0@dev', 'acme/zeta' => '^1.0']]),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.1.0', 'require' => ['acme/vcs' => '^1.0@dev', 'acme/zeta' => '^2.0']]),
+            $loader->load(['name' => 'acme/zeta', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/zeta', 'version' => '2.0.0']),
         ]);
 
         $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$repository], '8.4', false, Deadline::never());

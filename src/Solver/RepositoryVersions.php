@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
-use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
-use Composer\Package\CompleteAliasPackage;
-use Composer\Package\CompletePackage;
 use Composer\Package\Version\StabilityFilter;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\RepositoryInterface;
@@ -34,6 +31,8 @@ final class RepositoryVersions implements VersionSource
 
     /** @var array<ComposerRepository> */
     private array $repositories;
+    /** @var array<string, true> */
+    private array $notFromComposerRepository;
     private bool $offline;
     private Deadline $deadline;
     /** @var array<string, list<BasePackage>> */
@@ -49,19 +48,17 @@ final class RepositoryVersions implements VersionSource
 
     /**
      * @param list<RepositoryInterface> $repositories              only ComposerRepository instances are asked
-     * @param array<string, array<BasePackage>> $fromLock the lock's packages of each name that a path, VCS or package repository serves: the lock's version is their only version
+     * @param list<string>              $notFromComposerRepository the locked names that a path, VCS or package repository serves: the lock's version is their only version
      * @param string                    $minimumStability          the root's `minimum-stability`
      * @param array<string, BasePackage::STABILITY_*> $stabilityFlags the root's stability flags, by name
      */
-    public function __construct(array $repositories, array $fromLock, bool $offline, Deadline $deadline, string $minimumStability = 'stable', array $stabilityFlags = [])
+    public function __construct(array $repositories, array $notFromComposerRepository, bool $offline, Deadline $deadline, string $minimumStability = 'stable', array $stabilityFlags = [])
     {
         $floor = BasePackage::$stabilities[$minimumStability] ?? BasePackage::STABILITY_STABLE;
         $this->acceptable = array_filter(BasePackage::$stabilities, static fn (int $value): bool => $value <= $floor);
         $this->stabilityFlags = $stabilityFlags;
         $this->repositories = array_filter($repositories, static fn (RepositoryInterface $repository): bool => $repository instanceof ComposerRepository);
-        foreach ($fromLock as $name => $packages) {
-            $this->loaded[$name] = self::copies($packages);
-        }
+        $this->notFromComposerRepository = array_fill_keys($notFromComposerRepository, true);
         $this->offline = $offline;
         $this->deadline = $deadline;
     }
@@ -98,7 +95,7 @@ final class RepositoryVersions implements VersionSource
      */
     private function load(array $names): void
     {
-        $pending = array_fill_keys($names, null);
+        $pending = array_diff_key(array_fill_keys($names, null), $this->notFromComposerRepository);
         $this->loaded += array_fill_keys($names, []);
 
         try {
@@ -220,36 +217,6 @@ final class RepositoryVersions implements VersionSource
         $this->loaded[$name] = [];
 
         return true;
-    }
-
-    /**
-     * Copies of the packages without their root aliases, which Composer's pool builder adds from
-     * the root. A package keeps the repository that loaded it, and the pool builder never loads a
-     * package of the lock's repository.
-     *
-     * @param array<BasePackage> $packages
-     *
-     * @return list<BasePackage>
-     */
-    private static function copies(array $packages): array
-    {
-        $copies = [];
-        $bases = [];
-        foreach ($packages as $package) {
-            if (!$package instanceof AliasPackage) {
-                $copy = clone $package;
-                $bases[spl_object_id($package)] = $copy;
-                $copies[] = $copy;
-            }
-        }
-        foreach ($packages as $package) {
-            $base = $package instanceof AliasPackage && !$package->isRootPackageAlias() ? ($bases[spl_object_id($package->getAliasOf())] ?? null) : null;
-            if ($base instanceof CompletePackage) {
-                $copies[] = new CompleteAliasPackage($base, $package->getVersion(), $package->getPrettyVersion());
-            }
-        }
-
-        return $copies;
     }
 
     private function admitsDev(string $name): bool

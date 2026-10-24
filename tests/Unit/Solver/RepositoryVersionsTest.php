@@ -6,7 +6,6 @@ namespace Lockrot\Tests\Unit\Solver;
 
 use Composer\Downloader\TransportException;
 use Composer\Package\BasePackage;
-use Composer\Package\CompleteAliasPackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
@@ -387,9 +386,9 @@ final class RepositoryVersionsTest extends TestCase
     public function testAfterTheDeadlineNoRepositoryIsAskedAndEachNameIsOverTheBudget(): void
     {
         $repository = self::recording(['acme/a' => ['1.0.0']]);
-        $versions = new RepositoryVersions([$repository], ['acme/path' => [self::package('acme/path', '1.0.0')]], false, Deadline::inSeconds(0.0, static fn (): float => 0.0));
+        $versions = new RepositoryVersions([$repository], ['acme/path'], false, Deadline::inSeconds(0.0, static fn (): float => 0.0));
 
-        self::assertSame(['acme/a' => [], 'acme/path' => ['1.0.0']], array_map(static fn (array $packages): array => self::pretty($packages), $versions->versionsOf(['acme/a', 'acme/path'])));
+        self::assertSame(['acme/a' => [], 'acme/path' => []], $versions->versionsOf(['acme/a', 'acme/path']));
         self::assertSame([VersionSource::BUDGET, null], [$versions->failure('acme/a'), $versions->failure('acme/path')]);
         self::assertSame([], $repository->asked);
     }
@@ -453,32 +452,14 @@ final class RepositoryVersionsTest extends TestCase
     }
 
     /** A path, VCS or package repository serves the name: the lock's version is its only one. */
-    public function testANameThatNoComposerRepositoryServesHasItsLockedVersionOnlyAndIsNotAsked(): void
+    public function testANameThatNoComposerRepositoryServesIsNotAsked(): void
     {
         $repository = self::recording(['acme/path' => ['2.0.0'], 'acme/lib' => ['1.0.0']]);
-        $locked = self::package('acme/path', '1.0.0');
-        $versions = new RepositoryVersions([$repository], ['acme/path' => [$locked]], false, Deadline::never());
+        $versions = new RepositoryVersions([$repository], ['acme/path'], false, Deadline::never());
 
-        self::assertSame(['acme/path' => ['1.0.0'], 'acme/lib' => ['1.0.0']], array_map(static fn (array $packages): array => self::pretty($packages), $versions->versionsOf(['acme/path', 'acme/lib'])));
+        self::assertSame(['acme/path' => [], 'acme/lib' => ['1.0.0']], array_map(static fn (array $packages): array => self::pretty($packages), $versions->versionsOf(['acme/path', 'acme/lib'])));
         self::assertSame([[['acme/lib'], 'stable']], $repository->asked);
         self::assertNull($versions->failure('acme/path'));
-        self::assertNotSame($locked, $versions->versions('acme/path')[0], 'the lock keeps its own package: a package takes one repository');
-    }
-
-    /** A branch alias comes with the locked branch, as the VCS repository loads it. Composer adds a root alias from the root. */
-    public function testALockedPackageThatNoComposerRepositoryServesKeepsItsBranchAliasButNoRootAlias(): void
-    {
-        $repository = new ArrayRepository();
-        $loaded = (new ArrayLoader())->load(['name' => 'acme/vcs', 'version' => 'dev-main', 'extra' => ['branch-alias' => ['dev-main' => '1.x-dev']]]);
-        self::assertInstanceOf(CompleteAliasPackage::class, $loaded);
-        $root = new CompleteAliasPackage($loaded->getAliasOf(), '1.5.0.0', '1.5.0');
-        $root->setRootPackageAlias(true);
-        $repository->addPackage($loaded);
-        $repository->addPackage($root);
-
-        $versions = new RepositoryVersions([], ['acme/vcs' => $repository->findPackages('acme/vcs')], false, Deadline::never());
-
-        self::assertSame(['dev-main', '1.x-dev'], self::pretty($versions->versions('acme/vcs')));
     }
 
     /**
