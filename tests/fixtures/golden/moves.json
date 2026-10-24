@@ -7238,6 +7238,151 @@
         "move_in": "next_step",
         "partial": null
     },
+    "mc-replan-major\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "8.x",
+            "version": "8.0.1",
+            "newest": "8.0.1",
+            "constraint": "^8.0.1",
+            "latest": null,
+            "php_check": {
+                "requires": "^8.1",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "target": null,
+                    "constraint": "^7.10",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-gcrk-3vtt-1r14",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "inline",
+                "reason": null
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "guzzlehttp/guzzle:^8.0.1"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require guzzlehttp/guzzle ^8.0.1 \u2014 clears the advisory; 8.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^7.10); a new major brings its own requirements; Composer's solver checked it against the lock"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "upgrade",
+            "lowest": "7.15.2",
+            "newest": "7.15.2",
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "target": null,
+                    "constraint": "^7.10",
+                    "holder": null
+                },
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "root-require",
+                    "target": "acme/gz-promises",
+                    "constraint": "^1.0",
+                    "holder": null
+                },
+                {
+                    "source": "package",
+                    "package": "guzzlehttp/guzzle",
+                    "version": "7.15.2",
+                    "link": "require",
+                    "target": "acme/gz-promises",
+                    "constraint": "^2.0",
+                    "holder": {
+                        "verdict": "high",
+                        "lead": null,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "require",
+                            "to_branch": "8.x",
+                            "constraint": "^8.0.1",
+                            "check": {
+                                "result": "resolves",
+                                "form": "inline",
+                                "reason": null
+                            }
+                        }
+                    }
+                }
+            ],
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": {
+                "result": "refused",
+                "form": null,
+                "reason": null
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "mc-root-hold\u2021": {
         "next_step": {
             "kind": "require",

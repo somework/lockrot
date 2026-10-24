@@ -551,8 +551,9 @@ every `conflict`.
 
 Limits: a class reads the lock's links on the package, and Composer's solver checks the move to
 the release ([The move check](#the-move-check)). A refused move holds every release that its
-constraint admits, so its class is `upgrade`, with the holds. The suggested constraint is the
-lowest release that fixes every counted advisory on that branch.
+constraint admits, so its class is `upgrade`, with the holds. Of the releases of one class, the
+move goes to one that no refused constraint admits, and then to the lowest. The suggested
+constraint is the lowest release that fixes every counted advisory on that branch.
 
 ### Accepting advisories {#accepting-advisories}
 
