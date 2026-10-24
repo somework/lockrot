@@ -60,7 +60,7 @@
                 {
                     "ruleId": "lockrot/stale",
                     "ruleIndex": 0,
-                    "level": "warning",
+                    "level": "note",
                     "rank": 25.0,
                     "message": {
                         "text": "ocramius/proxy-manager 2.2.4 \u2014 finding low, 5 = (stale 8 + capped 2 [\u00bc of 8]) \u00f7 2 transitive \u2014 stale: last release 2022-03-05 (4.6 years ago). Do: \u2014."
@@ -68,6 +68,13 @@
                     "partialFingerprints": {
                         "lockrot/package": "ocramius/proxy-manager"
                     },
+                    "suppressions": [
+                        {
+                            "kind": "external",
+                            "status": "accepted",
+                            "justification": "covered by lockrot-baseline.json (known since 2026-06-01)"
+                        }
+                    ],
                     "properties": {
                         "package": "ocramius/proxy-manager",
                         "version": "2.2.4",
@@ -84,7 +91,7 @@
                         "direct": false,
                         "dev": false,
                         "data_date": "2026-10-01T17:41:20+00:00",
-                        "baseline_status": null,
+                        "baseline_status": "known",
                         "error_by": [],
                         "chain": [
                             "symfony/proxy-manager-bridge",
@@ -155,7 +162,7 @@
                 {
                     "ruleId": "lockrot/capped",
                     "ruleIndex": 1,
-                    "level": "warning",
+                    "level": "note",
                     "rank": 25.0,
                     "message": {
                         "text": "ocramius/proxy-manager 2.2.4 \u2014 finding low, 5 = (stale 8 + capped 2 [\u00bc of 8]) \u00f7 2 transitive \u2014 capped: requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded. Do: \u2014."
@@ -163,6 +170,13 @@
                     "partialFingerprints": {
                         "lockrot/package": "ocramius/proxy-manager"
                     },
+                    "suppressions": [
+                        {
+                            "kind": "external",
+                            "status": "accepted",
+                            "justification": "covered by lockrot-baseline.json (known since 2026-06-01)"
+                        }
+                    ],
                     "properties": {
                         "package": "ocramius/proxy-manager",
                         "version": "2.2.4",
@@ -179,7 +193,7 @@
                         "direct": false,
                         "dev": false,
                         "data_date": "2026-10-01T17:41:20+00:00",
-                        "baseline_status": null,
+                        "baseline_status": "known",
                         "error_by": [],
                         "term": {
                             "part": "maintenance",
