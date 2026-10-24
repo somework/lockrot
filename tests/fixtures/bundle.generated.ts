@@ -65576,7 +65576,13 @@ export const d_capped_covered_dagger = {
         },
         "packages": 1
     },
-    "baseline": null,
+    "baseline": {
+        "path": "lockrot-baseline.json",
+        "known": 1,
+        "new": 0,
+        "worsened": 0,
+        "stale": []
+    },
     "gate": {
         "fails": false,
         "tripped_by": [],
@@ -65654,7 +65660,11 @@ export const d_capped_covered_dagger = {
                 {
                     "id": "stale",
                     "role": "lead",
-                    "baseline": null,
+                    "baseline": {
+                        "state": "known",
+                        "since": "2026-06-01",
+                        "covered_by": null
+                    },
                     "signal_ids": [
                         "S2"
                     ],
@@ -65671,7 +65681,11 @@ export const d_capped_covered_dagger = {
                 {
                     "id": "capped",
                     "role": "corroborating",
-                    "baseline": null,
+                    "baseline": {
+                        "state": "covered",
+                        "since": "2026-06-01",
+                        "covered_by": "stale"
+                    },
                     "signal_ids": [
                         "S11"
                     ],
@@ -65955,13 +65969,46 @@ export const d_capped_covered_dagger = {
                 },
                 "push_unmeasured": null
             },
-            "baseline": null,
+            "baseline": {
+                "status": "known",
+                "recorded": {
+                    "lead": "stale",
+                    "flags": {
+                        "stale": {
+                            "known_since": "2026-06-01"
+                        }
+                    },
+                    "advisory_count": 0,
+                    "first_seen": "2026-06-01",
+                    "target_php": "8.4",
+                    "fix_model": 1
+                },
+                "advisories_now": {
+                    "known": 0,
+                    "new": 0,
+                    "re_rated": 0,
+                    "fix_lost": 0
+                },
+                "worsened_by": []
+            },
             "gate": {
                 "reaches_fail_on": false,
                 "fails": false,
                 "exempt_by": null,
                 "by": [],
-                "basis": null
+                "basis": {
+                    "score": 0,
+                    "verdict": null,
+                    "cap": 0,
+                    "limited_by": "cap",
+                    "new": {
+                        "total": 0,
+                        "exact": 0,
+                        "rounded_down": false,
+                        "terms": [],
+                        "modifiers": []
+                    }
+                }
             }
         }
     ]

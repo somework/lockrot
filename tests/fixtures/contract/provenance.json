@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "014e1410970dc2de67510d2d3518bf7202da969252c1fd001b81dfacf19b1a0f",
+        "tests/fixtures/flags/cases.json": "ce59fb756b26c7c7a51f1c57c9187c1b88792303efbd6ce62c5531ab7e742041",
         "tests/fixtures/flags/composite.json": "97b982c33c1b4bfe46d41ca53c2d59452b490902ab96ffca5e80e49280731a6f",
-        "tests/fixtures/flags/provenance.json": "b415310626f9cdc2b06c83ace9b1cbc15c44415baef126228de690d6644fe413"
+        "tests/fixtures/flags/provenance.json": "1efc4a73919d58e1e3bb9e5f2ce8a1e898bbae68e983f3cc0b76c803f1a84638"
     },
     "version_mask": {
         "paths": [
@@ -72,18 +72,18 @@
     "model_goldens": {
         "compared": {
             "age_line": 115,
-            "baseline_suffix": 116,
+            "baseline_suffix": 117,
             "commands_cmd": 119,
             "commands_posix": 119,
-            "gate_line": 117,
+            "gate_line": 118,
             "next_step_text": 100,
             "run_gate_line": 119,
             "score_text": 118
         },
         "inputs_differ": {
             "age_line": 4,
-            "baseline_suffix": 3,
-            "gate_line": 2,
+            "baseline_suffix": 2,
+            "gate_line": 1,
             "next_step_text": 19,
             "score_text": 1
         }

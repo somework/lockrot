@@ -6,7 +6,7 @@
         "categories": [
             "Bug Risk"
         ],
-        "severity": "minor",
+        "severity": "info",
         "fingerprint": "ae34463ffe24cf7e6cec09acb131ae43b52402a196bdd876cac70180888aadf8",
         "location": {
             "path": "composer.lock",
@@ -22,7 +22,7 @@
         "categories": [
             "Bug Risk"
         ],
-        "severity": "minor",
+        "severity": "info",
         "fingerprint": "c710e80b816502ee249f14920a3cb3785bea9c75176a239a2d948c4f674fdf9f",
         "location": {
             "path": "composer.lock",
