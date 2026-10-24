@@ -11,15 +11,11 @@ use Lockrot\Solver\MoveChecker;
 use Lockrot\Solver\MoveQuery;
 
 /**
- * The move checks that a case records (`inputs.checks`, keyed by {@see MoveQuery::key()}), as
- * Composer's solver answered them, each with its `problem` text. lockrot also asks about moves that
- * it does not publish, so a request that the case does not record is `not_checked`: a published one
- * then differs from the case's move. A test can record `*`: the answer to every request that it does
- * not record, `combined`: the answer to the combined update, and `baseline`: the answer to the lock
- * itself. Both resolve when the case records none. `combined <name> <name>` answers the combined
- * update of exactly those names, in the order of the request. `target_fix` answers {@see solveAt()},
- * the model's ‡ input `_target_fix`, and is `not_checked` when the case records none. A strict
- * checker answers only what the case records: a train 7d case records every request of the model.
+ * The move checks that a case records (`inputs.checks`), as Composer's solver answered them, with
+ * their `problem` text. A key is a {@see MoveQuery::key()}, `combined <names>`, `baseline` or
+ * `target_fix` ({@see solveAt()}). `*` and `combined` answer every other request and combined
+ * update, and an absent `baseline` or `combined` resolves. A lenient checker leaves another request
+ * `not_checked`. A strict checker, for a case with a `solver_world`, fails the test on it.
  */
 final class RecordedMoveChecker implements MoveChecker
 {
