@@ -13,8 +13,9 @@ use Lockrot\Signal\BranchRow;
 /**
  * The one producer of a finding's moves (docs/verdicts.md#move): a security move of class
  * `update` leads, else the move of the larger part, a tie to the lower score after it, then
- * security's. Two moves to one branch merge into the tightest constraint. The other part's move
- * follows in `also[]` unless the lead already clears or leaves unverified every fact of that part.
+ * security's. Two moves to one branch merge: into the tightest constraint, or into one blocked
+ * move. The other part's move follows in `also[]` unless the lead already clears or leaves
+ * unverified every fact of that part.
  *
  * @internal
  */
@@ -37,7 +38,7 @@ final class NextStep
         $merged = [];
         $mainRow = $main->row();
         $otherRow = $other === null ? null : $other->row();
-        if ($other !== null && self::namesBranch($main) && self::namesBranch($other) && $mainRow !== null && $otherRow !== null && $mainRow->branch() === $otherRow->branch()) {
+        if ($other !== null && self::merges($main, $other) && $mainRow !== null && $otherRow !== null && $mainRow->branch() === $otherRow->branch()) {
             $main = self::merge($main, $other);
             $merged = [$other->source()];
             $other = null;
@@ -215,9 +216,14 @@ final class NextStep
         return MoveDraft::of($kind, $main->source())->to($row, $lower, $constraint)->withFixKind($main->fixKind());
     }
 
-    private static function namesBranch(MoveDraft $draft): bool
+    /** A blocked move never takes in a move that runs on the target, and a move to a tag keeps its tag. */
+    private static function merges(MoveDraft $main, MoveDraft $other): bool
     {
-        return $draft->isRowMove() || $draft->kind() === Move::BLOCKED;
+        if ($main->isRowMove() && $other->isRowMove()) {
+            return true;
+        }
+
+        return $main->kind() === Move::BLOCKED && $other->kind() === Move::BLOCKED && $main->latest() === null && $other->latest() === null;
     }
 
     /** The normalized lower bound of a move: its constraint's, else the release it names. */

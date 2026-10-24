@@ -90,8 +90,8 @@ final class MoveCheckersTest extends TestCase
     }
 
     /**
-     * Composer never locks a path package in a partial update: it reads the package from the path
-     * repository. The solve offers the lock's version in its place.
+     * In a partial update, Composer reads a symlinked path package from its path repository, not
+     * from the lock. The solve offers the lock's version in its place.
      */
     public function testTheProjectsBaselineResolvesWithARootRequirementOnALockedPathPackage(): void
     {
