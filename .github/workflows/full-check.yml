@@ -4,8 +4,8 @@ name: full-check
 # move-check-oracle job. The pull request's own run has checked every other job on that commit.
 # ci.yml ignores these branches. The two workflows share .github/actions/mutation-coverage,
 # .github/actions/mutation-shard and .github/actions/move-check-oracle, and
-# tools/mutation/tests/test_full_check_matrix.py keeps the shard matrix equal to the one in ci.yml.
-# A branch named release/full-check-<sha>--solver,verdicts runs only
+# tools/mutation/tests/test_full_check_matrix.py keeps the shard
+# matrix equal to the one in ci.yml. A branch named release/full-check-<sha>--solver,verdicts runs only
 # those shards, so a check of one shard's MSI does not hold a runner per shard for the whole cap.
 # tools/mutation/full_check_subset.py gives the naming rule.
 on:

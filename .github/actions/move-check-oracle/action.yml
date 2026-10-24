@@ -19,4 +19,5 @@ runs:
     - name: Run the oracle test, where a skip fails
       shell: bash
       env: {LOCKROT_COMPOSER_ORACLE: '1'}
-      run: vendor/bin/phpunit tests/Integration/MoveCheckComposerOracleTest.php
+      # A group that phpunit.xml.dist excludes leaves no test to run: that run must fail too.
+      run: vendor/bin/phpunit --fail-on-empty-test-suite tests/Integration/MoveCheckComposerOracleTest.php

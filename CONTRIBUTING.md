@@ -36,7 +36,7 @@ matrix in `.github/workflows/ci.yml`) and these gates:
 | Undeclared dependencies | `composer-require-checker.json` | `composer global require maglnet/composer-require-checker`, then `$(composer global config bin-dir --absolute)/composer-require-checker check --config-file=composer-require-checker.json composer.json` |
 | Docs build | `mkdocs.yml` | `pip install -r docs/requirements.txt`, then `mkdocs build --strict` |
 | Corpus self-test | `tools/corpus/tests/` | `tools/corpus/corpus selftest` |
-| Move check oracle: `MoveCheckComposerOracleTest` on the composer/composer of the train 7d answers. A skip fails | `.github/actions/move-check-oracle` | With that composer/composer installed: `LOCKROT_COMPOSER_ORACLE=1 vendor/bin/phpunit tests/Integration/MoveCheckComposerOracleTest.php` |
+| Move check oracle | `.github/actions/move-check-oracle`: the composer/composer that the train 7d cases record in `inputs.move_check.composer`, where a skip fails | With that composer/composer installed: `LOCKROT_COMPOSER_ORACLE=1 vendor/bin/phpunit tests/Integration/MoveCheckComposerOracleTest.php` |
 | PHAR build and byte-identical rebuild | `build/build-phar.sh` | `build/build-phar.sh` ([The PHAR](#the-phar)) |
 
 Document an escaped mutant that no test can kill, with the reason, in
