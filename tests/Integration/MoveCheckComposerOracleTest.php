@@ -20,6 +20,7 @@ use Lockrot\Solver\MoveChecker;
 use Lockrot\Solver\MoveCheckers;
 use Lockrot\Solver\MoveQuery;
 use Lockrot\Tests\Support\CaseHydrator;
+use Lockrot\Tests\Support\ComposerOracle;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -31,7 +32,8 @@ use PHPUnit\Framework\TestCase;
  * Each case of train 7d records the Composer CLI's answers to the requests of its designed world
  * (`inputs.solver_world`, SPEC-0.14.md §5.6). lockrot's move checker solves the same requests on
  * that world, served over HTTP, and gives the same result, form, holds and `{cause}` (§6.2). The
- * test runs only on the Composer version that recorded the answers (`inputs.move_check.composer`).
+ * test runs only on the Composer version that recorded the answers (`inputs.move_check.composer`),
+ * and skips on another one, except where {@see ComposerOracle::REQUIRED} makes that a failure.
  * It covers nothing: each solve outlasts a mutant's time limit, and the rule tests kill the mutants.
  *
  * @coversNothing
@@ -76,9 +78,7 @@ final class MoveCheckComposerOracleTest extends TestCase
     #[DataProvider('worlds')]
     public function testLockrotsSolverGivesEachAnswerOfTheComposerCli(array $solverWorld, string $recordedBy): void
     {
-        if (Composer::getVersion() !== $recordedBy) {
-            self::markTestSkipped('the answers are those of composer/composer '.$recordedBy.', and this run has '.Composer::getVersion());
-        }
+        ComposerOracle::guard($recordedBy, Composer::getVersion(), getenv(ComposerOracle::REQUIRED) === '1');
         $world = JsonPath::arrayAt($solverWorld, ['world']);
         $answers = JsonPath::arrayAt($solverWorld, ['answers']);
         $server = FixtureRepositoryServer::fromReleases(self::releases(JsonPath::arrayAt($world, ['repo'])));
