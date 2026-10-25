@@ -110,6 +110,20 @@ final class SolverCheckerTest extends TestCase
         self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => null, 'constraint' => '^2.0']], self::rows($outcome->holds()));
     }
 
+    /** A locked package's requirement on the moved package is a package hold, whatever release it admits. */
+    public function testAPackageRequirementOnTheMovedPackageStaysAHold(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/user' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/user', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']]],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/gone' => '^1.0']]]]
+        );
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+
+        self::assertContains(['source' => 'package', 'package' => 'acme/user', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^1.0'], self::rows($outcome->holds()));
+    }
+
     /** A root requirement that excludes the release still holds it. */
     public function testARootRequirementThatExcludesTheMovesReleaseHoldsIt(): void
     {

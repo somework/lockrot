@@ -360,14 +360,14 @@ final class MoveText
     private static function ranked(array $holders): array
     {
         $grades = array_flip(ScoreModel::GRADES);
-        $keys = [];
+        $rows = [];
         foreach ($holders as $index => $holder) {
             $finding = $holder->finding();
-            $keys[$index] = [$finding === null ? \count($grades) : $grades[$finding->verdict()] ?? \count($grades), $holder->package(), $index];
+            $rows[] = [[$finding === null ? \count($grades) : $grades[$finding->verdict()] ?? \count($grades), $holder->package(), $index], $holder];
         }
-        uksort($holders, static fn (int $a, int $b): int => $keys[$a] <=> $keys[$b]);
+        usort($rows, static fn (array $a, array $b): int => $a[0] <=> $b[0]);
 
-        return array_values($holders);
+        return array_column($rows, 1);
     }
 
     /**
