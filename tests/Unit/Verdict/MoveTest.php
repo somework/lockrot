@@ -380,8 +380,8 @@ final class MoveTest extends TestCase
     }
 
     /**
-     * Locks whose parts tie at 16: left-behind on a lock with no old-promise, and one high advisory or
-     * a medium one that no reachable release fixes. ~1.0.0 makes the 1.x fix a `raise-php` move.
+     * Locks whose parts tie at 16. Each has left-behind and no old-promise. The advisory is high, or
+     * medium with no reachable fix. ~1.0.0 makes the 1.x fix a `raise-php` move.
      *
      * @return iterable<string, array{array<string, mixed>, array{string, string, string, ?int}, array{string, string}}>
      */
@@ -409,8 +409,8 @@ final class MoveTest extends TestCase
     }
 
     /**
-     * When the parts tie, the move with the lower total after it leads, a null `if_applied` counts as
-     * the current total, and an equal total goes to the security move (docs/verdicts.md#move).
+     * On tied parts, the move with the lower total after it leads (docs/verdicts.md#move). A null
+     * `if_applied` counts as the current total. An equal total goes to the security move.
      *
      * @dataProvider tiedParts
      *

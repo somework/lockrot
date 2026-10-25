@@ -62,9 +62,9 @@ target php 8.4 (--target-php)
 - Exits `0` whatever `--fail-on` says. With `--strict-network`, it still exits `1`, after it writes
   the file, when a [run note](notes.md) counts as a network failure
   ([exit codes](ci.md#exit-codes)).
-- With `--output` on the same run, writes the reports first and the baseline last. The reports
-  compare with the file that the run read before it rewrites it, as a check run does. A report that
-  lockrot cannot write (exit `2`) leaves the baseline unchanged.
+- With `--output` on the same run, writes the reports first and the baseline last. When the run
+  reads a baseline-2 file, the reports compare with it before lockrot rewrites it, as a check run
+  does. A report that lockrot cannot write (exit `2`) leaves the baseline unchanged.
 
 ```json
 {

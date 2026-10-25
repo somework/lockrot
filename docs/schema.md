@@ -391,10 +391,11 @@ Each argument of `commands` and of `security.update_now_command` matches
 `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only a Composer option starts
 with `-`: `--no-update` in a `require` step, and `--with-dependencies` or `--with-all-dependencies`
 in an `update` or `require` step. An option comes after the package arguments. The first argument
-is `composer`, and the second is `update`, `require` or `why-not`. An argument comes from the lock or a
-repository, so lockrot leaves out a step that breaks this rule. The move keeps its `constraint`,
-`text` and other steps. `text` shows a command only as the POSIX rendering of a step in `commands`.
-Render each argv with one of these renderings:
+is `composer`, and the second is `update`, `require` or `why-not`.
+
+An argument comes from the lock or a repository, so lockrot leaves out a step that breaks this
+rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the
+POSIX rendering of a step in `commands`. Render each argv with one of these renderings:
 
 | Shell | Rendering | Example |
 |---|---|---|
@@ -476,10 +477,14 @@ validates with any object as its `data`.
 
 ### Dates
 
-Dates are RFC 3339 strings (`format: date-time`). These dates are plain `YYYY-MM-DD`: S5's
-`ga_date`, a baseline entry's `first_seen` and `known_since`, the `baseline.since` of a flag and of
-an S9 row, `allowlist.expires` and `unchecked_accepted[].accepted_by.expires`. Every years field
-holds one decimal at most.
+Dates are RFC 3339 strings (`format: date-time`). These dates are plain `YYYY-MM-DD`:
+
+- S5's `ga_date`
+- a baseline entry's `first_seen` and `known_since`
+- the `baseline.since` of a flag and of an S9 row
+- `allowlist.expires` and `unchecked_accepted[].accepted_by.expires`
+
+Every years field holds one decimal at most.
 
 ### The explanation
 

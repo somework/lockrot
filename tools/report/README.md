@@ -16,9 +16,9 @@ These scripts connect lockrot with its report renderer,
   or a `--from-dir` build in `resources/report/`.
 - A pull request into a release branch can vendor a pre-release `vX.Y.Z-rc.N`. This lets the
   release branch test the page before the renderer release.
-- The renderer release commit changes only the version of its newest pre-release. The page
-  carries that version, so its bytes, its CSP hash and its manifest differ from the pre-release.
-  The CI of the lockrot release pull request that vendors the release tests those final bytes,
-  before the lockrot tag.
+- Cut the renderer release with a commit that changes only the version of its newest
+  pre-release. The page carries that version, so its bytes, its CSP hash and its manifest differ
+  from the pre-release. The CI of the lockrot release pull request that vendors the release tests
+  those final bytes, before the lockrot tag.
 - `update-renderer` and the PHAR workflow accept only an attestation from the renderer's
   `release.yml`, run for the tag that the manifest names.

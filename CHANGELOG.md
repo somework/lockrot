@@ -186,11 +186,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   latest` from this tag on. The Docker image's `latest` tag moves with v1.2.0. Action: to stay on
   0.13, set the action's `version: 0.13.0`, or use the image tag `0.13.0`.
   ([Compatibility](docs/compatibility.md#distribution))
-- **Breaking:** **Config:** an `ignore[]` entry whose `flags` key has another shape (`"stale"`,
-  `["vulnerable"]`) now exits 2. Action: list maintenance flag ids, or drop the key.
-  ([The allowlist](docs/configuration.md#the-allowlist))
-- **Baseline:** the reports of a `--generate-baseline` run compare with the baseline file that the
-  run read, as a check run does, so they carry the root `baseline` and each finding's `baseline`.
+- **Breaking:** **Config:** an `ignore[].flags`, `accept-unchecked` or `advisory-lookup` value that
+  0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2.
+  Action: give the key a valid value, or drop it.
+  ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
+- **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
+  with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.
   ([What --generate-baseline does](docs/baseline.md#what-generate-baseline-does))
 - **CLI:** every 0.14.x run that gates, or writes json, sarif, gitlab or a baseline, prints one
   upgrade notice on stderr that links the upgrade page. Read stdout alone (do not merge `2>&1`).
@@ -198,7 +199,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **table, markdown, github, install-time, `--explain`:** each finding prints its grade, its flags
   and its move. All but install-time add the score line and one evidence line per counted flag. The
   table footer adds the `flags:`, `depth:`, `security:`, `fix, by package:`, `update now:` and
-  `advisories:` lines, and the other formats print a part of them. ([In CI](docs/ci.md))
+  `advisories:` lines, and markdown, github and install-time print a part of them.
+  ([In CI](docs/ci.md))
 - **All formats:** findings sort by verdict, then the points of the deciding advisory, then score.
 - **json:** `libyears_unmeasured` and the keys of `libyears.unmeasured` follow `metadata.status`
   and `age`. `metadata_unavailable` is `unavailable` or `not_found`. `no_stable_release_date` is
@@ -227,9 +229,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and the finding's `activity`. ([Migrating](docs/schema.md#migrating-from-report-1))
 - **Breaking:** **json (explain):** the explanation's top-level `target_php`, `project_php`,
   `thresholds` and `activity` move to `run` and `finding`, and `activity` takes report-2's shape.
-  Action: read `.run.target_php`, `.run.project_php`, `.run.thresholds` and `.finding.activity`,
-  with `pushed_at` at `.finding.age.push.at`, `repository` as `host` and `repo`, and `from_cache` as
-  `cached_at` not null. ([Migrating](docs/schema.md#migrating-from-report-1))
+  Action: read `.run.target_php`, `.run.project_php`, `.run.thresholds` and `.finding.activity`.
+  Read `pushed_at` at `.finding.age.push.at`, `repository` as `host` and `repo`, and `from_cache`
+  as `cached_at` not null. ([Migrating](docs/schema.md#migrating-from-report-1))
 
 ### Fixed
 

@@ -658,7 +658,7 @@ holds. JSON writes the answer as the move's `check`.
 |---|---|---|
 | `resolves` | Composer installs the move from the lock in `form`: `inline`, `with-dependencies` or `with-all-dependencies` | the form that resolves, with `--with-dependencies` or `--with-all-dependencies` when it needs one |
 | `refused` | no form installs it: `held_by[]` names the holds that the refusal and a `composer prohibits`-style scan find | no `update` or `require` step |
-| `not_checked` | lockrot did not ask. `check.reason` says why | the inline form, unchecked |
+| `not_checked` | lockrot did not ask. `check.reason` says why | the inline form, unchecked. A `require`, `raise-php` or `tag` move of a package that composer.json does not require gets no package step |
 
 - **Holds.** `held_by[]` adds the links that the solver names, with the package that a link points
   to in `target`:
@@ -724,9 +724,9 @@ Limits of the check:
   an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
   severities and the blocking of abandoned packages. It blocks every name that the update can move,
   packages-dev and new dependencies included.
-- On Composer 2.10 and later, an update also removes the versions that a filter list names: the
-  `malware` list under `config.policy`, which blocks by default, and the custom lists there. The
-  check does not read these lists. So a move that resolves in lockrot can fail in Composer, or
+- On Composer 2.10 and later, an update also removes the versions that a filter list names. Such a
+  list is the `malware` list under `config.policy`, which blocks by default, or a custom list there.
+  The check does not read these lists. So a move that resolves in lockrot can fail in Composer, or
   install another version.
 - It stops a chain of refusals after `Analyzer::CHECK_PASSES` passes. A new request after the
   last one is not checked (`check.reason` `pass_cap`).

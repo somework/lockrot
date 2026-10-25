@@ -59,7 +59,6 @@ final class AbandonedIgnoreParityTest extends TestCase
         }
     }
 
-    /** Composer 2.9 only: the `tests (8.3, 2.9)` row of CI runs it, and a skip there fails the row. */
     public function testTheAuditConfigLegMatchesComposersFilter(): void
     {
         if (class_exists(PolicyConfig::class)) {

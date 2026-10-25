@@ -225,6 +225,7 @@ final class ConfigSchemaTest extends TestCase
     }
 
     private const RELEASED_WITH_THE_ENUM = __DIR__.'/../../fixtures/schema-evolution/schemas/0.12.0/lockrot-config.schema.json';
+    private const CONFIG_1 = __DIR__.'/../../../resources/lockrot-config-1.schema.json';
 
     private static function decodedFile(string $path): object
     {
@@ -351,5 +352,39 @@ final class ConfigSchemaTest extends TestCase
         yield 'ignore entry empty package' => [['ignore' => [['package' => '', 'reason' => 'because']]], 'ignore[0].package'];
         yield 'ignore entry empty reason' => [['ignore' => [['package' => 'a/b', 'reason' => '']]], 'ignore[0].reason'];
         yield 'ignore entry bad expires pattern' => [['ignore' => [['package' => 'a/b', 'reason' => 'x', 'expires' => 'soon']]], 'ignore[0].expires'];
+    }
+
+    /**
+     * The config-2 schema description names the keys of these values: config-1 accepts each one,
+     * and config-2 refuses it.
+     *
+     * @param array<string, mixed> $extra
+     *
+     * @dataProvider config1ValuesThatConfig2Refuses
+     */
+    #[DataProvider('config1ValuesThatConfig2Refuses')]
+    public function testAConfig1ValueThatConfig2RefusesIsReportedWithItsPath(array $extra, string $expectedPropertyPath): void
+    {
+        $validator = new Validator();
+        $data = SchemaPayload::of($extra, 'extra.lockrot');
+        $validator->validate($data, self::decodedFile(self::CONFIG_1));
+        self::assertSame([], $validator->getErrors(), 'config-1 accepts it');
+
+        try {
+            ConfigSchema::validate($extra);
+            self::fail('Expected a ConfigException naming '.$expectedPropertyPath);
+        } catch (ConfigException $e) {
+            self::assertStringContainsString('  - '.$expectedPropertyPath.':', $e->getMessage());
+        }
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, string}> */
+    public static function config1ValuesThatConfig2Refuses(): iterable
+    {
+        yield 'ignore entry flags a string' => [['ignore' => [['package' => 'a/b', 'reason' => 'x', 'flags' => 'stale']]], 'ignore[0].flags'];
+        yield 'ignore entry flags empty' => [['ignore' => [['package' => 'a/b', 'reason' => 'x', 'flags' => []]]], 'ignore[0].flags'];
+        yield 'ignore entry flags repeated' => [['ignore' => [['package' => 'a/b', 'reason' => 'x', 'flags' => ['stale', 'stale']]]], 'ignore[0].flags'];
+        yield 'accept-unchecked not a list' => [['accept-unchecked' => true], 'accept-unchecked'];
+        yield 'advisory-lookup not a string' => [['advisory-lookup' => 1], 'advisory-lookup'];
     }
 }
