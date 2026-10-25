@@ -681,7 +681,7 @@ def explain_schema():
                         'report-2 carries it, everything it was read from, and the run block every field of `run.score_model` refers to '
                         '(§7.7, §8.3). Every human string in it is a rendering of fields in the same object or in `run` (§7.11): '
                         'strings carry `x-rendered-from`, and no consumer parses them. Objects are open: a field added later validates against this '
-                        'file unchanged; the number in the id changes only when a field is removed or renamed. Open sets carry a `pattern` and '
+                        'file unchanged; the number in the id changes only when a field is removed, renamed, made required or narrowed, or a closed set changes. Open sets carry a `pattern` and '
                         '`x-known-values`; closed sets are enums.'),
         'type': 'object',
         'required': ['$schema', 'lockrot', 'package', 'version', 'finding', 'lock', 'metadata', 'run', 'generated_at', 'notes', 'note_details'],
@@ -744,7 +744,7 @@ def baseline_schema():
                         'wrote it. The baseline knows facts and does not accept them. A known fact still counts for the verdict, and only what the uncovered '
                         'facts add sets the level of the gate, min(score, 2 × new). lockrot 0.14 reads baseline-2 only: a baseline-1 file exits 2 with a message '
                         'to review the findings and run --generate-baseline, which overwrites it. lockrot 0.13 exits 2 on this file. Objects are open: a field '
-                        'added later validates against this file unchanged. The number in the id changes only when a field is removed or renamed.'),
+                        'added later validates against this file unchanged. The number in the id changes only when a field is removed, renamed, made required or narrowed, or a closed set changes.'),
         'type': 'object',
         'required': ['$schema', 'lockrot', 'generated_at', 'target_php', 'target_php_source', 'score_model_id', 'fix_model', 'findings'],
         'properties': {
@@ -785,8 +785,8 @@ def ci(word):
 def config_schema():
     s = copy.deepcopy(C1)
     s['id'] = 'https://lockrot.dev/schema/config-2.json'
-    s['description'] = ('The `extra.lockrot` object in composer.json (config-2, lockrot 0.14). Unknown keys are allowed, and every config-1 document is '
-                        'config-2. The listed keys must have the listed type. config-2 adds the `fail-on` list (a comma-separated string or a JSON '
+    s['description'] = ('The `extra.lockrot` object in composer.json (config-2, lockrot 0.14). Unknown keys are allowed. Every config-1 document is '
+                        'config-2, except one with an `ignore[]` entry whose `flags` key is not a list of maintenance flag ids. The listed keys must have the listed type. config-2 adds the `fail-on` list (a comma-separated string or a JSON '
                         'array, one value per kind: a grade, a maintenance flag, a raw advisory severity, `unchecked`), `ignore[].flags`, '
                         '`accept-unchecked` and `advisory-lookup`.')
     tokens = sorted(FAIL_ON_VALUES, key=len, reverse=True)  # the longest first, so `vulnerable-high` is not read as `vulnerable`
