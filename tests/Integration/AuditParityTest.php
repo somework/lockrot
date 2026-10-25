@@ -173,14 +173,14 @@ final class AuditParityTest extends TestCase
         }
     }
 
-    /** Composer 2.4 to 2.9 only. No CI leg has such a Composer. */
+    /** Composer 2.4 to 2.9 only: the `tests (8.3, 2.9)` row of CI runs it, and a skip there fails the row. */
     public function testTheAuditConfigLegMatchesComposersAuditor(): void
     {
         if (!interface_exists(AdvisoryProviderInterface::class)) {
             self::markTestSkipped('Composer 2.2 has no advisory API: there is no lookup to compare');
         }
         if (class_exists(PolicyConfig::class)) {
-            self::markTestSkipped('Composer 2.10 or later: this leg runs only on Composer 2.4 to 2.9, which no CI leg has');
+            self::markTestSkipped('Composer 2.10 or later: this leg runs only on Composer 2.4 to 2.9');
         }
         foreach (self::auditConfigs() as $label => $section) {
             $config = self::config($section);
