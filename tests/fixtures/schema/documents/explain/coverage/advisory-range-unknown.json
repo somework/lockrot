@@ -1231,7 +1231,11 @@
   },
   "move_check": null,
   "php_window": {
-   "platform_override": null
+   "platform_override": null,
+   "target": {
+    "php": "8.4.99",
+    "inside": false
+   }
   }
  },
  "generated_at": "2026-10-01T17:41:33+00:00",

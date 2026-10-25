@@ -1328,15 +1328,6 @@
                             "source": "root",
                             "package": null,
                             "version": null,
-                            "link": "require",
-                            "target": null,
-                            "constraint": "^7.10",
-                            "holder": null
-                        },
-                        {
-                            "source": "root",
-                            "package": null,
-                            "version": null,
                             "link": "root-require",
                             "target": "acme/gz-promises",
                             "constraint": "^1.0",
@@ -1349,24 +1340,7 @@
                             "link": "require",
                             "target": "acme/gz-promises",
                             "constraint": "^2.0",
-                            "holder": {
-                                "verdict": "high",
-                                "lead": null,
-                                "flag_ids": [
-                                    "vulnerable"
-                                ],
-                                "replacement": null,
-                                "next_step": {
-                                    "kind": "require",
-                                    "to_branch": "8.x",
-                                    "constraint": "^8.0.1",
-                                    "check": {
-                                        "result": "resolves",
-                                        "form": "inline",
-                                        "reason": null
-                                    }
-                                }
-                            }
+                            "holder": null
                         }
                     ],
                     "if_applied": {

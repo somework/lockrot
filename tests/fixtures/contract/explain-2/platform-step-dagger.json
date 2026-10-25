@@ -133,7 +133,11 @@
                     "composer_resolves"
                 ]
             },
-            "check": null,
+            "check": {
+                "result": "not_checked",
+                "form": null,
+                "reason": "baseline_refused"
+            },
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -152,7 +156,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
         },
         "security": {
             "status": "clear",
@@ -1206,12 +1210,35 @@
                 }
             ]
         },
-        "move_check": null,
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": true,
+            "ignores_extensions": true,
+            "baseline": "resolves",
+            "reason": null
+        },
         "php_window": {
-            "platform_override": "7.4.29"
+            "platform_override": "7.4.29",
+            "target": {
+                "php": "8.4.99",
+                "inside": false
+            }
         }
     },
     "generated_at": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": []
+    "notes": [
+        "2 packages are not from a Composer repository: their release metadata and repository activity were not read"
+    ],
+    "note_details": [
+        {
+            "code": "not_from_composer_repository",
+            "text": "2 packages are not from a Composer repository: their release metadata and repository activity were not read",
+            "docs_url": "https://lockrot.dev/notes/#not_from_composer_repository",
+            "sets_network_failures": false,
+            "data": {
+                "package_count": 2,
+                "advisories_asked": true
+            }
+        }
+    ]
 }

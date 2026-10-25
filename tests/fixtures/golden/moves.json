@@ -6756,15 +6756,6 @@
                     "source": "root",
                     "package": null,
                     "version": null,
-                    "link": "require",
-                    "target": null,
-                    "constraint": "^6.4",
-                    "holder": null
-                },
-                {
-                    "source": "root",
-                    "package": null,
-                    "version": null,
                     "link": "root-require",
                     "target": "acme/ml-widget",
                     "constraint": "^1.0",
@@ -6828,7 +6819,7 @@
             "commands": [],
             "through": [],
             "also": [],
-            "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+            "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": {
@@ -6839,15 +6830,6 @@
             "lowest": "v6.4.40",
             "newest": "v6.4.40",
             "held_by": [
-                {
-                    "source": "root",
-                    "package": null,
-                    "version": null,
-                    "link": "require",
-                    "target": null,
-                    "constraint": "^6.4",
-                    "holder": null
-                },
                 {
                     "source": "root",
                     "package": null,
@@ -6927,15 +6909,6 @@
                     "source": "root",
                     "package": null,
                     "version": null,
-                    "link": "require",
-                    "target": null,
-                    "constraint": "^6.4",
-                    "holder": null
-                },
-                {
-                    "source": "root",
-                    "package": null,
-                    "version": null,
                     "link": "root-require",
                     "target": "acme/ml-widget",
                     "constraint": "^1.0",
@@ -7005,7 +6978,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it"
+            "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": {
@@ -7016,15 +6989,6 @@
             "lowest": "v6.4.40",
             "newest": "v6.4.40",
             "held_by": [
-                {
-                    "source": "root",
-                    "package": null,
-                    "version": null,
-                    "link": "require",
-                    "target": null,
-                    "constraint": "^6.4",
-                    "holder": null
-                },
                 {
                     "source": "root",
                     "package": null,
@@ -7256,15 +7220,6 @@
                     "source": "root",
                     "package": null,
                     "version": null,
-                    "link": "require",
-                    "target": null,
-                    "constraint": "^7.10",
-                    "holder": null
-                },
-                {
-                    "source": "root",
-                    "package": null,
-                    "version": null,
                     "link": "root-require",
                     "target": "acme/gz-promises",
                     "constraint": "^1.0",
@@ -7370,15 +7325,6 @@
             "lowest": "7.15.2",
             "newest": "7.15.2",
             "held_by": [
-                {
-                    "source": "root",
-                    "package": null,
-                    "version": null,
-                    "link": "require",
-                    "target": null,
-                    "constraint": "^7.10 || ^8.0",
-                    "holder": null
-                },
                 {
                     "source": "root",
                     "package": null,
@@ -8652,6 +8598,83 @@
             "text": "no move: lockrot did not read its releases, so it names none; review the snapshot"
         }
     },
+    "platform-step-inside\u2021": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "6.x",
+            "version": "v6.13.0",
+            "newest": "v6.13.1",
+            "constraint": "^6.13",
+            "latest": null,
+            "php_check": {
+                "requires": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.0",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                }
+            ],
+            "unverified": [],
+            "adds": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "stops_below_newest_php"
+                }
+            ],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 8,
+                "verdict": "medium",
+                "lead": "capped",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": {
+                "result": "not_checked",
+                "form": null,
+                "reason": "baseline_refused"
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.0",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "scheb/2fa-bundle:^6.13"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+        }
+    },
     "platform-step\u2021": {
         "next_step": {
             "kind": "raise-php",
@@ -8703,7 +8726,11 @@
                     "composer_resolves"
                 ]
             },
-            "check": null,
+            "check": {
+                "result": "not_checked",
+                "form": null,
+                "reason": "baseline_refused"
+            },
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -8722,7 +8749,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
         }
     },
     "policy-off\u2021": {

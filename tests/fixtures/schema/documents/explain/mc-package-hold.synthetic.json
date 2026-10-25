@@ -112,15 +112,6 @@
      "source": "root",
      "package": null,
      "version": null,
-     "link": "require",
-     "target": null,
-     "constraint": "^6.4",
-     "holder": null
-    },
-    {
-     "source": "root",
-     "package": null,
-     "version": null,
      "link": "root-require",
      "target": "acme/ml-widget",
      "constraint": "^1.0",
@@ -148,24 +139,7 @@
      "link": "require",
      "target": "acme/ml-transport",
      "constraint": "^2.0",
-     "holder": {
-      "verdict": "high",
-      "lead": null,
-      "flag_ids": [
-       "vulnerable"
-      ],
-      "replacement": null,
-      "next_step": {
-       "kind": "require",
-       "to_branch": "6.x",
-       "constraint": "^6.4.40",
-       "check": {
-        "result": "refused",
-        "form": null,
-        "reason": null
-       }
-      }
-     }
+     "holder": null
     }
    ],
    "clears": [
@@ -201,7 +175,7 @@
    "commands": [],
    "through": [],
    "also": [],
-   "text": "require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, the release this move installs (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+   "text": "require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
   },
   "security": {
    "status": "vulnerable",
@@ -241,15 +215,6 @@
       "source": "root",
       "package": null,
       "version": null,
-      "link": "require",
-      "target": null,
-      "constraint": "^6.4",
-      "holder": null
-     },
-     {
-      "source": "root",
-      "package": null,
-      "version": null,
       "link": "root-require",
       "target": "acme/ml-widget",
       "constraint": "^1.0",
@@ -277,24 +242,7 @@
       "link": "require",
       "target": "acme/ml-transport",
       "constraint": "^2.0",
-      "holder": {
-       "verdict": "high",
-       "lead": null,
-       "flag_ids": [
-        "vulnerable"
-       ],
-       "replacement": null,
-       "next_step": {
-        "kind": "require",
-        "to_branch": "6.x",
-        "constraint": "^6.4.40",
-        "check": {
-         "result": "refused",
-         "form": null,
-         "reason": null
-        }
-       }
-      }
+      "holder": null
      }
     ],
     "if_applied": {
@@ -414,15 +362,6 @@
           "source": "root",
           "package": null,
           "version": null,
-          "link": "require",
-          "target": null,
-          "constraint": "^6.4",
-          "holder": null
-         },
-         {
-          "source": "root",
-          "package": null,
-          "version": null,
           "link": "root-require",
           "target": "acme/ml-widget",
           "constraint": "^1.0",
@@ -450,24 +389,7 @@
           "link": "require",
           "target": "acme/ml-transport",
           "constraint": "^2.0",
-          "holder": {
-           "verdict": "high",
-           "lead": null,
-           "flag_ids": [
-            "vulnerable"
-           ],
-           "replacement": null,
-           "next_step": {
-            "kind": "require",
-            "to_branch": "6.x",
-            "constraint": "^6.4.40",
-            "check": {
-             "result": "refused",
-             "form": null,
-             "reason": null
-            }
-           }
-          }
+          "holder": null
          }
         ],
         "reason": null
@@ -590,15 +512,6 @@
        "source": "root",
        "package": null,
        "version": null,
-       "link": "require",
-       "target": null,
-       "constraint": "^6.4",
-       "holder": null
-      },
-      {
-       "source": "root",
-       "package": null,
-       "version": null,
        "link": "root-require",
        "target": "acme/ml-widget",
        "constraint": "^1.0",
@@ -626,24 +539,7 @@
        "link": "require",
        "target": "acme/ml-transport",
        "constraint": "^2.0",
-       "holder": {
-        "verdict": "high",
-        "lead": null,
-        "flag_ids": [
-         "vulnerable"
-        ],
-        "replacement": null,
-        "next_step": {
-         "kind": "require",
-         "to_branch": "6.x",
-         "constraint": "^6.4.40",
-         "check": {
-          "result": "refused",
-          "form": null,
-          "reason": null
-         }
-        }
-       }
+       "holder": null
       }
      ],
      "if_applied": {
@@ -1456,7 +1352,11 @@
    "reason": null
   },
   "php_window": {
-   "platform_override": null
+   "platform_override": null,
+   "target": {
+    "php": "8.4.99",
+    "inside": true
+   }
   }
  },
  "generated_at": "2026-10-01T17:41:59+00:00",

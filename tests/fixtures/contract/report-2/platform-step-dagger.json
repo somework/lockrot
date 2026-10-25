@@ -794,19 +794,19 @@
                 }
             ]
         },
-        "move_check": null,
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": true,
+            "ignores_extensions": true,
+            "baseline": "resolves",
+            "reason": null
+        },
         "php_window": {
             "platform_override": "7.4.29",
             "host_requires": [],
             "with_dev": {
                 "minors": [
-                    "7.4",
-                    "8.0",
-                    "8.1",
-                    "8.2",
-                    "8.3",
-                    "8.4",
-                    "8.5"
+                    "7.4"
                 ],
                 "gaps": false,
                 "lower_edge": {
@@ -819,21 +819,35 @@
                             "target": "php",
                             "constraint": ">=7.4",
                             "dev": false
+                        },
+                        {
+                            "name": "laminas/laminas-code",
+                            "version": "4.7.1",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.4, <8.2",
+                            "dev": false
                         }
                     ]
                 },
-                "upper_edge": null,
+                "upper_edge": {
+                    "excludes": "8.0",
+                    "set_by": [
+                        {
+                            "name": "php-http/guzzle5-adapter",
+                            "version": "2.0.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.0",
+                            "dev": false
+                        }
+                    ]
+                },
                 "closest": null
             },
             "without_dev": {
                 "minors": [
-                    "7.4",
-                    "8.0",
-                    "8.1",
-                    "8.2",
-                    "8.3",
-                    "8.4",
-                    "8.5"
+                    "7.4"
                 ],
                 "gaps": false,
                 "lower_edge": {
@@ -846,17 +860,61 @@
                             "target": "php",
                             "constraint": ">=7.4",
                             "dev": false
+                        },
+                        {
+                            "name": "laminas/laminas-code",
+                            "version": "4.7.1",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.4, <8.2",
+                            "dev": false
                         }
                     ]
                 },
-                "upper_edge": null,
+                "upper_edge": {
+                    "excludes": "8.0",
+                    "set_by": [
+                        {
+                            "name": "php-http/guzzle5-adapter",
+                            "version": "2.0.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.0",
+                            "dev": false
+                        }
+                    ]
+                },
                 "closest": null
             },
             "target": {
                 "php": "8.4.99",
-                "inside": true
+                "inside": false
             },
-            "target_fix": null
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "laminas/laminas-code",
+                        "version": "4.7.1",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": ">=7.4, <8.2",
+                        "dev": false
+                    },
+                    {
+                        "name": "php-http/guzzle5-adapter",
+                        "version": "2.0.0",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": "^7.0",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "not_checked",
+                "reason": "unloaded_name",
+                "held_by": [],
+                "platform_step": false
+            }
         },
         "score_rules_used": {
             "counted": 0,
@@ -879,11 +937,11 @@
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 6,
+    "packages_checked": 8,
     "packages_flagged": 1,
     "packages_multi_flag": 0,
     "include_dev": false,
-    "not_from_composer_repository": 0,
+    "not_from_composer_repository": 2,
     "packages_unchecked_accepted": 0,
     "network_failures": false,
     "counts": {
@@ -1133,8 +1191,21 @@
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "2 packages are not from a Composer repository: their release metadata and repository activity were not read"
+    ],
+    "note_details": [
+        {
+            "code": "not_from_composer_repository",
+            "text": "2 packages are not from a Composer repository: their release metadata and repository activity were not read",
+            "docs_url": "https://lockrot.dev/notes/#not_from_composer_repository",
+            "sets_network_failures": false,
+            "data": {
+                "package_count": 2,
+                "advisories_asked": true
+            }
+        }
+    ],
     "findings": [
         {
             "package": "scheb/2fa-bundle",
@@ -1263,7 +1334,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -1282,7 +1357,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",

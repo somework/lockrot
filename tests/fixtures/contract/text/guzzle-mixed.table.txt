@@ -3,8 +3,8 @@
       36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory]
       do: raise require.php to \>=7.2.5, then require guzzlehttp/guzzle ^7.15.2 — clears left-behind and 14 advisories;
           7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not
-          checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires
-          ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and
+          checked: old-promise; held by composer.json (requires ~5.0) and guzzlehttp/cache-subscriber 0.2.0 (requires
+          ~5.0; itself abandoned) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and
           guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0
           (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own
           requirements, which lockrot does not solve

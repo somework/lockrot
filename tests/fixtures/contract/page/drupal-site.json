@@ -1525,7 +1525,7 @@
             "data": {
                 "reason": "baseline_refused",
                 "php": "8.3.99",
-                "problem": "Problem 1\n    - drupal/core-recommended is locked to version 9.3.14 and an update of this package was not requested.\n    - drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 -> satisfiable by laminas/laminas-diactoros[2.8.0].\n    - laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0 -> your php version (8.3.99; overridden via config.platform) does not satisfy that requirement."
+                "problem": "Problem 1\n    - drupal/core-recommended is locked to version 9.3.14 and an update of this package was not requested.\n    - drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 -> satisfiable by laminas/laminas-diactoros[2.8.0].\n    - laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0 -> your php version (8.3.99) does not satisfy that requirement."
             }
         }
     ],
@@ -2324,7 +2324,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move drupal/core to ^10.6.19 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 4 more \u2014 clears left-behind and 62 advisories; 10.x needs php >=8.1.0; the target php 8.3 runs it; held by drunomics/service-utils 9.3.2 (requires 9.3.*; itself left-behind) and drupal/core-recommended 9.3.14 (requires 9.3.14; itself high: vulnerable) and drupal/ctools 3.7.0 (requires ^8.8 || ^9) and drupal/custom_elements 2.0.0-beta6 (requires ^8 || ^9) and drupal/entity_reference_revisions 1.9.0 (requires ^8.7.7 || ^9) and drupal/lupus_ce_renderer 2.0.0 (requires ^9) and drupal/metatag 1.19.0 (requires ^9) and drupal/paragraphs 1.14.0 (requires ^9.2; itself medium: vulnerable) and drupal/pathauto 1.10.0 (requires ^8.8 || ^9) and drupal/rest_menu_items 3.0.2 (requires ^8.8.4 || ^9) and drupal/token 1.10.0 (requires ^8.8 || ^9) and drupal/trusted_redirect 1.9.0 (requires ^8 || ^9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "move drupal/core to ^10.6.19 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 4 more \u2014 clears left-behind and 62 advisories; 10.x needs php >=8.1.0; the target php 8.3 runs it; held by drupal/core-recommended 9.3.14 (requires 9.3.14; itself high: vulnerable) and drunomics/service-utils 9.3.2 (requires 9.3.*; itself left-behind) and drupal/paragraphs 1.14.0 (requires ^9.2; itself medium: vulnerable) and drupal/ctools 3.7.0 (requires ^8.8 || ^9) and drupal/custom_elements 2.0.0-beta6 (requires ^8 || ^9) and drupal/entity_reference_revisions 1.9.0 (requires ^8.7.7 || ^9) and drupal/lupus_ce_renderer 2.0.0 (requires ^9) and drupal/metatag 1.19.0 (requires ^9) and drupal/pathauto 1.10.0 (requires ^8.8 || ^9) and drupal/rest_menu_items 3.0.2 (requires ^8.8.4 || ^9) and drupal/token 1.10.0 (requires ^8.8 || ^9) and drupal/trusted_redirect 1.9.0 (requires ^8 || ^9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -14939,7 +14939,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move twig/twig to ^3.27.0 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 5 more \u2014 clears 16 advisories; 3.x needs php >=8.1.0; the target php 8.3 runs it; held by chi-teck/drupal-code-generator 1.33.1 (requires ^1.41 || ^2.12; itself left-behind) and drupal/core 9.3.14 (requires ^2.12.0; itself left-behind) and drupal/core-recommended 9.3.14 (requires v2.14.11; itself high: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "move twig/twig to ^3.27.0 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 5 more \u2014 clears 16 advisories; 3.x needs php >=8.1.0; the target php 8.3 runs it; held by drupal/core 9.3.14 (requires ^2.12.0; itself left-behind) and drupal/core-recommended 9.3.14 (requires v2.14.11; itself high: vulnerable) and chi-teck/drupal-code-generator 1.33.1 (requires ^1.41 || ^2.12; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -31446,7 +31446,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move consolidation/config to ^3.2 through drush/drush \u2014 clears left-behind and old-promise; 3.x needs php >=8.2.0; the target php 8.3 runs it; held by consolidation/robo 3.0.10 (requires ^1.2.1 || ^2.0.1; itself left-behind) and consolidation/site-alias 3.1.5 (requires ^1.2.1 || ^2; itself left-behind) and consolidation/site-process 4.2.0 (requires ^1.2.1|^2; itself left-behind) and drush/drush 10.6.2 (requires ^1.2; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "move consolidation/config to ^3.2 through drush/drush \u2014 clears left-behind and old-promise; 3.x needs php >=8.2.0; the target php 8.3 runs it; held by drush/drush 10.6.2 (requires ^1.2; itself left-behind) and consolidation/robo 3.0.10 (requires ^1.2.1 || ^2.0.1; itself left-behind) and consolidation/site-alias 3.1.5 (requires ^1.2.1 || ^2; itself left-behind) and consolidation/site-process 4.2.0 (requires ^1.2.1|^2; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -34808,7 +34808,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move consolidation/site-alias to ^4.1 through drush/drush \u2014 clears left-behind; 4.x needs php >=7.4; the target php 8.3 runs it; held by consolidation/site-process 4.2.0 (requires ^3; itself left-behind) and drush/drush 10.6.2 (requires ^3.0.0@stable; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "move consolidation/site-alias to ^4.1 through drush/drush \u2014 clears left-behind; 4.x needs php >=7.4; the target php 8.3 runs it; held by drush/drush 10.6.2 (requires ^3.0.0@stable; itself left-behind) and consolidation/site-process 4.2.0 (requires ^3; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -37061,7 +37061,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move league/container to ^5.2 through drush/drush \u2014 clears left-behind; 5.x needs php ^8.1; the target php 8.3 runs it; held by consolidation/robo 3.0.10 (requires ^3.3.1 || ^4.0; itself left-behind) and drush/drush 10.6.2 (requires ^2.5 || ^3.4; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "move league/container to ^5.2 through drush/drush \u2014 clears left-behind; 5.x needs php ^8.1; the target php 8.3 runs it; held by drush/drush 10.6.2 (requires ^2.5 || ^3.4; itself left-behind) and consolidation/robo 3.0.10 (requires ^3.3.1 || ^4.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -38121,7 +38121,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move symfony/console to ^7.4 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 5 more \u2014 clears left-behind; 7.x needs php >=8.2; the target php 8.3 runs it; held by chi-teck/drupal-code-generator 1.33.1 (requires ^3.4 || ^4.0; itself left-behind) and consolidation/annotated-command 4.5.5 (requires ^4.4.8|^5|^6) and consolidation/log 2.1.1 (requires ^4 || ^5 || ^6; itself left-behind) and consolidation/output-formatters 4.2.2 (requires ^4|^5|^6) and consolidation/robo 3.0.10 (requires ^4.4.19 || ^5 || ^6; itself left-behind) and consolidation/self-update 2.0.5 (requires ^2.8 || ^3 || ^4 || ^5 || ^6; itself left-behind) and consolidation/site-process 4.2.0 (requires ^2.8.52|^3|^4.4|^5; itself left-behind) and drupal/core 9.3.14 (requires ^4.4; itself left-behind) and drupal/core-recommended 9.3.14 (requires v4.4.34; itself high: vulnerable) and enlightn/security-checker v1.10.0 (requires ^3.4|^4|^5|^6) and psy/psysh v0.10.12 (requires ~5.0|~4.0|~3.0|^2.4.2|~2.3.10; itself left-behind) and symfony/http-kernel v4.4.35 (conflicts with >=5; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "move symfony/console to ^7.4 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 5 more \u2014 clears left-behind; 7.x needs php >=8.2; the target php 8.3 runs it; held by drupal/core 9.3.14 (requires ^4.4; itself left-behind) and drupal/core-recommended 9.3.14 (requires v4.4.34; itself high: vulnerable) and psy/psysh v0.10.12 (requires ~5.0|~4.0|~3.0|^2.4.2|~2.3.10; itself left-behind) and chi-teck/drupal-code-generator 1.33.1 (requires ^3.4 || ^4.0; itself left-behind) and consolidation/log 2.1.1 (requires ^4 || ^5 || ^6; itself left-behind) and consolidation/robo 3.0.10 (requires ^4.4.19 || ^5 || ^6; itself left-behind) and consolidation/self-update 2.0.5 (requires ^2.8 || ^3 || ^4 || ^5 || ^6; itself left-behind) and consolidation/site-process 4.2.0 (requires ^2.8.52|^3|^4.4|^5; itself left-behind) and symfony/http-kernel v4.4.35 (conflicts with >=5; itself medium: vulnerable) and consolidation/annotated-command 4.5.5 (requires ^4.4.8|^5|^6) and consolidation/output-formatters 4.2.2 (requires ^4|^5|^6) and enlightn/security-checker v1.10.0 (requires ^3.4|^4|^5|^6); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -39481,7 +39481,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move symfony/event-dispatcher to ^7.4 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 5 more \u2014 clears left-behind; 7.x needs php >=8.2; the target php 8.3 runs it; held by consolidation/annotated-command 4.5.5 (requires ^4.4.8|^5|^6) and consolidation/robo 3.0.10 (requires ^4.4.19 || ^5 || ^6; itself left-behind) and drupal/core 9.3.14 (requires ^4.4; itself left-behind) and drupal/core-recommended 9.3.14 (requires v4.4.34; itself high: vulnerable) and drush/drush 10.6.2 (requires ^3.4 || ^4.0; itself left-behind) and symfony/console v4.4.34 (conflicts with <4.3|>=5; itself left-behind) and symfony/http-kernel v4.4.35 (requires ^4.4; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "move symfony/event-dispatcher to ^7.4 through drupal/admin_toolbar, drupal/core-recommended, drupal/lupus_ce_renderer and 5 more \u2014 clears left-behind; 7.x needs php >=8.2; the target php 8.3 runs it; held by drupal/core 9.3.14 (requires ^4.4; itself left-behind) and drupal/core-recommended 9.3.14 (requires v4.4.34; itself high: vulnerable) and drush/drush 10.6.2 (requires ^3.4 || ^4.0; itself left-behind) and consolidation/robo 3.0.10 (requires ^4.4.19 || ^5 || ^6; itself left-behind) and symfony/console v4.4.34 (conflicts with <4.3|>=5; itself left-behind) and symfony/http-kernel v4.4.35 (requires ^4.4; itself medium: vulnerable) and consolidation/annotated-command 4.5.5 (requires ^4.4.8|^5|^6); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
