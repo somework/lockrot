@@ -175,7 +175,7 @@ final class Explanation
             'finding' => $this->report->findingRows()[$package->name()] ?? $this->finding->toArray(),
             'lock' => $this->lock(),
             'metadata' => $this->metadata(),
-            'run' => $run->toExplainArray($this->report->advisoryLookup(), $this->report->moveCheck()),
+            'run' => $run->toExplainArray($this->report->advisoryLookup(), $this->report->moveCheck()) + ['php_window' => $this->phpWindow()],
             'generated_at' => self::date($this->report->generatedAt()),
             'notes' => $this->report->notes(),
             'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->report->runNotes()),
@@ -190,6 +190,14 @@ final class Explanation
     public function toDetailsArray(): array
     {
         return ['metadata' => $this->metadata(), 'lock' => $this->lock()];
+    }
+
+    /** @return ?array{platform_override: ?string} the one key of `run.php_window` that `next_step.text` reads */
+    private function phpWindow(): ?array
+    {
+        $window = $this->report->phpWindow();
+
+        return $window === null ? null : ['platform_override' => $window->platformOverride()];
     }
 
     /** @return Lock */

@@ -58,8 +58,22 @@ final class SchemaParityTest extends TestCase
         self::assertNotSame([], $explain);
         foreach ($explain as $key => $schema) {
             self::assertArrayHasKey($key, $report, 'explain-2 run.'.$key.' is no report-2 run key');
-            self::assertSame(self::sorted($report[$key]), self::sorted($schema), 'run.'.$key);
+            if ($key !== 'php_window') {
+                self::assertSame(self::sorted($report[$key]), self::sorted($schema), 'run.'.$key);
+            }
         }
+    }
+
+    /** SPEC §5.9: explain-2's `php_window` carries only the key that `next_step.text` reads, typed as report-2 types it. */
+    public function testThePhpWindowOfAnExplanationIsTheReportsPlatformOverrideAlone(): void
+    {
+        $report = self::properties(self::definitions(Schemas::REPORT, JsonFormatter::SCHEMA), 'run')['php_window'];
+        $explain = self::properties(self::definitions(Schemas::EXPLAIN, ExplainFormatter::SCHEMA), 'explainRun')['php_window'];
+
+        self::assertSame(['platform_override'], array_keys($explain['oneOf'][0]['properties']));
+        self::assertSame(['platform_override'], $explain['oneOf'][0]['required']);
+        self::assertSame(self::sorted($report['oneOf'][0]['properties']['platform_override']), self::sorted($explain['oneOf'][0]['properties']['platform_override']));
+        self::assertSame($report['oneOf'][1], $explain['oneOf'][1], 'null when report-2 writes null');
     }
 
     /**

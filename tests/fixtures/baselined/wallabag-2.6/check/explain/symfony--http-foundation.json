@@ -2369,6 +2369,9 @@
             "ignores_extensions": true,
             "baseline": "refused",
             "reason": null
+        },
+        "php_window": {
+            "platform_override": "7.4.29"
         }
     },
     "generated_at": "2026-10-14T00:00:00+00:00",

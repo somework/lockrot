@@ -3228,7 +3228,8 @@
                 "text_grammar",
                 "score_model",
                 "advisory_lookup",
-                "move_check"
+                "move_check",
+                "php_window"
             ],
             "properties": {
                 "target_php": {
@@ -3469,6 +3470,31 @@
                                     ]
                                 }
                             ]
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "php_window": {
+                    "description": "The one key of report-2's `run.php_window` that `next_step.text` reads; null when report-2's `php_window` is null.",
+                    "oneOf": [
+                        {
+                            "description": "The platform PHP of the lock.",
+                            "type": "object",
+                            "required": [
+                                "platform_override"
+                            ],
+                            "properties": {
+                                "platform_override": {
+                                    "description": "The lock's `platform-overrides.php`: the PHP at which `composer install` checks the lock.",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "minLength": 1
+                                }
+                            }
                         },
                         {
                             "type": "null"

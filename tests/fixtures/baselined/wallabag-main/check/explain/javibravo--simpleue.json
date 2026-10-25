@@ -1225,6 +1225,9 @@
             "ignores_extensions": true,
             "baseline": "resolves",
             "reason": null
+        },
+        "php_window": {
+            "platform_override": null
         }
     },
     "generated_at": "2026-10-14T00:00:00+00:00",
