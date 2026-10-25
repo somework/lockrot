@@ -1131,8 +1131,8 @@
    }
   }
  },
- "activity_cache_oldest_at": "2026-10-01T16:03:13+00:00",
- "activity_cache_age_hours": 1.6,
+ "activity_cache_oldest_at": null,
+ "activity_cache_age_hours": null,
  "packages_checked": 1,
  "packages_flagged": 0,
  "packages_multi_flag": 0,
@@ -1298,7 +1298,7 @@
   "deepest": []
  },
  "libyears": {
-  "total": 0,
+  "total": 4.91,
   "direct_requirements": 0,
   "measured": 1,
   "at_least_count": 0,
@@ -1312,7 +1312,12 @@
    "no_stable_release": 0,
    "undated_releases": 0
   },
-  "furthest_behind": null,
+  "furthest_behind": {
+   "package": "composer/semver",
+   "version": "3.2.6",
+   "libyears": 4.91,
+   "at_least": false
+  },
   "packages": 1
  },
  "baseline": null,
@@ -1377,11 +1382,11 @@
  "note_details": [],
  "findings": [
   {
-   "package": "symfony/flex",
-   "version": "v2.11.0",
-   "branch": "2.x",
+   "package": "composer/semver",
+   "version": "3.2.6",
+   "branch": "3.x",
    "installed_php": {
-    "requires": ">=8.1",
+    "requires": "^5.3.2 || ^7.0 || ^8.0",
     "target_runs": true,
     "project_allows": null
    },
@@ -1430,11 +1435,11 @@
     "reason": null,
     "forge": "github",
     "host": "github.com",
-    "repo": "symfony/flex",
+    "repo": "composer/semver",
     "event": "push",
     "archived": false,
-    "fetched_at": "2026-10-01T16:03:13+00:00",
-    "cached_at": "2026-10-01T16:03:13+00:00"
+    "fetched_at": "2026-10-01T17:39:07+00:00",
+    "cached_at": null
    },
    "allowlist": null,
    "abandoned_ignored": null,
@@ -1442,7 +1447,7 @@
    "origin": {
     "kind": "packagist",
     "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/symfony/flex",
+    "package_url": "https://packagist.org/packages/composer/semver",
     "local": false
    },
    "replacement": null,
@@ -1450,51 +1455,57 @@
    "note": null,
    "libyears_unmeasured": null,
    "libyears_at_least": false,
-   "direct": true,
+   "direct": false,
    "dev": false,
-   "reach": "direct",
+   "reach": "transitive",
    "chain": [
-    "symfony/flex"
+    "drupal/core-recommended",
+    "composer/semver"
    ],
-   "depth": 0,
+   "depth": 1,
    "depth_unmeasured": null,
-   "named_in": [
-    "require"
-   ],
+   "named_in": [],
    "direct_dependents": [
-    "symfony/flex"
+    "drupal/admin_toolbar",
+    "drupal/core-recommended",
+    "drupal/lupus_ce_renderer",
+    "drupal/paragraphs",
+    "drupal/pathauto",
+    "drupal/rest_menu_items",
+    "drupal/trusted_redirect",
+    "drush/drush"
    ],
    "signals": [],
    "evidence": "",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:07+00:00",
-   "libyears": 0,
+   "libyears": 4.91,
    "age": {
     "installed": {
-     "at": "2026-05-29T17:25:22+00:00",
-     "years": 0.3,
+     "at": "2021-10-25T11:34:17+00:00",
+     "years": 4.9,
      "dated_by": null
     },
     "installed_unmeasured": null,
     "release": {
-     "version": "v2.11.0",
-     "at": "2026-05-29T17:25:22+00:00",
-     "years": 0.3,
+     "version": "3.5.0",
+     "at": "2026-09-24T14:38:51+00:00",
+     "years": 0,
      "level": null,
      "dated_by": null
     },
     "release_unmeasured": null,
     "branch_release": {
-     "version": "v2.11.0",
-     "at": "2026-05-29T17:25:22+00:00",
-     "years": 0.3,
+     "version": "3.5.0",
+     "at": "2026-09-24T14:38:51+00:00",
+     "years": 0,
      "level": null,
      "dated_by": null
     },
     "branch_release_unmeasured": null,
     "push": {
-     "at": "2026-05-29T17:59:07+00:00",
-     "years": 0.3,
+     "at": "2026-10-01T08:18:40Z",
+     "years": 0,
      "level": null
     },
     "push_unmeasured": null

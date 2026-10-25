@@ -1185,6 +1185,9 @@
    "ignores_extensions": true,
    "baseline": "not_checked",
    "reason": "no_composer_json"
+  },
+  "php_window": {
+   "platform_override": null
   }
  },
  "generated_at": "2026-10-01T17:39:50+00:00",

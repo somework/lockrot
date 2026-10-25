@@ -161,7 +161,7 @@ final class CaseTextGoldensTest extends TestCase
                     $expected = [
                         'resolves' => 'checked with Composer',
                         'refused' => 'Composer refuses the move',
-                        'not_checked' => 'if Composer resolves it (not checked: '.PageGoldensTest::cardReasonWords($reason).')',
+                        'not_checked' => 'if Composer resolves it (not checked: '.PageGoldensTest::cardReasonWords($reason, JsonPath::arrayAt($case, ['run'])).')',
                     ][(string) $result] ?? ($runChecked ? (\in_array('composer_resolves', $assumes, true) ? 'if Composer resolves it' : null) : 'if Composer resolves it (not checked: the run checked no move)');
                 }
                 $after = JsonPath::decoded($cards[$i] ?? [])['after'] ?? null;

@@ -234,6 +234,7 @@ final class PageGoldensTest extends TestCase
             $golden = JsonPath::decoded($golden);
             self::assertArrayHasKey('sheet_moves', $golden, $id.': re-record page-goldens.json from the model');
             $findings = [];
+            $run = JsonPath::arrayAt(self::modelDocument(JsonPath::stringAt($golden, ['document'])), ['run']);
             foreach (JsonPath::arrayAt(self::modelDocument(JsonPath::stringAt($golden, ['document'])), ['findings']) as $finding) {
                 $finding = JsonPath::decoded($finding);
                 $findings[JsonPath::stringAt($finding, ['package'])] = $finding;
@@ -246,7 +247,7 @@ final class PageGoldensTest extends TestCase
                     $expected = [
                         'resolves' => 'checked with Composer',
                         'refused' => 'Composer refuses the move',
-                        'not_checked' => 'if Composer resolves it (not checked: '.($result === MoveCheck::NOT_CHECKED ? self::cardReasonWords(JsonPath::stringAt($move, ['check', 'reason'])) : '').')',
+                        'not_checked' => 'if Composer resolves it (not checked: '.($result === MoveCheck::NOT_CHECKED ? self::cardReasonWords(JsonPath::stringAt($move, ['check', 'reason']), $run) : '').')',
                     ][$result];
                     $conditions = JsonPath::arrayAt(JsonPath::decoded($cards), [$i, 'after', 'conditions']);
                     $lines[] = $expected;
@@ -258,7 +259,7 @@ final class PageGoldensTest extends TestCase
         }
 
         self::assertSame([], $differ);
-        foreach (['checked with Composer', 'Composer refuses the move', 'if Composer resolves it (not checked: '.MoveCheck::reasonWords(MoveCheck::UNLOADED_NAME).')', 'if Composer resolves it (not checked: '.self::cardReasonWords(MoveCheck::BASELINE_REFUSED).')'] as $line) {
+        foreach (['checked with Composer', 'Composer refuses the move', 'if Composer resolves it (not checked: '.MoveCheck::reasonWords(MoveCheck::UNLOADED_NAME).')', 'if Composer resolves it (not checked: '.self::cardReasonWords(MoveCheck::BASELINE_REFUSED, ['php_window' => ['target' => ['inside' => false]]]).')'] as $line) {
             self::assertContains($line, $lines, 'no sheet move card of a page case reads: '.$line);
         }
     }
@@ -428,7 +429,7 @@ final class PageGoldensTest extends TestCase
                 foreach (array_merge([$lead], JsonPath::arrayAt($lead, ['also'])) as $move) {
                     foreach (JsonPath::arrayAt(JsonPath::decoded($move), ['held_by']) as $hold) {
                         $hold = JsonPath::decoded($hold);
-                        $name = self::textAt($hold, ['source']) === 'root' ? 'your composer.json' : JsonPath::stringAt($hold, ['package']).' '.self::textAt($hold, ['version']);
+                        $name = self::textAt($hold, ['source']) === 'root' ? 'your composer.json' : JsonPath::stringAt($hold, ['package']).' '.self::textAt($hold, ['version']).(JsonPath::stringAt($hold, ['package']) === $package ? ', the release this move installs' : '');
                         $words[$name][self::linkWords($hold)] = JsonPath::stringAt($hold, ['link']).(self::textAt($hold, ['target']) === null ? '' : ', a target');
                     }
                 }
@@ -475,12 +476,22 @@ final class PageGoldensTest extends TestCase
     }
 
     /**
-     * SPEC-0.14.md §7.9.21: the check line of a move card names the place that holds the fix on a
-     * refused baseline. Every other reason keeps the words of `next_step.text`.
+     * SPEC-0.14.md §7.9.21: the check line of a move card names the place that holds the cause of a
+     * refused baseline: the PHP line when the window excludes the target, else the Run tab. Every
+     * other reason keeps the words of `next_step.text`.
+     *
+     * @param array<mixed, mixed> $run the document's `run`
      */
-    public static function cardReasonWords(string $reason): string
+    public static function cardReasonWords(string $reason, array $run): string
     {
-        return $reason === MoveCheck::BASELINE_REFUSED ? "Composer's solver refuses the lock itself at the target PHP; see the PHP line in the Overview" : MoveCheck::reasonWords($reason);
+        if ($reason !== MoveCheck::BASELINE_REFUSED) {
+            return MoveCheck::reasonWords($reason);
+        }
+        $window = $run['php_window'] ?? null;
+
+        return \is_array($window) && \is_array($window['target'] ?? null) && $window['target']['inside'] === false
+            ? "Composer's solver refuses the lock itself at the target PHP; see the PHP line in the Overview"
+            : "Composer's solver refuses the lock itself; the Run tab names the cause";
     }
 
     /**

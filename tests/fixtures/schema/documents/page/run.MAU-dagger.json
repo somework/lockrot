@@ -780,16 +780,16 @@
    "counted": 10,
    "lead-first": 24,
    "corroborating-share": 5,
-   "advisory-points": 3,
+   "advisory-points": 1,
    "no-reachable-fix-multiplier": 0,
    "security-max": 0,
    "divide-reach": 32,
-   "security-exempt-from-reach": 3,
+   "security-exempt-from-reach": 1,
    "sum": 0,
    "divide-dev": 0,
    "floor-once": 0,
-   "band-floors": 27,
-   "zero-verdicts": 169,
+   "band-floors": 25,
+   "zero-verdicts": 163,
    "sort": null,
    "gate-bounded-new": 0,
    "baseline-cover": 0
@@ -797,7 +797,7 @@
   "advisory_lookup": {
    "scope": "all",
    "scope_source": "default",
-   "packages_asked": 196,
+   "packages_asked": 188,
    "packages_not_asked": 0,
    "other_repositories": 1,
    "repositories": [
@@ -807,8 +807,8 @@
      "outcome": "answered",
      "reason": null,
      "message": null,
-     "packages_with_records": 50,
-     "records": 252
+     "packages_with_records": 47,
+     "records": 233
     }
    ]
   },
@@ -1973,21 +1973,21 @@
  },
  "activity_cache_oldest_at": "2026-10-01T16:04:05+00:00",
  "activity_cache_age_hours": 1.6,
- "packages_checked": 196,
- "packages_flagged": 27,
+ "packages_checked": 188,
+ "packages_flagged": 25,
  "packages_multi_flag": 5,
  "include_dev": false,
  "not_from_composer_repository": 1,
  "packages_unchecked_accepted": 0,
  "network_failures": false,
  "counts": {
-  "critical": 1,
-  "high": 7,
+  "critical": 0,
+  "high": 6,
   "medium": 11,
   "low": 8,
   "unknown": 0,
   "finished": 25,
-  "ok": 144
+  "ok": 138
  },
  "abandoned": {
   "total": 2,
@@ -1995,11 +1995,11 @@
   "with_suggestion": 0
  },
  "priorities": {
-  "critical": 1,
-  "high": 7,
+  "critical": 0,
+  "high": 6,
   "medium": 11,
   "low": 8,
-  "none": 169
+  "none": 163
  },
  "flags": {
   "abandoned": {
@@ -2101,12 +2101,12 @@
    }
   },
   "vulnerable": {
-   "carrying": 3,
+   "carrying": 1,
    "leading": null,
    "accepted": null,
    "by_verdict": {
-    "critical": 1,
-    "high": 1,
+    "critical": 0,
+    "high": 0,
     "medium": 0,
     "low": 1
    }
@@ -2115,7 +2115,7 @@
  "exposure": [
   {
    "package": "mautic/core-lib",
-   "flagged": 25
+   "flagged": 23
   }
  ],
  "exposure_rule": {
@@ -2123,20 +2123,20 @@
  },
  "unattributed": [],
  "rot_depth": {
-  "flagged": 27,
-  "measured": 27,
+  "flagged": 25,
+  "measured": 25,
   "unmeasured": {
    "unreached": 0,
    "no_composer_json": 0
   },
   "by_reach": {
    "direct": 2,
-   "transitive": 25,
+   "transitive": 23,
    "unreached": 0
   },
-  "not_in_composer_json": 25,
+  "not_in_composer_json": 23,
   "require_dev_not_walked": 0,
-  "production": 27,
+  "production": 25,
   "development": 0,
   "by_depth": [
    {
@@ -2145,7 +2145,7 @@
    },
    {
     "depth": 1,
-    "flagged": 11
+    "flagged": 9
    },
    {
     "depth": 2,
@@ -2269,9 +2269,9 @@
   ]
  },
  "libyears": {
-  "total": 162.46,
+  "total": 156.35,
   "direct_requirements": 2.86,
-  "measured": 190,
+  "measured": 182,
   "at_least_count": 0,
   "unmeasured": {
    "not_from_composer_repository": 1,
@@ -2289,7 +2289,7 @@
    "libyears": 9.53,
    "at_least": false
   },
-  "packages": 196
+  "packages": 188
  },
  "baseline": null,
  "gate": {
@@ -2298,8 +2298,8 @@
    "fail_on"
   ],
   "fail_on_applied": true,
-  "reaching": 8,
-  "failing": 8,
+  "reaching": 6,
+  "failing": 6,
   "exempt": {
    "baseline": 0
   },
@@ -2307,11 +2307,9 @@
    "known": 0,
    "new": 0,
    "worsened": 0,
-   "none": 8
+   "none": 6
   },
   "failing_packages": [
-   "predis/predis",
-   "composer/composer",
    "mustangostang/spyc",
    "cweagans/composer-patches",
    "mautic/core-lib",
@@ -2322,33 +2320,33 @@
   "failing_by": [
    {
     "value": "high",
-    "failing": 8
+    "failing": 6
    }
   ],
   "not_applied": [],
-  "text": "gate: fails · --fail-on=high · 8 findings fail it · target php 8.2 (--target-php)"
+  "text": "gate: fails · --fail-on=high · 6 findings fail it · target php 8.2 (--target-php)"
  },
  "security": {
   "check": "complete",
   "packages": {
-   "vulnerable": 3,
+   "vulnerable": 1,
    "unchecked": 0,
    "ignored": 0,
-   "clear": 193
+   "clear": 187
   },
   "advisories": {
-   "counted": 3,
+   "counted": 1,
    "ignored": 0
   },
   "severities": {
-   "critical": 1,
-   "high": 1,
+   "critical": 0,
+   "high": 0,
    "medium": 0,
    "unrated": 0,
    "low": 1
   },
   "fixes": {
-   "update": 3,
+   "update": 1,
    "upgrade": 0,
    "raise-php": 0,
    "unknown": 0,
@@ -2356,15 +2354,11 @@
    "none": 0
   },
   "update_now": [
-   "predis/predis",
-   "composer/composer",
    "league/flysystem"
   ],
   "update_now_command": [
    "composer",
    "update",
-   "predis/predis",
-   "composer/composer",
    "league/flysystem"
   ],
   "fix_unknown": 0
@@ -2387,722 +2381,6 @@
  ],
  "findings": [
   {
-   "package": "predis/predis",
-   "version": "v3.0.1",
-   "branch": "3.x",
-   "installed_php": {
-    "requires": "^7.2 || ^8.0",
-    "target_runs": true,
-    "project_allows": null
-   },
-   "verdict": "critical",
-   "priority": "critical",
-   "lead": null,
-   "rank": 1,
-   "flags": [
-    {
-     "id": "vulnerable",
-     "role": "security",
-     "baseline": null,
-     "signal_ids": [
-      "S9"
-     ],
-     "degree": null,
-     "headline": {
-      "unit": "advisories",
-      "value": 1,
-      "source": null
-     },
-     "summary": "1 advisory: 1 critical — all fixed on 3.x; advisory: CVE-2026-84372 Predis: Redis command injection and denial of service via CRLF smuggling in pipelined commands on aggregate connections"
-    }
-   ],
-   "score": {
-    "model": 1,
-    "total": 32,
-    "exact": 32,
-    "rounded_down": false,
-    "band": {
-     "floor": 32,
-     "next": null,
-     "to_next": null
-    },
-    "decided_by": "security",
-    "parts": {
-     "maintenance": {
-      "status": "none",
-      "contribution": 0,
-      "alone": {
-       "total": 0,
-       "verdict": null
-      }
-     },
-     "security": {
-      "status": "counted",
-      "contribution": 32,
-      "alone": {
-       "total": 32,
-       "verdict": "critical"
-      },
-      "of": 1,
-      "tied": []
-     }
-    },
-    "terms": [
-     {
-      "part": "security",
-      "flag": "vulnerable",
-      "role": "security",
-      "advisory": "PKSA-z888-whwt-brbj",
-      "severity": "critical",
-      "fix_kind": "update",
-      "weight": 32,
-      "multiplier": 1,
-      "points": 32,
-      "contribution": 32
-     }
-    ],
-    "modifiers": [
-     {
-      "reason": "transitive",
-      "applies_to": "maintenance",
-      "divide_by": 2,
-      "before": 0,
-      "after": 0
-     }
-    ],
-    "accepted": [],
-    "without": [],
-    "text": "32 = vulnerable 32 [critical advisory]"
-   },
-   "next_step": {
-    "kind": "update",
-    "source": "vulnerable",
-    "merged": [],
-    "fix_kind": "update",
-    "reason": null,
-    "replacement": null,
-    "quiet_years": null,
-    "to_branch": "3.x",
-    "version": "v3.3.0",
-    "newest": "v3.6.1",
-    "constraint": null,
-    "latest": null,
-    "php_check": {
-     "requires": "^7.2 || ^8.0",
-     "project_allows": null,
-     "target_runs": true,
-     "raise_to": null,
-     "raise_size": null
-    },
-    "crosses_major": false,
-    "held_by": [],
-    "clears": [
-     {
-      "kind": "advisory",
-      "id": "PKSA-z888-whwt-brbj",
-      "basis": "outside_range"
-     }
-    ],
-    "unverified": [],
-    "adds": [],
-    "leaves": [],
-    "clears_all": true,
-    "if_applied": {
-     "total": 0,
-     "verdict": "ok",
-     "lead": null,
-     "deciding_advisory": null,
-     "at_most": false,
-     "assumes": [
-      "clears_hold"
-     ]
-    },
-    "check": null,
-    "composer_moves_because": [],
-    "commands": [
-     [
-      "composer",
-      "update",
-      "predis/predis"
-     ]
-    ],
-    "through": [
-     {
-      "package": "mautic/core-lib",
-      "installed_version": "7.0.0-dev",
-      "installed_requires": null,
-      "newest_stable": null,
-      "newest_requires": null,
-      "newest_requires_unmeasured": "not_from_composer_repository"
-     }
-    ],
-    "also": [],
-    "text": "composer update predis/predis (gets v3.6.1) — clears the advisory"
-   },
-   "security": {
-    "status": "vulnerable",
-    "check": "complete",
-    "complete": true,
-    "unchecked_reason": null,
-    "records": 1,
-    "feeds": [
-     {
-      "composer_repository": "composer repo (https://repo.packagist.org)",
-      "registry": "packagist.org",
-      "answer": "answered",
-      "records": 1,
-      "reason": null
-     }
-    ],
-    "worst": "critical",
-    "counts": {
-     "critical": 1,
-     "high": 0,
-     "medium": 0,
-     "unrated": 0,
-     "low": 0
-    },
-    "ignored": [],
-    "ignored_count": 0,
-    "fix_kind": "update",
-    "installed_branch_fixes": {
-     "fixed": 1,
-     "unknown": 0,
-     "of": 1,
-     "fix_kind": "update",
-     "lowest": "v3.3.0",
-     "newest": "v3.6.1",
-     "held_by": [],
-     "if_applied": {
-      "total": 0,
-      "verdict": "ok",
-      "at_most": false,
-      "assumes": [
-       "clears_hold"
-      ]
-     },
-     "check": null
-    },
-    "move_in": "next_step",
-    "gets": {
-     "version": "v3.6.1",
-     "php_check": {
-      "requires": "^7.2 || ^8.0",
-      "project_allows": null,
-      "target_runs": true,
-      "raise_to": null,
-      "raise_size": null
-     },
-     "clears": [
-      {
-       "kind": "advisory",
-       "id": "PKSA-z888-whwt-brbj",
-       "basis": "outside_range"
-      }
-     ],
-     "clears_all": true
-    },
-    "partial": null
-   },
-   "checks_missing": [],
-   "checks_skipped": [],
-   "unchecked_accepted": [],
-   "maintenance_judged": true,
-   "metadata": {
-    "status": "read",
-    "reason": null,
-    "message": null
-   },
-   "activity": {
-    "status": "read",
-    "reason": null,
-    "forge": "github",
-    "host": "github.com",
-    "repo": "predis/predis",
-    "event": "push",
-    "archived": false,
-    "fetched_at": "2026-10-01T16:04:05+00:00",
-    "cached_at": "2026-10-01T16:04:05+00:00"
-   },
-   "allowlist": null,
-   "abandoned_ignored": null,
-   "from_composer_repository": true,
-   "origin": {
-    "kind": "packagist",
-    "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/predis/predis",
-    "local": false
-   },
-   "replacement": null,
-   "replacement_url": null,
-   "note": null,
-   "libyears_unmeasured": null,
-   "libyears_at_least": false,
-   "direct": false,
-   "dev": false,
-   "reach": "transitive",
-   "chain": [
-    "mautic/core-lib",
-    "predis/predis"
-   ],
-   "depth": 1,
-   "depth_unmeasured": null,
-   "named_in": [],
-   "direct_dependents": [
-    "mautic/core-lib"
-   ],
-   "signals": [
-    {
-     "id": "S9",
-     "level": "high",
-     "summary": "1 security advisory affects v3.0.1 (CVE-2026-84372); fixed in v3.3.0",
-     "data": {
-      "advisories": [
-       {
-        "id": "PKSA-z888-whwt-brbj",
-        "cve": "CVE-2026-84372",
-        "title": "Predis: Redis command injection and denial of service via CRLF smuggling in pipelined commands on aggregate connections",
-        "link": "https://github.com/advisories/GHSA-w6f5-v2h6-g786",
-        "reported_at": "2026-09-08T20:57:50+00:00",
-        "severity": "critical",
-        "severity_published": "critical",
-        "affected_versions": ">=3.0.0-RC1,<3.3.0",
-        "counted": true,
-        "points": 32,
-        "deciding": true,
-        "fix": {
-         "kind": "update",
-         "to_branch": "3.x",
-         "version": "v3.3.0",
-         "newest": "v3.6.1",
-         "on_installed_branch": true,
-         "php": "^7.2 || ^8.0",
-         "admits_target_php": true,
-         "admits_project_php": null,
-         "held_by": [],
-         "reason": null
-        },
-        "baseline": null
-       }
-      ],
-      "releases_read": true,
-      "complete": true
-     }
-    }
-   ],
-   "evidence": "vulnerable: 1 advisory: 1 critical — all fixed on 3.x; advisory: CVE-2026-84372 Predis: Redis command injection and denial of service via CRLF smuggling in pipelined commands on aggregate connections",
-   "allowlist_reason": null,
-   "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": 1.34,
-   "age": {
-    "installed": {
-     "at": "2025-05-16T18:30:32+00:00",
-     "years": 1.4,
-     "dated_by": null
-    },
-    "installed_unmeasured": null,
-    "release": {
-     "version": "v3.6.1",
-     "at": "2026-09-17T20:41:00+00:00",
-     "years": 0,
-     "level": null,
-     "dated_by": null
-    },
-    "release_unmeasured": null,
-    "branch_release": {
-     "version": "v3.6.1",
-     "at": "2026-09-17T20:41:00+00:00",
-     "years": 0,
-     "level": null,
-     "dated_by": null
-    },
-    "branch_release_unmeasured": null,
-    "push": {
-     "at": "2026-09-30T07:57:38+00:00",
-     "years": 0,
-     "level": null
-    },
-    "push_unmeasured": null
-   },
-   "baseline": null,
-   "gate": {
-    "reaches_fail_on": true,
-    "fails": true,
-    "exempt_by": null,
-    "by": [
-     {
-      "value": "high",
-      "kind": "grade",
-      "facts": [
-       {
-        "kind": "advisory",
-        "id": "PKSA-z888-whwt-brbj"
-       }
-      ]
-     }
-    ],
-    "basis": null
-   }
-  },
-  {
-   "package": "composer/composer",
-   "version": "2.10.2",
-   "branch": "2.x",
-   "installed_php": {
-    "requires": "^7.2.5 || ^8.0",
-    "target_runs": true,
-    "project_allows": null
-   },
-   "verdict": "high",
-   "priority": "high",
-   "lead": null,
-   "rank": 2,
-   "flags": [
-    {
-     "id": "vulnerable",
-     "role": "security",
-     "baseline": null,
-     "signal_ids": [
-      "S9"
-     ],
-     "degree": null,
-     "headline": {
-      "unit": "advisories",
-      "value": 1,
-      "source": null
-     },
-     "summary": "1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-84361 Composer arbitrary command execution via a malicious package's Perforce source URL"
-    }
-   ],
-   "score": {
-    "model": 1,
-    "total": 16,
-    "exact": 16,
-    "rounded_down": false,
-    "band": {
-     "floor": 16,
-     "next": "critical",
-     "to_next": 16
-    },
-    "decided_by": "security",
-    "parts": {
-     "maintenance": {
-      "status": "none",
-      "contribution": 0,
-      "alone": {
-       "total": 0,
-       "verdict": null
-      }
-     },
-     "security": {
-      "status": "counted",
-      "contribution": 16,
-      "alone": {
-       "total": 16,
-       "verdict": "high"
-      },
-      "of": 1,
-      "tied": []
-     }
-    },
-    "terms": [
-     {
-      "part": "security",
-      "flag": "vulnerable",
-      "role": "security",
-      "advisory": "PKSA-ym19-cy3j-z6df",
-      "severity": "high",
-      "fix_kind": "update",
-      "weight": 16,
-      "multiplier": 1,
-      "points": 16,
-      "contribution": 16
-     }
-    ],
-    "modifiers": [
-     {
-      "reason": "transitive",
-      "applies_to": "maintenance",
-      "divide_by": 2,
-      "before": 0,
-      "after": 0
-     }
-    ],
-    "accepted": [],
-    "without": [],
-    "text": "16 = vulnerable 16 [high advisory]"
-   },
-   "next_step": {
-    "kind": "update",
-    "source": "vulnerable",
-    "merged": [],
-    "fix_kind": "update",
-    "reason": null,
-    "replacement": null,
-    "quiet_years": null,
-    "to_branch": "2.x",
-    "version": "2.10.3",
-    "newest": "2.10.3",
-    "constraint": null,
-    "latest": null,
-    "php_check": {
-     "requires": "^5.3.2 || ^7.0 || ^8.0",
-     "project_allows": null,
-     "target_runs": true,
-     "raise_to": null,
-     "raise_size": null
-    },
-    "crosses_major": false,
-    "held_by": [],
-    "clears": [
-     {
-      "kind": "advisory",
-      "id": "PKSA-ym19-cy3j-z6df",
-      "basis": "outside_range"
-     }
-    ],
-    "unverified": [],
-    "adds": [],
-    "leaves": [],
-    "clears_all": true,
-    "if_applied": {
-     "total": 0,
-     "verdict": "ok",
-     "lead": null,
-     "deciding_advisory": null,
-     "at_most": false,
-     "assumes": [
-      "clears_hold"
-     ]
-    },
-    "check": null,
-    "composer_moves_because": [],
-    "commands": [
-     [
-      "composer",
-      "update",
-      "composer/composer"
-     ]
-    ],
-    "through": [
-     {
-      "package": "mautic/core-lib",
-      "installed_version": "7.0.0-dev",
-      "installed_requires": null,
-      "newest_stable": null,
-      "newest_requires": null,
-      "newest_requires_unmeasured": "not_from_composer_repository"
-     }
-    ],
-    "also": [],
-    "text": "composer update composer/composer (gets 2.10.3) — clears the advisory"
-   },
-   "security": {
-    "status": "vulnerable",
-    "check": "complete",
-    "complete": true,
-    "unchecked_reason": null,
-    "records": 17,
-    "feeds": [
-     {
-      "composer_repository": "composer repo (https://repo.packagist.org)",
-      "registry": "packagist.org",
-      "answer": "answered",
-      "records": 17,
-      "reason": null
-     }
-    ],
-    "worst": "high",
-    "counts": {
-     "critical": 0,
-     "high": 1,
-     "medium": 0,
-     "unrated": 0,
-     "low": 0
-    },
-    "ignored": [],
-    "ignored_count": 0,
-    "fix_kind": "update",
-    "installed_branch_fixes": {
-     "fixed": 1,
-     "unknown": 0,
-     "of": 1,
-     "fix_kind": "update",
-     "lowest": "2.10.3",
-     "newest": "2.10.3",
-     "held_by": [],
-     "if_applied": {
-      "total": 0,
-      "verdict": "ok",
-      "at_most": false,
-      "assumes": [
-       "clears_hold"
-      ]
-     },
-     "check": null
-    },
-    "move_in": "next_step",
-    "gets": {
-     "version": "2.10.3",
-     "php_check": {
-      "requires": "^5.3.2 || ^7.0 || ^8.0",
-      "project_allows": null,
-      "target_runs": true,
-      "raise_to": null,
-      "raise_size": null
-     },
-     "clears": [
-      {
-       "kind": "advisory",
-       "id": "PKSA-ym19-cy3j-z6df",
-       "basis": "outside_range"
-      }
-     ],
-     "clears_all": true
-    },
-    "partial": null
-   },
-   "checks_missing": [],
-   "checks_skipped": [],
-   "unchecked_accepted": [],
-   "maintenance_judged": true,
-   "metadata": {
-    "status": "read",
-    "reason": null,
-    "message": null
-   },
-   "activity": {
-    "status": "read",
-    "reason": null,
-    "forge": "github",
-    "host": "github.com",
-    "repo": "composer/composer",
-    "event": "push",
-    "archived": false,
-    "fetched_at": "2026-10-01T16:04:05+00:00",
-    "cached_at": "2026-10-01T16:04:05+00:00"
-   },
-   "allowlist": null,
-   "abandoned_ignored": null,
-   "from_composer_repository": true,
-   "origin": {
-    "kind": "packagist",
-    "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/composer/composer",
-    "local": false
-   },
-   "replacement": null,
-   "replacement_url": null,
-   "note": null,
-   "libyears_unmeasured": null,
-   "libyears_at_least": false,
-   "direct": false,
-   "dev": false,
-   "reach": "transitive",
-   "chain": [
-    "mautic/core-lib",
-    "composer/composer"
-   ],
-   "depth": 1,
-   "depth_unmeasured": null,
-   "named_in": [],
-   "direct_dependents": [
-    "mautic/core-lib"
-   ],
-   "signals": [
-    {
-     "id": "S9",
-     "level": "high",
-     "summary": "1 security advisory affects 2.10.2 (CVE-2026-84361); fixed in 2.10.3",
-     "data": {
-      "advisories": [
-       {
-        "id": "PKSA-ym19-cy3j-z6df",
-        "cve": "CVE-2026-84361",
-        "title": "Composer arbitrary command execution via a malicious package's Perforce source URL",
-        "link": "https://github.com/advisories/GHSA-rvx4-ffvw-m9q3",
-        "reported_at": "2026-09-08T21:25:41+00:00",
-        "severity": "high",
-        "severity_published": "high",
-        "affected_versions": ">=1.0,<2.2.30|>=2.3.0,<2.10.3",
-        "counted": true,
-        "points": 16,
-        "deciding": true,
-        "fix": {
-         "kind": "update",
-         "to_branch": "2.x",
-         "version": "2.10.3",
-         "newest": "2.10.3",
-         "on_installed_branch": true,
-         "php": "^5.3.2 || ^7.0 || ^8.0",
-         "admits_target_php": true,
-         "admits_project_php": null,
-         "held_by": [],
-         "reason": null
-        },
-        "baseline": null
-       }
-      ],
-      "releases_read": true,
-      "complete": true
-     }
-    }
-   ],
-   "evidence": "vulnerable: 1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-84361 Composer arbitrary command execution via a malicious package's Perforce source URL",
-   "allowlist_reason": null,
-   "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": 0.16,
-   "age": {
-    "installed": {
-     "at": "2026-07-01T09:24:45+00:00",
-     "years": 0.3,
-     "dated_by": null
-    },
-    "installed_unmeasured": null,
-    "release": {
-     "version": "2.2.30",
-     "at": "2026-08-27T11:34:49+00:00",
-     "years": 0.1,
-     "level": null,
-     "dated_by": null
-    },
-    "release_unmeasured": null,
-    "branch_release": {
-     "version": "2.2.30",
-     "at": "2026-08-27T11:34:49+00:00",
-     "years": 0.1,
-     "level": null,
-     "dated_by": null
-    },
-    "branch_release_unmeasured": null,
-    "push": {
-     "at": "2026-10-01T15:55:26+00:00",
-     "years": 0,
-     "level": null
-    },
-    "push_unmeasured": null
-   },
-   "baseline": null,
-   "gate": {
-    "reaches_fail_on": true,
-    "fails": true,
-    "exempt_by": null,
-    "by": [
-     {
-      "value": "high",
-      "kind": "grade",
-      "facts": [
-       {
-        "kind": "advisory",
-        "id": "PKSA-ym19-cy3j-z6df"
-       }
-      ]
-     }
-    ],
-    "basis": null
-   }
-  },
-  {
    "package": "mustangostang/spyc",
    "version": "0.6.3",
    "branch": "0.6.x",
@@ -3114,7 +2392,7 @@
    "verdict": "high",
    "priority": "high",
    "lead": "silent",
-   "rank": 3,
+   "rank": 1,
    "flags": [
     {
      "id": "silent",
@@ -3147,7 +2425,7 @@
       "value": 5,
       "source": null
      },
-     "summary": "released 2019-09-10 for PHP 5 (php \">=5.3.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+     "summary": "released 2019-09-10 for PHP 5 (php \">=5.3.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested"
     }
    ],
    "score": {
@@ -3382,9 +2660,9 @@
     {
      "id": "S5",
      "level": "warn",
-     "summary": "released 2019-09-10 for PHP 5 (php \">=5.3.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "summary": "released 2019-09-10 for PHP 5 (php \">=5.3.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested",
      "data": {
-      "target_php": "8.4",
+      "target_php": "8.2",
       "target_major": "8.0",
       "ga_date": "2020-11-26",
       "php_constraint": ">=5.3.1",
@@ -3393,7 +2671,7 @@
      }
     }
    ],
-   "evidence": "silent: last release 2019-09-10 (7.1 years ago); last push 2020-03-16 (6.5 years ago); old-promise: released 2019-09-10 for PHP 5 (php \">=5.3.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+   "evidence": "silent: last release 2019-09-10 (7.1 years ago); last push 2020-03-16 (6.5 years ago); old-promise: released 2019-09-10 for PHP 5 (php \">=5.3.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:56+00:00",
    "libyears": 0,
@@ -3459,7 +2737,7 @@
    "verdict": "high",
    "priority": "high",
    "lead": "left-behind",
-   "rank": 4,
+   "rank": 2,
    "flags": [
     {
      "id": "left-behind",
@@ -3747,7 +3025,7 @@
    "verdict": "high",
    "priority": "high",
    "lead": "pinned",
-   "rank": 5,
+   "rank": 3,
    "flags": [
     {
      "id": "pinned",
@@ -3948,34 +3226,10 @@
     {
      "id": "S7",
      "level": "info",
-     "summary": "pulls in 25 flagged packages: predis/predis (vulnerable), composer/composer (vulnerable), mustangostang/spyc (silent · old-promise), composer/package-versions-deprecated (abandoned), doctrine/cache (abandoned) and 20 more",
+     "summary": "pulls in 23 flagged packages: mustangostang/spyc (silent · old-promise), composer/package-versions-deprecated (abandoned), doctrine/cache (abandoned), gaufrette/extras (silent), knplabs/gaufrette (left-behind · old-promise) and 18 more",
      "data": {
-      "flagged": 25,
+      "flagged": 23,
       "packages": [
-       {
-        "package": "predis/predis",
-        "chain": [
-         "mautic/core-lib",
-         "predis/predis"
-        ],
-        "verdict": "critical",
-        "lead": null,
-        "flag_ids": [
-         "vulnerable"
-        ]
-       },
-       {
-        "package": "composer/composer",
-        "chain": [
-         "mautic/core-lib",
-         "composer/composer"
-        ],
-        "verdict": "high",
-        "lead": null,
-        "flag_ids": [
-         "vulnerable"
-        ]
-       },
        {
         "package": "mustangostang/spyc",
         "chain": [
@@ -4321,7 +3575,7 @@
    "verdict": "high",
    "priority": "high",
    "lead": "abandoned",
-   "rank": 6,
+   "rank": 4,
    "flags": [
     {
      "id": "abandoned",
@@ -4625,7 +3879,7 @@
    "verdict": "high",
    "priority": "high",
    "lead": "abandoned",
-   "rank": 7,
+   "rank": 5,
    "flags": [
     {
      "id": "abandoned",
@@ -4904,7 +4158,7 @@
    "verdict": "high",
    "priority": "high",
    "lead": "silent",
-   "rank": 8,
+   "rank": 6,
    "flags": [
     {
      "id": "silent",
@@ -5182,7 +4436,7 @@
    "verdict": "medium",
    "priority": "medium",
    "lead": "left-behind",
-   "rank": 9,
+   "rank": 7,
    "flags": [
     {
      "id": "left-behind",
@@ -5212,7 +4466,7 @@
       "value": 7,
       "source": null
      },
-     "summary": "released 2019-12-26 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+     "summary": "released 2019-12-26 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested"
     }
    ],
    "score": {
@@ -5441,9 +4695,9 @@
     {
      "id": "S5",
      "level": "warn",
-     "summary": "released 2019-12-26 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "summary": "released 2019-12-26 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested",
      "data": {
-      "target_php": "8.4",
+      "target_php": "8.2",
       "target_major": "8.0",
       "ga_date": "2020-11-26",
       "php_constraint": ">=7.1",
@@ -5482,7 +4736,7 @@
      }
     }
    ],
-   "evidence": "left-behind: branch 0.9.x last released 2019-12-26 (6.8 years ago); 1.x released v1.0.0 (2026-07-22); old-promise: released 2019-12-26 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+   "evidence": "left-behind: branch 0.9.x last released 2019-12-26 (6.8 years ago); 1.x released v1.0.0 (2026-07-22); old-promise: released 2019-12-26 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:56+00:00",
    "libyears": 6.57,
@@ -5537,7 +4791,7 @@
    "verdict": "medium",
    "priority": "medium",
    "lead": "left-behind",
-   "rank": 10,
+   "rank": 8,
    "flags": [
     {
      "id": "left-behind",
@@ -5567,7 +4821,7 @@
       "value": 5,
       "source": null
      },
-     "summary": "released 2020-02-05 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+     "summary": "released 2020-02-05 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested"
     }
    ],
    "score": {
@@ -5797,9 +5051,9 @@
     {
      "id": "S5",
      "level": "warn",
-     "summary": "released 2020-02-05 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "summary": "released 2020-02-05 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested",
      "data": {
-      "target_php": "8.4",
+      "target_php": "8.2",
       "target_major": "8.0",
       "ga_date": "2020-11-26",
       "php_constraint": ">=5.5.0",
@@ -5838,7 +5092,7 @@
      }
     }
    ],
-   "evidence": "left-behind: branch 5.x last released 2020-02-05 (6.7 years ago); 8.x released 8.12.2 (2026-09-28); old-promise: released 2020-02-05 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+   "evidence": "left-behind: branch 5.x last released 2020-02-05 (6.7 years ago); 8.x released 8.12.2 (2026-09-28); old-promise: released 2020-02-05 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:56+00:00",
    "libyears": 6.64,
@@ -5893,7 +5147,7 @@
    "verdict": "medium",
    "priority": "medium",
    "lead": "old-promise",
-   "rank": 11,
+   "rank": 9,
    "flags": [
     {
      "id": "old-promise",
@@ -5908,7 +5162,7 @@
       "value": 5,
       "source": null
      },
-     "summary": "released 2019-02-05 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+     "summary": "released 2019-02-05 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested"
     },
     {
      "id": "stale",
@@ -6167,9 +5421,9 @@
     {
      "id": "S5",
      "level": "warn",
-     "summary": "released 2019-02-05 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "summary": "released 2019-02-05 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested",
      "data": {
-      "target_php": "8.4",
+      "target_php": "8.2",
       "target_major": "8.0",
       "ga_date": "2020-11-26",
       "php_constraint": ">=5.3.0",
@@ -6178,7 +5432,7 @@
      }
     }
    ],
-   "evidence": "old-promise: released 2019-02-05 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; stale: last release 2019-02-05 (7.7 years ago); last push 2023-07-01 (3.3 years ago)",
+   "evidence": "old-promise: released 2019-02-05 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested; stale: last release 2019-02-05 (7.7 years ago); last push 2023-07-01 (3.3 years ago)",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:56+00:00",
    "libyears": 0,
@@ -6233,7 +5487,7 @@
    "verdict": "medium",
    "priority": "medium",
    "lead": "old-promise",
-   "rank": 12,
+   "rank": 10,
    "flags": [
     {
      "id": "old-promise",
@@ -6248,7 +5502,7 @@
       "value": 7,
       "source": null
      },
-     "summary": "released 2018-11-23 for PHP 7 (php \">=7.0.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+     "summary": "released 2018-11-23 for PHP 7 (php \">=7.0.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested"
     },
     {
      "id": "stale",
@@ -6493,9 +5747,9 @@
     {
      "id": "S5",
      "level": "warn",
-     "summary": "released 2018-11-23 for PHP 7 (php \">=7.0.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "summary": "released 2018-11-23 for PHP 7 (php \">=7.0.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested",
      "data": {
-      "target_php": "8.4",
+      "target_php": "8.2",
       "target_major": "8.0",
       "ga_date": "2020-11-26",
       "php_constraint": ">=7.0.0",
@@ -6504,7 +5758,7 @@
      }
     }
    ],
-   "evidence": "old-promise: released 2018-11-23 for PHP 7 (php \">=7.0.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; stale: last release 2018-11-23 (7.9 years ago)",
+   "evidence": "old-promise: released 2018-11-23 for PHP 7 (php \">=7.0.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested; stale: last release 2018-11-23 (7.9 years ago)",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:56+00:00",
    "libyears": 0,
@@ -6559,7 +5813,7 @@
    "verdict": "medium",
    "priority": "medium",
    "lead": "left-behind",
-   "rank": 13,
+   "rank": 11,
    "flags": [
     {
      "id": "left-behind",
@@ -6847,7 +6101,7 @@
    "verdict": "medium",
    "priority": "medium",
    "lead": "left-behind",
-   "rank": 14,
+   "rank": 12,
    "flags": [
     {
      "id": "left-behind",
@@ -7136,7 +6390,7 @@
    "verdict": "medium",
    "priority": "medium",
    "lead": "left-behind",
-   "rank": 15,
+   "rank": 13,
    "flags": [
     {
      "id": "left-behind",
@@ -7424,7 +6678,7 @@
    "verdict": "medium",
    "priority": "medium",
    "lead": "left-behind",
-   "rank": 16,
+   "rank": 14,
    "flags": [
     {
      "id": "left-behind",
@@ -7439,7 +6693,7 @@
       "value": 4.4,
       "source": "branch"
      },
-     "summary": "branch 2.x last released 2022-05-21 (4.4 years ago); 4.x released 4.3.3 (2026-09-26)"
+     "summary": "branch 2.x last released 2022-05-21 (4.4 years ago); 4.x released 4.3.3 (2026-09-26), needs php ^8.3 above the target's php 8.2; 3.x released 3.11.9 (2026-09-26)"
     }
    ],
    "score": {
@@ -7505,13 +6759,13 @@
     "reason": null,
     "replacement": null,
     "quiet_years": null,
-    "to_branch": "4.x",
+    "to_branch": "3.x",
     "version": null,
-    "newest": "4.3.3",
-    "constraint": "^4.3",
+    "newest": "3.11.9",
+    "constraint": "^3.11",
     "latest": null,
     "php_check": {
-     "requires": "^8.3",
+     "requires": "^8.1",
      "project_allows": null,
      "target_runs": true,
      "raise_to": null,
@@ -7558,7 +6812,7 @@
      }
     ],
     "also": [],
-    "text": "move intervention/image to ^4.3 through mautic/core-lib — clears left-behind; 4.x needs php ^8.3; the target php 8.2 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
+    "text": "move intervention/image to ^3.11 through mautic/core-lib — clears left-behind; 3.x needs php ^8.1; the target php 8.2 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
    },
    "security": {
     "status": "clear",
@@ -7630,7 +6884,7 @@
     {
      "id": "S8",
      "level": "warn",
-     "summary": "branch 2.x last released 2022-05-21 (4.4 years ago); 4.x released 4.3.3 (2026-09-26)",
+     "summary": "branch 2.x last released 2022-05-21 (4.4 years ago); 4.x released 4.3.3 (2026-09-26), needs php ^8.3 above the target's php 8.2; 3.x released 3.11.9 (2026-09-26)",
      "data": {
       "branch": "2.x",
       "branch_last_release": "2022-05-21T17:30:32+00:00",
@@ -7640,15 +6894,15 @@
       "newest_version": "4.3.3",
       "newest_release": "2026-09-26T06:48:23+00:00",
       "newest_php": "^8.3",
-      "newest_within_reach": true,
-      "floor_php": null,
-      "floor_source": null,
-      "reachable_branch": "4.x",
-      "reachable_version": "4.3.3",
-      "reachable_release": "2026-09-26T06:48:23+00:00",
-      "suggested_constraint": "^4.3",
+      "newest_within_reach": false,
+      "floor_php": "8.2",
+      "floor_source": "target",
+      "reachable_branch": "3.x",
+      "reachable_version": "3.11.9",
+      "reachable_release": "2026-09-26T06:42:25+00:00",
+      "suggested_constraint": "^3.11",
       "dated_by": null,
-      "reachable_php": "^8.3",
+      "reachable_php": "^8.1",
       "reachable_admits": {
        "project": null,
        "target": true
@@ -7658,7 +6912,7 @@
      }
     }
    ],
-   "evidence": "left-behind: branch 2.x last released 2022-05-21 (4.4 years ago); 4.x released 4.3.3 (2026-09-26)",
+   "evidence": "left-behind: branch 2.x last released 2022-05-21 (4.4 years ago); 4.x released 4.3.3 (2026-09-26), needs php ^8.3 above the target's php 8.2; 3.x released 3.11.9 (2026-09-26)",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:56+00:00",
    "libyears": 4.35,
@@ -7713,7 +6967,7 @@
    "verdict": "medium",
    "priority": "medium",
    "lead": "left-behind",
-   "rank": 17,
+   "rank": 15,
    "flags": [
     {
      "id": "left-behind",
@@ -8001,7 +7255,7 @@
    "verdict": "medium",
    "priority": "medium",
    "lead": "left-behind",
-   "rank": 18,
+   "rank": 16,
    "flags": [
     {
      "id": "left-behind",
@@ -8290,7 +7544,7 @@
    "verdict": "medium",
    "priority": "medium",
    "lead": "left-behind",
-   "rank": 19,
+   "rank": 17,
    "flags": [
     {
      "id": "left-behind",
@@ -8579,7 +7833,7 @@
    "verdict": "low",
    "priority": "low",
    "lead": null,
-   "rank": 20,
+   "rank": 18,
    "flags": [
     {
      "id": "vulnerable",
@@ -8927,7 +8181,7 @@
    "verdict": "low",
    "priority": "low",
    "lead": "capped",
-   "rank": 21,
+   "rank": 19,
    "flags": [
     {
      "id": "capped",
@@ -9204,7 +8458,7 @@
    "verdict": "low",
    "priority": "low",
    "lead": "stale",
-   "rank": 22,
+   "rank": 20,
    "flags": [
     {
      "id": "stale",
@@ -9470,7 +8724,7 @@
    "verdict": "low",
    "priority": "low",
    "lead": "stale",
-   "rank": 23,
+   "rank": 21,
    "flags": [
     {
      "id": "stale",
@@ -9722,7 +8976,7 @@
    "verdict": "low",
    "priority": "low",
    "lead": "stale",
-   "rank": 24,
+   "rank": 22,
    "flags": [
     {
      "id": "stale",
@@ -9974,7 +9228,7 @@
    "verdict": "low",
    "priority": "low",
    "lead": "stale",
-   "rank": 25,
+   "rank": 23,
    "flags": [
     {
      "id": "stale",
@@ -10225,7 +9479,7 @@
    "verdict": "low",
    "priority": "low",
    "lead": "stale",
-   "rank": 26,
+   "rank": 24,
    "flags": [
     {
      "id": "stale",
@@ -10491,7 +9745,7 @@
    "verdict": "low",
    "priority": "low",
    "lead": "stale",
-   "rank": 27,
+   "rank": 25,
    "flags": [
     {
      "id": "stale",
@@ -10757,7 +10011,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 28,
+   "rank": 26,
    "flags": [],
    "score": {
     "model": 1,
@@ -10889,7 +10143,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 29,
+   "rank": 27,
    "flags": [],
    "score": {
     "model": 1,
@@ -11020,7 +10274,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 30,
+   "rank": 28,
    "flags": [],
    "score": {
     "model": 1,
@@ -11152,7 +10406,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 31,
+   "rank": 29,
    "flags": [],
    "score": {
     "model": 1,
@@ -11283,7 +10537,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 32,
+   "rank": 30,
    "flags": [],
    "score": {
     "model": 1,
@@ -11414,7 +10668,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 33,
+   "rank": 31,
    "flags": [],
    "score": {
     "model": 1,
@@ -11534,138 +10788,6 @@
    }
   },
   {
-   "package": "composer/ca-bundle",
-   "version": "1.5.13",
-   "branch": "1.x",
-   "installed_php": {
-    "requires": null,
-    "target_runs": null,
-    "project_allows": null
-   },
-   "verdict": "ok",
-   "priority": "none",
-   "lead": null,
-   "rank": 34,
-   "flags": [],
-   "score": {
-    "model": 1,
-    "total": 0,
-    "exact": 0,
-    "accepted": [],
-    "text": "0"
-   },
-   "next_step": null,
-   "security": {
-    "status": "clear",
-    "check": "complete",
-    "complete": true,
-    "unchecked_reason": null,
-    "records": 0,
-    "feeds": [
-     {
-      "composer_repository": "composer repo (https://repo.packagist.org)",
-      "registry": "packagist.org",
-      "answer": "answered",
-      "records": 0,
-      "reason": null
-     }
-    ],
-    "ignored": [],
-    "ignored_count": 0
-   },
-   "checks_missing": [],
-   "checks_skipped": [],
-   "unchecked_accepted": [],
-   "maintenance_judged": true,
-   "metadata": {
-    "status": "read",
-    "reason": null,
-    "message": null
-   },
-   "activity": {
-    "status": "read",
-    "reason": null,
-    "forge": "github",
-    "host": "github.com",
-    "repo": "composer/ca-bundle",
-    "event": "push",
-    "archived": false,
-    "fetched_at": "2026-10-01T17:39:56+00:00",
-    "cached_at": null
-   },
-   "allowlist": null,
-   "abandoned_ignored": null,
-   "from_composer_repository": true,
-   "origin": {
-    "kind": "packagist",
-    "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/composer/ca-bundle",
-    "local": false
-   },
-   "replacement": null,
-   "replacement_url": null,
-   "note": null,
-   "libyears_unmeasured": null,
-   "libyears_at_least": false,
-   "direct": false,
-   "dev": false,
-   "reach": "transitive",
-   "chain": [
-    "mautic/core-lib",
-    "composer/composer",
-    "composer/ca-bundle"
-   ],
-   "depth": 2,
-   "depth_unmeasured": null,
-   "named_in": [],
-   "direct_dependents": [
-    "mautic/core-lib"
-   ],
-   "signals": [],
-   "evidence": "",
-   "allowlist_reason": null,
-   "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": 0.09,
-   "age": {
-    "installed": {
-     "at": "2026-07-18T12:35:13+00:00",
-     "years": 0.2,
-     "dated_by": null
-    },
-    "installed_unmeasured": null,
-    "release": {
-     "version": "1.4.15",
-     "at": "2026-08-21T14:57:32+00:00",
-     "years": 0.1,
-     "level": null,
-     "dated_by": null
-    },
-    "release_unmeasured": null,
-    "branch_release": {
-     "version": "1.5.14",
-     "at": "2026-08-21T14:57:29+00:00",
-     "years": 0.1,
-     "level": null,
-     "dated_by": null
-    },
-    "branch_release_unmeasured": null,
-    "push": {
-     "at": "2026-10-01T16:47:29Z",
-     "years": 0,
-     "level": null
-    },
-    "push_unmeasured": null
-   },
-   "baseline": null,
-   "gate": {
-    "reaches_fail_on": false,
-    "fails": false,
-    "exempt_by": null,
-    "by": [],
-    "basis": null
-   }
-  },
-  {
    "package": "composer/class-map-generator",
    "version": "1.7.3",
    "branch": "1.x",
@@ -11677,7 +10799,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 35,
+   "rank": 32,
    "flags": [],
    "score": {
     "model": 1,
@@ -11809,7 +10931,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 36,
+   "rank": 33,
    "flags": [],
    "score": {
     "model": 1,
@@ -11941,7 +11063,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 37,
+   "rank": 34,
    "flags": [],
    "score": {
     "model": 1,
@@ -12073,7 +11195,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 38,
+   "rank": 35,
    "flags": [],
    "score": {
     "model": 1,
@@ -12205,7 +11327,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 39,
+   "rank": 36,
    "flags": [],
    "score": {
     "model": 1,
@@ -12337,7 +11459,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 40,
+   "rank": 37,
    "flags": [],
    "score": {
     "model": 1,
@@ -12469,7 +11591,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 41,
+   "rank": 38,
    "flags": [],
    "score": {
     "model": 1,
@@ -12601,7 +11723,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 42,
+   "rank": 39,
    "flags": [],
    "score": {
     "model": 1,
@@ -12733,7 +11855,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 43,
+   "rank": 40,
    "flags": [],
    "score": {
     "model": 1,
@@ -12864,7 +11986,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 44,
+   "rank": 41,
    "flags": [],
    "score": {
     "model": 1,
@@ -12995,7 +12117,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 45,
+   "rank": 42,
    "flags": [],
    "score": {
     "model": 1,
@@ -13127,7 +12249,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 46,
+   "rank": 43,
    "flags": [],
    "score": {
     "model": 1,
@@ -13258,7 +12380,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 47,
+   "rank": 44,
    "flags": [],
    "score": {
     "model": 1,
@@ -13389,7 +12511,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 48,
+   "rank": 45,
    "flags": [],
    "score": {
     "model": 1,
@@ -13520,7 +12642,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 49,
+   "rank": 46,
    "flags": [],
    "score": {
     "model": 1,
@@ -13652,7 +12774,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 50,
+   "rank": 47,
    "flags": [],
    "score": {
     "model": 1,
@@ -13784,7 +12906,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 51,
+   "rank": 48,
    "flags": [],
    "score": {
     "model": 1,
@@ -13916,7 +13038,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 52,
+   "rank": 49,
    "flags": [],
    "score": {
     "model": 1,
@@ -14048,7 +13170,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 53,
+   "rank": 50,
    "flags": [],
    "score": {
     "model": 1,
@@ -14180,7 +13302,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 54,
+   "rank": 51,
    "flags": [],
    "score": {
     "model": 1,
@@ -14311,7 +13433,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 55,
+   "rank": 52,
    "flags": [],
    "score": {
     "model": 1,
@@ -14443,7 +13565,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 56,
+   "rank": 53,
    "flags": [],
    "score": {
     "model": 1,
@@ -14575,7 +13697,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 57,
+   "rank": 54,
    "flags": [],
    "score": {
     "model": 1,
@@ -14707,7 +13829,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 58,
+   "rank": 55,
    "flags": [],
    "score": {
     "model": 1,
@@ -14838,7 +13960,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 59,
+   "rank": 56,
    "flags": [],
    "score": {
     "model": 1,
@@ -14969,7 +14091,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 60,
+   "rank": 57,
    "flags": [
     {
      "id": "stale",
@@ -15164,7 +14286,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 61,
+   "rank": 58,
    "flags": [],
    "score": {
     "model": 1,
@@ -15295,7 +14417,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 62,
+   "rank": 59,
    "flags": [],
    "score": {
     "model": 1,
@@ -15427,7 +14549,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 63,
+   "rank": 60,
    "flags": [],
    "score": {
     "model": 1,
@@ -15558,7 +14680,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 64,
+   "rank": 61,
    "flags": [],
    "score": {
     "model": 1,
@@ -15689,7 +14811,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 65,
+   "rank": 62,
    "flags": [],
    "score": {
     "model": 1,
@@ -15821,7 +14943,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 66,
+   "rank": 63,
    "flags": [],
    "score": {
     "model": 1,
@@ -15953,7 +15075,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 67,
+   "rank": 64,
    "flags": [],
    "score": {
     "model": 1,
@@ -16084,7 +15206,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 68,
+   "rank": 65,
    "flags": [],
    "score": {
     "model": 1,
@@ -16215,7 +15337,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 69,
+   "rank": 66,
    "flags": [],
    "score": {
     "model": 1,
@@ -16347,7 +15469,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 70,
+   "rank": 67,
    "flags": [],
    "score": {
     "model": 1,
@@ -16479,7 +15601,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 71,
+   "rank": 68,
    "flags": [],
    "score": {
     "model": 1,
@@ -16611,7 +15733,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 72,
+   "rank": 69,
    "flags": [],
    "score": {
     "model": 1,
@@ -16744,7 +15866,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 73,
+   "rank": 70,
    "flags": [],
    "score": {
     "model": 1,
@@ -16875,7 +15997,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 74,
+   "rank": 71,
    "flags": [],
    "score": {
     "model": 1,
@@ -17007,7 +16129,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 75,
+   "rank": 72,
    "flags": [],
    "score": {
     "model": 1,
@@ -17132,7 +16254,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 76,
+   "rank": 73,
    "flags": [],
    "score": {
     "model": 1,
@@ -17264,7 +16386,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 77,
+   "rank": 74,
    "flags": [],
    "score": {
     "model": 1,
@@ -17396,7 +16518,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 78,
+   "rank": 75,
    "flags": [],
    "score": {
     "model": 1,
@@ -17527,7 +16649,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 79,
+   "rank": 76,
    "flags": [],
    "score": {
     "model": 1,
@@ -17658,7 +16780,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 80,
+   "rank": 77,
    "flags": [],
    "score": {
     "model": 1,
@@ -17779,138 +16901,6 @@
    }
   },
   {
-   "package": "justinrainbow/json-schema",
-   "version": "6.10.0",
-   "branch": "6.x",
-   "installed_php": {
-    "requires": null,
-    "target_runs": null,
-    "project_allows": null
-   },
-   "verdict": "ok",
-   "priority": "none",
-   "lead": null,
-   "rank": 81,
-   "flags": [],
-   "score": {
-    "model": 1,
-    "total": 0,
-    "exact": 0,
-    "accepted": [],
-    "text": "0"
-   },
-   "next_step": null,
-   "security": {
-    "status": "clear",
-    "check": "complete",
-    "complete": true,
-    "unchecked_reason": null,
-    "records": 0,
-    "feeds": [
-     {
-      "composer_repository": "composer repo (https://repo.packagist.org)",
-      "registry": "packagist.org",
-      "answer": "answered",
-      "records": 0,
-      "reason": null
-     }
-    ],
-    "ignored": [],
-    "ignored_count": 0
-   },
-   "checks_missing": [],
-   "checks_skipped": [],
-   "unchecked_accepted": [],
-   "maintenance_judged": true,
-   "metadata": {
-    "status": "read",
-    "reason": null,
-    "message": null
-   },
-   "activity": {
-    "status": "read",
-    "reason": null,
-    "forge": "github",
-    "host": "github.com",
-    "repo": "jsonrainbow/json-schema",
-    "event": "push",
-    "archived": false,
-    "fetched_at": "2026-10-01T17:39:56+00:00",
-    "cached_at": null
-   },
-   "allowlist": null,
-   "abandoned_ignored": null,
-   "from_composer_repository": true,
-   "origin": {
-    "kind": "packagist",
-    "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/justinrainbow/json-schema",
-    "local": false
-   },
-   "replacement": null,
-   "replacement_url": null,
-   "note": null,
-   "libyears_unmeasured": null,
-   "libyears_at_least": false,
-   "direct": false,
-   "dev": false,
-   "reach": "transitive",
-   "chain": [
-    "mautic/core-lib",
-    "composer/composer",
-    "justinrainbow/json-schema"
-   ],
-   "depth": 2,
-   "depth_unmeasured": null,
-   "named_in": [],
-   "direct_dependents": [
-    "mautic/core-lib"
-   ],
-   "signals": [],
-   "evidence": "",
-   "allowlist_reason": null,
-   "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": 0.29,
-   "age": {
-    "installed": {
-     "at": "2026-06-16T20:50:26+00:00",
-     "years": 0.3,
-     "dated_by": null
-    },
-    "installed_unmeasured": null,
-    "release": {
-     "version": "6.13.1",
-     "at": "2026-09-30T07:42:28+00:00",
-     "years": 0,
-     "level": null,
-     "dated_by": null
-    },
-    "release_unmeasured": null,
-    "branch_release": {
-     "version": "6.13.1",
-     "at": "2026-09-30T07:42:28+00:00",
-     "years": 0,
-     "level": null,
-     "dated_by": null
-    },
-    "branch_release_unmeasured": null,
-    "push": {
-     "at": "2026-09-30T07:42:28Z",
-     "years": 0,
-     "level": null
-    },
-    "push_unmeasured": null
-   },
-   "baseline": null,
-   "gate": {
-    "reaches_fail_on": false,
-    "fails": false,
-    "exempt_by": null,
-    "by": [],
-    "basis": null
-   }
-  },
-  {
    "package": "kamermans/guzzle-oauth2-subscriber",
    "version": "v1.1.1",
    "branch": "1.x",
@@ -17922,7 +16912,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 82,
+   "rank": 78,
    "flags": [],
    "score": {
     "model": 1,
@@ -18053,7 +17043,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 83,
+   "rank": 79,
    "flags": [],
    "score": {
     "model": 1,
@@ -18184,7 +17174,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 84,
+   "rank": 80,
    "flags": [],
    "score": {
     "model": 1,
@@ -18316,7 +17306,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 85,
+   "rank": 81,
    "flags": [],
    "score": {
     "model": 1,
@@ -18448,7 +17438,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 86,
+   "rank": 82,
    "flags": [],
    "score": {
     "model": 1,
@@ -18579,7 +17569,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 87,
+   "rank": 83,
    "flags": [],
    "score": {
     "model": 1,
@@ -18712,7 +17702,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 88,
+   "rank": 84,
    "flags": [],
    "score": {
     "model": 1,
@@ -18845,7 +17835,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 89,
+   "rank": 85,
    "flags": [],
    "score": {
     "model": 1,
@@ -18977,7 +17967,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 90,
+   "rank": 86,
    "flags": [],
    "score": {
     "model": 1,
@@ -19099,138 +18089,6 @@
    }
   },
   {
-   "package": "masterminds/html5",
-   "version": "2.10.1",
-   "branch": "2.x",
-   "installed_php": {
-    "requires": null,
-    "target_runs": null,
-    "project_allows": null
-   },
-   "verdict": "ok",
-   "priority": "none",
-   "lead": null,
-   "rank": 91,
-   "flags": [],
-   "score": {
-    "model": 1,
-    "total": 0,
-    "exact": 0,
-    "accepted": [],
-    "text": "0"
-   },
-   "next_step": null,
-   "security": {
-    "status": "clear",
-    "check": "complete",
-    "complete": true,
-    "unchecked_reason": null,
-    "records": 0,
-    "feeds": [
-     {
-      "composer_repository": "composer repo (https://repo.packagist.org)",
-      "registry": "packagist.org",
-      "answer": "answered",
-      "records": 0,
-      "reason": null
-     }
-    ],
-    "ignored": [],
-    "ignored_count": 0
-   },
-   "checks_missing": [],
-   "checks_skipped": [],
-   "unchecked_accepted": [],
-   "maintenance_judged": true,
-   "metadata": {
-    "status": "read",
-    "reason": null,
-    "message": null
-   },
-   "activity": {
-    "status": "read",
-    "reason": null,
-    "forge": "github",
-    "host": "github.com",
-    "repo": "Masterminds/html5-php",
-    "event": "push",
-    "archived": false,
-    "fetched_at": "2026-10-01T17:39:56+00:00",
-    "cached_at": null
-   },
-   "allowlist": null,
-   "abandoned_ignored": null,
-   "from_composer_repository": true,
-   "origin": {
-    "kind": "packagist",
-    "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/masterminds/html5",
-    "local": false
-   },
-   "replacement": null,
-   "replacement_url": null,
-   "note": null,
-   "libyears_unmeasured": null,
-   "libyears_at_least": false,
-   "direct": false,
-   "dev": false,
-   "reach": "transitive",
-   "chain": [
-    "mautic/core-lib",
-    "symfony/dom-crawler",
-    "masterminds/html5"
-   ],
-   "depth": 2,
-   "depth_unmeasured": null,
-   "named_in": [],
-   "direct_dependents": [
-    "mautic/core-lib"
-   ],
-   "signals": [],
-   "evidence": "",
-   "allowlist_reason": null,
-   "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": 0.15,
-   "age": {
-    "installed": {
-     "at": "2026-06-23T18:43:15+00:00",
-     "years": 0.3,
-     "dated_by": null
-    },
-    "installed_unmeasured": null,
-    "release": {
-     "version": "2.11.0",
-     "at": "2026-08-18T06:18:41+00:00",
-     "years": 0.1,
-     "level": null,
-     "dated_by": null
-    },
-    "release_unmeasured": null,
-    "branch_release": {
-     "version": "2.11.0",
-     "at": "2026-08-18T06:18:41+00:00",
-     "years": 0.1,
-     "level": null,
-     "dated_by": null
-    },
-    "branch_release_unmeasured": null,
-    "push": {
-     "at": "2026-08-18T06:20:28Z",
-     "years": 0.1,
-     "level": null
-    },
-    "push_unmeasured": null
-   },
-   "baseline": null,
-   "gate": {
-    "reaches_fail_on": false,
-    "fails": false,
-    "exempt_by": null,
-    "by": [],
-    "basis": null
-   }
-  },
-  {
    "package": "matomo/device-detector",
    "version": "6.5.0",
    "branch": "6.x",
@@ -19242,7 +18100,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 92,
+   "rank": 87,
    "flags": [],
    "score": {
     "model": 1,
@@ -19373,7 +18231,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 93,
+   "rank": 88,
    "flags": [],
    "score": {
     "model": 1,
@@ -19504,7 +18362,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 94,
+   "rank": 89,
    "flags": [],
    "score": {
     "model": 1,
@@ -19636,7 +18494,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 95,
+   "rank": 90,
    "flags": [],
    "score": {
     "model": 1,
@@ -19768,7 +18626,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 96,
+   "rank": 91,
    "flags": [],
    "score": {
     "model": 1,
@@ -19900,7 +18758,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 97,
+   "rank": 92,
    "flags": [],
    "score": {
     "model": 1,
@@ -20031,7 +18889,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 98,
+   "rank": 93,
    "flags": [],
    "score": {
     "model": 1,
@@ -20162,7 +19020,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 99,
+   "rank": 94,
    "flags": [],
    "score": {
     "model": 1,
@@ -20294,7 +19152,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 100,
+   "rank": 95,
    "flags": [],
    "score": {
     "model": 1,
@@ -20427,7 +19285,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 101,
+   "rank": 96,
    "flags": [],
    "score": {
     "model": 1,
@@ -20558,7 +19416,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 102,
+   "rank": 97,
    "flags": [],
    "score": {
     "model": 1,
@@ -20691,7 +19549,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 103,
+   "rank": 98,
    "flags": [
     {
      "id": "stale",
@@ -20887,7 +19745,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 104,
+   "rank": 99,
    "flags": [
     {
      "id": "stale",
@@ -21084,7 +19942,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 105,
+   "rank": 100,
    "flags": [
     {
      "id": "stale",
@@ -21280,7 +20138,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 106,
+   "rank": 101,
    "flags": [
     {
      "id": "old-promise",
@@ -21295,7 +20153,7 @@
       "value": 7,
       "source": null
      },
-     "summary": "released 2019-01-08 for PHP 7 (php \">=7.2.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+     "summary": "released 2019-01-08 for PHP 7 (php \">=7.2.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested"
     },
     {
      "id": "stale",
@@ -21461,9 +20319,9 @@
     {
      "id": "S5",
      "level": "warn",
-     "summary": "released 2019-01-08 for PHP 7 (php \">=7.2.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "summary": "released 2019-01-08 for PHP 7 (php \">=7.2.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested",
      "data": {
-      "target_php": "8.4",
+      "target_php": "8.2",
       "target_major": "8.0",
       "ga_date": "2020-11-26",
       "php_constraint": ">=7.2.0",
@@ -21523,7 +20381,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 107,
+   "rank": 102,
    "flags": [
     {
      "id": "stale",
@@ -21719,7 +20577,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 108,
+   "rank": 103,
    "flags": [],
    "score": {
     "model": 1,
@@ -21866,7 +20724,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 109,
+   "rank": 104,
    "flags": [
     {
      "id": "stale",
@@ -22062,7 +20920,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 110,
+   "rank": 105,
    "flags": [
     {
      "id": "stale",
@@ -22259,7 +21117,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 111,
+   "rank": 106,
    "flags": [],
    "score": {
     "model": 1,
@@ -22405,7 +21263,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 112,
+   "rank": 107,
    "flags": [
     {
      "id": "stale",
@@ -22601,7 +21459,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 113,
+   "rank": 108,
    "flags": [
     {
      "id": "old-promise",
@@ -22616,7 +21474,7 @@
       "value": 5,
       "source": null
      },
-     "summary": "released 2019-03-08 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+     "summary": "released 2019-03-08 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested"
     },
     {
      "id": "stale",
@@ -22783,9 +21641,9 @@
     {
      "id": "S5",
      "level": "warn",
-     "summary": "released 2019-03-08 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "summary": "released 2019-03-08 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.2 untested",
      "data": {
-      "target_php": "8.4",
+      "target_php": "8.2",
       "target_major": "8.0",
       "ga_date": "2020-11-26",
       "php_constraint": ">=5.6",
@@ -22845,7 +21703,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 114,
+   "rank": 109,
    "flags": [],
    "score": {
     "model": 1,
@@ -22976,7 +21834,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 115,
+   "rank": 110,
    "flags": [],
    "score": {
     "model": 1,
@@ -23108,7 +21966,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 116,
+   "rank": 111,
    "flags": [],
    "score": {
     "model": 1,
@@ -23242,7 +22100,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 117,
+   "rank": 112,
    "flags": [],
    "score": {
     "model": 1,
@@ -23363,138 +22221,6 @@
    }
   },
   {
-   "package": "seld/phar-utils",
-   "version": "1.2.1",
-   "branch": "1.x",
-   "installed_php": {
-    "requires": null,
-    "target_runs": null,
-    "project_allows": null
-   },
-   "verdict": "ok",
-   "priority": "none",
-   "lead": null,
-   "rank": 118,
-   "flags": [],
-   "score": {
-    "model": 1,
-    "total": 0,
-    "exact": 0,
-    "accepted": [],
-    "text": "0"
-   },
-   "next_step": null,
-   "security": {
-    "status": "clear",
-    "check": "complete",
-    "complete": true,
-    "unchecked_reason": null,
-    "records": 0,
-    "feeds": [
-     {
-      "composer_repository": "composer repo (https://repo.packagist.org)",
-      "registry": "packagist.org",
-      "answer": "answered",
-      "records": 0,
-      "reason": null
-     }
-    ],
-    "ignored": [],
-    "ignored_count": 0
-   },
-   "checks_missing": [],
-   "checks_skipped": [],
-   "unchecked_accepted": [],
-   "maintenance_judged": true,
-   "metadata": {
-    "status": "read",
-    "reason": null,
-    "message": null
-   },
-   "activity": {
-    "status": "read",
-    "reason": null,
-    "forge": "github",
-    "host": "github.com",
-    "repo": "Seldaek/phar-utils",
-    "event": "push",
-    "archived": false,
-    "fetched_at": "2026-10-01T17:39:56+00:00",
-    "cached_at": null
-   },
-   "allowlist": null,
-   "abandoned_ignored": null,
-   "from_composer_repository": true,
-   "origin": {
-    "kind": "packagist",
-    "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/seld/phar-utils",
-    "local": false
-   },
-   "replacement": null,
-   "replacement_url": null,
-   "note": null,
-   "libyears_unmeasured": null,
-   "libyears_at_least": false,
-   "direct": false,
-   "dev": false,
-   "reach": "transitive",
-   "chain": [
-    "mautic/core-lib",
-    "composer/composer",
-    "seld/phar-utils"
-   ],
-   "depth": 2,
-   "depth_unmeasured": null,
-   "named_in": [],
-   "direct_dependents": [
-    "mautic/core-lib"
-   ],
-   "signals": [],
-   "evidence": "",
-   "allowlist_reason": null,
-   "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": 4.08,
-   "age": {
-    "installed": {
-     "at": "2022-08-31T10:31:18+00:00",
-     "years": 4.1,
-     "dated_by": null
-    },
-    "installed_unmeasured": null,
-    "release": {
-     "version": "1.2.3",
-     "at": "2026-10-01T08:16:23+00:00",
-     "years": 0,
-     "level": null,
-     "dated_by": null
-    },
-    "release_unmeasured": null,
-    "branch_release": {
-     "version": "1.2.3",
-     "at": "2026-10-01T08:16:23+00:00",
-     "years": 0,
-     "level": null,
-     "dated_by": null
-    },
-    "branch_release_unmeasured": null,
-    "push": {
-     "at": "2026-10-01T08:18:03Z",
-     "years": 0,
-     "level": null
-    },
-    "push_unmeasured": null
-   },
-   "baseline": null,
-   "gate": {
-    "reaches_fail_on": false,
-    "fails": false,
-    "exempt_by": null,
-    "by": [],
-    "basis": null
-   }
-  },
-  {
    "package": "simshaun/recurr",
    "version": "v5.0.3",
    "branch": "5.x",
@@ -23506,7 +22232,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 119,
+   "rank": 113,
    "flags": [],
    "score": {
     "model": 1,
@@ -23637,7 +22363,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 120,
+   "rank": 114,
    "flags": [],
    "score": {
     "model": 1,
@@ -23769,7 +22495,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 121,
+   "rank": 115,
    "flags": [],
    "score": {
     "model": 1,
@@ -23900,7 +22626,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 122,
+   "rank": 116,
    "flags": [],
    "score": {
     "model": 1,
@@ -24031,7 +22757,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 123,
+   "rank": 117,
    "flags": [],
    "score": {
     "model": 1,
@@ -24162,7 +22888,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 124,
+   "rank": 118,
    "flags": [],
    "score": {
     "model": 1,
@@ -24294,7 +23020,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 125,
+   "rank": 119,
    "flags": [],
    "score": {
     "model": 1,
@@ -24426,7 +23152,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 126,
+   "rank": 120,
    "flags": [],
    "score": {
     "model": 1,
@@ -24557,7 +23283,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 127,
+   "rank": 121,
    "flags": [],
    "score": {
     "model": 1,
@@ -24677,137 +23403,6 @@
    }
   },
   {
-   "package": "symfony/css-selector",
-   "version": "v7.4.18",
-   "branch": "7.x",
-   "installed_php": {
-    "requires": null,
-    "target_runs": null,
-    "project_allows": null
-   },
-   "verdict": "ok",
-   "priority": "none",
-   "lead": null,
-   "rank": 128,
-   "flags": [],
-   "score": {
-    "model": 1,
-    "total": 0,
-    "exact": 0,
-    "accepted": [],
-    "text": "0"
-   },
-   "next_step": null,
-   "security": {
-    "status": "clear",
-    "check": "complete",
-    "complete": true,
-    "unchecked_reason": null,
-    "records": 0,
-    "feeds": [
-     {
-      "composer_repository": "composer repo (https://repo.packagist.org)",
-      "registry": "packagist.org",
-      "answer": "answered",
-      "records": 0,
-      "reason": null
-     }
-    ],
-    "ignored": [],
-    "ignored_count": 0
-   },
-   "checks_missing": [],
-   "checks_skipped": [],
-   "unchecked_accepted": [],
-   "maintenance_judged": true,
-   "metadata": {
-    "status": "read",
-    "reason": null,
-    "message": null
-   },
-   "activity": {
-    "status": "read",
-    "reason": null,
-    "forge": "github",
-    "host": "github.com",
-    "repo": "symfony/css-selector",
-    "event": "push",
-    "archived": false,
-    "fetched_at": "2026-10-01T17:39:56+00:00",
-    "cached_at": null
-   },
-   "allowlist": null,
-   "abandoned_ignored": null,
-   "from_composer_repository": true,
-   "origin": {
-    "kind": "packagist",
-    "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/symfony/css-selector",
-    "local": false
-   },
-   "replacement": null,
-   "replacement_url": null,
-   "note": null,
-   "libyears_unmeasured": null,
-   "libyears_at_least": false,
-   "direct": false,
-   "dev": false,
-   "reach": "transitive",
-   "chain": [
-    "mautic/core-lib",
-    "symfony/css-selector"
-   ],
-   "depth": 1,
-   "depth_unmeasured": null,
-   "named_in": [],
-   "direct_dependents": [
-    "mautic/core-lib"
-   ],
-   "signals": [],
-   "evidence": "",
-   "allowlist_reason": null,
-   "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": 0,
-   "age": {
-    "installed": {
-     "at": "2026-08-23T10:03:40+00:00",
-     "years": 0.1,
-     "dated_by": null
-    },
-    "installed_unmeasured": null,
-    "release": {
-     "version": "v8.1.6",
-     "at": "2026-08-23T10:06:25+00:00",
-     "years": 0.1,
-     "level": null,
-     "dated_by": null
-    },
-    "release_unmeasured": null,
-    "branch_release": {
-     "version": "v7.4.18",
-     "at": "2026-08-23T10:03:40+00:00",
-     "years": 0.1,
-     "level": null,
-     "dated_by": null
-    },
-    "branch_release_unmeasured": null,
-    "push": {
-     "at": "2026-08-30T21:43:01Z",
-     "years": 0.1,
-     "level": null
-    },
-    "push_unmeasured": null
-   },
-   "baseline": null,
-   "gate": {
-    "reaches_fail_on": false,
-    "fails": false,
-    "exempt_by": null,
-    "by": [],
-    "basis": null
-   }
-  },
-  {
    "package": "symfony/dependency-injection",
    "version": "v7.4.14",
    "branch": "7.x",
@@ -24819,7 +23414,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 129,
+   "rank": 122,
    "flags": [],
    "score": {
     "model": 1,
@@ -24950,7 +23545,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 130,
+   "rank": 123,
    "flags": [],
    "score": {
     "model": 1,
@@ -25082,7 +23677,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 131,
+   "rank": 124,
    "flags": [],
    "score": {
     "model": 1,
@@ -25213,7 +23808,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 132,
+   "rank": 125,
    "flags": [],
    "score": {
     "model": 1,
@@ -25333,137 +23928,6 @@
    }
   },
   {
-   "package": "symfony/dom-crawler",
-   "version": "v7.4.17",
-   "branch": "7.x",
-   "installed_php": {
-    "requires": null,
-    "target_runs": null,
-    "project_allows": null
-   },
-   "verdict": "ok",
-   "priority": "none",
-   "lead": null,
-   "rank": 133,
-   "flags": [],
-   "score": {
-    "model": 1,
-    "total": 0,
-    "exact": 0,
-    "accepted": [],
-    "text": "0"
-   },
-   "next_step": null,
-   "security": {
-    "status": "clear",
-    "check": "complete",
-    "complete": true,
-    "unchecked_reason": null,
-    "records": 1,
-    "feeds": [
-     {
-      "composer_repository": "composer repo (https://repo.packagist.org)",
-      "registry": "packagist.org",
-      "answer": "answered",
-      "records": 1,
-      "reason": null
-     }
-    ],
-    "ignored": [],
-    "ignored_count": 0
-   },
-   "checks_missing": [],
-   "checks_skipped": [],
-   "unchecked_accepted": [],
-   "maintenance_judged": true,
-   "metadata": {
-    "status": "read",
-    "reason": null,
-    "message": null
-   },
-   "activity": {
-    "status": "read",
-    "reason": null,
-    "forge": "github",
-    "host": "github.com",
-    "repo": "symfony/dom-crawler",
-    "event": "push",
-    "archived": false,
-    "fetched_at": "2026-10-01T17:39:56+00:00",
-    "cached_at": null
-   },
-   "allowlist": null,
-   "abandoned_ignored": null,
-   "from_composer_repository": true,
-   "origin": {
-    "kind": "packagist",
-    "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/symfony/dom-crawler",
-    "local": false
-   },
-   "replacement": null,
-   "replacement_url": null,
-   "note": null,
-   "libyears_unmeasured": null,
-   "libyears_at_least": false,
-   "direct": false,
-   "dev": false,
-   "reach": "transitive",
-   "chain": [
-    "mautic/core-lib",
-    "symfony/dom-crawler"
-   ],
-   "depth": 1,
-   "depth_unmeasured": null,
-   "named_in": [],
-   "direct_dependents": [
-    "mautic/core-lib"
-   ],
-   "signals": [],
-   "evidence": "",
-   "allowlist_reason": null,
-   "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": 0,
-   "age": {
-    "installed": {
-     "at": "2026-08-21T17:40:08+00:00",
-     "years": 0.1,
-     "dated_by": null
-    },
-    "installed_unmeasured": null,
-    "release": {
-     "version": "v8.1.5",
-     "at": "2026-08-21T17:47:34+00:00",
-     "years": 0.1,
-     "level": null,
-     "dated_by": null
-    },
-    "release_unmeasured": null,
-    "branch_release": {
-     "version": "v7.4.17",
-     "at": "2026-08-21T17:40:08+00:00",
-     "years": 0.1,
-     "level": null,
-     "dated_by": null
-    },
-    "branch_release_unmeasured": null,
-    "push": {
-     "at": "2026-08-22T13:46:35Z",
-     "years": 0.1,
-     "level": null
-    },
-    "push_unmeasured": null
-   },
-   "baseline": null,
-   "gate": {
-    "reaches_fail_on": false,
-    "fails": false,
-    "exempt_by": null,
-    "by": [],
-    "basis": null
-   }
-  },
-  {
    "package": "symfony/dotenv",
    "version": "v7.4.11",
    "branch": "7.x",
@@ -25475,7 +23939,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 134,
+   "rank": 126,
    "flags": [],
    "score": {
     "model": 1,
@@ -25606,7 +24070,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 135,
+   "rank": 127,
    "flags": [],
    "score": {
     "model": 1,
@@ -25738,7 +24202,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 136,
+   "rank": 128,
    "flags": [],
    "score": {
     "model": 1,
@@ -25869,7 +24333,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 137,
+   "rank": 129,
    "flags": [],
    "score": {
     "model": 1,
@@ -26001,7 +24465,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 138,
+   "rank": 130,
    "flags": [],
    "score": {
     "model": 1,
@@ -26132,7 +24596,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 139,
+   "rank": 131,
    "flags": [],
    "score": {
     "model": 1,
@@ -26263,7 +24727,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 140,
+   "rank": 132,
    "flags": [],
    "score": {
     "model": 1,
@@ -26394,7 +24858,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 141,
+   "rank": 133,
    "flags": [],
    "score": {
     "model": 1,
@@ -26525,7 +24989,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 142,
+   "rank": 134,
    "flags": [],
    "score": {
     "model": 1,
@@ -26656,7 +25120,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 143,
+   "rank": 135,
    "flags": [],
    "score": {
     "model": 1,
@@ -26787,7 +25251,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 144,
+   "rank": 136,
    "flags": [],
    "score": {
     "model": 1,
@@ -26919,7 +25383,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 145,
+   "rank": 137,
    "flags": [],
    "score": {
     "model": 1,
@@ -27050,7 +25514,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 146,
+   "rank": 138,
    "flags": [],
    "score": {
     "model": 1,
@@ -27181,7 +25645,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 147,
+   "rank": 139,
    "flags": [],
    "score": {
     "model": 1,
@@ -27312,7 +25776,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 148,
+   "rank": 140,
    "flags": [],
    "score": {
     "model": 1,
@@ -27443,7 +25907,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 149,
+   "rank": 141,
    "flags": [],
    "score": {
     "model": 1,
@@ -27574,7 +26038,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 150,
+   "rank": 142,
    "flags": [],
    "score": {
     "model": 1,
@@ -27705,7 +26169,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 151,
+   "rank": 143,
    "flags": [],
    "score": {
     "model": 1,
@@ -27836,7 +26300,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 152,
+   "rank": 144,
    "flags": [],
    "score": {
     "model": 1,
@@ -27967,7 +26431,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 153,
+   "rank": 145,
    "flags": [],
    "score": {
     "model": 1,
@@ -28098,7 +26562,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 154,
+   "rank": 146,
    "flags": [],
    "score": {
     "model": 1,
@@ -28229,7 +26693,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 155,
+   "rank": 147,
    "flags": [],
    "score": {
     "model": 1,
@@ -28361,7 +26825,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 156,
+   "rank": 148,
    "flags": [],
    "score": {
     "model": 1,
@@ -28503,7 +26967,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 157,
+   "rank": 149,
    "flags": [],
    "score": {
     "model": 1,
@@ -28650,7 +27114,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 158,
+   "rank": 150,
    "flags": [],
    "score": {
     "model": 1,
@@ -28792,7 +27256,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 159,
+   "rank": 151,
    "flags": [],
    "score": {
     "model": 1,
@@ -28938,7 +27402,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 160,
+   "rank": 152,
    "flags": [],
    "score": {
     "model": 1,
@@ -29085,7 +27549,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 161,
+   "rank": 153,
    "flags": [],
    "score": {
     "model": 1,
@@ -29230,7 +27694,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 162,
+   "rank": 154,
    "flags": [],
    "score": {
     "model": 1,
@@ -29376,7 +27840,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 163,
+   "rank": 155,
    "flags": [],
    "score": {
     "model": 1,
@@ -29518,7 +27982,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 164,
+   "rank": 156,
    "flags": [],
    "score": {
     "model": 1,
@@ -29660,7 +28124,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 165,
+   "rank": 157,
    "flags": [],
    "score": {
     "model": 1,
@@ -29806,7 +28270,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 166,
+   "rank": 158,
    "flags": [],
    "score": {
     "model": 1,
@@ -29952,7 +28416,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 167,
+   "rank": 159,
    "flags": [],
    "score": {
     "model": 1,
@@ -30098,7 +28562,7 @@
    "verdict": "finished",
    "priority": "none",
    "lead": null,
-   "rank": 168,
+   "rank": 160,
    "flags": [],
    "score": {
     "model": 1,
@@ -30244,7 +28708,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 169,
+   "rank": 161,
    "flags": [],
    "score": {
     "model": 1,
@@ -30375,7 +28839,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 170,
+   "rank": 162,
    "flags": [],
    "score": {
     "model": 1,
@@ -30506,7 +28970,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 171,
+   "rank": 163,
    "flags": [],
    "score": {
     "model": 1,
@@ -30638,7 +29102,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 172,
+   "rank": 164,
    "flags": [],
    "score": {
     "model": 1,
@@ -30769,7 +29233,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 173,
+   "rank": 165,
    "flags": [],
    "score": {
     "model": 1,
@@ -30900,7 +29364,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 174,
+   "rank": 166,
    "flags": [],
    "score": {
     "model": 1,
@@ -31031,7 +29495,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 175,
+   "rank": 167,
    "flags": [],
    "score": {
     "model": 1,
@@ -31162,7 +29626,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 176,
+   "rank": 168,
    "flags": [],
    "score": {
     "model": 1,
@@ -31293,7 +29757,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 177,
+   "rank": 169,
    "flags": [],
    "score": {
     "model": 1,
@@ -31425,7 +29889,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 178,
+   "rank": 170,
    "flags": [],
    "score": {
     "model": 1,
@@ -31556,7 +30020,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 179,
+   "rank": 171,
    "flags": [],
    "score": {
     "model": 1,
@@ -31688,7 +30152,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 180,
+   "rank": 172,
    "flags": [],
    "score": {
     "model": 1,
@@ -31819,7 +30283,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 181,
+   "rank": 173,
    "flags": [],
    "score": {
     "model": 1,
@@ -31951,7 +30415,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 182,
+   "rank": 174,
    "flags": [],
    "score": {
     "model": 1,
@@ -32082,7 +30546,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 183,
+   "rank": 175,
    "flags": [],
    "score": {
     "model": 1,
@@ -32214,7 +30678,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 184,
+   "rank": 176,
    "flags": [],
    "score": {
     "model": 1,
@@ -32346,7 +30810,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 185,
+   "rank": 177,
    "flags": [],
    "score": {
     "model": 1,
@@ -32477,7 +30941,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 186,
+   "rank": 178,
    "flags": [],
    "score": {
     "model": 1,
@@ -32609,7 +31073,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 187,
+   "rank": 179,
    "flags": [],
    "score": {
     "model": 1,
@@ -32740,7 +31204,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 188,
+   "rank": 180,
    "flags": [],
    "score": {
     "model": 1,
@@ -32873,7 +31337,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 189,
+   "rank": 181,
    "flags": [],
    "score": {
     "model": 1,
@@ -33005,7 +31469,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 190,
+   "rank": 182,
    "flags": [],
    "score": {
     "model": 1,
@@ -33137,7 +31601,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 191,
+   "rank": 183,
    "flags": [],
    "score": {
     "model": 1,
@@ -33269,7 +31733,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 192,
+   "rank": 184,
    "flags": [],
    "score": {
     "model": 1,
@@ -33400,7 +31864,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 193,
+   "rank": 185,
    "flags": [],
    "score": {
     "model": 1,
@@ -33527,7 +31991,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 194,
+   "rank": 186,
    "flags": [],
    "score": {
     "model": 1,
@@ -33659,7 +32123,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 195,
+   "rank": 187,
    "flags": [],
    "score": {
     "model": 1,
@@ -33791,7 +32255,7 @@
    "verdict": "ok",
    "priority": "none",
    "lead": null,
-   "rank": 196,
+   "rank": 188,
    "flags": [],
    "score": {
     "model": 1,

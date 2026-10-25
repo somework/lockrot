@@ -8754,6 +8754,79 @@
             "text": "no move: lockrot did not read its releases, so it names none; review the snapshot"
         }
     },
+    "platform-step\u2021": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "6.x",
+            "version": "v6.13.0",
+            "newest": "v6.13.1",
+            "constraint": "^6.13",
+            "latest": null,
+            "php_check": {
+                "requires": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.0",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                }
+            ],
+            "unverified": [],
+            "adds": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "stops_below_newest_php"
+                }
+            ],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 8,
+                "verdict": "medium",
+                "lead": "capped",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.0",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "scheb/2fa-bundle:^6.13"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+        }
+    },
     "policy-off\u2021": {
         "next_step": {
             "kind": "raise-php",

@@ -289,17 +289,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             ],
         ],
         'adds-capped-require‡' => [
-            'verdict_line' => [
-                [['signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::S8_UNDER_CASE_PHP],
-            ],
-            'readings' => [
-                [['signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::S8_UNDER_CASE_PHP],
-            ],
             'moves' => [
                 [['next_step.version'], self::MOVE_VERSION],
-            ],
-            'branches_lead' => [
-                [['signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::S8_UNDER_CASE_PHP],
             ],
         ],
         'php-edge-lower‡' => [
@@ -307,18 +298,14 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version'], self::MOVE_VERSION],
             ],
         ],
-        'php-edge-equal‡' => [
-            'verdict_line' => [
-                [['signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::S8_UNDER_CASE_PHP],
-            ],
-            'readings' => [
-                [['signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::S8_UNDER_CASE_PHP],
-            ],
+        'platform-step‡' => [
             'moves' => [
                 [['next_step.version'], self::MOVE_VERSION],
             ],
-            'branches_lead' => [
-                [['signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::S8_UNDER_CASE_PHP],
+        ],
+        'php-edge-equal‡' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
             ],
         ],
         'php-edge-upper‡' => [
