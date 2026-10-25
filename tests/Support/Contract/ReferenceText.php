@@ -68,8 +68,8 @@ final class ReferenceText
         }
         $package = Fields::string($in, 'package');
         $holds = Fields::objects($move, 'held_by');
-        // The root holds, then the holds of the package's own release, then the rest (§5.6, ruling L3).
-        $group = static fn ($hold): int => Fields::string($hold, 'source') === 'root' ? 0 : (($hold['package'] ?? null) === $package ? 1 : 2);
+        // The root holds, then the holds of the package's own release, then the rest (§5.6).
+        $group = static fn (array $hold): int => Fields::string($hold, 'source') === 'root' ? 0 : (($hold['package'] ?? null) === $package ? 1 : 2);
         $ordered = array_merge(...array_map(static fn (int $rank): array => array_values(array_filter($holds, static fn ($hold): bool => $group($hold) === $rank)), [0, 1, 2]));
         $holders = array_map(static fn ($hold): string => self::holder($hold, $package), $ordered);
         if ($holders !== []) {
@@ -88,7 +88,7 @@ final class ReferenceText
     }
 
     /**
-     * A move with commands under a `platform_override` outside the minor of `run.target_php` (§5.6, ruling L5).
+     * A move with commands under a `platform_override` outside the minor of `run.target_php` (§5.6).
      *
      * @param array<mixed, mixed> $move
      * @param array<mixed, mixed> $in
@@ -99,7 +99,7 @@ final class ReferenceText
         $window = \is_array($run['php_window'] ?? null) ? $run['php_window'] : [];
         $override = \is_string($window['platform_override'] ?? null) ? $window['platform_override'] : null;
         $target = \is_string($run['target_php'] ?? null) ? $run['target_php'] : null;
-        if (Fields::objects($move, 'commands') === [] || $override === null || $target === null || $override === $target || strpos($override, $target.'.') === 0) {
+        if (Fields::objects($move, 'commands') === [] || $override === null || $target === null || preg_match('/^'.preg_quote($target, '/').'(\.\d+)*$/', $override) === 1) {
             return '';
         }
 
@@ -409,7 +409,9 @@ final class ReferenceText
 
                 return 'test it on PHP '.$target.($latest !== null && Fields::bool($latest, 'is_installed') ? ' — '.Fields::string($latest, 'version').' is its newest release' : '');
             case 'update':
-                return self::update($move).' (gets '.Fields::string($move, 'newest').')'.self::clears($move).self::adds($move);
+                $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';
+
+                return $raise.self::update($move).' (gets '.Fields::string($move, 'newest').')'.self::clears($move).self::adds($move);
             case 'require':
             case 'raise-php':
                 $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';

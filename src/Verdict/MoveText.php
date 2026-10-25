@@ -63,8 +63,8 @@ final class MoveText
     }
 
     /**
-     * SPEC §5.6: Composer refuses the commands while the lock records a platform PHP outside the
-     * target minor. The sentence and a space, else an empty string.
+     * SPEC §5.6: while the lock records a platform PHP outside the target minor, Composer solves
+     * the commands at that PHP, not at the target. The sentence and a space, else an empty string.
      *
      * @param ?string $platformOverride `run.php_window.platform_override`
      */
@@ -117,7 +117,7 @@ final class MoveText
 
                 return 'test it on PHP '.$subject->targetPhp().($latest !== null && $latest->isInstalled() ? ' — '.$latest->version().' is its newest release' : '');
             case Move::UPDATE:
-                return self::update($move).' (gets '.$move->newest().')'.self::clears($move).self::adds($move);
+                return self::raise($move).self::update($move).' (gets '.$move->newest().')'.self::clears($move).self::adds($move);
             case Move::REQUIRE:
             case Move::RAISE_PHP:
                 return self::requirement($move, $subject);
@@ -193,8 +193,7 @@ final class MoveText
 
     private static function requirement(Move $move, MoveSubject $subject): string
     {
-        $check = $move->phpCheck();
-        $raise = $check !== null && $check->raiseTo() !== null ? 'raise require.php to '.$check->raiseTo().', then ' : '';
+        $raise = self::raise($move);
         if ($subject->isDirect()) {
             $text = $raise.'require '.$subject->package().' '.$move->constraint();
         } else {
@@ -203,6 +202,13 @@ final class MoveText
         }
 
         return $text.self::clears($move).self::adds($move).self::phpClause($move, $subject, true);
+    }
+
+    private static function raise(Move $move): string
+    {
+        $check = $move->phpCheck();
+
+        return $check !== null && $check->raiseTo() !== null ? 'raise require.php to '.$check->raiseTo().', then ' : '';
     }
 
     /** One clause per basis of `adds[]`: what the move raises that would count. */

@@ -3208,7 +3208,7 @@
             }
         },
         "explainRun": {
-            "description": "What an `--explain` run read, and every field `score_model` refers to: the explain text renders from this block and the finding alone. Each key is report-2's `run` key of the same name, typed by the same schema.",
+            "description": "What an `--explain` run read, and every field `score_model` refers to: the explain text renders from this block and the finding alone. Each key is report-2's `run` key of the same name, typed by the same schema, except `php_window`, which holds only report-2's `platform_override`.",
             "type": "object",
             "required": [
                 "target_php",
@@ -16372,7 +16372,7 @@
             ]
         },
         "phpCheck": {
-            "description": "What the release a move names needs from PHP: set on every move that names a branch or a tag (`update require raise-php blocked tag`) and on `security.gets`. A sentence prints its php clause only when `requires` is set; it names the project's lowest PHP from `run.project_php_lowest`.",
+            "description": "What the release a move names needs from PHP; on a move, the branch's highest release, or for `blocked` the release that blocks it. Set on every move that names a branch or a tag (`update require raise-php blocked tag`) and on `security.gets`. A sentence prints its php clause only when `requires` is set; it names the project's lowest PHP from `run.project_php_lowest`.",
             "type": "object",
             "required": [
                 "requires",

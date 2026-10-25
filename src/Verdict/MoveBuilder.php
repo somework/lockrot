@@ -47,7 +47,8 @@ final class MoveBuilder
         }
         $phpCheck = null;
         if ($row !== null && (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) || $draft->source() === FlagSet::PINNED)) {
-            $phpCheck = PhpCheck::of($row->highestPhp(), $context->floor());
+            // A blocked move names the PHP of the release that keeps it off the target, the others the release at the top of their constraint.
+            $phpCheck = PhpCheck::of($kind === Move::BLOCKED ? ($lower === null ? $row->php() : $lower->php()) : $row->highestPhp(), $context->floor());
         }
         $latest = $draft->latest();
         if ($kind === Move::TAG) {
@@ -144,7 +145,7 @@ final class MoveBuilder
         $php = $phpCheck === null ? null : $phpCheck->raiseTo();
         switch ($kind) {
             case Move::UPDATE:
-                return MoveQuery::update($subject->package(), $caret, $version);
+                return MoveQuery::update($subject->package(), $caret, $version, $php);
             case Move::REQUIRE:
             case Move::RAISE_PHP:
                 if ($constraint === null) {
@@ -382,17 +383,15 @@ final class MoveBuilder
         $form = $check === null ? null : $check->form();
         $option = $form !== null && isset(MoveCheck::OPTIONS[$form]) ? [MoveCheck::OPTIONS[$form]] : [];
         $package = $subject->package();
+        $raise = $phpCheck !== null && $phpCheck->raiseTo() !== null ? [['composer', 'require', 'php:'.$phpCheck->raiseTo(), '--no-update']] : [];
         switch ($kind) {
             case Move::UPDATE:
                 $inline = $checks !== null && $version !== null && $checks->writesInline($subject->isDirect());
 
-                return [array_merge(['composer', 'update', $inline ? $package.':^'.ltrim((string) $version, 'vV') : $package], $option)];
+                return array_merge($raise, [array_merge(['composer', 'update', $inline ? $package.':^'.ltrim((string) $version, 'vV') : $package], $option)]);
             case Move::REQUIRE:
             case Move::RAISE_PHP:
-                $commands = [];
-                if ($phpCheck !== null && $phpCheck->raiseTo() !== null) {
-                    $commands[] = ['composer', 'require', 'php:'.$phpCheck->raiseTo(), '--no-update'];
-                }
+                $commands = $raise;
                 if ($constraint !== null) {
                     $commands = array_merge($commands, self::packageStep($subject, $constraint, $option, $check, $checks));
                 }

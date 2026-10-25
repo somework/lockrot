@@ -81,7 +81,12 @@ final class MoveWordsWallabagTest extends TestCase
 
     public function testAPlatformPhpInsideTheTargetMinorTakesNoPlatformStep(): void
     {
-        $texts = array_map(static fn ($finding): string => \is_array($finding) && \is_array($finding['next_step'] ?? null) ? (string) $finding['next_step']['text'] : '', JsonPath::arrayAt(self::$reports['7.4'], ['findings']));
+        $texts = [];
+        foreach (JsonPath::arrayAt(self::$reports['7.4'], ['findings']) as $finding) {
+            if (\is_array($finding) && \is_array($finding['next_step'] ?? null)) {
+                $texts[] = JsonPath::stringAt($finding, ['next_step', 'text']);
+            }
+        }
 
         self::assertNotSame([], $texts);
         self::assertSame([], array_values(array_filter($texts, static fn (string $text): bool => strpos($text, 'First set config.platform.php') !== false)));

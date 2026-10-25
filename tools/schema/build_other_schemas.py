@@ -645,7 +645,8 @@ def explain_schema():
     sd = shared_definitions()
     run = copy.deepcopy(RD['run'])
     D['explainRun'] = {'description': ('What an `--explain` run read, and every field `score_model` refers to (§7.7, §8.3): the explain text renders from this '
-                                       'block and the finding alone. Each key is report-2\'s `run` key of the same name, typed by the same schema.'),
+                                       'block and the finding alone. Each key is report-2\'s `run` key of the same name, typed by the same schema, except `php_window`, '
+                                       'which holds only report-2\'s `platform_override`.'),
                        'type': 'object', 'required': list(EXPLAIN_RUN_KEYS), 'properties': {k: run['properties'][k] for k in EXPLAIN_RUN_KEYS},
                        'allOf': copy.deepcopy(run.get('allOf', []))}  # the run relation (`none` ⇔ no gate) too
     # explain-2 copies `next_step`, whose text reads `run.php_window.platform_override` (§5.9): only that key comes along.

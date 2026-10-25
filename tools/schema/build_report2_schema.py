@@ -263,7 +263,7 @@ defs['heldBy'] = obj(("One link that excludes the move or the fix (§5.3): the r
     'constraint': d('The constraint as the link writes it, quoted and never interpreted ("requires ^2.0").', {'type': 'string', 'minLength': 1}),
     'holder': ref('holder'),
 })
-defs['phpCheck'] = obj(("What the release a move names needs from PHP (§5.3): set on every move that names a branch or a tag (`update require raise-php blocked tag`, I18) "
+defs['phpCheck'] = obj(("What the release a move names needs from PHP (§5.3); on a move, the branch's highest release, or for `blocked` the release that blocks it. Set on every move that names a branch or a tag (`update require raise-php blocked tag`, I18) "
                         "and on `security.gets`. A sentence prints its php clause only when `requires` is set; it names the project's lowest PHP from `run.project_php_lowest`."), {
     'requires': nul('The php constraint the release declares (`>=8.1.0`); null when it declares none (round 4).', {'type': 'string', 'minLength': 1}),
     'project_allows': nul("Whether the project's `require.php` admits it; null when lockrot could not compare (no `require.php`, or no php on the branch row), never \"does not allow\".", {'type': 'boolean'}),

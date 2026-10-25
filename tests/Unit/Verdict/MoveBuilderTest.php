@@ -145,6 +145,48 @@ final class MoveBuilderTest extends TestCase
         self::assertSame(['>=8.0', '>=8.0'], [$check->requires(), $check->raiseTo()]);
     }
 
+    /** The update installs 2.5.0 on the target, which needs a higher PHP than require.php admits: the raise comes first. */
+    public function testAnUpdateWhoseNewestReleaseNeedsAHigherPhpRaisesItFirst(): void
+    {
+        $facts = self::factsOf([['2.0.0', '2026-01-01', '>=7.4'], ['2.1.0', '2026-02-01', '>=7.4'], ['2.5.0', '2026-03-01', '>=8.1']]);
+        $floor = new PhpFloor('8.4', '>=7.4');
+        $row = BranchRow::all($facts, $floor, Clock::fixed(self::NOW))[0];
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
+        $context = (new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', '7.4.0'), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true))
+            ->withChecks(new MoveChecks(new RecordedMoveChecker(['update a/b ^2.1.0 >=8.1' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], []), true));
+        [$lower] = $context->lowestAdmitted($row, '^2.1');
+        self::assertNotNull($lower);
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::VULNERABLE)->to($row, $lower, null), [], null, $context);
+        $check = $move->check();
+
+        self::assertNotNull($check);
+        self::assertSame(MoveCheck::RESOLVES, $check->result(), 'the query sends the raise');
+        self::assertSame([['composer', 'require', 'php:>=8.1', '--no-update'], ['composer', 'update', 'a/b:^2.1.0']], $move->commands());
+        self::assertStringStartsWith('raise require.php to >=8.1, then composer update \'a/b:^2.1.0\' (gets 2.5.0)', $move->text());
+    }
+
+    /** 2.0.0, the release that the move takes, needs PHP 8.2, which the target 8.1 does not run: a later release on the branch does not move that PHP. */
+    public function testABlockedMoveNamesThePhpOfTheReleaseThatBlocksIt(): void
+    {
+        $facts = self::factsOf([['2.0.0', '2026-01-01', '>=8.2'], ['2.1.0', '2026-02-01', '>=8.0']]);
+        $floor = new PhpFloor('8.1', '>=7.4');
+        $row = BranchRow::all($facts, $floor, Clock::fixed(self::NOW))[0];
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
+        $context = new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.1', '7.4.0'), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+        self::assertNotNull($lower);
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::BLOCKED, FlagSet::VULNERABLE)->to($row, $lower, null), [], null, $context);
+        $check = $move->phpCheck();
+
+        self::assertNotNull($check);
+        self::assertSame(['>=8.2', false], [$check->requires(), $check->targetRuns()]);
+        self::assertStringStartsWith('no move runs on the target: 2.x needs php >=8.2 and the target php 8.1 does not run it', $move->text());
+    }
+
     /** composer.json does not require a/b: a resolved request becomes `composer update` with the constraint inline. */
     public function testATransitiveRequireThatComposerResolvesBecomesAnInlineUpdate(): void
     {

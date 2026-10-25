@@ -608,6 +608,12 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
   branch merge too, unless one of them names a tag. A `blocked` move never merges with a move that
   runs on the target PHP.
 
+- **The PHP it needs.** `next_step.php_check` reads the branch's highest release, the release
+  that Composer installs at the top of the constraint. A `blocked` move reads the release that
+  keeps it off the target. When your `require.php` does not admit that PHP, the line starts with
+  "raise require.php to …", and `commands[]` starts with `composer require php:<version>
+  --no-update`, for an `update` move too.
+
 - **What it clears.** `next_step.clears[]` names only what lockrot checked for every version the
   constraint admits. `unverified[]` names what it could not check, and `leaves[]` what the move
   does not touch.
@@ -622,9 +628,10 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 - **A new major.** A move to a higher branch says that a new major brings its own requirements.
 
 - **A PHP that the lock records.** When `run.php_window.platform_override` lies outside the minor
-  of the target PHP, Composer refuses the commands of a move. The line of each move with commands
-  then starts with "First set config.platform.php to your PHP <target> release: the lock records
-  <version>." So does the `update now:` line. The commands stay the same.
+  of the target PHP, Composer solves the commands of a move at that PHP, not at the target. The
+  line of each move with commands then starts with "First set config.platform.php to your PHP
+  <target> release: the lock records <version>." So does the `update now:` line. The commands
+  stay the same.
 
 The `update now:` footer line lists every package whose `update` move Composer's solver resolves
 with the constraint inline, with one command for all of them.
