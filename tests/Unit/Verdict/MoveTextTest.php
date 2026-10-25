@@ -104,6 +104,20 @@ final class MoveTextTest extends TestCase
         self::assertStringEndsWith('; held by composer.json (requires ^1.2) and acme/lib 2.0.0, the release this move installs (requires psr/log ^1) and acme/lib 2.0.0, the release this move installs (conflicts with psr/clock <2) and a/early 1.0.0 (requires acme/lib ^1.2; itself left-behind)', MoveText::render($move));
     }
 
+    /** The text order does not rest on the order of `held_by[]`. */
+    public function testTheTextListsTheRootHoldsThenTheOwnReleaseThenTheOtherHolds(): void
+    {
+        $holds = [
+            new Holder(Holder::PACKAGE, 'b/other', '1.0.0', Holder::REQUIRE, '^1', 'acme/lib'),
+            new Holder(Holder::PACKAGE, 'acme/lib', '2.0.0', Holder::REQUIRE, '^1', 'psr/log'),
+            new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.2'),
+        ];
+
+        $ordered = MoveText::inTextOrder($holds, 'acme/lib');
+
+        self::assertSame([$holds[2], $holds[1], $holds[0]], $ordered);
+    }
+
     public function testWithCheckLeavesTheOriginalMoveUnchecked(): void
     {
         $move = self::move(Move::UPDATE, null, []);

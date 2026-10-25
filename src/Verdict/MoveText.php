@@ -329,12 +329,20 @@ final class MoveText
      */
     public static function inTextOrder(array $holders, string $package): array
     {
-        $groups = [[], [], []];
+        $root = [];
+        $own = [];
+        $other = [];
         foreach ($holders as $holder) {
-            $groups[$holder->source() === Holder::ROOT ? 0 : ($holder->package() === $package ? 1 : 2)][] = $holder;
+            if ($holder->source() === Holder::ROOT) {
+                $root[] = $holder;
+            } elseif ($holder->package() === $package) {
+                $own[] = $holder;
+            } else {
+                $other[] = $holder;
+            }
         }
 
-        return array_merge(...$groups);
+        return array_merge($root, $own, $other);
     }
 
     /**
