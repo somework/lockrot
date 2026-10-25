@@ -34,6 +34,13 @@ final class LinkIndexTest extends TestCase
         self::assertSame([[Holder::ROOT, Holder::REQUIRE, '^1.0']], array_map(static fn (Holder $holder): array => [$holder->source(), $holder->link(), $holder->constraint()], $index->excluding('a/b', '2.0.0.0')));
     }
 
+    public function testANameInBothRootSectionsLeavesTheOtherRequireDevNamesTheirHolds(): void
+    {
+        $index = LinkIndex::of(LockFile::fromArray(['packages' => []]), ProjectConfig::fromArray(['require' => ['a/b' => '^1.0'], 'require-dev' => ['a/b' => '^1.0', 'c/d' => '^1.0']]));
+
+        self::assertSame([[Holder::REQUIRE_DEV, '^1.0']], array_map(static fn (Holder $holder): array => [$holder->link(), $holder->constraint()], $index->excluding('c/d', '2.0.0.0')));
+    }
+
     public function testANameInBothRootSectionsWithTwoConstraintsKeepsEachSection(): void
     {
         $index = LinkIndex::of(LockFile::fromArray(['packages' => []]), ProjectConfig::fromArray(['require' => ['a/b' => '^1.0'], 'require-dev' => ['a/b' => '^1.5']]));
