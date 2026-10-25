@@ -29,8 +29,9 @@ else
   tag=$1
   [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]] || { echo "update-renderer: expected a tag like v1.2.3 or v1.2.3-rc.1, got $tag" >&2; exit 2; }
   gh release download "$tag" --repo "$REPO" --dir "$work" "${FILES[@]/#/--pattern=}"
+  # Only the renderer's release workflow, run for this tag, attests a page that lockrot vendors.
   for file in "${FILES[@]}"; do
-    gh attestation verify "$work/$file" --repo "$REPO" >/dev/null
+    gh attestation verify "$work/$file" --repo "$REPO" --signer-workflow "$REPO/.github/workflows/release.yml" --source-ref "refs/tags/$tag" >/dev/null
   done
 fi
 
