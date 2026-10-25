@@ -57,7 +57,7 @@ final class MoveText
             $text .= '; '.$through;
         }
 
-        $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride());
+        $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->isBaselineRefused(), $subject->isTargetInside());
 
         return $step.$text.self::checked($move->check());
     }
@@ -65,16 +65,20 @@ final class MoveText
     /**
      * SPEC §5.6: while the lock records a platform PHP outside the target minor, Composer solves
      * the commands at that PHP, not at the target. The sentence and a space, else an empty string.
+     * While Composer refuses the lock itself, the step alone does not make it install.
      *
      * @param ?string $platformOverride `run.php_window.platform_override`
+     * @param bool    $baselineRefused  whether `run.move_check.baseline` is `refused`
+     * @param bool    $targetInside     `run.php_window.target.inside`
      */
-    public static function platformStep(?string $targetPhp, ?string $platformOverride): string
+    public static function platformStep(?string $targetPhp, ?string $platformOverride, bool $baselineRefused = false, bool $targetInside = true): string
     {
         if ($targetPhp === null || $platformOverride === null || MoveCheckers::platformPhp($targetPhp, $platformOverride) === $platformOverride) {
             return '';
         }
+        $refused = $baselineRefused ? ' Composer still refuses the lock itself: '.($targetInside ? 'the Run tab names the cause.' : 'the PHP line names the packages.') : '';
 
-        return 'First set config.platform.php to your PHP '.$targetPhp.' release: the lock records '.$platformOverride.'. ';
+        return 'First set config.platform.php to your PHP '.$targetPhp.' release: the lock records '.$platformOverride.'.'.$refused.' ';
     }
 
     /** D10: what Composer's solver said about the move, or why lockrot did not ask it. */
@@ -308,7 +312,7 @@ final class MoveText
         }
         // The finding's own release: its grade and flags are the installed version's, not this one's.
         if ($holder->package() === $subject->package()) {
-            return $holder->package().' '.$holder->version().', the release this move installs ('.$link.')';
+            return $holder->package().' '.$holder->version().', its own release ('.$link.')';
         }
         $bits = [$link];
         $finding = $holder->finding();
@@ -320,8 +324,9 @@ final class MoveText
     }
 
     /**
-     * The root holds, then the holds of the package's own release, then the other holds, each group
-     * in `held_by[]` order.
+     * The root holds, then the holds of the package's own releases, then the package holds whose
+     * target is the package, then the other holds. Within a group: by the holder's grade, then by
+     * name, then in `held_by[]` order.
      *
      * @param list<Holder> $holders
      *
@@ -329,20 +334,27 @@ final class MoveText
      */
     public static function inTextOrder(array $holders, string $package): array
     {
-        $root = [];
-        $own = [];
-        $other = [];
-        foreach ($holders as $holder) {
-            if ($holder->source() === Holder::ROOT) {
-                $root[] = $holder;
-            } elseif ($holder->package() === $package) {
-                $own[] = $holder;
-            } else {
-                $other[] = $holder;
-            }
+        $keys = [];
+        foreach ($holders as $index => $holder) {
+            $finding = $holder->finding();
+            $grade = $finding === null ? false : array_search($finding->verdict(), ScoreModel::GRADES, true);
+            $keys[$index] = [self::group($holder, $package), $grade === false ? \count(ScoreModel::GRADES) : $grade, (string) $holder->package(), $index];
+        }
+        uksort($holders, static fn (int $a, int $b): int => $keys[$a] <=> $keys[$b]);
+
+        return array_values($holders);
+    }
+
+    private static function group(Holder $holder, string $package): int
+    {
+        if ($holder->source() === Holder::ROOT) {
+            return 0;
+        }
+        if ($holder->package() === $package) {
+            return 1;
         }
 
-        return array_merge($root, $own, $other);
+        return $holder->target() === null || $holder->target() === $package ? 2 : 3;
     }
 
     /**
@@ -361,7 +373,7 @@ final class MoveText
         }
         $verb = ['conflict' => 'conflicts with ', 'replace' => 'replaces '][$holder->link()] ?? 'requires ';
 
-        return $verb.($target === null ? '' : ($name === null ? $target : $name($target)).' ').$holder->constraint();
+        return $verb.($target === null ? '' : ($name === null ? $target : $name($target)).' ').$holder->constraint().($holder->link() === Holder::REQUIRE_DEV ? ' (require-dev)' : '');
     }
 
     private static function because(string $reason, Move $move, MoveSubject $subject): string

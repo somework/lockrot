@@ -371,6 +371,11 @@ final class PhpWindow implements \JsonSerializable
         return $this->data['platform_override'];
     }
 
+    public function isTargetInside(): bool
+    {
+        return $this->data['target']['inside'];
+    }
+
     /** @return list<string> the known minors that the window was read on, oldest first */
     public function knownMinors(): array
     {

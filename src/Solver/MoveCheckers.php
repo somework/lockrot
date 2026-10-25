@@ -52,6 +52,7 @@ final class MoveCheckers
         }
         $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline, $root->getMinimumStability(), $root->getStabilityFlags());
         $solver = (new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], $overrides), $source, []))->withLockedOnly($notFromComposerRepository);
+        $solver = $php === $configured ? $solver : $solver->withPhpSetByLockrot();
 
         $blocking = AdvisoryBlocking::fromConfig($config);
         $lookup = new RepositoryAdvisoryLoader($repositories, $offline, $deadline);

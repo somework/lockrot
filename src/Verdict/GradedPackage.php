@@ -19,11 +19,16 @@ final class GradedPackage implements \JsonSerializable
     private array $flagIds;
     private ?string $replacement;
     private ?Move $move;
+    private string $version;
     private bool $short = false;
 
-    /** @param list<string> $flagIds the counted flags */
-    public function __construct(string $verdict, ?string $lead, array $flagIds, ?string $replacement, ?Move $move)
+    /**
+     * @param list<string> $flagIds the counted flags
+     * @param string       $version the locked version that the finding grades
+     */
+    public function __construct(string $verdict, ?string $lead, array $flagIds, ?string $replacement, ?Move $move, string $version)
     {
+        $this->version = $version;
         $this->verdict = $verdict;
         $this->lead = $lead;
         $this->flagIds = $flagIds;
@@ -33,7 +38,7 @@ final class GradedPackage implements \JsonSerializable
 
     public static function of(Finding $finding): self
     {
-        return new self($finding->verdict(), $finding->lead(), $finding->flagIds(), $finding->countedSuccessor(), $finding->nextStep());
+        return new self($finding->verdict(), $finding->lead(), $finding->flagIds(), $finding->countedSuccessor(), $finding->nextStep(), $finding->version());
     }
 
     /** `replacement.finding`: the verdict, the lead and the flags. */
@@ -48,6 +53,11 @@ final class GradedPackage implements \JsonSerializable
     public function verdict(): string
     {
         return $this->verdict;
+    }
+
+    public function version(): string
+    {
+        return $this->version;
     }
 
     public function isGraded(): bool

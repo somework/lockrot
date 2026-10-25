@@ -6792,24 +6792,7 @@
                     "link": "require",
                     "target": "acme/ml-transport",
                     "constraint": "^2.0",
-                    "holder": {
-                        "verdict": "high",
-                        "lead": null,
-                        "flag_ids": [
-                            "vulnerable"
-                        ],
-                        "replacement": null,
-                        "next_step": {
-                            "kind": "require",
-                            "to_branch": "6.x",
-                            "constraint": "^6.4.40",
-                            "check": {
-                                "result": "refused",
-                                "form": null,
-                                "reason": null
-                            }
-                        }
-                    }
+                    "holder": null
                 }
             ],
             "clears": [
@@ -6896,24 +6879,7 @@
                     "link": "require",
                     "target": "acme/ml-transport",
                     "constraint": "^2.0",
-                    "holder": {
-                        "verdict": "high",
-                        "lead": null,
-                        "flag_ids": [
-                            "vulnerable"
-                        ],
-                        "replacement": null,
-                        "next_step": {
-                            "kind": "require",
-                            "to_branch": "6.x",
-                            "constraint": "^6.4.40",
-                            "check": {
-                                "result": "refused",
-                                "form": null,
-                                "reason": null
-                            }
-                        }
-                    }
+                    "holder": null
                 }
             ],
             "if_applied": {
@@ -6997,24 +6963,7 @@
                     "link": "require",
                     "target": "acme/ml-transport",
                     "constraint": "^2.0",
-                    "holder": {
-                        "verdict": "high",
-                        "lead": null,
-                        "flag_ids": [
-                            "vulnerable"
-                        ],
-                        "replacement": null,
-                        "next_step": {
-                            "kind": "require",
-                            "to_branch": "6.x",
-                            "constraint": "^6.4.40",
-                            "check": {
-                                "result": "not_checked",
-                                "form": null,
-                                "reason": "pass_cap"
-                            }
-                        }
-                    }
+                    "holder": null
                 }
             ],
             "clears": [
@@ -7107,24 +7056,7 @@
                     "link": "require",
                     "target": "acme/ml-transport",
                     "constraint": "^2.0",
-                    "holder": {
-                        "verdict": "high",
-                        "lead": null,
-                        "flag_ids": [
-                            "vulnerable"
-                        ],
-                        "replacement": null,
-                        "next_step": {
-                            "kind": "require",
-                            "to_branch": "6.x",
-                            "constraint": "^6.4.40",
-                            "check": {
-                                "result": "not_checked",
-                                "form": null,
-                                "reason": "pass_cap"
-                            }
-                        }
-                    }
+                    "holder": null
                 }
             ],
             "if_applied": {
@@ -7345,24 +7277,7 @@
                     "link": "require",
                     "target": "acme/gz-promises",
                     "constraint": "^2.0",
-                    "holder": {
-                        "verdict": "high",
-                        "lead": null,
-                        "flag_ids": [
-                            "vulnerable"
-                        ],
-                        "replacement": null,
-                        "next_step": {
-                            "kind": "require",
-                            "to_branch": "8.x",
-                            "constraint": "^8.0.1",
-                            "check": {
-                                "result": "resolves",
-                                "form": "inline",
-                                "reason": null
-                            }
-                        }
-                    }
+                    "holder": null
                 }
             ],
             "if_applied": {
@@ -7480,24 +7395,7 @@
                     "link": "require",
                     "target": "acme/gz-promises",
                     "constraint": "^2.0",
-                    "holder": {
-                        "verdict": "high",
-                        "lead": null,
-                        "flag_ids": [
-                            "vulnerable"
-                        ],
-                        "replacement": null,
-                        "next_step": {
-                            "kind": "require",
-                            "to_branch": "8.x",
-                            "constraint": "^8.0.1",
-                            "check": {
-                                "result": "resolves",
-                                "form": "inline",
-                                "reason": null
-                            }
-                        }
-                    }
+                    "holder": null
                 }
             ],
             "if_applied": {

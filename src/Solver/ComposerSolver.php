@@ -53,6 +53,7 @@ final class ComposerSolver
     private PlatformRequirementFilterInterface $filter;
     private ?PoolAdvisories $advisories = null;
     private ?ArrayRepository $lockedOnly = null;
+    private bool $setsPhp = false;
     private string $lastInputs = '';
     /** @phpstan-ignore property.onlyWritten (the last built pool keeps the object ids of its packages taken: {@see SolverInputs}) */
     private Pool $lastBuilt;
@@ -106,6 +107,15 @@ final class ComposerSolver
                 $clone->lockedOnly->addPackage($package);
             }
         }
+
+        return $clone;
+    }
+
+    /** A copy whose problem text drops Composer's config.platform words on php: lockrot, not the project, set its version. */
+    public function withPhpSetByLockrot(): self
+    {
+        $clone = clone $this;
+        $clone->setsPhp = true;
 
         return $clone;
     }
@@ -170,7 +180,9 @@ final class ComposerSolver
                 }
             }
 
-            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false)), $unloaded);
+            $setsPhp = $this->setsPhp;
+
+            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $unloaded);
         }
 
         return Solution::resolved(self::installs($answer));
@@ -359,10 +371,13 @@ final class ComposerSolver
     /**
      * Composer's text without the version of the platform that runs lockrot: Composer appends it to
      * each override (`actual: 8.5.1`, `same as actual`), and lockrot overrides `php` with the target.
+     * When lockrot chose that php, Composer's `; overridden via config.platform` on it goes too.
      */
-    private static function problemText(string $text): string
+    private static function problemText(string $text, bool $setsPhp): string
     {
-        return trim((string) preg_replace('/, (?:actual: [^)]*|same as actual)\)/', ')', $text));
+        $text = (string) preg_replace('/, (?:actual: [^)]*|same as actual)\)/', ')', $text);
+
+        return trim($setsPhp ? (string) preg_replace('/(php version \([^;)]*); overridden via config\.platform\)/', '$1)', $text) : $text);
     }
 
     /** @return array<string, string> name => the pretty version that the solve installs, for each name it installs or moves */

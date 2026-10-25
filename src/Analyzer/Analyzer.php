@@ -231,7 +231,6 @@ final class Analyzer
         $checks = $this->checks === null ? null : $this->checks->withAdvisories($advisories->records(), $advisories->asked());
         $baseline = $checks === null ? null : $checks->checker()->baseline();
         $window = PhpWindow::of($lock, $project, $this->signals->phpFloor()->php(PhpFloor::TARGET) ?? PhpReleaseDates::minorOf(\PHP_VERSION), PhpReleaseDates::load()->minors($this->clock), $checks === null ? null : $checks->checker()->platformPhp());
-        $platformOverride = $window === null ? null : $window->platformOverride();
         $findings = [];
         $factsByPackage = [];
         $notInRepository = 0;
@@ -248,7 +247,7 @@ final class Analyzer
             do {
                 $scan = $finder->withRefused($refused);
                 $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $advisories->byName() === [] ? null : $scan, $advisories->ignored($package->name()), $every);
-                $moves = $this->moves($finding, $facts, $scan, $lock, $metadata, $every, $checks === null || $pass < $this->checkPasses ? $checks : $checks->answeredOnly(), $platformOverride);
+                $moves = $this->moves($finding, $facts, $scan, $lock, $metadata, $every, $checks === null || $pass < $this->checkPasses ? $checks : $checks->answeredOnly(), $window, $baseline !== null && $baseline->check()->isRefused());
                 $known = $refused->count();
                 $refused = $checks === null ? $refused : $checks->refused($package->name());
                 if ($refused->count() === $known) {
@@ -666,7 +665,7 @@ final class Analyzer
      * @param array<string, PackageMetadata> $metadata by package name, what the run read
      * @param list<Advisory>                 $every    every advisory of the package on any version
      */
-    private function moves(Finding $finding, PackageFacts $facts, FixFinder $finder, LockFile $lock, array $metadata, array $every, ?MoveChecks $checks, ?string $platformOverride): Moves
+    private function moves(Finding $finding, PackageFacts $facts, FixFinder $finder, LockFile $lock, array $metadata, array $every, ?MoveChecks $checks, ?PhpWindow $window, bool $baselineRefused): Moves
     {
         if (!$finding->isGraded()) {
             return Moves::none();
@@ -679,7 +678,7 @@ final class Analyzer
                 $ranges[$advisory->id()] = $advisory->affectedRange();
             }
         }
-        $subject = new MoveSubject($finding->package(), $finding->version(), $finding->isDirect(), $finding->directDependents(), $floor->php(PhpFloor::TARGET), $floor->lowestAsString(), $this->signals->phpCap()->newest(), $platformOverride);
+        $subject = new MoveSubject($finding->package(), $finding->version(), $finding->isDirect(), $finding->directDependents(), $floor->php(PhpFloor::TARGET), $floor->lowestAsString(), $this->signals->phpCap()->newest(), $window === null ? null : $window->platformOverride(), $baselineRefused, $window === null || $window->isTargetInside());
         $context = new MoveContext(
             $finding,
             $subject,

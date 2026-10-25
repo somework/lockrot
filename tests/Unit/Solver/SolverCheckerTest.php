@@ -73,6 +73,36 @@ final class SolverCheckerTest extends TestCase
         self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'symfony/http-kernel', 'constraint' => '^4.4.51'], self::rows($outcome->holds()));
     }
 
+    /** monica's laravel/framework: the root's `^12.0` admits v12.69.0, so only the release's own requirement holds the move. */
+    public function testARootRequirementThatAdmitsTheMovesReleaseIsNoHold(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/gone' => '^1.0']]]]
+        );
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertSame([['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'require', 'target' => 'acme/gone', 'constraint' => '^1.0']], self::rows($outcome->holds()));
+    }
+
+    /** A root requirement that excludes the release still holds it. */
+    public function testARootRequirementThatExcludesTheMovesReleaseHoldsIt(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '~1.0.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]
+        );
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '~1.0.0'], self::rows($outcome->holds()));
+    }
+
     /** magento's guzzlehttp/guzzle: the target needs a newer promises that no root requirement holds. */
     public function testAMoveThatNeedsADependencyUpdateResolvesWithDependencies(): void
     {

@@ -64,7 +64,20 @@ final class ComposerSolverTest extends TestCase
 
         $solution = $solver->solve(SolveRequest::update(['acme/dev' => '^2.0']));
 
-        self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '^1.0']], self::rows($solution->holds()));
+        self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require-dev', 'target' => null, 'constraint' => '^1.0']], self::rows($solution->holds()));
+    }
+
+    /** Composer merges both sections into one root requirement, and `require` wins: the hold names that section. */
+    public function testAnUpdatePastAConstraintInRequireAndRequireDevIsHeldByTheRequireSection(): void
+    {
+        if (!ComposerFeatures::hasTemporaryConstraints()) {
+            self::markTestSkipped('Composer 2.2 and 2.3 join the inline constraint to the root requirement: that requirement is the request');
+        }
+        $solver = self::solver(['require' => ['acme/lib' => '^1.0'], 'require-dev' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0']]]);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^2.0']));
+
+        self::assertSame(['require'], array_column(self::rows($solution->holds()), 'link'));
     }
 
     /**

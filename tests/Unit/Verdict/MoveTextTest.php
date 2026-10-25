@@ -80,6 +80,27 @@ final class MoveTextTest extends TestCase
         self::assertSame($step ? 'First set config.platform.php to your PHP '.$target.' release: the lock records '.$override.'. composer update acme/lib (gets 2.0.0)' : 'composer update acme/lib (gets 2.0.0)', $text);
     }
 
+    /** @return iterable<string, array{bool, string}> */
+    public static function refusedBaselines(): iterable
+    {
+        yield 'the target outside the window' => [false, 'the PHP line names the packages.'];
+        yield 'the target inside the window' => [true, 'the Run tab names the cause.'];
+    }
+
+    /**
+     * wallabag at 8.4: the platform step alone does not make the lock install while Composer refuses the lock itself.
+     *
+     * @dataProvider refusedBaselines
+     */
+    #[DataProvider('refusedBaselines')]
+    public function testThePlatformStepOfARefusedBaselineSaysWhereTheCauseIsNamed(bool $inside, string $pointer): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '7.4.29', true, $inside);
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], [['composer', 'update', 'acme/lib']], $subject);
+
+        self::assertSame('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: '.$pointer.' composer update acme/lib (gets 2.0.0)', MoveText::render($move));
+    }
+
     public function testAMoveWithoutCommandsTakesNoPlatformStep(): void
     {
         $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '7.4.29');
@@ -89,9 +110,9 @@ final class MoveTextTest extends TestCase
     }
 
     /** The finding's own release holds the move: the hold takes no grade and no flags of the installed version, and follows the root holds. */
-    public function testAHoldOfTheFindingsOwnPackageNamesTheReleaseThatTheMoveInstalls(): void
+    public function testAHoldOfTheFindingsOwnPackageNamesItsOwnRelease(): void
     {
-        $graded = new GradedPackage('high', 'left-behind', ['left-behind'], null, null);
+        $graded = new GradedPackage('high', 'left-behind', ['left-behind'], null, null, '1.0.0');
         $holds = Holder::filled([
             new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.2'),
             new Holder(Holder::PACKAGE, 'a/early', '1.0.0', Holder::REQUIRE, '^1.2', 'acme/lib'),
@@ -101,21 +122,41 @@ final class MoveTextTest extends TestCase
         $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '7.4', null);
         $move = new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, null, true, $holds, [], [], [], [], null, [], [], $subject);
 
-        self::assertStringEndsWith('; held by composer.json (requires ^1.2) and acme/lib 2.0.0, the release this move installs (requires psr/log ^1) and acme/lib 2.0.0, the release this move installs (conflicts with psr/clock <2) and a/early 1.0.0 (requires acme/lib ^1.2; itself left-behind)', MoveText::render($move));
+        self::assertStringEndsWith('; held by composer.json (requires ^1.2) and acme/lib 2.0.0, its own release (requires psr/log ^1) and acme/lib 2.0.0, its own release (conflicts with psr/clock <2) and a/early 1.0.0 (requires acme/lib ^1.2; itself left-behind)', MoveText::render($move));
     }
 
-    /** The text order does not rest on the order of `held_by[]`. */
-    public function testTheTextListsTheRootHoldsThenTheOwnReleaseThenTheOtherHolds(): void
+    public function testARootHoldFromRequireDevSaysRequireDev(): void
     {
-        $holds = [
-            new Holder(Holder::PACKAGE, 'b/other', '1.0.0', Holder::REQUIRE, '^1', 'acme/lib'),
+        $holds = [new Holder(Holder::ROOT, null, null, Holder::REQUIRE_DEV, '^1.2')];
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '7.4', null);
+        $move = new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, null, true, $holds, [], [], [], [], null, [], [], $subject);
+
+        self::assertStringEndsWith('; held by composer.json (requires ^1.2 (require-dev))', MoveText::render($move));
+    }
+
+    /**
+     * The root holds, then the own releases, then the package holds on the finding's package, then
+     * the other package holds. Within a group: by grade, then by name. The order does not rest on
+     * the order of `held_by[]`.
+     */
+    public function testTheTextRanksTheHoldsByGroupThenByGradeThenByName(): void
+    {
+        $high = new GradedPackage('high', 'left-behind', ['left-behind'], null, null, '1.0.0');
+        $critical = new GradedPackage('critical', null, ['vulnerable'], null, null, '1.0.0');
+        $holds = Holder::filled([
+            new Holder(Holder::PACKAGE, 'a/other', '1.0.0', Holder::REQUIRE, '^1', 'psr/log'),
+            new Holder(Holder::PACKAGE, 'z/critical', '1.0.0', Holder::REQUIRE, '^1', 'psr/log'),
+            new Holder(Holder::PACKAGE, 'a/plain', '1.0.0', Holder::REQUIRE, '^1.2'),
+            new Holder(Holder::PACKAGE, 'c/high', '1.0.0', Holder::REQUIRE, '^1.2', 'acme/lib'),
+            new Holder(Holder::PACKAGE, 'b/high', '1.0.0', Holder::REQUIRE, '^1.2'),
             new Holder(Holder::PACKAGE, 'acme/lib', '2.0.0', Holder::REQUIRE, '^1', 'psr/log'),
+            new Holder(Holder::ROOT, null, null, Holder::REQUIRE_DEV, '^1.2'),
             new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.2'),
-        ];
+        ], ['z/critical' => $critical, 'c/high' => $high, 'b/high' => $high]);
 
         $ordered = MoveText::inTextOrder($holds, 'acme/lib');
 
-        self::assertSame([$holds[2], $holds[1], $holds[0]], $ordered);
+        self::assertSame([$holds[6], $holds[7], $holds[5], $holds[4], $holds[3], $holds[2], $holds[1], $holds[0]], $ordered);
     }
 
     public function testWithCheckLeavesTheOriginalMoveUnchecked(): void
