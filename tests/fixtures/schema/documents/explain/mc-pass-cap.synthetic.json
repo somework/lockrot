@@ -207,7 +207,7 @@
    ],
    "through": [],
    "also": [],
-   "text": "require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0) and symfony/mailer v6.4.40 (requires acme/ml-transport ^2.0; itself high: vulnerable); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it"
+   "text": "require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, the release this move installs (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it"
   },
   "security": {
    "status": "vulnerable",
@@ -1460,6 +1460,9 @@
    "ignores_extensions": true,
    "baseline": "resolves",
    "reason": null
+  },
+  "php_window": {
+   "platform_override": null
   }
  },
  "generated_at": "2026-10-01T17:41:59+00:00",

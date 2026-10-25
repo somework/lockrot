@@ -174,6 +174,14 @@ final class RunFooter
         return $command === null ? null : ShellCommand::posix($command);
     }
 
+    /** The sentence that comes before the `update now:` command, and a space: empty without a pin outside the target minor. */
+    public static function platformStep(Report $report): string
+    {
+        $window = $report->phpWindow();
+
+        return $window === null ? '' : MoveText::platformStep($window->targetMinor(), $window->platformOverride());
+    }
+
     /**
      * `pulled in by: …`: the first names of root `exposure`, then `… and N more`.
      *
@@ -306,8 +314,8 @@ final class RunFooter
     /**
      * The `target_fix` clause (§7.0): Composer's answer to the update of the listed packages.
      *
-     * @param array{packages: list<array{name: ?string}>, command: ?list<string>, check: string, reason: ?string, held_by: list<Holder>, platform_step: bool} $fix
-     * @param callable(string): string                                                                                                               $name
+     * @param array{packages: list<array{name: ?string, dev: bool}>, command: ?list<string>, check: string, reason: ?string, held_by: list<Holder>, platform_step: bool} $fix
+     * @param callable(string): string                                                                                                                          $name
      */
     private static function fixWords(array $fix, string $target, callable $name): string
     {
@@ -321,7 +329,10 @@ final class RunFooter
                     ? 'set config.platform.php to your PHP '.$target." release, then Composer's solver resolves: ".$command
                     : "Composer's solver at PHP ".$target.' resolves: '.$command;
             case MoveCheck::REFUSED:
-                $holds = array_map(static fn (Holder $hold): string => ($hold->source() === Holder::ROOT ? 'composer.json' : $name((string) $hold->package()).' '.$hold->version()).' '.MoveText::linkWords($hold, $name), $fix['held_by']);
+                $dev = array_column(array_filter($fix['packages'], static fn (array $entry): bool => $entry['dev']), 'name');
+                $holds = array_map(static fn (Holder $hold): string => $hold->source() === Holder::ROOT
+                    ? 'composer.json '.MoveText::linkWords($hold, $name).(\in_array($hold->target(), $dev, true) ? ' (require-dev)' : '')
+                    : $name((string) $hold->package()).' '.$hold->version().' '.MoveText::linkWords($hold, $name), $fix['held_by']);
 
                 return "Composer's solver at PHP ".$target.' refuses the update of '.$them.($holds === [] ? '' : ': '.implode(' and ', $holds));
             default:

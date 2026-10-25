@@ -289,17 +289,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             ],
         ],
         'adds-capped-require‡' => [
-            'verdict_line' => [
-                [['signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::S8_UNDER_CASE_PHP],
-            ],
-            'readings' => [
-                [['signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::S8_UNDER_CASE_PHP],
-            ],
             'moves' => [
                 [['next_step.version'], self::MOVE_VERSION],
-            ],
-            'branches_lead' => [
-                [['signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::S8_UNDER_CASE_PHP],
             ],
         ],
         'php-edge-lower‡' => [
@@ -307,18 +298,14 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version'], self::MOVE_VERSION],
             ],
         ],
-        'php-edge-equal‡' => [
-            'verdict_line' => [
-                [['signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::S8_UNDER_CASE_PHP],
-            ],
-            'readings' => [
-                [['signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::S8_UNDER_CASE_PHP],
-            ],
+        'platform-step‡' => [
             'moves' => [
                 [['next_step.version'], self::MOVE_VERSION],
             ],
-            'branches_lead' => [
-                [['signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::S8_UNDER_CASE_PHP],
+        ],
+        'php-edge-equal‡' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
             ],
         ],
         'php-edge-upper‡' => [
@@ -329,8 +316,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     ];
 
     private const MOVE_VERSION = 'The model names a move\'s `version` from the advisory ranges, because the reports carry only each branch\'s newest tag. lockrot names the release of the move\'s row (P2b). The move card prints `newest` and reads `version` only when `newest` is null.';
-
-    private const S8_UNDER_CASE_PHP = 'The case sets the project\'s require.php (‡). The model keeps the finding\'s S8 as the corpus judged it, and lockrot judges S8 under the case\'s require.php.';
 
     private const PHP_STAR = 'The case sets the project\'s require.php to `*` (‡). The model keeps the holder\'s own step of case A, and lockrot judges the holder under the case\'s require.php, which admits its newest line.';
 

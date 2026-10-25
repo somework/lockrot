@@ -17,13 +17,14 @@
 <options=bold><fg=red>high (3)</fg=red></options=bold>
   matomo/searchengine-and-social-list dev-master  direct  ·  pinned · stale
       18 = pinned 16 + stale 2 [¼ of 8]
-      do: require a tag — the newest is 3.14.0 (2023-01-20), older than your snapshot (2026-07-15); review, or
-          replace; stale stays
+      do: First set config.platform.php to your PHP 8.4 release: the lock records 8.1.0. require a tag — the newest is
+          3.14.0 (2023-01-20), older than your snapshot (2026-07-15); review, or replace; stale stays
       pinned       pinned to branch snapshot dev-master
       stale        last release 2023-01-20 (3.6 years ago)
   matomo/referrer-spam-list dev-master  direct  ·  pinned
       16 = pinned 16
-      do: require a tag — the newest is 4.0.5 (2026-04-15), older than your snapshot (2026-09-04); review, or replace
+      do: First set config.platform.php to your PHP 8.4 release: the lock records 8.1.0. require a tag — the newest is
+          4.0.5 (2026-04-15), older than your snapshot (2026-09-04); review, or replace
       pinned       pinned to branch snapshot dev-master
       age: newest release 4.0.5 2026-04-15 (0.4 years ago); last push 2026-09-04 (less than three weeks ago)
   pear/console_getopt v1.4.3  via matomo/decompress  ·  silent

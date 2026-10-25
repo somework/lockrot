@@ -1625,7 +1625,8 @@
                         "direct",
                         "direct_dependents",
                         "run.target_php",
-                        "run.project_php_lowest"
+                        "run.project_php_lowest",
+                        "run.php_window.platform_override"
                     ],
                     "minLength": 1
                 }
@@ -3207,7 +3208,7 @@
             }
         },
         "explainRun": {
-            "description": "What an `--explain` run read, and every field `score_model` refers to: the explain text renders from this block and the finding alone. Each key is report-2's `run` key of the same name, typed by the same schema.",
+            "description": "What an `--explain` run read, and every field `score_model` refers to: the explain text renders from this block and the finding alone. Each key is report-2's `run` key of the same name, typed by the same schema, except `php_window`, which holds only report-2's `platform_override`.",
             "type": "object",
             "required": [
                 "target_php",
@@ -3227,7 +3228,8 @@
                 "text_grammar",
                 "score_model",
                 "advisory_lookup",
-                "move_check"
+                "move_check",
+                "php_window"
             ],
             "properties": {
                 "target_php": {
@@ -3468,6 +3470,31 @@
                                     ]
                                 }
                             ]
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "php_window": {
+                    "description": "The one key of report-2's `run.php_window` that `next_step.text` reads; null when report-2's `php_window` is null.",
+                    "oneOf": [
+                        {
+                            "description": "The platform PHP of the lock.",
+                            "type": "object",
+                            "required": [
+                                "platform_override"
+                            ],
+                            "properties": {
+                                "platform_override": {
+                                    "description": "The lock's `platform-overrides.php`: the PHP at which `composer install` checks the lock.",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "minLength": 1
+                                }
+                            }
                         },
                         {
                             "type": "null"
@@ -13873,7 +13900,8 @@
                         "direct",
                         "direct_dependents",
                         "run.target_php",
-                        "run.project_php_lowest"
+                        "run.project_php_lowest",
+                        "run.php_window.platform_override"
                     ],
                     "minLength": 1
                 }
@@ -16344,7 +16372,7 @@
             ]
         },
         "phpCheck": {
-            "description": "What the release a move names needs from PHP: set on every move that names a branch or a tag (`update require raise-php blocked tag`) and on `security.gets`. A sentence prints its php clause only when `requires` is set; it names the project's lowest PHP from `run.project_php_lowest`.",
+            "description": "What the release a move names needs from PHP; on a move, the branch's highest release, or for `blocked` the release that blocks it. Set on every move that names a branch or a tag (`update require raise-php blocked tag`) and on `security.gets`. A sentence prints its php clause only when `requires` is set; it names the project's lowest PHP from `run.project_php_lowest`.",
             "type": "object",
             "required": [
                 "requires",

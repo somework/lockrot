@@ -234,7 +234,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/http-foundation ^5.4.50 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+            "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/http-foundation ^5.4.50 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
         },
         "security": {
             "status": "vulnerable",
@@ -2369,6 +2369,9 @@
             "ignores_extensions": true,
             "baseline": "refused",
             "reason": null
+        },
+        "php_window": {
+            "platform_override": "7.4.29"
         }
     },
     "generated_at": "2026-10-14T00:00:00+00:00",

@@ -1698,7 +1698,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
    },
    "security": {
     "status": "vulnerable",
@@ -2668,7 +2668,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require guzzlehttp/guzzle ^8.2 — clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require guzzlehttp/guzzle ^8.2 — clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "vulnerable",
@@ -3486,7 +3486,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/http-foundation ^5.4.50 — clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/http-foundation ^5.4.50 — clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "vulnerable",
@@ -3973,7 +3973,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/mime ^5.4.52 — clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/mime ^5.4.52 — clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "vulnerable",
@@ -4465,7 +4465,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/security-http ^5.4.53 — clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/security-http ^5.4.53 — clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "vulnerable",
@@ -8405,7 +8405,7 @@
      }
     ],
     "also": [],
-    "text": "raise require.php to >=8.1, then move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator — clears left-behind and 2 advisories; 11.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of scheb/2fa-google-authenticator (v8.6.1) still requires it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator — clears left-behind and 2 advisories; 11.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of scheb/2fa-google-authenticator (v8.6.1) still requires it"
    },
    "security": {
     "status": "vulnerable",
@@ -8830,7 +8830,7 @@
      }
     ],
     "also": [],
-    "text": "composer update phpseclib/phpseclib (gets 3.0.57) — clears 5 advisories"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update phpseclib/phpseclib (gets 3.0.57) — clears 5 advisories"
    },
    "security": {
     "status": "vulnerable",
@@ -9305,7 +9305,7 @@
      }
     ],
     "also": [],
-    "text": "composer update symfony/monolog-bridge (gets v5.4.52) — clears the advisory"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/monolog-bridge (gets v5.4.52) — clears the advisory"
    },
    "security": {
     "status": "vulnerable",
@@ -9692,7 +9692,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require enshrined/svg-sanitize ^1.0 — clears left-behind and the advisory; 1.x needs php ^7.1 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require enshrined/svg-sanitize ^1.0 — clears left-behind and the advisory; 1.x needs php ^7.1 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "vulnerable",
@@ -10088,7 +10088,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/mailer ^5.4.52 — clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/mailer ^5.4.52 — clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "vulnerable",
@@ -10504,7 +10504,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/routing ^5.4.53 — clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/routing ^5.4.53 — clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "vulnerable",
@@ -10950,7 +10950,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/dom-crawler ^5.4.52 — clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/dom-crawler ^5.4.52 — clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "vulnerable",
@@ -11346,7 +11346,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/validator ^5.4.43 — clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/validator ^5.4.43 — clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "vulnerable",
@@ -14304,7 +14304,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter: replace or update them; the newest release of guzzlehttp/guzzle (8.2.0) no longer requires it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter: replace or update them; the newest release of guzzlehttp/guzzle (8.2.0) no longer requires it"
    },
    "security": {
     "status": "clear",
@@ -16541,7 +16541,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update them; the newest release of symfony/security-bundle (v8.1.8) no longer requires it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update them; the newest release of symfony/security-bundle (v8.1.8) no longer requires it"
    },
    "security": {
     "status": "clear",
@@ -16851,7 +16851,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.1, then require babdev/pagerfanta-bundle ^4.6 — clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then require babdev/pagerfanta-bundle ^4.6 — clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -17153,7 +17153,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.2, then require craue/config-bundle ^3.0 — clears left-behind; 3.x needs php ^8.2, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.2, then require craue/config-bundle ^3.0 — clears left-behind; 3.x needs php ^8.2, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -17469,7 +17469,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.1, then require doctrine/collections ^2.6 — clears left-behind; 2.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then require doctrine/collections ^2.6 — clears left-behind; 2.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -17753,7 +17753,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.1, then require doctrine/event-manager ^2.1 — clears left-behind; 2.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then require doctrine/event-manager ^2.1 — clears left-behind; 2.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -18045,7 +18045,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.1, then require egulias/email-validator ^4.0 — clears left-behind; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then require egulias/email-validator ^4.0 — clears left-behind; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -18327,7 +18327,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.0, then require friendsofsymfony/jsrouting-bundle ^3.6 — clears left-behind; 3.x needs php ^8.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require friendsofsymfony/jsrouting-bundle ^3.6 — clears left-behind; 3.x needs php ^8.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -18630,7 +18630,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.2, then require lcobucci/jwt ^5.6 — clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.2, then require lcobucci/jwt ^5.6 — clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -18933,7 +18933,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.1, then require pagerfanta/doctrine-orm-adapter ^4.9 — clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then require pagerfanta/doctrine-orm-adapter ^4.9 — clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -19261,7 +19261,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.1, then require pagerfanta/twig ^4.9 — clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then require pagerfanta/twig ^4.9 — clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -19590,7 +19590,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.0, then require scheb/2fa-backup-code ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-backup-code ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -19897,7 +19897,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -20188,7 +20188,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.0, then require scheb/2fa-email ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-email ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -20474,7 +20474,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.0, then require scheb/2fa-google-authenticator ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-google-authenticator ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -20818,7 +20818,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.0, then require scheb/2fa-trusted-device ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-trusted-device ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -21136,7 +21136,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/asset ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/asset ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -21413,7 +21413,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/config ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/config ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -21720,7 +21720,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/console ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/console ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -22008,7 +22008,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/dependency-injection ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/dependency-injection ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -22316,7 +22316,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/doctrine-bridge ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/doctrine-bridge ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -22596,7 +22596,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/error-handler ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/error-handler ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -22906,7 +22906,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/event-dispatcher ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/event-dispatcher ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -23219,7 +23219,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/finder ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/finder ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -23520,7 +23520,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/form ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/form ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -23801,7 +23801,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/framework-bundle ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/framework-bundle ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -24100,7 +24100,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/google-mailer ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/google-mailer ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -24377,7 +24377,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/options-resolver ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/options-resolver ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -24665,7 +24665,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/proxy-manager-bridge ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/proxy-manager-bridge ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -24942,7 +24942,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/security-bundle ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/security-bundle ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -25227,7 +25227,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/security-core ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/security-core ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -25516,7 +25516,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/templating ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/templating ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -25793,7 +25793,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/twig-bundle ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require symfony/twig-bundle ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "clear",
@@ -26166,7 +26166,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 4 more: replace or update them; the newest releases of doctrine/doctrine-bundle (3.3.2), nelmio/api-doc-bundle (v5.12.2) and willdurand/hateoas (3.14.0) no longer require it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 4 more: replace or update them; the newest releases of doctrine/doctrine-bundle (3.3.2), nelmio/api-doc-bundle (v5.12.2) and willdurand/hateoas (3.14.0) no longer require it"
    },
    "security": {
     "status": "clear",
@@ -26499,7 +26499,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 3 more: replace or update them; the newest releases of doctrine/doctrine-bundle (3.3.2) and doctrine/orm (3.7.3) no longer require it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 3 more: replace or update them; the newest releases of doctrine/doctrine-bundle (3.3.2) and doctrine/orm (3.7.3) no longer require it"
    },
    "security": {
     "status": "clear",
@@ -31297,7 +31297,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "composer update guzzlehttp/psr7 (gets 2.13.1) — clears 4 advisories"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update guzzlehttp/psr7 (gets 2.13.1) — clears 4 advisories"
    },
    "security": {
     "status": "vulnerable",
@@ -32018,7 +32018,7 @@
      }
     ],
     "also": [],
-    "text": "composer update symfony/cache (gets v5.4.53) — clears the advisory"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/cache (gets v5.4.53) — clears the advisory"
    },
    "security": {
     "status": "vulnerable",
@@ -32393,7 +32393,7 @@
      }
     ],
     "also": [],
-    "text": "composer update symfony/http-client (gets v5.4.53) — clears the advisory"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/http-client (gets v5.4.53) — clears the advisory"
    },
    "security": {
     "status": "vulnerable",
@@ -32800,7 +32800,7 @@
      }
     ],
     "also": [],
-    "text": "raise require.php to >=8.1, then move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator — clears left-behind and old-promise; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator — clears left-behind and old-promise; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
    },
    "security": {
     "status": "clear",
@@ -33980,7 +33980,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 — clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 — clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
    },
    "security": {
     "status": "clear",
@@ -34839,7 +34839,7 @@
      }
     ],
     "also": [],
-    "text": "raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 through scheb/2fa-qr-code — clears left-behind; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 through scheb/2fa-qr-code — clears left-behind; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
    },
    "security": {
     "status": "clear",
@@ -35201,7 +35201,7 @@
      }
     ],
     "also": [],
-    "text": "raise require.php to >=8.4, then move doctrine/instantiator to ^2.1 through doctrine/orm, jms/serializer, jms/serializer-bundle and 4 more — clears left-behind; 2.x needs php ^8.4, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of doctrine/orm (3.7.3) and jms/serializer (3.32.9) still require it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.4, then move doctrine/instantiator to ^2.1 through doctrine/orm, jms/serializer, jms/serializer-bundle and 4 more — clears left-behind; 2.x needs php ^8.4, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of doctrine/orm (3.7.3) and jms/serializer (3.32.9) still require it"
    },
    "security": {
     "status": "clear",
@@ -35502,7 +35502,7 @@
      }
     ],
     "also": [],
-    "text": "raise require.php to >=8.1, then move endroid/qr-code to ^5.1 through scheb/2fa-qr-code — clears left-behind; 5.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of scheb/2fa-qr-code (v5.13.2) still requires it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move endroid/qr-code to ^5.1 through scheb/2fa-qr-code — clears left-behind; 5.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of scheb/2fa-qr-code (v5.13.2) still requires it"
    },
    "security": {
     "status": "clear",
@@ -35797,7 +35797,7 @@
      }
     ],
     "also": [],
-    "text": "raise require.php to >=8.1, then move khanamiryan/qrcode-detector-decoder to ^2.0 through scheb/2fa-qr-code — clears left-behind; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move khanamiryan/qrcode-detector-decoder to ^2.0 through scheb/2fa-qr-code — clears left-behind; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
    },
    "security": {
     "status": "clear",
@@ -36110,7 +36110,7 @@
      }
     ],
     "also": [],
-    "text": "raise require.php to >=8.4, then move lcobucci/clock to ^3.6 through lcobucci/jwt, scheb/2fa-trusted-device — clears left-behind; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.4, then move lcobucci/clock to ^3.6 through lcobucci/jwt, scheb/2fa-trusted-device — clears left-behind; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it"
    },
    "security": {
     "status": "clear",
@@ -36428,7 +36428,7 @@
      }
     ],
     "also": [],
-    "text": "raise require.php to >=8.1, then move pagerfanta/core to ^4.9 through babdev/pagerfanta-bundle, pagerfanta/doctrine-orm-adapter, pagerfanta/twig — clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of babdev/pagerfanta-bundle (v4.6.0), pagerfanta/doctrine-orm-adapter (v4.9.0) and pagerfanta/twig (v4.9.0) still require it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move pagerfanta/core to ^4.9 through babdev/pagerfanta-bundle, pagerfanta/doctrine-orm-adapter, pagerfanta/twig — clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of babdev/pagerfanta-bundle (v4.6.0), pagerfanta/doctrine-orm-adapter (v4.9.0) and pagerfanta/twig (v4.9.0) still require it"
    },
    "security": {
     "status": "clear",
@@ -38234,7 +38234,7 @@
      }
     ],
     "also": [],
-    "text": "raise require.php to >=8.1, then move symfony/psr-http-message-bridge to ^6.4 through sentry/sentry-symfony — clears left-behind; 6.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of sentry/sentry-symfony (5.13.0) still requires it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move symfony/psr-http-message-bridge to ^6.4 through sentry/sentry-symfony — clears left-behind; 6.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of sentry/sentry-symfony (5.13.0) still requires it"
    },
    "security": {
     "status": "clear",
@@ -39485,7 +39485,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "composer update j0k3r/graby (gets 2.5.3) — clears the advisory"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update j0k3r/graby (gets 2.5.3) — clears the advisory"
    },
    "security": {
     "status": "vulnerable",
@@ -40276,7 +40276,7 @@
      }
     ],
     "also": [],
-    "text": "composer update symfony/polyfill-intl-idn (gets v1.43.0) — clears the advisory"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/polyfill-intl-idn (gets v1.43.0) — clears the advisory"
    },
    "security": {
     "status": "vulnerable",
@@ -40722,7 +40722,7 @@
      }
     ],
     "also": [],
-    "text": "composer update symfony/yaml (gets v5.4.53) — clears 3 advisories"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/yaml (gets v5.4.53) — clears 3 advisories"
    },
    "security": {
     "status": "vulnerable",

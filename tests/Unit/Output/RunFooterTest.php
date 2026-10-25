@@ -14,6 +14,9 @@ use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Output\ConsoleMarkup;
+use Lockrot\Output\FormatContext;
+use Lockrot\Output\Formatters;
 use Lockrot\Output\RunFooter;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveChecker;
@@ -25,6 +28,7 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\MoveChecks;
 use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /** The run footer lines that the composite does not reach. */
@@ -203,6 +207,44 @@ final class RunFooterTest extends TestCase
         $line = self::phpLine($lock, [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'refused', 'holds' => $holds]], []));
 
         self::assertSame("php: the lock installs on PHP 5.3 to 8.3, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of the 2 packages that exclude it: composer.json requires acme/a ^1.0 and acme/c 2.0.0 requires acme/b 1.0.0", $line);
+    }
+
+    /** wallabag 2.6.14 at 8.4 lists friendsoftwig/twigcs from packages-dev among the packages that exclude the target. */
+    public function testARootHoldOnAPackagesDevEntryOfTheFixSaysRequireDev(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php' => '<8.4'])], 'packages-dev' => [self::package('acme/tool', ['php' => '<8.4'])]];
+        $holds = [
+            ['source' => 'root', 'link' => 'root-require', 'target' => 'acme/a', 'constraint' => '^1.0'],
+            ['source' => 'root', 'link' => 'root-require', 'target' => 'acme/tool', 'constraint' => '^2.0'],
+        ];
+
+        $line = self::phpLine($lock, [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'refused', 'holds' => $holds]], []));
+
+        self::assertStringEndsWith('refuses the update of the 2 packages that exclude it: composer.json requires acme/a ^1.0 and composer.json requires acme/tool ^2.0 (require-dev)', (string) $line);
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function updateNowFormats(): iterable
+    {
+        yield 'table' => ['table', 'update now: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn'];
+        yield 'markdown' => ['markdown', '**Update now:** First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. `composer update symfony/yaml symfony/polyfill-intl-idn`'];
+        yield 'github' => ['github', "\nupdate now: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn\n"];
+    }
+
+    /**
+     * Composer runs the `update now:` command under the same pin as a move's commands.
+     *
+     * @dataProvider updateNowFormats
+     */
+    #[DataProvider('updateNowFormats')]
+    public function testTheUpdateNowLineFirstSetsAPlatformPhpOutsideTheTargetMinor(string $format, string $line): void
+    {
+        $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => [], 'platform-overrides' => ['php' => '7.4.29']]), ProjectConfig::empty(), '8.4', PhpReleaseDates::load()->minors(new Clock(new \DateTimeImmutable(self::AT))));
+        $report = CaseHydrator::composite()->withPhpWindow($window);
+
+        $text = Formatters::for($format, FormatContext::create(null, 'high'))->format($report);
+
+        self::assertStringContainsString($line, $format === 'table' ? (string) preg_replace('/\n +/', ' ', ConsoleMarkup::render($text, false)) : $text);
     }
 
     public function testThePhpLineOfARefusalWithNoHoldEndsAfterThePackageThatExcludesTheTarget(): void

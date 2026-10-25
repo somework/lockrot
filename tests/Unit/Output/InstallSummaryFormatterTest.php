@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Clock;
+use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Lock\LockFile;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Tests\Support\CaseHydrator;
@@ -127,6 +132,17 @@ final class InstallSummaryFormatterTest extends TestCase
         self::assertCount(10, $lines);
         self::assertSame('  medium   [ 8] vendor/p6 1.0.0: stale', $lines[7]);
         self::assertSame('  … and 2 more', $lines[8]);
+    }
+
+    public function testTheUpdateLineFirstSetsAPlatformPhpOutsideTheTargetMinor(): void
+    {
+        $composite = CaseHydrator::composite();
+        $findings = array_values(array_filter($composite->findings(), static fn (Finding $finding): bool => \in_array($finding->package(), ['symfony/yaml', 'symfony/polyfill-intl-idn'], true)));
+        $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => [], 'platform-overrides' => ['php' => '7.4.29']]), ProjectConfig::empty(), '8.4', PhpReleaseDates::load()->minors(Clock::fixed(self::NOW)));
+
+        $lines = self::lines(self::report($findings)->withPhpWindow($window));
+
+        self::assertContains('  update now: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn', $lines);
     }
 
     public function testTheUpdateLineCountsOnlyThePackagesThatTheBlockDoesNotShow(): void

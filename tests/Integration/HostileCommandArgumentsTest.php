@@ -106,7 +106,7 @@ final class HostileCommandArgumentsTest extends TestCase
     public function testAHostileBranchInTheLockKeepsTheStepsOfTheReleases(): void
     {
         $expected = [
-            'E' => ['symfony/yaml', [['composer', 'require', 'symfony/yaml:^8.1.8']]],
+            'E' => ['symfony/yaml', [['composer', 'require', 'php:>=8.4.1', '--no-update'], ['composer', 'require', 'symfony/yaml:^8.1.8']]],
             'G-tag‡' => ['friendsofsymfony/oauth-server-bundle', [['composer', 'require', 'friendsofsymfony/oauth-server-bundle:^1.6.2']]],
         ];
         foreach ($expected as $id => [$package, $commands]) {

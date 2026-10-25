@@ -1175,7 +1175,7 @@
       "value": 4.5,
       "source": "branch"
      },
-     "summary": "branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach"
+     "summary": "branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=8.1; 6.x released v6.13.1 (2024-11-29)"
     }
    ],
    "score": {
@@ -1365,7 +1365,7 @@
     {
      "id": "S8",
      "level": "warn",
-     "summary": "branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
+     "summary": "branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=8.1; 6.x released v6.13.1 (2024-11-29)",
      "data": {
       "branch": "5.x",
       "branch_last_release": "2022-04-16T10:18:34+00:00",
@@ -1376,21 +1376,24 @@
       "newest_release": "2026-07-10T18:29:30+00:00",
       "newest_php": "~8.4.0 || ~8.5.0",
       "newest_within_reach": false,
-      "floor_php": ">=7.4",
+      "floor_php": ">=8.1",
       "floor_source": "project",
-      "reachable_branch": null,
-      "reachable_version": null,
-      "reachable_release": null,
-      "suggested_constraint": null,
+      "reachable_branch": "6.x",
+      "reachable_version": "v6.13.1",
+      "reachable_release": "2024-11-29T19:29:49+00:00",
+      "suggested_constraint": "^6.13",
       "dated_by": null,
-      "reachable_php": null,
-      "reachable_admits": null,
+      "reachable_php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+      "reachable_admits": {
+       "project": true,
+       "target": true
+      },
       "newest_years": 0.2,
-      "reachable_years": null
+      "reachable_years": 1.8
      }
     }
    ],
-   "evidence": "left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
+   "evidence": "left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=8.1; 6.x released v6.13.1 (2024-11-29)",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:46+00:00",
    "libyears": 4.23,

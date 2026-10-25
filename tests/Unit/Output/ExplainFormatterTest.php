@@ -420,6 +420,12 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString('; held by composer.json and symfony/twig-bridge; after it', self::plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())), 'the require and the conflict of composer.json name it once');
     }
 
+    /** symfony/mailer v6.4.40 holds the move to itself: its own requirement conflicts with the lock, and it follows composer.json. */
+    public function testABranchRowNamesAHoldOfThePackagesOwnReleaseAsTheReleaseThatTheMoveInstalls(): void
+    {
+        self::assertStringContainsString('; held by composer.json and symfony/mailer v6.4.40, the release this move installs and acme/ml-widget; after it', self::plain(self::caseExplanation('mc-package-hold‡')));
+    }
+
     public function testEveryCaseExplainsAsItsGolden(): void
     {
         $text = '';

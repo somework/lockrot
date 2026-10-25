@@ -118,7 +118,7 @@
    "constraint": null,
    "latest": null,
    "php_check": {
-    "requires": "^5.3.2 || ^7.0 || ^8.0",
+    "requires": "^7.2.5 || ^8.0",
     "project_allows": true,
     "target_runs": true,
     "raise_to": null,
@@ -238,7 +238,7 @@
    "gets": {
     "version": "2.10.3",
     "php_check": {
-     "requires": "^5.3.2 || ^7.0 || ^8.0",
+     "requires": "^7.2.5 || ^8.0",
      "project_allows": true,
      "target_runs": true,
      "raise_to": null,
@@ -1416,7 +1416,10 @@
     }
    ]
   },
-  "move_check": null
+  "move_check": null,
+  "php_window": {
+   "platform_override": null
+  }
  },
  "generated_at": "2026-10-01T17:40:04+00:00",
  "notes": [

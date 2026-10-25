@@ -6,10 +6,15 @@ namespace Lockrot\Tests\Unit\Explain;
 
 use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Analyzer\LibyearsMeasurement;
+use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
+use Lockrot\Clock;
+use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
+use Lockrot\Lock\LockFile;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\BranchFixes;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Signal\PhpFloor;
@@ -501,10 +506,22 @@ final class ExplanationTest extends TestCase
         self::assertSame(['3.x' => null, '2.x' => FindingDetails::branchFixes($two, null), '1.x' => FindingDetails::branchFixes($one, null)], array_column($branches, 'fixes', 'branch'));
     }
 
+    /** next_step.text reads the lock's platform PHP, so explain-2 carries it beside the move (SPEC §5.9). */
+    public function testTheRunCarriesThePlatformPhpOfTheLockAndNothingElseOfTheWindow(): void
+    {
+        $finding = $this->finding('1.0.0', Verdict::STALE);
+        $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => [], 'platform-overrides' => ['php' => '7.4.29']]), ProjectConfig::empty(), '8.4', PhpReleaseDates::load()->minors(Clock::fixed(F::NOW)));
+        $report = (new Report([$finding], [], new \DateTimeImmutable(F::NOW), 1, 0))->withPhpWindow($window);
+
+        $array = (new Explanation($finding, F::facts(F::package()), new Thresholds(), '8.4', $report))->toArray();
+
+        self::assertSame(['platform_override' => '7.4.29'], JsonPath::arrayAt($array, ['run', 'php_window']));
+    }
+
     /**
-     * The report's run and its row of the finding come first. The run carries the keys that
-     * explain-2 lists, and the legacy block keeps report-1's reading.
-     */
+         * The report's run and its row of the finding come first. The run carries the keys that
+         * explain-2 lists, and the legacy block keeps report-1's reading.
+         */
     public function testTheReportsRunAndRowComeFirst(): void
     {
         $finding = $this->finding('1.0.0', Verdict::STALE);
@@ -517,6 +534,7 @@ final class ExplanationTest extends TestCase
         self::assertSame(1, JsonPath::intAt($array, ['finding', 'rank']), "the report's row of the finding");
         $keys = array_keys(JsonPath::arrayAt($array, ['run']));
         sort($keys);
-        self::assertSame(['advisory_lookup', 'fail_on', 'fail_on_source', 'fix_model', 'flag_ids', 'gates', 'graded_verdicts', 'include_dev', 'move_check', 'project_php', 'project_php_lowest', 'score_model', 'signal_ids', 'target_php', 'target_php_source', 'text_grammar', 'thresholds', 'verdicts'], $keys);
+        self::assertSame(['advisory_lookup', 'fail_on', 'fail_on_source', 'fix_model', 'flag_ids', 'gates', 'graded_verdicts', 'include_dev', 'move_check', 'php_window', 'project_php', 'project_php_lowest', 'score_model', 'signal_ids', 'target_php', 'target_php_source', 'text_grammar', 'thresholds', 'verdicts'], $keys);
+        self::assertNull(JsonPath::arrayAt($array, ['run'])['php_window'], 'the report has no PHP window');
     }
 }

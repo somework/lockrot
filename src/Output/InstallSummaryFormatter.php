@@ -61,7 +61,7 @@ final class InstallSummaryFormatter
         }
         if ($updateNow !== []) {
             $hidden = \count(array_diff($updateNow, array_map(static fn (Finding $finding): string => $finding->package(), $shown)));
-            $lines[] = '  update now: '.self::text(RunFooter::updateNow($report).($hidden > 0 ? ' ('.$hidden.' not shown above)' : ''));
+            $lines[] = '  update now: '.self::text(RunFooter::platformStep($report).RunFooter::updateNow($report).($hidden > 0 ? ' ('.$hidden.' not shown above)' : ''));
         }
         if ($gateLine !== null) {
             $lines[] = $gateLine;

@@ -20,14 +20,17 @@ final class MoveSubject
     private ?string $targetPhp;
     private ?string $projectPhpLowest;
     private ?string $newestPhp;
+    private ?string $platformOverride;
 
     /**
      * @param list<string> $dependents       `direct_dependents`
      * @param ?string      $projectPhpLowest `run.project_php_lowest`
      * @param ?string      $newestPhp        R, the newest PHP minor that the root php allows ({@see \Lockrot\Signal\PhpCap})
+     * @param ?string      $platformOverride `run.php_window.platform_override`
      */
-    public function __construct(string $package, string $version, bool $direct, array $dependents, ?string $targetPhp, ?string $projectPhpLowest, ?string $newestPhp = null)
+    public function __construct(string $package, string $version, bool $direct, array $dependents, ?string $targetPhp, ?string $projectPhpLowest, ?string $newestPhp = null, ?string $platformOverride = null)
     {
+        $this->platformOverride = $platformOverride;
         $this->newestPhp = $newestPhp;
         $this->package = $package;
         $this->version = $version;
@@ -71,5 +74,10 @@ final class MoveSubject
     public function newestPhp(): ?string
     {
         return $this->newestPhp;
+    }
+
+    public function platformOverride(): ?string
+    {
+        return $this->platformOverride;
     }
 }

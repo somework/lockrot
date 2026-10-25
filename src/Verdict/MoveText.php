@@ -7,6 +7,7 @@ namespace Lockrot\Verdict;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Security\Holder;
 use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\MoveCheckers;
 
 /**
  * `next_step.text`, text grammar 1: rendered from the move object, the package and the run alone.
@@ -44,7 +45,7 @@ final class MoveText
         if (\in_array($kind, array_merge(Move::ROW_KINDS, [Move::TAG]), true)) {
             $text .= self::leaves($move).self::unverified($move);
         }
-        $holders = array_map([self::class, 'holderWords'], $move->heldBy());
+        $holders = array_map(static fn (Holder $holder): string => self::holderWords($holder, $subject), self::inTextOrder($move->heldBy(), $subject->package()));
         if ($holders !== []) {
             $text .= '; held by '.implode(' and ', $holders);
         }
@@ -56,7 +57,24 @@ final class MoveText
             $text .= '; '.$through;
         }
 
-        return $text.self::checked($move->check());
+        $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride());
+
+        return $step.$text.self::checked($move->check());
+    }
+
+    /**
+     * SPEC §5.6: while the lock records a platform PHP outside the target minor, Composer solves
+     * the commands at that PHP, not at the target. The sentence and a space, else an empty string.
+     *
+     * @param ?string $platformOverride `run.php_window.platform_override`
+     */
+    public static function platformStep(?string $targetPhp, ?string $platformOverride): string
+    {
+        if ($targetPhp === null || $platformOverride === null || MoveCheckers::platformPhp($targetPhp, $platformOverride) === $platformOverride) {
+            return '';
+        }
+
+        return 'First set config.platform.php to your PHP '.$targetPhp.' release: the lock records '.$platformOverride.'. ';
     }
 
     /** D10: what Composer's solver said about the move, or why lockrot did not ask it. */
@@ -99,7 +117,7 @@ final class MoveText
 
                 return 'test it on PHP '.$subject->targetPhp().($latest !== null && $latest->isInstalled() ? ' — '.$latest->version().' is its newest release' : '');
             case Move::UPDATE:
-                return self::update($move).' (gets '.$move->newest().')'.self::clears($move).self::adds($move);
+                return self::raise($move).self::update($move).' (gets '.$move->newest().')'.self::clears($move).self::adds($move);
             case Move::REQUIRE:
             case Move::RAISE_PHP:
                 return self::requirement($move, $subject);
@@ -160,10 +178,10 @@ final class MoveText
         $ownLine = $move->toBranch() !== null && $move->crossesMajor() === false && self::isBranchAlias($subject->version());
         $word = $ownLine ? 'the newest on its own line' : 'the newest';
         if ($subject->isDirect()) {
-            $text = 'require a tag — '.$word.' is '.$version;
+            $text = self::raise($move).'require a tag — '.$word.' is '.$version;
         } else {
             $via = self::dependents($subject->dependents());
-            $text = 'move it to a tag — '.$word.' is '.$version.($via === '' ? '' : ', through '.$via);
+            $text = self::raise($move).'move it to a tag — '.$word.' is '.$version.($via === '' ? '' : ', through '.$via);
         }
         $released = $latest === null ? null : $latest->released();
         $text .= $released === null ? '' : ' ('.substr($released, 0, 10).')';
@@ -175,8 +193,7 @@ final class MoveText
 
     private static function requirement(Move $move, MoveSubject $subject): string
     {
-        $check = $move->phpCheck();
-        $raise = $check !== null && $check->raiseTo() !== null ? 'raise require.php to '.$check->raiseTo().', then ' : '';
+        $raise = self::raise($move);
         if ($subject->isDirect()) {
             $text = $raise.'require '.$subject->package().' '.$move->constraint();
         } else {
@@ -185,6 +202,13 @@ final class MoveText
         }
 
         return $text.self::clears($move).self::adds($move).self::phpClause($move, $subject, true);
+    }
+
+    private static function raise(Move $move): string
+    {
+        $check = $move->phpCheck();
+
+        return $check !== null && $check->raiseTo() !== null ? 'raise require.php to '.$check->raiseTo().', then ' : '';
     }
 
     /** One clause per basis of `adds[]`: what the move raises that would count. */
@@ -276,11 +300,15 @@ final class MoveText
         return $ids === [] ? '' : '; not checked: '.implode(', ', $ids);
     }
 
-    private static function holderWords(Holder $holder): string
+    private static function holderWords(Holder $holder, MoveSubject $subject): string
     {
         $link = self::linkWords($holder);
         if ($holder->source() === Holder::ROOT) {
             return 'composer.json ('.$link.')';
+        }
+        // The finding's own release: its grade and flags are the installed version's, not this one's.
+        if ($holder->package() === $subject->package()) {
+            return $holder->package().' '.$holder->version().', the release this move installs ('.$link.')';
         }
         $bits = [$link];
         $finding = $holder->finding();
@@ -289,6 +317,32 @@ final class MoveText
         }
 
         return $holder->package().' '.$holder->version().' ('.implode('; ', $bits).')';
+    }
+
+    /**
+     * The root holds, then the holds of the package's own release, then the other holds, each group
+     * in `held_by[]` order.
+     *
+     * @param list<Holder> $holders
+     *
+     * @return list<Holder>
+     */
+    public static function inTextOrder(array $holders, string $package): array
+    {
+        $root = [];
+        $own = [];
+        $other = [];
+        foreach ($holders as $holder) {
+            if ($holder->source() === Holder::ROOT) {
+                $root[] = $holder;
+            } elseif ($holder->package() === $package) {
+                $own[] = $holder;
+            } else {
+                $other[] = $holder;
+            }
+        }
+
+        return array_merge($root, $own, $other);
     }
 
     /**

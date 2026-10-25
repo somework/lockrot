@@ -48,6 +48,7 @@ final class MoveContractTest extends TestCase
         'php-edge-lower‡' => [[['version'], self::VERSION]],
         'php-edge-equal‡' => [[['version'], self::VERSION]],
         'php-edge-upper‡' => [[['version'], self::VERSION]],
+        'platform-step‡' => [[['version'], self::VERSION]],
     ];
 
     private const NO_SCORE_AFTER = ['replace', 'find-alternative', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'];

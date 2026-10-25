@@ -1678,7 +1678,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 18 advisories; 3.x needs php >=8.1.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 18 advisories; 3.x needs php >=8.1.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -2774,7 +2774,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -5546,7 +5546,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'symfony/http-foundation:^5.4.50' (gets v5.4.50) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/http-foundation:^5.4.50' (gets v5.4.50) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -5972,7 +5972,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'symfony/mime:^5.4.52' (gets v5.4.52) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/mime:^5.4.52' (gets v5.4.52) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -6384,7 +6384,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'symfony/process:^5.4.51' (gets v5.4.51) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/process:^5.4.51' (gets v5.4.51) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -6822,7 +6822,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'symfony/security-http:^5.4.53' (gets v5.4.53) \u2014 clears 3 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/security-http:^5.4.53' (gets v5.4.53) \u2014 clears 3 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -7268,7 +7268,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'tecnickcom/tcpdf:^6.8.0' (gets 6.11.4) \u2014 clears 5 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'tecnickcom/tcpdf:^6.8.0' (gets 6.11.4) \u2014 clears 5 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -7797,7 +7797,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update 'phpseclib/phpseclib:^3.0.57' (gets 3.0.57) \u2014 clears 5 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'phpseclib/phpseclib:^3.0.57' (gets 3.0.57) \u2014 clears 5 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -8319,7 +8319,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears 2 advisories; 11.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears 2 advisories; 11.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -8707,7 +8707,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update 'symfony/monolog-bridge:^5.4.52' (gets v5.4.52) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/monolog-bridge:^5.4.52' (gets v5.4.52) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -11671,7 +11671,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through guzzlehttp/guzzle, php-http/guzzle5-adapter, php-http/httplug-bundle: replace or update them; the newest release of guzzlehttp/guzzle (7.8.1) no longer requires it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. find a replacement (none named); it comes in through guzzlehttp/guzzle, php-http/guzzle5-adapter, php-http/httplug-bundle: replace or update them; the newest release of guzzlehttp/guzzle (7.8.1) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -15201,7 +15201,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through craue/config-bundle, dama/doctrine-test-bundle, doctrine/dbal and 8 more: replace or update them; the newest releases of doctrine/dbal (4.0.2) and doctrine/orm (3.1.3) no longer require it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. find a replacement (none named); it comes in through craue/config-bundle, dama/doctrine-test-bundle, doctrine/dbal and 8 more: replace or update them; the newest releases of doctrine/dbal (4.0.2) and doctrine/orm (3.1.3) no longer require it"
             },
             "security": {
                 "status": "clear",
@@ -19902,7 +19902,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update them; the newest release of symfony/security-bundle (v7.0.7) no longer requires it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update them; the newest release of symfony/security-bundle (v7.0.7) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -20193,7 +20193,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require enshrined/svg-sanitize ^0.22.0 \u2014 clears the advisory; 0.22.x needs php ^7.1 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^0.18); a new 0.x line (Composer treats 0.x minors as breaking) brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. require enshrined/svg-sanitize ^0.22.0 \u2014 clears the advisory; 0.22.x needs php ^7.1 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^0.18); a new 0.x line (Composer treats 0.x minors as breaking) brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -20546,7 +20546,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'guzzlehttp/psr7:^2.12.3' (gets 2.13.1) \u2014 clears 4 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'guzzlehttp/psr7:^2.12.3' (gets 2.13.1) \u2014 clears 4 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -20990,7 +20990,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'phpunit/phpunit:^9.6.33' (gets 9.6.38) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'phpunit/phpunit:^9.6.33' (gets 9.6.38) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -21475,7 +21475,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'symfony/http-client:^5.4.53' (gets v5.4.53) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/http-client:^5.4.53' (gets v5.4.53) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -21847,7 +21847,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'symfony/mailer:^5.4.52' (gets v5.4.52) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/mailer:^5.4.52' (gets v5.4.52) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -22230,7 +22230,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'symfony/routing:^5.4.53' (gets v5.4.53) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/routing:^5.4.53' (gets v5.4.53) \u2014 clears 2 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -22964,7 +22964,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update 'symfony/cache:^5.4.52' (gets v5.4.53) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/cache:^5.4.52' (gets v5.4.53) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -23796,7 +23796,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.0, then move thecodingmachine/safe to ^2.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and old-promise; 2.x needs php ^8.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then move thecodingmachine/safe to ^2.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and old-promise; 2.x needs php ^8.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -24822,7 +24822,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -25055,10 +25055,10 @@
                 "constraint": "^4.8",
                 "latest": null,
                 "php_check": {
-                    "requires": "^8.0",
+                    "requires": "^8.1",
                     "project_allows": false,
                     "target_runs": true,
-                    "raise_to": ">=8.0",
+                    "raise_to": ">=8.1",
                     "raise_size": "major"
                 },
                 "crosses_major": true,
@@ -25121,7 +25121,7 @@
                     [
                         "composer",
                         "require",
-                        "php:>=8.0",
+                        "php:>=8.1",
                         "--no-update"
                     ]
                 ],
@@ -25139,7 +25139,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.0, then move endroid/qr-code to ^4.8 through scheb/2fa-qr-code \u2014 clears left-behind; 4.x needs php ^8.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-qr-code v5.13.2 (requires ^3.0; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move endroid/qr-code to ^4.8 through scheb/2fa-qr-code \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-qr-code v5.13.2 (requires ^3.0; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -25428,7 +25428,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through phpunit/phpunit: replace or update that package; the newest release of phpunit/phpunit (11.1.3) no longer requires it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. find a replacement (none named); it comes in through phpunit/phpunit: replace or update that package; the newest release of phpunit/phpunit (11.1.3) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -25933,7 +25933,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'j0k3r/graby:^2.5.1' (gets 2.5.3) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'j0k3r/graby:^2.5.1' (gets 2.5.3) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -26321,7 +26321,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'symfony/dom-crawler:^5.4.52' (gets v5.4.52) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/dom-crawler:^5.4.52' (gets v5.4.52) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -26661,7 +26661,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'symfony/validator:^5.4.43' (gets v5.4.48) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/validator:^5.4.43' (gets v5.4.48) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -27056,7 +27056,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update 'symfony/polyfill-intl-idn:^1.38.1' (gets v1.42.0) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/polyfill-intl-idn:^1.38.1' (gets v1.42.0) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -27479,7 +27479,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update 'symfony/yaml:^5.4.52' (gets v5.4.53) \u2014 clears 3 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update 'symfony/yaml:^5.4.52' (gets v5.4.53) \u2014 clears 3 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -27991,7 +27991,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move phpunit/php-invoker to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^3.1.1; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move phpunit/php-invoker to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^3.1.1; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -28406,7 +28406,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move phpunit/php-text-template to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.31 (requires ^2.0.2) and phpunit/phpunit 9.6.19 (requires ^2.0.3; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move phpunit/php-text-template to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.31 (requires ^2.0.2) and phpunit/phpunit 9.6.19 (requires ^2.0.3; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -28806,7 +28806,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move phpunit/php-timer to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^5.0.2; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move phpunit/php-timer to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^5.0.2; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -29206,7 +29206,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move sebastian/code-unit to ^2.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^1.0.6; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move sebastian/code-unit to ^2.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^1.0.6; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -29595,7 +29595,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move sebastian/code-unit-reverse-lookup to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.31 (requires ^2.0.2); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move sebastian/code-unit-reverse-lookup to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.31 (requires ^2.0.2); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -29996,7 +29996,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move sebastian/object-enumerator to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^4.0.3; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move sebastian/object-enumerator to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/phpunit 9.6.19 (requires ^4.0.3; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -30412,7 +30412,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move sebastian/object-reflector to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by sebastian/global-state 5.0.7 (requires ^2.0) and sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move sebastian/object-reflector to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by sebastian/global-state 5.0.7 (requires ^2.0) and sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -30828,7 +30828,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move sebastian/version to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.31 (requires ^3.0.1) and phpunit/phpunit 9.6.19 (requires ^3.0.2; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move sebastian/version to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.31 (requires ^3.0.1) and phpunit/phpunit 9.6.19 (requires ^3.0.2; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -31129,7 +31129,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.0, then require friendsoftwig/twigcs ^6.6.1 \u2014 clears capped; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require friendsoftwig/twigcs ^6.6.1 \u2014 clears capped; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",

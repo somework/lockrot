@@ -263,7 +263,7 @@ defs['heldBy'] = obj(("One link that excludes the move or the fix (§5.3): the r
     'constraint': d('The constraint as the link writes it, quoted and never interpreted ("requires ^2.0").', {'type': 'string', 'minLength': 1}),
     'holder': ref('holder'),
 })
-defs['phpCheck'] = obj(("What the release a move names needs from PHP (§5.3): set on every move that names a branch or a tag (`update require raise-php blocked tag`, I18) "
+defs['phpCheck'] = obj(("What the release a move names needs from PHP (§5.3); on a move, the branch's highest release, or for `blocked` the release that blocks it. Set on every move that names a branch or a tag (`update require raise-php blocked tag`, I18) "
                         "and on `security.gets`. A sentence prints its php clause only when `requires` is set; it names the project's lowest PHP from `run.project_php_lowest`."), {
     'requires': nul('The php constraint the release declares (`>=8.1.0`); null when it declares none (round 4).', {'type': 'string', 'minLength': 1}),
     'project_allows': nul("Whether the project's `require.php` admits it; null when lockrot could not compare (no `require.php`, or no php on the branch row), never \"does not allow\".", {'type': 'boolean'}),
@@ -521,7 +521,7 @@ def move_props(with_also):
     if with_also:
         p['also'] = arr("The other part's move, the same object without `also` (§5.6 rule 3); empty when the lead move's `clears` and `unverified` hold every fact of that part.", ref('alsoMove'))
     p['text'] = rendered('The `do:` line, `MoveText` (§5.6, §7.11; versioned by `run.text_grammar`); never empty. A renderer that does not know `kind` (or a `no-move` `reason`) prints this string (§7.9).',
-                         [('next_step' if with_also else 'next_step.also[]'), 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest'])
+                         [('next_step' if with_also else 'next_step.also[]'), 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override'])
     p['text']['minLength'] = 1
     return p
 

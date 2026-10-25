@@ -176,7 +176,7 @@ final class MarkdownFormatter implements FormatterInterface
         $updateNow = RunFooter::updateNow($report);
         if ($updateNow !== null) {
             $lines[] = '';
-            $lines[] = '**Update now:** '.self::code($updateNow);
+            $lines[] = '**Update now:** '.self::text(RunFooter::platformStep($report)).self::code($updateNow);
         }
         $notes = $report->notes();
         $stale = $baseline === null ? null : $baseline->staleNote();

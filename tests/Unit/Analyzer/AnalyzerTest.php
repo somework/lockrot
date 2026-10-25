@@ -38,6 +38,7 @@ use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\RecordedMoveChecker;
 use Lockrot\Tests\Support\Summaries;
@@ -153,6 +154,20 @@ final class AnalyzerTest extends TestCase
                 return $this->batch;
             }
         };
+    }
+
+    /** Case `move-check‡`, whose lock records a platform PHP outside the minor of its target 8.4. */
+    public function testAMoveWithCommandsFirstSetsThePlatformPhpThatTheLockRecords(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['php_lock'] = ['platform-overrides' => ['php' => '7.4.29']];
+        $case['inputs'] = $inputs;
+
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+
+        self::assertNotSame([], JsonPath::arrayAt($document, ['findings', 0, 'next_step', 'commands']));
+        self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. ', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'text']));
     }
 
     public function testAnalyzeWithFactsKeepsWhatEachFindingWasDecidedOn(): void

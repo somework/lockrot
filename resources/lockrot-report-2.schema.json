@@ -1944,7 +1944,7 @@
       ]
     },
     "phpCheck": {
-      "description": "What the release a move names needs from PHP: set on every move that names a branch or a tag (`update require raise-php blocked tag`) and on `security.gets`. A sentence prints its php clause only when `requires` is set; it names the project's lowest PHP from `run.project_php_lowest`.",
+      "description": "What the release a move names needs from PHP; on a move, the branch's highest release, or for `blocked` the release that blocks it. Set on every move that names a branch or a tag (`update require raise-php blocked tag`) and on `security.gets`. A sentence prints its php clause only when `requires` is set; it names the project's lowest PHP from `run.project_php_lowest`.",
       "type": "object",
       "required": [
         "requires",
@@ -4529,7 +4529,8 @@
             "direct",
             "direct_dependents",
             "run.target_php",
-            "run.project_php_lowest"
+            "run.project_php_lowest",
+            "run.php_window.platform_override"
           ],
           "minLength": 1
         }
@@ -5707,7 +5708,8 @@
             "direct",
             "direct_dependents",
             "run.target_php",
-            "run.project_php_lowest"
+            "run.project_php_lowest",
+            "run.php_window.platform_override"
           ],
           "minLength": 1
         }

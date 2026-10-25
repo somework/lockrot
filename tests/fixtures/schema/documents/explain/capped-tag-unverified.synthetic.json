@@ -1228,7 +1228,10 @@
     }
    ]
   },
-  "move_check": null
+  "move_check": null,
+  "php_window": {
+   "platform_override": null
+  }
  },
  "generated_at": "2026-10-01T17:39:31+00:00",
  "notes": [],
