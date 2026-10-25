@@ -553,12 +553,14 @@ def recorded_checks(f, rows):
         # A move with no release read names no version, so it sends no request.
         if m.get('check') is None or m['check'].get('reason') == 'no_release_read':
             continue
+        # Every kind sends the raise of its php_check (§5.6, the commands).
+        raise_to = (m.get('php_check') or {}).get('raise_to') or ''
         if m['kind'] == 'update':
-            key = 'update %s ^%s ' % (pkg, m['version'].lstrip('vV'))
+            key = 'update %s ^%s %s' % (pkg, m['version'].lstrip('vV'), raise_to)
         elif m['kind'] in ('require', 'raise-php'):
-            key = '%s %s %s %s' % (verb, pkg, m['constraint'], (m.get('php_check') or {}).get('raise_to') or '')
+            key = '%s %s %s %s' % (verb, pkg, m['constraint'], raise_to)
         else:
-            key = '%s %s ^%s ' % (verb, pkg, m['latest']['version'].lstrip('vV'))
+            key = '%s %s ^%s %s' % (verb, pkg, m['latest']['version'].lstrip('vV'), raise_to)
         keep(key, m['check'], m['held_by'])
     for r in rows:
         fx = r.get('fixes') or {}
