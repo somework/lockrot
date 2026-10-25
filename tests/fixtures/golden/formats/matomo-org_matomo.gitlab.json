@@ -130,7 +130,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/silent",
-        "description": "pear/console_getopt v1.4.3 \u2014 finding high (16 = silent 32 \u00f7 2 transitive) \u2014 silent: last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago). Do: find a maintained alternative: nothing released for 6.8 years; it comes in through matomo/decompress: replace or update that package. (via matomo/decompress)",
+        "description": "pear/console_getopt v1.4.3 \u2014 finding high (16 = silent 32 \u00f7 2 transitive) \u2014 silent: last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago). Do: find a maintained alternative: nothing released for 6.8 years; it comes in through matomo/decompress (pear/pear-core-minimal requires it): replace matomo/decompress. (via matomo/decompress)",
         "categories": [
             "Bug Risk"
         ],

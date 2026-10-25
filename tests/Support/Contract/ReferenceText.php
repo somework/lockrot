@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support\Contract;
 
+use Composer\Semver\Comparator;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreLineFromJson;
 use Lockrot\Verdict\ShellCommand;
@@ -19,8 +20,8 @@ final class ReferenceText
     /** The inputs of each string, as paths of `x-rendered-from`. A string outside the JSON names its own list. */
     public const INPUTS = [
         'score.text' => ['score.terms', 'score.modifiers', 'score.accepted', 'score.exact', 'score.total', 'score.rounded_down'],
-        'next_step.text' => ['next_step', 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
-        'also.text' => ['next_step.also[]', 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
+        'next_step.text' => ['next_step', 'package', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
+        'also.text' => ['next_step.also[]', 'package', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
         'gate.text' => ['gate', 'run.fail_on', 'run.fail_on_source', 'run.gates', 'run.mode', 'run.target_php', 'run.target_php_source'],
         'evidence' => ['flags[].id', 'flags[].summary', 'score.terms[].flag'],
         'gate_line' => ['gate.basis', 'score.total'],
@@ -424,15 +425,17 @@ final class ReferenceText
             case 'update':
                 $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';
 
-                return $raise.self::update($move).' (gets '.Fields::string($move, 'newest').')'.self::clears($move).self::adds($move);
+                $below = self::below($move, Fields::string($move, 'newest'));
+
+                return $raise.self::update($move).($below === '' ? ' (gets '.Fields::string($move, 'newest').')' : $below).self::clears($move).self::adds($move);
             case 'require':
             case 'raise-php':
                 $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';
                 $constraint = Fields::string($move, 'constraint');
-                $text = Fields::bool($in, 'direct')
-                    ? $raise.'require '.$package.' '.$constraint
+                $text = self::listed($in)
+                    ? $raise.'require '.$package.' '.$constraint.(self::listedInRequireDevOnly($in) ? ' in require-dev' : '')
                     : $raise.'move '.$package.' to '.$constraint.(self::dependents($in) === '' ? '' : ' through '.self::dependents($in));
-                $text .= self::clears($move).self::adds($move);
+                $text .= self::below($move, Fields::nullableString($move, 'newest')).self::clears($move).self::adds($move);
                 if ($check !== null && \is_string($check['requires'] ?? null)) {
                     $text .= self::php($move, $check, $run).'; the target php '.$target.' runs it';
                 }
@@ -477,7 +480,7 @@ final class ReferenceText
         // A tag move's crosses_major is false only on a branch-alias snapshot that stays on its line.
         $word = ($move['to_branch'] ?? null) !== null && ($move['crosses_major'] ?? null) === false ? 'the newest on its own line' : 'the newest';
         $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';
-        if (Fields::bool($in, 'direct')) {
+        if (self::listed($in)) {
             $text = $raise.'require a tag — '.$word.' is '.Fields::string($latest, 'version');
         } else {
             $through = self::dependents($in);
@@ -486,6 +489,7 @@ final class ReferenceText
         if (\is_string($latest['released'] ?? null)) {
             $text .= ' ('.substr($latest['released'], 0, 10).')';
         }
+        $text .= self::below($move, Fields::string($latest, 'version'));
         if (($latest['relation'] ?? null) === 'older') {
             $text .= ', older than your snapshot ('.substr(Fields::string($latest, 'snapshot_time'), 0, 10).'); review, or replace';
         }
@@ -582,9 +586,12 @@ final class ReferenceText
     private static function holder(array $holder, string $package): string
     {
         $constraint = \is_string($holder['constraint'] ?? null) ? $holder['constraint'] : null;
+        if ($constraint === 'self.version' && \is_string($holder['version'] ?? null)) {
+            $constraint = 'self.version ('.$holder['version'].')';
+        }
         $target = \is_string($holder['target'] ?? null) ? $holder['target'].' ' : '';
         $kind = Fields::string($holder, 'link');
-        $link = (['conflict' => 'conflicts with ', 'replace' => 'replaces '][$kind] ?? 'requires ').$target.$constraint.($kind === 'require-dev' ? ' (require-dev)' : '');
+        $link = (['conflict' => 'conflicts with ', 'replace' => 'replaces '][$kind] ?? 'requires ').$target.$constraint.($kind === 'require-dev' ? ' in require-dev' : '');
         if ($target === '' && \in_array($kind, ['root-require', 'replace'], true)) {
             $link = $kind === 'replace' ? 'replaces it' : 'no release of '.$constraint.' can install';
         }
@@ -618,7 +625,7 @@ final class ReferenceText
 
                 return (\is_string($toBranch) && strpos($toBranch, '0.') === 0 ? 'a new 0.x line (Composer treats 0.x minors as breaking)' : 'a new major').' brings its own requirements'.($solved ? '' : ', which lockrot does not solve');
             case 'transitive':
-                return $resolved ? 'what requires it must allow it' : 'it comes in through '.self::dependents($in).': replace or update '.(\count(Fields::strings($in, 'direct_dependents')) === 1 ? 'that package' : 'them');
+                return $resolved ? 'what requires it must allow it' : 'it comes in through '.self::requiredThrough($in).': '.self::actions($in);
             case 'unreached':
                 return $resolved ? 'lockrot found no path from your requirements to it, so what requires it must allow it' : 'lockrot found no path from your requirements to it: `composer why` names what requires it';
             default:
@@ -648,11 +655,88 @@ final class ReferenceText
         return \count($entries) === 1 ? 'the newest release of '.$shown.' '.$verb[0].' it' : 'the newest releases of '.$shown.' '.$verb[1].' it';
     }
 
+    /**
+     * " (gets X, below the newest Y)" when the move's solver check installs a release below $newest.
+     *
+     * @param array<mixed, mixed> $move
+     */
+    private static function below(array $move, ?string $newest): string
+    {
+        $check = Fields::nullableObject($move, 'check');
+        $installs = $check === null ? null : Fields::nullableString($check, 'installs');
+        if ($newest === null || $installs === null || !Comparator::lessThan(ltrim($installs, 'vV'), ltrim($newest, 'vV'))) {
+            return '';
+        }
+
+        return ' (gets '.$installs.', below the newest '.$newest.')';
+    }
+
+    /** @param array<mixed, mixed> $in */
+    private static function listed(array $in): bool
+    {
+        return Fields::bool($in, 'direct') || Fields::strings($in, 'named_in') !== [];
+    }
+
+    /** @param array<mixed, mixed> $in */
+    private static function listedInRequireDevOnly(array $in): bool
+    {
+        $sections = Fields::strings($in, 'named_in');
+
+        return !\in_array('require', $sections, true) && \in_array('require-dev', $sections, true);
+    }
+
+    /**
+     * The dependents, with "({requirer} requires it)" after the first package of a chain of three or more.
+     *
+     * @param array<mixed, mixed> $in
+     */
+    private static function requiredThrough(array $in): string
+    {
+        $chain = Fields::strings($in, 'chain');
+        $names = Fields::strings($in, 'direct_dependents');
+        if (\count($chain) >= 3) {
+            $names = array_map(static fn (string $name): string => $name === $chain[0] ? $name.' ('.$chain[\count($chain) - 2].' requires it)' : $name, $names);
+        }
+
+        return self::list($names);
+    }
+
+    /**
+     * One action per group of `through[]`, in entry order: a local package, one installed at its
+     * newest release, then the others. Without entries every dependent is in the last group.
+     *
+     * @param array<mixed, mixed> $in
+     */
+    private static function actions(array $in): string
+    {
+        $move = Fields::object($in, 'next_step');
+        $entries = \array_key_exists('through', $move) && \is_array($move['through']) ? Fields::objects($move, 'through') : [];
+        $groups = [];
+        foreach ($entries as $entry) {
+            $group = ($entry['local'] ?? null) === true ? 'local' : (($entry['newest_is_installed'] ?? null) === true ? 'replace' : 'update');
+            $groups[$group][] = Fields::string($entry, 'package');
+        }
+        if ($entries === []) {
+            $groups['update'] = Fields::strings($in, 'direct_dependents');
+        }
+        $actions = [];
+        foreach ($groups as $group => $names) {
+            $verb = ['local' => \count($names) === 1 ? 'change your own package' : 'change your own packages', 'replace' => 'replace'][$group] ?? 'replace or update';
+            $actions[] = $verb.' '.self::list($names);
+        }
+
+        return implode(', or ', $actions);
+    }
+
     /** @param array<mixed, mixed> $in */
     private static function dependents(array $in): string
     {
-        $names = Fields::strings($in, 'direct_dependents');
+        return self::list(Fields::strings($in, 'direct_dependents'));
+    }
 
+    /** @param list<string> $names */
+    private static function list(array $names): string
+    {
         return \count($names) > self::DEPENDENTS_SHOWN ? implode(', ', \array_slice($names, 0, self::DEPENDENTS_SHOWN)).' and '.(\count($names) - self::DEPENDENTS_SHOWN).' more' : implode(', ', $names);
     }
 

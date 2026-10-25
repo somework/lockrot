@@ -83,7 +83,7 @@ final class MoveCheckWallabagTest extends TestCase
     {
         $move = self::move('phpseclib/phpseclib');
 
-        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => null], $move['check']);
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '3.0.57'], $move['check']);
         self::assertSame([['composer', 'update', 'phpseclib/phpseclib:^3.0.57']], $move['commands']);
     }
 
