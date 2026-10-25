@@ -65,15 +65,16 @@ final class SchemaParityTest extends TestCase
         }
     }
 
-    /** SPEC §5.9: explain-2's `php_window` carries only the key that `next_step.text` reads, typed as report-2 types it. */
-    public function testThePhpWindowOfAnExplanationIsTheReportsPlatformOverrideAlone(): void
+    /** SPEC §5.6, §5.9: explain-2's `php_window` carries only the keys that `next_step.text` reads, typed as report-2 types them. */
+    public function testThePhpWindowOfAnExplanationIsTheReportsPlatformOverrideAndTargetAlone(): void
     {
         $report = JsonPath::arrayAt(self::properties(self::definitions(Schemas::REPORT, JsonFormatter::SCHEMA), 'run'), ['php_window', 'oneOf']);
         $explain = JsonPath::arrayAt(self::properties(self::definitions(Schemas::EXPLAIN, ExplainFormatter::SCHEMA), 'explainRun'), ['php_window', 'oneOf']);
 
-        self::assertSame(['platform_override'], array_keys(JsonPath::arrayAt($explain, [0, 'properties'])));
-        self::assertSame(['platform_override'], JsonPath::arrayAt($explain, [0, 'required']));
+        self::assertSame(['platform_override', 'target'], array_keys(JsonPath::arrayAt($explain, [0, 'properties'])));
+        self::assertSame(['platform_override', 'target'], JsonPath::arrayAt($explain, [0, 'required']));
         self::assertSame(self::sorted(JsonPath::arrayAt($report, [0, 'properties', 'platform_override'])), self::sorted(JsonPath::arrayAt($explain, [0, 'properties', 'platform_override'])));
+        self::assertSame(self::sorted(JsonPath::arrayAt($report, [0, 'properties', 'target'])), self::sorted(JsonPath::arrayAt($explain, [0, 'properties', 'target'])));
         self::assertSame(JsonPath::arrayAt($report, [1]), JsonPath::arrayAt($explain, [1]), 'null when report-2 writes null');
     }
 
