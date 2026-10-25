@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
+use Composer\Semver\Constraint\Constraint;
+use Composer\Semver\VersionParser;
 use Lockrot\Security\Holder;
 
 /**
@@ -40,6 +42,20 @@ final class CheckOutcome
         return $this->holds;
     }
 
+    /**
+     * A copy without the root requirements on the moved package that admit $version, Composer's
+     * steps on the way to the hold that refuses the move. When no other hold is left, the copy keeps
+     * them: Composer then names only the root requirement.
+     */
+    public function withoutAdmitting(string $version): self
+    {
+        $holds = array_values(array_filter($this->holds, static fn (Holder $hold): bool => !self::admits($hold, $version)));
+        $clone = clone $this;
+        $clone->holds = $holds === [] ? $this->holds : $holds;
+
+        return $clone;
+    }
+
     /** The version of the moved package that a resolved move installs, null otherwise. */
     public function installs(): ?string
     {
@@ -49,5 +65,21 @@ final class CheckOutcome
     public function problem(): ?string
     {
         return $this->problem;
+    }
+
+    private static function admits(Holder $hold, string $version): bool
+    {
+        if ($hold->source() !== Holder::ROOT) {
+            return false;
+        }
+        if ($hold->target() !== null || !\in_array($hold->link(), [Holder::REQUIRE, Holder::REQUIRE_DEV], true)) {
+            return false;
+        }
+        $parser = new VersionParser();
+        try {
+            return $parser->parseConstraints($hold->constraint())->matches(new Constraint('==', $parser->normalize($version)));
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
     }
 }

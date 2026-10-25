@@ -23,6 +23,7 @@ use Lockrot\Solver\PoolAdvisories;
 use Lockrot\Solver\SolverChecker;
 use Lockrot\Solver\VersionSource;
 use Lockrot\Tests\Support\ArrayVersionSource;
+use Lockrot\Verdict\MoveChecks;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -73,7 +74,7 @@ final class SolverCheckerTest extends TestCase
         self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'symfony/http-kernel', 'constraint' => '^4.4.51'], self::rows($outcome->holds()));
     }
 
-    /** monica's laravel/framework: the root's `^12.0` admits v12.69.0, so only the release's own requirement holds the move. */
+    /** monica's laravel/framework: the root's `^12.0` admits v12.69.0, so the run's move checks keep only the release's own requirement. */
     public function testARootRequirementThatAdmitsTheMovesReleaseIsNoHold(): void
     {
         $checker = self::checker(
@@ -82,7 +83,7 @@ final class SolverCheckerTest extends TestCase
             ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/gone' => '^1.0']]]]
         );
 
-        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
         self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
         self::assertSame([['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'require', 'target' => 'acme/gone', 'constraint' => '^1.0']], self::rows($outcome->holds()));
@@ -96,7 +97,7 @@ final class SolverCheckerTest extends TestCase
         }
         $checker = self::checker(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0']]]);
 
-        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
         self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '^1.0']], self::rows($outcome->holds()));
     }
@@ -106,7 +107,7 @@ final class SolverCheckerTest extends TestCase
     {
         $checker = self::checkerWith(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]), ['acme/lib' => '>=1.1']);
 
-        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
         self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
         self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'conflict', 'target' => null, 'constraint' => '>=1.1'], self::rows($outcome->holds()));
@@ -117,7 +118,7 @@ final class SolverCheckerTest extends TestCase
     {
         $checker = self::checker(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0']]]);
 
-        $outcome = $checker->check(MoveQuery::require('acme/lib', '^2.0', '2.0.0'));
+        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::require('acme/lib', '^2.0', '2.0.0'));
 
         self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
         self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => null, 'constraint' => '^2.0']], self::rows($outcome->holds()));
@@ -132,7 +133,7 @@ final class SolverCheckerTest extends TestCase
             ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/gone' => '^1.0']]]]
         );
 
-        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
         self::assertContains(['source' => 'package', 'package' => 'acme/user', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^1.0'], self::rows($outcome->holds()));
     }
@@ -146,7 +147,7 @@ final class SolverCheckerTest extends TestCase
             ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]
         );
 
-        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
         self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
         self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '~1.0.0'], self::rows($outcome->holds()));

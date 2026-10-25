@@ -429,7 +429,7 @@ final class PageGoldensTest extends TestCase
                 foreach (array_merge([$lead], JsonPath::arrayAt($lead, ['also'])) as $move) {
                     foreach (JsonPath::arrayAt(JsonPath::decoded($move), ['held_by']) as $hold) {
                         $hold = JsonPath::decoded($hold);
-                        $name = self::textAt($hold, ['source']) === 'root' ? 'your composer.json' : JsonPath::stringAt($hold, ['package']).' '.self::textAt($hold, ['version']).(JsonPath::stringAt($hold, ['package']) === $package ? ', the release this move installs' : '');
+                        $name = self::textAt($hold, ['source']) === 'root' ? 'your composer.json' : JsonPath::stringAt($hold, ['package']).' '.self::textAt($hold, ['version']).(JsonPath::stringAt($hold, ['package']) === $package ? ', its own release' : '');
                         $words[$name][self::linkWords($hold)] = JsonPath::stringAt($hold, ['link']).(self::textAt($hold, ['target']) === null ? '' : ', a target');
                     }
                 }

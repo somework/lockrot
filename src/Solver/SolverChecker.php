@@ -246,29 +246,8 @@ final class SolverChecker implements MoveChecker
         $target = $this->release($query->package(), $query->version());
         $scanned = $target === null ? [] : $this->scan->of($target, (new VersionParser())->normalize($this->platformPhp));
 
-        // Another hold explains the refusal: without one, the root requirement is what Composer names.
-        $holds = array_filter($last->holds(), static fn (Holder $hold): bool => !self::admits($hold, $query->version()));
-        $holds = $holds === [] ? $last->holds() : $holds;
-
         // A move publishes its holds, never Composer's problem text, which is costly to render.
-        return new CheckOutcome(MoveCheck::refused(), Holder::distinct(array_merge($holds, $scanned)));
-    }
-
-    /** Whether the hold is the root's requirement on the moved package and admits its release: Composer names it on the way to the hold that refuses the move. */
-    private static function admits(Holder $hold, string $version): bool
-    {
-        if ($hold->source() !== Holder::ROOT) {
-            return false;
-        }
-        if ($hold->target() !== null || !\in_array($hold->link(), [Holder::REQUIRE, Holder::REQUIRE_DEV], true)) {
-            return false;
-        }
-        $parser = new VersionParser();
-        try {
-            return $parser->parseConstraints($hold->constraint())->matches(new Constraint('==', $parser->normalize($version)));
-        } catch (\UnexpectedValueException $e) {
-            return false;
-        }
+        return new CheckOutcome(MoveCheck::refused(), Holder::distinct(array_merge($last->holds(), $scanned)));
     }
 
     /** Whether Composer failed on the solve: the first failure of the run is kept for its run note. */

@@ -73,7 +73,7 @@ final class MoveChecks
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::PASS_CAP));
         }
         if (!isset($this->asked[$key])) {
-            $this->asked[$key] = [$query, $this->checker->check($query)];
+            $this->asked[$key] = [$query, $this->checker->check($query)->withoutAdmitting($query->version())];
         }
 
         return $this->asked[$key][1];
