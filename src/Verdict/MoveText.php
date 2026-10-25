@@ -178,10 +178,10 @@ final class MoveText
         $ownLine = $move->toBranch() !== null && $move->crossesMajor() === false && self::isBranchAlias($subject->version());
         $word = $ownLine ? 'the newest on its own line' : 'the newest';
         if ($subject->isDirect()) {
-            $text = 'require a tag — '.$word.' is '.$version;
+            $text = self::raise($move).'require a tag — '.$word.' is '.$version;
         } else {
             $via = self::dependents($subject->dependents());
-            $text = 'move it to a tag — '.$word.' is '.$version.($via === '' ? '' : ', through '.$via);
+            $text = self::raise($move).'move it to a tag — '.$word.' is '.$version.($via === '' ? '' : ', through '.$via);
         }
         $released = $latest === null ? null : $latest->released();
         $text .= $released === null ? '' : ' ('.substr($released, 0, 10).')';

@@ -463,11 +463,12 @@ final class ReferenceText
         $latest = Fields::object($move, 'latest');
         // A tag move's crosses_major is false only on a branch-alias snapshot that stays on its line.
         $word = ($move['to_branch'] ?? null) !== null && ($move['crosses_major'] ?? null) === false ? 'the newest on its own line' : 'the newest';
+        $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';
         if (Fields::bool($in, 'direct')) {
-            $text = 'require a tag — '.$word.' is '.Fields::string($latest, 'version');
+            $text = $raise.'require a tag — '.$word.' is '.Fields::string($latest, 'version');
         } else {
             $through = self::dependents($in);
-            $text = 'move it to a tag — '.$word.' is '.Fields::string($latest, 'version').($through === '' ? '' : ', through '.$through);
+            $text = $raise.'move it to a tag — '.$word.' is '.Fields::string($latest, 'version').($through === '' ? '' : ', through '.$through);
         }
         if (\is_string($latest['released'] ?? null)) {
             $text .= ' ('.substr($latest['released'], 0, 10).')';

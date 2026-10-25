@@ -24,6 +24,7 @@ use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\RecordedMoveChecker;
 use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\Latest;
 use Lockrot\Verdict\Move;
 use Lockrot\Verdict\MoveBuilder;
 use Lockrot\Verdict\MoveChecks;
@@ -165,6 +166,26 @@ final class MoveBuilderTest extends TestCase
         self::assertSame(MoveCheck::RESOLVES, $check->result(), 'the query sends the raise');
         self::assertSame([['composer', 'require', 'php:>=8.1', '--no-update'], ['composer', 'update', 'a/b:^2.1.0']], $move->commands());
         self::assertStringStartsWith('raise require.php to >=8.1, then composer update \'a/b:^2.1.0\' (gets 2.5.0)', $move->text());
+    }
+
+    /** The tag needs a higher PHP than require.php admits: as on every kind, the raise comes first. */
+    public function testATagMoveWhoseTagNeedsAHigherPhpRaisesItFirst(): void
+    {
+        $facts = self::factsOf([['2.0.0', '2026-01-01', '>=8.1']]);
+        $floor = new PhpFloor('8.4', '>=7.4');
+        $row = BranchRow::all($facts, $floor, Clock::fixed(self::NOW))[0];
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
+        $context = (new MoveContext($finding, new MoveSubject('a/b', '1.x-dev', true, [], '8.4', '7.4.0'), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true))
+            ->withChecks(new MoveChecks(new RecordedMoveChecker(['require a/b ^2.0.0 >=8.1' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], []), true));
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::TAG, FlagSet::PINNED)->withLatest(new Latest('2.0.0', '2026-01-01T00:00:00+00:00', false, 'newer', null), $row), [], null, $context);
+        $check = $move->check();
+
+        self::assertNotNull($check);
+        self::assertSame(MoveCheck::RESOLVES, $check->result(), 'the query sends the raise');
+        self::assertSame([['composer', 'require', 'php:>=8.1', '--no-update'], ['composer', 'require', 'a/b:^2.0.0']], $move->commands());
+        self::assertStringStartsWith('raise require.php to >=8.1, then require a tag — the newest is 2.0.0', $move->text());
     }
 
     /** 2.0.0, the release that the move takes, needs PHP 8.2, which the target 8.1 does not run: a later release on the branch does not move that PHP. */

@@ -612,7 +612,7 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
   that Composer installs at the top of the constraint. A `blocked` move reads the release that
   keeps it off the target. When your `require.php` does not admit that PHP, the line starts with
   "raise require.php to …", and `commands[]` starts with `composer require php:<version>
-  --no-update`, for an `update` move too.
+  --no-update`, on every kind, `update` and `tag` included.
 
 - **What it clears.** `next_step.clears[]` names only what lockrot checked for every version the
   constraint admits. `unverified[]` names what it could not check, and `leaves[]` what the move

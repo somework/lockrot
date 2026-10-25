@@ -154,7 +154,7 @@ final class MoveBuilder
 
                 return $subject->isDirect() ? MoveQuery::require($subject->package(), $constraint, $version, $php) : MoveQuery::update($subject->package(), $constraint, $version, $php);
             case Move::TAG:
-                return $subject->isDirect() ? MoveQuery::require($subject->package(), $caret, $version) : MoveQuery::update($subject->package(), $caret, $version);
+                return $subject->isDirect() ? MoveQuery::require($subject->package(), $caret, $version, $php) : MoveQuery::update($subject->package(), $caret, $version, $php);
             default:
                 return null;
         }
@@ -398,7 +398,7 @@ final class MoveBuilder
 
                 return $commands;
             case Move::TAG:
-                return $latest === null ? [] : self::packageStep($subject, '^'.ltrim($latest->version(), 'vV'), $option, $check, $checks);
+                return $latest === null ? [] : array_merge($raise, self::packageStep($subject, '^'.ltrim($latest->version(), 'vV'), $option, $check, $checks));
             default:
                 return [];
         }
