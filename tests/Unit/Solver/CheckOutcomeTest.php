@@ -45,6 +45,17 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([$other, $package], $outcome->holds());
     }
 
+    public function testAJointSolveThatInstallsAReleaseOutsideTheConstraintKeepsTheFirstRefusal(): void
+    {
+        $first = new Holder(Holder::PACKAGE, 'acme/holder', '1.0.0', Holder::REQUIRE, '^1.0');
+        $outcome = new CheckOutcome(MoveCheck::refused(), [$first]);
+        $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '1.9.0')))->withChanges(['acme/lib' => '1.9.0', 'acme/holder' => '2.0.0']);
+
+        $joined = $outcome->joinedWith($joint, 'acme/lib', '^2.0', ['acme/holder']);
+
+        self::assertSame([true, [$first], []], [$joined->check()->isRefused(), $joined->holds(), $joined->movesWith()]);
+    }
+
     public function testTheCopyLeavesTheOutcomeItComesFromAsItWas(): void
     {
         $root = new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.0');
