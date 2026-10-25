@@ -18,8 +18,8 @@ final class ReferenceText
     /** The inputs of each string, as paths of `x-rendered-from`. A string outside the JSON names its own list. */
     public const INPUTS = [
         'score.text' => ['score.terms', 'score.modifiers', 'score.accepted', 'score.exact', 'score.total', 'score.rounded_down'],
-        'next_step.text' => ['next_step', 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest'],
-        'also.text' => ['next_step.also[]', 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest'],
+        'next_step.text' => ['next_step', 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override'],
+        'also.text' => ['next_step.also[]', 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override'],
         'gate.text' => ['gate', 'run.fail_on', 'run.fail_on_source', 'run.gates', 'run.mode', 'run.target_php', 'run.target_php_source'],
         'evidence' => ['flags[].id', 'flags[].summary', 'score.terms[].flag'],
         'gate_line' => ['gate.basis', 'score.total'],
@@ -66,7 +66,12 @@ final class ReferenceText
         if (\in_array($kind, array_merge(self::ROW_KINDS, ['tag']), true)) {
             $text .= self::leaves($move).self::unverified($move);
         }
-        $holders = array_map([self::class, 'holder'], Fields::objects($move, 'held_by'));
+        $package = Fields::string($in, 'package');
+        $holds = Fields::objects($move, 'held_by');
+        // The root holds, then the holds of the package's own release, then the rest (§5.6, ruling L3).
+        $group = static fn ($hold): int => Fields::string($hold, 'source') === 'root' ? 0 : (($hold['package'] ?? null) === $package ? 1 : 2);
+        $ordered = array_merge(...array_map(static fn (int $rank): array => array_values(array_filter($holds, static fn ($hold): bool => $group($hold) === $rank)), [0, 1, 2]));
+        $holders = array_map(static fn ($hold): string => self::holder($hold, $package), $ordered);
         if ($holders !== []) {
             $text .= '; held by '.implode(' and ', $holders);
         }
@@ -79,7 +84,26 @@ final class ReferenceText
             $text .= '; '.$through;
         }
 
-        return $text.self::checked(Fields::nullableObject($move, 'check'));
+        return self::platformStep($move, $in).$text.self::checked(Fields::nullableObject($move, 'check'));
+    }
+
+    /**
+     * A move with commands under a `platform_override` outside the minor of `run.target_php` (§5.6, ruling L5).
+     *
+     * @param array<mixed, mixed> $move
+     * @param array<mixed, mixed> $in
+     */
+    private static function platformStep(array $move, array $in): string
+    {
+        $run = Fields::object($in, 'run');
+        $window = \is_array($run['php_window'] ?? null) ? $run['php_window'] : [];
+        $override = \is_string($window['platform_override'] ?? null) ? $window['platform_override'] : null;
+        $target = \is_string($run['target_php'] ?? null) ? $run['target_php'] : null;
+        if (Fields::objects($move, 'commands') === [] || $override === null || $target === null || $override === $target || strpos($override, $target.'.') === 0) {
+            return '';
+        }
+
+        return 'First set config.platform.php to your PHP '.$target.' release: the lock records '.$override.'. ';
     }
 
     /** @param array<mixed, mixed>|null $check */
@@ -539,7 +563,7 @@ final class ReferenceText
     }
 
     /** @param array<mixed, mixed> $holder */
-    private static function holder(array $holder): string
+    private static function holder(array $holder, string $package): string
     {
         $constraint = \is_string($holder['constraint'] ?? null) ? $holder['constraint'] : null;
         $target = \is_string($holder['target'] ?? null) ? $holder['target'].' ' : '';
@@ -550,6 +574,9 @@ final class ReferenceText
         }
         if (Fields::string($holder, 'source') === 'root') {
             return 'composer.json'.($constraint === null ? '' : ' ('.$link.')');
+        }
+        if (Fields::string($holder, 'package') === $package) {
+            return $package.' '.Fields::string($holder, 'version').', the release this move installs'.($constraint === null ? '' : ' ('.$link.')');
         }
         $bits = $constraint === null ? [] : [$link];
         $finding = Fields::nullableObject($holder, 'holder');

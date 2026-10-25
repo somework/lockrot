@@ -4529,7 +4529,8 @@
             "direct",
             "direct_dependents",
             "run.target_php",
-            "run.project_php_lowest"
+            "run.project_php_lowest",
+            "run.php_window.platform_override"
           ],
           "minLength": 1
         }
@@ -5707,7 +5708,8 @@
             "direct",
             "direct_dependents",
             "run.target_php",
-            "run.project_php_lowest"
+            "run.project_php_lowest",
+            "run.php_window.platform_override"
           ],
           "minLength": 1
         }

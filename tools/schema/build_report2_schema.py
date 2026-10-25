@@ -521,7 +521,7 @@ def move_props(with_also):
     if with_also:
         p['also'] = arr("The other part's move, the same object without `also` (§5.6 rule 3); empty when the lead move's `clears` and `unverified` hold every fact of that part.", ref('alsoMove'))
     p['text'] = rendered('The `do:` line, `MoveText` (§5.6, §7.11; versioned by `run.text_grammar`); never empty. A renderer that does not know `kind` (or a `no-move` `reason`) prints this string (§7.9).',
-                         [('next_step' if with_also else 'next_step.also[]'), 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest'])
+                         [('next_step' if with_also else 'next_step.also[]'), 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override'])
     p['text']['minLength'] = 1
     return p
 
