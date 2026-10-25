@@ -1392,7 +1392,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+    "text": "require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 (require-dev)); a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "vulnerable",

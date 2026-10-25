@@ -241,7 +241,7 @@ HOLDER_MOVE = obj("The holder's own move, `{kind, to_branch, constraint, check}`
     'check': ref('moveCheck'),
 })
 defs['holder'] = nul(("The holder's own finding in this report, for display only (no score reads it; §5.3): `{verdict, lead, flag_ids[], replacement, next_step}`. "
-                      "Null for the root, and for a holder that is not a finding of this report."),
+                      "Null for the root, for a holder that is not a finding of this report, and for a hold whose `version` is not the holder's locked version."),
     obj("A holder's finding, restated.", {
         'verdict': ref('verdict'),
         'lead': nul("The holder's `lead`.", ref('maintenanceFlag')),
@@ -521,7 +521,7 @@ def move_props(with_also):
     if with_also:
         p['also'] = arr("The other part's move, the same object without `also` (§5.6 rule 3); empty when the lead move's `clears` and `unverified` hold every fact of that part.", ref('alsoMove'))
     p['text'] = rendered('The `do:` line, `MoveText` (§5.6, §7.11; versioned by `run.text_grammar`); never empty. A renderer that does not know `kind` (or a `no-move` `reason`) prints this string (§7.9).',
-                         [('next_step' if with_also else 'next_step.also[]'), 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override'])
+                         [('next_step' if with_also else 'next_step.also[]'), 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'])
     p['text']['minLength'] = 1
     return p
 

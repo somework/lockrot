@@ -104,6 +104,8 @@ final class Holder implements \JsonSerializable
     }
 
     /**
+     * A hold at another version than the locked one takes no finding: the finding grades the locked version.
+     *
      * @param list<self>                   $holders
      * @param array<string, GradedPackage> $findings by package name
      *
@@ -111,7 +113,11 @@ final class Holder implements \JsonSerializable
      */
     public static function filled(array $holders, array $findings): array
     {
-        return array_map(static fn (self $holder): self => $holder->package === null ? $holder : $holder->withFinding($findings[$holder->package] ?? null), $holders);
+        return array_map(static function (self $holder) use ($findings): self {
+            $finding = $holder->package === null ? null : ($findings[$holder->package] ?? null);
+
+            return $holder->withFinding($finding !== null && $finding->version() === $holder->version ? $finding : null);
+        }, $holders);
     }
 
     /**

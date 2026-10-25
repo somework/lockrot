@@ -23,10 +23,15 @@ declare(strict_types=1);
 // locked names that it lists and its advisory answer. It reuses an envelope on disk only when its recorded `status` is not 0: status
 // 0 is a transport failure (a timeout or a DNS error), so the script fetches that answer again.
 // It records a GitLab answer only with the status 200 or 404, and it stops on a 429.
+// With --names=<name[~dev],…> and --into, it records only the p2 answers that it lists into <dir>, and appends
+// each name to <dir>/names.json, which Lockrot\Tests\Support\FixtureCliRun::forRecording serves after the cache:
+// a move check asks names that no lock lists, and `~dev` answers. --before=<ISO time> drops every version
+// released after that instant, so the answers describe the moment of the other recordings, and it prints each one.
 require __DIR__.'/../vendor/autoload.php';
 
 use Composer\Factory;
 use Composer\IO\NullIO;
+use Composer\MetadataMinifier\MetadataMinifier;
 use Lockrot\Clock;
 use Lockrot\Composer\ComposerHttpClient;
 use Lockrot\Data\Forge\GitHubApi;
@@ -49,8 +54,14 @@ $root = \dirname(__DIR__);
 $fixtures = [];
 $gitlabDomains = ['gitlab.com'];
 $into = null;
+$names = null;
+$before = null;
 foreach (\array_slice($argv, 1) as $arg) {
-    if (strpos($arg, '--into=') === 0) {
+    if (strpos($arg, '--names=') === 0) {
+        $names = array_values(array_filter(explode(',', substr($arg, \strlen('--names=')))));
+    } elseif (strpos($arg, '--before=') === 0) {
+        $before = new \DateTimeImmutable(substr($arg, \strlen('--before=')));
+    } elseif (strpos($arg, '--into=') === 0) {
         $into = rtrim(substr($arg, \strlen('--into=')), '/');
     } elseif (strpos($arg, '--gitlab-domain=') === 0) {
         $gitlabDomains[] = substr($arg, \strlen('--gitlab-domain='));
@@ -68,7 +79,7 @@ $httpDir = $into ?? $root.'/tests/fixtures/http';
 $p2Dir = $httpDir.'/p2';
 $ghDir = $httpDir.'/github';
 $advisoryDir = $httpDir.'/advisories';
-foreach ([$p2Dir, $ghDir, $advisoryDir] as $dir) {
+foreach ($names === null ? [$p2Dir, $ghDir, $advisoryDir] : [] as $dir) {
     if (!is_dir($dir)) {
         mkdir($dir, 0777, true);
     }
@@ -147,6 +158,60 @@ $recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, 
         fwrite(STDERR, \sprintf("p2 %s%s %d\n", $name, $dev ? '~dev' : '', $result->status()));
     }
 };
+if ($names !== null) {
+    if ($into === null) {
+        fwrite(STDERR, "--names needs --into\n");
+        exit(2);
+    }
+    if (!is_dir($into)) {
+        mkdir($into, 0777, true);
+    }
+    // A minified p2 list repeats only what changed from the version before it: expand it before a version goes.
+    $trimBefore = static function (string $body, string $name) use ($before): array {
+        $json = json_decode($body, true);
+        if (!\is_array($json) || !isset($json['packages'][$name])) {
+            return [$body, []];
+        }
+        $minified = ($json['minified'] ?? null) === 'composer/2.0';
+        $versions = $minified ? MetadataMinifier::expand($json['packages'][$name]) : $json['packages'][$name];
+        $dropped = [];
+        $kept = [];
+        foreach ($versions as $version) {
+            if ($before !== null && isset($version['time']) && new \DateTimeImmutable($version['time']) > $before) {
+                $dropped[] = $name.' '.$version['version'].' ('.$version['time'].')';
+                continue;
+            }
+            $kept[] = array_intersect_key($version, array_flip(KEEP));
+        }
+        $json['packages'][$name] = $minified ? MetadataMinifier::minify($kept) : $kept;
+        unset($json['security-advisories']);
+
+        return [(string) json_encode($json, \JSON_UNESCAPED_SLASHES), $dropped];
+    };
+    $listed = is_file($into.'/names.json') ? json_decode((string) file_get_contents($into.'/names.json'), true) : [];
+    $listed = \is_array($listed) ? $listed : [];
+    foreach ($names as $entry) {
+        $name = (string) preg_replace('/~dev$/', '', $entry);
+        $listed[] = $name;
+        $url = REPOSITORY_BASE_URL.$entry.'.json';
+        $path = RecordedHttpClient::pathFor($into, $url);
+        if ($isRecorded($path)) {
+            continue;
+        }
+        $result = $repositoryHttp->fetchAll([$url])[$url];
+        [$body, $dropped] = $result->body() === null ? [null, []] : $trimBefore($result->body(), $name);
+        file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
+        fwrite(STDERR, \sprintf("p2 %s %d\n", $entry, $result->status()));
+        foreach ($dropped as $line) {
+            echo 'dropped '.$line."\n";
+        }
+    }
+    $listed = array_values(array_unique($listed));
+    sort($listed);
+    file_put_contents($into.'/names.json', json_encode($listed, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n");
+    echo "recorded into $into\n";
+    exit(0);
+}
 /**
  * @param list<array{string, string}> $answers [p2 URL, recording directory], the first recorded one wins
  *

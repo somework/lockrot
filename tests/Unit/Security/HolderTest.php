@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Security;
 
 use Lockrot\Security\Holder;
+use Lockrot\Verdict\GradedPackage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -74,6 +75,19 @@ final class HolderTest extends TestCase
             [['require', 'acme/y', '^1.0'], ['require', 'acme/z', '^1.0'], ['require', 'acme/z', '^2.0'], ['conflict', 'acme/a', '<2.0']],
             array_map(static fn (Holder $hold): array => [$hold->link(), $hold->target(), $hold->constraint()], $holds)
         );
+    }
+
+    /** wallabag's twig/twig: a hold at v3.28.0 is not the finding of the locked v3.11.3, so it carries none of its grade and flags. */
+    public function testAHoldTakesTheHoldersFindingOnlyAtTheLockedVersion(): void
+    {
+        $twig = new GradedPackage('critical', null, ['vulnerable'], null, null, 'v3.11.3');
+
+        $holds = Holder::filled([
+            new Holder(Holder::PACKAGE, 'twig/twig', 'v3.28.0', Holder::PLATFORM, '>=8.1.0', 'php'),
+            new Holder(Holder::PACKAGE, 'twig/twig', 'v3.11.3', Holder::REQUIRE, '^5.4', 'symfony/polyfill-mbstring'),
+        ], ['twig/twig' => $twig]);
+
+        self::assertSame([null, $twig], [$holds[0]->finding(), $holds[1]->finding()]);
     }
 
     public function testTheTargetIsWrittenBesideTheLink(): void

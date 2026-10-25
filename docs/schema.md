@@ -481,8 +481,8 @@ Dates are RFC 3339 strings (`format: date-time`). S5's `ga_date` and a baseline 
 
 The explanation's `finding` has a report finding's fields. `run` holds the report's `run` keys that
 the explanation reads, `target_php`, `project_php` and `thresholds` among them. Its `php_window`
-holds only `platform_override`, which the move's text reads, and is null when the report has no
-PHP window. `explain-2.json`
+holds only `platform_override` and `target`, which the move's text reads, and is null when the
+report has no PHP window. `explain-2.json`
 types its `lock` and its `metadata`, whose `branches[]` carry the PHP test of each branch and its
 `fixes` ([The PHP test](verdicts.md#the-php-test-in-explain)).
 [Explaining one package](configuration.md#explaining-one-package) says what each shows.

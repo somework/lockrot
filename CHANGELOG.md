@@ -124,10 +124,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--fail-on` and the exit code do not read `next_step`. ([The move](docs/verdicts.md#move))
 - **All formats:** when the lock records a `config.platform.php` outside the minor of the target
   PHP, the line of each move with commands and the `update now:` line first say to set it to a
-  target PHP release.
+  target PHP release. When Composer also refuses the lock itself, that sentence says where the
+  cause is named.
   ([The move](docs/verdicts.md#move))
-- **json:** the `--explain` document writes `run.php_window` with `platform_override` alone, the
-  field that the move's text reads. It is null when the report has no PHP window.
+- **json:** the `--explain` document writes `run.php_window` with `platform_override` and `target`
+  alone, the fields that the move's text reads. It is null when the report has no PHP window.
   ([The explanation](docs/schema.md#the-explanation))
 - **json:** each finding writes its repository activity lookup (`activity`: read, not found, or
   not read and why), `age` (the installed release, the newest release, the newest release of the

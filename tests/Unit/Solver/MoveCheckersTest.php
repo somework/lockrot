@@ -78,6 +78,34 @@ final class MoveCheckersTest extends TestCase
         self::assertNull(MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), new Config(false), [], '8.4', false, Deadline::never())->configuredPhp());
     }
 
+    /** laminas at 8.4: lockrot set the php of the solve, so Composer's words about config.platform do not hold. */
+    public function testTheBaselineProblemOmitsTheConfigPlatformClauseWhenLockrotSetThePhp(): void
+    {
+        $checker = MoveCheckers::forProject(self::root(['php' => '~8.1.0']), LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), new Config(false), [], '8.4', false, Deadline::never());
+
+        $problem = (string) $checker->baseline()->problem();
+
+        self::assertStringContainsString('your php version (8.4.99) does not satisfy', $problem);
+    }
+
+    /** Composer gives php-64bit the version of the php override, with the same words. */
+    public function testTheBaselineProblemOmitsTheConfigPlatformClauseOfAPackageThatTheSetPhpOverrides(): void
+    {
+        $checker = MoveCheckers::forProject(self::root(['php-64bit' => '~8.1.0']), LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), new Config(false), [], '8.4', false, Deadline::never());
+
+        self::assertStringContainsString('your php-64bit version (8.4.99) does not satisfy', (string) $checker->baseline()->problem());
+    }
+
+    public function testTheBaselineProblemKeepsTheConfigPlatformClauseOfTheProjectsOwnPhp(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['platform' => ['php' => '8.4.3']]]);
+
+        $checker = MoveCheckers::forProject(self::root(['php' => '~8.1.0']), LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
+
+        self::assertStringContainsString('your php version (8.4.3; overridden via config.platform) does not satisfy', (string) $checker->baseline()->problem());
+    }
+
     /** A locked package without a Composer repository's notification-url keeps its locked version only, in packages-dev too. */
     public function testTheProjectsMoveCheckChecksNoMoveOfALockedPackageThatNoComposerRepositoryServes(): void
     {
@@ -185,9 +213,10 @@ final class MoveCheckersTest extends TestCase
         self::assertSame([MoveCheck::RESOLVES, MoveCheck::WITH_ALL_DEPENDENCIES], [$check->result(), $check->form()]);
     }
 
-    private static function root(): RootPackageInterface
+    /** @param array<string, string> $requires */
+    private static function root(array $requires = ['acme/lib' => '^1.0']): RootPackageInterface
     {
-        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']], RootPackage::class);
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => $requires], RootPackage::class);
         self::assertInstanceOf(RootPackageInterface::class, $root);
 
         return $root;

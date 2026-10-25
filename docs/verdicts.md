@@ -632,7 +632,9 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
   of the target PHP, Composer solves the commands of a move at that PHP, not at the target. The
   line of each move with commands then starts with "First set config.platform.php to your PHP
   <target> release: the lock records <version>." So does the `update now:` line. The commands
-  stay the same.
+  stay the same. When `run.move_check.baseline` is `refused`, the sentence goes on with "Composer
+  still refuses the lock itself:" and names where the cause is: the `php:` line when the window
+  excludes the target, else the Run tab.
 
 The `update now:` footer line lists every package whose `update` move Composer's solver resolves
 with the constraint inline, with one command for all of them.
@@ -661,9 +663,15 @@ holds. JSON writes the answer as the move's `check`.
     - `replace`: a package that replaces `target`, or the moved package when `target` is null.
       Composer installs only one of the two.
 
-    A hold of the package's own release reads `<package> <version>, the release this move installs`,
-    then its link. It has no verdict, because the verdict of the package is that of the installed
-    release. The text lists it after the holds of composer.json and before the other holds.
+    A hold of the package's own release reads `<package> <version>, its own release`, then its
+    link. A hold names its holder's verdict only at the holder's locked version, because a
+    verdict grades the installed release. A root hold names the composer.json section that lists
+    the package, and a `require-dev` hold ends its link with "(require-dev)". A root requirement
+    that admits the move's release is no hold.
+
+    The text lists the holds of composer.json first, then the package's own releases, then the
+    holds on the package, then the other holds. Within each group, a higher verdict comes first,
+    then the package name decides.
 
 - **A refusal that names no hold.** The release is `blocked`, so the advisory counts as having no
   reachable fix. The text says that Composer names no hold.

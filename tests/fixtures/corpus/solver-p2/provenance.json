@@ -1,0 +1,423 @@
+{
+    "written_by": "bin/record-fixtures --into=tests/fixtures/corpus/solver-p2 --before=2026-10-14T03:28:16+00:00 --names=<name[~dev],...>",
+    "asked_by": "the move checks of the corpus runs of apps/monicahq_monica at --target-php=8.4 and apps/mautic_mautic at --target-php=8.2: each p2 request that tests/fixtures/corpus/cache does not answer, again until only the names of not_recorded are left",
+    "not_recorded": {
+        "psr/http-client-implementation": "a virtual name: Packagist answers 404",
+        "psr/http-factory-implementation": "a virtual name: Packagist answers 404",
+        "maxmind-ws/web-service-common": "Packagist answers 404"
+    },
+    "before": "2026-10-14T03:28:16+00:00",
+    "before_is": "the newest fetched_at of tests/fixtures/corpus/cache",
+    "dropped": [
+        {
+            "name": "composer/ca-bundle",
+            "version": "1.4.x-dev",
+            "time": "2026-10-20T20:14:07+00:00"
+        },
+        {
+            "name": "composer/ca-bundle",
+            "version": "dev-main",
+            "time": "2026-10-20T20:14:05+00:00"
+        },
+        {
+            "name": "ezyang/htmlpurifier",
+            "version": "dev-master",
+            "time": "2026-10-19T02:50:31+00:00"
+        },
+        {
+            "name": "geoip2/geoip2",
+            "version": "dev-main",
+            "time": "2026-10-19T22:55:47+00:00"
+        },
+        {
+            "name": "guzzlehttp/psr7",
+            "version": "2.13.x-dev",
+            "time": "2026-10-17T23:49:46+00:00"
+        },
+        {
+            "name": "guzzlehttp/psr7",
+            "version": "3.1.x-dev",
+            "time": "2026-10-17T23:49:14+00:00"
+        },
+        {
+            "name": "guzzlehttp/psr7",
+            "version": "3.2.x-dev",
+            "time": "2026-10-17T23:57:19+00:00"
+        },
+        {
+            "name": "guzzlehttp/psr7",
+            "version": "3.3.x-dev",
+            "time": "2026-10-18T16:10:41+00:00"
+        },
+        {
+            "name": "guzzlehttp/psr7",
+            "version": "dev-uri-redactor-3.3",
+            "time": "2026-10-18T16:19:33+00:00"
+        },
+        {
+            "name": "illuminate/auth",
+            "version": "13.x-dev",
+            "time": "2026-10-22T00:28:51+00:00"
+        },
+        {
+            "name": "illuminate/auth",
+            "version": "v13.38.0",
+            "time": "2026-10-19T14:11:57+00:00"
+        },
+        {
+            "name": "illuminate/broadcasting",
+            "version": "13.x-dev",
+            "time": "2026-10-19T14:34:54+00:00"
+        },
+        {
+            "name": "illuminate/broadcasting",
+            "version": "v13.38.0",
+            "time": "2026-10-19T14:34:54+00:00"
+        },
+        {
+            "name": "illuminate/bus",
+            "version": "13.x-dev",
+            "time": "2026-10-19T14:13:59+00:00"
+        },
+        {
+            "name": "illuminate/bus",
+            "version": "v13.38.0",
+            "time": "2026-10-19T14:13:59+00:00"
+        },
+        {
+            "name": "illuminate/cache",
+            "version": "13.x-dev",
+            "time": "2026-10-21T11:34:12+00:00"
+        },
+        {
+            "name": "illuminate/cache",
+            "version": "v13.37.0",
+            "time": "2026-10-15T14:31:37+00:00"
+        },
+        {
+            "name": "illuminate/cache",
+            "version": "v13.38.0",
+            "time": "2026-10-19T14:11:57+00:00"
+        },
+        {
+            "name": "illuminate/collections",
+            "version": "13.x-dev",
+            "time": "2026-10-21T11:30:00+00:00"
+        },
+        {
+            "name": "illuminate/collections",
+            "version": "v13.38.0",
+            "time": "2026-10-19T14:11:57+00:00"
+        },
+        {
+            "name": "illuminate/console",
+            "version": "13.x-dev",
+            "time": "2026-10-21T11:30:00+00:00"
+        },
+        {
+            "name": "illuminate/console",
+            "version": "v13.37.0",
+            "time": "2026-10-14T14:29:35+00:00"
+        },
+        {
+            "name": "illuminate/console",
+            "version": "v13.38.0",
+            "time": "2026-10-18T14:47:00+00:00"
+        },
+        {
+            "name": "illuminate/container",
+            "version": "13.x-dev",
+            "time": "2026-10-20T10:26:12+00:00"
+        },
+        {
+            "name": "illuminate/contracts",
+            "version": "13.x-dev",
+            "time": "2026-10-22T00:28:51+00:00"
+        },
+        {
+            "name": "illuminate/database",
+            "version": "13.x-dev",
+            "time": "2026-10-24T14:36:09+00:00"
+        },
+        {
+            "name": "illuminate/database",
+            "version": "v13.37.0",
+            "time": "2026-10-15T18:35:02+00:00"
+        },
+        {
+            "name": "illuminate/database",
+            "version": "v13.38.0",
+            "time": "2026-10-19T14:22:29+00:00"
+        },
+        {
+            "name": "illuminate/events",
+            "version": "13.x-dev",
+            "time": "2026-10-20T10:26:12+00:00"
+        },
+        {
+            "name": "illuminate/events",
+            "version": "v13.37.0",
+            "time": "2026-10-15T21:32:04+00:00"
+        },
+        {
+            "name": "illuminate/events",
+            "version": "v13.38.0",
+            "time": "2026-10-16T19:10:56+00:00"
+        },
+        {
+            "name": "illuminate/filesystem",
+            "version": "13.x-dev",
+            "time": "2026-10-24T14:31:05+00:00"
+        },
+        {
+            "name": "illuminate/filesystem",
+            "version": "v13.37.0",
+            "time": "2026-10-14T15:45:27+00:00"
+        },
+        {
+            "name": "illuminate/filesystem",
+            "version": "v13.38.0",
+            "time": "2026-10-14T15:45:27+00:00"
+        },
+        {
+            "name": "illuminate/http",
+            "version": "13.x-dev",
+            "time": "2026-10-22T21:43:56+00:00"
+        },
+        {
+            "name": "illuminate/http",
+            "version": "v13.37.0",
+            "time": "2026-10-15T14:24:56+00:00"
+        },
+        {
+            "name": "illuminate/http",
+            "version": "v13.38.0",
+            "time": "2026-10-15T14:24:56+00:00"
+        },
+        {
+            "name": "illuminate/mail",
+            "version": "12.x-dev",
+            "time": "2026-10-15T03:30:23+00:00"
+        },
+        {
+            "name": "illuminate/mail",
+            "version": "13.x-dev",
+            "time": "2026-10-21T11:30:00+00:00"
+        },
+        {
+            "name": "illuminate/mail",
+            "version": "v12.70.1",
+            "time": "2026-10-15T03:30:23+00:00"
+        },
+        {
+            "name": "illuminate/mail",
+            "version": "v13.38.0",
+            "time": "2026-10-16T19:10:56+00:00"
+        },
+        {
+            "name": "illuminate/notifications",
+            "version": "13.x-dev",
+            "time": "2026-10-24T14:33:06+00:00"
+        },
+        {
+            "name": "illuminate/notifications",
+            "version": "v13.38.0",
+            "time": "2026-10-17T21:36:18+00:00"
+        },
+        {
+            "name": "illuminate/pagination",
+            "version": "13.x-dev",
+            "time": "2026-10-21T17:00:28+00:00"
+        },
+        {
+            "name": "illuminate/pipeline",
+            "version": "13.x-dev",
+            "time": "2026-10-21T11:30:00+00:00"
+        },
+        {
+            "name": "illuminate/queue",
+            "version": "13.x-dev",
+            "time": "2026-10-24T14:37:02+00:00"
+        },
+        {
+            "name": "illuminate/queue",
+            "version": "v13.37.0",
+            "time": "2026-10-14T15:46:07+00:00"
+        },
+        {
+            "name": "illuminate/queue",
+            "version": "v13.38.0",
+            "time": "2026-10-19T14:16:40+00:00"
+        },
+        {
+            "name": "illuminate/redis",
+            "version": "13.x-dev",
+            "time": "2026-10-21T11:30:00+00:00"
+        },
+        {
+            "name": "illuminate/redis",
+            "version": "v13.37.0",
+            "time": "2026-10-14T13:52:48+00:00"
+        },
+        {
+            "name": "illuminate/redis",
+            "version": "v13.38.0",
+            "time": "2026-10-14T13:52:48+00:00"
+        },
+        {
+            "name": "illuminate/routing",
+            "version": "13.x-dev",
+            "time": "2026-10-24T14:28:26+00:00"
+        },
+        {
+            "name": "illuminate/session",
+            "version": "13.x-dev",
+            "time": "2026-10-21T12:17:41+00:00"
+        },
+        {
+            "name": "illuminate/support",
+            "version": "11.x-dev",
+            "time": "2026-10-21T12:20:29+00:00"
+        },
+        {
+            "name": "illuminate/support",
+            "version": "12.x-dev",
+            "time": "2026-10-24T14:38:23+00:00"
+        },
+        {
+            "name": "illuminate/support",
+            "version": "13.x-dev",
+            "time": "2026-10-24T14:33:34+00:00"
+        },
+        {
+            "name": "illuminate/support",
+            "version": "v13.37.0",
+            "time": "2026-10-15T03:33:08+00:00"
+        },
+        {
+            "name": "illuminate/support",
+            "version": "v13.38.0",
+            "time": "2026-10-19T14:12:28+00:00"
+        },
+        {
+            "name": "illuminate/translation",
+            "version": "13.x-dev",
+            "time": "2026-10-21T11:30:00+00:00"
+        },
+        {
+            "name": "illuminate/validation",
+            "version": "13.x-dev",
+            "time": "2026-10-24T14:09:24+00:00"
+        },
+        {
+            "name": "illuminate/validation",
+            "version": "v13.37.0",
+            "time": "2026-10-15T14:33:27+00:00"
+        },
+        {
+            "name": "illuminate/validation",
+            "version": "v13.38.0",
+            "time": "2026-10-16T18:52:46+00:00"
+        },
+        {
+            "name": "illuminate/view",
+            "version": "13.x-dev",
+            "time": "2026-10-20T13:42:06+00:00"
+        },
+        {
+            "name": "illuminate/view",
+            "version": "v13.37.0",
+            "time": "2026-10-14T15:44:24+00:00"
+        },
+        {
+            "name": "illuminate/view",
+            "version": "v13.38.0",
+            "time": "2026-10-14T15:44:24+00:00"
+        },
+        {
+            "name": "intervention/image",
+            "version": "dev-develop",
+            "time": "2026-10-25T07:05:17+00:00"
+        },
+        {
+            "name": "intervention/image",
+            "version": "dev-main",
+            "time": "2026-10-17T09:34:51+00:00"
+        },
+        {
+            "name": "lcobucci/clock",
+            "version": "3.7.x-dev",
+            "time": "2026-10-24T17:39:11+00:00"
+        },
+        {
+            "name": "maxmind-db/reader",
+            "version": "dev-main",
+            "time": "2026-10-19T23:10:49+00:00"
+        },
+        {
+            "name": "symfony/contracts",
+            "version": "dev-main",
+            "time": "2026-10-20T17:38:25+00:00"
+        },
+        {
+            "name": "symfony/event-dispatcher",
+            "version": "8.2.x-dev",
+            "time": "2026-10-21T09:23:46+00:00"
+        },
+        {
+            "name": "symfony/finder",
+            "version": "6.4.x-dev",
+            "time": "2026-10-19T12:57:44+00:00"
+        },
+        {
+            "name": "symfony/finder",
+            "version": "7.4.x-dev",
+            "time": "2026-10-19T16:56:54+00:00"
+        },
+        {
+            "name": "symfony/finder",
+            "version": "8.1.x-dev",
+            "time": "2026-10-19T17:00:07+00:00"
+        },
+        {
+            "name": "symfony/finder",
+            "version": "8.2.x-dev",
+            "time": "2026-10-20T07:03:01+00:00"
+        },
+        {
+            "name": "symfony/http-client",
+            "version": "5.4.x-dev",
+            "time": "2026-10-14T13:53:45+00:00"
+        },
+        {
+            "name": "symfony/http-client",
+            "version": "6.4.x-dev",
+            "time": "2026-10-20T19:53:43+00:00"
+        },
+        {
+            "name": "symfony/http-client",
+            "version": "7.4.x-dev",
+            "time": "2026-10-21T21:04:10+00:00"
+        },
+        {
+            "name": "symfony/http-client",
+            "version": "8.1.x-dev",
+            "time": "2026-10-21T21:11:00+00:00"
+        },
+        {
+            "name": "symfony/http-client",
+            "version": "8.2.x-dev",
+            "time": "2026-10-23T06:32:44+00:00"
+        },
+        {
+            "name": "symfony/http-client",
+            "version": "v5.4.54",
+            "time": "2026-10-14T13:53:45+00:00"
+        },
+        {
+            "name": "symfony/service-contracts",
+            "version": "dev-main",
+            "time": "2026-10-20T17:38:25+00:00"
+        }
+    ]
+}

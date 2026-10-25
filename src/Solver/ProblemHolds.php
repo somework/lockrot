@@ -20,7 +20,7 @@ use Lockrot\Security\Holder;
  *
  * | Rule | Hold |
  * |---|---|
- * | root requirement | the root: `require` on a moved name, `platform` on a platform name, else `root-require` |
+ * | root requirement | the root: on a moved name `require`, or `require-dev` when that section holds the constraint and `require` does not; `platform` on a platform name; else `root-require` |
  * | package requirement | the requiring package: `platform` on a platform name, else `require` |
  * | package conflict | the package or the root that declares it: `conflict` |
  * | same name | the package or the root that replaces the name: `replace` |
@@ -39,6 +39,10 @@ final class ProblemHolds
     private array $wanted = [];
     /** The request's own requirement when the pool holds no release of it. */
     private ?Holder $noRelease = null;
+    /** @var array<string, Link> */
+    private array $requires = [];
+    /** @var array<string, Link> */
+    private array $devRequires = [];
 
     /**
      * @param array<string, string> $moved     the names on the allow list: a link to one of them has no target
@@ -47,6 +51,8 @@ final class ProblemHolds
     public static function of(SolverProblemsException $e, Pool $pool, RootPackageInterface $root, array $moved, array $requested = []): self
     {
         $out = new self();
+        $out->requires = $root->getRequires();
+        $out->devRequires = $root->getDevRequires();
         $rootRequires = array_merge($root->getDevRequires(), $root->getRequires());
         foreach ($e->getProblems() as $problem) {
             foreach ($problem->getReasons() as $section) {
@@ -105,7 +111,7 @@ final class ProblemHolds
     private function addRootRequire(Rule $rule, string $name, string $constraint, string $rootName, array $moved, array $requested): void
     {
         if (!isset($requested[$name])) {
-            $this->holds[] = self::rootHold($rootName, $name, $constraint, $moved);
+            $this->holds[] = $this->rootHold($rootName, $name, $constraint, $moved);
         } elseif ($rule->getLiterals() === []) {
             $this->noRelease = new Holder(Holder::ROOT, $rootName, null, Holder::ROOT_REQUIRE, $constraint);
         }
@@ -157,15 +163,30 @@ final class ProblemHolds
         }
     }
 
+    /**
+     * The composer.json section of the constraint that the rule names: `require` when it holds that constraint.
+     *
+     * @return Holder::REQUIRE|Holder::REQUIRE_DEV
+     */
+    private function section(string $name, string $constraint): string
+    {
+        $require = $this->requires[$name] ?? null;
+        if (!isset($this->devRequires[$name]) || ($require !== null && $require->getPrettyConstraint() === $constraint)) {
+            return Holder::REQUIRE;
+        }
+
+        return Holder::REQUIRE_DEV;
+    }
+
     /** @param array<string, string> $moved */
-    private static function rootHold(string $rootName, string $name, string $constraint, array $moved): Holder
+    private function rootHold(string $rootName, string $name, string $constraint, array $moved): Holder
     {
         if (PlatformRepository::isPlatformPackage($name)) {
             return new Holder(Holder::ROOT, $rootName, null, Holder::PLATFORM, $constraint, $name);
         }
 
         return \in_array($name, $moved, true)
-            ? new Holder(Holder::ROOT, $rootName, null, Holder::REQUIRE, $constraint)
+            ? new Holder(Holder::ROOT, $rootName, null, $this->section($name, $constraint), $constraint)
             : new Holder(Holder::ROOT, $rootName, null, Holder::ROOT_REQUIRE, $constraint, $name);
     }
 }

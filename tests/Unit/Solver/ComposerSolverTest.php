@@ -64,7 +64,34 @@ final class ComposerSolverTest extends TestCase
 
         $solution = $solver->solve(SolveRequest::update(['acme/dev' => '^2.0']));
 
-        self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '^1.0']], self::rows($solution->holds()));
+        self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require-dev', 'target' => null, 'constraint' => '^1.0']], self::rows($solution->holds()));
+    }
+
+    /**
+     * @return iterable<string, array{string, string, string, string}> the constraints of require and require-dev, the constraint of the hold and its section
+     */
+    public static function bothSections(): iterable
+    {
+        yield 'the same constraint' => ['^1.0', '^1.0', '^1.0', 'require'];
+        yield 'a narrower require-dev' => ['^1.0', '^1.5', '^1.5', 'require-dev'];
+    }
+
+    /**
+     * The hold names the section whose constraint the solve read.
+     *
+     * @dataProvider bothSections
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('bothSections')]
+    public function testAnUpdatePastAConstraintInRequireAndRequireDevNamesTheSectionOfTheSolvedConstraint(string $require, string $dev, string $held, string $section): void
+    {
+        if (!ComposerFeatures::hasTemporaryConstraints()) {
+            self::markTestSkipped('Composer 2.2 and 2.3 join the inline constraint to the root requirement: that requirement is the request');
+        }
+        $solver = self::solver(['require' => ['acme/lib' => $require], 'require-dev' => ['acme/lib' => $dev]], [['name' => 'acme/lib', 'version' => '1.5.0']], ['acme/lib' => [['version' => '1.5.0'], ['version' => '2.0.0']]]);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^2.0']));
+
+        self::assertSame([[$section, $held]], array_map(static fn (array $row): array => [$row['link'], $row['constraint']], self::rows($solution->holds())));
     }
 
     /**
@@ -144,6 +171,16 @@ final class ComposerSolverTest extends TestCase
 
         self::assertStringStartsWith('Problem 1', $problem);
         self::assertStringContainsString('acme/a[1.1.0, ..., 1.4.0]', $problem);
+    }
+
+    public function testTheCopyThatDropsTheConfigPlatformWordsLeavesTheSolverItComesFromAsItWas(): void
+    {
+        $solver = self::solver(['require' => ['php' => '~8.1.0']], [], []);
+
+        $copy = $solver->withPhpSetByLockrot();
+
+        self::assertStringContainsString('(8.4.99; overridden via config.platform)', (string) $solver->solve(SolveRequest::baseline())->problem());
+        self::assertStringContainsString('your php version (8.4.99) does not satisfy', (string) $copy->solve(SolveRequest::baseline())->problem());
     }
 
     /** The forms of a move of a package with no dependency build one pool, and the solves after them build their own. */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support\Contract;
 
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreLineFromJson;
 use Lockrot\Verdict\ShellCommand;
 
@@ -18,8 +19,8 @@ final class ReferenceText
     /** The inputs of each string, as paths of `x-rendered-from`. A string outside the JSON names its own list. */
     public const INPUTS = [
         'score.text' => ['score.terms', 'score.modifiers', 'score.accepted', 'score.exact', 'score.total', 'score.rounded_down'],
-        'next_step.text' => ['next_step', 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override'],
-        'also.text' => ['next_step.also[]', 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override'],
+        'next_step.text' => ['next_step', 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
+        'also.text' => ['next_step.also[]', 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
         'gate.text' => ['gate', 'run.fail_on', 'run.fail_on_source', 'run.gates', 'run.mode', 'run.target_php', 'run.target_php_source'],
         'evidence' => ['flags[].id', 'flags[].summary', 'score.terms[].flag'],
         'gate_line' => ['gate.basis', 'score.total'],
@@ -68,9 +69,18 @@ final class ReferenceText
         }
         $package = Fields::string($in, 'package');
         $holds = Fields::objects($move, 'held_by');
-        // The root holds, then the holds of the package's own release, then the rest (§5.6).
-        $group = static fn (array $hold): int => Fields::string($hold, 'source') === 'root' ? 0 : (($hold['package'] ?? null) === $package ? 1 : 2);
-        $ordered = array_merge(...array_map(static fn (int $rank): array => array_values(array_filter($holds, static fn ($hold): bool => $group($hold) === $rank)), [0, 1, 2]));
+        // The root holds, then the own releases, then the holds on the package, then the rest. Within a group: by grade, then by name (§5.6).
+        $rank = static function (array $hold, int $index) use ($package): array {
+            $on = $hold['target'] ?? null;
+            $group = Fields::string($hold, 'source') === 'root' ? 0 : (($hold['package'] ?? null) === $package ? 1 : ($on === null || $on === $package ? 2 : 3));
+            $finding = Fields::nullableObject($hold, 'holder');
+            $grade = $finding === null ? false : array_search(Fields::string($finding, 'verdict'), self::GRADES, true);
+
+            return [$group, $grade === false ? \count(self::GRADES) : $grade, \is_string($hold['package'] ?? null) ? $hold['package'] : '', $index];
+        };
+        $keys = array_map($rank, $holds, array_keys($holds));
+        $ordered = $holds;
+        array_multisort($keys, $ordered);
         $holders = array_map(static fn ($hold): string => self::holder($hold, $package), $ordered);
         if ($holders !== []) {
             $text .= '; held by '.implode(' and ', $holders);
@@ -103,7 +113,10 @@ final class ReferenceText
             return '';
         }
 
-        return 'First set config.platform.php to your PHP '.$target.' release: the lock records '.$override.'. ';
+        $check = \is_array($run['move_check'] ?? null) ? $run['move_check'] : [];
+        $refused = ($check['baseline'] ?? null) === 'refused' ? ' Composer still refuses the lock itself: '.(JsonPath::has($window, ['target', 'inside']) && JsonPath::boolAt($window, ['target', 'inside']) === false ? 'the PHP line names the packages.' : 'the Run tab names the cause.') : '';
+
+        return 'First set config.platform.php to your PHP '.$target.' release: the lock records '.$override.'.'.$refused.' ';
     }
 
     /** @param array<mixed, mixed>|null $check */
@@ -571,7 +584,7 @@ final class ReferenceText
         $constraint = \is_string($holder['constraint'] ?? null) ? $holder['constraint'] : null;
         $target = \is_string($holder['target'] ?? null) ? $holder['target'].' ' : '';
         $kind = Fields::string($holder, 'link');
-        $link = (['conflict' => 'conflicts with ', 'replace' => 'replaces '][$kind] ?? 'requires ').$target.$constraint;
+        $link = (['conflict' => 'conflicts with ', 'replace' => 'replaces '][$kind] ?? 'requires ').$target.$constraint.($kind === 'require-dev' ? ' (require-dev)' : '');
         if ($target === '' && \in_array($kind, ['root-require', 'replace'], true)) {
             $link = $kind === 'replace' ? 'replaces it' : 'no release of '.$constraint.' can install';
         }
@@ -579,7 +592,7 @@ final class ReferenceText
             return 'composer.json'.($constraint === null ? '' : ' ('.$link.')');
         }
         if (Fields::string($holder, 'package') === $package) {
-            return $package.' '.Fields::string($holder, 'version').', the release this move installs'.($constraint === null ? '' : ' ('.$link.')');
+            return $package.' '.Fields::string($holder, 'version').', its own release'.($constraint === null ? '' : ' ('.$link.')');
         }
         $bits = $constraint === null ? [] : [$link];
         $finding = Fields::nullableObject($holder, 'holder');

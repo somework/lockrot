@@ -506,8 +506,8 @@ final class ExplanationTest extends TestCase
         self::assertSame(['3.x' => null, '2.x' => FindingDetails::branchFixes($two, null), '1.x' => FindingDetails::branchFixes($one, null)], array_column($branches, 'fixes', 'branch'));
     }
 
-    /** next_step.text reads the lock's platform PHP, so explain-2 carries it beside the move (SPEC §5.9). */
-    public function testTheRunCarriesThePlatformPhpOfTheLockAndNothingElseOfTheWindow(): void
+    /** next_step.text reads the lock's platform PHP and whether the window admits the target, so explain-2 carries both beside the move (SPEC §5.6, §5.9). */
+    public function testTheRunCarriesThePlatformPhpAndTheTargetOfTheWindowAndNothingElse(): void
     {
         $finding = $this->finding('1.0.0', Verdict::STALE);
         $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => [], 'platform-overrides' => ['php' => '7.4.29']]), ProjectConfig::empty(), '8.4', PhpReleaseDates::load()->minors(Clock::fixed(F::NOW)));
@@ -515,7 +515,8 @@ final class ExplanationTest extends TestCase
 
         $array = (new Explanation($finding, F::facts(F::package()), new Thresholds(), '8.4', $report))->toArray();
 
-        self::assertSame(['platform_override' => '7.4.29'], JsonPath::arrayAt($array, ['run', 'php_window']));
+        self::assertNotNull($window);
+        self::assertSame(['platform_override' => '7.4.29', 'target' => JsonPath::arrayAt(JsonPath::decoded($window->toArray()), ['target'])], JsonPath::arrayAt($array, ['run', 'php_window']));
     }
 
     /**

@@ -482,7 +482,7 @@ score     48 = old-promise 16 + vulnerable 32 [critical advisory]     critical f
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned) and symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
+do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38) and symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears PKSA-h8hf-ytnd-5t9q, PKSA-8zx5-v2nz-58pb, PKSA-dpx1-78wg-1kqs, PKSA-n7sg-8f52-pqtf, PKSA-1tmc-rt7x-12w6, PKSA-3mcc-k66d-pydb, PKSA-6319-ffpf-gx66, PKSA-fbvq-z33h-r2np, PKSA-xx6c-6d96-db2w, PKSA-kvv6-36cr-fkzb, PKSA-yd6k-t2gh-1m43, PKSA-2wrf-1xmk-1pky, PKSA-g9zw-qxh8-pq8w, PKSA-n14z-jjjg-g8vd, PKSA-sjvz-tbbr-vwth, PKSA-yhcn-xrg3-68b1
 
 flags
@@ -526,7 +526,7 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-     3.x      v3.30.0       2026-09-25   >=8.1.0    16 of 16 · php floor raise (lowest fix); held by composer.json and csa/guzzle-bundle and symfony/symfony; after it: at most 16, high, if Composer resolves it
+     3.x      v3.30.0       2026-09-25   >=8.1.0    16 of 16 · php floor raise (lowest fix); held by composer.json and symfony/symfony and csa/guzzle-bundle; after it: at most 16, high, if Composer resolves it
      2.x      v2.16.1       2024-09-09   >=7.1.3    2 of 16 · upgrade; held by composer.json; after it: at most 48, critical, if Composer resolves it
    * 1.x      v1.44.8       2024-09-09   >=7.2.5    2 of 16 · php floor raise; after it: at most 48, critical, if Composer resolves it
 note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
@@ -986,7 +986,7 @@ score     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high a
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require guzzlehttp/guzzle ^8.2 — clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
+do        require guzzlehttp/guzzle ^8.2 — clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears left-behind, old-promise, PKSA-2z36-j4q9-rsfy, PKSA-6d8m-6kgw-18zr, PKSA-fvw5-9t6n-nwvr, PKSA-gcrk-3vtt-1r14, PKSA-k1b4-kshy-xgbh, PKSA-yfw5-9gnj-n2c7, PKSA-93qv-9n9h-6k6p, PKSA-bbs6-q5q9-f3t4, PKSA-bcdd-5xc7-gwfb, PKSA-cnw1-2ytm-cgr8, PKSA-fy2t-3c5f-827y, PKSA-k22t-f949-t9g6, PKSA-pwsk-hy21-4gby, PKSA-qxvb-2bpp-dnk6
 
 flags
@@ -1028,9 +1028,9 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-     8.x      8.2.0         2026-09-06   ^7.4 || ^8.0 14 of 14 · upgrade (lowest fix); held by composer.json and bdunogier/guzzle-site-authenticator and php-http/guzzle5-adapter; after it: at most 16, high, if Composer resolves it
-     7.x      7.15.5        2026-08-24   ^7.2.5 || ^8.0 14 of 14 · upgrade; held by composer.json and bdunogier/guzzle-site-authenticator and php-http/guzzle5-adapter; after it: at most 16, high, if Composer resolves it
-     6.x      6.5.8         2022-06-20   >=5.5      5 of 14 · upgrade; held by composer.json and bdunogier/guzzle-site-authenticator and php-http/guzzle5-adapter; after it: 32, critical, if Composer resolves it
+     8.x      8.2.0         2026-09-06   ^7.4 || ^8.0 14 of 14 · upgrade (lowest fix); held by composer.json and php-http/guzzle5-adapter and bdunogier/guzzle-site-authenticator; after it: at most 16, high, if Composer resolves it
+     7.x      7.15.5        2026-08-24   ^7.2.5 || ^8.0 14 of 14 · upgrade; held by composer.json and php-http/guzzle5-adapter and bdunogier/guzzle-site-authenticator; after it: at most 16, high, if Composer resolves it
+     6.x      6.5.8         2022-06-20   >=5.5      5 of 14 · upgrade; held by composer.json and php-http/guzzle5-adapter and bdunogier/guzzle-site-authenticator; after it: 32, critical, if Composer resolves it
    * 5.x      5.3.4         2019-10-30   >=5.4.0    0 of 14
      4.x      4.2.4         2016-07-15   >=5.4.0    0 of 14
      3.x      v3.8.1        2014-01-28   >=5.3.3    0 of 14
@@ -1143,8 +1143,8 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-     8.x      v8.1.8        2026-09-28   >=8.4.1    2 of 2 · upgrade; held by friendsofsymfony/rest-bundle and mautic/core-lib and symfony/framework-bundle; after it: 0, ok, if Composer resolves it
-     7.x      v7.4.20       2026-09-28   >=8.2      2 of 2 · upgrade; held by friendsofsymfony/rest-bundle and mautic/core-lib and symfony/framework-bundle; after it: 0, ok, if Composer resolves it
+     8.x      v8.1.8        2026-09-28   >=8.4.1    2 of 2 · upgrade; held by mautic/core-lib and symfony/framework-bundle and friendsofsymfony/rest-bundle; after it: 0, ok, if Composer resolves it
+     7.x      v7.4.20       2026-09-28   >=8.2      2 of 2 · upgrade; held by mautic/core-lib and symfony/framework-bundle and friendsofsymfony/rest-bundle; after it: 0, ok, if Composer resolves it
      6.x      v6.4.47       2026-09-28   >=8.1      2 of 2 · upgrade; held by mautic/core-lib and symfony/framework-bundle; after it: 0, ok, if Composer resolves it
      5.x      v5.4.53       2026-05-22   >=7.2.5    2 of 2 · upgrade (lowest fix); held by mautic/core-lib; after it: 0, ok, if Composer resolves it
    * 4.x      v4.4.44       2022-07-20   >=7.1.3    0 of 2
@@ -1263,7 +1263,7 @@ score     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high a
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 — clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
+do        raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 — clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears left-behind, PKSA-2z36-j4q9-rsfy, PKSA-6d8m-6kgw-18zr, PKSA-fvw5-9t6n-nwvr, PKSA-gcrk-3vtt-1r14, PKSA-k1b4-kshy-xgbh, PKSA-yfw5-9gnj-n2c7, PKSA-93qv-9n9h-6k6p, PKSA-bbs6-q5q9-f3t4, PKSA-bcdd-5xc7-gwfb, PKSA-cnw1-2ytm-cgr8, PKSA-fy2t-3c5f-827y, PKSA-k22t-f949-t9g6, PKSA-pwsk-hy21-4gby, PKSA-qxvb-2bpp-dnk6
 
 flags
@@ -1305,9 +1305,9 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-     8.x      8.2.0         2026-09-06   ^7.4 || ^8.0 14 of 14 · php floor raise; held by composer.json and csa/guzzle-bundle and guzzlehttp/cache-subscriber and guzzlehttp/log-subscriber and prestashop/circuit-breaker; after it: at most 16, high, if Composer resolves it
-     7.x      7.15.5        2026-08-24   ^7.2.5 || ^8.0 14 of 14 · php floor raise (lowest fix); held by composer.json and csa/guzzle-bundle and guzzlehttp/cache-subscriber and guzzlehttp/log-subscriber and prestashop/circuit-breaker; after it: at most 16, high, if Composer resolves it
-     6.x      6.5.8         2022-06-20   >=5.5      5 of 14 · upgrade; held by composer.json and csa/guzzle-bundle and guzzlehttp/cache-subscriber and guzzlehttp/log-subscriber and prestashop/circuit-breaker; after it: 32, critical, if Composer resolves it
+     8.x      8.2.0         2026-09-06   ^7.4 || ^8.0 14 of 14 · php floor raise; held by composer.json and guzzlehttp/cache-subscriber and csa/guzzle-bundle and guzzlehttp/log-subscriber and prestashop/circuit-breaker; after it: at most 16, high, if Composer resolves it
+     7.x      7.15.5        2026-08-24   ^7.2.5 || ^8.0 14 of 14 · php floor raise (lowest fix); held by composer.json and guzzlehttp/cache-subscriber and csa/guzzle-bundle and guzzlehttp/log-subscriber and prestashop/circuit-breaker; after it: at most 16, high, if Composer resolves it
+     6.x      6.5.8         2022-06-20   >=5.5      5 of 14 · upgrade; held by composer.json and guzzlehttp/cache-subscriber and csa/guzzle-bundle and guzzlehttp/log-subscriber and prestashop/circuit-breaker; after it: 32, critical, if Composer resolves it
    * 5.x      5.3.4         2019-10-30   >=5.4.0    0 of 14
      4.x      4.2.4         2016-07-15   >=5.4.0    0 of 14
      3.x      v3.8.1        2014-01-28   >=5.3.3    0 of 14
@@ -1945,7 +1945,7 @@ score     18 = (left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high 
   dev          packages-dev: the score ÷ 2
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve
+do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 (require-dev)); a new major brings its own requirements, which lockrot does not solve
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
@@ -3636,7 +3636,7 @@ score     16 = left-behind 16     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+do        First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it
           clears left-behind
 
 flags
@@ -3651,6 +3651,41 @@ repository metadata
      7.x      v7.14.0       2026-06-12   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
      6.x      v6.13.1       2024-11-29   ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
    * 5.x      v5.13.2       2022-04-16   >=7.2.5
+note: 2 packages are not from a Composer repository: their release metadata and repository activity were not read
+note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code 4.7.1 requires php >=7.4, <8.2.
+
+== case platform-step-inside‡
+scheb/2fa-bundle v5.13.2 — high: left-behind
+  direct requirement (composer.json require)
+
+age       installed  v5.13.2   2022-04-16   4.5 years ago
+          5.x        v5.13.2   2022-04-16   4.5 years ago                 past release-warn-years 3
+          newest     v8.6.1    2026-07-10   0.2 years ago                 below release-warn-years 3
+          last push            2026-07-10   0.2 years ago                 below push-warn-years 3
+          libyears 4.2 behind the newest stable release
+repository GitHub github.com/scheb/2fa-bundle: last push 2026-07-10 · fetched 2026-09-14
+
+score     16 = left-behind 16     high from 16
+  maintenance  left-behind 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the Run tab names the cause. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it
+          clears left-behind
+
+flags
+  left-behind  S8 · branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     8.x      v8.6.1        2026-07-10   ~8.4.0 || ~8.5.0
+     7.x      v7.14.0       2026-06-12   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     6.x      v6.13.1       2024-11-29   ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
+   * 5.x      v5.13.2       2022-04-16   >=7.2.5
+note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: scheb/2fa-bundle v5.13.2 requires symfony/framework-bundle ^4.4 || ^5.0.
 
 == case unknown-origin
 bower-asset/jquery 3.7.1 — unknown
@@ -4231,7 +4266,7 @@ flags
 repository metadata
      branch   highest tag   released     php        fixes
      8.x      8.0.1         2026-07-04   ^8.1       1 of 1 · composer update (lowest fix); after it: 0, ok; Composer's solver resolves it
-   * 7.x      7.15.2        2026-07-03   ^7.2.5 || ^8.0 1 of 1 · upgrade; held by composer.json and guzzlehttp/guzzle 7.15.2, the release this move installs; after it: 0, ok; Composer's solver refuses it
+   * 7.x      7.15.2        2026-07-03   ^7.2.5 || ^8.0 1 of 1 · upgrade; held by composer.json and guzzlehttp/guzzle 7.15.2, its own release; after it: 0, ok; Composer's solver refuses it
 
 == case mc-replan-major‡
 guzzlehttp/guzzle 7.10.0 — high: vulnerable
@@ -4263,7 +4298,7 @@ flags
 repository metadata
      branch   highest tag   released     php        fixes
      8.x      8.0.1         2026-07-04   ^8.1       1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok; Composer's solver resolves it
-   * 7.x      7.15.2        2026-07-03   ^7.2.5 || ^8.0 1 of 1 · upgrade; held by composer.json and guzzlehttp/guzzle 7.15.2, the release this move installs; after it: 0, ok; Composer's solver refuses it
+   * 7.x      7.15.2        2026-07-03   ^7.2.5 || ^8.0 1 of 1 · upgrade; held by composer.json and guzzlehttp/guzzle 7.15.2, its own release; after it: 0, ok; Composer's solver refuses it
 
 == case mc-package-hold‡
 symfony/mailer v6.4.27 — high: vulnerable
@@ -4281,7 +4316,7 @@ score     16 = vulnerable 16 [high advisory]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, the release this move installs (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock
+do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock
           clears PKSA-28rh-rzzn-djk4
 
 flags
@@ -4294,7 +4329,7 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json and symfony/mailer v6.4.40, the release this move installs and acme/ml-widget; after it: 0, ok; Composer's solver refuses it
+   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json and symfony/mailer v6.4.40, its own release and acme/ml-widget; after it: 0, ok; Composer's solver refuses it
 
 == case mc-pass-cap‡
 symfony/mailer v6.4.27 — high: vulnerable
@@ -4312,7 +4347,7 @@ score     16 = vulnerable 16 [high advisory]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, the release this move installs (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it
+do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it
           clears PKSA-28rh-rzzn-djk4
 
 flags
@@ -4325,7 +4360,7 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json and symfony/mailer v6.4.40, the release this move installs and acme/ml-widget; after it: 0, ok, if Composer resolves it
+   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json and symfony/mailer v6.4.40, its own release and acme/ml-widget; after it: 0, ok, if Composer resolves it
 
 == case mc-raise-php‡
 symfony/yaml v6.4.26 — high: vulnerable

@@ -1724,7 +1724,7 @@
       ]
     },
     "holder": {
-      "description": "The holder's own finding in this report, for display only (no score reads it): `{verdict, lead, flag_ids[], replacement, next_step}`. Null for the root, and for a holder that is not a finding of this report.",
+      "description": "The holder's own finding in this report, for display only (no score reads it): `{verdict, lead, flag_ids[], replacement, next_step}`. Null for the root, for a holder that is not a finding of this report, and for a hold whose `version` is not the holder's locked version.",
       "oneOf": [
         {
           "description": "A holder's finding, restated.",
@@ -4530,7 +4530,9 @@
             "direct_dependents",
             "run.target_php",
             "run.project_php_lowest",
-            "run.php_window.platform_override"
+            "run.php_window.platform_override",
+            "run.php_window.target.inside",
+            "run.move_check.baseline"
           ],
           "minLength": 1
         }
@@ -5709,7 +5711,9 @@
             "direct_dependents",
             "run.target_php",
             "run.project_php_lowest",
-            "run.php_window.platform_override"
+            "run.php_window.platform_override",
+            "run.php_window.target.inside",
+            "run.move_check.baseline"
           ],
           "minLength": 1
         }

@@ -1626,7 +1626,9 @@
                         "direct_dependents",
                         "run.target_php",
                         "run.project_php_lowest",
-                        "run.php_window.platform_override"
+                        "run.php_window.platform_override",
+                        "run.php_window.target.inside",
+                        "run.move_check.baseline"
                     ],
                     "minLength": 1
                 }
@@ -3208,7 +3210,7 @@
             }
         },
         "explainRun": {
-            "description": "What an `--explain` run read, and every field `score_model` refers to: the explain text renders from this block and the finding alone. Each key is report-2's `run` key of the same name, typed by the same schema, except `php_window`, which holds only report-2's `platform_override`.",
+            "description": "What an `--explain` run read, and every field `score_model` refers to: the explain text renders from this block and the finding alone. Each key is report-2's `run` key of the same name, typed by the same schema, except `php_window`, which holds only report-2's `platform_override` and `target`.",
             "type": "object",
             "required": [
                 "target_php",
@@ -3477,13 +3479,14 @@
                     ]
                 },
                 "php_window": {
-                    "description": "The one key of report-2's `run.php_window` that `next_step.text` reads; null when report-2's `php_window` is null.",
+                    "description": "The keys of report-2's `run.php_window` that `next_step.text` reads; null when report-2's `php_window` is null.",
                     "oneOf": [
                         {
-                            "description": "The platform PHP of the lock.",
+                            "description": "The platform PHP of the lock and the target PHP against the window.",
                             "type": "object",
                             "required": [
-                                "platform_override"
+                                "platform_override",
+                                "target"
                             ],
                             "properties": {
                                 "platform_override": {
@@ -3493,6 +3496,25 @@
                                         "null"
                                     ],
                                     "minLength": 1
+                                },
+                                "target": {
+                                    "description": "The target PHP against the window.",
+                                    "type": "object",
+                                    "required": [
+                                        "php",
+                                        "inside"
+                                    ],
+                                    "properties": {
+                                        "php": {
+                                            "description": "The php that the move check solves at: `config.platform.php` when it lies in the target minor, else the minor at patch 99.",
+                                            "type": "string",
+                                            "pattern": "^[0-9]+(\\.[0-9]+)*$"
+                                        },
+                                        "inside": {
+                                            "description": "Whether the set with require-dev (`without_dev` when `with_dev` is null) admits that point.",
+                                            "type": "boolean"
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -12990,7 +13012,7 @@
             ]
         },
         "holder": {
-            "description": "The holder's own finding in this report, for display only (no score reads it): `{verdict, lead, flag_ids[], replacement, next_step}`. Null for the root, and for a holder that is not a finding of this report.",
+            "description": "The holder's own finding in this report, for display only (no score reads it): `{verdict, lead, flag_ids[], replacement, next_step}`. Null for the root, for a holder that is not a finding of this report, and for a hold whose `version` is not the holder's locked version.",
             "oneOf": [
                 {
                     "description": "A holder's finding, restated.",
@@ -13901,7 +13923,9 @@
                         "direct_dependents",
                         "run.target_php",
                         "run.project_php_lowest",
-                        "run.php_window.platform_override"
+                        "run.php_window.platform_override",
+                        "run.php_window.target.inside",
+                        "run.move_check.baseline"
                     ],
                     "minLength": 1
                 }

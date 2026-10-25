@@ -303,6 +303,11 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version'], self::MOVE_VERSION],
             ],
         ],
+        'platform-step-inside‡' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
+            ],
+        ],
         'php-edge-equal‡' => [
             'moves' => [
                 [['next_step.version'], self::MOVE_VERSION],

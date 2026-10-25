@@ -513,8 +513,10 @@ def inputs_of(case):
     if allowlist is not None and allowlist['by'] == 'project':
         inputs['accept'] = allowlist['flag_ids']
         inputs['allowlist'] = {k: allowlist[k] for k in ('pattern', 'version', 'reason', 'expires')}
+    # The lock facts that the case's findings do not carry: the model's ‡ run inputs, in the case's `run_inputs` block.
+    run_inputs = case.get('run_inputs') or {}
     # The move checks that Composer's solver answered, keyed as lockrot keys each request (MoveQuery::key()).
-    checks = recorded_checks(f, rows)
+    checks = merged_checks(recorded_checks(f, rows), run_inputs)
     world = case.get('solver_world')
     if world is not None:
         # Composer's answer to every request that the model asked, the baseline and the combined update included:
@@ -525,10 +527,7 @@ def inputs_of(case):
             inputs['check_passes'] = world['check_passes']
     if checks:
         inputs['checks'] = checks
-        # The PHP that Composer solved at: the world's `config.platform.php`, which the run notes quote.
-        inputs['move_check'] = run['move_check'] if world is None else dict(run['move_check'], php=world['world']['platform_php'])
-    # The lock facts that the case's findings do not carry: the model's ‡ run inputs, in the case's `run_inputs` block.
-    run_inputs = case.get('run_inputs') or {}
+        inputs['move_check'] = move_check_of(run['move_check'], world, run.get('php_window'))
     if run_inputs.get('_php_lock') is not None:
         inputs['php_lock'] = run_inputs['_php_lock']
     if run_inputs.get('_config_platform_php') is not None:
@@ -538,6 +537,22 @@ def inputs_of(case):
         # The project's vcs repository serves the package: lockrot names its origin from it.
         inputs['root']['repositories'] = [{'type': 'vcs', 'url': 'https://%s/%s.git' % (act['host'], act['repo'])}]
     return inputs
+
+
+def move_check_of(move_check, world, window):
+    """`run.move_check` with the PHP that Composer solved at, which the run notes quote: the world's
+    `config.platform.php`, else the window's `target.php`."""
+    if world is not None:
+        return dict(move_check, php=world['world']['platform_php'])
+    if window is not None:
+        return dict(move_check, php=window['target']['php'])
+    return move_check
+
+
+def merged_checks(recorded, run_inputs):
+    """The recorded checks and the answers of the run inputs (`_checks`), which no finding carries: the baseline and
+    `target_fix`. An answer of the run inputs replaces a recorded one of the same request."""
+    return dict(recorded, **(run_inputs.get('_checks') or {}))
 
 
 def recorded_checks(f, rows):

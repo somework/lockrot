@@ -135,10 +135,9 @@ high (20)
   symfony/mailer v6.4.27  direct  ·  vulnerable
       16 = vulnerable 16 [high advisory] (baseline: new package)
       do: require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the
-          target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0)
-          and symfony/mailer v6.4.40, the release this move installs (requires acme/ml-transport ^2.0) and
-          acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too;
-          Composer's solver refuses it against the lock
+          target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its
+          own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport
+          >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock
       vulnerable   1 advisory: 1 high — all fixed on 6.x (upgrade); advisory: CVE-2026-45068 Argument Injection in
                    SendmailTransport via Dash-Prefixed Recipient Address
       age: installed v6.4.27 released 2025-10-24 (0.9 years ago); 6.x last released v6.4.40 2026-07-04 (0.2 years
@@ -433,7 +432,7 @@ furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: mautic/core-lib 5 · guzzlehttp/guzzle 2 · akaunting/laravel-apexcharts 1 ·
 genealabs/laravel-model-caching 1 · jfcherng/php-diff 1 · … and 6 more
 advisories: 53 packages asked · packagist.org answered (286 on record for 22 packages)
-php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 9 packages that exclude it is not checked (the run checked no move)
+php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 10 packages that exclude it is not checked (the run checked no move)
 baseline: 3 known · 42 new · 4 worsened · 0 stale (lockrot-baseline.json)
 gate: fails · --fail-on=high,unchecked ·
 31 findings fail it (high 30, unchecked 3); 2 reach it and are known to the baseline · target php 8.4 (--target-php)

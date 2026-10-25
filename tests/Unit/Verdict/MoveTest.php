@@ -136,7 +136,7 @@ final class MoveTest extends TestCase
         $before = JsonPath::decoded($finding->toArray());
         $bare = (new FindingBuilder())->withPackage('a/b')->build();
 
-        $copy = $finding->withHolders(['h/old' => new GradedPackage('critical', null, ['vulnerable'], null, null)]);
+        $copy = $finding->withHolders(['h/old' => new GradedPackage('critical', null, ['vulnerable'], null, null, '1.0.0')]);
         $filled = JsonPath::decoded($copy->toArray());
         $moved = $bare->withMoves($finding->details()->moves());
         $lead = $finding->nextStep();

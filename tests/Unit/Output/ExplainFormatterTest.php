@@ -421,9 +421,9 @@ final class ExplainFormatterTest extends TestCase
     }
 
     /** symfony/mailer v6.4.40 holds the move to itself: its own requirement conflicts with the lock, and it follows composer.json. */
-    public function testABranchRowNamesAHoldOfThePackagesOwnReleaseAsTheReleaseThatTheMoveInstalls(): void
+    public function testABranchRowNamesAHoldOfThePackagesOwnReleaseAsItsOwnRelease(): void
     {
-        self::assertStringContainsString('; held by composer.json and symfony/mailer v6.4.40, the release this move installs and acme/ml-widget; after it', self::plain(self::caseExplanation('mc-package-hold‡')));
+        self::assertStringContainsString('; held by composer.json and symfony/mailer v6.4.40, its own release and acme/ml-widget; after it', self::plain(self::caseExplanation('mc-package-hold‡')));
     }
 
     public function testEveryCaseExplainsAsItsGolden(): void

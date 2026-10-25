@@ -429,7 +429,7 @@ final class ExplainFormatter
         }
         $cell .= ' · '.self::FIX_WORDS[$candidate->kind()].($moveRow ? ' (lowest fix)' : '');
         $holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json'
-            : ($holder->package() === $package ? $package.' '.$holder->version().', the release this move installs' : (string) $holder->package()), MoveText::inTextOrder($candidate->heldBy(), $package));
+            : ($holder->package() === $package ? $package.' '.$holder->version().', its own release' : (string) $holder->package()), MoveText::inTextOrder($candidate->heldBy(), $package));
         if ($holders !== []) {
             $cell .= '; held by '.implode(' and ', array_unique($holders));
         }

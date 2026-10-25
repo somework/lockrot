@@ -142,6 +142,7 @@ jobs:
       - run: vendor/bin/php-cs-fixer fix --dry-run --diff
       - run: vendor/bin/phpstan analyse --memory-limit=1G
       - run: vendor/bin/phpstan analyse -c phpstan.tests.neon.dist --memory-limit=1G
+      - run: python3 -m unittest discover -s tools/schema/tests -t tools/schema/tests
       # tools/schema writes the -2 schemas and their negative fixtures (tools/schema/README.md). An edit
       # of a generated file, or a builder change committed without its output, fails here.
       - name: The generated schemas and negatives match tools/schema

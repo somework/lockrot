@@ -21,15 +21,18 @@ final class MoveSubject
     private ?string $projectPhpLowest;
     private ?string $newestPhp;
     private ?string $platformOverride;
+    private ?bool $refusedTargetInside;
 
     /**
      * @param list<string> $dependents       `direct_dependents`
      * @param ?string      $projectPhpLowest `run.project_php_lowest`
      * @param ?string      $newestPhp        R, the newest PHP minor that the root php allows ({@see \Lockrot\Signal\PhpCap})
      * @param ?string      $platformOverride `run.php_window.platform_override`
+     * @param ?bool        $refusedTargetInside `run.php_window.target.inside` while `run.move_check.baseline` is `refused`, else null
      */
-    public function __construct(string $package, string $version, bool $direct, array $dependents, ?string $targetPhp, ?string $projectPhpLowest, ?string $newestPhp = null, ?string $platformOverride = null)
+    public function __construct(string $package, string $version, bool $direct, array $dependents, ?string $targetPhp, ?string $projectPhpLowest, ?string $newestPhp = null, ?string $platformOverride = null, ?bool $refusedTargetInside = null)
     {
+        $this->refusedTargetInside = $refusedTargetInside;
         $this->platformOverride = $platformOverride;
         $this->newestPhp = $newestPhp;
         $this->package = $package;
@@ -79,5 +82,10 @@ final class MoveSubject
     public function platformOverride(): ?string
     {
         return $this->platformOverride;
+    }
+
+    public function refusedTargetInside(): ?bool
+    {
+        return $this->refusedTargetInside;
     }
 }
