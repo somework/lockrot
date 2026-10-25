@@ -356,6 +356,9 @@ tools/corpus/corpus check   --out head --explain-out head
       in `SchemaEvolutionTest`. `SchemaEvolutionTest` fails unless the releases that `CHANGELOG.md`
       lists, the keys of `RELEASED_SCHEMAS` and the directories under `schemas/` match exactly.
 
+    - Pin the sha256 of each formatter golden in `ChangedGoldensTest::RELEASED`, and empty its
+      `CHANGED`.
+
     - Vendor a renderer release ([The HTML report page](#the-html-report-page)). When the contract
       bundle changes, run `tools/report/record` first, so that the renderer release pins the new
       `bundle_sha256`. Then release lockrot-report `vX.Y.Z` and run

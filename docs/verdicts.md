@@ -608,6 +608,9 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
   branch merge too, unless one of them names a tag. A `blocked` move never merges with a move that
   runs on the target PHP.
 
+- **A tie of the parts.** The move whose `if_applied.total` is lower leads. A move with a null
+  `if_applied` counts as the score of the finding. On an equal total, the security move leads.
+
 - **The PHP it needs.** `next_step.php_check` reads the branch's highest release, the release
   that Composer installs at the top of the constraint. A `blocked` move reads the release that
   keeps it off the target. When your `require.php` does not admit that PHP, the line starts with

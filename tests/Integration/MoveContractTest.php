@@ -34,8 +34,8 @@ final class MoveContractTest extends TestCase
         'unreached-move' => [[['version'], self::VERSION]],
         'many-dependents' => [[['version'], self::VERSION]],
         'pagerfanta' => [[['version'], self::VERSION]],
-        'B-also‡' => [[['also'], self::DATED], [['rows.if_applied'], self::DATED]],
-        'tie‡' => [[['version', 'unverified', 'if_applied', 'also'], self::TIE]],
+        'B-also‡' => [[['also.version'], self::VERSION], [['rows.if_applied'], self::DATED]],
+        'tie‡' => [[['version', 'unverified', 'if_applied', 'also.leaves'], self::TIE]],
         'B-offline‡' => [[['version'], self::VERSION]],
         'holder-vuln‡' => [[['version'], self::VERSION]],
         'partial-op‡' => [[['version'], self::VERSION]],
@@ -363,8 +363,9 @@ final class MoveContractTest extends TestCase
         $actual = self::reference($lockrot, $lockrotRows, $skipped);
 
         self::assertSame($expected, $actual, $id);
-        if ($skipped !== []) {
-            self::assertNotSame(self::reference($golden, $goldenRows, []), self::reference($lockrot, $lockrotRows, []), $id.': a listed field agrees again: take the case off DIFFERENCES');
+        foreach ($skipped as $field) {
+            $others = array_values(array_diff($skipped, [$field]));
+            self::assertNotSame(self::reference($golden, $goldenRows, $others), self::reference($lockrot, $lockrotRows, $others), $id.': '.$field.' agrees again: take it off DIFFERENCES');
         }
     }
 
@@ -547,7 +548,8 @@ final class MoveContractTest extends TestCase
 
     /**
      * The move, the security fields, each branch row's `fixes` and each S9 `fix` that the reference
-     * compares, without $skipped. A `rows.` or `s9.` name skips that field of every row or fix.
+     * compares, without $skipped. A `rows.`, `s9.` or `also.` name skips that field of every row,
+     * fix or `also[]` move.
      *
      * @param array<mixed, mixed> $finding
      * @param array<mixed, mixed> $rows
@@ -580,17 +582,32 @@ final class MoveContractTest extends TestCase
             }
             foreach (['rows', 's9'] as $list) {
                 if (strpos($field, $list.'.') === 0 && \is_array($out[$list] ?? null)) {
-                    foreach ($out[$list] as $key => $each) {
-                        if (\is_array($each)) {
-                            unset($each[substr($field, \strlen($list) + 1)]);
-                            $out[$list][$key] = $each;
-                        }
-                    }
+                    $out[$list] = self::withoutField($out[$list], substr($field, \strlen($list) + 1));
                 }
+            }
+            if (strpos($field, 'also.') === 0 && \is_array($out['next_step']['also'] ?? null)) {
+                $out['next_step']['also'] = self::withoutField($out['next_step']['also'], substr($field, \strlen('also.')));
             }
         }
 
         return $out;
+    }
+
+    /**
+     * @param array<mixed, mixed> $list
+     *
+     * @return array<mixed, mixed> each entry without $field
+     */
+    private static function withoutField(array $list, string $field): array
+    {
+        foreach ($list as $key => $each) {
+            if (\is_array($each)) {
+                unset($each[$field]);
+                $list[$key] = $each;
+            }
+        }
+
+        return $list;
     }
 
     /**

@@ -31,9 +31,9 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The pin of the formatter goldens: the github, gitlab, sarif, markdown and table output of four
- * fixture locks at --fail-on=high, byte for byte. A pull request that changes a golden lists the
- * file in CHANGED with its reason: tools/fixtures/dump-app-formats.php at the base and at the head
- * finds them.
+ * fixture locks at --fail-on=high, byte for byte. A golden whose bytes differ from RELEASED has a
+ * row in CHANGED with its reason, and every row of CHANGED names such a golden.
+ * tools/fixtures/dump-app-formats.php at the base and at the head finds a changed golden.
  *
  * @coversNothing
  *
@@ -52,7 +52,16 @@ final class ChangedGoldensTest extends TestCase
     private const TEXT = 'SPEC 7.0 to 7.3: each graded finding prints its flags, score line, move and evidence under its grade; a vulnerable-only finding becomes a row; the footer adds flags:, depth:, security:, advisories: and gate:';
     private const RECORDS = 'SPEC 7.4, 7.5: one record per counted flag, and in SARIF per counted advisory, marked by gate.by; SARIF writes the invocation exit code and the run properties';
 
-    /** Each golden that a pull request of the 0.14 train changed, with its reason. Every other golden is unchanged. */
+    /**
+     * The sha256 of each golden as the newest release shipped it, empty while no release shipped
+     * them. A release pull request pins the goldens here and empties CHANGED (CONTRIBUTING, "Cutting
+     * a release").
+     *
+     * @var array<string, string>
+     */
+    private const RELEASED = [];
+
+    /** Each golden whose bytes differ from RELEASED, with its reason. */
     private const CHANGED = [
         'laravel.github.txt' => self::TEXT,
         'laravel.gitlab.json' => self::RECORDS,
@@ -89,6 +98,7 @@ final class ChangedGoldensTest extends TestCase
         $server->start();
         $differ = [];
         $names = [];
+        $rewritten = [];
         try {
             $clock = Clock::fixed(self::NOW);
             foreach (self::DIRS as $dir) {
@@ -110,7 +120,8 @@ final class ChangedGoldensTest extends TestCase
                     $names[] = $name;
                     $text = Formatters::for($format, FormatContext::create(null, 'high'))->format($report);
                     if (getenv('LOCKROT_REWRITE_GOLDEN') === '1') {
-                        file_put_contents(self::GOLDEN.$name, $text);
+                        self::assertNotFalse(file_put_contents(self::GOLDEN.$name, $text), 'cannot write '.$name);
+                        $rewritten[] = $name;
                     }
                     if (@file_get_contents(self::GOLDEN.$name) !== $text) {
                         $differ[] = $name;
@@ -121,7 +132,22 @@ final class ChangedGoldensTest extends TestCase
             $server->stop();
         }
 
+        if ($rewritten !== []) {
+            self::fail('rewrote '.implode(', ', $rewritten).'; review the diff, give each changed file a row in CHANGED, and run again without LOCKROT_REWRITE_GOLDEN');
+        }
         self::assertSame([], $differ, 'rewrite with LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit --filter ChangedGoldensTest, review the diff, and give each changed file a row in CHANGED');
         self::assertSame([], array_values(array_diff(array_keys(self::CHANGED), $names)), 'CHANGED names a golden that no output writes');
+        $released = self::released();
+        $moved = array_values(array_filter($names, static fn (string $name): bool => ($released[$name] ?? null) !== hash_file('sha256', self::GOLDEN.$name)));
+        $listed = array_keys(self::CHANGED);
+        sort($moved);
+        sort($listed);
+        self::assertSame($moved, $listed, 'a golden whose bytes differ from RELEASED needs a row in CHANGED, and a row in CHANGED needs such a golden');
+    }
+
+    /** @return array<string, string> RELEASED, typed for PHPStan, which reads an empty constant as array{} */
+    private static function released(): array
+    {
+        return self::RELEASED;
     }
 }

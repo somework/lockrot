@@ -320,7 +320,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         ],
     ];
 
-    private const MOVE_VERSION = 'The model names a move\'s `version` from the advisory ranges, because the reports carry only each branch\'s newest tag. lockrot names the release of the move\'s row (P2b). The move card prints `newest` and reads `version` only when `newest` is null.';
+    private const MOVE_VERSION = 'The model leaves `version` null on a move whose constraint comes from S8. lockrot names the lowest release that the constraint admits. The move card prints `newest` and reads `version` only when `newest` is null.';
 
     private const PHP_STAR = 'The case sets the project\'s require.php to `*` (‡). The model keeps the holder\'s own step of case A, and lockrot judges the holder under the case\'s require.php, which admits its newest line.';
 
