@@ -791,7 +791,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0) and h/old 1.0.0 (requires ^1.0; itself stale) and h/pin dev-master (requires ^1.0; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0) and h/pin dev-master (requires ^1.0; itself pinned) and h/old 1.0.0 (requires ^1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         }
     },
     "a replacement that the registry names": {

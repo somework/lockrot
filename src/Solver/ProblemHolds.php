@@ -39,7 +39,7 @@ final class ProblemHolds
     private array $wanted = [];
     /** The request's own requirement when the pool holds no release of it. */
     private ?Holder $noRelease = null;
-    /** @var array<string, mixed> the names that composer.json lists under `require-dev` only */
+    /** @var array<string, Link> the names that composer.json lists under `require-dev` only */
     private array $devOnly = [];
 
     /**

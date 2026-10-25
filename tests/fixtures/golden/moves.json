@@ -1526,7 +1526,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 (require-dev)); a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": {
@@ -4906,7 +4906,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": {
@@ -5167,7 +5167,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "raise-php",
         "installed_branch_fixes": {
@@ -6828,7 +6828,7 @@
             "commands": [],
             "through": [],
             "also": [],
-            "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, the release this move installs (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+            "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": {
@@ -7005,7 +7005,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, the release this move installs (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it"
+            "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^6.4) and composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": {
@@ -10342,7 +10342,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned) and symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38) and symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "raise-php",
         "installed_branch_fixes": {

@@ -95,6 +95,11 @@ other keys are for lockrot-report.
   of their composer.json files. `corpus/model-report-2/` holds the model's report-2 of the same
   apps, with a `provenance.json`, and `corpus/model-divergences.json` the reviewed differences that
   `tools/corpus/differential.php` allows (`tools/corpus/README.md`).
+- `corpus/solver-p2/` — the p2 answers that the move checks of the corpus apps ask and that
+  `corpus/cache/` lacks: names that no lock lists, and `~dev` answers. `bin/record-fixtures --names`
+  records them, without the releases after the moment of the cache, and lists the served names in
+  `names.json`. `provenance.json` names the cut-off and each dropped release. `FixtureCliRun` serves
+  them after the cache, and the model's provenance does not cover them.
 - `big-summary.json`, `phar-summary.json`, `skeletons-summary.json`, `summary.json`,
   `top500.json`, `liveness.py`, `pre8.py` — research artefacts kept for provenance. No test reads
   them.
