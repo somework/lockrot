@@ -36,8 +36,13 @@ final class LinkIndex
         $index = new self();
         $parser = new VersionParser();
         $root = $project->name();
+        $required = $project->constraints(ProjectConfig::REQUIRE);
         foreach ([Holder::REQUIRE => ProjectConfig::REQUIRE, Holder::REQUIRE_DEV => ProjectConfig::REQUIRE_DEV, Holder::CONFLICT => ProjectConfig::CONFLICT] as $link => $section) {
             foreach ($project->constraints($section) as $target => $constraint) {
+                // One constraint in both sections is one hold: the `require` one.
+                if ($link === Holder::REQUIRE_DEV && ($required[$target] ?? null) === $constraint) {
+                    continue;
+                }
                 $index->add($parser, (string) $target, new Holder(Holder::ROOT, $root, null, $link, $constraint), null);
             }
         }
