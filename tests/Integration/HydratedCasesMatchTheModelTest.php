@@ -317,8 +317,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 
     private const MOVE_VERSION = 'The model names a move\'s `version` from the advisory ranges, because the reports carry only each branch\'s newest tag. lockrot names the release of the move\'s row (P2b). The move card prints `newest` and reads `version` only when `newest` is null.';
 
-    private const S8_UNDER_CASE_PHP = 'The case sets the project\'s require.php (‡). The model keeps the finding\'s S8 as the corpus judged it, and lockrot judges S8 under the case\'s require.php.';
-
     private const PHP_STAR = 'The case sets the project\'s require.php to `*` (‡). The model keeps the holder\'s own step of case A, and lockrot judges the holder under the case\'s require.php, which admits its newest line.';
 
     private const INSTALLED_COMMIT = 'The model holds the date of a shared commit only for a branch\'s highest tag, so the hydrated lock gives the installed tag no date. lockrot then reads it as undated, not as dated by a commit its tags share.';

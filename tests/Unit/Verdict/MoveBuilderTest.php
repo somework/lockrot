@@ -188,6 +188,21 @@ final class MoveBuilderTest extends TestCase
         self::assertStringStartsWith('raise require.php to >=8.1, then require a tag — the newest is 2.0.0', $move->text());
     }
 
+    /** A package that the project does not require gets the raise before its tag too. */
+    public function testATransitiveTagMoveWhoseTagNeedsAHigherPhpRaisesItFirst(): void
+    {
+        $facts = self::factsOf([['2.0.0', '2026-01-01', '>=8.1']]);
+        $floor = new PhpFloor('8.4', '>=7.4');
+        $row = BranchRow::all($facts, $floor, Clock::fixed(self::NOW))[0];
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
+        $context = new MoveContext($finding, new MoveSubject('a/b', '1.x-dev', false, ['c/d'], '8.4', '7.4.0'), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::TAG, FlagSet::PINNED)->withLatest(new Latest('2.0.0', '2026-01-01T00:00:00+00:00', false, 'newer', null), $row), [], null, $context);
+
+        self::assertStringStartsWith('raise require.php to >=8.1, then move it to a tag — the newest is 2.0.0, through c/d', $move->text());
+    }
+
     /** 2.0.0, the release that the move takes, needs PHP 8.2, which the target 8.1 does not run: a later release on the branch does not move that PHP. */
     public function testABlockedMoveNamesThePhpOfTheReleaseThatBlocksIt(): void
     {
