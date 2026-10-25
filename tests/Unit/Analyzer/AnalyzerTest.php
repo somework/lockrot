@@ -45,6 +45,7 @@ use Lockrot\Tests\Support\Summaries;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\MoveChecks;
 use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class AnalyzerTest extends TestCase
@@ -168,6 +169,41 @@ final class AnalyzerTest extends TestCase
 
         self::assertNotSame([], JsonPath::arrayAt($document, ['findings', 0, 'next_step', 'commands']));
         self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. ', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'text']));
+    }
+
+    /** @return iterable<string, array{?string, bool, string}> the lock's php of the package, whether Composer refuses the lock itself, and the step */
+    public static function refusedBaselines(): iterable
+    {
+        $step = 'First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29.';
+        yield 'a lock that Composer installs' => [null, false, $step.' '];
+        yield 'a refused lock with the target inside the window' => [null, true, $step.' Composer still refuses the lock itself: the Run tab names the cause. '];
+        yield 'a refused lock with the target outside the window' => ['^7.2 || ~8.0.0', true, $step.' Composer still refuses the lock itself: the PHP line names the packages. '];
+    }
+
+    /**
+     * Case `move-check‡` under a platform PHP outside the target minor: the step says where the
+     * cause is named while Composer refuses the lock itself.
+     *
+     * @dataProvider refusedBaselines
+     */
+    #[DataProvider('refusedBaselines')]
+    public function testThePlatformStepOfARefusedLockSaysWhereTheCauseIsNamed(?string $php, bool $refused, string $step): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['php_lock'] = ['platform-overrides' => ['php' => '7.4.29']];
+        if ($php !== null) {
+            $inputs['lock'] = [['php' => $php] + JsonPath::arrayAt($inputs, ['lock', 0])];
+        }
+        if ($refused) {
+            $inputs['checks'] = ['baseline' => ['result' => 'refused', 'form' => null, 'reason' => null, 'holds' => [], 'problem' => 'Problem 1']] + JsonPath::arrayAt($inputs, ['checks']);
+        }
+        $case['inputs'] = $inputs;
+
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+
+        self::assertSame([$refused ? 'refused' : 'resolves', $php === null], [JsonPath::stringAt($document, ['run', 'move_check', 'baseline']), JsonPath::boolAt($document, ['run', 'php_window', 'target', 'inside'])]);
+        self::assertStringStartsWith($step.'composer update', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'text']));
     }
 
     public function testAnalyzeWithFactsKeepsWhatEachFindingWasDecidedOn(): void

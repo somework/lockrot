@@ -515,6 +515,7 @@ final class ExplanationTest extends TestCase
 
         $array = (new Explanation($finding, F::facts(F::package()), new Thresholds(), '8.4', $report))->toArray();
 
+        self::assertNotNull($window);
         self::assertSame(['platform_override' => '7.4.29', 'target' => JsonPath::arrayAt(JsonPath::decoded($window->toArray()), ['target'])], JsonPath::arrayAt($array, ['run', 'php_window']));
     }
 

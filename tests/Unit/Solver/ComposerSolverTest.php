@@ -159,6 +159,16 @@ final class ComposerSolverTest extends TestCase
         self::assertStringContainsString('acme/a[1.1.0, ..., 1.4.0]', $problem);
     }
 
+    public function testTheCopyThatDropsTheConfigPlatformWordsLeavesTheSolverItComesFromAsItWas(): void
+    {
+        $solver = self::solver(['require' => ['php' => '~8.1.0']], [], []);
+
+        $copy = $solver->withPhpSetByLockrot();
+
+        self::assertStringContainsString('(8.4.99; overridden via config.platform)', (string) $solver->solve(SolveRequest::baseline())->problem());
+        self::assertStringContainsString('your php version (8.4.99) does not satisfy', (string) $copy->solve(SolveRequest::baseline())->problem());
+    }
+
     /** The forms of a move of a package with no dependency build one pool, and the solves after them build their own. */
     public function testASolveThatBuildsThePoolOfTheLastSolveGetsTheAnswerOfAFreshSolver(): void
     {

@@ -21,21 +21,18 @@ final class MoveSubject
     private ?string $projectPhpLowest;
     private ?string $newestPhp;
     private ?string $platformOverride;
-    private bool $baselineRefused;
-    private bool $targetInside;
+    private ?bool $refusedTargetInside;
 
     /**
      * @param list<string> $dependents       `direct_dependents`
      * @param ?string      $projectPhpLowest `run.project_php_lowest`
      * @param ?string      $newestPhp        R, the newest PHP minor that the root php allows ({@see \Lockrot\Signal\PhpCap})
      * @param ?string      $platformOverride `run.php_window.platform_override`
-     * @param bool         $baselineRefused  whether `run.move_check.baseline` is `refused`
-     * @param bool         $targetInside     `run.php_window.target.inside`
+     * @param ?bool        $refusedTargetInside `run.php_window.target.inside` while `run.move_check.baseline` is `refused`, else null
      */
-    public function __construct(string $package, string $version, bool $direct, array $dependents, ?string $targetPhp, ?string $projectPhpLowest, ?string $newestPhp = null, ?string $platformOverride = null, bool $baselineRefused = false, bool $targetInside = true)
+    public function __construct(string $package, string $version, bool $direct, array $dependents, ?string $targetPhp, ?string $projectPhpLowest, ?string $newestPhp = null, ?string $platformOverride = null, ?bool $refusedTargetInside = null)
     {
-        $this->baselineRefused = $baselineRefused;
-        $this->targetInside = $targetInside;
+        $this->refusedTargetInside = $refusedTargetInside;
         $this->platformOverride = $platformOverride;
         $this->newestPhp = $newestPhp;
         $this->package = $package;
@@ -87,13 +84,8 @@ final class MoveSubject
         return $this->platformOverride;
     }
 
-    public function isBaselineRefused(): bool
+    public function refusedTargetInside(): ?bool
     {
-        return $this->baselineRefused;
-    }
-
-    public function isTargetInside(): bool
-    {
-        return $this->targetInside;
+        return $this->refusedTargetInside;
     }
 }

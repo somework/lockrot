@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support\Contract;
 
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreLineFromJson;
 use Lockrot\Verdict\ShellCommand;
 
@@ -113,7 +114,7 @@ final class ReferenceText
         }
 
         $check = \is_array($run['move_check'] ?? null) ? $run['move_check'] : [];
-        $refused = ($check['baseline'] ?? null) === 'refused' ? ' Composer still refuses the lock itself: '.(($window['target']['inside'] ?? true) === false ? 'the PHP line names the packages.' : 'the Run tab names the cause.') : '';
+        $refused = ($check['baseline'] ?? null) === 'refused' ? ' Composer still refuses the lock itself: '.(JsonPath::has($window, ['target', 'inside']) && JsonPath::boolAt($window, ['target', 'inside']) === false ? 'the PHP line names the packages.' : 'the Run tab names the cause.') : '';
 
         return 'First set config.platform.php to your PHP '.$target.' release: the lock records '.$override.'.'.$refused.' ';
     }

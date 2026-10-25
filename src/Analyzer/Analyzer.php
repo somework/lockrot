@@ -678,7 +678,7 @@ final class Analyzer
                 $ranges[$advisory->id()] = $advisory->affectedRange();
             }
         }
-        $subject = new MoveSubject($finding->package(), $finding->version(), $finding->isDirect(), $finding->directDependents(), $floor->php(PhpFloor::TARGET), $floor->lowestAsString(), $this->signals->phpCap()->newest(), $window === null ? null : $window->platformOverride(), $baselineRefused, $window === null || $window->isTargetInside());
+        $subject = new MoveSubject($finding->package(), $finding->version(), $finding->isDirect(), $finding->directDependents(), $floor->php(PhpFloor::TARGET), $floor->lowestAsString(), $this->signals->phpCap()->newest(), $window === null ? null : $window->platformOverride(), $baselineRefused ? $window === null || $window->isTargetInside() : null);
         $context = new MoveContext(
             $finding,
             $subject,

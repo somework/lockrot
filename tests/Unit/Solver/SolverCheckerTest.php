@@ -88,6 +88,28 @@ final class SolverCheckerTest extends TestCase
         self::assertSame([['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'require', 'target' => 'acme/gone', 'constraint' => '^1.0']], self::rows($outcome->holds()));
     }
 
+    /** A conflict of composer.json on the moved package that matches the release holds it. */
+    public function testARootConflictThatMatchesTheMovesReleaseHoldsIt(): void
+    {
+        $checker = self::checkerWith(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]), ['acme/lib' => '>=1.1']);
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'conflict', 'target' => null, 'constraint' => '>=1.1'], self::rows($outcome->holds()));
+    }
+
+    /** No release of the move's own constraint is in the pool: that root hold stays, though its constraint admits the release. */
+    public function testAMoveToAReleaseThatThePoolLacksKeepsItsOwnConstraintAsTheHold(): void
+    {
+        $checker = self::checker(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0']]]);
+
+        $outcome = $checker->check(MoveQuery::require('acme/lib', '^2.0', '2.0.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => null, 'constraint' => '^2.0']], self::rows($outcome->holds()));
+    }
+
     /** A root requirement that excludes the release still holds it. */
     public function testARootRequirementThatExcludesTheMovesReleaseHoldsIt(): void
     {
@@ -637,18 +659,22 @@ final class SolverCheckerTest extends TestCase
     /**
      * @param array<string, string>      $requires
      * @param list<array<string, mixed>> $locked
+     * @param array<string, string>      $conflicts the root's `conflict`
      */
-    private static function checkerWith(array $requires, array $locked, VersionSource $source): SolverChecker
+    private static function checkerWith(array $requires, array $locked, VersionSource $source, array $conflicts = []): SolverChecker
     {
-        $solver = new ComposerSolver(self::root($requires), LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, []);
+        $solver = new ComposerSolver(self::root($requires, $conflicts), LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, []);
 
         return new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
     }
 
-    /** @param array<string, string> $requires */
-    private static function root(array $requires): RootPackageInterface
+    /**
+     * @param array<string, string> $requires
+     * @param array<string, string> $conflicts
+     */
+    private static function root(array $requires, array $conflicts = []): RootPackageInterface
     {
-        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => $requires], RootPackage::class);
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => $requires, 'conflict' => $conflicts], RootPackage::class);
         self::assertInstanceOf(RootPackageInterface::class, $root);
 
         return $root;

@@ -57,7 +57,7 @@ final class MoveText
             $text .= '; '.$through;
         }
 
-        $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->isBaselineRefused(), $subject->isTargetInside());
+        $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->refusedTargetInside());
 
         return $step.$text.self::checked($move->check());
     }
@@ -67,16 +67,15 @@ final class MoveText
      * the commands at that PHP, not at the target. The sentence and a space, else an empty string.
      * While Composer refuses the lock itself, the step alone does not make it install.
      *
-     * @param ?string $platformOverride `run.php_window.platform_override`
-     * @param bool    $baselineRefused  whether `run.move_check.baseline` is `refused`
-     * @param bool    $targetInside     `run.php_window.target.inside`
+     * @param ?string $platformOverride    `run.php_window.platform_override`
+     * @param ?bool   $refusedTargetInside `run.php_window.target.inside` while `run.move_check.baseline` is `refused`, else null
      */
-    public static function platformStep(?string $targetPhp, ?string $platformOverride, bool $baselineRefused = false, bool $targetInside = true): string
+    public static function platformStep(?string $targetPhp, ?string $platformOverride, ?bool $refusedTargetInside = null): string
     {
         if ($targetPhp === null || $platformOverride === null || MoveCheckers::platformPhp($targetPhp, $platformOverride) === $platformOverride) {
             return '';
         }
-        $refused = $baselineRefused ? ' Composer still refuses the lock itself: '.($targetInside ? 'the Run tab names the cause.' : 'the PHP line names the packages.') : '';
+        $refused = $refusedTargetInside === null ? '' : ' Composer still refuses the lock itself: '.($refusedTargetInside ? 'the Run tab names the cause.' : 'the PHP line names the packages.');
 
         return 'First set config.platform.php to your PHP '.$targetPhp.' release: the lock records '.$platformOverride.'.'.$refused.' ';
     }
@@ -334,27 +333,41 @@ final class MoveText
      */
     public static function inTextOrder(array $holders, string $package): array
     {
+        $root = [];
+        $own = [];
+        $on = [];
+        $other = [];
+        foreach ($holders as $holder) {
+            if ($holder->source() === Holder::ROOT) {
+                $root[] = $holder;
+            } elseif ($holder->package() === $package) {
+                $own[] = $holder;
+            } elseif ($holder->target() === null || $holder->target() === $package) {
+                $on[] = $holder;
+            } else {
+                $other[] = $holder;
+            }
+        }
+
+        return array_merge($root, $own, self::ranked($on), self::ranked($other));
+    }
+
+    /**
+     * @param list<Holder> $holders
+     *
+     * @return list<Holder> by the holder's grade, then by name, then in the given order
+     */
+    private static function ranked(array $holders): array
+    {
+        $grades = array_flip(ScoreModel::GRADES);
         $keys = [];
         foreach ($holders as $index => $holder) {
             $finding = $holder->finding();
-            $grade = $finding === null ? false : array_search($finding->verdict(), ScoreModel::GRADES, true);
-            $keys[$index] = [self::group($holder, $package), $grade === false ? \count(ScoreModel::GRADES) : $grade, (string) $holder->package(), $index];
+            $keys[$index] = [$finding === null ? \count($grades) : $grades[$finding->verdict()] ?? \count($grades), $holder->package(), $index];
         }
         uksort($holders, static fn (int $a, int $b): int => $keys[$a] <=> $keys[$b]);
 
         return array_values($holders);
-    }
-
-    private static function group(Holder $holder, string $package): int
-    {
-        if ($holder->source() === Holder::ROOT) {
-            return 0;
-        }
-        if ($holder->package() === $package) {
-            return 1;
-        }
-
-        return $holder->target() === null || $holder->target() === $package ? 2 : 3;
     }
 
     /**

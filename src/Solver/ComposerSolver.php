@@ -375,9 +375,11 @@ final class ComposerSolver
      */
     private static function problemText(string $text, bool $setsPhp): string
     {
-        $text = (string) preg_replace('/, (?:actual: [^)]*|same as actual)\)/', ')', $text);
+        if ($setsPhp) {
+            $text = preg_replace('/(php version \([^;)]*); overridden via config\.platform(?=[,)])/', '$1', $text) ?? $text;
+        }
 
-        return trim($setsPhp ? (string) preg_replace('/(php version \([^;)]*); overridden via config\.platform\)/', '$1)', $text) : $text);
+        return trim((string) preg_replace('/, (?:actual: [^)]*|same as actual)\)/', ')', $text));
     }
 
     /** @return array<string, string> name => the pretty version that the solve installs, for each name it installs or moves */

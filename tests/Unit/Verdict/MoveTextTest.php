@@ -95,7 +95,7 @@ final class MoveTextTest extends TestCase
     #[DataProvider('refusedBaselines')]
     public function testThePlatformStepOfARefusedBaselineSaysWhereTheCauseIsNamed(bool $inside, string $pointer): void
     {
-        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '7.4.29', true, $inside);
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '7.4.29', $inside);
         $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], [['composer', 'update', 'acme/lib']], $subject);
 
         self::assertSame('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: '.$pointer.' composer update acme/lib (gets 2.0.0)', MoveText::render($move));
@@ -152,7 +152,7 @@ final class MoveTextTest extends TestCase
             new Holder(Holder::PACKAGE, 'acme/lib', '2.0.0', Holder::REQUIRE, '^1', 'psr/log'),
             new Holder(Holder::ROOT, null, null, Holder::REQUIRE_DEV, '^1.2'),
             new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.2'),
-        ], ['z/critical' => $critical, 'c/high' => $high, 'b/high' => $high]);
+        ], ['z/critical' => $critical, 'c/high' => $high, 'b/high' => $high, 'a/plain' => new GradedPackage('finished', null, [], null, null, '1.0.0')]);
 
         $ordered = MoveText::inTextOrder($holds, 'acme/lib');
 
