@@ -189,8 +189,8 @@ composer lockrot --format=github --fail-on=high --target-php=8.4 \
   already has the report.
 - **With other options.** `--explain` refuses it ([Explaining one
   package](#explaining-one-package)). `--generate-baseline` writes the reports first, compared with
-  the baseline file that the run read, and then the baseline. A report that fails stops the run before lockrot
-  replaces the baseline. Under `LOCKROT_DISABLE`, lockrot writes nothing.
+  the baseline file that the run read, and then the baseline. A report that fails stops the run
+  before lockrot replaces the baseline. Under `LOCKROT_DISABLE`, lockrot writes nothing.
 
 lockrot refuses these values before the analysis starts (exit `2`, nothing fetched, nothing
 written):

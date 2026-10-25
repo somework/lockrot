@@ -390,8 +390,8 @@ comes in through others, `commands` (argv lists) and `text`. `also` holds the ot
 Each argument of `commands` and of `security.update_now_command` matches
 `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only a Composer option starts
 with `-`: `--no-update` in a `require` step, and `--with-dependencies` or `--with-all-dependencies`
-in an `update` or `require` step. An option comes after the package arguments. The first argument is `composer`,
-and the second is `update`, `require` or `why-not`. An argument comes from the lock or a
+in an `update` or `require` step. An option comes after the package arguments. The first argument
+is `composer`, and the second is `update`, `require` or `why-not`. An argument comes from the lock or a
 repository, so lockrot leaves out a step that breaks this rule. The move keeps its `constraint`,
 `text` and other steps. `text` shows a command only as the POSIX rendering of a step in `commands`.
 Render each argv with one of these renderings:
