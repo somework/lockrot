@@ -116,7 +116,7 @@ entry in the commit that changes the line.
 
 ## src/Output
 
-- `src/Output/ExplainFormatter.php` CastString `: ($holder->package() === $package ? $package.' '.$holder->version().', the release this move installs' : (string) $holder->package()), MoveText::inTextOrder($candidate->heldBy(), $package));` — a holder that is not the root always names its package, so the cast never meets null.
+- `src/Output/ExplainFormatter.php` CastString `: ($holder->package() === $package ? $package.' '.$holder->version().', its own release' : (string) $holder->package()), MoveText::inTextOrder($candidate->heldBy(), $package));` — a holder that is not the root always names its package, so the cast never meets null.
 - `src/Output/MarkdownFormatter.php` Break_ `break;` — the room only shrinks row by row, so no row after the first that does not fit can fit.
 - `src/Output/InstallSummaryFormatter.php` LogicalAnd `$gateLine = $gate !== null && $run !== null && $gate->fails() ? '  '.self::text(RunGateText::render($gate, $run)) : null;` — a report decides its gate only from its run settings, so the gate and the run are null together.
 - `src/Output/AgeText.php` Coalesce `$key = ReleaseBranch::of($version) ?? ReleaseBranch::aliasLine($version);` — `ReleaseBranch::of()` answers only a release and `aliasLine()` only a branch alias, so at most one of them is not null.
