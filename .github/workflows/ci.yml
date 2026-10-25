@@ -406,6 +406,10 @@ jobs:
       - run: git diff --exit-code build/phar/composer.lock
       - run: build/build-phar.sh
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
+      # The PHAR validates extra.lockrot and the baseline with the justinrainbow/json-schema of
+      # build/phar/composer.lock, which the tests rows do not install.
+      - name: The schema fixtures validate with the PHAR's justinrainbow/json-schema
+        run: LOCKROT_JR_VENDOR=build/phar/vendor vendor/bin/phpunit --bootstrap tests/json-schema-bootstrap.php tests/Integration/JsonSchemaConformanceTest.php
       # This step runs the release workflow's signing helper with a throw-away key: wrap and unwrap
       # must round-trip, openssl must accept the unwrapped bytes, and the archive's verifier must
       # refuse a signature by a key that is not the release key.
