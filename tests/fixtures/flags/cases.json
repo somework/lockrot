@@ -123710,7 +123710,8 @@
      "blocks_advisories": false,
      "ignores_extensions": true,
      "baseline": "resolves",
-     "reason": null
+     "reason": null,
+     "php": "8.4.99"
     }
    }
   },
@@ -246916,6 +246917,28 @@
       "form": null,
       "reason": "baseline_refused",
       "holds": []
+     },
+     "baseline": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "holds": [],
+      "problem": "  Problem 1\n    - laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested.\n    - laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement.\n  Problem 2\n    - php-http/guzzle5-adapter is locked to version 2.0.0 and an update of this package was not requested.\n    - php-http/guzzle5-adapter 2.0.0 requires php ^7.0 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement."
+     },
+     "target_fix": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "holds": [
+       {
+        "source": "root",
+        "package": null,
+        "version": null,
+        "link": "root-require",
+        "target": "php-http/guzzle5-adapter",
+        "constraint": "^2.0"
+       }
+      ]
      }
     },
     "move_check": {
@@ -246923,7 +246946,8 @@
      "blocks_advisories": true,
      "ignores_extensions": true,
      "baseline": "refused",
-     "reason": null
+     "reason": null,
+     "php": "8.4.99"
     },
     "php_lock": {
      "packages": [
@@ -248541,6 +248565,13 @@
       "form": null,
       "reason": "baseline_refused",
       "holds": []
+     },
+     "baseline": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "holds": [],
+      "problem": "  Problem 1\n    - scheb/2fa-bundle is locked to version v5.13.2 and an update of this package was not requested.\n    - scheb/2fa-bundle v5.13.2 requires symfony/framework-bundle ^4.4 || ^5.0 -> found symfony/framework-bundle[v4.4.0, ..., v5.4.0] but the package is fixed to v6.4.0 (lock file version) by a partial update and that version does not match."
      }
     },
     "move_check": {
@@ -248548,7 +248579,8 @@
      "blocks_advisories": true,
      "ignores_extensions": true,
      "baseline": "refused",
-     "reason": null
+     "reason": null,
+     "php": "8.4.99"
     },
     "php_lock": {
      "platform-overrides": {

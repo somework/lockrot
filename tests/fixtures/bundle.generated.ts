@@ -165643,7 +165643,7 @@ export const d_platform_step_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": true,
             "ignores_extensions": true,
-            "baseline": "resolves",
+            "baseline": "refused",
             "reason": null
         },
         "php_window": {
@@ -165755,9 +165755,19 @@ export const d_platform_step_dagger = {
                     }
                 ],
                 "command": null,
-                "check": "not_checked",
-                "reason": "unloaded_name",
-                "held_by": [],
+                "check": "refused",
+                "reason": null,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "root-require",
+                        "target": "php-http/guzzle5-adapter",
+                        "constraint": "^2.0",
+                        "holder": null
+                    }
+                ],
                 "platform_step": false
             }
         },
@@ -166037,7 +166047,8 @@ export const d_platform_step_dagger = {
     },
     "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [
-        "2 packages are not from a Composer repository: their release metadata and repository activity were not read"
+        "2 packages are not from a Composer repository: their release metadata and repository activity were not read",
+        "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code 4.7.1 requires php >=7.4, <8.2."
     ],
     "note_details": [
         {
@@ -166048,6 +166059,17 @@ export const d_platform_step_dagger = {
             "data": {
                 "package_count": 2,
                 "advisories_asked": true
+            }
+        },
+        {
+            "code": "moves_not_checked",
+            "text": "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code 4.7.1 requires php >=7.4, <8.2.",
+            "docs_url": "https://lockrot.dev/notes/#moves_not_checked",
+            "sets_network_failures": false,
+            "data": {
+                "reason": "baseline_refused",
+                "php": "8.4.99",
+                "problem": "  Problem 1\n    - laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested.\n    - laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement.\n  Problem 2\n    - php-http/guzzle5-adapter is locked to version 2.0.0 and an update of this package was not requested.\n    - php-http/guzzle5-adapter 2.0.0 requires php ^7.0 -> your php version (8.4.99; overridden via config.platform) does not satisfy that requirement."
             }
         }
     ],
@@ -166202,7 +166224,7 @@ export const d_platform_step_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -167161,7 +167183,7 @@ export const d_platform_step_inside_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": true,
             "ignores_extensions": true,
-            "baseline": "resolves",
+            "baseline": "refused",
             "reason": null
         },
         "php_window": {
@@ -167502,8 +167524,22 @@ export const d_platform_step_inside_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: scheb/2fa-bundle v5.13.2 requires symfony/framework-bundle ^4.4 || ^5.0."
+    ],
+    "note_details": [
+        {
+            "code": "moves_not_checked",
+            "text": "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: scheb/2fa-bundle v5.13.2 requires symfony/framework-bundle ^4.4 || ^5.0.",
+            "docs_url": "https://lockrot.dev/notes/#moves_not_checked",
+            "sets_network_failures": false,
+            "data": {
+                "reason": "baseline_refused",
+                "php": "8.4.99",
+                "problem": "  Problem 1\n    - scheb/2fa-bundle is locked to version v5.13.2 and an update of this package was not requested.\n    - scheb/2fa-bundle v5.13.2 requires symfony/framework-bundle ^4.4 || ^5.0 -> found symfony/framework-bundle[v4.4.0, ..., v5.4.0] but the package is fixed to v6.4.0 (lock file version) by a partial update and that version does not match."
+            }
+        }
+    ],
     "findings": [
         {
             "package": "scheb/2fa-bundle",
@@ -167655,7 +167691,7 @@ export const d_platform_step_inside_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the Run tab names the cause. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
