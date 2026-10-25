@@ -88,6 +88,19 @@ final class SolverCheckerTest extends TestCase
         self::assertSame([['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'require', 'target' => 'acme/gone', 'constraint' => '^1.0']], self::rows($outcome->holds()));
     }
 
+    /** The pool serves no release of the move: the root requirement is the one hold that Composer names, so it stays. */
+    public function testARootRequirementThatAdmitsTheReleaseStaysWhenItIsTheOnlyHold(): void
+    {
+        if (!ComposerFeatures::hasTemporaryConstraints()) {
+            self::markTestSkipped('Composer 2.2 and 2.3 join the inline constraint to the root requirement: that requirement is the request');
+        }
+        $checker = self::checker(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0']]]);
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+
+        self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '^1.0']], self::rows($outcome->holds()));
+    }
+
     /** A conflict of composer.json on the moved package that matches the release holds it. */
     public function testARootConflictThatMatchesTheMovesReleaseHoldsIt(): void
     {

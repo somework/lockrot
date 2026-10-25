@@ -349,7 +349,7 @@ final class MoveText
             }
         }
 
-        return array_merge($root, $own, self::ranked($on), self::ranked($other));
+        return array_merge($root, self::ranked($own), self::ranked($on), self::ranked($other));
     }
 
     /**

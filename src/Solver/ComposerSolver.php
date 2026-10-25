@@ -376,7 +376,7 @@ final class ComposerSolver
     private static function problemText(string $text, bool $setsPhp): string
     {
         if ($setsPhp) {
-            $text = preg_replace('/(php version \([^;)]*); overridden via config\.platform(?=[,)])/', '$1', $text) ?? $text;
+            $text = preg_replace('/(php(?:-[a-z0-9]+)? version \([^;)]*); overridden via config\.platform(?=[,)])/', '$1', $text) ?? $text;
         }
 
         return trim((string) preg_replace('/, (?:actual: [^)]*|same as actual)\)/', ')', $text));

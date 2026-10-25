@@ -88,6 +88,14 @@ final class MoveCheckersTest extends TestCase
         self::assertStringContainsString('your php version (8.4.99) does not satisfy', $problem);
     }
 
+    /** Composer gives php-64bit the version of the php override, with the same words. */
+    public function testTheBaselineProblemOmitsTheConfigPlatformClauseOfAPackageThatTheSetPhpOverrides(): void
+    {
+        $checker = MoveCheckers::forProject(self::root(['php-64bit' => '~8.1.0']), LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), new Config(false), [], '8.4', false, Deadline::never());
+
+        self::assertStringContainsString('your php-64bit version (8.4.99) does not satisfy', (string) $checker->baseline()->problem());
+    }
+
     public function testTheBaselineProblemKeepsTheConfigPlatformClauseOfTheProjectsOwnPhp(): void
     {
         $config = new Config(false);

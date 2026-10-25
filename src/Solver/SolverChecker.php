@@ -246,7 +246,9 @@ final class SolverChecker implements MoveChecker
         $target = $this->release($query->package(), $query->version());
         $scanned = $target === null ? [] : $this->scan->of($target, (new VersionParser())->normalize($this->platformPhp));
 
+        // Another hold explains the refusal: without one, the root requirement is what Composer names.
         $holds = array_filter($last->holds(), static fn (Holder $hold): bool => !self::admits($hold, $query->version()));
+        $holds = $holds === [] ? $last->holds() : $holds;
 
         // A move publishes its holds, never Composer's problem text, which is costly to render.
         return new CheckOutcome(MoveCheck::refused(), Holder::distinct(array_merge($holds, $scanned)));

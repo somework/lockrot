@@ -241,7 +241,7 @@ HOLDER_MOVE = obj("The holder's own move, `{kind, to_branch, constraint, check}`
     'check': ref('moveCheck'),
 })
 defs['holder'] = nul(("The holder's own finding in this report, for display only (no score reads it; §5.3): `{verdict, lead, flag_ids[], replacement, next_step}`. "
-                      "Null for the root, and for a holder that is not a finding of this report."),
+                      "Null for the root, for a holder that is not a finding of this report, and for a hold whose `version` is not the holder's locked version."),
     obj("A holder's finding, restated.", {
         'verdict': ref('verdict'),
         'lead': nul("The holder's `lead`.", ref('maintenanceFlag')),
