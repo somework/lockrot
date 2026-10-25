@@ -527,8 +527,7 @@ def inputs_of(case):
             inputs['check_passes'] = world['check_passes']
     if checks:
         inputs['checks'] = checks
-        # The PHP that Composer solved at: the world's `config.platform.php`, which the run notes quote.
-        inputs['move_check'] = run['move_check'] if world is None else dict(run['move_check'], php=world['world']['platform_php'])
+        inputs['move_check'] = move_check_of(run['move_check'], world, run.get('php_window'))
     if run_inputs.get('_php_lock') is not None:
         inputs['php_lock'] = run_inputs['_php_lock']
     if run_inputs.get('_config_platform_php') is not None:
@@ -538,6 +537,16 @@ def inputs_of(case):
         # The project's vcs repository serves the package: lockrot names its origin from it.
         inputs['root']['repositories'] = [{'type': 'vcs', 'url': 'https://%s/%s.git' % (act['host'], act['repo'])}]
     return inputs
+
+
+def move_check_of(move_check, world, window):
+    """`run.move_check` with the PHP that Composer solved at, which the run notes quote: the world's
+    `config.platform.php`, else the window's `target.php`."""
+    if world is not None:
+        return dict(move_check, php=world['world']['platform_php'])
+    if window is not None:
+        return dict(move_check, php=window['target']['php'])
+    return move_check
 
 
 def merged_checks(recorded, run_inputs):

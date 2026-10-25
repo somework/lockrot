@@ -27,5 +27,21 @@ class TheRunInputsAddTheirChecks(unittest.TestCase):
         self.assertEqual({'baseline': REFUSED}, checks)
 
 
+
+class TheMoveCheckNamesThePhpOfTheSolve(unittest.TestCase):
+    RUN = {'composer': '2.10.3', 'baseline': 'refused', 'reason': None}
+
+    def test_a_world_gives_its_platform_php(self):
+        world = {'world': {'platform_php': '8.4.3'}}
+
+        self.assertEqual('8.4.3', project_fixtures.move_check_of(self.RUN, world, {'target': {'php': '8.4.99'}})['php'])
+
+    def test_a_run_without_a_world_takes_the_php_of_the_window_target(self):
+        self.assertEqual(dict(self.RUN, php='8.4.99'), project_fixtures.move_check_of(self.RUN, None, {'target': {'php': '8.4.99', 'inside': False}}))
+
+    def test_a_run_without_a_world_or_a_window_names_no_php(self):
+        self.assertEqual(self.RUN, project_fixtures.move_check_of(self.RUN, None, None))
+
+
 if __name__ == '__main__':
     unittest.main()
