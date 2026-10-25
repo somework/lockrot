@@ -4530,7 +4530,9 @@
             "direct_dependents",
             "run.target_php",
             "run.project_php_lowest",
-            "run.php_window.platform_override"
+            "run.php_window.platform_override",
+            "run.php_window.target.inside",
+            "run.move_check.baseline"
           ],
           "minLength": 1
         }
@@ -5709,7 +5711,9 @@
             "direct_dependents",
             "run.target_php",
             "run.project_php_lowest",
-            "run.php_window.platform_override"
+            "run.php_window.platform_override",
+            "run.php_window.target.inside",
+            "run.move_check.baseline"
           ],
           "minLength": 1
         }

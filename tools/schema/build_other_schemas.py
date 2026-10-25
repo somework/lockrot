@@ -646,15 +646,15 @@ def explain_schema():
     run = copy.deepcopy(RD['run'])
     D['explainRun'] = {'description': ('What an `--explain` run read, and every field `score_model` refers to (§7.7, §8.3): the explain text renders from this '
                                        'block and the finding alone. Each key is report-2\'s `run` key of the same name, typed by the same schema, except `php_window`, '
-                                       'which holds only report-2\'s `platform_override`.'),
+                                       'which holds only report-2\'s `platform_override` and `target`.'),
                        'type': 'object', 'required': list(EXPLAIN_RUN_KEYS), 'properties': {k: run['properties'][k] for k in EXPLAIN_RUN_KEYS},
                        'allOf': copy.deepcopy(run.get('allOf', []))}  # the run relation (`none` ⇔ no gate) too
-    # explain-2 copies `next_step`, whose text reads `run.php_window.platform_override` (§5.9): only that key comes along.
+    # explain-2 copies `next_step`, whose text reads `run.php_window.platform_override` and `target.inside` (§5.6, §5.9): only those keys come along.
     window = run['properties']['php_window']
     D['explainRun']['properties']['php_window'] = {
-        'description': "The one key of report-2's `run.php_window` that `next_step.text` reads; null when report-2's `php_window` is null.",
-        'oneOf': [{'description': 'The platform PHP of the lock.', 'type': 'object', 'required': ['platform_override'],
-                   'properties': {'platform_override': copy.deepcopy(window['oneOf'][0]['properties']['platform_override'])}}, {'type': 'null'}]}
+        'description': "The keys of report-2's `run.php_window` that `next_step.text` reads; null when report-2's `php_window` is null.",
+        'oneOf': [{'description': 'The platform PHP of the lock and the target PHP against the window.', 'type': 'object', 'required': ['platform_override', 'target'],
+                   'properties': {k: copy.deepcopy(window['oneOf'][0]['properties'][k]) for k in ('platform_override', 'target')}}, {'type': 'null'}]}
     D['explainRun']['required'].append('php_window')
     lock = strip_optional(copy.deepcopy(E1['properties']['lock']))
     lock['properties']['php']['description'] = lock['properties']['php'].get('description', 'The entry\'s php requirement, null when it has none.')

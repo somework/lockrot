@@ -84,9 +84,9 @@ final class FixtureCliRun
         }
 
         $solver = realpath($httpDir) === realpath(self::CORPUS_CACHE);
-        $names = $solver ? JsonPath::decodeFile(self::CORPUS_SOLVER_P2.'/names.json') : [];
+        $names = $solver ? array_values(array_filter(JsonPath::decodeFile(self::CORPUS_SOLVER_P2.'/names.json'), 'is_string')) : [];
 
-        return self::start([$projectDir.'/composer.lock'], array_merge([$httpDir.'/p2'], $solver ? [self::CORPUS_SOLVER_P2] : []), [$httpDir.'/github'], $httpDir.'/advisories/'.basename($projectDir).'.json', true, $recorded, array_values(array_map('strval', $names)));
+        return self::start([$projectDir.'/composer.lock'], array_merge([$httpDir.'/p2'], $solver ? [self::CORPUS_SOLVER_P2] : []), [$httpDir.'/github'], $httpDir.'/advisories/'.basename($projectDir).'.json', true, $recorded, $names);
     }
 
     public function stop(): void

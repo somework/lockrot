@@ -371,6 +371,12 @@ final class PhpWindow implements \JsonSerializable
         return $this->data['platform_override'];
     }
 
+    /** @return array{php: string, inside: bool} */
+    public function target(): array
+    {
+        return $this->data['target'];
+    }
+
     public function isTargetInside(): bool
     {
         return $this->data['target']['inside'];

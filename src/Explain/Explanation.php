@@ -192,12 +192,12 @@ final class Explanation
         return ['metadata' => $this->metadata(), 'lock' => $this->lock()];
     }
 
-    /** @return ?array{platform_override: ?string} the one key of `run.php_window` that `next_step.text` reads */
+    /** @return ?array{platform_override: ?string, target: array{php: string, inside: bool}} the keys of `run.php_window` that `next_step.text` reads */
     private function phpWindow(): ?array
     {
         $window = $this->report->phpWindow();
 
-        return $window === null ? null : ['platform_override' => $window->platformOverride()];
+        return $window === null ? null : ['platform_override' => $window->platformOverride(), 'target' => $window->target()];
     }
 
     /** @return Lock */
