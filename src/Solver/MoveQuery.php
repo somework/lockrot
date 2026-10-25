@@ -88,7 +88,7 @@ final class MoveQuery
     /** One key per Composer request: two moves with one request share one check. */
     public function key(): string
     {
-        return implode(' ', [$this->isRequire ? 'require' : 'update', $this->package, $this->constraint, $this->php]);
+        return implode(' ', [$this->isRequire ? ($this->dev ? 'require --dev' : 'require') : 'update', $this->package, $this->constraint, $this->php]);
     }
 
     public function request(): SolveRequest

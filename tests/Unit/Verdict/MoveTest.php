@@ -14,7 +14,10 @@ use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Golden;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\GradedPackage;
+use Lockrot\Verdict\Move;
+use Lockrot\Verdict\MoveSubject;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -717,5 +720,16 @@ final class MoveTest extends TestCase
             'a blocked move beside an advisory' => ['releases' => array_merge($one, [self::release('2.3.0', '2026-06-01', '>=9.0')]), 'advisories' => [self::advisory('PKSA-1', 'high', '<99.0')]],
             'two 0.x lines' => ['lock' => [['version' => '0.3.1']], 'root' => ['require' => ['a/b' => '^0.3']], 'releases' => [self::release('0.3.1', '2019-01-01', '>=7.2'), self::release('0.3.5', '2020-01-01', '>=7.2'), self::release('0.4.0', '2026-01-01', '>=7.2')], 'advisories' => [self::advisory('PKSA-1', 'high', '<0.3.5')]],
         ];
+    }
+
+    public function testTheCopyWithTheHoldersThatMoveLeavesTheMoveAsItWas(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null);
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], [['composer', 'update', 'acme/lib']], $subject);
+        $movesWith = [['package' => 'acme/holder', 'installed_version' => '1.0.0', 'version' => '2.0.0']];
+
+        $copy = $move->withMovesWith($movesWith);
+
+        self::assertSame([[], $movesWith], [$move->movesWith(), $copy->movesWith()]);
     }
 }

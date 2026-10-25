@@ -118,7 +118,7 @@ final class RecordedMoveChecker implements MoveChecker
 
         $problem = self::text($check, 'problem') ?? 'Your requirements could not be resolved to an installable set of packages.';
 
-        return new CheckOutcome($outcome, $holds, null, $outcome->isRefused() ? $problem : null);
+        return new CheckOutcome($outcome, $holds, $outcome->isRefused() ? $problem : null);
     }
 
     public function combined(array $inline): CheckOutcome

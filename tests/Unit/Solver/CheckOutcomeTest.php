@@ -56,6 +56,32 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([true, [$first], []], [$joined->check()->isRefused(), $joined->holds(), $joined->movesWith()]);
     }
 
+    /** The root hold names the root's `name` as its package: it is no holder of a joint request. */
+    public function testARootHoldIsNoHolderAlthoughItNamesTheRootPackage(): void
+    {
+        $root = new Holder(Holder::ROOT, 'acme/app', null, Holder::REQUIRE, '^1.0');
+        $package = new Holder(Holder::PACKAGE, 'acme/holder', '1.0.0', Holder::REQUIRE, '^1.0');
+
+        $outcome = new CheckOutcome(MoveCheck::refused(), [$root, $package]);
+
+        self::assertSame(['acme/holder'], $outcome->holders('acme/lib'));
+    }
+
+    public function testTheCopiesWithChangesAndWithoutRootOnHoldersLeaveTheOutcomeAsItWas(): void
+    {
+        $root = new Holder(Holder::ROOT, null, null, Holder::ROOT_REQUIRE, '^1.0', 'acme/holder');
+        $package = new Holder(Holder::PACKAGE, 'acme/holder', '1.0.0', Holder::REQUIRE, '^1.0');
+        $outcome = new CheckOutcome(MoveCheck::refused(), [$root, $package]);
+
+        $changed = $outcome->withChanges(['acme/lib' => '1.9.0']);
+        $withoutRoot = $outcome->withoutRootOnHolders();
+
+        self::assertSame(
+            [[], ['acme/lib' => '1.9.0'], [$root, $package], [$package]],
+            [$outcome->changes(), $changed->changes(), $outcome->holds(), $withoutRoot->holds()],
+        );
+    }
+
     public function testTheCopyLeavesTheOutcomeItComesFromAsItWas(): void
     {
         $root = new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.0');

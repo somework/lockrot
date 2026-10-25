@@ -395,11 +395,9 @@ final class MoveBuilder
         $whyNot = \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true) && $version !== null && ($check === null || !$check->isResolved())
             ? [['composer', 'why-not', $subject->package(), $version, '--locked']]
             : [];
-        if ($check !== null && $check->isRefused()) {
-            return $whyNot;
-        }
+        $steps = $check !== null && $check->isRefused() ? [] : self::steps($kind, $subject, $constraint, $phpCheck, $latest, $version, $check, $checks, $holders);
 
-        return array_merge(self::steps($kind, $subject, $constraint, $phpCheck, $latest, $version, $check, $checks, $holders), $whyNot);
+        return array_merge($steps, $whyNot);
     }
 
     /**

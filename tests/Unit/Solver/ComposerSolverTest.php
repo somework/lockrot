@@ -43,7 +43,7 @@ final class ComposerSolverTest extends TestCase
     {
         $solver = self::solver(['require-dev' => ['acme/dev' => '^1.0']], [], ['acme/dev' => [['version' => '1.0.0'], ['version' => '2.0.0']]], [['name' => 'acme/dev', 'version' => '1.0.0']]);
 
-        self::assertSame(['acme/dev' => '2.0.0'], $solver->solve(SolveRequest::require('acme/dev', ['acme/dev' => '^2.0']))->installs());
+        self::assertSame(['acme/dev' => '2.0.0'], $solver->solve(SolveRequest::require('acme/dev', ['acme/dev' => '^2.0'], false))->installs());
     }
 
     /** `composer require` without `--dev` moves a name out of require-dev, so the move's constraint is the only one left. */
@@ -51,7 +51,7 @@ final class ComposerSolverTest extends TestCase
     {
         $solver = self::solver(['require' => ['acme/lib' => '^1.0'], 'require-dev' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0']]]);
 
-        self::assertSame(['acme/lib' => '2.0.0'], $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0']))->installs());
+        self::assertSame(['acme/lib' => '2.0.0'], $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0'], false))->installs());
         self::assertSame(['acme/lib'], array_keys($solver->root()->getDevRequires()), 'the solve changes a copy of the root');
     }
 
@@ -238,7 +238,7 @@ final class ComposerSolverTest extends TestCase
     {
         $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0']]]);
 
-        $required = $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0']));
+        $required = $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0'], false));
         $updated = $solver->solve(SolveRequest::update(['acme/lib' => '^2.0']));
 
         self::assertSame([true, false], [$required->resolves(), $updated->resolves()]);

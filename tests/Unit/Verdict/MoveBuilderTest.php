@@ -315,12 +315,15 @@ final class MoveBuilderTest extends TestCase
 
     public function testAPackageThatOnlyRequireDevListsGetsTheRequireCommandOfThatSection(): void
     {
-        [$row, $context] = self::checked(['require a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, true, null, [], null, [], ['require-dev']);
+        [$row, $context] = self::checked(['require --dev a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, true, null, [], null, [], ['require-dev']);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
 
-        self::assertSame([['composer', 'require', 'a/b:^2.0', '--dev']], $move->commands());
+        $check = $move->check();
+
+        self::assertNotNull($check);
+        self::assertSame([MoveCheck::RESOLVES, [['composer', 'require', 'a/b:^2.0', '--dev']]], [$check->result(), $move->commands()]);
     }
 
     /** @return array<string, mixed> a refusal by the holder h/x 1.0.0, and the joint request that moves h/x to 2.1.0 */

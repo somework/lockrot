@@ -66,7 +66,7 @@ final class SolverChecker implements MoveChecker
             if ($solution === null || $this->failed($solution)) {
                 $this->baseline = new CheckOutcome(MoveCheck::notChecked($solution === null ? MoveCheck::INSTALL_TIME_BUDGET : MoveCheck::SOLVER_ERROR));
             } else {
-                $this->baseline = $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), [], null, $solution->problem());
+                $this->baseline = $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), [], $solution->problem());
             }
         }
 
@@ -103,7 +103,7 @@ final class SolverChecker implements MoveChecker
 
         return $solution->resolves()
             ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE))
-            : new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds()), null, $solution->problem());
+            : new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds()), $solution->problem());
     }
 
     public function platformPhp(): string

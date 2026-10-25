@@ -797,6 +797,42 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'installs' => '5.3.9'], $outcome->check()->jsonSerialize());
     }
 
+    /** Without a newest release, the first form that resolves is the move's form, although `-w` installs a higher release. */
+    public function testWithoutANewestReleaseTheFirstResolvingFormStays(): void
+    {
+        $checker = self::checker(['acme/app-auth' => '^1.0'], self::webauthnLock(), self::webauthnRemote(true));
+
+        $outcome = $checker->check(MoveQuery::update('web-auth/webauthn-lib', '^5.3.5', '5.3.5'));
+
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '5.3.8'], $outcome->check()->jsonSerialize());
+    }
+
+    /** The form that installs the move's newest release wins, although a later form installs a higher one. */
+    public function testTheFirstFormThatInstallsTheNewestReleaseWinsOverAHigherRelease(): void
+    {
+        $checker = self::checker(['acme/app-auth' => '^1.0'], self::webauthnLock(), self::webauthnRemote(true));
+
+        $outcome = $checker->check(MoveQuery::update('web-auth/webauthn-lib', '^5.3.5', '5.3.5', null, '5.3.8'));
+
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '5.3.8'], $outcome->check()->jsonSerialize());
+    }
+
+    /** The budget stops `-w` after the inline form resolved below the newest release: the inline form stays the move's form. */
+    public function testABudgetThatStopsALaterFormKeepsTheFormThatResolved(): void
+    {
+        // The clock reads: the deadline, the baseline, the inline form, then `-w` past the budget.
+        $readings = [0.0, 0.0, 0.0, 100.0];
+        $now = static function () use (&$readings): float {
+            return array_shift($readings) ?? 100.0;
+        };
+        $solver = new ComposerSolver(self::root(['acme/app-auth' => '^1.0']), LockFile::fromArray(['packages' => self::webauthnLock()])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(self::webauthnRemote(true)), []);
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::inSeconds(10.0, $now));
+
+        $outcome = $checker->check(MoveQuery::update('web-auth/webauthn-lib', '^5.3.5', '5.3.5', null, '5.3.9'));
+
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '5.3.8'], $outcome->check()->jsonSerialize());
+    }
+
     /** @return list<array<string, mixed>> */
     private static function webauthnLock(): array
     {

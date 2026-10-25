@@ -19,7 +19,6 @@ final class CheckOutcome
     private MoveCheck $check;
     /** @var list<Holder> */
     private array $holds;
-    private ?string $installs;
     private ?string $problem;
     /** @var array<string, string> */
     private array $changes = [];
@@ -28,11 +27,10 @@ final class CheckOutcome
     private bool $joint = false;
 
     /** @param list<Holder> $holds */
-    public function __construct(MoveCheck $check, array $holds = [], ?string $installs = null, ?string $problem = null)
+    public function __construct(MoveCheck $check, array $holds = [], ?string $problem = null)
     {
         $this->check = $check;
         $this->holds = $holds;
-        $this->installs = $installs ?? $check->installs();
         $this->problem = $problem;
     }
 
@@ -156,7 +154,7 @@ final class CheckOutcome
     /** The version of the moved package that a resolved move installs, null otherwise. */
     public function installs(): ?string
     {
-        return $this->installs;
+        return $this->check->installs();
     }
 
     public function problem(): ?string

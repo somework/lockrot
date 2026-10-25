@@ -11,7 +11,9 @@ use Lockrot\Signal\PhpFloor;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\GradedPackage;
+use Lockrot\Verdict\Latest;
 use Lockrot\Verdict\Move;
+use Lockrot\Verdict\MoveFact;
 use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\MoveText;
 use Lockrot\Verdict\ThroughEntry;
@@ -109,6 +111,31 @@ final class MoveTextTest extends TestCase
         $move = new Move(Move::FIND_ALTERNATIVE, FlagSet::ABANDONED, [], null, null, null, null, null, null, null, null, null, null, null, [], [], [], [], [], null, [], [], $subject);
 
         self::assertSame('find a replacement (none named)', MoveText::render($move));
+    }
+
+    /** A refused move keeps one command, the why-not step, and `composer why-not` reads config.platform.php too. */
+    public function testARefusedMoveWhoseOnlyCommandIsTheWhyNotStepFirstSetsThePlatformPhp(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '7.4.29');
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], [['composer', 'why-not', 'acme/lib', '2.0.0', '--locked']], $subject);
+
+        self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. ', MoveText::render($move->withCheck(MoveCheck::refused())));
+    }
+
+    public function testATagMoveThatInstallsBelowTheTagNamesTheReleaseAfterTheTagDate(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null);
+        $move = new Move(Move::TAG, FlagSet::PINNED, [], null, null, null, null, null, '2.0.0', '2.0.0', null, new Latest('2.0.0', '2026-01-01T00:00:00+00:00', false, null, null), null, false, [], [], [], [], [], null, [], [['composer', 'require', 'acme/lib:2.0.0']], $subject);
+
+        self::assertStringStartsWith('require a tag — the newest is 2.0.0 (2026-01-01) (gets 1.9.0, below the newest 2.0.0)', MoveText::render($move->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '1.9.0'))));
+    }
+
+    public function testARequireMoveNamesTheReleaseBelowTheNewestBeforeWhatItClears(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null);
+        $move = new Move(Move::REQUIRE, FlagSet::ABANDONED, [], null, null, null, null, null, '2.0.0', '2.1.0', '^2.0', null, null, false, [], [MoveFact::on(MoveFact::FLAG, FlagSet::ABANDONED, MoveFact::OUTSIDE_RANGE)], [], [], [], null, [], [['composer', 'require', 'acme/lib:^2.0']], $subject);
+
+        self::assertStringStartsWith('require acme/lib ^2.0 (gets 2.0.5, below the newest 2.1.0) — clears abandoned', MoveText::render($move->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '2.0.5'))));
     }
 
     /** The finding's own release holds the move: the hold takes no grade and no flags of the installed version, and follows the root holds. */

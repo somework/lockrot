@@ -73,7 +73,7 @@ final class SolveRequest
      *                                           changes the root requirement without an update
      * @param bool                  $dev         `require --dev`: the package's change goes to `require-dev`
      */
-    public static function require(string $package, array $rootChanges, bool $dev = false): self
+    public static function require(string $package, array $rootChanges, bool $dev): self
     {
         $request = new self([$package => $package], [], $rootChanges, self::LISTED);
         $request->dev = $dev ? [$package => $package] : [];

@@ -122,15 +122,12 @@ final class MoveCheck implements \JsonSerializable
         return $this->installs;
     }
 
-    /** The installed release when it sorts below `$newest`, else null. */
+    /** The installed release when it sorts below `$newest`, else null: also when either one is missing or does not parse. */
     public function installsBelow(?string $newest): ?string
     {
-        if ($this->installs === null || $newest === null) {
-            return null;
-        }
         $parser = new VersionParser();
         try {
-            return Comparator::lessThan($parser->normalize($this->installs), $parser->normalize($newest)) ? $this->installs : null;
+            return Comparator::lessThan($parser->normalize((string) $this->installs), $parser->normalize((string) $newest)) ? $this->installs : null;
         } catch (\UnexpectedValueException $e) {
             return null;
         }
