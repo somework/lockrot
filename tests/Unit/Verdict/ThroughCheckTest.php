@@ -34,7 +34,29 @@ final class ThroughCheckTest extends TestCase
             'newest_stable' => ['version' => '2.0.0', 'released' => '2026-01-01T00:00:00+00:00'],
             'newest_requires' => false,
             'newest_requires_unmeasured' => null,
+            'local' => false,
+            'newest_is_installed' => false,
         ]], $entries);
+    }
+
+    public function testADependentWhoseLockedReleaseIsItsNewestStableReleaseSaysSo(): void
+    {
+        $entries = self::check(['d/x' => [['1.0.0', '2024-01-01', true]], 'd/y' => null]);
+
+        self::assertSame([true, null], [$entries[0]['newest_is_installed'], $entries[1]['newest_is_installed']]);
+    }
+
+    /** The project's own path package: its dependent entry is `local`, and lockrot reads none of its releases. */
+    public function testADependentInstalledFromALocalPathIsLocal(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => self::PACKAGIST],
+            ['name' => 'app/module', 'version' => 'dev-main', 'dist' => ['type' => 'path', 'url' => './modules/app']],
+        ]]);
+
+        $entry = JsonPath::decoded(ThroughCheck::of('a/b', false, ['app/module'], $lock, [])[0]);
+
+        self::assertSame([true, null, 'not_from_composer_repository'], [$entry['local'], $entry['newest_is_installed'], $entry['newest_requires_unmeasured']]);
     }
 
     public function testADependentWhoseNewestReleaseStillRequiresThePackageIsMeasured(): void
@@ -132,8 +154,8 @@ final class ThroughCheckTest extends TestCase
         self::assertSame([], ThroughCheck::of('a/b', true, ['a/b'], LockFile::fromArray(['packages' => []]), []));
     }
 
-    /** The lead move of a transitive package lists the entries, ends its commands with `why-not`, and its text names the dependent. */
-    public function testTheLeadMoveCarriesTheEntriesAndTheWhyNotCommand(): void
+    /** The lead move of a transitive package lists the entries, and its `why-not` step asks about the moved package, not the dependent. */
+    public function testTheLeadMoveCarriesTheEntriesAndAWhyNotStepOnTheMovedPackage(): void
     {
         $inputs = JsonPath::arrayAt(CaseHydrator::case('psr7'), ['inputs']);
         $inputs['dependents'] = ['guzzlehttp/guzzle' => [
@@ -149,8 +171,7 @@ final class ThroughCheckTest extends TestCase
         $move = JsonPath::arrayAt($finding, ['next_step']);
 
         self::assertSame([false], array_column(JsonPath::arrayAt($move, ['through']), 'newest_requires'));
-        $commands = JsonPath::arrayAt($move, ['commands']);
-        self::assertSame(['composer', 'why-not', 'guzzlehttp/guzzle', '8.2.0'], end($commands));
+        self::assertSame([['composer', 'why-not', 'guzzlehttp/psr7', '2.13.0', '--locked']], array_values(array_filter(JsonPath::arrayAt($move, ['commands']), static fn ($command): bool => \is_array($command) && ($command[1] ?? null) === 'why-not')));
     }
 
     /**

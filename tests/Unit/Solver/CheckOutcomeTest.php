@@ -33,6 +33,18 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([$root, $package], $outcome->holds());
     }
 
+    /** mautic at 8.2: mautic/core-lib's own requirement holds the move, so the root requirement on core-lib is not a second hold. */
+    public function testARootHoldOnAPackageThatAPackageHoldNamesDrops(): void
+    {
+        $coreLib = new Holder(Holder::ROOT, null, null, Holder::ROOT_REQUIRE, '^7.0', 'mautic/core-lib');
+        $other = new Holder(Holder::ROOT, null, null, Holder::ROOT_REQUIRE, '^3.0', 'acme/other');
+        $package = new Holder(Holder::PACKAGE, 'mautic/core-lib', '7.0.1', Holder::REQUIRE, '~2.7.0', null);
+
+        $outcome = (new CheckOutcome(MoveCheck::refused(), [$coreLib, $other, $package]))->withoutRootOnHolders();
+
+        self::assertSame([$other, $package], $outcome->holds());
+    }
+
     public function testTheCopyLeavesTheOutcomeItComesFromAsItWas(): void
     {
         $root = new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.0');

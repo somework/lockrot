@@ -28,6 +28,8 @@ final class ThroughEntry implements \JsonSerializable
     private ?StableRelease $newestStable;
     private ?bool $newestRequires;
     private ?string $unmeasured;
+    private bool $local = false;
+    private ?bool $newestIsInstalled = null;
 
     private function __construct(string $package, ?string $installedVersion, ?bool $installedRequires, ?StableRelease $newestStable, ?bool $newestRequires, ?string $unmeasured)
     {
@@ -66,6 +68,29 @@ final class ThroughEntry implements \JsonSerializable
         return new self($package, $installedVersion, true, $newestStable, \in_array($required, $newestRequires, true), null);
     }
 
+    /**
+     * A copy that knows the dependent's own `origin.local`, and whether its locked release is its
+     * newest stable one: null when lockrot read no newest stable release.
+     */
+    public function withInstalled(bool $local, ?string $installedNormalized): self
+    {
+        $clone = clone $this;
+        $clone->local = $local;
+        $clone->newestIsInstalled = $this->newestStable === null ? null : $installedNormalized === $this->newestStable->normalized();
+
+        return $clone;
+    }
+
+    public function isLocal(): bool
+    {
+        return $this->local;
+    }
+
+    public function newestIsInstalled(): ?bool
+    {
+        return $this->newestIsInstalled;
+    }
+
     public function package(): string
     {
         return $this->package;
@@ -82,7 +107,7 @@ final class ThroughEntry implements \JsonSerializable
         return $this->newestStable === null ? null : $this->newestStable->pretty();
     }
 
-    /** @return array{package: string, installed_version: ?string, installed_requires: ?bool, newest_stable: ?array{version: string, released: ?string}, newest_requires: ?bool, newest_requires_unmeasured: ?string} */
+    /** @return array{package: string, installed_version: ?string, installed_requires: ?bool, newest_stable: ?array{version: string, released: ?string}, newest_requires: ?bool, newest_requires_unmeasured: ?string, local: bool, newest_is_installed: ?bool} */
     public function jsonSerialize(): array
     {
         $newest = $this->newestStable;
@@ -95,6 +120,8 @@ final class ThroughEntry implements \JsonSerializable
             'newest_stable' => $newest === null ? null : ['version' => $newest->pretty(), 'released' => $at === null ? null : $at->format(\DATE_ATOM)],
             'newest_requires' => $this->newestRequires,
             'newest_requires_unmeasured' => $this->unmeasured,
+            'local' => $this->local,
+            'newest_is_installed' => $this->newestIsInstalled,
         ];
     }
 }

@@ -25,6 +25,7 @@ final class CheckOutcome
     private array $changes = [];
     /** @var list<array{package: string, installed_version: string, version: string}> */
     private array $movesWith = [];
+    private bool $joint = false;
 
     /** @param list<Holder> $holds */
     public function __construct(MoveCheck $check, array $holds = [], ?string $installs = null, ?string $problem = null)
@@ -82,8 +83,15 @@ final class CheckOutcome
         }
         $resolved = new self(MoveCheck::resolves(MoveCheck::INLINE, $installs));
         $resolved->movesWith = $movesWith;
+        $resolved->joint = true;
 
         return $resolved;
+    }
+
+    /** Whether the joint request resolves the move: then nothing holds it. */
+    public function isJoint(): bool
+    {
+        return $this->joint;
     }
 
     /** @return list<array{package: string, installed_version: string, version: string}> the holders that the joint solve moves, in holder order */

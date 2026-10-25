@@ -109,7 +109,7 @@ final class MoveWordsWallabagTest extends TestCase
         $own = array_values(array_filter(JsonPath::arrayAt($move, ['held_by']), static fn ($hold): bool => \is_array($hold) && $hold['source'] === 'root' && $hold['target'] === null));
 
         self::assertSame([['require-dev', '^4.4.47']], array_map(static fn (array $hold): array => [$hold['link'], $hold['constraint']], $own));
-        self::assertStringContainsString('held by composer.json (requires ^4.4.47 (require-dev)) and composer.json (requires symfony/debug-bundle', JsonPath::stringAt($move, ['text']));
+        self::assertStringContainsString('held by composer.json (requires ^4.4.47 in require-dev) and composer.json (requires symfony/debug-bundle', JsonPath::stringAt($move, ['text']));
     }
 
     /** twig/twig is locked at v3.11.3: its hold at a newer release is not that finding, so it carries no grade and no flags. */

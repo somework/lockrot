@@ -19,6 +19,7 @@ final class MoveQuery
     private bool $isRequire;
     private ?string $php;
     private ?string $newest;
+    private bool $dev = false;
 
     /**
      * @param string  $version the release that the move names, which the hold scan reads
@@ -43,6 +44,15 @@ final class MoveQuery
     public static function require(string $package, string $constraint, string $version, ?string $php = null, ?string $newest = null): self
     {
         return new self($package, $constraint, $version, true, $php, $newest);
+    }
+
+    /** A copy for a package that only `require-dev` lists: `composer require --dev`. */
+    public function inRequireDev(): self
+    {
+        $clone = clone $this;
+        $clone->dev = $this->isRequire;
+
+        return $clone;
     }
 
     public function package(): string
@@ -86,7 +96,7 @@ final class MoveQuery
         $php = $this->php === null ? [] : ['php' => $this->php];
 
         return $this->isRequire
-            ? SolveRequest::require($this->package, [$this->package => $this->constraint] + $php)
+            ? SolveRequest::require($this->package, [$this->package => $this->constraint] + $php, $this->dev)
             : SolveRequest::update([$this->package => $this->constraint])->withRootChanges($php);
     }
 

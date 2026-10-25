@@ -83,10 +83,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **All formats:** Composer's solver checks each move offline against the lock, and the move
-  writes `check` (`resolves`, `refused` or `not_checked`). A refused move names its holds in
-  `held_by[]` and prints no `update` or `require` step. A resolved step names its constraint inline
-  and the dependency option it needs. `run.move_check` names the Composer that solved.
-  ([The move check](docs/verdicts.md#the-move-check))
+  writes `check` with the release it `installs`. A refused move asks once more with its holders, and
+  `moves_with[]` names the holders that move. A move still refused names its holds in `held_by[]`
+  and prints only `composer why-not --locked`. ([The move check](docs/verdicts.md#the-move-check))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
   installs, with require-dev and without, and the links that set each edge. The minors and edges
   assume no override, and `platform_override` names the lock's `platform-overrides.php`. The text
@@ -94,7 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **json, table, markdown, github:** `run.php_window.target_fix` names the packages that exclude
   the target PHP, and the answer of Composer's solver to their update at the target: the command,
   the holds of a refusal, or the root links that no update can change. The `php:` line prints it,
-  and marks a root hold on a packages-dev package "(require-dev)".
+  and marks a root hold on a packages-dev package " in require-dev".
   ([The update that admits the target](docs/verdicts.md#the-update-that-admits-the-target))
 - **All formats:** the run notes `update_now_not_checked`, `move_check_failed` and
   `package_name_invalid`. lockrot skips a lock entry whose name is no Composer package name.

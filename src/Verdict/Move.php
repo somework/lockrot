@@ -16,7 +16,7 @@ use Lockrot\Solver\MoveCheck;
  *
  * @internal
  *
- * @phpstan-type Shape array{kind: string, source: string, merged: list<string>, fix_kind: ?string, reason: ?string, replacement: ?Replacement, quiet_years: ?float, to_branch: ?string, version: ?string, newest: ?string, constraint: ?string, latest: ?Latest, php_check: ?PhpCheck, crosses_major: ?bool, held_by: list<Holder>, clears: list<MoveFact>, unverified: list<MoveFact>, adds: list<MoveFact>, leaves: list<MoveFact>, clears_all: bool, if_applied: ?IfApplied, check: ?MoveCheck, composer_moves_because: list<string>, commands: list<list<string>>, through?: list<ThroughEntry>, also?: list<self>, text: string}
+ * @phpstan-type Shape array{kind: string, source: string, merged: list<string>, fix_kind: ?string, reason: ?string, replacement: ?Replacement, quiet_years: ?float, to_branch: ?string, version: ?string, newest: ?string, constraint: ?string, latest: ?Latest, php_check: ?PhpCheck, crosses_major: ?bool, held_by: list<Holder>, clears: list<MoveFact>, unverified: list<MoveFact>, adds: list<MoveFact>, leaves: list<MoveFact>, clears_all: bool, if_applied: ?IfApplied, check: ?MoveCheck, moves_with: list<array{package: string, installed_version: string, version: string}>, composer_moves_because: list<string>, commands: list<list<string>>, through?: list<ThroughEntry>, also?: list<self>, text: string}
  */
 final class Move implements \JsonSerializable
 {
@@ -58,6 +58,8 @@ final class Move implements \JsonSerializable
     private ?bool $crossesMajor;
     /** @var list<Holder> */
     private array $heldBy;
+    /** @var list<array{package: string, installed_version: string, version: string}> */
+    private array $movesWith = [];
     /** @var list<MoveFact> */
     private array $clears;
     /** @var list<MoveFact> */
@@ -139,9 +141,7 @@ final class Move implements \JsonSerializable
     }
 
     /**
-     * The lead move: its `through[]` entries, the `composer why-not` command of each dependent whose newest
-     * release does not require the package (when its arguments pass {@see CommandArgument}), and the
-     * other part's move.
+     * The lead move: its `through[]` entries and the other part's move.
      *
      * @param list<ThroughEntry> $through
      * @param list<self>         $also
@@ -151,14 +151,27 @@ final class Move implements \JsonSerializable
         $clone = clone $this;
         $clone->through = $through;
         $clone->also = $also;
-        foreach ($through as $entry) {
-            $whyNot = ['composer', 'why-not', $entry->package(), $entry->newestVersion() ?? ''];
-            if ($entry->newestRequires() === false && CommandArgument::allPass($whyNot)) {
-                $clone->commands[] = $whyNot;
-            }
-        }
 
         return $clone;
+    }
+
+    /**
+     * A copy with the holders that a resolving joint request moves beside the package.
+     *
+     * @param list<array{package: string, installed_version: string, version: string}> $movesWith
+     */
+    public function withMovesWith(array $movesWith): self
+    {
+        $clone = clone $this;
+        $clone->movesWith = $movesWith;
+
+        return $clone;
+    }
+
+    /** @return list<array{package: string, installed_version: string, version: string}> */
+    public function movesWith(): array
+    {
+        return $this->movesWith;
     }
 
     /** A copy with Composer's check of the move: null for a kind that runs no Composer request. */
@@ -385,6 +398,7 @@ final class Move implements \JsonSerializable
             'clears_all' => $this->clears !== [] && $this->leaves === [] && $this->unverified === [],
             'if_applied' => $this->ifApplied,
             'check' => $this->check,
+            'moves_with' => $this->movesWith,
             'composer_moves_because' => $this->composerMovesBecause,
             'commands' => $this->commands,
         ];

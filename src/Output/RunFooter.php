@@ -331,7 +331,7 @@ final class RunFooter
             case MoveCheck::REFUSED:
                 $dev = array_column(array_filter($fix['packages'], static fn (array $entry): bool => $entry['dev']), 'name');
                 $holds = array_map(static fn (Holder $hold): string => $hold->source() === Holder::ROOT
-                    ? 'composer.json '.MoveText::linkWords($hold, $name).(\in_array($hold->target(), $dev, true) ? ' (require-dev)' : '')
+                    ? 'composer.json '.MoveText::linkWords($hold, $name).($hold->link() !== Holder::REQUIRE_DEV && \in_array($hold->target(), $dev, true) ? ' in require-dev' : '')
                     : $name((string) $hold->package()).' '.$hold->version().' '.MoveText::linkWords($hold, $name), $fix['held_by']);
 
                 return "Composer's solver at PHP ".$target.' refuses the update of '.$them.($holds === [] ? '' : ': '.implode(' and ', $holds));

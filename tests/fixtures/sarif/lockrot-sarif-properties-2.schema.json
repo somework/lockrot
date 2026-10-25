@@ -1349,6 +1349,7 @@
             "verdict",
             "lead",
             "flag_ids",
+            "direct",
             "replacement",
             "next_step"
           ],
@@ -1374,6 +1375,10 @@
                 "$ref": "#/definitions/flag"
               },
               "uniqueItems": true
+            },
+            "direct": {
+              "description": "The holder's own `direct`: whether the project's composer.json requires the holder.",
+              "type": "boolean"
             },
             "replacement": {
               "description": "The holder's `replacement` (a Composer package name), so an abandoned holder reads \"held by abandoned symfony/x (replacement: …)\".",
@@ -1620,7 +1625,8 @@
           "required": [
             "result",
             "form",
-            "reason"
+            "reason",
+            "installs"
           ],
           "properties": {
             "result": {
@@ -1671,11 +1677,19 @@
                   "type": "null"
                 }
               ]
+            },
+            "installs": {
+              "description": "The release of the moved package that the resolving form installs, as its repository lists it. Null unless `result` is `resolves`, and null when the check was recorded without it.",
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1
             }
           },
           "allOf": [
             {
-              "description": "`form` is set exactly on `resolves`, and `reason` exactly on `not_checked`.",
+              "description": "`form` is set exactly on `resolves`, `reason` exactly on `not_checked`, and `installs` only on `resolves`.",
               "anyOf": [
                 {
                   "properties": {
@@ -1704,6 +1718,9 @@
                     },
                     "reason": {
                       "type": "null"
+                    },
+                    "installs": {
+                      "type": "null"
                     }
                   }
                 },
@@ -1719,6 +1736,9 @@
                     },
                     "reason": {
                       "type": "string"
+                    },
+                    "installs": {
+                      "type": "null"
                     }
                   }
                 }

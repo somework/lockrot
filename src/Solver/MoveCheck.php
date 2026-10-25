@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
+use Composer\Semver\Comparator;
+use Composer\Semver\VersionParser;
+
 /**
  * A move's `check`: whether Composer's solver installs it from the lock, in which command form,
  * or why lockrot did not ask (docs/verdicts.md#the-move-check).
@@ -117,6 +120,20 @@ final class MoveCheck implements \JsonSerializable
     public function installs(): ?string
     {
         return $this->installs;
+    }
+
+    /** The installed release when it sorts below `$newest`, else null. */
+    public function installsBelow(?string $newest): ?string
+    {
+        if ($this->installs === null || $newest === null) {
+            return null;
+        }
+        $parser = new VersionParser();
+        try {
+            return Comparator::lessThan($parser->normalize($this->installs), $parser->normalize($newest)) ? $this->installs : null;
+        } catch (\UnexpectedValueException $e) {
+            return null;
+        }
     }
 
     public function isResolved(): bool

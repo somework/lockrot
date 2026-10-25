@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Solver;
 
 use Composer\Package\BasePackage;
+use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\VersionParser;
 use Lockrot\Deadline;
@@ -198,8 +199,8 @@ final class SolverChecker implements MoveChecker
 
     /**
      * The request as listed, then `-w`, then `-W`: the first form that resolves and installs
-     * $newest, else the first form that resolves, with its solution; a null form and the last
-     * refusal; or the outcome of a solve that did not run.
+     * $newest, else the resolving form that installs the highest release, the first on a tie, with
+     * its solution; a null form and the last refusal; or the outcome of a solve that did not run.
      *
      * @param non-empty-list<string> $moved the names that the request moves, the move's package first
      *
@@ -220,7 +221,7 @@ final class SolverChecker implements MoveChecker
                 return [$form, $solution];
             }
             if ($solution->resolves()) {
-                $resolved ??= [$form, $solution];
+                $resolved = $resolved !== null && !self::installsHigher($solution, $resolved[1], $moved[0]) ? $resolved : [$form, $solution];
             } else {
                 $last = $solution;
             }
@@ -239,6 +240,17 @@ final class SolverChecker implements MoveChecker
         $parser = new VersionParser();
         try {
             return $installs !== null && $parser->normalize($installs) === $parser->normalize($newest);
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
+    }
+
+    /** Whether $solution installs a higher release of $package than $than; false when a release does not parse. */
+    private static function installsHigher(Solution $solution, Solution $than, string $package): bool
+    {
+        $parser = new VersionParser();
+        try {
+            return Comparator::greaterThan($parser->normalize((string) ($solution->installs()[$package] ?? '')), $parser->normalize((string) ($than->installs()[$package] ?? '')));
         } catch (\UnexpectedValueException $e) {
             return false;
         }

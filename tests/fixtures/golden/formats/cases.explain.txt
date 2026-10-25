@@ -308,7 +308,7 @@ score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     hig
   reach        via lorisleiva/laravel-search-string: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package
+do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string
 
 flags
   abandoned    S1 high, S3 high · marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.1 years ago); last push 2021-04-28 (5.4 years ago)
@@ -1879,7 +1879,7 @@ score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     hig
   reach        via lorisleiva/laravel-search-string: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package
+do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string
 
 flags
   abandoned    S1 high · marked abandoned by its registry; last release 2017-08-29 (9.1 years ago)
@@ -1945,7 +1945,7 @@ score     18 = (left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high 
   dev          packages-dev: the score ÷ 2
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 (require-dev)); a new major brings its own requirements, which lockrot does not solve
+do        require symfony/monolog-bridge ^5.4.52 in require-dev — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 in require-dev); a new major brings its own requirements, which lockrot does not solve
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
@@ -1986,7 +1986,7 @@ score     16 = vulnerable 32 [critical advisory] ÷ 2 dev     high from 16
   dev          packages-dev: the score ÷ 2
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+do        raise require.php to >=8.1, then require twig/twig ^3.27.0 in require-dev — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
           clears PKSA-h8hf-ytnd-5t9q, PKSA-8zx5-v2nz-58pb, PKSA-dpx1-78wg-1kqs, PKSA-gw7n-z4yx-7xjt, PKSA-1tmc-rt7x-12w6, PKSA-3mcc-k66d-pydb, PKSA-fbvq-z33h-r2np, PKSA-xx6c-6d96-db2w, PKSA-kvv6-36cr-fkzb, PKSA-yd6k-t2gh-1m43, PKSA-2wrf-1xmk-1pky, PKSA-g9zw-qxh8-pq8w, PKSA-n14z-jjjg-g8vd, PKSA-sjvz-tbbr-vwth, PKSA-yhcn-xrg3-68b1
 
 flags
@@ -2623,7 +2623,7 @@ score     18 = (abandoned 32 + left-behind 4 [¼ of 16]) ÷ 2 transitive     hig
   reach        via web-auth/webauthn-lib: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it
+do        replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update web-auth/webauthn-lib; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it
 
 flags
   abandoned    S1 high · marked abandoned by its registry, replacement: web-auth/webauthn-lib
@@ -2785,7 +2785,7 @@ score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     hig
   reach        via lorisleiva/laravel-search-string: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package
+do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string
 
 flags
   abandoned    S1 high · marked abandoned by its registry; last release 2017-08-29 (9.1 years ago)
@@ -2817,7 +2817,7 @@ score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     hig
   reach        via lorisleiva/laravel-search-string: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package
+do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string
 
 flags
   abandoned    S1 high · marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); last commit 2021-04-28 (5.4 years ago)
@@ -3847,7 +3847,7 @@ score     8 = left-behind 16 ÷ 2 transitive     medium from 8
   reach        via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, php-http/httplug-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, sentry/sentry-symfony, stof/doctrine-extensions-bundle, symfony/error-handler, symfony/framework-bundle, symfony/http-kernel, symfony/monolog-bundle, symfony/security-bundle, symfony/security-http, symfony/twig-bundle, twig/extra-bundle, willdurand/hateoas-bundle: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        move symfony/var-dumper to ^5.4 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 31 more — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.8) still requires it
+do        require symfony/var-dumper ^5.4 in require-dev — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
           clears left-behind
 
 flags
@@ -4316,7 +4316,7 @@ score     16 = vulnerable 16 [high advisory]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock
+do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock
           clears PKSA-28rh-rzzn-djk4
 
 flags
@@ -4329,7 +4329,7 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json and symfony/mailer v6.4.40, its own release and acme/ml-widget; after it: 0, ok; Composer's solver refuses it
+   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by symfony/mailer v6.4.40, its own release and acme/ml-widget; after it: 0, ok; Composer's solver refuses it
 
 == case mc-pass-cap‡
 symfony/mailer v6.4.27 — high: vulnerable
@@ -4347,7 +4347,7 @@ score     16 = vulnerable 16 [high advisory]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it
+do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it
           clears PKSA-28rh-rzzn-djk4
 
 flags
@@ -4360,7 +4360,7 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json and symfony/mailer v6.4.40, its own release and acme/ml-widget; after it: 0, ok, if Composer resolves it
+   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by symfony/mailer v6.4.40, its own release and acme/ml-widget; after it: 0, ok, if Composer resolves it
 
 == case mc-raise-php‡
 symfony/yaml v6.4.26 — high: vulnerable

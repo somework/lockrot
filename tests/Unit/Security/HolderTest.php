@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Security;
 
 use Lockrot\Security\Holder;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\GradedPackage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -80,7 +81,7 @@ final class HolderTest extends TestCase
     /** wallabag's twig/twig: a hold at v3.28.0 is not the finding of the locked v3.11.3, so it carries none of its grade and flags. */
     public function testAHoldTakesTheHoldersFindingOnlyAtTheLockedVersion(): void
     {
-        $twig = new GradedPackage('critical', null, ['vulnerable'], null, null, 'v3.11.3');
+        $twig = new GradedPackage('critical', null, ['vulnerable'], null, null, 'v3.11.3', true);
 
         $holds = Holder::filled([
             new Holder(Holder::PACKAGE, 'twig/twig', 'v3.28.0', Holder::PLATFORM, '>=8.1.0', 'php'),
@@ -95,6 +96,16 @@ final class HolderTest extends TestCase
         self::assertSame(
             ['source' => 'package', 'package' => 'symfony/yaml', 'version' => 'v5.4.54', 'link' => 'conflict', 'target' => 'symfony/console', 'constraint' => '<5.3', 'holder' => null],
             (new Holder(Holder::PACKAGE, 'symfony/yaml', 'v5.4.54', Holder::CONFLICT, '<5.3', 'symfony/console'))->jsonSerialize()
+        );
+    }
+
+    public function testAHoldersFindingSaysWhetherTheProjectRequiresTheHolder(): void
+    {
+        $transitive = new GradedPackage('high', 'left-behind', ['left-behind'], null, null, '2.7.2', false);
+
+        self::assertSame(
+            [false, ['verdict' => 'high', 'lead' => 'left-behind', 'flag_ids' => ['left-behind']]],
+            [JsonPath::decoded($transitive)['direct'] ?? null, JsonPath::decoded($transitive->asReplacement())]
         );
     }
 }

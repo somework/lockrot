@@ -785,6 +785,18 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '5.3.8'], $outcome->check()->jsonSerialize());
     }
 
+    /** No form installs 5.4.0, which needs a package that no repository has: `-w` installs 5.3.9, higher than the inline 5.3.8. */
+    public function testWhenNoFormInstallsTheNewestReleaseTheFormThatInstallsTheHighestReleaseWins(): void
+    {
+        $remote = self::webauthnRemote(true);
+        $remote['web-auth/webauthn-lib'][] = ['version' => '5.4.0', 'require' => ['acme/missing' => '^1.0']];
+        $checker = self::checker(['acme/app-auth' => '^1.0'], self::webauthnLock(), $remote);
+
+        $outcome = $checker->check(MoveQuery::update('web-auth/webauthn-lib', '^5.3.5', '5.3.5', null, '5.4.0'));
+
+        self::assertSame(['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'installs' => '5.3.9'], $outcome->check()->jsonSerialize());
+    }
+
     /** @return list<array<string, mixed>> */
     private static function webauthnLock(): array
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Verdict;
 
+use Lockrot\Data\Repository\StableRelease;
 use Lockrot\Security\Holder;
 use Lockrot\Security\PhpCheck;
 use Lockrot\Signal\PhpFloor;
@@ -13,6 +14,7 @@ use Lockrot\Verdict\GradedPackage;
 use Lockrot\Verdict\Move;
 use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\MoveText;
+use Lockrot\Verdict\ThroughEntry;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -112,7 +114,7 @@ final class MoveTextTest extends TestCase
     /** The finding's own release holds the move: the hold takes no grade and no flags of the installed version, and follows the root holds. */
     public function testAHoldOfTheFindingsOwnPackageNamesItsOwnRelease(): void
     {
-        $graded = new GradedPackage('high', 'left-behind', ['left-behind'], null, null, '1.0.0');
+        $graded = new GradedPackage('high', 'left-behind', ['left-behind'], null, null, '1.0.0', true);
         $holds = Holder::filled([
             new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.2'),
             new Holder(Holder::PACKAGE, 'a/early', '1.0.0', Holder::REQUIRE, '^1.2', 'acme/lib'),
@@ -131,7 +133,51 @@ final class MoveTextTest extends TestCase
         $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '7.4', null);
         $move = new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, null, true, $holds, [], [], [], [], null, [], [], $subject);
 
-        self::assertStringEndsWith('; held by composer.json (requires ^1.2 (require-dev))', MoveText::render($move));
+        self::assertStringEndsWith('; held by composer.json (requires ^1.2 in require-dev)', MoveText::render($move));
+    }
+
+    /** monica's web-auth/webauthn-lib: the resolving form installs 5.3.8, below the branch's newest 5.3.9. */
+    public function testAnUpdateWhoseFormInstallsBelowTheNewestReleaseNamesBoth(): void
+    {
+        $subject = new MoveSubject('web-auth/webauthn-lib', '5.2.0', false, ['web-auth/webauthn-symfony-bundle'], '8.4', null);
+        $move = (new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '5.x', '5.3.5', '5.3.9', null, null, null, false, [], [], [], [], [], null, [], [['composer', 'update', 'web-auth/webauthn-lib:^5.3.5']], $subject))
+            ->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '5.3.8'));
+
+        self::assertStringStartsWith("composer update 'web-auth/webauthn-lib:^5.3.5' (gets 5.3.8, below the newest 5.3.9)", MoveText::render($move));
+    }
+
+    /** A package that only require-dev lists reads as a root requirement of that section, also in a run without `--dev`. */
+    public function testARequireMoveOfARequireDevPackageNamesTheSectionThenTheReleaseItGets(): void
+    {
+        $subject = (new MoveSubject('acme/lib', '1.2.0', false, [], '8.4', null))->withNamedIn(['require-dev']);
+        $move = (new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.1.0', '^2.0', null, null, true, [], [], [], [], [], null, [], [['composer', 'require', 'acme/lib:^2.0', '--dev']], $subject))
+            ->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '2.0.4'));
+
+        self::assertStringStartsWith('require acme/lib ^2.0 in require-dev (gets 2.0.4, below the newest 2.1.0)', MoveText::render($move));
+    }
+
+    public function testASelfVersionHoldNamesTheHoldersVersion(): void
+    {
+        $hold = new Holder(Holder::PACKAGE, 'acme/suite', '3.1.0', Holder::REQUIRE, 'self.version', 'acme/lib');
+
+        self::assertSame('requires acme/lib self.version (3.1.0)', MoveText::linkWords($hold));
+    }
+
+    /** mautic's jbroadway/urlify: each dependent group gets its own action, and `chain[0]` names the package that requires the finding. */
+    public function testATransitiveMoveNamesOneActionPerDependentGroupAndTheRequirer(): void
+    {
+        $through = [
+            ThroughEntry::unread('mautic/core-lib', 'dev-main', ThroughEntry::NOT_FROM_COMPOSER_REPOSITORY)->withInstalled(true, null),
+            ThroughEntry::unread('c/unread', '2.0.0', ThroughEntry::RELEASES_UNKNOWN)->withInstalled(false, '2.0.0.0'),
+            ThroughEntry::measured('l/newest', '1.0.0', 'acme/lib', ['acme/lib'], new StableRelease('1.0.0.0', '1.0.0', new \DateTimeImmutable('2025-01-01'), null, false), ['acme/lib'])->withInstalled(false, '1.0.0.0'),
+        ];
+        $subject = (new MoveSubject('acme/lib', '1.2.0', false, ['mautic/core-lib', 'c/unread', 'l/newest'], '8.4', null))->withChain(['mautic/core-lib', 'jbroadway/urlify', 'acme/lib']);
+        $move = (new Move(Move::FIND_ALTERNATIVE, FlagSet::ABANDONED, [], null, null, null, null, null, null, null, null, null, null, null, [], [], [], [], [], null, [Move::TRANSITIVE], [], $subject))->asLead($through, []);
+
+        self::assertStringContainsString(
+            '; it comes in through mautic/core-lib (jbroadway/urlify requires it), c/unread, l/newest: change your own package mautic/core-lib, or replace or update c/unread, or replace l/newest',
+            MoveText::render($move)
+        );
     }
 
     /**
@@ -141,8 +187,8 @@ final class MoveTextTest extends TestCase
      */
     public function testTheTextRanksTheHoldsByGroupThenByGradeThenByName(): void
     {
-        $high = new GradedPackage('high', 'left-behind', ['left-behind'], null, null, '1.0.0');
-        $critical = new GradedPackage('critical', null, ['vulnerable'], null, null, '1.0.0');
+        $high = new GradedPackage('high', 'left-behind', ['left-behind'], null, null, '1.0.0', true);
+        $critical = new GradedPackage('critical', null, ['vulnerable'], null, null, '1.0.0', true);
         $holds = Holder::filled([
             new Holder(Holder::PACKAGE, 'a/other', '1.0.0', Holder::REQUIRE, '^1', 'psr/log'),
             new Holder(Holder::PACKAGE, 'z/critical', '1.0.0', Holder::REQUIRE, '^1', 'psr/log'),
@@ -152,7 +198,7 @@ final class MoveTextTest extends TestCase
             new Holder(Holder::PACKAGE, 'acme/lib', '2.0.0', Holder::REQUIRE, '^1', 'psr/log'),
             new Holder(Holder::ROOT, null, null, Holder::REQUIRE_DEV, '^1.2'),
             new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.2'),
-        ], ['z/critical' => $critical, 'c/high' => $high, 'b/high' => $high, 'a/plain' => new GradedPackage('finished', null, [], null, null, '1.0.0')]);
+        ], ['z/critical' => $critical, 'c/high' => $high, 'b/high' => $high, 'a/plain' => new GradedPackage('finished', null, [], null, null, '1.0.0', true)]);
 
         $ordered = MoveText::inTextOrder($holds, 'acme/lib');
 

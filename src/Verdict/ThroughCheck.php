@@ -36,12 +36,13 @@ final class ThroughCheck
             $version = $locked === null ? null : $locked->version();
             $meta = $metadata[$name] ?? null;
             if ($locked !== null && !$locked->isFromComposerRepository()) {
-                $entries[] = ThroughEntry::unread($name, $version, ThroughEntry::NOT_FROM_COMPOSER_REPOSITORY);
+                $entry = ThroughEntry::unread($name, $version, ThroughEntry::NOT_FROM_COMPOSER_REPOSITORY);
             } elseif ($meta === null || $version === null) {
-                $entries[] = ThroughEntry::unread($name, $version, ThroughEntry::RELEASES_UNKNOWN);
+                $entry = ThroughEntry::unread($name, $version, ThroughEntry::RELEASES_UNKNOWN);
             } else {
-                $entries[] = ThroughEntry::measured($name, $version, strtolower($package), $meta->installedRequires(), $meta->newestStable(), $meta->newestRequires());
+                $entry = ThroughEntry::measured($name, $version, strtolower($package), $meta->installedRequires(), $meta->newestStable(), $meta->newestRequires());
             }
+            $entries[] = $locked === null ? $entry : $entry->withInstalled($locked->origin()->isLocal(), $locked->normalizedVersion());
         }
 
         return $entries;

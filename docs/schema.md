@@ -383,15 +383,22 @@ the graded shape.
 
 `next_step` is the [move](verdicts.md#move) of a graded finding: its `kind`, the `constraint` or
 command, `clears`, `unverified` and `leaves` (the facts it settles, cannot check and does not
-touch), `held_by`, `php_check`, `if_applied` (the score after it), `through` for a package that
-comes in through others, `commands` (argv lists) and `text`. `also` holds the other part's move.
+touch), `held_by`, `php_check`, `if_applied` (the score after it), `check` (Composer's answer and
+the release it installs), `moves_with` (the holders that a joint request moves), `through` for a
+package that comes in through others, `commands` (argv lists) and `text`. `also` holds the other
+part's move. A holder's `held_by[].holder.direct` says whether composer.json requires the holder.
 `kind` is an open set: show `text` for a kind you do not know.
 
 Each argument of `commands` and of `security.update_now_command` matches
-`^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only a Composer option starts
-with `-`: `--no-update` in a `require` step, and `--with-dependencies` or `--with-all-dependencies`
-in an `update` or `require` step. An option comes after the package arguments. The first argument
-is `composer`, and the second is `update`, `require` or `why-not`.
+`^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only the Composer options that
+lockrot writes start with `-`:
+
+- `--no-update` and `--dev` in a `require` step
+- `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step
+- `--locked` in a `why-not` step
+
+An option comes after the package arguments. The first argument is `composer`, and the second is
+`update`, `require` or `why-not`.
 
 An argument comes from the lock or a repository, so lockrot leaves out a step that breaks this
 rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the

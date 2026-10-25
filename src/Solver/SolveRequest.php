@@ -35,6 +35,8 @@ final class SolveRequest
     private bool $keepsTargets = false;
     /** @var array<string, string> */
     private array $joined = [];
+    /** @var array<string, string> */
+    private array $dev = [];
 
     /**
      * @param array<string, string>                                       $allow       the update allow list, name => name
@@ -69,10 +71,14 @@ final class SolveRequest
     /**
      * @param array<string, string> $rootChanges name => constraint; a platform name such as `php`
      *                                           changes the root requirement without an update
+     * @param bool                  $dev         `require --dev`: the package's change goes to `require-dev`
      */
-    public static function require(string $package, array $rootChanges): self
+    public static function require(string $package, array $rootChanges, bool $dev = false): self
     {
-        return new self([$package => $package], [], $rootChanges, self::LISTED);
+        $request = new self([$package => $package], [], $rootChanges, self::LISTED);
+        $request->dev = $dev ? [$package => $package] : [];
+
+        return $request;
     }
 
     /**
@@ -149,6 +155,12 @@ final class SolveRequest
     public function rootChanges(): array
     {
         return $this->rootChanges;
+    }
+
+    /** @return array<string, string> name => name, the root changes that `require --dev` writes in `require-dev` */
+    public function devChanges(): array
+    {
+        return $this->dev;
     }
 
     /** @return self::LISTED|self::WITH_DEPENDENCIES|self::WITH_ALL_DEPENDENCIES */

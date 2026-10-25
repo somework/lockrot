@@ -147,7 +147,7 @@ final class ComposerSolver
 
     private function solveOrThrow(SolveRequest $request): Solution
     {
-        $root = $this->rootWith($request->rootChanges());
+        $root = $this->rootWith($request->rootChanges(), $request->devChanges());
         $links = array_merge($root->getRequires(), $root->getDevRequires());
         $requires = [];
         foreach ($links as $name => $link) {
@@ -322,14 +322,19 @@ final class ComposerSolver
     /**
      * @param array<string, string> $changes name => constraint, as `require name:constraint` without
      *                                       `--dev` writes it: in `require`, and out of `require-dev`
+     * @param array<string, string> $dev     name => name, the changes that `require --dev` writes in `require-dev` instead
      */
-    private function rootWith(array $changes): RootPackageInterface
+    private function rootWith(array $changes, array $dev = []): RootPackageInterface
     {
         $root = clone $this->root;
         $parser = new VersionParser();
         $requires = $root->getRequires();
         $devRequires = $root->getDevRequires();
         foreach ($changes as $name => $constraint) {
+            if (isset($dev[$name])) {
+                $devRequires[$name] = new Link($root->getName(), $name, $parser->parseConstraints($constraint), Link::TYPE_DEV_REQUIRE, $constraint);
+                continue;
+            }
             $requires[$name] = new Link($root->getName(), $name, $parser->parseConstraints($constraint), Link::TYPE_REQUIRE, $constraint);
             unset($devRequires[$name]);
         }
