@@ -328,9 +328,10 @@ verdicts only under these rules:
 - The one patch exception is a curated-data fix that moves a package to `finished` or `ok`.
 - A new signal that decides verdicts ships for one minor release as evidence only: it appears in
   the report and decides nothing until the next minor release.
-- One exception, once: in 0.14.0 the `vulnerable` flag decides verdicts at once, because 0.14
-  changes every verdict anyway ([0.14.0's Verdict changes](changelog.md)). The rule above holds for
-  every later signal.
+- Two exceptions, once: in 0.14.0 the `vulnerable` and `capped` flags decide verdicts at once,
+  because 0.14 changes every verdict anyway. A baseline entry that records any maintenance flag
+  covers `capped` ([0.14.0's Verdict changes](changelog.md)). The rule above holds for every later
+  signal.
 
 A committed baseline does not make an upgrade silent. A package that a release starts to grade is
 `new`. A package whose facts worsen (a higher flag, a new advisory, a higher rating or a lost fix)

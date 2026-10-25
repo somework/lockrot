@@ -507,12 +507,12 @@ Top to bottom, it holds:
    run `### lockrot: nothing flagged in <checked> packages`. A clean run has no table unless you
    pass `--all`, which lists every package under the heading.
 2. The [`gate:` line](#reading-the-gate-line), its first part in bold.
-3. With a [baseline](baseline.md), its `known`/`new`/`worsened`/`stale` counts.
-4. A table of the graded findings (every finding with `--all`) in report order. The verdict is bold
+3. A table of the graded findings (every finding with `--all`) in report order. The verdict is bold
    where the finding fails the gate.
-5. The `flags:`, `depth:`, `security:`, `libyears:`, `pulled in by:`, `advisories:`, `moves:` and
-   [`php:`](verdicts.md#the-php-window) lines, then **Update now** with the command.
-6. The report's notes as a bullet list, and a `<sub>` footer with the data date and the score model.
+4. The `flags:`, `depth:`, `security:`, `libyears:`, `pulled in by:`, `advisories:`, `moves:` and
+   [`php:`](verdicts.md#the-php-window) lines. With a [baseline](baseline.md), its
+   `known`/`new`/`worsened`/`stale` counts follow. Then **Update now** with the command.
+5. The report's notes as a bullet list, and a `<sub>` footer with the data date and the score model.
 
 The shape of the table:
 

@@ -62,9 +62,9 @@ target php 8.4 (--target-php)
 - Exits `0` whatever `--fail-on` says. With `--strict-network`, it still exits `1`, after it writes
   the file, when a [run note](notes.md) counts as a network failure
   ([exit codes](ci.md#exit-codes)).
-- With `--output` on the same run, writes the reports first and the baseline last. The reports carry
-  no baseline comparison, and a report that lockrot cannot write (exit `2`) leaves the baseline
-  unchanged.
+- With `--output` on the same run, writes the reports first and the baseline last. The reports
+  compare with the file that the run read before it rewrites it, as a check run does. A report that
+  lockrot cannot write (exit `2`) leaves the baseline unchanged.
 
 ```json
 {
@@ -218,7 +218,7 @@ error. That run has no baseline.
 | `lockrot: <path> is not valid JSON: …` or `… must contain a JSON object` | The file is damaged, for example by a merge conflict | Restore it from version control, or delete it and generate a new one |
 | `lockrot: baseline file is invalid:` and one `  - <field>: <message>` line per problem | The file does not match the [schema](schema.md): a field of the wrong type or a missing key | Fix the named field, or delete the file and generate a new one |
 | `lockrot: Cannot read <path>: …` | The file exists, but lockrot cannot read it | Fix its permissions |
-| `lockrot <major>.<minor> reads baseline-2 only. Review the findings, then run --generate-baseline.`, such as `lockrot 0.14 reads …` | The file is a baseline-1 file, written by lockrot 0.13 or earlier | [Move to baseline-2](#moving-from-a-baseline-1-file) |
+| `lockrot: lockrot <major>.<minor> reads baseline-2 only. Review the findings, then run --generate-baseline.`, such as `lockrot: lockrot 0.14 reads …` | The file is a baseline-1 file, written by lockrot 0.13 or earlier | [Move to baseline-2](#moving-from-a-baseline-1-file) |
 
 `--generate-baseline` reads an existing file to keep its `first_seen` dates, so it stops on a
 damaged file too. Delete the file first. A baseline-1 file is the exception: `--generate-baseline`

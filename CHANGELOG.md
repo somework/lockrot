@@ -25,9 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stay in `verdict`. ([The score](docs/verdicts.md#score))
 - **Breaking:** **All formats:** a counted security advisory flags the package `vulnerable` and adds
   its severity's points, doubled when no release fixes it or none runs on the target PHP.
-  `ignore[]` entries no longer hide advisories. `vulnerable` decides at once, an exception to the
-  evidence-first rule for a new signal, because 0.14 changes every verdict anyway. Action: run once
-  without a gate. ([Verdict changes](docs/compatibility.md#verdict-changes))
+  `ignore[]` entries no longer hide advisories. `vulnerable` and `capped` decide at once, the two
+  exceptions to the evidence-first rule for a new signal, because 0.14 changes every verdict anyway.
+  Action: run once without a gate. ([Verdict changes](docs/compatibility.md#verdict-changes))
 - **Breaking:** **All formats:** the raise for advisories not fixed on the installed branch is gone,
   so a left-behind package with only medium or low advisories can drop a grade. Action: if you gate
   at `critical` or `high`, run once without the gate and compare each finding's verdict.
@@ -38,11 +38,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Action: list a GitLab host in `gitlab-domains`, or accept a lasting gap in `accept-unchecked`. On
   Composer below 2.4, upgrade Composer or run the PHAR. ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
-  `require.php` stops below the newest PHP minor that the project's root php allows. It comes after
-  `stale` in flag order, so `--fail-on=stale` and a baseline entry that records `stale` keep their
-  reach. Its move goes to the newest release of the lowest branch whose newest release admits that
-  PHP or states no php. A grade gate at `medium` or `low` can fail on a package that 0.13 passed.
-  Action: run once without a gate. ([Capped](docs/verdicts.md#capped))
+  `require.php` stops below the newest PHP minor that the root php allows. It decides at once, and
+  comes after `stale`, so `--fail-on=stale` keeps its reach. A baseline entry that records any
+  maintenance flag covers it. A grade gate at `medium` or `low` can fail where 0.13 passed. Action:
+  run once without a gate. ([Capped](docs/verdicts.md#capped))
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
   is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
@@ -178,6 +177,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `run.gates[]` carry a kind, S4's `data` gains `forge` and `event`, and `evidence` holds the
   counted flags' summaries only. Action: assert `."$schema" == "https://lockrot.dev/schema/report-2.json"`
   first. ([Schema](docs/schema.md#migrating-from-report-1))
+- **Breaking:** **json:** S9's `severity` is a bucket: null reads `unrated` and `moderate` reads
+  `medium`, and `severity_published` keeps the word that the repository published. S9's `title`
+  drops its leading `<cve>: `. Action: match `unrated` and `medium`, and read `cve` for the id.
+  ([Migrating](docs/schema.md#migrating-from-report-1))
 - **Breaking:** **Distribution:** `docs/compatibility.md` no longer promises which lockrot-action
   major line follows lockrot 1.x. `@v1` runs 0.14 from lockrot-action v1.2.0 on, and with `version:
   latest` from this tag on. The Docker image's `latest` tag moves with v1.2.0. Action: to stay on
@@ -186,13 +189,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** **Config:** an `ignore[]` entry whose `flags` key has another shape (`"stale"`,
   `["vulnerable"]`) now exits 2. Action: list maintenance flag ids, or drop the key.
   ([The allowlist](docs/configuration.md#the-allowlist))
+- **Baseline:** the reports of a `--generate-baseline` run compare with the baseline file that the
+  run read, as a check run does, so they carry the root `baseline` and each finding's `baseline`.
+  ([What --generate-baseline does](docs/baseline.md#what-generate-baseline-does))
 - **CLI:** every 0.14.x run that gates, or writes json, sarif, gitlab or a baseline, prints one
   upgrade notice on stderr that links the upgrade page. Read stdout alone (do not merge `2>&1`).
   `-q` also silences the report. ([Upgrading to 0.14](docs/changes/0.14.md))
-- **table, markdown, github, install-time, `--explain`:** each finding prints its flags, its score
-  line, its move and one evidence line per counted flag, under its grade. The footer adds the
-  `flags:`, `depth:`, `security:`, `fix, by package:`, `update now:` and `advisories:` lines.
-  ([In CI](docs/ci.md))
+- **table, markdown, github, install-time, `--explain`:** each finding prints its grade, its flags
+  and its move. All but install-time add the score line and one evidence line per counted flag. The
+  table footer adds the `flags:`, `depth:`, `security:`, `fix, by package:`, `update now:` and
+  `advisories:` lines, and the other formats print a part of them. ([In CI](docs/ci.md))
 - **All formats:** findings sort by verdict, then the points of the deciding advisory, then score.
 - **json:** `libyears_unmeasured` and the keys of `libyears.unmeasured` follow `metadata.status`
   and `age`. `metadata_unavailable` is `unavailable` or `not_found`. `no_stable_release_date` is
@@ -220,9 +226,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `run.flag_ids`, `run.gates[].kind`, `baseline.recorded.lead`, the root `flags.<flag>.leading`
   and the finding's `activity`. ([Migrating](docs/schema.md#migrating-from-report-1))
 - **Breaking:** **json (explain):** the explanation's top-level `target_php`, `project_php`,
-  `thresholds` and `activity` move to `run` and `finding`. Action: read `.run.target_php`,
-  `.run.project_php`, `.run.thresholds` and `.finding.activity`.
-  ([Migrating](docs/schema.md#migrating-from-report-1))
+  `thresholds` and `activity` move to `run` and `finding`, and `activity` takes report-2's shape.
+  Action: read `.run.target_php`, `.run.project_php`, `.run.thresholds` and `.finding.activity`,
+  with `pushed_at` at `.finding.age.push.at`, `repository` as `host` and `repo`, and `from_cache` as
+  `cached_at` not null. ([Migrating](docs/schema.md#migrating-from-report-1))
 
 ### Fixed
 

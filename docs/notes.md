@@ -69,7 +69,7 @@ lockrot asked for the metadata of `package_count` packages, and it did not arriv
 - `data`: `package_count`, and `reasons`, one entry per distinct `message` in the order the
   sentence lists them. Each entry has a `reason`, the `message` and its own `package_count`. The
   counts sum to the note's.
-- Findings: each such package is `unknown`, with `libyears_unmeasured` `metadata_unavailable`.
+- Findings: each such package is `unknown`, with `libyears_unmeasured` `unavailable`.
 - `sets_network_failures`: yes, whatever the reasons, `offline` and `install_time_budget` included.
 
 | `reason` | Cause | What to do |

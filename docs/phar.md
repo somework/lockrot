@@ -250,7 +250,7 @@ What lockrot 0.13 does with the files that 0.14 writes, on a machine that has no
 | 0.14 file or key | lockrot 0.13 |
 |---|---|
 | A baseline-2 file | Exits `2` |
-| A `fail-on` list, or a `vulnerable` or `vulnerable-*` value | Exits `2`: its configuration schema refuses them |
+| A `fail-on` list, or a `capped`, `vulnerable` or `vulnerable-*` value | Exits `2`: its configuration schema refuses them |
 | An `ignore` entry with `flags` | Warns about an unknown key, then accepts every flag of that package |
 | `accept-unchecked` | Warns about an unknown key and ignores it, so `--fail-on=unchecked` fails on 0.13 where 0.14 accepted the gap |
 | `advisory-lookup` | Warns about an unknown key and ignores it, keeping its own boundary: it asks only packages from a Composer repository |
