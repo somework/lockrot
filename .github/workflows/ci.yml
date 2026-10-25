@@ -88,10 +88,11 @@ jobs:
             groups_config phpunit-ci.xml "<exclude>$slow<group>covers-nothing</group></exclude>"
             vendor/bin/phpunit -c phpunit-ci.xml tests/Unit/Solver tests/Unit/Verdict tests/Unit/Analyzer
           elif [ "${{ matrix.composer }}" = "2.9" ]; then
-            # The Composer 2.9 legs of the parity tests must run here, so a skip fails the row.
+            # The Composer 2.9 legs of the parity tests must run here, so a skip or an empty run fails
+            # the row.
             groups_config phpunit-ci.xml "<exclude>$slow</exclude>"
-            vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --filter 'testTheAuditConfigLeg' tests/Integration/AuditParityTest.php
-            vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --filter 'testTheAuditConfigLeg' tests/Integration/AbandonedIgnoreParityTest.php
+            vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AuditParityTest.php
+            vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AbandonedIgnoreParityTest.php
             vendor/bin/phpunit -c phpunit-ci.xml tests/Unit/Data
           else
             # Processes side by side shorten the row. Each writes its own log, and the step checks every exit code.
