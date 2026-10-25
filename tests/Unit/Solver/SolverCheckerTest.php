@@ -141,6 +141,9 @@ final class SolverCheckerTest extends TestCase
     /** A root requirement that excludes the release still holds it. */
     public function testARootRequirementThatExcludesTheMovesReleaseHoldsIt(): void
     {
+        if (!ComposerFeatures::hasTemporaryConstraints()) {
+            self::markTestSkipped('Composer 2.2 and 2.3 join the inline constraint to the root requirement: that requirement is the request');
+        }
         $checker = self::checker(
             ['acme/lib' => '~1.0.0'],
             [['name' => 'acme/lib', 'version' => '1.0.0']],
