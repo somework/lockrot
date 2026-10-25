@@ -21,7 +21,7 @@ final class MoveChecksTest extends TestCase
         $answeredOnly = $checks->answeredOnly();
 
         self::assertSame(MoveCheck::RESOLVES, $answeredOnly->check($asked)->check()->result());
-        self::assertSame(['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::PASS_CAP], $answeredOnly->check(MoveQuery::update('c/d', '^3.0', '3.0.0'))->check()->jsonSerialize());
+        self::assertSame(['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::PASS_CAP, 'installs' => null], $answeredOnly->check(MoveQuery::update('c/d', '^3.0', '3.0.0'))->check()->jsonSerialize());
         self::assertSame(MoveCheck::RESOLVES, $checks->check(MoveQuery::update('c/d', '^3.0', '3.0.0'))->check()->result(), 'the original still asks');
     }
 }

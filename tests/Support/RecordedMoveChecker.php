@@ -26,7 +26,7 @@ final class RecordedMoveChecker implements MoveChecker
     private bool $strict;
 
     /**
-     * @param array<string, array<mixed, mixed>> $checks key => `{result, form, reason, holds, problem}`
+     * @param array<string, array<mixed, mixed>> $checks key => `{result, form, reason, installs, holds, problem, joint}`
      * @param array<mixed, mixed>                $run    the case's `run.move_check`
      */
     public function __construct(array $checks, array $run, bool $strict = false)
@@ -51,6 +51,28 @@ final class RecordedMoveChecker implements MoveChecker
         $check = $this->recorded($query->key(), '*');
 
         return $check === null ? new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME)) : self::outcome($check);
+    }
+
+    /**
+     * The request's recorded `joint` answer, `{names, result, form, installs, holds}`: `installs`
+     * maps each name that the joint solve changes to its release. A request that records none is
+     * not checked.
+     */
+    public function joint(MoveQuery $query, array $holders): CheckOutcome
+    {
+        $recorded = $this->recorded($query->key(), '*');
+        $joint = $recorded !== null && \is_array($recorded['joint'] ?? null) ? $recorded['joint'] : null;
+        if ($joint === null) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME));
+        }
+        $changes = [];
+        foreach (\is_array($joint['installs'] ?? null) ? $joint['installs'] : [] as $name => $version) {
+            if (\is_string($version)) {
+                $changes[(string) $name] = $version;
+            }
+        }
+
+        return self::outcome(['installs' => $changes[$query->package()] ?? null] + $joint)->withChanges($changes);
     }
 
     /** As {@see \Lockrot\Solver\SolverChecker}: Composer refuses the lock itself, so lockrot asks no move of it. */
@@ -161,7 +183,7 @@ final class RecordedMoveChecker implements MoveChecker
                     throw new \InvalidArgumentException('a recorded check has an unknown form');
                 }
 
-                return MoveCheck::resolves($form);
+                return MoveCheck::resolves($form, self::text($check, 'installs'));
             case MoveCheck::REFUSED:
                 return MoveCheck::refused();
             default:

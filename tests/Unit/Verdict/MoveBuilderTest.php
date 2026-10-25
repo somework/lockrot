@@ -51,7 +51,7 @@ final class MoveBuilderTest extends TestCase
 
         self::assertNull($move->version());
         self::assertNotNull($check);
-        self::assertSame(['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::NO_RELEASE_READ], $check->jsonSerialize());
+        self::assertSame(['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::NO_RELEASE_READ, 'installs' => null], $check->jsonSerialize());
     }
 
     public function testARefusedMoveKeepsTheHoldsOfItsReleaseAddsTheRefusalsAndPrintsNoStep(): void

@@ -73,10 +73,21 @@ final class MoveChecks
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::PASS_CAP));
         }
         if (!isset($this->asked[$key])) {
-            $this->asked[$key] = [$query, $this->checker->check($query)->withoutAdmitting($query->version())];
+            $this->asked[$key] = [$query, $this->joined($query, $this->checker->check($query))->withoutAdmitting($query->version())->withoutRootOnHolders()];
         }
 
         return $this->asked[$key][1];
+    }
+
+    /** A refused move gets one more request, which may also update the packages that hold it. */
+    private function joined(MoveQuery $query, CheckOutcome $outcome): CheckOutcome
+    {
+        $holders = $outcome->check()->isRefused() ? $outcome->holders($query->package()) : [];
+        if ($holders === []) {
+            return $outcome;
+        }
+
+        return $outcome->joinedWith($this->checker->joint($query, $holders), $query->package(), $query->constraint(), $holders);
     }
 
     /** Whether an `update` step names its constraint inline (`composer update vendor/pkg:^1.2`). */

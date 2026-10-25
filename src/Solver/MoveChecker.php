@@ -22,6 +22,14 @@ interface MoveChecker
 
     public function check(MoveQuery $query): CheckOutcome;
 
+    /**
+     * The refused move's request that may also update its holders, inline: Composer's answer,
+     * with every release that a resolving solve changes ({@see CheckOutcome::changes()}).
+     *
+     * @param non-empty-list<string> $holders
+     */
+    public function joint(MoveQuery $query, array $holders): CheckOutcome;
+
     /** @param array<string, string> $inline name => constraint: one `composer update` of every name */
     public function combined(array $inline): CheckOutcome;
 

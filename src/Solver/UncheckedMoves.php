@@ -29,6 +29,11 @@ final class UncheckedMoves implements MoveChecker
         return new CheckOutcome(MoveCheck::notChecked($this->reason));
     }
 
+    public function joint(MoveQuery $query, array $holders): CheckOutcome
+    {
+        return new CheckOutcome(MoveCheck::notChecked($this->reason));
+    }
+
     public function combined(array $inline): CheckOutcome
     {
         return new CheckOutcome(MoveCheck::notChecked($this->reason));

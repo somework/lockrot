@@ -48,7 +48,7 @@ final class SolverCheckerTest extends TestCase
 
         $outcome = $checker->check(MoveQuery::update('symfony/yaml', '^5.4.54', 'v5.4.54'));
 
-        self::assertSame(['result' => 'refused', 'form' => null, 'reason' => null], $outcome->check()->jsonSerialize());
+        self::assertSame(['result' => 'refused', 'form' => null, 'reason' => null, 'installs' => null], $outcome->check()->jsonSerialize());
         self::assertContains(['source' => 'package', 'package' => 'symfony/yaml', 'version' => 'v5.4.54', 'link' => 'conflict', 'target' => 'symfony/console', 'constraint' => '<5.3'], self::rows($outcome->holds()));
         self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'symfony/console', 'constraint' => '^4.4'], self::rows($outcome->holds()));
         self::assertNull($outcome->problem(), "a move publishes its holds, not Composer's problem text");
@@ -133,7 +133,7 @@ final class SolverCheckerTest extends TestCase
             ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/gone' => '^1.0']]]]
         );
 
-        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
         self::assertContains(['source' => 'package', 'package' => 'acme/user', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^1.0'], self::rows($outcome->holds()));
     }
@@ -173,8 +173,7 @@ final class SolverCheckerTest extends TestCase
 
         $outcome = $checker->check(MoveQuery::update('guzzlehttp/guzzle', '^7.15.2', '7.15.2'));
 
-        self::assertSame(['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null], $outcome->check()->jsonSerialize());
-        self::assertSame('7.15.2', $outcome->installs());
+        self::assertSame(['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'installs' => '7.15.2'], $outcome->check()->jsonSerialize());
         self::assertSame([], $outcome->holds());
     }
 
@@ -196,7 +195,7 @@ final class SolverCheckerTest extends TestCase
         );
 
         self::assertSame(MoveCheck::REFUSED, $checker->check(MoveQuery::update('drupal/core', '^11.4.10', '11.4.10'))->check()->result());
-        self::assertSame(['result' => 'resolves', 'form' => 'with-all-dependencies', 'reason' => null], $checker->check(MoveQuery::require('drupal/core-recommended', '^11.4.10', '11.4.10'))->check()->jsonSerialize());
+        self::assertSame(['result' => 'resolves', 'form' => 'with-all-dependencies', 'reason' => null, 'installs' => '11.4.10'], $checker->check(MoveQuery::require('drupal/core-recommended', '^11.4.10', '11.4.10'))->check()->jsonSerialize());
     }
 
     public function testARequireThatALockedPackageExcludesIsRefusedWithThatPackagesRequirement(): void
@@ -256,7 +255,7 @@ final class SolverCheckerTest extends TestCase
 
         self::assertSame(MoveCheck::REFUSED, $baseline->check()->result());
         self::assertStringContainsString('acme/lib', (string) $baseline->problem());
-        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'baseline_refused'], $move->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'baseline_refused', 'installs' => null], $move->check()->jsonSerialize());
         self::assertSame([MoveCheck::NOT_CHECKED, 'baseline_refused'], [$checker->combined(['acme/lib' => '^1.1.0'])->check()->result(), $checker->combined(['acme/lib' => '^1.1.0'])->check()->reason()]);
     }
 
@@ -275,7 +274,7 @@ final class SolverCheckerTest extends TestCase
             ['acme/new-dependency' => $failure]
         );
 
-        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->jsonSerialize());
     }
 
     /**
@@ -288,7 +287,7 @@ final class SolverCheckerTest extends TestCase
     {
         $checker = self::checker(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], [], ['acme/lib' => $failure]);
 
-        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->jsonSerialize());
     }
 
     /** wallabag 2.6.14 at 8.4: the root requires guzzle5-adapter ^2.0, and its one 2.x release requires php ^7.0. */
@@ -302,7 +301,7 @@ final class SolverCheckerTest extends TestCase
 
         $outcome = $checker->solveAt(['acme/adapter']);
 
-        self::assertSame(['result' => 'refused', 'form' => null, 'reason' => null], $outcome->check()->jsonSerialize());
+        self::assertSame(['result' => 'refused', 'form' => null, 'reason' => null, 'installs' => null], $outcome->check()->jsonSerialize());
         self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'acme/adapter', 'constraint' => '^2.0'], self::rows($outcome->holds()));
         self::assertContains(['source' => 'package', 'package' => 'acme/adapter', 'version' => '2.0.0', 'link' => 'platform', 'target' => 'php', 'constraint' => '^7.0'], self::rows($outcome->holds()));
     }
@@ -318,7 +317,7 @@ final class SolverCheckerTest extends TestCase
         $outcome = $checker->solveAt(['acme/lib']);
 
         self::assertSame(MoveCheck::REFUSED, $checker->baseline()->check()->result());
-        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null], $outcome->check()->jsonSerialize());
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => null], $outcome->check()->jsonSerialize());
     }
 
     /** monica at 8.5: the newer release needs a dependency that a root requirement keeps, so only `-W` moves it. */
@@ -333,7 +332,7 @@ final class SolverCheckerTest extends TestCase
             ]
         );
 
-        self::assertSame(['result' => 'resolves', 'form' => 'with-all-dependencies', 'reason' => null], $checker->solveAt(['acme/lib'])->check()->jsonSerialize());
+        self::assertSame(['result' => 'resolves', 'form' => 'with-all-dependencies', 'reason' => null, 'installs' => null], $checker->solveAt(['acme/lib'])->check()->jsonSerialize());
     }
 
     public function testAnUnlockTakesTheReasonOfABaselineThatWasNotChecked(): void
@@ -341,7 +340,7 @@ final class SolverCheckerTest extends TestCase
         $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [['version' => '1.1.0']]]), []);
         $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::inSeconds(-1.0));
 
-        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'install_time_budget'], $checker->solveAt(['acme/lib'])->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'install_time_budget', 'installs' => null], $checker->solveAt(['acme/lib'])->check()->jsonSerialize());
     }
 
     public function testAnUnlockOfAPackageThatNoComposerRepositoryServesIsNotChecked(): void
@@ -349,7 +348,7 @@ final class SolverCheckerTest extends TestCase
         $solver = new ComposerSolver(self::root(['acme/own' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/own', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource([]), []);
         $checker = new SolverChecker($solver, ['acme/own'], '8.4.99', false, Deadline::never());
 
-        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'not_from_composer_repository'], $checker->solveAt(['acme/lib', 'acme/own'])->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'not_from_composer_repository', 'installs' => null], $checker->solveAt(['acme/lib', 'acme/own'])->check()->jsonSerialize());
         self::assertNotSame('not_from_composer_repository', $checker->solveAt(['acme/lib'])->check()->reason(), 'the other names solve');
     }
 
@@ -364,7 +363,7 @@ final class SolverCheckerTest extends TestCase
         $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]), []);
         $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::inSeconds(10.0, $now));
 
-        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'install_time_budget'], $checker->solveAt(['acme/lib'])->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'install_time_budget', 'installs' => null], $checker->solveAt(['acme/lib'])->check()->jsonSerialize());
     }
 
     /**
@@ -380,7 +379,7 @@ final class SolverCheckerTest extends TestCase
             ['acme/other' => $failure]
         );
 
-        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason], $checker->solveAt(['acme/lib', 'acme/other'])->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason, 'installs' => null], $checker->solveAt(['acme/lib', 'acme/other'])->check()->jsonSerialize());
     }
 
     /** @return iterable<string, array{string, string}> */
@@ -411,7 +410,7 @@ final class SolverCheckerTest extends TestCase
         $solver = new ComposerSolver(self::root(['acme/own' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/own', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource([]), []);
         $checker = new SolverChecker($solver, ['acme/own'], '8.4.99', false, Deadline::never());
 
-        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'not_from_composer_repository'], $checker->check(MoveQuery::update('acme/own', '^1.1', '1.1.0'))->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'not_from_composer_repository', 'installs' => null], $checker->check(MoveQuery::update('acme/own', '^1.1', '1.1.0'))->check()->jsonSerialize());
     }
 
     public function testAnExpiredDeadlineChecksNothing(): void
@@ -600,7 +599,7 @@ final class SolverCheckerTest extends TestCase
 
         $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
-        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::SOLVER_ERROR], $outcome->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::SOLVER_ERROR, 'installs' => null], $outcome->check()->jsonSerialize());
         self::assertSame(['class' => \UnexpectedValueException::class, 'message' => 'Could not parse version constraint'], $checker->solverError());
     }
 
@@ -633,7 +632,7 @@ final class SolverCheckerTest extends TestCase
     {
         $checker = self::checker(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], [], ['acme/lib' => VersionSource::FAILED]);
 
-        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME], $checker->combined(['acme/lib' => '^1.1.0'])->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->combined(['acme/lib' => '^1.1.0'])->check()->jsonSerialize());
     }
 
     /** The run note names the first failure of Composer's solver, so a later solve that succeeds keeps it. */
@@ -674,6 +673,139 @@ final class SolverCheckerTest extends TestCase
     {
         yield 'a checker that blocks advisories' => [true, MoveCheck::REFUSED];
         yield 'a checker that blocks none' => [false, MoveCheck::RESOLVES];
+    }
+
+    /**
+     * monica at 8.4, firebase/php-jwt: socialite and the manager hold php-jwt at 6.x. The joint
+     * request may update them too, and it resolves: the move lists the holders whose release the
+     * solve changes, and facebook, whose release stays, is not one of them.
+     */
+    public function testARefusedMoveResolvesWithTheHoldersWhoseReleaseTheJointSolveChanges(): void
+    {
+        $checker = self::checker(
+            ['laravel/socialite' => '^5.5', 'socialiteproviders/facebook' => '^4.1'],
+            [
+                ['name' => 'laravel/socialite', 'version' => 'v5.23.0', 'require' => ['firebase/php-jwt' => '^6.4']],
+                ['name' => 'socialiteproviders/facebook', 'version' => '4.1.0', 'require' => ['socialiteproviders/manager' => '~4.0']],
+                ['name' => 'socialiteproviders/manager', 'version' => 'v4.8.1', 'require' => ['laravel/socialite' => '^5.5']],
+                ['name' => 'firebase/php-jwt', 'version' => 'v6.11.1'],
+            ],
+            [
+                'firebase/php-jwt' => [['version' => 'v6.11.1'], ['version' => 'v7.0.0'], ['version' => 'v7.2.1']],
+                'laravel/socialite' => [['version' => 'v5.23.0', 'require' => ['firebase/php-jwt' => '^6.4']], ['version' => 'v5.30.0', 'require' => ['firebase/php-jwt' => '^6.4|^7.0']]],
+                'socialiteproviders/facebook' => [['version' => '4.1.0', 'require' => ['socialiteproviders/manager' => '~4.0']]],
+                'socialiteproviders/manager' => [['version' => 'v4.8.1', 'require' => ['laravel/socialite' => '^5.5']], ['version' => '4.10.0', 'require' => ['laravel/socialite' => '^5.5']]],
+            ]
+        );
+
+        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('firebase/php-jwt', '^7.0.0', 'v7.0.0', null, 'v7.2.1'));
+
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => 'v7.2.1'], $outcome->check()->jsonSerialize());
+        self::assertSame([], $outcome->holds());
+        self::assertSame([
+            ['package' => 'laravel/socialite', 'installed_version' => 'v5.23.0', 'version' => 'v5.30.0'],
+            ['package' => 'socialiteproviders/manager', 'installed_version' => 'v4.8.1', 'version' => '4.10.0'],
+        ], $outcome->movesWith());
+    }
+
+    /**
+     * monica at 8.4, erusev/parsedown: the joint update of scribe resolves by a scribe release that
+     * drops erusev/parsedown. A solve that does not install the move is not the move, so the move
+     * stays refused with the holds of its first refusal.
+     */
+    public function testAJointSolveThatDropsTheMovedPackageLeavesTheFirstRefusal(): void
+    {
+        $checker = self::checker(
+            ['knuckleswtf/scribe' => '^5.1'],
+            [
+                ['name' => 'knuckleswtf/scribe', 'version' => '5.3.0', 'require' => ['erusev/parsedown' => '1.7.4']],
+                ['name' => 'erusev/parsedown', 'version' => '1.7.4'],
+            ],
+            [
+                'erusev/parsedown' => [['version' => '1.7.4'], ['version' => '1.8.0']],
+                'knuckleswtf/scribe' => [['version' => '5.3.0', 'require' => ['erusev/parsedown' => '1.7.4']], ['version' => '5.11.0', 'require' => ['parsedown/parsedown' => '^1.7']]],
+                'parsedown/parsedown' => [['version' => '1.8.0']],
+            ]
+        );
+
+        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('erusev/parsedown', '^1.8.0', '1.8.0', null, '1.8.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertContains(['source' => 'package', 'package' => 'knuckleswtf/scribe', 'version' => '5.3.0', 'link' => 'require', 'target' => null, 'constraint' => '1.7.4'], self::rows($outcome->holds()));
+        self::assertSame([], $outcome->movesWith());
+    }
+
+    /**
+     * The joint request is refused too: the holds come from that refusal, and the root holds on a
+     * package that a package hold names drop beside it.
+     */
+    public function testARefusedJointRequestGivesItsOwnHolds(): void
+    {
+        $checker = self::checker(
+            ['acme/frame' => '^1.0', 'acme/http' => '^1.0'],
+            [
+                ['name' => 'acme/frame', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']],
+                ['name' => 'acme/http', 'version' => '1.0.0'],
+                ['name' => 'acme/lib', 'version' => '1.0.0'],
+            ],
+            [
+                'acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0']],
+                'acme/frame' => [['version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/lib' => '^1.0|^2.0', 'acme/http' => '^2.0']]],
+                'acme/http' => [['version' => '1.0.0'], ['version' => '2.0.0']],
+            ]
+        );
+
+        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^2.0.0', '2.0.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'acme/http', 'constraint' => '^1.0'], self::rows($outcome->holds()));
+        self::assertNotContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'acme/frame', 'constraint' => '^1.0'], self::rows($outcome->holds()));
+    }
+
+    /**
+     * monica at 8.4, web-auth/webauthn-lib: the inline update installs 5.3.8, below the newest 5.3.9,
+     * which needs a newer cbor-php. `-w` installs 5.3.9, so it is the move's form.
+     */
+    public function testAFormThatInstallsBelowTheNewestReleaseGivesWayToTheNextForm(): void
+    {
+        $checker = self::checker(['acme/app-auth' => '^1.0'], self::webauthnLock(), self::webauthnRemote(true));
+
+        $outcome = $checker->check(MoveQuery::update('web-auth/webauthn-lib', '^5.3.5', '5.3.5', null, '5.3.9'));
+
+        self::assertSame(['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'installs' => '5.3.9'], $outcome->check()->jsonSerialize());
+    }
+
+    /** No form installs 5.3.9: the first form that resolves stays the move's form, with the release it installs. */
+    public function testWhenNoFormInstallsTheNewestReleaseTheFirstResolvingFormStays(): void
+    {
+        $checker = self::checker(['acme/app-auth' => '^1.0'], self::webauthnLock(), self::webauthnRemote(false));
+
+        $outcome = $checker->check(MoveQuery::update('web-auth/webauthn-lib', '^5.3.5', '5.3.5', null, '5.3.9'));
+
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '5.3.8'], $outcome->check()->jsonSerialize());
+    }
+
+    /** @return list<array<string, mixed>> */
+    private static function webauthnLock(): array
+    {
+        return [
+            ['name' => 'acme/app-auth', 'version' => '1.0.0', 'require' => ['web-auth/webauthn-lib' => '^5.2']],
+            ['name' => 'web-auth/webauthn-lib', 'version' => '5.2.2', 'require' => ['spomky-labs/cbor-php' => '^3.0']],
+            ['name' => 'spomky-labs/cbor-php', 'version' => '3.1.1'],
+        ];
+    }
+
+    /** @return array<string, list<array<string, mixed>>> */
+    private static function webauthnRemote(bool $newCbor): array
+    {
+        return [
+            'web-auth/webauthn-lib' => [
+                ['version' => '5.2.2', 'require' => ['spomky-labs/cbor-php' => '^3.0']],
+                ['version' => '5.3.8', 'require' => ['spomky-labs/cbor-php' => '^3.0']],
+                ['version' => '5.3.9', 'require' => ['spomky-labs/cbor-php' => '^3.4']],
+            ],
+            'spomky-labs/cbor-php' => array_merge([['version' => '3.1.1']], $newCbor ? [['version' => '3.4.2']] : []),
+        ];
     }
 
     /**
