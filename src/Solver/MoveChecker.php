@@ -61,6 +61,9 @@ interface MoveChecker
     /** Whether the solve removes the versions that an advisory affects, as Composer 2.9 and later do. */
     public function blocksAdvisories(): bool;
 
+    /** @return list<string> the environment variables that turned Composer's blocking off (`run.move_check.blocking_disabled_by`) */
+    public function blockingDisabledBy(): array;
+
     /**
      * The same check with the advisories that the run's lookup found. When {@see blocksAdvisories()}
      * is true, the solve blocks them as Composer's settings of the `block` operation say.

@@ -751,7 +751,9 @@ Limits of the check:
 - On Composer 2.9 and later, it removes the versions that an advisory affects, as Composer does in
   an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
   severities and the blocking of abandoned packages. It blocks every name that the update can move,
-  packages-dev and new dependencies included.
+  packages-dev and new dependencies included. `COMPOSER_NO_SECURITY_BLOCKING` on Composer 2.9.2 and
+  later, or `COMPOSER_NO_BLOCKING` on Composer 2.10 and later, set to a true value, turns this
+  blocking off, as in Composer. `run.move_check.blocking_disabled_by` then names the variable.
 - On Composer 2.10 and later, an update also removes the versions that a filter list names. Such a
   list is the `malware` list under `config.policy`, which blocks by default, or a custom list there.
   The check does not read these lists. So a move that resolves in lockrot can fail in Composer, or

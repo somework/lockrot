@@ -145,7 +145,7 @@ final class RunFooterTest extends TestCase
     public function testTheMovesLineOfARunWithNoCheckSaysWhyInWords(): void
     {
         $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
-        $report = self::report([])->withMoveChecks(new MoveCheckRun(null, false, MoveCheck::notChecked(MoveCheck::NO_COMPOSER_JSON)), UpdateNow::of([], $checks));
+        $report = self::report([])->withMoveChecks(new MoveCheckRun(null, false, [], MoveCheck::notChecked(MoveCheck::NO_COMPOSER_JSON)), UpdateNow::of([], $checks));
 
         self::assertSame('moves: not checked (the project has no composer.json)', RunFooter::moveCheck($report));
     }

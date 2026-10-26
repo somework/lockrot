@@ -131,6 +131,11 @@ final class SolverChecker implements MoveChecker
         return $this->blocksAdvisories;
     }
 
+    public function blockingDisabledBy(): array
+    {
+        return $this->advisories === null ? [] : $this->advisories->blocking()->disabledBy();
+    }
+
     public function withAdvisories(array $records, array $covered): MoveChecker
     {
         if (!$this->blocksAdvisories || $this->advisories === null) {

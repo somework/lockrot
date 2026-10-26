@@ -174,8 +174,8 @@ final class ComposerHttpClient implements HttpClientInterface
     }
 
     /**
-     * @param array<string, mixed>      $options
-     * @param array<string, HttpResult> $results the answer for $url goes in here
+     * @param array{http: array{timeout: int, header: list<string>}, retry-auth-failure: false, prevent_url_access_callable?: \Closure(string): bool} $options
+     * @param array<string, HttpResult>                                                                                                        $results the answer for $url goes in here
      */
     private function add(string $url, string $target, array $options, array &$results): void
     {

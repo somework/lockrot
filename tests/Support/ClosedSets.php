@@ -68,6 +68,7 @@ final class ClosedSets
             'A move\'s `composer_moves_because`' => [$definition('move', 'properties', 'composer_moves_because', 'items')],
             'A move check\'s `result`' => [$definition('moveCheck', 'oneOf', '0', 'properties', 'result')],
             '`run.move_check.baseline`' => [$definition('run', 'properties', 'move_check', 'oneOf', '0', 'properties', 'baseline')],
+            '`run.move_check.blocking_disabled_by`, in this order' => [$definition('run', 'properties', 'move_check', 'oneOf', '0', 'properties', 'blocking_disabled_by', 'items')],
             'A move check\'s `form`' => [$definition('moveCheck', 'oneOf', '0', 'properties', 'form', 'oneOf', '0')],
             'A PHP check\'s `raise_size`' => [$definition('phpCheck', 'properties', 'raise_size', 'oneOf', '0')],
             '`allowlist.by`' => [$definition('allowlist', 'oneOf', '0', 'properties', 'by')],

@@ -276,7 +276,7 @@ final class Analyzer
         $report = (new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev, $advisories->coverage()))
             ->withPhpWindow($window === null ? null : $window->withTargetFix($checks === null ? null : $checks->checker()));
         if ($checks !== null) {
-            $report = $report->withMoveChecks(new MoveCheckRun($checks->checker()->composerVersion(), $checks->checker()->blocksAdvisories(), $checks->checker()->baseline()->check()), UpdateNow::of($report->sorted(), $checks));
+            $report = $report->withMoveChecks(new MoveCheckRun($checks->checker()->composerVersion(), $checks->checker()->blocksAdvisories(), $checks->checker()->blockingDisabledBy(), $checks->checker()->baseline()->check()), UpdateNow::of($report->sorted(), $checks));
             $error = $checks->checker()->solverError();
             if ($error !== null) {
                 $report = $report->withNote(RunNote::moveCheckFailed($error['class'], $error['message']));

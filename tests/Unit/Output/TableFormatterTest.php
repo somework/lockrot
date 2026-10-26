@@ -221,7 +221,10 @@ final class TableFormatterTest extends TestCase
         $commands = [];
         foreach ($report->graded() as $finding) {
             $move = $finding->nextStep();
-            foreach ($move === null ? [] : $move->commands() as $argv) {
+            if ($move === null) {
+                continue;
+            }
+            foreach ($move->commands() as $argv) {
                 $command = ShellCommand::posix($argv);
                 if ($command !== null && strpos($move->text(), $command) !== false) {
                     $commands[$command] = true;

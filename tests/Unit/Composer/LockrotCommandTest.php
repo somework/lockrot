@@ -529,7 +529,7 @@ final class LockrotCommandTest extends TestCase
         self::assertStringStartsWith('doctrine/annotations ', $display, 'the name is trimmed and lower-cased, as Composer names packages');
         self::assertStringContainsString(' — high: abandoned', $display);
         self::assertStringContainsString("\n  abandoned    S1 high · marked abandoned by its registry", $display);
-        self::assertStringContainsString("\nrepository metadata\n     branch   highest tag   released     php        fixes\n", $display);
+        self::assertStringContainsString("\nrepository metadata\n     branch   highest tag   released     php          fixes\n", $display, "the php column is as wide as `^7.2 || ^8.0`");
         self::assertStringNotContainsString('packages checked', $display, 'the report itself is not printed');
     }
 

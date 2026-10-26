@@ -382,7 +382,7 @@ final class ReportTest extends TestCase
         $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
         $checks = new MoveChecks(new UncheckedMoves(MoveCheck::OFFLINE), true);
 
-        $checked = $report->withMoveChecks(new MoveCheckRun(null, false, MoveCheck::notChecked(MoveCheck::OFFLINE)), UpdateNow::of([], $checks));
+        $checked = $report->withMoveChecks(new MoveCheckRun(null, false, [], MoveCheck::notChecked(MoveCheck::OFFLINE)), UpdateNow::of([], $checks));
         $noted = $report->withNote(RunNote::offline());
 
         self::assertNull($report->moveCheck());

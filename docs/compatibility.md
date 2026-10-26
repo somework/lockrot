@@ -79,6 +79,7 @@ Nothing is added to these sets, removed from them or reordered within 1.x:
 - A move's `composer_moves_because`: `holders`, `crosses_major`, `transitive`, `unreached`.
 - A move check's `result`: `resolves`, `refused`, `not_checked`.
 - `run.move_check.baseline`: `resolves`, `refused`, `not_checked`.
+- `run.move_check.blocking_disabled_by`, in this order: `COMPOSER_NO_BLOCKING`, `COMPOSER_NO_SECURITY_BLOCKING`.
 - A move check's `form`: `inline`, `with-dependencies`, `with-all-dependencies`.
 - A PHP check's `raise_size`: `major`, `minor`, `patch`.
 - `allowlist.by`: `builtin`, `project`, `type`.

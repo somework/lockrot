@@ -163,6 +163,13 @@ final class RecordedMoveChecker implements MoveChecker
         return ($this->run['blocks_advisories'] ?? false) === true;
     }
 
+    public function blockingDisabledBy(): array
+    {
+        $names = $this->run['blocking_disabled_by'] ?? [];
+
+        return \is_array($names) ? array_values(array_filter($names, 'is_string')) : [];
+    }
+
     public function withAdvisories(array $records, array $covered): MoveChecker
     {
         return $this;

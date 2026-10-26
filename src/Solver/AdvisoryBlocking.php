@@ -12,6 +12,7 @@ use Composer\Package\PackageInterface;
 use Composer\Policy\ListPolicyConfig;
 use Composer\Policy\PolicyConfig;
 use Composer\Semver\Constraint\ConstraintInterface;
+use Composer\Util\Platform;
 
 /**
  * What Composer 2.9 and later block in an update: the settings of the `block` operation, read
@@ -31,6 +32,8 @@ final class AdvisoryBlocking
     private bool $abandoned;
     /** @var array<int|string, ?string> */
     private array $abandonedIgnore;
+    /** @var list<string> */
+    private array $disabledBy;
 
     /**
      * Each list keeps the keys that this Composer's Auditor reads: a list on Composer 2.9.0 and 2.9.1.
@@ -38,19 +41,22 @@ final class AdvisoryBlocking
      * @param array<int|string, ?string> $list            the ignore list for blocking
      * @param array<string, ?string>     $severities      the severities that blocking ignores
      * @param array<int|string, ?string> $abandonedIgnore the abandoned packages that blocking ignores
+     * @param list<string>               $disabledBy      the environment variables that turned the blocking off
      */
-    private function __construct(bool $blocks, array $list, array $severities, bool $abandoned, array $abandonedIgnore)
+    private function __construct(bool $blocks, array $list, array $severities, bool $abandoned, array $abandonedIgnore, array $disabledBy = [])
     {
         $this->blocks = $blocks;
         $this->list = $list;
         $this->severities = $severities;
         $this->abandoned = $abandoned;
         $this->abandonedIgnore = $abandonedIgnore;
+        $this->disabledBy = $disabledBy;
     }
 
-    private static function none(): self
+    /** @param list<string> $disabledBy */
+    private static function none(array $disabledBy = []): self
     {
-        return new self(false, [], [], false, []);
+        return new self(false, [], [], false, [], $disabledBy);
     }
 
     /** Every advisory blocks, and no abandoned package: a test's Composer 2.9 default. */
@@ -64,6 +70,11 @@ final class AdvisoryBlocking
     {
         if (!ComposerFeatures::blocksAdvisories()) {
             return self::none();
+        }
+        // Composer sets the option of each variable on `(bool) Platform::getEnv()`, so `0` and an empty value leave the blocking on.
+        $disabledBy = array_values(array_filter(ComposerFeatures::blockingVariables(ComposerFeatures::version()), static fn (string $name): bool => (bool) Platform::getEnv($name)));
+        if ($disabledBy !== []) {
+            return self::none($disabledBy);
         }
         if (class_exists(PolicyConfig::class)) {
             try {
@@ -99,6 +110,12 @@ final class AdvisoryBlocking
     public function blocks(): bool
     {
         return $this->blocks;
+    }
+
+    /** @return list<string> the environment variables that turned the blocking off */
+    public function disabledBy(): array
+    {
+        return $this->disabledBy;
     }
 
     /**

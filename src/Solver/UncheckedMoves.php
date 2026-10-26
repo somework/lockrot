@@ -69,6 +69,11 @@ final class UncheckedMoves implements MoveChecker
         return false;
     }
 
+    public function blockingDisabledBy(): array
+    {
+        return [];
+    }
+
     public function withAdvisories(array $records, array $covered): MoveChecker
     {
         return $this;

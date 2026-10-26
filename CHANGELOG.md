@@ -91,6 +91,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **JSON:** `run.move_check.blocking_disabled_by` lists each of `COMPOSER_NO_BLOCKING` and
+  `COMPOSER_NO_SECURITY_BLOCKING` that the solving Composer reads and that holds a true value.
+  The move check then blocks no advisory and no abandoned package, as Composer's update does.
+  ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** Composer's solver checks each move offline against the lock, and the move
   writes `check` with the release it `installs`. A refused move asks once more with its holders, and
   `moves_with[]` names the holders that move. A move still refused names its holds in `held_by[]`
