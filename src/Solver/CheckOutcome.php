@@ -152,9 +152,9 @@ final class CheckOutcome
     }
 
     /**
-     * A copy without the root requirements on the moved package that admit $version, Composer's
-     * steps on the way to the hold that refuses the move. When no other hold is left, the copy keeps
-     * them: Composer then names only the root requirement.
+     * A copy without the requirements on the moved package that admit $version, of the root or of a
+     * package: Composer's steps on the way to the hold that refuses the move. When no other hold is
+     * left, the copy keeps them: Composer then names only those requirements.
      */
     public function withoutAdmitting(string $version): self
     {
@@ -215,9 +215,6 @@ final class CheckOutcome
 
     private static function admits(Holder $hold, string $version): bool
     {
-        if ($hold->source() !== Holder::ROOT) {
-            return false;
-        }
         if ($hold->target() !== null || !\in_array($hold->link(), [Holder::REQUIRE, Holder::REQUIRE_DEV], true)) {
             return false;
         }

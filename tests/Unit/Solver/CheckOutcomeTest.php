@@ -46,6 +46,27 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([$other, $package], $outcome->holds());
     }
 
+    /** wallabag at 7.4: monolog-bundle's own requirement admits v5.4.52, so only the root pin on http-kernel holds the move (ruling R2-2). */
+    public function testAPackageRequirementOnTheMovedPackageThatAdmitsItsReleaseIsNoHold(): void
+    {
+        $bundle = new Holder(Holder::PACKAGE, 'symfony/monolog-bundle', 'v3.8.0', Holder::REQUIRE, '~4.4 || ^5.0 || ^6.0');
+        $kernel = new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^4.4.51', 'symfony/http-kernel');
+
+        $outcome = (new CheckOutcome(MoveCheck::refused(), [$bundle, $kernel]))->withoutAdmitting('v5.4.52');
+
+        self::assertSame([$kernel], $outcome->holds());
+    }
+
+    public function testAPackageRequirementOnTheMovedPackageThatExcludesItsReleaseStays(): void
+    {
+        $bundle = new Holder(Holder::PACKAGE, 'symfony/monolog-bundle', 'v3.8.0', Holder::REQUIRE_DEV, '~4.4');
+        $kernel = new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^4.4.51', 'symfony/http-kernel');
+
+        $outcome = (new CheckOutcome(MoveCheck::refused(), [$bundle, $kernel]))->withoutAdmitting('v5.4.52');
+
+        self::assertSame([$bundle, $kernel], $outcome->holds());
+    }
+
     /** @return iterable<string, array{Holder::REQUIRE|Holder::REQUIRE_DEV|Holder::ROOT_REQUIRE}> */
     public static function rootRequirementLinks(): iterable
     {
