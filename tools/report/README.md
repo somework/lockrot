@@ -8,6 +8,7 @@ These scripts connect lockrot with its report renderer,
 | `update-renderer vX.Y.Z` | Vendors a release of the renderer into `resources/report/`. It verifies the attestation, the page against the sha256 in its manifest, and that the manifest names the requested version |
 | `update-renderer vX.Y.Z-rc.N` | Vendors a pre-release of the renderer, with the same checks |
 | `update-renderer --from-dir DIR` | Vendors a local build for development. It is not attested |
+| `check-vendored` | Fails unless `resources/report/` holds a plain release with the attestation that `update-renderer` checks. The release pull request and the tag workflow run it |
 | `record` | Records the rendering contract bundle into `tests/fixtures/contract/` (`--all-baselined`: the real baselined projects too, `--engine-pages`: the page cases of real apps) |
 
 ## Which renderer a lockrot release vendors
@@ -20,5 +21,5 @@ These scripts connect lockrot with its report renderer,
   pre-release. The page carries that version, so its bytes, its CSP hash and its manifest differ
   from the pre-release. The CI of the lockrot release pull request that vendors the release tests
   those final bytes, before the lockrot tag.
-- `update-renderer` and the PHAR workflow accept only an attestation from the renderer's
+- `update-renderer` and `check-vendored` accept only an attestation from the renderer's
   `release.yml`, run for the tag that the manifest names.

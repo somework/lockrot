@@ -357,8 +357,10 @@ tools/corpus/corpus check   --out head --explain-out head
       in `SchemaEvolutionTest`. `SchemaEvolutionTest` fails unless the releases that `CHANGELOG.md`
       lists, the keys of `RELEASED_SCHEMAS` and the directories under `schemas/` match exactly.
 
-    - Pin the sha256 of each formatter golden in `ChangedGoldensTest::RELEASED`, and empty its
-      `CHANGED`.
+    - Pin the sha256 of each formatter golden in `ChangedGoldensTest::RELEASED`, set
+      `RELEASED_AT` to the new version, and empty `CHANGED`. From `FIRST_RELEASE` on,
+      `ChangedGoldensTest` fails unless `RELEASED_AT` names the newest release that `CHANGELOG.md`
+      lists. `VersionTest` fails unless `Version::STRING` names that release.
 
     - Vendor a renderer release ([The HTML report page](#the-html-report-page)). When the contract
       bundle changes, run `tools/report/record` first, so that the renderer release pins the new
@@ -375,7 +377,8 @@ tools/corpus/corpus check   --out head --explain-out head
       change that reads it is merged. The lockrot.dev build stops on a set that it does not know.
     - A lockrot-action release that `@v1` jobs need on the tag day is published.
 
-4. Merge the release pull request into `main` with CI green.
+4. Merge the release pull request into `main` with CI green. On a pull request into `main`, the
+   `quality` job also runs `tools/report/check-vendored`, the renderer check of the tag.
 5. When a schema file changes, `.github/workflows/schemas.yml` asks lockrot.dev to publish it.
    Approve the `schemas` environment of the lockrot.dev run, then check that each new schema URL
    answers (`curl -fsI https://lockrot.dev/schema/<document>-<number>.json`).
@@ -384,6 +387,7 @@ tools/corpus/corpus check   --out head --explain-out head
 
     - a tag that is not on `main`, or whose `ci.yml` push run on `main` did not pass
     - a tag whose vendored renderer is not an attested release
+    - a tag whose `-2` schemas lockrot.dev does not serve as the tag holds them
     - a tag whose archive prints another version
 
     It builds, signs and attests the PHAR, runs it on PHP 7.4, then publishes the GitHub release

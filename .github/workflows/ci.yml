@@ -160,6 +160,13 @@ jobs:
       - run: vendor/bin/phpstan analyse --memory-limit=1G
       - run: vendor/bin/phpstan analyse -c phpstan.tests.neon.dist --memory-limit=1G
       - run: python3 -m unittest discover -s tools/schema/tests -t tools/schema/tests
+      # A pull request into main is a release pull request. Its tag is public at once, and Packagist
+      # reads it before phar.yml runs, so the renderer check of phar.yml runs here first. VersionTest
+      # and ChangedGoldensTest hold the version and the golden pins to the CHANGELOG.
+      - name: The release pull request vendors an attested renderer release
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: tools/report/check-vendored
       # tools/schema writes the -2 schemas and their negative fixtures (tools/schema/README.md). An edit
       # of a generated file, or a builder change committed without its output, fails here.
       - name: The generated schemas and negatives match tools/schema
