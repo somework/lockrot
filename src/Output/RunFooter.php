@@ -24,6 +24,9 @@ use Lockrot\Verdict\ShellCommand;
  * writes a package name: markdown puts it in a code span.
  *
  * @internal
+ *
+ * @phpstan-import-type Req from PhpWindow
+ * @phpstan-import-type Fix from PhpWindow
  */
 final class RunFooter
 {
@@ -250,14 +253,15 @@ final class RunFooter
             : 'without require-dev the lock installs '.self::installsOn($without['minors'], $known).', and with require-dev '.self::installsOn($with['minors'], $known);
         $target = $window->targetMinor();
         $fix = $data['target_fix'];
+        $records = $fix === null || $fix['lock_platform'] === [] ? '' : '; '.self::lockPlatformWords($fix, $fix['lock_platform'], $target, $name);
         if ($fix !== null && TargetFix::isRootCeiling($fix)) {
-            return 'php: '.$clause.'; your target, '.$target.', is excluded: '.self::ceilingWords($fix['held_by']);
+            return 'php: '.$clause.'; your target, '.$target.', is excluded: '.self::ceilingWords($fix['held_by']).$records;
         }
         if (!$data['target']['inside']) {
             $clause .= ', so your target, '.$target.', is excluded';
         }
         if ($fix !== null) {
-            return 'php: '.$clause.'; '.self::fixWords($fix, $target, $name);
+            return 'php: '.$clause.($fix['packages'] === [] ? '' : '; '.self::fixWords($fix, $target, $name)).$records;
         }
         $parts = [$clause];
         if ($data['platform_override'] !== null) {
@@ -332,15 +336,59 @@ final class RunFooter
                     ? 'set config.platform.php to your PHP '.$target." release, then Composer's solver resolves: ".$command
                     : "Composer's solver at PHP ".$target.' resolves: '.$command;
             case MoveCheck::REFUSED:
-                $dev = array_column(array_filter($fix['packages'], static fn (array $entry): bool => $entry['dev']), 'name');
-                $holds = array_map(static fn (Holder $hold): string => $hold->source() === Holder::ROOT
-                    ? 'composer.json '.MoveText::linkWords($hold, $name).($hold->link() !== Holder::REQUIRE_DEV && \in_array($hold->target(), $dev, true) ? ' in require-dev' : '')
-                    : $name((string) $hold->package()).' '.$hold->version().' '.MoveText::linkWords($hold, $name), $fix['held_by']);
-
-                return "Composer's solver at PHP ".$target.' refuses the update of '.$them.($holds === [] ? '' : ': '.implode(' and ', $holds));
+                return "Composer's solver at PHP ".$target.' refuses the update of '.$them.self::fixHolds($fix, $name);
             default:
-                return 'the update of '.$them.' is not checked ('.($fix['reason'] === null ? 'the run checked no move' : MoveCheck::reasonWords($fix['reason'])).')';
+                return 'the update of '.$them.' is not checked ('.self::fixReasonWords($fix).')';
         }
+    }
+
+    /**
+     * The `lock_platform` clause (§7.0, ruling Q3): the root links that only the lock records, and
+     * the update that rewrites them. Beside a listed package or at the root ceiling, the fix clause
+     * carries a refusal and an unchecked fix.
+     *
+     * @param Fix                      $fix
+     * @param non-empty-list<Req>      $links `lock_platform`
+     * @param callable(string): string $name
+     */
+    private static function lockPlatformWords(array $fix, array $links, string $target, callable $name): string
+    {
+        $records = 'the lock records '.self::names(array_values(array_unique(array_map(static fn (array $req): string => self::setter($req, $name).' '.$req['constraint'], $links)))).', which composer.json does not have';
+        if ($fix['check'] === MoveCheck::RESOLVES) {
+            $step = $fix['platform_step'] && $fix['packages'] === [] ? 'set config.platform.php to your PHP '.$target.' release, then ' : '';
+
+            return $records.': '.$step.$name((string) ShellCommand::posix((array) $fix['command'])).' rewrites it';
+        }
+        if ($fix['packages'] !== [] || TargetFix::isRootCeiling($fix)) {
+            return $records;
+        }
+        if ($fix['check'] === MoveCheck::REFUSED) {
+            return $records.", and Composer's solver at PHP ".$target.' refuses the update that rewrites it'.self::fixHolds($fix, $name);
+        }
+
+        return $records.', and the update that rewrites it is not checked ('.self::fixReasonWords($fix).')';
+    }
+
+    /**
+     * ": {holds}" of a refused fix, or nothing when the refusal names no hold.
+     *
+     * @param array{packages: list<array{name: ?string, dev: bool}>, held_by: list<Holder>} $fix
+     * @param callable(string): string                                                      $name
+     */
+    private static function fixHolds(array $fix, callable $name): string
+    {
+        $dev = array_column(array_filter($fix['packages'], static fn (array $entry): bool => $entry['dev']), 'name');
+        $holds = array_map(static fn (Holder $hold): string => $hold->source() === Holder::ROOT
+            ? 'composer.json '.MoveText::linkWords($hold, $name).($hold->link() !== Holder::REQUIRE_DEV && \in_array($hold->target(), $dev, true) ? ' in require-dev' : '')
+            : $name((string) $hold->package()).' '.$hold->version().' '.MoveText::linkWords($hold, $name), $fix['held_by']);
+
+        return $holds === [] ? '' : ': '.implode(' and ', $holds);
+    }
+
+    /** @param array{reason: ?string} $fix */
+    private static function fixReasonWords(array $fix): string
+    {
+        return $fix['reason'] === null ? 'the run checked no move' : MoveCheck::reasonWords($fix['reason']);
     }
 
     /**

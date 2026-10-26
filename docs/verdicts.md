@@ -844,6 +844,12 @@ it. It also gives the answer of Composer's solver:
 - A root link on `php` or `php-64bit` that excludes the target is the root ceiling. No update can
   admit the target, so `check` is `refused` with no solve. `held_by` names each such root link with
   its section: `require`, `require-dev` or `conflict`.
+- `lock_platform` lists the root `require` links that exclude the target and that only the lock's
+  `platform` or `platform-dev` holds. composer.json has no link of that name, and Composer writes
+  the lock's platform from composer.json on every update. So such a link is no root ceiling and no
+  hold. With no package listed, lockrot solves an update that names no package, and `command` is
+  `composer update --lock`. On a run with no composer.json, the lock's platform is the root, and
+  `lock_platform` is empty.
 - `platform_step` is true when `config.platform.php` lies outside the target minor. The solve then
   runs at the target. Before you run the command, set `config.platform.php` to your release of the
   target PHP. The lock's `platform-overrides` does not set it.
@@ -857,7 +863,9 @@ edge of the set that `target.inside` reads. No update of a package can lower tha
 The `php:` line of the table, markdown and github formats prints the window. When the minors of
 `with_dev` differ, the line prints `with_dev` and `without_dev`. The line adds the target when the
 window excludes it. With `target_fix`, the line ends with its answer. That is the command, the holds
-of the refusal, the root links of the root ceiling, or the reason that the run did not check it. A
+of the refusal, the root links of the root ceiling, or the reason that the run did not check it.
+Each `lock_platform` link adds "the lock records …, which composer.json does not have" last, with
+the update that rewrites it. A
 root hold on a package of `packages-dev` ends with " in require-dev". Without
 `target_fix`, the line adds the PHP of `platform_override` and the links that set one edge. That is
 the lowest edge when the target lies below it, else the edge after the last minor of the analysed

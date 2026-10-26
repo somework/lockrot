@@ -35,6 +35,10 @@ final class CommandArgument
         if (($argv[0] ?? null) !== 'composer' || !isset(self::SUBCOMMANDS[$subcommand])) {
             return false;
         }
+        // `run.php_window.target_fix` alone writes it: an update of no package rewrites the lock's platform.
+        if ($argv === ['composer', 'update', '--lock']) {
+            return true;
+        }
         $package = false;
         $option = false;
         foreach (\array_slice($argv, 2) as $argument) {

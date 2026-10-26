@@ -163,6 +163,15 @@ final class SolverChecker implements MoveChecker
         if (array_intersect($names, $this->notFromComposerRepository) !== []) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::NOT_FROM_COMPOSER_REPOSITORY));
         }
+        if ($names === []) {
+            // `composer update --lock` allows a name that the lock does not hold, as the baseline does.
+            $solution = $this->attempt(SolveRequest::unlock([SolveRequest::BASELINE_NAME]));
+            if (!$solution instanceof Solution) {
+                return $solution;
+            }
+
+            return $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds()));
+        }
         $tried = $this->forms(SolveRequest::unlock($names), $names);
         if ($tried instanceof CheckOutcome) {
             return $tried;

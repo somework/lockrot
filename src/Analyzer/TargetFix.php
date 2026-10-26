@@ -24,21 +24,23 @@ final class TargetFix
 
     /**
      * A root link that fails is the root ceiling: no update can admit the target, so nothing solves.
+     * A root link that only the lock's platform holds is no ceiling, because any update rewrites it.
      *
      * @param list<Req>    $failing      the links that fail at `target.php`, on the set that `target.inside` reads
+     * @param list<Req>    $lockPlatform those of $failing that only the lock's platform holds
      * @param list<string> $skippedNames the lock entries whose name is no Composer package name: none reaches a solve or a command
      * @param ?MoveChecker $checker      null when the run checks no move
      *
      * @return Fix
      */
-    public static function of(array $failing, array $skippedNames, bool $platformStep, ?MoveChecker $checker): array
+    public static function of(array $failing, array $lockPlatform, array $skippedNames, bool $platformStep, ?MoveChecker $checker): array
     {
         $packages = array_filter($failing, static fn (array $req): bool => $req['name'] !== null);
         usort($packages, static fn (array $a, array $b): int => [$a['dev'], $a['name'], $a['link'], $a['target']] <=> [$b['dev'], $b['name'], $b['link'], $b['target']]);
-        $fix = ['packages' => $packages, 'command' => null, 'check' => MoveCheck::NOT_CHECKED, 'reason' => null, 'held_by' => [], 'platform_step' => $platformStep];
+        $fix = ['packages' => $packages, 'lock_platform' => $lockPlatform, 'command' => null, 'check' => MoveCheck::NOT_CHECKED, 'reason' => null, 'held_by' => [], 'platform_step' => $platformStep];
         $ceiling = [];
         foreach ($failing as $req) {
-            if ($req['name'] === null) {
+            if ($req['name'] === null && !\in_array($req, $lockPlatform, true)) {
                 $ceiling[] = new Holder(Holder::ROOT, null, null, self::section($req), $req['constraint'], $req['target']);
             }
         }
@@ -46,7 +48,7 @@ final class TargetFix
             return array_replace($fix, ['check' => MoveCheck::REFUSED, 'held_by' => Holder::distinct($ceiling)]);
         }
         $names = array_keys(array_flip(array_column($packages, 'name')));
-        if ($checker === null || $names === []) {
+        if ($checker === null || ($names === [] && $lockPlatform === [])) {
             return $fix;
         }
         // Ruling T5: no solve runs while the baseline is not checked, so its reason wins over the names'.
@@ -64,7 +66,9 @@ final class TargetFix
         if ($check->isResolved()) {
             $option = MoveCheck::OPTIONS[$check->form() ?? MoveCheck::INLINE] ?? null;
 
-            return array_replace($fix, ['command' => array_merge(['composer', 'update'], $names, $option === null ? [] : [$option]), 'check' => MoveCheck::RESOLVES]);
+            $command = $names === [] ? ['composer', 'update', '--lock'] : array_merge(['composer', 'update'], $names, $option === null ? [] : [$option]);
+
+            return array_replace($fix, ['command' => $command, 'check' => MoveCheck::RESOLVES]);
         }
         if ($check->isRefused()) {
             // A listed package's own php or php-64bit requirement restates `packages`. Composer names packages in lower case.

@@ -35,10 +35,10 @@ interface MoveChecker
 
     /**
      * One update of the names at the solve's php, with no constraint, each hold with its target
-     * (`run.php_window.target_fix`). It takes the baseline's reason when the baseline was not
-     * checked, and ignores a refused baseline.
+     * (`run.php_window.target_fix`). With no name, it is `composer update --lock`. It takes the
+     * baseline's reason when the baseline was not checked, and ignores a refused baseline.
      *
-     * @param non-empty-list<string> $names
+     * @param list<string> $names
      */
     public function solveAt(array $names): CheckOutcome;
 

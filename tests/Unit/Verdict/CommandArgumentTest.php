@@ -89,6 +89,15 @@ final class CommandArgumentTest extends TestCase
         }
     }
 
+    /** SPEC §5.6 (ruling Q3): `--lock` is the one argument of an update that rewrites the lock's platform. */
+    public function testLockPassesOnlyAsTheOneArgumentOfAnUpdate(): void
+    {
+        self::assertTrue(CommandArgument::allPass(['composer', 'update', '--lock']));
+        foreach ([['composer', 'update', 'a/b', '--lock'], ['composer', 'update', '--lock', 'a/b'], ['composer', 'update', '--lock', '--with-dependencies'], ['composer', 'require', '--lock'], ['composer', 'why-not', '--lock'], ['lockrot', 'update', '--lock']] as $argv) {
+            self::assertFalse(CommandArgument::allPass($argv), implode(' ', $argv));
+        }
+    }
+
     public function testLockedPassesOnWhyNotOnlyAndDevOnRequireOnly(): void
     {
         self::assertSame(
