@@ -20,6 +20,7 @@ use Lockrot\Output\SarifFormatter;
 use Lockrot\Output\SarifRecords;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Signal;
+use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
@@ -790,10 +791,33 @@ final class SarifFormatterTest extends TestCase
         self::assertSame(['maintainability'], JsonPath::arrayAt($byId['lockrot/left-behind'], ['properties', 'tags']));
     }
 
+    /** SPEC §7.5: the rule text of an age flag names the thresholds of the run. */
+    public function testTheRuleTextOfAnAgeFlagNamesTheThresholdsOfTheRun(): void
+    {
+        $thresholds = new Thresholds(1, 7, 4, 9);
+        $text = static fn (string $flag): string => SarifRecords::rule('lockrot/'.$flag, null, $thresholds)['fullDescription']['text'];
+
+        self::assertSame('No release for 7 years (release-high-years) and no repository push for 9 years (push-high-years).', $text('silent'));
+        self::assertSame('No stable release on the installed branch for 1 year (release-warn-years), while a higher branch has released since.', $text('left-behind'));
+        self::assertSame('No release for 1 year (release-warn-years), or no repository push for 4 years (push-warn-years), short of silent.', $text('stale'));
+    }
+
+    public function testTheRulesOfASarifRunFollowTheThresholdsOfTheRun(): void
+    {
+        $settings = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, new Thresholds(2, 6, 2, 6));
+        $rules = [];
+        foreach (JsonPath::arrayAt($this->singleRun($this->formatter('none', null)->format(CaseHydrator::composite()->withRun($settings))), ['tool', 'driver', 'rules']) as $rule) {
+            self::assertIsArray($rule);
+            $rules[JsonPath::stringAt($rule, ['id'])] = JsonPath::stringAt($rule, ['fullDescription', 'text']);
+        }
+
+        self::assertSame('No stable release on the installed branch for 2 years (release-warn-years), while a higher branch has released since.', $rules['lockrot/left-behind']);
+    }
+
     /** GitHub reads `security-severity` as a score from 0.0 to 10.0, and SPEC §5.2 omits it for an unrated advisory. */
     public function testAnUnratedAdvisoryRuleCarriesNoSecuritySeverity(): void
     {
-        $rule = SarifRecords::rule('lockrot/advisory/PKSA-unrated', null);
+        $rule = SarifRecords::rule('lockrot/advisory/PKSA-unrated', null, new Thresholds());
 
         self::assertSame(['tags' => ['security', 'dependency']], $rule['properties']);
     }

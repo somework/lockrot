@@ -169,10 +169,15 @@ final class RunSettings
         ];
     }
 
+    public function thresholds(): Thresholds
+    {
+        return $this->thresholds ?? new Thresholds();
+    }
+
     /** @return array{thresholds: array<string, int>, flag_ids: list<string>, verdicts: list<string>, graded_verdicts: list<string>, signal_ids: list<string>, fix_model: int, text_grammar: int, score_model: array<string, mixed>} */
     private function toModelArray(): array
     {
-        $thresholds = $this->thresholds ?? new Thresholds();
+        $thresholds = $this->thresholds();
 
         return [
             'thresholds' => [
