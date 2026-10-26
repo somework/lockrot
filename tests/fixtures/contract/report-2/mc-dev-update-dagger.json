@@ -789,14 +789,15 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 6
+                    "packages_with_records": 2,
+                    "records": 21
                 }
             ]
         },
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
+            "blocking_disabled_by": [],
             "ignores_extensions": true,
             "baseline": "resolves",
             "reason": null
@@ -823,6 +824,14 @@
                             "target": "php",
                             "constraint": "^8.1",
                             "dev": false
+                        },
+                        {
+                            "name": "guzzlehttp/guzzle",
+                            "version": "7.10.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.1",
+                            "dev": false
                         }
                     ]
                 },
@@ -847,6 +856,14 @@
                             "link": "require",
                             "target": "php",
                             "constraint": "^8.1",
+                            "dev": false
+                        },
+                        {
+                            "name": "guzzlehttp/guzzle",
+                            "version": "7.10.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.1",
                             "dev": false
                         }
                     ]
@@ -1313,13 +1330,13 @@
                         "installed_version": "7.10.0",
                         "installed_requires": true,
                         "newest_stable": {
-                            "version": "8.2.0",
-                            "released": "2026-09-06T13:55:09+00:00"
+                            "version": "7.10.0",
+                            "released": "2026-07-01T10:00:00+00:00"
                         },
                         "newest_requires": true,
                         "newest_requires_unmeasured": null,
                         "local": false,
-                        "newest_is_installed": false
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],

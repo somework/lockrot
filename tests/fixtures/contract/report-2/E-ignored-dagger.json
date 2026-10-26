@@ -890,6 +890,7 @@
             },
             "target_fix": {
                 "packages": [],
+                "lock_platform": [],
                 "command": null,
                 "check": "refused",
                 "reason": null,

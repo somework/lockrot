@@ -187,7 +187,7 @@
                     "target": null,
                     "constraint": "self.version",
                     "holder": {
-                        "verdict": "unknown",
+                        "verdict": "ok",
                         "lead": null,
                         "flag_ids": [],
                         "direct": false,
@@ -438,7 +438,7 @@
                                         "target": null,
                                         "constraint": "self.version",
                                         "holder": {
-                                            "verdict": "unknown",
+                                            "verdict": "ok",
                                             "lead": null,
                                             "flag_ids": [],
                                             "direct": false,
@@ -506,7 +506,7 @@
                                         "target": null,
                                         "constraint": "self.version",
                                         "holder": {
-                                            "verdict": "unknown",
+                                            "verdict": "ok",
                                             "lead": null,
                                             "flag_ids": [],
                                             "direct": false,
@@ -667,7 +667,7 @@
                             "target": null,
                             "constraint": "self.version",
                             "holder": {
-                                "verdict": "unknown",
+                                "verdict": "ok",
                                 "lead": null,
                                 "flag_ids": [],
                                 "direct": false,
@@ -788,7 +788,7 @@
                             "target": null,
                             "constraint": "self.version",
                             "holder": {
-                                "verdict": "unknown",
+                                "verdict": "ok",
                                 "lead": null,
                                 "flag_ids": [],
                                 "direct": false,
@@ -909,7 +909,7 @@
                             "target": null,
                             "constraint": "self.version",
                             "holder": {
-                                "verdict": "unknown",
+                                "verdict": "ok",
                                 "lead": null,
                                 "flag_ids": [],
                                 "direct": false,
@@ -1014,7 +1014,7 @@
                             "target": null,
                             "constraint": "self.version",
                             "holder": {
-                                "verdict": "unknown",
+                                "verdict": "ok",
                                 "lead": null,
                                 "flag_ids": [],
                                 "direct": false,

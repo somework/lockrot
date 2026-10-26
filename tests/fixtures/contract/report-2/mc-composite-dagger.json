@@ -797,6 +797,7 @@
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
+            "blocking_disabled_by": [],
             "ignores_extensions": true,
             "baseline": "resolves",
             "reason": null
@@ -825,7 +826,31 @@
                             "dev": false
                         },
                         {
+                            "name": "acme/gz-promises",
+                            "version": "1.0.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.1",
+                            "dev": false
+                        },
+                        {
+                            "name": "acme/hf-mime",
+                            "version": "1.0.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.1",
+                            "dev": false
+                        },
+                        {
                             "name": "acme/ml-widget",
+                            "version": "1.0.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.1",
+                            "dev": false
+                        },
+                        {
+                            "name": "acme/rt-kernel",
                             "version": "1.0.0",
                             "link": "require",
                             "target": "php",
@@ -890,7 +915,31 @@
                             "dev": false
                         },
                         {
+                            "name": "acme/gz-promises",
+                            "version": "1.0.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.1",
+                            "dev": false
+                        },
+                        {
+                            "name": "acme/hf-mime",
+                            "version": "1.0.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.1",
+                            "dev": false
+                        },
+                        {
                             "name": "acme/ml-widget",
+                            "version": "1.0.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.1",
+                            "dev": false
+                        },
+                        {
+                            "name": "acme/rt-kernel",
                             "version": "1.0.0",
                             "link": "require",
                             "target": "php",

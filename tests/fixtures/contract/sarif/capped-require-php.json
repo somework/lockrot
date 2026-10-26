@@ -16,7 +16,7 @@
                                 "text": "left-behind: The installed release branch stopped while a newer branch kept releasing"
                             },
                             "fullDescription": {
-                                "text": "No stable release on the installed branch for release-warn-years, while a higher branch has released since."
+                                "text": "No stable release on the installed branch for 3 years (release-warn-years), while a higher branch has released since."
                             },
                             "defaultConfiguration": {
                                 "level": "warning"

@@ -1,0 +1,21 @@
+{
+    "score_text": "24 = capped 8 + vulnerable 16 [high advisory]",
+    "next_step_text": "require symfony/routing ^6.4.40 — clears capped and the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/rt-kernel ^1.0) and symfony/routing v6.4.40, its own release (requires acme/rt-kernel ^2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-04 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)",
+    "explain_age": [
+        "installed  v6.4.28   2025-10-31   0.9 years ago",
+        "6.x        v6.4.41   2026-07-04   0.2 years ago                 below release-warn-years 3",
+        "newest     v6.4.41   2026-07-04   0.2 years ago                 below release-warn-years 3",
+        "last push            2026-09-29   less than three weeks ago     below push-warn-years 3",
+        "libyears 0.7 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer why-not symfony/routing v6.4.40 --locked"
+    ],
+    "commands_cmd": [
+        "composer why-not symfony/routing v6.4.40 --locked"
+    ]
+}

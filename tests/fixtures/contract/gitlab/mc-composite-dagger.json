@@ -11,7 +11,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 18
+                "begin": 60
             }
         }
     },
@@ -27,7 +27,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 32
+                "begin": 74
             }
         }
     },
@@ -43,7 +43,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 46
+                "begin": 88
             }
         }
     },
@@ -59,7 +59,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 60
+                "begin": 102
             }
         }
     },
@@ -75,7 +75,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 74
+                "begin": 116
             }
         }
     },
@@ -91,7 +91,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 88
+                "begin": 130
             }
         }
     }

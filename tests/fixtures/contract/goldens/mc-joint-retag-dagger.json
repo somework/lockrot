@@ -1,0 +1,21 @@
+{
+    "score_text": "16 = vulnerable 16 [high advisory]",
+    "next_step_text": "require guzzlehttp/guzzle ^8.0.1 — clears the advisory; 8.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by acme/h 1.0.0 (requires ^7.10); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 7.10.0 released 2025-08-23 (1.1 years ago); 7.x last released 7.15.2 2026-07-02 (0.3 years ago); newest release 8.0.1 2026-07-03 (0.2 years ago); last push 2026-09-06 (0.1 years ago)",
+    "explain_age": [
+        "installed  7.10.0    2025-08-23   1.1 years ago",
+        "7.x        7.15.2    2026-07-02   0.3 years ago                 below release-warn-years 3",
+        "newest     8.0.1     2026-07-03   0.2 years ago                 below release-warn-years 3",
+        "last push            2026-09-06   0.1 years ago                 below push-warn-years 3",
+        "libyears 0.9 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer why-not guzzlehttp/guzzle 8.0.1 --locked"
+    ],
+    "commands_cmd": [
+        "composer why-not guzzlehttp/guzzle 8.0.1 --locked"
+    ]
+}

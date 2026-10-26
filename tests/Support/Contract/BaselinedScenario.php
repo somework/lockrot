@@ -457,7 +457,8 @@ final class BaselinedScenario
     /** The fixture server listens on a free port: its address loses the port, so two recordings agree. */
     private function put(string $path, string $contents): void
     {
-        $this->files[$path] = (string) preg_replace('{'.preg_quote(self::SERVER, '}').':\d+}', self::SERVER, VersionMask::apply($contents));
+        // Markdown escapes the scheme of a bare URL as `http\://`.
+        $this->files[$path] = (string) preg_replace('{http(\\\\?)://127\.0\.0\.1:\d+}', 'http$1://127.0.0.1', VersionMask::apply($contents));
     }
 
     /**

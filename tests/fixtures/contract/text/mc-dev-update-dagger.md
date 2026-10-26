@@ -11,7 +11,7 @@ depth: every flagged package is named in composer.json · 1 hop 1 · deepest: `g
 security: 1 vulnerable package · 1 advisory: 1 high
 libyears: 0.9 behind across the one package · 0.0 from direct requirements · furthest behind guzzlehttp/psr7 2.8.0 at 0.9
 pulled in by: `guzzlehttp/guzzle` 1
-advisories: 1 package asked · packagist.org answered (6 on record for 1 package)
+advisories: 1 package asked · packagist.org answered (21 on record for 2 packages)
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-\* requirements not checked
 php: the lock installs on PHP 8.1 to 8.5
 

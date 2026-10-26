@@ -1,0 +1,5 @@
+::error file=composer.lock,line=4,title=lockrot%3A high — pinned · stale::friendsofsymfony/oauth-server-bundle dev-master: 18 = pinned 16 + stale 2 [¼ of 8]. Do: no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it; replace it. pinned: pinned to branch snapshot dev-master. stale: last release 2019-01-23 (7.7 years ago).
+flags: pinned 1 · stale 1 · 1 package carries more than one
+depth: every flagged package is named in composer.json · direct 1
+php: the lock installs on PHP 7.4 to 8.5; Composer checks it at 7.4.29 from config.platform.php
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

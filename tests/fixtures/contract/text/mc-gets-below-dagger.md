@@ -1,4 +1,4 @@
-### lockrot: 1 of 1 packages flagged — high 1
+### lockrot: 1 of 2 packages flagged — high 1
 
 **gate: fails** · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)
 
@@ -16,4 +16,4 @@ php: the lock installs on PHP 8.1 to 8.5
 
 **Update now:** `composer update 'symfony/routing:^6.4.40'`
 
-<sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

@@ -1,4 +1,4 @@
-### lockrot: 1 of 1 packages flagged — critical 1
+### lockrot: 1 of 1 package flagged — critical 1
 
 **gate: off** · --fail-on=none (default) · target php 8.4 (--target-php)
 
