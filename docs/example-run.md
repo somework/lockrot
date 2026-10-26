@@ -39,7 +39,7 @@ critical (3)
 high (39)
   spomky-labs/otphp v10.0.3  via scheb/2fa-google-authenticator  ·  left-behind · vulnerable
       24 = left-behind 16 ÷ 2 transitive + vulnerable 16 [high advisory]
-      do: move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator — clears left-behind and 2
+      do: move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator — clears left-behind and 2
           advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json
           (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself
           left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev));
@@ -351,8 +351,8 @@ medium (12)
            2026-10-20 (less than three weeks ago); last push 2026-10-20 (less than three weeks ago)
   symfony/expression-language v5.4.45  direct  ·  vulnerable
       8 = vulnerable 8 [unrated advisory]
-      do: composer update 'symfony/expression-language:^5.4.54' (gets v5.4.54) — clears the advisory; Composer's
-          solver checked it against the lock
+      do: composer update 'symfony/expression-language:^5.4.54'
+          (gets v5.4.54) — clears the advisory; Composer's solver checked it against the lock
       vulnerable   1 advisory: 1 unrated — all fixed on 5.x; advisory: CVE-2026-109449 Unbounded Nesting in the
                    Expression Parser Lets Untrusted Expressions Crash the Process
       age: installed v5.4.45 released 2024-10-04 (2.1 years ago); 5.x last released v5.4.54 2026-10-09 (less than
@@ -360,8 +360,8 @@ medium (12)
            than three weeks ago)
   symfony/http-foundation v5.4.50  direct  ·  vulnerable
       8 = vulnerable 8 [unrated advisory]
-      do: composer update 'symfony/http-foundation:^5.4.54' (gets v5.4.54) — clears the advisory; Composer's solver
-          checked it against the lock
+      do: composer update 'symfony/http-foundation:^5.4.54'
+          (gets v5.4.54) — clears the advisory; Composer's solver checked it against the lock
       vulnerable   1 advisory: 1 unrated — all fixed on 5.x; advisory: CVE-2026-108082 ReDoS in HeaderUtils::split()
                    Reachable Through the Cache-Control Request Header
       age: installed v5.4.50 released 2025-11-03 (1.0 years ago); 5.x last released v5.4.54 2026-09-30 (0.1 years
@@ -369,16 +369,16 @@ medium (12)
            weeks ago)
   phpseclib/phpseclib 3.0.55  via php-amqplib/php-amqplib, php-amqplib/rabbitmq-bundle  ·  vulnerable
       8 = vulnerable 8 [medium advisory]
-      do: composer update 'phpseclib/phpseclib:^3.0.57' (gets 3.0.57) — clears the advisory; Composer's solver checked
-          it against the lock
+      do: composer update 'phpseclib/phpseclib:^3.0.57'
+          (gets 3.0.57) — clears the advisory; Composer's solver checked it against the lock
       vulnerable   1 advisory: 1 medium — all fixed on 3.x; advisory: CVE-2026-84308 phpseclib — non-constant-time
                    X25519 scalar multiplication permits full private-key recovery
       age: installed 3.0.55 released 2026-06-14 (0.4 years ago); 3.x last released 3.0.57 2026-08-26 (0.2 years
            ago); newest release 4.0.2 2026-10-07 (0.1 years ago); last push 2026-10-26 (less than three weeks ago)
   symfony/yaml v6.4.43  via nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle, sentry/sentry-symfony  ·  vulnerable
       8 = vulnerable 8 [unrated advisory]
-      do: composer update 'symfony/yaml:^6.4.45' (gets v6.4.48) — clears the advisory; Composer's solver checked it
-          against the lock
+      do: composer update 'symfony/yaml:^6.4.45'
+          (gets v6.4.48) — clears the advisory; Composer's solver checked it against the lock
       vulnerable   1 advisory: 1 unrated — all fixed on 6.x; advisory: CVE-2026-109413 Unbounded Recursion in the YAML
                    Inline Lexer Lets a Single Document Crash the Process
       age: installed v6.4.43 released 2026-07-20 (0.3 years ago); 6.x last released v6.4.48 2026-10-12 (less than
@@ -411,9 +411,9 @@ medium (12)
       8 = left-behind 16 ÷ 2 transitive
       do: move symfony/psr-http-message-bridge to ^7.4 through sentry/sentry-symfony — clears left-behind; 7.x needs
           php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires
-          symfony/http-foundation ^5.4.48) and symfony/psr-http-message-bridge v7.4.21, its own release (requires
+          symfony/http-foundation ^5.4.48) and symfony/psr-http-message-bridge v7.4.0, its own release (requires
           symfony/http-foundation ^6.4|^7.0|^8.0) and symfony/psr-http-message-bridge v7.4.0, its own release (conflicts
-          with symfony/http-kernel <6.4) and sentry/sentry-symfony 5.6.0 (requires ^1.2||^2.0||^6.4||^7.0) and
+          with symfony/http-kernel <6.4) and sentry/sentry-symfony 5.2.0 (requires ^1.2||^2.0||^6.4||^7.0) and
           sentry/sentry-symfony 5.12.0 (requires ^1.2||^2.0||^6.4||^7.0||^8.0) and sentry/sentry-symfony 5.13.0
           (requires sentry/sentry ^4.31.0) and sentry/sentry-symfony 5.14.0 (requires sentry/sentry ^4.34.0); the
           packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses
@@ -544,7 +544,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         "version": "0.14.0",
         "schema": 2
     },
-    "generated_at": "2026-10-26T03:27:24+00:00",
+    "generated_at": "2026-10-26T08:46:29+00:00",
     "run": {
         "project": "wallabag/wallabag",
         "root_package": "wallabag/wallabag",
@@ -872,6 +872,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": true,
+            "blocking_disabled_by": [],
             "ignores_extensions": true,
             "baseline": "resolves",
             "reason": null
@@ -1340,7 +1341,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         ],
         "fix_unknown": 0
     },
-    "data_date": "2026-10-26T03:27:24+00:00",
+    "data_date": "2026-10-26T08:46:29+00:00",
     "notes": [],
     "note_details": [],
     "findings": [
@@ -1496,17 +1497,15 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             "next_step": {
                 "kind": "require",
                 "source": "vulnerable",
-                "merged": [
-                    "left-behind"
-                ],
+                "merged": [],
                 "fix_kind": "upgrade",
                 "reason": null,
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "11.x",
-                "version": "11.5.0",
+                "version": "11.4.3",
                 "newest": "11.5.0",
-                "constraint": "^11.5",
+                "constraint": "^11.4.3",
                 "latest": null,
                 "php_check": {
                     "requires": ">=8.1",
@@ -1612,7 +1611,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                         "composer",
                         "why-not",
                         "spomky-labs/otphp",
-                        "11.5.0",
+                        "11.4.3",
                         "--locked"
                     ]
                 ],
@@ -1632,7 +1631,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                     }
                 ],
                 "also": [],
-                "text": "move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator — clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator — clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "vulnerable",
@@ -1692,7 +1691,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                 "repo": "Spomky-Labs/otphp",
                 "event": "push",
                 "archived": false,
-                "fetched_at": "2026-10-26T03:27:24+00:00",
+                "fetched_at": "2026-10-26T08:46:29+00:00",
                 "cached_at": null
             },
             "allowlist": null,
@@ -1913,7 +1912,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             ],
             "evidence": "left-behind: branch 10.x last released 2022-03-17 (4.6 years ago); 11.x released 11.5.0 (2026-06-06); vulnerable: 2 advisories: 1 high, 1 medium — none fixed on 10.x; worst: PKSA-kbc7-dq62-pt7d Unbounded digits parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation",
             "allowlist_reason": null,
-            "data_date": "2026-10-26T03:27:24+00:00",
+            "data_date": "2026-10-26T08:46:29+00:00",
             "libyears": 4.22,
             "age": {
                 "installed": {
