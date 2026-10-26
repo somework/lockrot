@@ -1141,6 +1141,17 @@
     "exempt": {
       "baseline": 0
     },
+    "standing": {
+      "known": 0,
+      "new": 0,
+      "worsened": 0,
+      "none": 3
+    },
+    "failing_packages": [
+      "bantu/ini-get-wrapper",
+      "microsoft/azure-storage-blob",
+      "pear/console_getopt"
+    ],
     "failing_by": [
       {
         "value": "high",
@@ -1319,6 +1330,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1585,6 +1597,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1895,6 +1908,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -1909,7 +1923,9 @@
               "released": "2026-08-19T17:37:49+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "pear/pear-core-minimal",
@@ -1920,11 +1936,13 @@
               "released": "2025-12-14T20:37:07+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 6.9 years; it comes in through pear/archive_tar, pear/pear-core-minimal: replace or update them; the newest release of pear/pear-core-minimal (v1.10.18) still requires it"
+        "text": "find a maintained alternative: nothing released for 6.9 years; it comes in through pear/archive_tar, pear/pear-core-minimal: replace or update pear/archive_tar, or replace pear/pear-core-minimal; the newest release of pear/pear-core-minimal (v1.10.18) still requires it"
       },
       "security": {
         "status": "clear",
@@ -2196,12 +2214,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "phpseclib/phpseclib"
+          ],
+          [
+            "composer",
+            "why-not",
+            "phpseclib/phpseclib",
+            "3.0.57",
+            "--locked"
           ]
         ],
         "through": [],
@@ -2510,6 +2536,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2745,6 +2772,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2981,6 +3009,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -3247,6 +3276,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -3255,6 +3285,13 @@
             "composer",
             "require",
             "web-auth/webauthn-lib:^5.3.5"
+          ],
+          [
+            "composer",
+            "why-not",
+            "web-auth/webauthn-lib",
+            "5.3.5",
+            "--locked"
           ]
         ],
         "through": [],
@@ -3547,6 +3584,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -3559,7 +3597,9 @@
               "released": "2025-10-30T23:44:22+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
@@ -3802,6 +3842,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -3814,7 +3855,9 @@
               "released": "2022-09-02T02:13:06+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
@@ -4069,6 +4112,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -4081,7 +4125,9 @@
               "released": "2026-08-19T17:37:49+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "pear/pear-core-minimal",
@@ -4092,7 +4138,9 @@
               "released": "2025-12-14T20:37:07+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],

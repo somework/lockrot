@@ -1309,6 +1309,56 @@
     "exempt": {
       "baseline": 0
     },
+    "standing": {
+      "known": 0,
+      "new": 0,
+      "worsened": 0,
+      "none": 42
+    },
+    "failing_packages": [
+      "javibravo/simpleue",
+      "mnapoli/piwik-twig-extension",
+      "sensio/framework-extra-bundle",
+      "spomky-labs/otphp",
+      "j0k3r/httplug-ssrf-plugin",
+      "friendsofsymfony/oauth-server-bundle",
+      "mgargano/simplehtmldom",
+      "grandt/binstring",
+      "grandt/phpresizegif",
+      "grandt/phpzipmerge",
+      "grandt/relativepath",
+      "hoa/consistency",
+      "phpzip/phpzip",
+      "pragmarx/random",
+      "craue/config-bundle",
+      "doctrine/event-manager",
+      "lcobucci/jwt",
+      "scheb/2fa-backup-code",
+      "scheb/2fa-bundle",
+      "scheb/2fa-email",
+      "scheb/2fa-google-authenticator",
+      "scheb/2fa-trusted-device",
+      "symfony/webpack-encore-bundle",
+      "wallabag/rulerz",
+      "wallabag/rulerz-bundle",
+      "behat/transliterator",
+      "doctrine/annotations",
+      "doctrine/cache",
+      "hoa/compiler",
+      "hoa/event",
+      "hoa/exception",
+      "hoa/file",
+      "hoa/iterator",
+      "hoa/math",
+      "hoa/protocol",
+      "hoa/regex",
+      "hoa/ruler",
+      "hoa/stream",
+      "hoa/ustring",
+      "hoa/visitor",
+      "hoa/zformat",
+      "symfony/security-guard"
+    ],
     "failing_by": [
       {
         "value": "high",
@@ -1524,6 +1574,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1850,6 +1901,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2135,6 +2187,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2535,11 +2588,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major",
           "transitive"
         ],
-        "commands": [],
+        "commands": [
+          [
+            "composer",
+            "why-not",
+            "spomky-labs/otphp",
+            "11.5.0",
+            "--locked"
+          ]
+        ],
         "through": [
           {
             "package": "scheb/2fa-google-authenticator",
@@ -2550,7 +2612,9 @@
               "released": "2026-01-24T13:27:55+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -2913,6 +2977,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -2925,7 +2990,9 @@
               "released": "2026-09-14T14:05:34+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -3284,6 +3351,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -3638,6 +3706,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -3972,6 +4041,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -3986,11 +4056,13 @@
               "released": "2022-03-21T19:27:18+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub: replace or update that package"
+        "text": "find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub (grandt/phpresizegif requires it): replace wallabag/phpepub"
       },
       "security": {
         "status": "clear",
@@ -4320,6 +4392,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -4334,11 +4407,13 @@
               "released": "2022-03-21T19:27:18+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it"
+        "text": "find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace wallabag/phpepub; the newest release of wallabag/phpepub (4.0.10) still requires it"
       },
       "security": {
         "status": "clear",
@@ -4667,6 +4742,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -4681,11 +4757,13 @@
               "released": "2022-03-21T19:27:18+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub: replace or update that package"
+        "text": "find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub (phpzip/phpzip requires it): replace wallabag/phpepub"
       },
       "security": {
         "status": "clear",
@@ -5015,6 +5093,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -5029,11 +5108,13 @@
               "released": "2022-03-21T19:27:18+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it"
+        "text": "find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace wallabag/phpepub; the newest release of wallabag/phpepub (4.0.10) still requires it"
       },
       "security": {
         "status": "clear",
@@ -5373,6 +5454,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -5384,7 +5466,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -5392,11 +5476,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -5746,6 +5832,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -5760,11 +5847,13 @@
               "released": "2022-03-21T19:27:18+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 10.9 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it"
+        "text": "find a maintained alternative: nothing released for 10.9 years; it comes in through wallabag/phpepub: replace wallabag/phpepub; the newest release of wallabag/phpepub (4.0.10) still requires it"
       },
       "security": {
         "status": "clear",
@@ -6093,6 +6182,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -6107,11 +6197,13 @@
               "released": "2021-08-15T12:26:51+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 8.9 years; it comes in through pragmarx/recovery: replace or update that package; the newest release of pragmarx/recovery (v0.2.1) still requires it"
+        "text": "find a maintained alternative: nothing released for 8.9 years; it comes in through pragmarx/recovery: replace pragmarx/recovery; the newest release of pragmarx/recovery (v0.2.1) still requires it"
       },
       "security": {
         "status": "clear",
@@ -6393,6 +6485,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -6401,6 +6494,13 @@
             "composer",
             "require",
             "craue/config-bundle:^3.0"
+          ],
+          [
+            "composer",
+            "why-not",
+            "craue/config-bundle",
+            "3.0.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -6704,6 +6804,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -7004,6 +7105,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -7315,6 +7417,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -7323,6 +7426,13 @@
             "composer",
             "require",
             "scheb/2fa-backup-code:^7.14"
+          ],
+          [
+            "composer",
+            "why-not",
+            "scheb/2fa-backup-code",
+            "v7.14.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -7648,6 +7758,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -7656,6 +7767,13 @@
             "composer",
             "require",
             "scheb/2fa-bundle:^7.14"
+          ],
+          [
+            "composer",
+            "why-not",
+            "scheb/2fa-bundle",
+            "v7.14.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -7963,6 +8081,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -7971,6 +8090,13 @@
             "composer",
             "require",
             "scheb/2fa-email:^7.14"
+          ],
+          [
+            "composer",
+            "why-not",
+            "scheb/2fa-email",
+            "v7.14.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -8275,6 +8401,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -8283,6 +8410,13 @@
             "composer",
             "require",
             "scheb/2fa-google-authenticator:^7.14"
+          ],
+          [
+            "composer",
+            "why-not",
+            "scheb/2fa-google-authenticator",
+            "v7.14.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -8634,6 +8768,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -8642,6 +8777,13 @@
             "composer",
             "require",
             "scheb/2fa-trusted-device:^7.14"
+          ],
+          [
+            "composer",
+            "why-not",
+            "scheb/2fa-trusted-device",
+            "v7.14.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -8979,6 +9121,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -9250,6 +9393,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -9691,6 +9835,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -10173,6 +10318,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -10187,11 +10333,13 @@
               "released": "2026-01-23T08:45:07+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through stof/doctrine-extensions-bundle: replace or update that package"
+        "text": "find a replacement (none named); it comes in through stof/doctrine-extensions-bundle (gedmo/doctrine-extensions requires it): replace or update stof/doctrine-extensions-bundle"
       },
       "security": {
         "status": "clear",
@@ -10464,6 +10612,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -10478,11 +10627,13 @@
               "released": "2023-02-24T14:57:12+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through sensio/framework-extra-bundle: replace or update that package; the newest release of sensio/framework-extra-bundle (v6.2.10) still requires it"
+        "text": "find a replacement (none named); it comes in through sensio/framework-extra-bundle: replace sensio/framework-extra-bundle; the newest release of sensio/framework-extra-bundle (v6.2.10) still requires it"
       },
       "security": {
         "status": "clear",
@@ -10734,23 +10885,11 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
-        "commands": [
-          [
-            "composer",
-            "why-not",
-            "doctrine/doctrine-bundle",
-            "3.3.2"
-          ],
-          [
-            "composer",
-            "why-not",
-            "doctrine/orm",
-            "3.7.5"
-          ]
-        ],
+        "commands": [],
         "through": [
           {
             "package": "craue/config-bundle",
@@ -10761,7 +10900,9 @@
               "released": "2026-09-15T09:43:34+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "doctrine/doctrine-bundle",
@@ -10772,7 +10913,9 @@
               "released": "2026-09-09T11:58:04+00:00"
             },
             "newest_requires": false,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "doctrine/doctrine-migrations-bundle",
@@ -10783,7 +10926,9 @@
               "released": "2026-08-26T05:54:54+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "doctrine/orm",
@@ -10794,7 +10939,9 @@
               "released": "2026-10-09T05:58:13+00:00"
             },
             "newest_requires": false,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "pagerfanta/doctrine-orm-adapter",
@@ -10805,7 +10952,9 @@
               "released": "2026-10-09T12:41:36+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "spiriitlabs/form-filter-bundle",
@@ -10816,11 +10965,13 @@
               "released": "2026-09-07T08:52:12+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 3 more: replace or update them; the newest releases of doctrine/doctrine-bundle (3.3.2) and doctrine/orm (3.7.5) no longer require it"
+        "text": "find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 3 more: replace or update craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 3 more; the newest releases of doctrine/doctrine-bundle (3.3.2) and doctrine/orm (3.7.5) no longer require it"
       },
       "security": {
         "status": "clear",
@@ -11091,6 +11242,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -11102,7 +11254,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -11110,11 +11264,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -11405,6 +11561,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -11416,7 +11573,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -11424,11 +11583,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/exception requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -11720,6 +11881,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -11731,7 +11893,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -11739,11 +11903,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/consistency requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -12034,6 +12200,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -12045,7 +12212,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -12053,11 +12222,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -12348,6 +12519,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -12359,7 +12531,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -12367,11 +12541,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -12663,6 +12839,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -12674,7 +12851,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -12682,11 +12861,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -12978,6 +13159,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -12989,7 +13171,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -12997,11 +13181,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -13292,6 +13478,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -13303,7 +13490,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -13311,11 +13500,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -13607,6 +13798,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -13618,7 +13810,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -13626,11 +13820,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -13920,6 +14116,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -13931,7 +14128,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -13939,11 +14138,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/file requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -14235,6 +14436,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -14246,7 +14448,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -14254,11 +14458,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/regex requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -14551,6 +14757,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -14562,7 +14769,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -14570,11 +14779,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -14865,6 +15076,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -14876,7 +15088,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           },
           {
             "package": "wallabag/rulerz-bundle",
@@ -14884,11 +15098,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/math requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -15179,17 +15395,11 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
-        "commands": [
-          [
-            "composer",
-            "why-not",
-            "symfony/security-bundle",
-            "v8.1.8"
-          ]
-        ],
+        "commands": [],
         "through": [
           {
             "package": "friendsofsymfony/oauth-server-bundle",
@@ -15200,7 +15410,9 @@
               "released": "2019-01-23T15:23:04+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "friendsofsymfony/user-bundle",
@@ -15211,7 +15423,9 @@
               "released": "2026-02-13T21:22:55+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "scheb/2fa-backup-code",
@@ -15222,7 +15436,9 @@
               "released": "2026-01-24T13:26:10+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "scheb/2fa-bundle",
@@ -15233,7 +15449,9 @@
               "released": "2026-07-10T18:29:30+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "scheb/2fa-email",
@@ -15244,7 +15462,9 @@
               "released": "2026-06-02T20:21:59+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "scheb/2fa-google-authenticator",
@@ -15255,7 +15475,9 @@
               "released": "2026-01-24T13:27:55+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "scheb/2fa-trusted-device",
@@ -15266,7 +15488,9 @@
               "released": "2026-01-24T13:26:10+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "symfony/security-bundle",
@@ -15277,11 +15501,13 @@
               "released": "2026-09-24T11:09:32+00:00"
             },
             "newest_requires": false,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more: replace or update them; the newest release of symfony/security-bundle (v8.1.8) no longer requires it"
+        "text": "find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more: replace or update friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more; the newest release of symfony/security-bundle (v8.1.8) no longer requires it"
       },
       "security": {
         "status": "clear",
@@ -15582,6 +15808,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -15951,12 +16178,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "phpseclib/phpseclib"
+          ],
+          [
+            "composer",
+            "why-not",
+            "phpseclib/phpseclib",
+            "3.0.57",
+            "--locked"
           ]
         ],
         "through": [
@@ -15969,7 +16204,9 @@
               "released": "2026-09-28T19:08:43+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "php-amqplib/rabbitmq-bundle",
@@ -15980,7 +16217,9 @@
               "released": "2026-01-16T12:34:27+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -16288,6 +16527,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -16523,6 +16763,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -16781,6 +17022,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -17116,6 +17358,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major",
           "transitive"
@@ -17131,7 +17374,9 @@
               "released": "2026-09-14T14:05:34+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -17407,6 +17652,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major",
           "transitive"
@@ -17422,7 +17668,9 @@
               "released": "2026-10-08T13:18:44+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -17698,11 +17946,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major",
           "transitive"
         ],
-        "commands": [],
+        "commands": [
+          [
+            "composer",
+            "why-not",
+            "thecodingmachine/safe",
+            "v3.4.0",
+            "--locked"
+          ]
+        ],
         "through": [
           {
             "package": "scheb/2fa-google-authenticator",
@@ -17713,7 +17970,9 @@
               "released": "2026-01-24T13:27:55+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -17973,6 +18232,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -17982,7 +18242,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
@@ -18220,6 +18482,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -18232,7 +18495,9 @@
               "released": "2019-01-23T15:23:04+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "installed_unlisted"
+            "newest_requires_unmeasured": "installed_unlisted",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -18489,6 +18754,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -18502,8 +18768,9 @@
           [
             "composer",
             "why-not",
-            "lcobucci/jwt",
-            "5.6.1"
+            "lcobucci/clock",
+            "3.6.0",
+            "--locked"
           ]
         ],
         "through": [
@@ -18516,7 +18783,9 @@
               "released": "2026-10-10T09:42:14+00:00"
             },
             "newest_requires": false,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "scheb/2fa-trusted-device",
@@ -18527,7 +18796,9 @@
               "released": "2026-01-24T13:26:10+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -18777,6 +19048,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -18789,7 +19061,9 @@
               "released": "2025-11-04T21:03:25+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           },
           {
             "package": "friendsofsymfony/rest-bundle",
@@ -18800,7 +19074,9 @@
               "released": "2026-02-10T02:36:12+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
@@ -19057,6 +19333,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -19069,7 +19346,9 @@
               "released": "2026-02-10T02:36:12+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],

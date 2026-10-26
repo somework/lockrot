@@ -1237,6 +1237,20 @@
     "exempt": {
       "baseline": 0
     },
+    "standing": {
+      "known": 0,
+      "new": 0,
+      "worsened": 0,
+      "none": 6
+    },
+    "failing_packages": [
+      "daverandom/resume",
+      "league/commonmark",
+      "zbateson/mail-mime-parser",
+      "jwilsson/spotify-web-api-php",
+      "meilisearch/meilisearch-php",
+      "predis/predis"
+    ],
     "failing_by": [
       {
         "value": "high",
@@ -1471,6 +1485,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1786,12 +1801,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "league/commonmark"
+          ],
+          [
+            "composer",
+            "why-not",
+            "league/commonmark",
+            "2.10.3",
+            "--locked"
           ]
         ],
         "through": [
@@ -1804,7 +1827,9 @@
               "released": "2026-10-13T13:21:00+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "laravel/nightwatch",
@@ -1815,7 +1840,9 @@
               "released": "2026-10-13T04:38:02+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -2210,12 +2237,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "zbateson/mail-mime-parser"
+          ],
+          [
+            "composer",
+            "why-not",
+            "zbateson/mail-mime-parser",
+            "4.0.2",
+            "--locked"
           ]
         ],
         "through": [
@@ -2228,7 +2263,9 @@
               "released": "2026-04-28T06:07:04+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
@@ -2592,6 +2629,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -2600,6 +2638,13 @@
             "composer",
             "require",
             "jwilsson/spotify-web-api-php:^7.2"
+          ],
+          [
+            "composer",
+            "why-not",
+            "jwilsson/spotify-web-api-php",
+            "7.2.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -2880,6 +2925,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -2888,6 +2934,13 @@
             "composer",
             "require",
             "meilisearch/meilisearch-php:^1.17"
+          ],
+          [
+            "composer",
+            "why-not",
+            "meilisearch/meilisearch-php",
+            "v1.17.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -3168,6 +3221,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -3176,6 +3230,13 @@
             "composer",
             "require",
             "predis/predis:^3.7"
+          ],
+          [
+            "composer",
+            "why-not",
+            "predis/predis",
+            "v3.7.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -3485,6 +3546,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -3854,12 +3916,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "phpseclib/phpseclib"
+          ],
+          [
+            "composer",
+            "why-not",
+            "phpseclib/phpseclib",
+            "3.0.57",
+            "--locked"
           ]
         ],
         "through": [
@@ -3872,7 +3942,9 @@
               "released": "2026-08-31T13:49:19+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "league/flysystem-sftp-v3",
@@ -3883,7 +3955,9 @@
               "released": "2026-09-02T07:49:56+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -4191,6 +4265,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -4443,12 +4518,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "laravel/framework"
+          ],
+          [
+            "composer",
+            "why-not",
+            "laravel/framework",
+            "v13.30.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -4830,12 +4913,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "league/flysystem"
+          ],
+          [
+            "composer",
+            "why-not",
+            "league/flysystem",
+            "3.36.0",
+            "--locked"
           ]
         ],
         "through": [
@@ -4848,7 +4939,9 @@
               "released": "2026-10-13T13:21:00+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "laravel/nightwatch",
@@ -4859,7 +4952,9 @@
               "released": "2026-10-13T04:38:02+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "league/flysystem-aws-s3-v3",
@@ -4870,7 +4965,9 @@
               "released": "2026-08-08T16:19:23+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "league/flysystem-sftp-v3",
@@ -4881,7 +4978,9 @@
               "released": "2026-09-02T07:49:56+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "league/flysystem-webdav",
@@ -4892,7 +4991,9 @@
               "released": "2026-01-23T15:30:45+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           },
           {
             "package": "spatie/flysystem-dropbox",
@@ -4903,7 +5004,9 @@
               "released": "2026-02-09T20:12:36+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
@@ -5223,6 +5326,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -5235,7 +5339,9 @@
               "released": "2026-10-13T13:21:00+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "laravel/nightwatch",
@@ -5246,7 +5352,9 @@
               "released": "2026-10-13T04:38:02+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],

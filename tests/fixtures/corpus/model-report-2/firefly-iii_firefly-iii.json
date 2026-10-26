@@ -1113,6 +1113,16 @@
     "exempt": {
       "baseline": 0
     },
+    "standing": {
+      "known": 0,
+      "new": 0,
+      "worsened": 0,
+      "none": 2
+    },
+    "failing_packages": [
+      "league/commonmark",
+      "pragmarx/random"
+    ],
     "failing_by": [
       {
         "value": "high",
@@ -1311,12 +1321,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "league/commonmark"
+          ],
+          [
+            "composer",
+            "why-not",
+            "league/commonmark",
+            "2.10.3",
+            "--locked"
           ]
         ],
         "through": [],
@@ -1754,6 +1772,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -1768,11 +1787,13 @@
               "released": "2022-03-31T05:55:34+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 8.9 years; it comes in through jc5/recovery: replace or update that package; the newest release of jc5/recovery (v2.2.0) still requires it"
+        "text": "find a maintained alternative: nothing released for 8.9 years; it comes in through jc5/recovery: replace jc5/recovery; the newest release of jc5/recovery (v2.2.0) still requires it"
       },
       "security": {
         "status": "clear",
@@ -2064,12 +2085,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "phpseclib/phpseclib"
+          ],
+          [
+            "composer",
+            "why-not",
+            "phpseclib/phpseclib",
+            "3.0.57",
+            "--locked"
           ]
         ],
         "through": [
@@ -2082,7 +2111,9 @@
               "released": "2026-10-08T20:13:55+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -2390,6 +2421,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2639,6 +2671,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2910,6 +2943,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -3162,12 +3196,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "laravel/framework"
+          ],
+          [
+            "composer",
+            "why-not",
+            "laravel/framework",
+            "v13.30.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -3538,12 +3580,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "league/flysystem"
+          ],
+          [
+            "composer",
+            "why-not",
+            "league/flysystem",
+            "3.36.0",
+            "--locked"
           ]
         ],
         "through": [
@@ -3556,7 +3606,9 @@
               "released": "2026-03-30T05:25:07+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": true
           },
           {
             "package": "jc5/google2fa-laravel",
@@ -3567,7 +3619,9 @@
               "released": "2026-09-30T15:40:39+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "laravel/framework",
@@ -3578,7 +3632,9 @@
               "released": "2026-10-13T13:21:00+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -3895,6 +3951,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -3907,7 +3964,9 @@
               "released": "2026-10-08T20:13:55+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -4151,6 +4210,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -4163,7 +4223,9 @@
               "released": "2026-03-30T05:25:07+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
@@ -4418,6 +4480,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -4430,7 +4493,9 @@
               "released": "2026-03-30T05:25:07+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": true
           },
           {
             "package": "jc5/google2fa-laravel",
@@ -4441,7 +4506,9 @@
               "released": "2026-09-30T15:40:39+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "laravel/framework",
@@ -4452,7 +4519,9 @@
               "released": "2026-10-13T13:21:00+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "league/commonmark",
@@ -4463,7 +4532,9 @@
               "released": "2026-09-21T13:07:34+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
