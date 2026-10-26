@@ -144,6 +144,21 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([['package' => 'h/dev', 'installed_version' => 'dev-main', 'version' => 'dev-main']], $joined->movesWith());
     }
 
+    /** SPEC §5.6, case `mc-joint-retag‡`: the tag 1.0.0 of h/x points at a new commit, and a new install of the same tag changes no holder. */
+    public function testAJointSolveThatInstallsAHolderAgainAtItsLockedTagKeepsTheFirstRefusal(): void
+    {
+        $hold = new Holder(Holder::PACKAGE, 'h/x', '1.0.0', Holder::REQUIRE, '^1.0');
+        $outcome = new CheckOutcome(MoveCheck::refused(), [$hold]);
+        $locked = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['acme/lib' => '2.0.0', 'h/x' => '1.0.0'], ['acme/lib' => '1.0.0', 'h/x' => '1.0.0']);
+        $recorded = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['acme/lib' => '2.0.0', 'h/x' => '1.0.0']);
+
+        $fromLock = $outcome->joinedWith($locked, 'acme/lib', '^2.0', ['h/x']);
+        $fromHold = $outcome->joinedWith($recorded, 'acme/lib', '^2.0', ['h/x']);
+
+        self::assertSame([MoveCheck::REFUSED, [$hold], []], [$fromLock->check()->result(), $fromLock->holds(), $fromLock->movesWith()]);
+        self::assertSame([MoveCheck::REFUSED, [$hold], []], [$fromHold->check()->result(), $fromHold->holds(), $fromHold->movesWith()]);
+    }
+
     /** A `-W` refusal names a release of the holder that the lock does not hold: the installed version comes from the lock. */
     public function testTheInstalledVersionOfAMovedHolderIsItsLockedRelease(): void
     {

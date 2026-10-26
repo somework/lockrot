@@ -61,12 +61,11 @@ final class CheckOutcome
     }
 
     /**
-     * The move after its joint request ({@see \Lockrot\Verdict\MoveChecks}): the joint solve
-     * resolves the move only when it installs the moved package inside the move's constraint and
-     * changes the release of a holder. Then the move resolves with no hold, and it lists each holder
-     * whose release the solve changes.
-     * A joint refusal gives its own holds, and a joint solve that installs a name whose advisories
-     * the lookup could not read leaves the move not checked. Any other answer leaves this refusal.
+     * The move after its joint request ({@see \Lockrot\Verdict\MoveChecks}, SPEC §5.6). The joint
+     * solve resolves the move when it installs the moved package inside the move's constraint and
+     * changes a holder's release. The move then has no hold and lists each changed holder. A new
+     * install of the same tag is no change, but a branch version can move to another commit.
+     * A joint refusal gives its own holds. Any other answer keeps this refusal.
      *
      * @param list<string> $holders
      */
@@ -83,8 +82,9 @@ final class CheckOutcome
         $movesWith = [];
         foreach ($holders as $holder) {
             $version = $joint->changes()[$holder] ?? null;
-            if ($version !== null) {
-                $movesWith[] = ['package' => $holder, 'installed_version' => $joint->updatedFrom[$holder] ?? $this->holderVersion($holder), 'version' => $version];
+            $from = $joint->updatedFrom[$holder] ?? $this->holderVersion($holder);
+            if ($version !== null && ($version !== $from || VersionParser::parseStability($version) === 'dev')) {
+                $movesWith[] = ['package' => $holder, 'installed_version' => $from, 'version' => $version];
             }
         }
         if ($movesWith === []) {
