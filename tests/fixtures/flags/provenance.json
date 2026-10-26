@@ -1,12 +1,12 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "cfc9c81580dcd01b17f3bf49bb84016a8f91066f48a319b43aaaaba85b2a5130",
+  "cases.json": "94ff5610cf0eca4c0f55231f30b6a9beb302efb4fde644d09e811f3a54763327",
   "model_run_date": "2026-10-26"
  },
- "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",
+ "suite": "the model suite reports every step passed (57 steps), and spec_blocks_check gives 0 mismatches",
  "page_goldens": {
-  "sha256": "2dd3592558ce561c1b621d5528a5517974fec49524d1776a813813fe3351e298",
+  "sha256": "664f4810bdab3a51dcda90b8f54501027b3a1e970bde311bef57913d0378130c",
   "rendered": "the model's goldens"
  },
  "dropped": [],

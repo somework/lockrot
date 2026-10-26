@@ -318,28 +318,9 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
-        'routing-self‡' => [
-            'held_by' => [
-                [['next_step.held_by[].constraint', 'next_step.held_by[].package', 'next_step.held_by[].version', 'next_step.held_by[].holder.flag_ids', 'next_step.held_by[].holder.verdict', 'next_step.held_by[].holder.next_step.constraint', 'next_step.held_by[].holder.next_step.kind', 'next_step.held_by[].holder.next_step.to_branch'], self::MODEL_R7_PENDING],
-            ],
-            'security' => [
-                [['details.metadata.branches[].fixes.held_by[].package', 'next_step.held_by[].package'], self::MODEL_R7_PENDING],
-            ],
-        ],
-        'mc-joint‡' => [
-            'security' => [
-                [['details.metadata.branches[].fixes.fix_kind', 'security.fix_kind', 'signals[].data.advisories[].fix.kind'], self::MODEL_R7_PENDING],
-            ],
-            'why' => [
-                [['score.terms[].fix_kind'], self::MODEL_R7_PENDING],
-            ],
-        ],
     ];
 
     private const MOVE_VERSION = 'The model leaves `version` null on a move whose constraint comes from S8. lockrot names the lowest release that the constraint admits, and the why-not step of a move that does not resolve names it. The move card prints `newest` and reads `version` only when `newest` is null.';
-
-    // HARDEN-SRC removes every MODEL_R7_PENDING entry when it projects the MODEL-R7 shas.
-    private const MODEL_R7_PENDING = 'MODEL-R7 corrects the model value or the inputs of the case. lockrot follows SPEC-0.14.md for the inputs that the case gives.';
 
     private const PHP_STAR = 'The case sets the project\'s require.php to `*` (‡). The model keeps the holder\'s own step of case A, and lockrot judges the holder under the case\'s require.php, which admits its newest line.';
 

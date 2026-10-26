@@ -899,6 +899,7 @@
       "dev": false
      }
     ],
+    "lock_platform": [],
     "command": null,
     "check": "not_checked",
     "reason": null,
@@ -1353,6 +1354,22 @@
     "held_by": [
      {
       "source": "package",
+      "package": "acme/routing-bridge",
+      "version": "v4.4.41",
+      "link": "require",
+      "target": null,
+      "constraint": "self.version",
+      "holder": {
+       "verdict": "unknown",
+       "lead": null,
+       "flag_ids": [],
+       "replacement": null,
+       "direct": false,
+       "next_step": null
+      }
+     },
+     {
+      "source": "package",
       "package": "mautic/core-lib",
       "version": "4.3.x-dev",
       "link": "require",
@@ -1375,15 +1392,6 @@
         "check": null
        }
       }
-     },
-     {
-      "source": "package",
-      "package": "acme/routing-bridge",
-      "version": "v4.4.41",
-      "link": "require",
-      "target": null,
-      "constraint": "self.version",
-      "holder": null
      }
     ],
     "clears": [
@@ -1608,6 +1616,22 @@
          "held_by": [
           {
            "source": "package",
+           "package": "acme/routing-bridge",
+           "version": "v4.4.41",
+           "link": "require",
+           "target": null,
+           "constraint": "self.version",
+           "holder": {
+            "verdict": "unknown",
+            "lead": null,
+            "flag_ids": [],
+            "replacement": null,
+            "direct": false,
+            "next_step": null
+           }
+          },
+          {
+           "source": "package",
            "package": "mautic/core-lib",
            "version": "4.3.x-dev",
            "link": "require",
@@ -1630,15 +1654,6 @@
              "check": null
             }
            }
-          },
-          {
-           "source": "package",
-           "package": "acme/routing-bridge",
-           "version": "v4.4.41",
-           "link": "require",
-           "target": null,
-           "constraint": "self.version",
-           "holder": null
           }
          ],
          "reason": null
@@ -1669,6 +1684,22 @@
          "held_by": [
           {
            "source": "package",
+           "package": "acme/routing-bridge",
+           "version": "v4.4.41",
+           "link": "require",
+           "target": null,
+           "constraint": "self.version",
+           "holder": {
+            "verdict": "unknown",
+            "lead": null,
+            "flag_ids": [],
+            "replacement": null,
+            "direct": false,
+            "next_step": null
+           }
+          },
+          {
+           "source": "package",
            "package": "mautic/core-lib",
            "version": "4.3.x-dev",
            "link": "require",
@@ -1691,15 +1722,6 @@
              "check": null
             }
            }
-          },
-          {
-           "source": "package",
-           "package": "acme/routing-bridge",
-           "version": "v4.4.41",
-           "link": "require",
-           "target": null,
-           "constraint": "self.version",
-           "holder": null
           }
          ],
          "reason": null

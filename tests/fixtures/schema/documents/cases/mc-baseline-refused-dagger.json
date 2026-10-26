@@ -815,6 +815,7 @@
   "move_check": {
    "composer": "2.10.3",
    "blocks_advisories": false,
+   "blocking_disabled_by": [],
    "ignores_extensions": true,
    "baseline": "refused",
    "reason": null
@@ -841,6 +842,14 @@
        "target": "php",
        "constraint": "^8.1",
        "dev": false
+      },
+      {
+       "name": "acme/san-tokens",
+       "version": "1.0.0",
+       "link": "require",
+       "target": "php",
+       "constraint": ">=8.1",
+       "dev": false
       }
      ]
     },
@@ -865,6 +874,14 @@
        "link": "require",
        "target": "php",
        "constraint": "^8.1",
+       "dev": false
+      },
+      {
+       "name": "acme/san-tokens",
+       "version": "1.0.0",
+       "link": "require",
+       "target": "php",
+       "constraint": ">=8.1",
        "dev": false
       }
      ]

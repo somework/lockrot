@@ -11,7 +11,7 @@
         "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
-      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
       "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
       "panel": [
         "How the score works · score model 1",
@@ -42,7 +42,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
-      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
         "critical 4",
@@ -208,7 +208,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 7",
+          "direct 7",
           "1 hop away 2"
         ],
         "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
@@ -473,7 +473,7 @@
         "No security advisory · 0.0 libyears behind."
       ],
       "grade_line": "Project grade: nothing flagged",
-      "figure_line": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "figure_line": "0 of 1 package flagged · 1 ok · 0 finished",
       "load_line": null,
       "panel": [
         "How the score works · score model 1",
@@ -504,7 +504,7 @@
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [],
-      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
       "waffle": [
@@ -587,14 +587,14 @@
         "All 37 in production · 14 required directly, 23 pulled in · 12 security advisories on 4 packages (severity: 3 high, 6 medium, 3 low) · fix by package: 2 composer update, 2 php floor raise · 97.8 libyears behind."
       ],
       "grade_line": "Project grade: critical · 3 critical findings · 25 of 183 packages high or worse",
-      "figure_line": "37 of 183 packages flagged · 126 ok · 20 allowlisted",
+      "figure_line": "37 of 183 packages flagged · 126 ok · 20 finished",
       "load_line": "527 points on 37 flagged packages · 450 (85 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 25,
       "state_lines": [],
-      "waffle_caption": "37 of 183 packages flagged · 126 ok · 20 allowlisted",
+      "waffle_caption": "37 of 183 packages flagged · 126 ok · 20 finished",
       "lead_scope": "all 37 in production · 14 required directly, 23 pulled in",
       "grade_chips": [
         "critical 3",
@@ -629,7 +629,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 20
         },
@@ -816,7 +816,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 14",
+          "direct 14",
           "1 hop away 9",
           "2 hops away 10",
           "3 hops away 4"
@@ -1483,7 +1483,7 @@
         "The advisory check did not run · 3.0 libyears behind."
       ],
       "grade_line": "Project grade: nothing flagged",
-      "figure_line": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "figure_line": "0 of 1 package flagged · 1 ok · 0 finished",
       "load_line": null,
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -1493,7 +1493,7 @@
         "Incomplete data: no advisory check ran. What this run could not see",
         "PHP: this lock installs on PHP 7.2 to 7.4 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
       ],
-      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
       "waffle": [
@@ -1590,7 +1590,7 @@
         "In production · required directly · 1 security advisory on 1 package (severity: 1 medium) · fix by package: 1 php floor raise · 2.1 libyears behind."
       ],
       "grade_line": "Project grade: medium · 1 medium finding · 0 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
       "load_line": "8 points on 1 flagged package · 0 (0 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -1599,7 +1599,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.2 to 7.4 · your target, 8.4, is excluded by require.php and by 1 package: joomla/filter. The PHP window"
       ],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
         "medium 1"
@@ -1655,7 +1655,7 @@
       "exposure": null,
       "depth": {
         "rows": [
-          "in composer.json 1"
+          "direct 1"
         ],
         "sentence": "The flagged package is named by a line of composer.json."
       },
@@ -1745,7 +1745,7 @@
         "All 111 in production · 61 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 php floor raise · 406.6 libyears behind."
       ],
       "grade_line": "Project grade: critical · 15 critical findings · 84 of 210 packages high or worse",
-      "figure_line": "111 of 210 packages flagged · 80 ok · 19 allowlisted",
+      "figure_line": "111 of 210 packages flagged · 80 ok · 19 finished",
       "load_line": "1859 points on 111 flagged packages · 1666 (89 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -1754,7 +1754,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.4, so your target, 8.4, is excluded · 3 packages exclude 8.4: laminas/laminas-code, php-http/guzzle5-adapter and friendsoftwig/twigcs (require-dev) · not checked (the run checked no move). The PHP window"
       ],
-      "waffle_caption": "111 of 210 packages flagged · 80 ok · 19 allowlisted",
+      "waffle_caption": "111 of 210 packages flagged · 80 ok · 19 finished",
       "lead_scope": "all 111 in production · 61 required directly, 50 pulled in",
       "grade_chips": [
         "critical 15",
@@ -1789,7 +1789,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 19
         },
@@ -1978,7 +1978,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 61",
+          "direct 61",
           "1 hop away 29",
           "2 hops away 14",
           "3 hops away 5",
@@ -3665,7 +3665,7 @@
         "Dev-only · required directly · 1 security advisory on 1 package (severity: 1 high) · fix by package: 1 upgrade · 10.6 libyears behind."
       ],
       "grade_line": "Project grade: high · 1 high finding · 1 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
       "load_line": "18 points on 1 flagged package · 18 (100 %) from high or worse · score model 1 · 18 from packages-dev",
       "panel": [
         "How the score works · score model 1",
@@ -3696,7 +3696,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 dev-only · 1 required directly",
       "grade_chips": [
         "high 1"
@@ -3752,7 +3752,7 @@
       "exposure": null,
       "depth": {
         "rows": [
-          "in composer.json 1"
+          "direct 1"
         ],
         "sentence": "The flagged package is named by a line of composer.json."
       },
@@ -3846,7 +3846,7 @@
         "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
-      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
       "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
       "panel": [
         "How the score works · score model 1",
@@ -3879,7 +3879,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
-      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
         "critical 4",
@@ -4045,7 +4045,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 7",
+          "direct 7",
           "1 hop away 2"
         ],
         "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
@@ -4310,14 +4310,14 @@
         "In production · required directly · no security advisory · 1.9 libyears behind."
       ],
       "grade_line": "Project grade: high · 1 high finding · 1 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
       "load_line": "16 points on 1 flagged package · 16 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
         "high 1"
@@ -4389,7 +4389,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 1"
+          "direct 1"
         ],
         "sentence": "The flagged package is named by a line of composer.json."
       },
@@ -4475,7 +4475,7 @@
         "All 2 in production · 1 required directly, 1 pulled in · no security advisory · 5.3 libyears behind."
       ],
       "grade_line": "Project grade: high · 2 high findings · 2 of 16 packages high or worse · 1 known to the baseline",
-      "figure_line": "2 of 16 packages flagged · 6 ok · 8 allowlisted",
+      "figure_line": "2 of 16 packages flagged · 6 ok · 8 finished",
       "load_line": "34 points on 2 flagged packages · 34 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -4484,7 +4484,7 @@
       "state_lines": [
         "Against lockrot-baseline.json: 1 new · 0 worsened · 1 known · 1 entry for packages that left the lock: lockrot-fixture/left-the-lock."
       ],
-      "waffle_caption": "2 of 16 packages flagged · 6 ok · 8 allowlisted",
+      "waffle_caption": "2 of 16 packages flagged · 6 ok · 8 finished",
       "lead_scope": "all 2 in production · 1 required directly, 1 pulled in",
       "grade_chips": [
         "high 2"
@@ -4498,7 +4498,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 8
         },
@@ -4577,7 +4577,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 1",
+          "direct 1",
           "1 hop away 1"
         ],
         "sentence": "1 of 2 flagged packages is named by no line of composer.json; the deepest, php-di/phpdoc-reader, sits 1 hop from the nearest line."
@@ -4691,14 +4691,14 @@
         "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
-      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
       "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [],
-      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
         "critical 4",
@@ -4864,7 +4864,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 7",
+          "direct 7",
           "1 hop away 2"
         ],
         "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
@@ -5125,7 +5125,7 @@
         "In production · required directly · 14 security advisories on 1 package (severity: 6 high, 8 medium) · fix by package: 1 php floor raise · 6.8 libyears behind."
       ],
       "grade_line": "Project grade: critical · 1 critical finding · 1 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
       "load_line": "36 points on 1 flagged package · 36 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -5134,7 +5134,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.1 to 7.4 · your target, 8.4, is excluded by require.php and by 1 package: csa/guzzle-bundle. The PHP window"
       ],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
         "critical 1"
@@ -5206,7 +5206,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 1"
+          "direct 1"
         ],
         "sentence": "The flagged package is named by a line of composer.json."
       },
@@ -5302,14 +5302,14 @@
         "All 14 in production · 10 required directly, 4 pulled in · no security advisory · 64.6 libyears behind."
       ],
       "grade_line": "Project grade: critical · 2 critical findings · 12 of 55 packages high or worse",
-      "figure_line": "14 of 55 packages flagged · 30 ok · 11 allowlisted",
+      "figure_line": "14 of 55 packages flagged · 30 ok · 11 finished",
       "load_line": "260 points on 14 flagged packages · 244 (93 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 12,
       "state_lines": [],
-      "waffle_caption": "14 of 55 packages flagged · 30 ok · 11 allowlisted",
+      "waffle_caption": "14 of 55 packages flagged · 30 ok · 11 finished",
       "lead_scope": "all 14 in production · 10 required directly, 4 pulled in",
       "grade_chips": [
         "critical 2",
@@ -5337,7 +5337,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 11
         },
@@ -5504,7 +5504,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 10",
+          "direct 10",
           "1 hop away 3",
           "2 hops away 0",
           "3 hops away 1"
@@ -5816,7 +5816,7 @@
         "In production · required directly · 3 security advisories on 1 package (severity: 3 low) · fix by package: 1 composer update · 3.4 libyears behind."
       ],
       "grade_line": "Project grade: low · 1 low finding · 0 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
       "load_line": "2 points on 1 flagged package · 0 (0 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -5826,7 +5826,7 @@
         "PHP: this lock installs on PHP 7.2 to 7.4 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window",
         "extra.lockrot.ignore accepts maintenance flags, not advisories · 1 package it lists still counts for advisories. The run note"
       ],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
         "low 1"
@@ -5882,7 +5882,7 @@
       "exposure": null,
       "depth": {
         "rows": [
-          "in composer.json 1"
+          "direct 1"
         ],
         "sentence": "The flagged package is named by a line of composer.json."
       },
@@ -5970,7 +5970,7 @@
         "Dev-only · pulled in · no security advisory · 1.0 libyears behind."
       ],
       "grade_line": "Project grade: low · 1 low finding · 0 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
       "load_line": "4 points on 1 flagged package · 0 (0 %) from high or worse · score model 1 · 4 from packages-dev",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -5979,7 +5979,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.2 to 7.4 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
       ],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 dev-only · 1 pulled in",
       "grade_chips": [
         "low 1"
@@ -6035,7 +6035,7 @@
       "exposure": null,
       "depth": {
         "rows": [
-          "in composer.json 0",
+          "direct 0",
           "1 hop away 1"
         ],
         "sentence": "1 of 1 flagged package is named by no line of composer.json; the deepest, jfcherng/php-color-output, sits 1 hop from the nearest line."
@@ -6119,14 +6119,14 @@
         "In production · 1 unreached · no security advisory · 0.0 libyears behind."
       ],
       "grade_line": "Project grade: high · 1 high finding · 1 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
       "load_line": "16 points on 1 flagged package · 16 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production",
       "grade_chips": [
         "high 1"
@@ -6264,14 +6264,14 @@
         "In production · required directly · 1 security advisory on 1 package (severity: 1 high) · fix by package: 1 upgrade · 10.6 libyears behind."
       ],
       "grade_line": "Project grade: critical · 1 critical finding · 1 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
       "load_line": "36 points on 1 flagged package · 36 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
         "critical 1"
@@ -6327,7 +6327,7 @@
       "exposure": null,
       "depth": {
         "rows": [
-          "in composer.json 1"
+          "direct 1"
         ],
         "sentence": "The flagged package is named by a line of composer.json."
       },
@@ -6417,14 +6417,14 @@
         "In production · required directly · 1 security advisory on 1 package (severity: 1 high) · fix by package: 1 upgrade · 10.6 libyears behind."
       ],
       "grade_line": "Project grade: high · 1 high finding · 1 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
       "load_line": "16 points on 1 flagged package · 16 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
         "high 1"
@@ -6480,7 +6480,7 @@
       "exposure": null,
       "depth": {
         "rows": [
-          "in composer.json 1"
+          "direct 1"
         ],
         "sentence": "The flagged package is named by a line of composer.json."
       },
@@ -6574,14 +6574,14 @@
         "No security advisory."
       ],
       "grade_line": "Project grade: nothing flagged",
-      "figure_line": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "figure_line": "0 of 1 package flagged · 1 ok · 0 finished",
       "load_line": null,
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=packages&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
-      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
       "waffle": [
@@ -6670,7 +6670,7 @@
         "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
-      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
       "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -6679,7 +6679,7 @@
       "state_lines": [
         "PHP: without require-dev this lock installs on PHP 8.1 to 8.3, and with require-dev on no PHP (8.1 to 8.3 are excluded only by acme/string 1.0.0 >=8.4.1) · your target, 8.4, is excluded by require.php and by 1 package: acme/installer. The PHP window"
       ],
-      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
         "critical 4",
@@ -6845,7 +6845,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 7",
+          "direct 7",
           "1 hop away 2"
         ],
         "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
@@ -7110,14 +7110,14 @@
         "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
-      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
       "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
-      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
         "critical 4",
@@ -7283,7 +7283,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 7",
+          "direct 7",
           "1 hop away 2"
         ],
         "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
@@ -7548,7 +7548,7 @@
         "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
-      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
       "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -7557,7 +7557,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 8.2 to 8.4 · Composer checks it at 8.4.1, the PHP that the lock records from config.platform.php, not the PHP of the machine. The PHP window"
       ],
-      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
         "critical 4",
@@ -7723,7 +7723,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 7",
+          "direct 7",
           "1 hop away 2"
         ],
         "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
@@ -7989,14 +7989,14 @@
         "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
-      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
       "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
-      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
         "critical 4",
@@ -8162,7 +8162,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 7",
+          "direct 7",
           "1 hop away 2"
         ],
         "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
@@ -8424,7 +8424,7 @@
         "All 111 in production · 61 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 blocked · 406.6 libyears behind."
       ],
       "grade_line": "Project grade: critical · 16 critical findings · 83 of 210 packages high or worse",
-      "figure_line": "111 of 210 packages flagged · 80 ok · 19 allowlisted",
+      "figure_line": "111 of 210 packages flagged · 80 ok · 19 finished",
       "load_line": "1871 points on 111 flagged packages · 1672 (89 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -8433,7 +8433,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.4 · Composer checks it at 7.4.29, the PHP that the lock records from config.platform.php, not the PHP of the machine · 2 packages stop below the newest PHP, 8.5. The PHP window"
       ],
-      "waffle_caption": "111 of 210 packages flagged · 80 ok · 19 allowlisted",
+      "waffle_caption": "111 of 210 packages flagged · 80 ok · 19 finished",
       "lead_scope": "all 111 in production · 61 required directly, 50 pulled in",
       "grade_chips": [
         "critical 16",
@@ -8468,7 +8468,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 19
         },
@@ -8657,7 +8657,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 61",
+          "direct 61",
           "1 hop away 29",
           "2 hops away 14",
           "3 hops away 5",
@@ -10344,7 +10344,7 @@
         "All 4 in production · 1 required directly, 3 pulled in · no security advisory · 36.3 libyears behind."
       ],
       "grade_line": "Project grade: medium · 2 medium findings · 0 of 25 packages high or worse",
-      "figure_line": "4 of 25 packages flagged · 13 ok · 8 allowlisted",
+      "figure_line": "4 of 25 packages flagged · 13 ok · 8 finished",
       "load_line": "24 points on 4 flagged packages · 0 (0 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -10353,7 +10353,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 8.3 to 8.4 · 2 packages stop below the newest PHP, 8.5. The PHP window"
       ],
-      "waffle_caption": "4 of 25 packages flagged · 13 ok · 8 allowlisted",
+      "waffle_caption": "4 of 25 packages flagged · 13 ok · 8 finished",
       "lead_scope": "all 4 in production · 1 required directly, 3 pulled in",
       "grade_chips": [
         "medium 2",
@@ -10374,7 +10374,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 8
         },
@@ -10491,7 +10491,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 1",
+          "direct 1",
           "1 hop away 1",
           "2 hops away 1",
           "3 hops away 1"
@@ -10659,7 +10659,7 @@
         "All 4 in production · 1 required directly, 3 pulled in · no security advisory · 36.3 libyears behind."
       ],
       "grade_line": "Project grade: medium · 2 medium findings · 0 of 25 packages high or worse",
-      "figure_line": "4 of 25 packages flagged · 13 ok · 8 allowlisted",
+      "figure_line": "4 of 25 packages flagged · 13 ok · 8 finished",
       "load_line": "24 points on 4 flagged packages · 0 (0 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -10668,7 +10668,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded · 3 packages exclude 8.5: moneyphp/money, nette/schema and brianium/paratest (require-dev) · Composer's solver at PHP 8.5 resolves this update: composer update moneyphp/money nette/schema brianium/paratest --with-all-dependencies. The PHP window"
       ],
-      "waffle_caption": "4 of 25 packages flagged · 13 ok · 8 allowlisted",
+      "waffle_caption": "4 of 25 packages flagged · 13 ok · 8 finished",
       "lead_scope": "all 4 in production · 1 required directly, 3 pulled in",
       "grade_chips": [
         "medium 2",
@@ -10689,7 +10689,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 8
         },
@@ -10806,7 +10806,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 1",
+          "direct 1",
           "1 hop away 1",
           "2 hops away 1",
           "3 hops away 1"
@@ -10974,7 +10974,7 @@
         "All 25 in production · 2 required directly, 23 pulled in · 1 security advisory on 1 package (severity: 1 low) · fix by package: 1 composer update · 156.3 libyears behind."
       ],
       "grade_line": "Project grade: high · 6 high findings · 6 of 188 packages high or worse",
-      "figure_line": "25 of 188 packages flagged · 138 ok · 25 allowlisted",
+      "figure_line": "25 of 188 packages flagged · 138 ok · 25 finished",
       "load_line": "222 points on 25 flagged packages · 98 (44 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -10983,7 +10983,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 8.2 to 8.3 · Composer checks it at 8.2.0, the PHP that the lock records from config.platform.php, not the PHP of the machine · 1 package stops below the newest PHP, 8.5. The PHP window"
       ],
-      "waffle_caption": "25 of 188 packages flagged · 138 ok · 25 allowlisted",
+      "waffle_caption": "25 of 188 packages flagged · 138 ok · 25 finished",
       "lead_scope": "all 25 in production · 2 required directly, 23 pulled in",
       "grade_chips": [
         "high 6",
@@ -11011,7 +11011,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 25
         },
@@ -11163,7 +11163,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 2",
+          "direct 2",
           "1 hop away 9",
           "2 hops away 14"
         ],
@@ -11663,7 +11663,7 @@
         "No security advisory."
       ],
       "grade_line": "Project grade: nothing flagged",
-      "figure_line": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "figure_line": "0 of 1 package flagged · 1 ok · 0 finished",
       "load_line": null,
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -11672,7 +11672,7 @@
       "state_lines": [
         "PHP: without require-dev this lock installs on PHP 8.2 to 8.3, and with require-dev on no PHP (8.2 to 8.3 are excluded only by symfony/string v8.1.2 >=8.4.1) · your target, 8.4, is excluded by require.php and by 2 packages: laminas/laminas-skeleton-installer and vimeo/psalm (require-dev). The PHP window"
       ],
-      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
       "waffle": [
@@ -11755,7 +11755,7 @@
         "No security advisory · 4.9 libyears behind."
       ],
       "grade_line": "Project grade: nothing flagged",
-      "figure_line": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "figure_line": "0 of 1 package flagged · 1 ok · 0 finished",
       "load_line": null,
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -11764,7 +11764,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded · 4 packages exclude 8.3: laminas/laminas-diactoros, laminas/laminas-escaper, laminas/laminas-feed and 1 more · Composer's solver at PHP 8.3 refuses their update: composer.json requires drupal/core-recommended ^9.3 and composer.json requires drupal/trusted_redirect ^1.9 and drupal/core 9.3.14 requires laminas/laminas-diactoros ^2.1 and drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 and drupal/trusted_redirect 1.9.0 requires drupal/core ^8 || ^9. The PHP window"
       ],
-      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
       "waffle": [
@@ -11853,7 +11853,7 @@
         "No security advisory · 4.9 libyears behind."
       ],
       "grade_line": "Project grade: nothing flagged",
-      "figure_line": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "figure_line": "0 of 1 package flagged · 1 ok · 0 finished",
       "load_line": null,
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -11862,7 +11862,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.3 to 8.1, so your target, 7.2, is excluded. The PHP window"
       ],
-      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 allowlisted",
+      "waffle_caption": "0 of 1 package flagged · 1 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
       "waffle": [
@@ -11951,7 +11951,7 @@
         "All 110 in production · 60 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 blocked · 406.6 libyears behind."
       ],
       "grade_line": "Project grade: critical · 16 critical findings · 83 of 210 packages high or worse",
-      "figure_line": "110 of 210 packages flagged · 80 ok · 20 allowlisted",
+      "figure_line": "110 of 210 packages flagged · 80 ok · 20 finished",
       "load_line": "1863 points on 110 flagged packages · 1672 (89 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -11960,7 +11960,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.4 · Composer checks it at 7.4.29, the PHP that the lock records from config.platform.php, not the PHP of the machine · 2 packages stop below the newest PHP, 8.5. The PHP window"
       ],
-      "waffle_caption": "110 of 210 packages flagged · 80 ok · 20 allowlisted",
+      "waffle_caption": "110 of 210 packages flagged · 80 ok · 20 finished",
       "lead_scope": "all 110 in production · 60 required directly, 50 pulled in",
       "grade_chips": [
         "critical 16",
@@ -11995,7 +11995,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 20
         },
@@ -12184,7 +12184,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 60",
+          "direct 60",
           "1 hop away 29",
           "2 hops away 14",
           "3 hops away 5",
@@ -13858,7 +13858,7 @@
         "All 4 in production · 1 required directly, 3 pulled in · no security advisory · 36.3 libyears behind."
       ],
       "grade_line": "Project grade: medium · 2 medium findings · 0 of 25 packages high or worse",
-      "figure_line": "4 of 25 packages flagged · 13 ok · 8 allowlisted",
+      "figure_line": "4 of 25 packages flagged · 13 ok · 8 finished",
       "load_line": "24 points on 4 flagged packages · 0 (0 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -13867,7 +13867,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded · 3 packages exclude 8.5: moneyphp/money, nette/schema and brianium/paratest (require-dev) · set config.platform.php to your PHP 8.5 release, then Composer's solver resolves this update: composer update moneyphp/money nette/schema brianium/paratest --with-all-dependencies. The PHP window"
       ],
-      "waffle_caption": "4 of 25 packages flagged · 13 ok · 8 allowlisted",
+      "waffle_caption": "4 of 25 packages flagged · 13 ok · 8 finished",
       "lead_scope": "all 4 in production · 1 required directly, 3 pulled in",
       "grade_chips": [
         "medium 2",
@@ -13888,7 +13888,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 8
         },
@@ -14005,7 +14005,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 1",
+          "direct 1",
           "1 hop away 1",
           "2 hops away 1",
           "3 hops away 1"
@@ -14173,7 +14173,7 @@
         "All 6 in production · 1 required directly, 5 pulled in · 6 security advisories on 2 packages (severity: 2 high, 2 medium, 2 low) · fix by package: 2 composer update · 45.2 libyears behind."
       ],
       "grade_line": "Project grade: high · 1 high finding · 1 of 35 packages high or worse",
-      "figure_line": "6 of 35 packages flagged · 21 ok · 8 allowlisted",
+      "figure_line": "6 of 35 packages flagged · 21 ok · 8 finished",
       "load_line": "42 points on 6 flagged packages · 16 (38 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -14182,7 +14182,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 8.3 to 8.4 · 2 packages stop below the newest PHP, 8.5. The PHP window"
       ],
-      "waffle_caption": "6 of 35 packages flagged · 21 ok · 8 allowlisted",
+      "waffle_caption": "6 of 35 packages flagged · 21 ok · 8 finished",
       "lead_scope": "all 6 in production · 1 required directly, 5 pulled in",
       "grade_chips": [
         "high 1",
@@ -14210,7 +14210,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 8
         },
@@ -14237,7 +14237,8 @@
                 "checked with Composer"
               ]
             },
-            "also_holds": null
+            "also_holds": null,
+            "moves_with": null
           }
         ],
         "more": null,
@@ -14376,7 +14377,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 1",
+          "direct 1",
           "1 hop away 3",
           "2 hops away 1",
           "3 hops away 1"
@@ -14660,10 +14661,6 @@
                 "items": []
               },
               {
-                "text": "What requires it must allow it",
-                "items": []
-              },
-              {
                 "text": "The newest release of laravel/socialite (v5.31.0) still requires it",
                 "items": []
               }
@@ -14700,14 +14697,14 @@
         "All 25 in production · 16 required directly, 9 pulled in · 11 security advisories on 7 packages (severity: 1 critical, 1 high, 7 medium, 1 unrated, 1 low) · fix by package: 6 composer update, 1 upgrade · 79.7 libyears behind."
       ],
       "grade_line": "Project grade: critical · 5 critical findings · 14 of 167 packages high or worse",
-      "figure_line": "25 of 167 packages flagged · 121 ok · 21 allowlisted",
+      "figure_line": "25 of 167 packages flagged · 121 ok · 21 finished",
       "load_line": "386 points on 25 flagged packages · 318 (82 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 14,
       "state_lines": [],
-      "waffle_caption": "25 of 167 packages flagged · 121 ok · 21 allowlisted",
+      "waffle_caption": "25 of 167 packages flagged · 121 ok · 21 finished",
       "lead_scope": "all 25 in production · 16 required directly, 9 pulled in",
       "grade_chips": [
         "critical 5",
@@ -14742,7 +14739,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 21
         },
@@ -14769,7 +14766,8 @@
                 "checked with Composer"
               ]
             },
-            "also_holds": null
+            "also_holds": null,
+            "moves_with": null
           },
           {
             "package": "league/commonmark",
@@ -14784,7 +14782,8 @@
                 "checked with Composer"
               ]
             },
-            "also_holds": null
+            "also_holds": null,
+            "moves_with": null
           }
         ],
         "more": null,
@@ -14947,7 +14946,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 16",
+          "direct 16",
           "1 hop away 5",
           "2 hops away 4"
         ],
@@ -15484,14 +15483,8 @@
       "sheet_holders": {
         "pragmarx/google2fa-qrcode": [
           {
-            "count": 2,
+            "count": 1,
             "shown": [
-              {
-                "name": "your composer.json",
-                "grade": null,
-                "meta": "requires pragmarx/google2fa-laravel ^1.3",
-                "step": null
-              },
               {
                 "name": "pragmarx/google2fa-laravel v1.4.1",
                 "grade": "high",
@@ -15515,7 +15508,7 @@
         "All 55 in production · 4 required directly, 51 pulled in · 122 security advisories on 16 packages (severity: 4 critical, 18 high, 40 medium, 43 unrated, 17 low) · fix by package: 1 composer update, 15 upgrade · 358.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 2 critical findings · 20 of 97 packages high or worse",
-      "figure_line": "55 of 97 packages flagged · 29 ok · 13 allowlisted",
+      "figure_line": "55 of 97 packages flagged · 29 ok · 13 finished",
       "load_line": "664 points on 55 flagged packages · 392 (59 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -15524,7 +15517,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded · 4 packages exclude 8.3: laminas/laminas-diactoros, laminas/laminas-escaper, laminas/laminas-feed and 1 more · Composer's solver at PHP 8.3 refuses their update: composer.json requires drupal/core-recommended ^9.3 and composer.json requires drupal/trusted_redirect ^1.9 and drupal/core 9.3.14 requires laminas/laminas-diactoros ^2.1 and drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 and drupal/trusted_redirect 1.9.0 requires drupal/core ^8 || ^9. The PHP window"
       ],
-      "waffle_caption": "55 of 97 packages flagged · 29 ok · 13 allowlisted",
+      "waffle_caption": "55 of 97 packages flagged · 29 ok · 13 finished",
       "lead_scope": "all 55 in production · 4 required directly, 51 pulled in",
       "grade_chips": [
         "critical 2",
@@ -15559,7 +15552,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 13
         },
@@ -15748,7 +15741,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 4",
+          "direct 4",
           "1 hop away 46",
           "2 hops away 5"
         ],
@@ -16829,7 +16822,7 @@
         "All 113 in production · 61 required directly, 52 pulled in · 64 security advisories on 20 packages (severity: 1 critical, 17 high, 30 medium, 3 unrated, 13 low) · fix by package: 8 composer update, 9 upgrade, 2 php floor raise, 1 no fix · 388.8 libyears behind."
       ],
       "grade_line": "Project grade: critical · 15 critical findings · 84 of 210 packages high or worse · 46 known to the baseline",
-      "figure_line": "113 of 210 packages flagged · 78 ok · 19 allowlisted",
+      "figure_line": "113 of 210 packages flagged · 78 ok · 19 finished",
       "load_line": "1871 points on 113 flagged packages · 1666 (89 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -16839,7 +16832,7 @@
         "PHP: this lock installs on PHP 7.4, so your target, 8.4, is excluded · 3 packages exclude 8.4: laminas/laminas-code, php-http/guzzle5-adapter and friendsoftwig/twigcs (require-dev) · Composer's solver at PHP 8.4 refuses their update: composer.json requires php-http/guzzle5-adapter ^2.0. The PHP window",
         "Against lockrot-baseline.json: 61 new · 6 worsened · 48 known · 2 entries for packages that left the lock: behat/transliterator, true/punycode."
       ],
-      "waffle_caption": "113 of 210 packages flagged · 78 ok · 19 allowlisted",
+      "waffle_caption": "113 of 210 packages flagged · 78 ok · 19 finished",
       "lead_scope": "all 113 in production · 61 required directly, 52 pulled in",
       "grade_chips": [
         "critical 15",
@@ -16874,7 +16867,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 19
         },
@@ -17063,13 +17056,13 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 61",
+          "direct 61",
           "1 hop away 31",
           "2 hops away 14",
           "3 hops away 5",
           "4 hops away 2"
         ],
-        "sentence": "51 of 113 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line."
+        "sentence": "51 of 113 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line. 1 more is named only in require-dev, which this run did not walk (pass --dev)."
       },
       "libyears": {
         "figure": "388.83",
@@ -17121,7 +17114,7 @@
         "none": null
       },
       "radius_lead": [
-        "51 of 113 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line.",
+        "51 of 113 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line. 1 more is named only in require-dev, which this run did not walk (pass --dev).",
         "52 flagged packages pulled in.",
         "7 of them sit under no direct requirement.",
         "20 of them sit under kphoen/rulerz-bundle, kphoen/rulerz and wallabag/phpepub."
@@ -18985,14 +18978,14 @@
         "All 9 in production · 7 required directly, 2 pulled in · 29 security advisories on 5 packages (severity: 1 critical, 5 high, 12 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 2 php floor raise · 22.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
-      "figure_line": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
       "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
-      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
         "critical 4",
@@ -19158,7 +19151,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 7",
+          "direct 7",
           "1 hop away 2"
         ],
         "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
@@ -19425,14 +19418,14 @@
         "In production · required directly · 1 security advisory on 1 package (severity: 1 high) · fix by package: 1 composer update · 10.6 libyears behind."
       ],
       "grade_line": "Project grade: critical · 1 critical finding · 1 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
       "load_line": "36 points on 1 flagged package · 36 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
         "critical 1"
@@ -19461,7 +19454,8 @@
                 "checked with Composer"
               ]
             },
-            "also_holds": null
+            "also_holds": null,
+            "moves_with": null
           }
         ],
         "more": null,
@@ -19504,7 +19498,7 @@
       "exposure": null,
       "depth": {
         "rows": [
-          "in composer.json 1"
+          "direct 1"
         ],
         "sentence": "The flagged package is named by a line of composer.json."
       },
@@ -19596,7 +19590,7 @@
         "No security advisory."
       ],
       "grade_line": "Project grade: nothing flagged · 1 not judged",
-      "figure_line": "0 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "0 of 1 package flagged · 0 ok · 0 finished",
       "load_line": null,
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -19605,7 +19599,7 @@
       "state_lines": [
         "Offline run: 1 of 1 package has no grade, because lockrot read no metadata for it. What this run could not see"
       ],
-      "waffle_caption": "0 of 1 package flagged · 1 not judged · 0 ok · 0 allowlisted",
+      "waffle_caption": "0 of 1 package flagged · 1 not judged · 0 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
       "waffle": [
@@ -19708,14 +19702,14 @@
         "All 25 in production · 16 required directly, 9 pulled in · 11 security advisories on 7 packages (severity: 1 critical, 1 high, 7 medium, 1 unrated, 1 low) · fix by package: 6 composer update, 1 upgrade · 79.7 libyears behind."
       ],
       "grade_line": "Project grade: critical · 5 critical findings · 14 of 167 packages high or worse",
-      "figure_line": "25 of 167 packages flagged · 121 ok · 21 allowlisted",
+      "figure_line": "25 of 167 packages flagged · 121 ok · 21 finished",
       "load_line": "386 points on 25 flagged packages · 318 (82 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 14,
       "state_lines": [],
-      "waffle_caption": "25 of 167 packages flagged · 121 ok · 21 allowlisted",
+      "waffle_caption": "25 of 167 packages flagged · 121 ok · 21 finished",
       "lead_scope": "all 25 in production · 16 required directly, 9 pulled in",
       "grade_chips": [
         "critical 5",
@@ -19750,7 +19744,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 21
         },
@@ -19777,7 +19771,8 @@
                 "checked with Composer"
               ]
             },
-            "also_holds": null
+            "also_holds": null,
+            "moves_with": null
           },
           {
             "package": "league/commonmark",
@@ -19792,7 +19787,8 @@
                 "checked with Composer"
               ]
             },
-            "also_holds": null
+            "also_holds": null,
+            "moves_with": null
           },
           {
             "package": "pragmarx/google2fa-laravel",
@@ -19807,7 +19803,8 @@
                 "checked with Composer"
               ]
             },
-            "also_holds": "Also holds: bacon/bacon-qr-code (high), pragmarx/google2fa-qrcode (medium)"
+            "also_holds": "Also holds: bacon/bacon-qr-code (high), pragmarx/google2fa-qrcode (medium)",
+            "moves_with": null
           }
         ],
         "more": null,
@@ -19970,7 +19967,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 16",
+          "direct 16",
           "1 hop away 5",
           "2 hops away 4"
         ],
@@ -20552,18 +20549,12 @@
       "sheet_holders": {
         "bacon/bacon-qr-code": [
           {
-            "count": 4,
+            "count": 3,
             "shown": [
               {
                 "name": "your composer.json",
                 "grade": null,
                 "meta": "requires ^2.0",
-                "step": null
-              },
-              {
-                "name": "your composer.json",
-                "grade": null,
-                "meta": "requires pragmarx/google2fa-laravel ^1.3",
                 "step": null
               },
               {
@@ -20615,14 +20606,14 @@
         "All 6 in production · all 6 required directly · 6 security advisories on 6 packages (severity: 6 high) · fix by package: 4 composer update, 1 upgrade, 1 php floor raise · 5.8 libyears behind."
       ],
       "grade_line": "Project grade: high · 6 high findings · 6 of 6 packages high or worse",
-      "figure_line": "6 of 6 packages flagged · 0 ok · 0 allowlisted",
+      "figure_line": "6 of 6 packages flagged · 0 ok · 0 finished",
       "load_line": "96 points on 6 flagged packages · 96 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
-      "waffle_caption": "6 of 6 packages flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "6 of 6 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 6 in production · all 6 required directly",
       "grade_chips": [
         "high 6"
@@ -20651,7 +20642,8 @@
                 "checked with Composer"
               ]
             },
-            "also_holds": null
+            "also_holds": null,
+            "moves_with": null
           },
           {
             "package": "symfony/http-foundation",
@@ -20666,7 +20658,8 @@
                 "checked with Composer"
               ]
             },
-            "also_holds": null
+            "also_holds": null,
+            "moves_with": null
           },
           {
             "package": "symfony/routing",
@@ -20681,7 +20674,8 @@
                 "checked with Composer"
               ]
             },
-            "also_holds": null
+            "also_holds": null,
+            "moves_with": null
           }
         ],
         "more": "All 4 ready to run",
@@ -20769,7 +20763,7 @@
       "exposure": null,
       "depth": {
         "rows": [
-          "in composer.json 6"
+          "direct 6"
         ],
         "sentence": "All 6 flagged packages are named by a line of composer.json."
       },
@@ -20959,8 +20953,8 @@
       "run_notes": [],
       "php_line": "php: the lock installs on PHP 8.1 to 8.5",
       "php_rows": [
-        "PHP window, with require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1, acme/ml-widget >=8.1, symfony/http-foundation >=8.1 and 3 more",
-        "PHP window, without require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1, acme/ml-widget >=8.1, symfony/http-foundation >=8.1 and 3 more"
+        "PHP window, with require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1, acme/gz-promises >=8.1, acme/hf-mime >=8.1 and 6 more",
+        "PHP window, without require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1, acme/gz-promises >=8.1, acme/hf-mime >=8.1 and 6 more"
       ],
       "platform_step": null,
       "sheet_moves": {
@@ -21042,7 +21036,7 @@
         "All 55 in production · 4 required directly, 51 pulled in · 122 security advisories on 16 packages (severity: 4 critical, 18 high, 40 medium, 43 unrated, 17 low) · fix by package: 1 composer update, 15 upgrade · 358.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 2 critical findings · 20 of 97 packages high or worse",
-      "figure_line": "55 of 97 packages flagged · 29 ok · 13 allowlisted",
+      "figure_line": "55 of 97 packages flagged · 29 ok · 13 finished",
       "load_line": "664 points on 55 flagged packages · 392 (59 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
@@ -21051,7 +21045,7 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded · 4 packages exclude 8.3: laminas/laminas-diactoros, laminas/laminas-escaper, laminas/laminas-feed and 1 more · Composer's solver at PHP 8.3 refuses their update: composer.json requires drupal/core-recommended ^9.3 and composer.json requires drupal/trusted_redirect ^1.9 and drupal/core 9.3.14 requires laminas/laminas-diactoros ^2.1 and drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 and drupal/trusted_redirect 1.9.0 requires drupal/core ^8 || ^9. The PHP window"
       ],
-      "waffle_caption": "55 of 97 packages flagged · 29 ok · 13 allowlisted",
+      "waffle_caption": "55 of 97 packages flagged · 29 ok · 13 finished",
       "lead_scope": "all 55 in production · 4 required directly, 51 pulled in",
       "grade_chips": [
         "critical 2",
@@ -21086,7 +21080,7 @@
         },
         {
           "verdict": "finished",
-          "word": "allowlisted",
+          "word": "finished",
           "mark": "ring-dot",
           "count": 13
         },
@@ -21275,7 +21269,7 @@
       },
       "depth": {
         "rows": [
-          "in composer.json 4",
+          "direct 4",
           "1 hop away 46",
           "2 hops away 5"
         ],
@@ -22282,14 +22276,14 @@
         "In production · required directly · 1 security advisory on 1 package (severity: 1 high) · fix by package: 1 upgrade · 0.9 libyears behind."
       ],
       "grade_line": "Project grade: high · 1 high finding · 1 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
       "load_line": "16 points on 1 flagged package · 16 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
         "high 1"
@@ -22318,7 +22312,8 @@
                 "checked with Composer"
               ]
             },
-            "also_holds": null
+            "also_holds": null,
+            "moves_with": "It also updates acme/gz-client from 1.0.0 to 1.1.0"
           }
         ],
         "more": null,
@@ -22361,7 +22356,7 @@
       "exposure": null,
       "depth": {
         "rows": [
-          "in composer.json 1"
+          "direct 1"
         ],
         "sentence": "The flagged package is named by a line of composer.json."
       },
@@ -22432,8 +22427,8 @@
       "run_notes": [],
       "php_line": "php: the lock installs on PHP 8.1 to 8.5",
       "php_rows": [
-        "PHP window, with require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1",
-        "PHP window, without require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1"
+        "PHP window, with require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1 and acme/gz-client >=8.1",
+        "PHP window, without require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1 and acme/gz-client >=8.1"
       ],
       "platform_step": null,
       "sheet_moves": {
@@ -22495,14 +22490,14 @@
         "In production · required directly · 1 security advisory on 1 package (severity: 1 high) · fix by package: 1 composer update · 0.7 libyears behind."
       ],
       "grade_line": "Project grade: high · 1 high finding · 1 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
       "load_line": "16 points on 1 flagged package · 16 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 allowlisted",
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
         "high 1"
@@ -22531,7 +22526,8 @@
                 "checked with Composer"
               ]
             },
-            "also_holds": null
+            "also_holds": null,
+            "moves_with": null
           }
         ],
         "more": null,
@@ -22574,7 +22570,7 @@
       "exposure": null,
       "depth": {
         "rows": [
-          "in composer.json 1"
+          "direct 1"
         ],
         "sentence": "The flagged package is named by a line of composer.json."
       },
@@ -22645,8 +22641,8 @@
       "run_notes": [],
       "php_line": "php: the lock installs on PHP 8.1 to 8.5",
       "php_rows": [
-        "PHP window, with require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1 and symfony/routing >=8.1",
-        "PHP window, without require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1 and symfony/routing >=8.1"
+        "PHP window, with require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1, acme/rt-kernel >=8.1 and symfony/routing >=8.1",
+        "PHP window, without require-dev: 8.1 to 8.5 · lowest 8.1.0, set by require.php ^8.1, acme/rt-kernel >=8.1 and symfony/routing >=8.1"
       ],
       "platform_step": null,
       "sheet_moves": {

@@ -1113,6 +1113,7 @@
   "move_check": {
    "composer": "2.10.3",
    "blocks_advisories": true,
+   "blocking_disabled_by": [],
    "ignores_extensions": true,
    "baseline": "refused",
    "reason": null
