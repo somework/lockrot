@@ -1377,7 +1377,7 @@
               "uniqueItems": true
             },
             "direct": {
-              "description": "The holder's own `direct`: whether the project's composer.json requires the holder.",
+              "description": "The holder's own `direct`: whether the run requires the holder directly.",
               "type": "boolean"
             },
             "replacement": {
