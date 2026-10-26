@@ -439,7 +439,7 @@ final class ComposerSolverTest extends TestCase
         $dev = ['version' => 'dev-main', 'extra' => ['branch-alias' => ['dev-main' => '1.x-dev']], 'source' => ['type' => 'git', 'url' => 'https://example.com/lib.git', 'reference' => 'abc123']];
         $solver = self::pinned(['acme/lib' => $constraint], $flags, $aliases, [['name' => 'acme/lib'] + $dev], ['acme/lib' => [$dev, ['version' => '1.5.0', 'require' => ['php' => '>=9.0']]]]);
 
-        self::assertFalse($solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^1.5.0']))->resolves(), 'the locked dev-main satisfies ^1.5.0 only through the old flag or alias');
+        self::assertFalse($solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^1.5.0'], false))->resolves(), 'the locked dev-main satisfies ^1.5.0 only through the old flag or alias');
         self::assertTrue($solver->solve(SolveRequest::baseline())->resolves(), 'the root as composer.json loads it keeps its flag and alias');
     }
 
@@ -469,16 +469,16 @@ final class ComposerSolverTest extends TestCase
         $solver = new ComposerSolver($root, $locked, new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [$dev, ['version' => '1.5.0', 'require' => ['php' => '>=9.0']]], 'acme/consumer' => [$consumer]]), []);
 
         self::assertTrue($solver->solve(SolveRequest::baseline())->resolves(), 'the lock installs with its alias');
-        self::assertFalse($solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => 'dev-main']))->resolves(), 'the branch satisfies the consumer only through the old alias');
-        self::assertTrue($solver->solve(SolveRequest::require('acme/consumer', ['acme/consumer' => '^1.0'])->withTransitive(SolveRequest::WITH_ALL_DEPENDENCIES))->resolves(), 'a require of another name keeps the alias of the branch that it unlocks');
+        self::assertFalse($solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => 'dev-main'], false))->resolves(), 'the branch satisfies the consumer only through the old alias');
+        self::assertTrue($solver->solve(SolveRequest::require('acme/consumer', ['acme/consumer' => '^1.0'], false)->withTransitive(SolveRequest::WITH_ALL_DEPENDENCIES))->resolves(), 'a require of another name keeps the alias of the branch that it unlocks');
     }
 
     public function testARequireDropsTheBetaFlagOfTheOldConstraintAndTakesTheFlagOfTheNewOne(): void
     {
         $solver = self::pinned(['acme/lib' => '^1.0@beta'], ['acme/lib' => 10], [], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '2.1.0-beta1']]]);
 
-        self::assertFalse($solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0']))->resolves(), 'minimum-stability stable admits no beta of ^2.0');
-        self::assertSame(['acme/lib' => '2.1.0-beta1'], $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0@beta']))->installs());
+        self::assertFalse($solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0'], false))->resolves(), 'minimum-stability stable admits no beta of ^2.0');
+        self::assertSame(['acme/lib' => '2.1.0-beta1'], $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0@beta'], false))->installs());
     }
 
     /**
