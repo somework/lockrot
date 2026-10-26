@@ -28,6 +28,22 @@ class TheRunInputsAddTheirChecks(unittest.TestCase):
 
 
 
+class AWorldGivesThePackagesReleases(unittest.TestCase):
+    PROJECTED = [{'version': 'v6.4.40', 'time': None, 'php': '>=8.1'}, {'version': 'v6.4.41', 'time': '2026-07-04T10:00:00+00:00', 'php': '>=8.1', 'shared_commit': True}]
+
+    def test_a_release_takes_the_php_and_the_time_that_the_world_gives_it(self):
+        world = [{'version': 'v6.4.40', 'require': {'php': '>=8.1 <8.5'}, 'time': '2026-07-03T10:00:00+00:00'}]
+
+        self.assertEqual({'version': 'v6.4.40', 'time': '2026-07-03T10:00:00+00:00', 'php': '>=8.1 <8.5'}, project_fixtures.world_releases(world, self.PROJECTED)[0])
+
+    def test_a_release_that_only_the_world_holds_joins_and_one_that_it_lacks_stays(self):
+        world = [{'version': 'v6.4.39', 'require': {}, 'time': None}]
+
+        releases = project_fixtures.world_releases(world, self.PROJECTED)
+
+        self.assertEqual([{'version': 'v6.4.39', 'time': None, 'php': None}] + self.PROJECTED, releases)
+
+
 class TheMoveCheckNamesThePhpOfTheSolve(unittest.TestCase):
     RUN = {'composer': '2.10.3', 'baseline': 'refused', 'reason': None}
 

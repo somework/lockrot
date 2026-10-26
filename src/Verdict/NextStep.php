@@ -35,15 +35,21 @@ final class NextStep
         if ($main === null) {
             return new Moves(null, null, $fixKind, $partial, $rows, $rowChecks);
         }
-        $merged = [];
+        $lead = null;
         $mainRow = $main->row();
         $otherRow = $other === null ? null : $other->row();
         if ($other !== null && self::merges($main, $other) && $mainRow !== null && $otherRow !== null && $mainRow->branch() === $otherRow->branch()) {
-            $main = self::merge($main, $other);
-            $merged = [$other->source()];
-            $other = null;
+            $mergedDraft = self::merge($main, $other);
+            $mergedLead = MoveBuilder::build($mergedDraft, [$other->source()], $fixKind, $context);
+            $check = $mergedLead->check();
+            if ($check === null || !$check->isRefused()) {
+                [$main, $lead, $other] = [$mergedDraft, $mergedLead, null];
+            } elseif ($security !== null && $maintenance !== null) {
+                // SPEC §5.6, rule 4 of the choice of move: a merge holds only while Composer's solver does not refuse it.
+                [$main, $other] = [$security, $maintenance];
+            }
         }
-        $lead = MoveBuilder::build($main, $merged, $fixKind, $context);
+        $lead ??= MoveBuilder::build($main, [], $fixKind, $context);
         $also = [];
         if ($other !== null && $other->kind() !== Move::NO_MOVE) {
             $second = MoveBuilder::build($other, [], $fixKind, $context);

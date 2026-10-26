@@ -524,6 +524,9 @@ def inputs_of(case):
         # the hydrator serves only these, and the real-solver test serves the world itself.
         checks = {k: dict(a, reason=None) for k, a in world['answers'].items()}
         inputs['solver_world'] = world
+        own = world['world']['repo'].get(f['package'])
+        if own is not None and 'releases' in inputs:
+            inputs['releases'] = world_releases(own, inputs['releases'])
         if world['check_passes'] is not None:
             inputs['check_passes'] = world['check_passes']
     if checks:
@@ -538,6 +541,15 @@ def inputs_of(case):
         # The project's vcs repository serves the package: lockrot names its origin from it.
         inputs['root']['repositories'] = [{'type': 'vcs', 'url': 'https://%s/%s.git' % (act['host'], act['repo'])}]
     return inputs
+
+
+def world_releases(world, releases):
+    """The package's releases, with the php and the time that the solver's world gives each one: the finding names only the
+    releases that its rows and fixes read, and a fix's release there takes its row's php."""
+    by_version = {r['version']: r for r in releases}
+    for w in world:
+        by_version[w['version']] = dict(by_version.get(w['version'], {}), version=w['version'], time=w.get('time'), php=(w.get('require') or {}).get('php'))
+    return sorted(by_version.values(), key=lambda r: r['version'])
 
 
 def move_check_of(move_check, world, window):

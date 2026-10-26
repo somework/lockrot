@@ -42,15 +42,33 @@ final class MoveBuilder
         $clears = [];
         $unverified = [];
         $adds = [];
-        if ($draft->isRowMove() && $row !== null) {
-            [$clears, $unverified] = self::clearsFor($row, $lower, self::countedMaintenance($finding), $context->advisoryIds(), $context);
-        }
         $phpCheck = null;
         if ($row !== null && (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) || $draft->source() === FlagSet::PINNED)) {
             // A blocked move names the PHP of the release that keeps it off the target, the others the release at the top of their constraint.
             $phpCheck = PhpCheck::of($kind === Move::BLOCKED ? ($lower === null ? $row->php() : $lower->php()) : $row->highestPhp(), $context->floor());
         }
         $latest = $draft->latest();
+        $subject = $context->subject();
+        $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $draft->constraint() : null;
+        $version = \in_array($kind, Move::ROW_KINDS, true) ? ($lower === null ? null : $lower->release()->pretty()) : ($kind === Move::TAG && $latest !== null ? $latest->version() : null);
+        $newest = $row === null ? null : ($kind === Move::UPDATE ? $context->updateTarget($row) : (\in_array($kind, [Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) ? $row->highest() : null));
+        $checks = $context->checks();
+        $query = $checks === null ? null : self::query($kind, $subject, $constraint, $version, $phpCheck, $newest);
+        $outcome = $query === null || $checks === null ? null : $checks->check($query);
+        $check = $outcome === null ? null : $outcome->check();
+        if ($check === null && $checks !== null && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
+            $check = MoveCheck::notChecked(MoveCheck::NO_RELEASE_READ);
+        }
+        if ($check === null && $checks !== null && $kind === Move::BLOCKED && $lower !== null && $checks->refused($subject->package())->refuses($lower->release()->normalized())) {
+            $check = MoveCheck::refused();
+        }
+        // Ruling R2: a solve that installs a release below the row's newest clears what that release clears.
+        $installs = $row === null || $check === null || !$draft->isRowMove() ? null : $check->installsBelow($row->highest());
+        $below = $installs === null ? null : $context->release($installs);
+        $judged = $below === null || $row === null ? $row : (BranchRow::ofRelease($below, $row->installed(), $context->floor()) ?? $row);
+        if ($draft->isRowMove() && $judged !== null) {
+            [$clears, $unverified] = self::clearsFor($judged, $lower, self::countedMaintenance($finding), $context->advisoryIds(), $context);
+        }
         if ($kind === Move::TAG) {
             $clears = [MoveFact::on(MoveFact::FLAG, FlagSet::PINNED, MoveFact::TAGS_ONLY)];
             [$adds, $unverified] = self::tagRisks($row, $latest, $flags, $context);
@@ -61,7 +79,7 @@ final class MoveBuilder
             }
         }
         if ($row !== null && \in_array($kind, array_merge(Move::ROW_KINDS, [Move::TAG]), true) && !\in_array(FlagSet::CAPPED, $flags->fired(), true)
-            && !\in_array(FlagSet::CAPPED, $flags->acceptSet(), true) && $context->phpCap()->stopsBelow($row->php()) === true) {
+            && !\in_array(FlagSet::CAPPED, $flags->acceptSet(), true) && $judged !== null && $context->phpCap()->stopsBelow($judged->php()) === true) {
             $adds[] = MoveFact::on(MoveFact::FLAG, FlagSet::CAPPED, MoveFact::STOPS_BELOW_NEWEST_PHP);
         }
         $cleared = self::keys(array_merge($clears, $unverified));
@@ -79,20 +97,6 @@ final class MoveBuilder
         $toBranch = $row !== null && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED, Move::TAG], true) ? $row->branch() : null;
         $installed = $context->installedBranch();
         $crosses = $toBranch === null || $installed === null ? null : (self::major($toBranch) !== self::major($installed) || (strpos($installed, '0.') === 0 && $toBranch !== $installed));
-        $subject = $context->subject();
-        $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $draft->constraint() : null;
-        $version = \in_array($kind, Move::ROW_KINDS, true) ? ($lower === null ? null : $lower->release()->pretty()) : ($kind === Move::TAG && $latest !== null ? $latest->version() : null);
-        $newest = $row === null ? null : ($kind === Move::UPDATE ? $context->updateTarget($row) : (\in_array($kind, [Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) ? $row->highest() : null));
-        $checks = $context->checks();
-        $query = $checks === null ? null : self::query($kind, $subject, $constraint, $version, $phpCheck, $newest);
-        $outcome = $query === null || $checks === null ? null : $checks->check($query);
-        $check = $outcome === null ? null : $outcome->check();
-        if ($check === null && $checks !== null && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
-            $check = MoveCheck::notChecked(MoveCheck::NO_RELEASE_READ);
-        }
-        if ($check === null && $checks !== null && $kind === Move::BLOCKED && $lower !== null && $checks->refused($subject->package())->refuses($lower->release()->normalized())) {
-            $check = MoveCheck::refused();
-        }
         $joint = $outcome !== null && $outcome->isJoint();
         $heldBy = $lower !== null && $kind !== Move::TAG && !$joint ? $lower->heldBy() : [];
         if ($outcome !== null && $outcome->check()->isRefused()) {
