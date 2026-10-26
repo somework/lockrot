@@ -24,6 +24,7 @@ use Lockrot\Verdict\Move;
 use Lockrot\Verdict\MoveContext;
 use Lockrot\Verdict\MoveDraft;
 use Lockrot\Verdict\MoveSubject;
+use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
 final class MaintenanceMoveTest extends TestCase
@@ -52,6 +53,41 @@ final class MaintenanceMoveTest extends TestCase
 
         self::assertNotNull($row);
         self::assertSame(['2.x', '^2.0.0'], [$row->branch(), $draft->constraint()]);
+    }
+
+    /** The 2.x line above a/b's 1.x released last in 2021, outside `release-warn-years`: no line to move to. */
+    public function testALeftBehindLeadWithNoHigherLineReleasingHasNoMoveForThatReason(): void
+    {
+        $draft = MaintenanceMove::draft(self::leftBehindContext(['1.0.0' => '2020-01-01', '2.0.0' => '2021-01-01']), FlagSet::LEFT_BEHIND);
+
+        self::assertSame([Move::NO_MOVE, 'no_higher_release'], [$draft->kind(), $draft->reason()]);
+    }
+
+    /** The 2.x line above a/b's 1.x has no dated release, so lockrot cannot tell whether it releases. */
+    public function testALeftBehindLeadWhoseHigherLineHasNoDateHasNoMoveForThatReason(): void
+    {
+        $draft = MaintenanceMove::draft(self::leftBehindContext(['1.0.0' => '2020-01-01', '2.0.0' => null]), FlagSet::LEFT_BEHIND);
+
+        self::assertSame([Move::NO_MOVE, 'higher_undated'], [$draft->kind(), $draft->reason()]);
+    }
+
+    /** @param array<string, ?string> $releases each release of a/b with its date */
+    private static function leftBehindContext(array $releases): MoveContext
+    {
+        $packages = [];
+        foreach ($releases as $version => $at) {
+            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $version] + ($at === null ? [] : ['time' => $at.'T00:00:00+00:00']));
+            self::assertInstanceOf(BasePackage::class, $release);
+            $packages[] = $release;
+        }
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $locked = $lock->find('a/b');
+        self::assertNotNull($locked);
+        $facts = new PackageFacts($locked, PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::NOW), '1.0.0.0'), null, []);
+        $floor = new PhpFloor('8.4');
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->withVerdict(Verdict::LEFT_BEHIND)->build();
+
+        return new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', null), $facts->metadata(), BranchRow::all($facts, $floor, Clock::fixed(self::NOW)), null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 3, null, [], [], true);
     }
 
     /** `admits_newest` on the installed branch, which the target and the project run and nothing holds. */
