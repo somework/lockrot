@@ -425,6 +425,40 @@ final class ComposerSolverTest extends TestCase
     }
 
     /**
+     * `composer require` rewrites composer.json and loads it again, so the stability flag, the root
+     * alias and the reference of the old constraint do not reach its solve. The only tag needs php 9.
+     *
+     * @dataProvider pinnedRoots
+     *
+     * @param array<string, 0|5|10|15|20>                                                            $flags
+     * @param list<array{package: string, version: string, alias: string, alias_normalized: string}> $aliases
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('pinnedRoots')]
+    public function testARequireOfAPinnedPackageSolvesWithoutTheOldStabilityFlagAndAlias(string $constraint, array $flags, array $aliases): void
+    {
+        $dev = ['version' => 'dev-main', 'extra' => ['branch-alias' => ['dev-main' => '1.x-dev']], 'source' => ['type' => 'git', 'url' => 'https://example.com/lib.git', 'reference' => 'abc123']];
+        $solver = self::pinned(['acme/lib' => $constraint], $flags, $aliases, [['name' => 'acme/lib'] + $dev], ['acme/lib' => [$dev, ['version' => '1.5.0', 'require' => ['php' => '>=9.0']]]]);
+
+        self::assertFalse($solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^1.5.0']))->resolves(), 'the locked dev-main satisfies ^1.5.0 only through the old flag or alias');
+        self::assertTrue($solver->solve(SolveRequest::baseline())->resolves(), 'the root as composer.json loads it keeps its flag and alias');
+    }
+
+    /** @return iterable<string, array{string, array<string, 0|5|10|15|20>, list<array{package: string, version: string, alias: string, alias_normalized: string}>}> */
+    public static function pinnedRoots(): iterable
+    {
+        yield 'a dev branch' => ['dev-main', ['acme/lib' => 20], []];
+        yield 'a dev branch with a root alias' => ['dev-main as 1.5.0', ['acme/lib' => 20], [['package' => 'acme/lib', 'version' => 'dev-main', 'alias' => '1.5.0', 'alias_normalized' => '1.5.0.0']]];
+    }
+
+    public function testARequireDropsTheBetaFlagOfTheOldConstraintAndTakesTheFlagOfTheNewOne(): void
+    {
+        $solver = self::pinned(['acme/lib' => '^1.0@beta'], ['acme/lib' => 10], [], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '2.1.0-beta1']]]);
+
+        self::assertFalse($solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0']))->resolves(), 'minimum-stability stable admits no beta of ^2.0');
+        self::assertSame(['acme/lib' => '2.1.0-beta1'], $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0@beta']))->installs());
+    }
+
+    /**
      * @param array<string, mixed>                      $root
      * @param list<array<string, mixed>>                $locked
      * @param array<string, list<array<string, mixed>>> $remote
@@ -437,6 +471,26 @@ final class ComposerSolverTest extends TestCase
         self::assertInstanceOf(RootPackageInterface::class, $package);
 
         return new ComposerSolver($package, LockFile::fromArray(['packages' => $locked, 'packages-dev' => $lockedDev])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote), $blocked);
+    }
+
+    /**
+     * The root as RootPackageLoader loads composer.json, at minimum-stability stable: ArrayLoader
+     * reads no flag or alias from a constraint, so the test sets them.
+     *
+     * @param array<string, string>                                                                  $require
+     * @param array<string, 0|5|10|15|20>                                                            $flags
+     * @param list<array{package: string, version: string, alias: string, alias_normalized: string}> $aliases
+     * @param list<array<string, mixed>>                                                             $locked
+     * @param array<string, list<array<string, mixed>>>                                              $remote
+     */
+    private static function pinned(array $require, array $flags, array $aliases, array $locked, array $remote): ComposerSolver
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => $require], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $root->setStabilityFlags($flags);
+        $root->setAliases($aliases);
+
+        return new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote), []);
     }
 
     /**
