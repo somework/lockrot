@@ -755,6 +755,10 @@ Limits of the check:
   later, or `COMPOSER_NO_BLOCKING` on Composer 2.10 and later, set to a true value, turns this
   blocking off, as in Composer. `run.move_check.blocking_disabled_by` and the `moves:` line then
   name the variable.
+- Composer blocks only the advisories that it reads. When the advisory lookup did not read a
+  package that a resolving solve installs, the move is not checked (`check.reason`
+  `advisory_lookup_incomplete`). An `--offline` run, a spent install-time budget and a failed
+  repository cause it. A refused solve stays refused.
 - On Composer 2.10 and later, an update also removes the versions that a filter list names. Such a
   list is the `malware` list under `config.policy`, which blocks by default, or a custom list there.
   The check does not read these lists. So a move that resolves in lockrot can fail in Composer, or

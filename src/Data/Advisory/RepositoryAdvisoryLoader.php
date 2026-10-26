@@ -76,7 +76,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         [$repositories, $answers, $askNotes] = $this->ask(array_keys($asked));
 
         return $this->batch($versionByName, $outside, $aliasVersionsByName, $repositories, $answers, array_merge($notes, $askNotes))
-            ->withRecords(self::merged($answers), array_keys($asked));
+            ->withRecords(self::merged($answers), self::readEvery($repositories) ? array_keys($asked) : []);
     }
 
     /**
@@ -86,15 +86,31 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
      *
      * @param list<string> $names
      *
-     * @return array<string, list<PartialSecurityAdvisory>>
+     * @return array<string, list<PartialSecurityAdvisory>>|null null when a repository with a feed was not asked or failed
      */
-    public function records(array $names, bool $complete): array
+    public function records(array $names, bool $complete): ?array
     {
-        if ($names === [] || $this->notAskedReason(array_fill_keys($names, '')) !== null) {
+        if ($names === []) {
             return [];
         }
+        if ($this->notAskedReason(array_fill_keys($names, '')) !== null) {
+            return null;
+        }
+        [$repositories, $answers] = $this->ask($names, !$complete);
 
-        return self::merged($this->ask($names, !$complete)[1]);
+        return self::readEvery($repositories) ? self::merged($answers) : null;
+    }
+
+    /** @param list<AdvisoryRepository> $repositories */
+    private static function readEvery(array $repositories): bool
+    {
+        foreach ($repositories as $repository) {
+            if (\in_array($repository->outcome(), [AdvisoryCoverage::FAILED, AdvisoryCoverage::NOT_ASKED], true)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

@@ -65,14 +65,15 @@ final class CheckOutcome
      * resolves the move only when it installs the moved package inside the move's constraint and
      * changes the release of a holder. Then the move resolves with no hold, and it lists each holder
      * whose release the solve changes.
-     * A joint refusal gives its own holds. Any other answer leaves this refusal.
+     * A joint refusal gives its own holds, and a joint solve that installs a name whose advisories
+     * the lookup could not read leaves the move not checked. Any other answer leaves this refusal.
      *
      * @param list<string> $holders
      */
     public function joinedWith(self $joint, string $package, string $constraint, array $holders): self
     {
         $check = $joint->check();
-        if ($check->isRefused()) {
+        if ($check->isRefused() || $check->reason() === MoveCheck::ADVISORY_LOOKUP_INCOMPLETE) {
             return $joint;
         }
         $installs = $joint->changes()[$package] ?? null;

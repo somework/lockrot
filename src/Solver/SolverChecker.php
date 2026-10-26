@@ -101,6 +101,9 @@ final class SolverChecker implements MoveChecker
         if ($unloaded !== null) {
             return new CheckOutcome(MoveCheck::notChecked($unloaded));
         }
+        if ($this->installsUnread($solution)) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE));
+        }
 
         return $solution->resolves()
             ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE))
@@ -143,7 +146,8 @@ final class SolverChecker implements MoveChecker
             return $this;
         }
         $clone = clone $this;
-        $clone->solver = $this->solver->withAdvisories($this->advisories->withRecords($records, $covered));
+        $clone->advisories = $this->advisories->withRecords($records, $covered);
+        $clone->solver = $this->solver->withAdvisories($clone->advisories);
         $clone->baseline = null;
         $clone->checked = [];
 
@@ -182,6 +186,9 @@ final class SolverChecker implements MoveChecker
             return $tried;
         }
         [$form, $solution] = $tried;
+        if ($form !== null && $this->installsUnread($solution)) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE));
+        }
 
         return $form === null ? $this->refusal($solution, $query) : $this->resolved($form, $solution, $query);
     }
@@ -198,6 +205,9 @@ final class SolverChecker implements MoveChecker
         }
         if (!$solution->resolves()) {
             return $this->refusal($solution, $query);
+        }
+        if ($this->installsUnread($solution)) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE));
         }
 
         return (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, $solution->installs()[$query->package()] ?? null)))->withChanges($solution->installs(), $solution->updatedFrom());
@@ -268,6 +278,12 @@ final class SolverChecker implements MoveChecker
         } catch (\UnexpectedValueException $e) {
             return false;
         }
+    }
+
+    /** Composer blocks only the advisories that it reads, so a solve that installs a name whose records the lookup could not read proves nothing (SPEC §5.6, ruling Q2). */
+    private function installsUnread(Solution $solution): bool
+    {
+        return $this->advisories !== null && $this->advisories->unread(array_keys($solution->installs())) !== [];
     }
 
     /** A move is not checked while the baseline does not resolve: for the baseline's reason, or because it is refused. */

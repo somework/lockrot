@@ -388,6 +388,24 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([false], self::networkFailures($batch));
     }
 
+    /** The move check reads a name as checked only when every repository with a feed answered for it (SPEC §5.6, ruling Q2). */
+    public function testALookupThatAnAdvisoryRepositoryDidNotAnswerReadsNoName(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK])->repositories();
+        $spent = Deadline::inSeconds(0.0, static fn (): float => 0.0);
+        $answered = new RepositoryAdvisoryLoader($this->server()->repositories());
+
+        self::assertNull((new RepositoryAdvisoryLoader($this->server()->repositories(), true))->records(['doctrine/cache'], false), 'offline');
+        self::assertNull((new RepositoryAdvisoryLoader($this->server()->repositories(), false, $spent))->records(['doctrine/cache'], false), 'budget spent');
+        self::assertNull((new RepositoryAdvisoryLoader($unreachable))->records(['doctrine/cache'], false), 'a repository failed');
+        self::assertSame([], (new RepositoryAdvisoryLoader($unreachable))->load(['doctrine/cache' => '2.2.0'])->asked(), 'a repository failed');
+        self::assertIsArray($answered->records(['doctrine/cache'], false));
+        self::assertSame(['doctrine/cache'], $answered->load(['doctrine/cache' => '2.2.0'])->asked());
+    }
+
     /** On the Composer 2.2 LTS the whole check is one note. On 2.4 or newer that note never appears. */
     public function testTheComposerVersionNoteMatchesTheApi(): void
     {

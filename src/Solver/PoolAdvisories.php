@@ -18,14 +18,16 @@ use Composer\Semver\Constraint\ConstraintInterface;
 final class PoolAdvisories
 {
     private AdvisoryBlocking $blocking;
-    /** @var \Closure(list<string>, bool): array<string, list<PartialSecurityAdvisory>> */
+    /** @var \Closure(list<string>, bool): (array<string, list<PartialSecurityAdvisory>>|null) */
     private \Closure $lookup;
     /** @var array<string, list<PartialSecurityAdvisory>> */
     private array $records = [];
     /** @var array<string, true> */
     private array $covered = [];
+    /** @var array<string, true> the covered names whose records the lookup could not read */
+    private array $unread = [];
 
-    /** @param \Closure(list<string>, bool): array<string, list<PartialSecurityAdvisory>> $lookup every record of each name, complete ones only when the flag is true */
+    /** @param \Closure(list<string>, bool): (array<string, list<PartialSecurityAdvisory>>|null) $lookup every record of each name, complete ones only when the flag is true, null when it could not read them */
     public function __construct(AdvisoryBlocking $blocking, \Closure $lookup)
     {
         $this->blocking = $blocking;
@@ -36,7 +38,7 @@ final class PoolAdvisories
      * A copy that knows the run's lookup.
      *
      * @param array<string, list<PartialSecurityAdvisory>> $records every record of each name
-     * @param list<string>                                 $covered the names that the lookup asked, with records or without
+     * @param list<string>                                 $covered the names that the lookup read, with records or without
      */
     public function withRecords(array $records, array $covered): self
     {
@@ -65,13 +67,26 @@ final class PoolAdvisories
         $missing = array_values(array_diff(array_unique($names), array_keys($this->covered)));
         if ($missing !== []) {
             $found = ($this->lookup)($missing, false);
-            if ($this->blocking->needsComplete($found)) {
+            if ($found !== null && $this->blocking->needsComplete($found)) {
                 $found = ($this->lookup)($missing, true);
             }
-            $this->records = $found + $this->records;
+            if ($found === null) {
+                $this->unread += array_fill_keys($missing, true);
+            }
+            $this->records = ($found ?? []) + $this->records;
             $this->covered += array_fill_keys($missing, true);
         }
 
         return $this->blocking->ranges(array_intersect_key($this->records, array_flip($names)));
+    }
+
+    /**
+     * @param array<string> $names
+     *
+     * @return list<string> those of $names whose records a lookup could not read
+     */
+    public function unread(array $names): array
+    {
+        return array_values(array_filter($names, fn (string $name): bool => isset($this->unread[$name])));
     }
 }

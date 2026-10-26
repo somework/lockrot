@@ -107,6 +107,18 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.1.0']], $joined->movesWith());
     }
 
+    /** SPEC §5.6 (ruling Q2): the joint request reads an incomplete advisory lookup as the move's own solve does. */
+    public function testAJointSolveThatTheAdvisoryLookupDidNotCoverLeavesTheMoveNotChecked(): void
+    {
+        $outcome = new CheckOutcome(MoveCheck::refused(), [new Holder(Holder::PACKAGE, 'h/x', '1.0.0', Holder::REQUIRE, '^1.0')]);
+
+        $incomplete = $outcome->joinedWith(new CheckOutcome(MoveCheck::notChecked(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE)), 'acme/lib', '^2.0', ['h/x']);
+        $budget = $outcome->joinedWith(new CheckOutcome(MoveCheck::notChecked(MoveCheck::INSTALL_TIME_BUDGET)), 'acme/lib', '^2.0', ['h/x']);
+
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::ADVISORY_LOOKUP_INCOMPLETE, []], [$incomplete->check()->result(), $incomplete->check()->reason(), $incomplete->holds()]);
+        self::assertSame(MoveCheck::REFUSED, $budget->check()->result(), 'another unchecked joint request leaves the refusal');
+    }
+
     /** A recorded joint answer names no locked releases: the hold's version stands in. */
     public function testWithoutTheLockedReleaseTheHoldGivesTheInstalledVersion(): void
     {
