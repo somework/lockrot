@@ -151,17 +151,6 @@ final class Fix implements \JsonSerializable
         return $this->candidate === null ? null : $this->candidate->php();
     }
 
-    /** {@see PhpFloor::admitsTarget()} of {@see php()}, as a branch row's `admits_target_php` asks it. */
-    public function admitsTargetPhp(): ?bool
-    {
-        return $this->admitsTargetPhp;
-    }
-
-    public function admitsProjectPhp(): ?bool
-    {
-        return $this->admitsProjectPhp;
-    }
-
     /** @return list<Holder> */
     public function heldBy(): array
     {
