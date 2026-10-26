@@ -328,6 +328,37 @@ final class SolverCheckerTest extends TestCase
     }
 
     /**
+     * R2-4: composer.json requires acme/new, which the lock lacks and the source could not load. The
+     * baseline's refusal says nothing about the lock, so it reads the load reason.
+     *
+     * @dataProvider unloadedNames
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('unloadedNames')]
+    public function testABaselineThatNeedsARootRequirementTheSourceCouldNotLoadIsNotChecked(string $failure, string $reason): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/new' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]],
+            ['acme/new' => $failure]
+        );
+
+        $baseline = $checker->baseline()->check();
+        $move = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check();
+
+        self::assertSame([MoveCheck::NOT_CHECKED, $reason], [$baseline->result(), $baseline->reason()]);
+        self::assertSame([MoveCheck::NOT_CHECKED, $reason], [$move->result(), $move->reason()]);
+    }
+
+    /** A repository answered that it lists no acme/new: Composer refuses the lock itself. */
+    public function testABaselineThatNeedsARootRequirementThatNoRepositoryListsIsRefused(): void
+    {
+        $checker = self::checker(['acme/lib' => '^1.0', 'acme/new' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0']]]);
+
+        self::assertSame(MoveCheck::REFUSED, $checker->baseline()->check()->result());
+    }
+
+    /**
      * D6: a refusal that needs a name the source could not load says nothing about the project.
      *
      * @dataProvider unloadedNames

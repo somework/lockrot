@@ -67,7 +67,13 @@ final class SolverChecker implements MoveChecker
             if ($solution === null || $this->failed($solution)) {
                 $this->baseline = new CheckOutcome(MoveCheck::notChecked($solution === null ? MoveCheck::INSTALL_TIME_BUDGET : MoveCheck::SOLVER_ERROR));
             } else {
-                $this->baseline = $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), [], $solution->problem());
+                // A baseline that resolves lets each move's own solve decide.
+                $unloaded = $solution->resolves() ? null : $this->notLoaded($solution);
+                if ($unloaded !== null) {
+                    $this->baseline = new CheckOutcome(MoveCheck::notChecked($unloaded));
+                } else {
+                    $this->baseline = $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), [], $solution->problem());
+                }
             }
         }
 

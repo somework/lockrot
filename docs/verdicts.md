@@ -726,6 +726,9 @@ holds. JSON writes the answer as the move's `check`.
 - **The baseline.** First, lockrot solves a partial update of a name outside the lock. When
   Composer refuses it, the lock itself does not install on the target PHP. Then no move is checked,
   and the run note [`moves_not_checked`](notes.md#moves_not_checked) gives Composer's problem text.
+  When that refusal needs a package that could not be loaded, `run.move_check.baseline` is
+  `not_checked` with the load reason (`unloaded_name`, `offline` or `install_time_budget`). Each
+  move then reads that reason.
 
 Limits of the check:
 
@@ -759,6 +762,10 @@ Limits of the check:
   later, or `COMPOSER_NO_BLOCKING` on Composer 2.10 and later, set to a true value, turns this
   blocking off, as in Composer. `run.move_check.blocking_disabled_by` and the `moves:` line then
   name the variable.
+- When a package that a resolving solve asks for could not be loaded, the solve can resolve at a
+  lower release than Composer installs. The move is then not checked, with the load reason
+  (`unloaded_name`, `offline` or `install_time_budget`). A refusal that needs such a package reads
+  the same.
 - Composer blocks only the advisories that it reads. When the advisory lookup did not read a
   package that a resolving solve installs, the move is not checked (`check.reason`
   `advisory_lookup_incomplete`). An `--offline` run, a spent install-time budget and a failed

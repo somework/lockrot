@@ -2989,6 +2989,8 @@
    "#/definitions/run/properties/move_check/oneOf/0/properties/reason/oneOf/0"
   ],
   "values": [
+   "unloaded_name",
+   "offline",
    "install_time_budget",
    "no_composer_json",
    "composer_json_invalid",
