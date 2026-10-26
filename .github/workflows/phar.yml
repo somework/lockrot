@@ -47,6 +47,8 @@ jobs:
       # release waits until lockrot.dev serves the schemas that this tag carries.
       - name: lockrot.dev serves the schemas of the tag
         if: startsWith(github.ref, 'refs/tags/')
+        # A named bash shell runs with pipefail, so a curl failure fails the pipe into jq.
+        shell: bash
         run: |
           for doc in report explain baseline config; do
             url="https://lockrot.dev/schema/$doc-2.json"

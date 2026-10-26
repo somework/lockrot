@@ -86,7 +86,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   escape (`\x1B`), also in `--explain`, in the error lines on stderr, as in the install-time
   summary. So does a character that prints as nothing, such as a zero-width space (`\u{200B}`). A
   lock cannot clear your screen, write your clipboard, plant a link in your terminal or hide text.
-  In the github format, a run line cannot hold a `##[` workflow command.
+  A github format run line and an error line on stderr cannot start a `::` workflow command or
+  hold a `##[` command.
   ([What lockrot does](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **markdown:** text from the lock cannot mention a user or a team, or link a bare URL or an email
   address, in a pull request comment or a job summary. ([`--format=markdown`](docs/ci.md#-formatmarkdown))

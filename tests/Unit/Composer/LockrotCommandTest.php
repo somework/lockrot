@@ -1227,6 +1227,23 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('#0 ', $stderr);
     }
 
+    /** On an Actions runner stderr goes to the job log, and the runner reads commands from it. */
+    public function testAFailureAndItsVerboseTraceStartNoWorkflowCommand(): void
+    {
+        $this->fixtureCopy(self::LARAVEL_LOCK);
+        $command = $this->buildCommand(static function (): Analyzer {
+            throw new \RuntimeException("boom\n::error::pwned ##[group]x");
+        });
+        $command->setIO(new BufferIO('', OutputInterface::VERBOSITY_VERBOSE));
+
+        [$code, , $stderr] = $this->runCommandWithSplitStreams($command, ['--target-php' => '8.4']);
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame(0, preg_match('/^\s*::/m', $stderr), $stderr);
+        self::assertStringNotContainsString('##[', $stderr);
+        self::assertStringContainsString("lockrot failed: boom\n\\x3A:error::pwned ##\\x5Bgroup]x", $stderr);
+    }
+
     /**
      * Decorated, the warning is coloured by lockrot itself, whole and on stderr alone. The key is
      * thousands of `<b`, a text that exhausts PCRE's JIT in Symfony's tag formatter. Through that

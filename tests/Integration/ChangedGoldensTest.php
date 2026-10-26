@@ -164,7 +164,24 @@ final class ChangedGoldensTest extends TestCase
         $shipped = version_compare($version, self::FIRST_RELEASE, '>=');
 
         self::assertSame($shipped ? $version : '', self::releasedAt(), 'pin RELEASED and set RELEASED_AT to '.$version);
-        self::assertSame($shipped, self::released() !== [], 'RELEASED holds a pin exactly when RELEASED_AT names a release');
+        $pinned = array_keys(self::released());
+        sort($pinned);
+        self::assertSame($shipped ? self::goldenNames() : [], $pinned, 'RELEASED pins every golden exactly when RELEASED_AT names a release');
+        self::assertSame([], $shipped ? array_keys(self::CHANGED) : [], 'the release pull request empties CHANGED');
+    }
+
+    /** @return list<string> sorted */
+    private static function goldenNames(): array
+    {
+        $names = [];
+        foreach (self::DIRS as $dir) {
+            foreach (self::FORMATS as $format => $extension) {
+                $names[] = basename($dir).'.'.$format.'.'.$extension;
+            }
+        }
+        sort($names);
+
+        return $names;
     }
 
     private static function releasedAt(): string

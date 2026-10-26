@@ -110,6 +110,15 @@ final class TerminalTextTest extends TestCase
         self::assertSame('a\\nb\\u{202E}c\\xFF<d>', TerminalText::neutralise("a\nb\u{202E}c\xFF<d>"));
     }
 
+    /** The runner reads `::` at a line start and `##[` anywhere in a line as a workflow command. */
+    public function testALogLineStartsNoWorkflowCommandAndHoldsNoLegacyCommand(): void
+    {
+        self::assertSame(
+            "boom\n\\x3A:error::pwned ##\\x5Bgroup]x\n  \\x3A:warning::y\n#0 a::b() \\x1B",
+            TerminalText::neutraliseLogLines("boom\n::error::pwned ##[group]x\n  ::warning::y\n#0 a::b() \x1B"),
+        );
+    }
+
     public function testAWarningIsPlainWhenTheOutputIsNotDecorated(): void
     {
         self::assertSame('lockrot: <b>x</b>', TerminalText::warning('lockrot: <b>x</b>', false));

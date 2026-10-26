@@ -12,8 +12,8 @@ use Symfony\Component\Process\Process;
 /**
  * tools/report/update-renderer vendors the renderer, and tools/report/check-vendored is the check of
  * the release pull request and of phar.yml. Each runs in a copy of the repository layout, with a
- * stand-in `gh` that serves a release from a directory and answers each attestation with
- * FAKE_ATTESTATION.
+ * stand-in `gh` that serves the named assets of a lockrot-report release from a directory,
+ * refuses any other argument, and answers each attestation with FAKE_ATTESTATION.
  *
  * @coversNothing
  *
@@ -30,8 +30,18 @@ final class RendererScriptsTest extends TestCase
         echo "$*" >> "$FAKE_LOG"
         case "$1 $2" in
           "release download")
-            while [ $# -gt 0 ]; do if [ "$1" = --dir ]; then dir=$2; fi; shift; done
-            cp "$FAKE_RELEASE"/* "$dir"/ ;;
+            shift 3
+            patterns=()
+            while [ $# -gt 0 ]; do
+              case "$1" in
+                --repo) [ "$2" = somework/lockrot-report ] || exit 96; shift 2 ;;
+                --dir) dir=$2; shift 2 ;;
+                --pattern=*) patterns+=("${1#--pattern=}"); shift ;;
+                *) exit 98 ;;
+              esac
+            done
+            [ ${#patterns[@]} -gt 0 ] || exit 97
+            for pattern in "${patterns[@]}"; do cp "$FAKE_RELEASE/$pattern" "$dir"/ || exit 95; done ;;
           "attestation verify") exit "${FAKE_ATTESTATION:-0}" ;;
           *) exit 99 ;;
         esac

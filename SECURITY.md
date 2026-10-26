@@ -138,8 +138,14 @@ repositories publish, and finds no vulnerability of its own.
 
 - **Terminal output.** The text formats (`table`, `--explain`, `github`, `markdown` and the
   install-time summary) print a control character from the lock or a repository as an escape,
-  such as `\x1B`. `self-update` does the same for the tags, versions and URLs that it prints from
-  the release list. Neither can send escape sequences to your terminal.
+  such as `\x1B`. They also print a character that shows as nothing as an escape, such as
+  `\u{200B}`. The error lines on stderr do the same. `self-update` does the same for the tags,
+  versions and URLs that it prints from the release list. Neither can send escape sequences to
+  your terminal.
+
+- **Workflow commands.** A GitHub Actions runner reads a line that starts with `::`, and a `##[`
+  anywhere in a line, as a command. The plain lines of the `github` format and the error lines on
+  stderr break both forms, so text from the lock cannot start a command.
 
 ## Key custody and rotation
 

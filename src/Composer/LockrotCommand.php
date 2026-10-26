@@ -588,21 +588,21 @@ final class LockrotCommand extends BaseCommand
      */
     private function writeError(OutputInterface $output, string $message): void
     {
-        self::errorOutput($output)->writeln(TerminalText::neutraliseLines($message), OutputInterface::OUTPUT_RAW);
+        self::errorOutput($output)->writeln(TerminalText::neutraliseLogLines($message), OutputInterface::OUTPUT_RAW);
     }
 
     /** Raw for the reason of writeError(). */
     private function writeWarning(OutputInterface $output, string $line): void
     {
         $target = self::errorOutput($output);
-        $target->writeln(TerminalText::warning(TerminalText::neutraliseLines($line), $target->isDecorated()), OutputInterface::OUTPUT_RAW);
+        $target->writeln(TerminalText::warning(TerminalText::neutraliseLogLines($line), $target->isDecorated()), OutputInterface::OUTPUT_RAW);
     }
 
     /** Raw for the reason of writeError(). */
     private function writeFailure(OutputInterface $output, string $text): void
     {
         $target = self::errorOutput($output);
-        $target->writeln(TerminalText::error(TerminalText::neutraliseLines($text), $target->isDecorated()), OutputInterface::OUTPUT_RAW);
+        $target->writeln(TerminalText::error(TerminalText::neutraliseLogLines($text), $target->isDecorated()), OutputInterface::OUTPUT_RAW);
     }
 
     private static function errorOutput(OutputInterface $output): OutputInterface

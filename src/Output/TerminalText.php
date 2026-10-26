@@ -78,6 +78,16 @@ final class TerminalText
         return implode("\n", array_map([self::class, 'neutralise'], explode("\n", $text)));
     }
 
+    /**
+     * {@see self::neutraliseLines()} for a log that a CI runner reads. The runner runs `::` at a line
+     * start and `##[` anywhere in a line as a command:
+     * https://github.com/actions/runner/blob/main/src/Runner.Worker/ActionCommandManager.cs
+     */
+    public static function neutraliseLogLines(string $text): string
+    {
+        return (string) preg_replace('/^( *):(?=:)/m', '$1\x3A', str_replace('##[', '##\x5B', self::neutraliseLines($text)));
+    }
+
     public static function warning(string $line, bool $decorated): string
     {
         return $decorated ? (new OutputFormatterStyle('black', 'yellow'))->apply($line) : $line;

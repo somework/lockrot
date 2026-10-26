@@ -93,7 +93,7 @@ jobs:
             vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AuditParityTest.php
           elif [ "${{ matrix.composer }}" = "2.9" ]; then
             # The Composer 2.9 legs of the parity tests and of the blocking settings must run here, so
-            # a skip or an empty run fails the row. The Composer 2.10 test of the blocking skips here.
+            # a skip or an empty run fails the row. The filter leaves out the Composer 2.10 test of the blocking.
             groups_config phpunit-ci.xml "<exclude>$slow</exclude>"
             vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AuditParityTest.php
             vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AbandonedIgnoreParityTest.php
