@@ -1380,6 +1380,7 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -1387,12 +1388,20 @@
                     [
                         "composer",
                         "require",
-                        "symfony/monolog-bridge:^5.4.52"
+                        "symfony/monolog-bridge:^5.4.52",
+                        "--dev"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 (require-dev)); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 in require-dev); a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",

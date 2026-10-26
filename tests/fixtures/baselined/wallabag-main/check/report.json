@@ -1589,6 +1589,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -1948,6 +1949,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -2291,6 +2293,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -2689,7 +2692,7 @@
                         "package": null,
                         "version": null,
                         "link": "root-require",
-                        "target": "scheb/2fa-google-authenticator",
+                        "target": "scheb/2fa-bundle",
                         "constraint": "^5.13.2",
                         "holder": null
                     },
@@ -2706,6 +2709,7 @@
                             "flag_ids": [
                                 "left-behind"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -2714,10 +2718,20 @@
                                 "check": {
                                     "result": "refused",
                                     "form": null,
-                                    "reason": null
+                                    "reason": null,
+                                    "installs": null
                                 }
                             }
                         }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-google-authenticator",
+                        "version": "5.x-dev",
+                        "link": "require",
+                        "target": "scheb/2fa-bundle",
+                        "constraint": "self.version",
+                        "holder": null
                     }
                 ],
                 "clears": [
@@ -2755,13 +2769,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "spomky-labs/otphp",
+                        "11.5.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "scheb/2fa-google-authenticator",
@@ -2772,11 +2796,13 @@
                             "released": "2026-01-24T13:27:55+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-google-authenticator ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "vulnerable",
@@ -2930,7 +2956,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "root-require",
-                                            "target": "scheb/2fa-google-authenticator",
+                                            "target": "scheb/2fa-bundle",
                                             "constraint": "^5.13.2",
                                             "holder": null
                                         },
@@ -2947,6 +2973,7 @@
                                                 "flag_ids": [
                                                     "left-behind"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -2955,10 +2982,20 @@
                                                     "check": {
                                                         "result": "refused",
                                                         "form": null,
-                                                        "reason": null
+                                                        "reason": null,
+                                                        "installs": null
                                                     }
                                                 }
                                             }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "scheb/2fa-google-authenticator",
+                                            "version": "5.x-dev",
+                                            "link": "require",
+                                            "target": "scheb/2fa-bundle",
+                                            "constraint": "self.version",
+                                            "holder": null
                                         }
                                     ],
                                     "reason": null
@@ -2996,7 +3033,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "root-require",
-                                            "target": "scheb/2fa-google-authenticator",
+                                            "target": "scheb/2fa-bundle",
                                             "constraint": "^5.13.2",
                                             "holder": null
                                         },
@@ -3013,6 +3050,7 @@
                                                 "flag_ids": [
                                                     "left-behind"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -3021,10 +3059,20 @@
                                                     "check": {
                                                         "result": "refused",
                                                         "form": null,
-                                                        "reason": null
+                                                        "reason": null,
+                                                        "installs": null
                                                     }
                                                 }
                                             }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "scheb/2fa-google-authenticator",
+                                            "version": "5.x-dev",
+                                            "link": "require",
+                                            "target": "scheb/2fa-bundle",
+                                            "constraint": "self.version",
+                                            "holder": null
                                         }
                                     ],
                                     "reason": null
@@ -3317,6 +3365,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -3704,6 +3753,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -4071,6 +4121,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -4085,11 +4136,13 @@
                             "released": "2022-03-21T19:27:18+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub: replace or update that package"
+                "text": "find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub (grandt/phpresizegif requires it): replace wallabag/phpepub"
             },
             "security": {
                 "status": "clear",
@@ -4452,6 +4505,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -4466,11 +4520,13 @@
                             "released": "2022-03-21T19:27:18+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it"
+                "text": "find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace wallabag/phpepub; the newest release of wallabag/phpepub (4.0.10) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -4832,6 +4888,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -4846,11 +4903,13 @@
                             "released": "2022-03-21T19:27:18+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub: replace or update that package"
+                "text": "find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub (phpzip/phpzip requires it): replace wallabag/phpepub"
             },
             "security": {
                 "status": "clear",
@@ -5213,6 +5272,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -5227,11 +5287,13 @@
                             "released": "2022-03-21T19:27:18+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it"
+                "text": "find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace wallabag/phpepub; the newest release of wallabag/phpepub (4.0.10) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -5641,6 +5703,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -5652,7 +5715,9 @@
                         "installed_requires": true,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "no_stable_release"
+                        "newest_requires_unmeasured": "no_stable_release",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -5660,11 +5725,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -6047,6 +6114,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -6061,11 +6129,13 @@
                             "released": "2022-03-21T19:27:18+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a maintained alternative: nothing released for 10.9 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it"
+                "text": "find a maintained alternative: nothing released for 10.9 years; it comes in through wallabag/phpepub: replace wallabag/phpepub; the newest release of wallabag/phpepub (4.0.10) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -6427,6 +6497,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -6441,11 +6512,13 @@
                             "released": "2021-08-15T12:26:51+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a maintained alternative: nothing released for 8.9 years; it comes in through pragmarx/recovery: replace or update that package; the newest release of pragmarx/recovery (v0.2.1) still requires it"
+                "text": "find a maintained alternative: nothing released for 8.9 years; it comes in through pragmarx/recovery: replace pragmarx/recovery; the newest release of pragmarx/recovery (v0.2.1) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -6743,130 +6816,17 @@
                         "holder": null
                     },
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "dama/doctrine-test-bundle",
-                        "constraint": "^8.2.2",
-                        "holder": null
-                    },
-                    {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "doctrine/dbal",
-                        "constraint": "^3.9.4",
-                        "holder": null
-                    },
-                    {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "doctrine/migrations",
-                        "constraint": "^3.8.2",
-                        "holder": null
-                    },
-                    {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "doctrine/orm",
-                        "constraint": "^2.20.2",
-                        "holder": null
-                    },
-                    {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "doctrine/persistence",
-                        "constraint": "^3.4",
-                        "holder": null
-                    },
-                    {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
+                        "source": "package",
+                        "package": "doctrine/doctrine-fixtures-bundle",
+                        "version": "3.7.1",
+                        "link": "require",
                         "target": "symfony/doctrine-bridge",
-                        "constraint": "^5.4.48",
-                        "holder": null
-                    },
-                    {
-                        "source": "package",
-                        "package": "dama/doctrine-test-bundle",
-                        "version": "v8.2.2",
-                        "link": "require",
-                        "target": "doctrine/dbal",
-                        "constraint": "^3.3 || ^4.0",
+                        "constraint": "^5.4.48 || ^6.4.16 || ^7.1.9",
                         "holder": {
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
-                            "replacement": null,
-                            "next_step": null
-                        }
-                    },
-                    {
-                        "source": "package",
-                        "package": "doctrine/dbal",
-                        "version": "3.10.5",
-                        "link": "require",
-                        "target": null,
-                        "constraint": "^1|^2",
-                        "holder": {
-                            "verdict": "ok",
-                            "lead": null,
-                            "flag_ids": [],
-                            "replacement": null,
-                            "next_step": null
-                        }
-                    },
-                    {
-                        "source": "package",
-                        "package": "doctrine/migrations",
-                        "version": "3.9.7",
-                        "link": "require",
-                        "target": null,
-                        "constraint": "^1.2 || ^2.0",
-                        "holder": {
-                            "verdict": "ok",
-                            "lead": null,
-                            "flag_ids": [],
-                            "replacement": null,
-                            "next_step": null
-                        }
-                    },
-                    {
-                        "source": "package",
-                        "package": "doctrine/orm",
-                        "version": "2.20.9",
-                        "link": "require",
-                        "target": null,
-                        "constraint": "^1.2 || ^2",
-                        "holder": {
-                            "verdict": "ok",
-                            "lead": null,
-                            "flag_ids": [],
-                            "replacement": null,
-                            "next_step": null
-                        }
-                    },
-                    {
-                        "source": "package",
-                        "package": "doctrine/persistence",
-                        "version": "3.4.3",
-                        "link": "require",
-                        "target": null,
-                        "constraint": "^1 || ^2",
-                        "holder": {
-                            "verdict": "ok",
-                            "lead": null,
-                            "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -6882,6 +6842,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -6912,16 +6873,26 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "doctrine/event-manager",
+                        "2.1.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [],
                 "also": [],
-                "text": "require doctrine/event-manager ^2.1 \u2014 clears left-behind; 2.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.2) and composer.json (requires dama/doctrine-test-bundle ^8.2.2) and composer.json (requires doctrine/dbal ^3.9.4) and composer.json (requires doctrine/migrations ^3.8.2) and composer.json (requires doctrine/orm ^2.20.2) and composer.json (requires doctrine/persistence ^3.4) and composer.json (requires symfony/doctrine-bridge ^5.4.48) and doctrine/dbal 3.10.5 (requires ^1|^2) and doctrine/migrations 3.9.7 (requires ^1.2 || ^2.0) and doctrine/orm 2.20.9 (requires ^1.2 || ^2) and doctrine/persistence 3.4.3 (requires ^1 || ^2) and symfony/doctrine-bridge v5.4.48 (requires ~1.0) and dama/doctrine-test-bundle v8.2.2 (requires doctrine/dbal ^3.3 || ^4.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require doctrine/event-manager ^2.1 \u2014 clears left-behind; 2.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.2) and symfony/doctrine-bridge v5.4.48 (requires ~1.0) and doctrine/doctrine-fixtures-bundle 3.7.1 (requires symfony/doctrine-bridge ^5.4.48 || ^6.4.16 || ^7.1.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -7225,7 +7196,7 @@
                         "package": null,
                         "version": null,
                         "link": "root-require",
-                        "target": "scheb/2fa-trusted-device",
+                        "target": "scheb/2fa-bundle",
                         "constraint": "^5.13.2",
                         "holder": null
                     },
@@ -7242,6 +7213,7 @@
                             "flag_ids": [
                                 "left-behind"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -7250,10 +7222,20 @@
                                 "check": {
                                     "result": "refused",
                                     "form": null,
-                                    "reason": null
+                                    "reason": null,
+                                    "installs": null
                                 }
                             }
                         }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-trusted-device",
+                        "version": "5.x-dev",
+                        "link": "require",
+                        "target": "scheb/2fa-bundle",
+                        "constraint": "self.version",
+                        "holder": null
                     }
                 ],
                 "clears": [
@@ -7281,16 +7263,26 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "lcobucci/jwt",
+                        "5.6.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [],
                 "also": [],
-                "text": "require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3) and composer.json (requires scheb/2fa-trusted-device ^5.13.2) and scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind) and scheb/2fa-trusted-device 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -7641,16 +7633,26 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-backup-code",
+                        "v7.14.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-backup-code ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-backup-code v7.14.0, its own release (requires scheb/2fa-bundle self.version); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require scheb/2fa-backup-code ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-backup-code v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -7984,42 +7986,6 @@
                         "package": null,
                         "version": null,
                         "link": "root-require",
-                        "target": "scheb/2fa-backup-code",
-                        "constraint": "^5.13.2",
-                        "holder": null
-                    },
-                    {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "scheb/2fa-email",
-                        "constraint": "^5.13.2",
-                        "holder": null
-                    },
-                    {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "scheb/2fa-google-authenticator",
-                        "constraint": "^5.13.2",
-                        "holder": null
-                    },
-                    {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "scheb/2fa-trusted-device",
-                        "constraint": "^5.13.2",
-                        "holder": null
-                    },
-                    {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
                         "target": "symfony/config",
                         "constraint": "^5.4.46",
                         "holder": null
@@ -8100,6 +8066,7 @@
                             "flag_ids": [
                                 "left-behind"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -8108,7 +8075,8 @@
                                 "check": {
                                     "result": "refused",
                                     "form": null,
-                                    "reason": null
+                                    "reason": null,
+                                    "installs": null
                                 }
                             }
                         }
@@ -8207,6 +8175,7 @@
                             "flag_ids": [
                                 "left-behind"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -8215,7 +8184,8 @@
                                 "check": {
                                     "result": "refused",
                                     "form": null,
-                                    "reason": null
+                                    "reason": null,
+                                    "installs": null
                                 }
                             }
                         }
@@ -8233,6 +8203,7 @@
                             "flag_ids": [
                                 "left-behind"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -8241,7 +8212,8 @@
                                 "check": {
                                     "result": "refused",
                                     "form": null,
-                                    "reason": null
+                                    "reason": null,
+                                    "installs": null
                                 }
                             }
                         }
@@ -8259,6 +8231,7 @@
                             "flag_ids": [
                                 "left-behind"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -8267,7 +8240,8 @@
                                 "check": {
                                     "result": "refused",
                                     "form": null,
-                                    "reason": null
+                                    "reason": null,
+                                    "installs": null
                                 }
                             }
                         }
@@ -8298,16 +8272,26 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-bundle",
+                        "v7.14.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-bundle ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-backup-code ^5.13.2) and composer.json (requires scheb/2fa-email ^5.13.2) and composer.json (requires scheb/2fa-google-authenticator ^5.13.2) and composer.json (requires scheb/2fa-trusted-device ^5.13.2) and composer.json (requires symfony/config ^5.4.46) and composer.json (requires symfony/dependency-injection ^5.4.48) and composer.json (requires symfony/event-dispatcher ^5.4.45) and composer.json (requires symfony/framework-bundle ^5.4.45) and composer.json (requires symfony/http-foundation ^5.4.48) and composer.json (requires symfony/http-kernel ^5.4.48) and composer.json (requires symfony/security-bundle ^5.4.45) and composer.json (requires symfony/twig-bundle ^5.4.45) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/config ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/dependency-injection ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/event-dispatcher ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/framework-bundle ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/http-foundation ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/http-kernel ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/property-access ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/security-bundle ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/twig-bundle ^6.4 || ^7.0) and scheb/2fa-backup-code v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-trusted-device v5.13.2 (requires self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require scheb/2fa-bundle ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires symfony/config ^5.4.46) and composer.json (requires symfony/dependency-injection ^5.4.48) and composer.json (requires symfony/event-dispatcher ^5.4.45) and composer.json (requires symfony/framework-bundle ^5.4.45) and composer.json (requires symfony/http-foundation ^5.4.48) and composer.json (requires symfony/http-kernel ^5.4.48) and composer.json (requires symfony/security-bundle ^5.4.45) and composer.json (requires symfony/twig-bundle ^5.4.45) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/config ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/dependency-injection ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/event-dispatcher ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/framework-bundle ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/http-foundation ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/http-kernel ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/property-access ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/security-bundle ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/twig-bundle ^6.4 || ^7.0) and scheb/2fa-backup-code v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-trusted-device v5.13.2 (requires self.version (v5.13.2); itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -8662,16 +8646,26 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-email",
+                        "v7.14.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-email ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-email v7.14.0, its own release (requires scheb/2fa-bundle self.version); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require scheb/2fa-email ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-email v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -9032,16 +9026,26 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-google-authenticator",
+                        "v7.14.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-google-authenticator ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v7.14.0, its own release (requires scheb/2fa-bundle self.version) and scheb/2fa-google-authenticator v7.14.0, its own release (requires spomky-labs/otphp ^11.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require scheb/2fa-google-authenticator ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)) and scheb/2fa-google-authenticator v7.14.0, its own release (requires spomky-labs/otphp ^11.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -9458,16 +9462,26 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-trusted-device",
+                        "v7.14.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-trusted-device ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires lcobucci/jwt ^4.3) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-trusted-device v7.14.0, its own release (requires lcobucci/jwt ^5.0) and scheb/2fa-trusted-device v7.14.0, its own release (requires scheb/2fa-bundle self.version); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require scheb/2fa-trusted-device ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires lcobucci/jwt ^4.3) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-trusted-device v7.14.0, its own release (requires lcobucci/jwt ^5.0) and scheb/2fa-trusted-device v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -9823,6 +9837,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -10154,8 +10169,10 @@
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v2.4.1"
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -10449,6 +10466,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -10916,6 +10934,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -11424,6 +11443,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -11438,11 +11458,13 @@
                             "released": "2026-01-23T08:45:07+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through stof/doctrine-extensions-bundle: replace or update that package"
+                "text": "find a replacement (none named); it comes in through stof/doctrine-extensions-bundle (gedmo/doctrine-extensions requires it): replace or update stof/doctrine-extensions-bundle"
             },
             "security": {
                 "status": "clear",
@@ -11741,6 +11763,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -11755,11 +11778,13 @@
                             "released": "2023-02-24T14:57:12+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through sensio/framework-extra-bundle: replace or update that package; the newest release of sensio/framework-extra-bundle (v6.2.10) still requires it"
+                "text": "find a replacement (none named); it comes in through sensio/framework-extra-bundle: replace sensio/framework-extra-bundle; the newest release of sensio/framework-extra-bundle (v6.2.10) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -12037,23 +12062,11 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "doctrine/doctrine-bundle",
-                        "3.3.2"
-                    ],
-                    [
-                        "composer",
-                        "why-not",
-                        "doctrine/orm",
-                        "3.7.1"
-                    ]
-                ],
+                "commands": [],
                 "through": [
                     {
                         "package": "craue/config-bundle",
@@ -12064,7 +12077,9 @@
                             "released": "2023-08-06T22:32:54+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "dama/doctrine-test-bundle",
@@ -12075,7 +12090,9 @@
                             "released": "2026-01-21T07:39:44+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/doctrine-bundle",
@@ -12086,7 +12103,9 @@
                             "released": "2026-09-09T11:58:04+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/doctrine-fixtures-bundle",
@@ -12097,7 +12116,9 @@
                             "released": "2025-12-03T16:05:42+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/doctrine-migrations-bundle",
@@ -12108,7 +12129,9 @@
                             "released": "2026-08-26T05:54:54+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/orm",
@@ -12119,7 +12142,9 @@
                             "released": "2026-09-14T05:45:59+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "pagerfanta/doctrine-orm-adapter",
@@ -12130,7 +12155,9 @@
                             "released": "2026-09-08T18:05:46+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "spiriitlabs/form-filter-bundle",
@@ -12141,11 +12168,13 @@
                             "released": "2026-09-07T08:52:12+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through craue/config-bundle, dama/doctrine-test-bundle, doctrine/doctrine-bundle and 5 more: replace or update them; the newest releases of doctrine/doctrine-bundle (3.3.2) and doctrine/orm (3.7.1) no longer require it"
+                "text": "find a replacement (none named); it comes in through craue/config-bundle, dama/doctrine-test-bundle, doctrine/doctrine-bundle and 5 more: replace craue/config-bundle, or replace or update dama/doctrine-test-bundle, doctrine/doctrine-bundle, doctrine/doctrine-fixtures-bundle and 4 more; the newest releases of doctrine/doctrine-bundle (3.3.2) and doctrine/orm (3.7.1) no longer require it"
             },
             "security": {
                 "status": "clear",
@@ -12444,6 +12473,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12455,7 +12485,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -12463,11 +12495,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -12784,6 +12818,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12795,7 +12830,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -12803,11 +12840,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/exception requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -13125,6 +13164,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -13136,7 +13176,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -13144,11 +13186,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/consistency requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -13465,6 +13509,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -13476,7 +13521,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -13484,11 +13531,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -13805,6 +13854,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -13816,7 +13866,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -13824,11 +13876,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -14146,6 +14200,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14157,7 +14212,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -14165,11 +14222,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -14487,6 +14546,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14498,7 +14558,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -14506,11 +14568,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -14827,6 +14891,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14838,7 +14903,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -14846,11 +14913,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -15168,6 +15237,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15179,7 +15249,9 @@
                         "installed_requires": true,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "no_stable_release"
+                        "newest_requires_unmeasured": "no_stable_release",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -15187,11 +15259,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -15507,6 +15581,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15518,7 +15593,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -15526,11 +15603,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/file requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -15848,6 +15927,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15859,7 +15939,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -15867,11 +15949,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/regex requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16190,6 +16274,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16201,7 +16286,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -16209,11 +16296,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16530,6 +16619,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16541,7 +16631,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -16549,11 +16641,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/math requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16870,17 +16964,11 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "symfony/security-bundle",
-                        "v8.1.6"
-                    ]
-                ],
+                "commands": [],
                 "through": [
                     {
                         "package": "friendsofsymfony/oauth-server-bundle",
@@ -16891,7 +16979,9 @@
                             "released": "2019-01-23T15:23:04+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "installed_unlisted"
+                        "newest_requires_unmeasured": "installed_unlisted",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/user-bundle",
@@ -16902,7 +16992,9 @@
                             "released": "2026-02-13T21:22:55+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-backup-code",
@@ -16913,7 +17005,9 @@
                             "released": "2026-01-24T13:26:10+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-bundle",
@@ -16924,7 +17018,9 @@
                             "released": "2026-07-10T18:29:30+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-email",
@@ -16935,7 +17031,9 @@
                             "released": "2026-06-02T20:21:59+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-google-authenticator",
@@ -16946,7 +17044,9 @@
                             "released": "2026-01-24T13:27:55+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-trusted-device",
@@ -16957,7 +17057,9 @@
                             "released": "2026-01-24T13:26:10+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/security-bundle",
@@ -16968,11 +17070,13 @@
                             "released": "2026-08-30T17:31:45+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more: replace or update them; the newest release of symfony/security-bundle (v8.1.6) no longer requires it"
+                "text": "find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more: replace or update friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more; the newest release of symfony/security-bundle (v8.1.6) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -17278,8 +17382,10 @@
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "3.0.57"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -17298,7 +17404,9 @@
                             "released": "2025-11-23T17:00:56+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "php-amqplib/rabbitmq-bundle",
@@ -17309,7 +17417,9 @@
                             "released": "2026-01-16T12:34:27+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -17360,7 +17470,8 @@
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "3.0.57"
                     }
                 },
                 "move_in": "next_step",
@@ -17650,6 +17761,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -17930,6 +18042,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -18187,6 +18300,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -18467,6 +18581,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -18819,17 +18934,11 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "phpunit/phpunit",
-                        "13.4.1"
-                    ]
-                ],
+                "commands": [],
                 "through": [
                     {
                         "package": "phpunit/phpunit",
@@ -18840,11 +18949,13 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through phpunit/phpunit: replace or update that package; the newest release of phpunit/phpunit (13.4.1) no longer requires it"
+                "text": "find a replacement (none named); it comes in through phpunit/phpunit: replace or update phpunit/phpunit; the newest release of phpunit/phpunit (13.4.1) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -19111,15 +19222,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "j0k3r/graby",
-                        "constraint": "^2.4.6",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "j0k3r/graby",
                         "version": "2.5.2",
@@ -19130,6 +19232,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -19160,13 +19263,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "smalot/pdfparser",
+                        "v2.12.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "j0k3r/graby",
@@ -19177,11 +19290,13 @@
                             "released": "2026-09-14T14:05:34+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move smalot/pdfparser to ^2.12 through j0k3r/graby \u2014 clears left-behind; 2.x needs php >=7.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires j0k3r/graby ^2.4.6) and j0k3r/graby 2.5.2 (requires ^1.1); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move smalot/pdfparser to ^2.12 through j0k3r/graby \u2014 clears left-behind; 2.x needs php >=7.1, which require.php allows; the target php 8.4 runs it; held by j0k3r/graby 2.5.2 (requires ^1.1); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -19457,17 +19572,17 @@
                         "package": null,
                         "version": null,
                         "link": "root-require",
-                        "target": "sentry/sentry-symfony",
-                        "constraint": "^5.2.0",
+                        "target": "symfony/http-foundation",
+                        "constraint": "^5.4.48",
                         "holder": null
                     },
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "symfony/http-foundation",
-                        "constraint": "^5.4.48",
+                        "source": "package",
+                        "package": "sentry/sentry-symfony",
+                        "version": "5.6.0",
+                        "link": "require",
+                        "target": null,
+                        "constraint": "^1.2||^2.0||^6.4||^7.0",
                         "holder": null
                     },
                     {
@@ -19481,9 +19596,19 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
+                    },
+                    {
+                        "source": "package",
+                        "package": "sentry/sentry-symfony",
+                        "version": "5.13.0",
+                        "link": "require",
+                        "target": "sentry/sentry",
+                        "constraint": "^4.31.0",
+                        "holder": null
                     },
                     {
                         "source": "package",
@@ -19520,13 +19645,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/psr-http-message-bridge",
+                        "v7.4.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "sentry/sentry-symfony",
@@ -19537,11 +19672,13 @@
                             "released": "2026-08-28T10:41:44+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move symfony/psr-http-message-bridge to ^7.4 through sentry/sentry-symfony \u2014 clears left-behind; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires sentry/sentry-symfony ^5.2.0) and composer.json (requires symfony/http-foundation ^5.4.48) and symfony/psr-http-message-bridge v7.4.8, its own release (requires symfony/http-foundation ^6.4|^7.0|^8.0) and sentry/sentry-symfony 5.12.0 (requires ^1.2||^2.0||^6.4||^7.0||^8.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move symfony/psr-http-message-bridge to ^7.4 through sentry/sentry-symfony \u2014 clears left-behind; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires symfony/http-foundation ^5.4.48) and symfony/psr-http-message-bridge v7.4.8, its own release (requires symfony/http-foundation ^6.4|^7.0|^8.0) and sentry/sentry-symfony 5.6.0 (requires ^1.2||^2.0||^6.4||^7.0) and sentry/sentry-symfony 5.12.0 (requires ^1.2||^2.0||^6.4||^7.0||^8.0) and sentry/sentry-symfony 5.13.0 (requires sentry/sentry ^4.31.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -19817,8 +19954,17 @@
                         "package": null,
                         "version": null,
                         "link": "root-require",
-                        "target": "scheb/2fa-google-authenticator",
+                        "target": "scheb/2fa-bundle",
                         "constraint": "^5.13.2",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-google-authenticator",
+                        "version": "5.x-dev",
+                        "link": "require",
+                        "target": "scheb/2fa-bundle",
+                        "constraint": "self.version",
                         "holder": null
                     },
                     {
@@ -19834,6 +19980,7 @@
                             "flag_ids": [
                                 "left-behind"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -19842,7 +19989,8 @@
                                 "check": {
                                     "result": "refused",
                                     "form": null,
-                                    "reason": null
+                                    "reason": null,
+                                    "installs": null
                                 }
                             }
                         }
@@ -19861,6 +20009,7 @@
                                 "left-behind",
                                 "vulnerable"
                             ],
+                            "direct": false,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -19869,7 +20018,8 @@
                                 "check": {
                                     "result": "refused",
                                     "form": null,
-                                    "reason": null
+                                    "reason": null,
+                                    "installs": null
                                 }
                             }
                         }
@@ -19900,13 +20050,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "thecodingmachine/safe",
+                        "v3.4.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "scheb/2fa-google-authenticator",
@@ -19917,11 +20077,13 @@
                             "released": "2026-01-24T13:27:55+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-google-authenticator ^5.13.2) and spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2) and spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -20217,6 +20379,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -20226,7 +20389,9 @@
                         "installed_requires": true,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "no_stable_release"
+                        "newest_requires_unmeasured": "no_stable_release",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
@@ -20554,15 +20719,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "phpunit/phpunit",
-                        "constraint": "^9.6.22",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
@@ -20573,6 +20729,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -20608,13 +20765,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "phpunit/php-invoker",
+                        "5.0.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "phpunit/phpunit",
@@ -20625,11 +20792,13 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move phpunit/php-invoker to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/phpunit 9.6.33 (requires ^3.1.1); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move phpunit/php-invoker to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/phpunit 9.6.33 (requires ^3.1.1); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -20992,15 +21161,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "phpunit/phpunit",
-                        "constraint": "^9.6.22",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.32",
@@ -21011,6 +21171,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": false,
                             "replacement": null,
                             "next_step": null
                         }
@@ -21026,6 +21187,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -21061,13 +21223,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "phpunit/php-text-template",
+                        "4.0.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "phpunit/phpunit",
@@ -21078,11 +21250,13 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move phpunit/php-text-template to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/php-code-coverage 9.2.32 (requires ^2.0.4) and phpunit/phpunit 9.6.33 (requires ^2.0.4); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move phpunit/php-text-template to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^2.0.4) and phpunit/phpunit 9.6.33 (requires ^2.0.4); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -21445,15 +21619,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "phpunit/phpunit",
-                        "constraint": "^9.6.22",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
@@ -21464,6 +21629,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -21499,13 +21665,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "phpunit/php-timer",
+                        "7.0.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "phpunit/phpunit",
@@ -21516,11 +21692,13 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move phpunit/php-timer to ^7.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/phpunit 9.6.33 (requires ^5.0.3); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move phpunit/php-timer to ^7.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/phpunit 9.6.33 (requires ^5.0.3); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -21883,15 +22061,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "phpunit/phpunit",
-                        "constraint": "^9.6.22",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
@@ -21902,6 +22071,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -21937,8 +22107,10 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -21947,8 +22119,9 @@
                     [
                         "composer",
                         "why-not",
-                        "phpunit/phpunit",
-                        "13.4.1"
+                        "sebastian/code-unit",
+                        "3.0.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -21961,11 +22134,13 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/code-unit to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/phpunit 9.6.33 (requires ^1.0.8); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move sebastian/code-unit to ^3.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 3.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/phpunit 9.6.33 (requires ^1.0.8); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -22328,15 +22503,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "phpunit/phpunit",
-                        "constraint": "^9.6.22",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.32",
@@ -22347,6 +22513,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": false,
                             "replacement": null,
                             "next_step": null
                         }
@@ -22354,17 +22521,20 @@
                     {
                         "source": "package",
                         "package": "phpunit/phpunit",
-                        "version": "9.6.33",
+                        "version": "9.6.35",
                         "link": "require",
                         "target": "phpunit/php-code-coverage",
                         "constraint": "^9.2.32",
-                        "holder": {
-                            "verdict": "ok",
-                            "lead": null,
-                            "flag_ids": [],
-                            "replacement": null,
-                            "next_step": null
-                        }
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "phpunit/phpunit",
+                        "version": "9.6.38",
+                        "link": "require",
+                        "target": "sebastian/exporter",
+                        "constraint": "^4.0.9",
+                        "holder": null
                     }
                 ],
                 "clears": [
@@ -22397,13 +22567,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "sebastian/code-unit-reverse-lookup",
+                        "4.0.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "phpunit/phpunit",
@@ -22414,11 +22594,13 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/code-unit-reverse-lookup to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/php-code-coverage 9.2.32 (requires ^2.0.3) and phpunit/phpunit 9.6.33 (requires phpunit/php-code-coverage ^9.2.32); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move sebastian/code-unit-reverse-lookup to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^2.0.3) and phpunit/phpunit 9.6.35 (requires phpunit/php-code-coverage ^9.2.32) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -22782,15 +22964,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "phpunit/phpunit",
-                        "constraint": "^9.6.22",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
@@ -22801,9 +22974,19 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
+                    },
+                    {
+                        "source": "package",
+                        "package": "phpunit/phpunit",
+                        "version": "9.6.38",
+                        "link": "require",
+                        "target": "sebastian/exporter",
+                        "constraint": "^4.0.9",
+                        "holder": null
                     },
                     {
                         "source": "package",
@@ -22854,13 +23037,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "sebastian/object-enumerator",
+                        "6.0.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "phpunit/phpunit",
@@ -22871,11 +23064,13 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/object-enumerator to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and sebastian/object-enumerator 6.0.0, its own release (requires sebastian/object-reflector ^4.0) and sebastian/object-enumerator 6.0.0, its own release (requires sebastian/recursion-context ^6.0) and phpunit/phpunit 9.6.33 (requires ^4.0.4); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move sebastian/object-enumerator to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 6.0.0, its own release (requires sebastian/object-reflector ^4.0) and sebastian/object-enumerator 6.0.0, its own release (requires sebastian/recursion-context ^6.0) and phpunit/phpunit 9.6.33 (requires ^4.0.4) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -23238,28 +23433,22 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "phpunit/phpunit",
-                        "constraint": "^9.6.22",
+                        "source": "package",
+                        "package": "phpunit/phpunit",
+                        "version": "9.6.38",
+                        "link": "require",
+                        "target": "sebastian/exporter",
+                        "constraint": "^4.0.9",
                         "holder": null
                     },
                     {
                         "source": "package",
                         "package": "phpunit/phpunit",
-                        "version": "9.6.33",
+                        "version": "9.6.35",
                         "link": "require",
                         "target": "sebastian/global-state",
                         "constraint": "^5.0.8",
-                        "holder": {
-                            "verdict": "ok",
-                            "lead": null,
-                            "flag_ids": [],
-                            "replacement": null,
-                            "next_step": null
-                        }
+                        "holder": null
                     },
                     {
                         "source": "package",
@@ -23272,6 +23461,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": false,
                             "replacement": null,
                             "next_step": null
                         }
@@ -23290,6 +23480,7 @@
                                 "left-behind",
                                 "old-promise"
                             ],
+                            "direct": false,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -23298,7 +23489,8 @@
                                 "check": {
                                     "result": "refused",
                                     "form": null,
-                                    "reason": null
+                                    "reason": null,
+                                    "installs": null
                                 }
                             }
                         }
@@ -23334,13 +23526,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "sebastian/object-reflector",
+                        "4.0.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "phpunit/phpunit",
@@ -23351,11 +23553,13 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/object-reflector to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind) and sebastian/global-state 5.0.8 (requires ^2.0) and phpunit/phpunit 9.6.33 (requires sebastian/global-state ^5.0.8); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move sebastian/object-reflector to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind) and sebastian/global-state 5.0.8 (requires ^2.0) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9) and phpunit/phpunit 9.6.35 (requires sebastian/global-state ^5.0.8); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -23719,15 +23923,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "phpunit/phpunit",
-                        "constraint": "^9.6.22",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.32",
@@ -23738,6 +23933,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": false,
                             "replacement": null,
                             "next_step": null
                         }
@@ -23753,9 +23949,19 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
+                    },
+                    {
+                        "source": "package",
+                        "package": "phpunit/phpunit",
+                        "version": "9.6.38",
+                        "link": "require",
+                        "target": "sebastian/exporter",
+                        "constraint": "^4.0.9",
+                        "holder": null
                     }
                 ],
                 "clears": [
@@ -23788,13 +23994,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "sebastian/version",
+                        "5.0.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "phpunit/phpunit",
@@ -23805,11 +24021,13 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/version to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/php-code-coverage 9.2.32 (requires ^3.0.2) and phpunit/phpunit 9.6.33 (requires ^3.0.2); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move sebastian/version to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^3.0.2) and phpunit/phpunit 9.6.33 (requires ^3.0.2) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -24120,6 +24338,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -24398,6 +24617,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -24410,7 +24630,9 @@
                             "released": "2019-01-23T15:23:04+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "installed_unlisted"
+                        "newest_requires_unmeasured": "installed_unlisted",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -24705,8 +24927,10 @@
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "3.6.0"
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -24721,12 +24945,6 @@
                         "composer",
                         "update",
                         "lcobucci/clock:^3.6.0"
-                    ],
-                    [
-                        "composer",
-                        "why-not",
-                        "lcobucci/jwt",
-                        "5.6.0"
                     ]
                 ],
                 "through": [
@@ -24739,7 +24957,9 @@
                             "released": "2025-10-17T11:30:53+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-trusted-device",
@@ -24750,7 +24970,9 @@
                             "released": "2026-01-24T13:26:10+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -25021,6 +25243,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -25033,7 +25256,9 @@
                             "released": "2026-09-14T11:12:11+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -25313,15 +25538,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "phpunit/phpunit",
-                        "constraint": "^9.6.22",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.32",
@@ -25332,6 +25548,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": false,
                             "replacement": null,
                             "next_step": null
                         }
@@ -25347,6 +25564,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -25377,13 +25595,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "phpunit/php-file-iterator",
+                        "5.1.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "phpunit/phpunit",
@@ -25394,11 +25622,13 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move phpunit/php-file-iterator to ^5.1 through phpunit/phpunit \u2014 clears left-behind; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/php-code-coverage 9.2.32 (requires ^3.0.6) and phpunit/phpunit 9.6.33 (requires ^3.0.6); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move phpunit/php-file-iterator to ^5.1 through phpunit/phpunit \u2014 clears left-behind; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^3.0.6) and phpunit/phpunit 9.6.33 (requires ^3.0.6); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -25677,15 +25907,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "phpunit/phpunit",
-                        "constraint": "^9.6.22",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "phpunit/php-code-coverage",
                         "version": "9.2.32",
@@ -25696,6 +25917,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": false,
                             "replacement": null,
                             "next_step": null
                         }
@@ -25711,6 +25933,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -25741,13 +25964,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "sebastian/environment",
+                        "7.2.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "phpunit/phpunit",
@@ -25758,11 +25991,13 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/environment to ^7.2 through phpunit/phpunit \u2014 clears left-behind; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/php-code-coverage 9.2.32 (requires ^5.1.5) and phpunit/phpunit 9.6.33 (requires ^5.1.5); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move sebastian/environment to ^7.2 through phpunit/phpunit \u2014 clears left-behind; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^5.1.5) and phpunit/phpunit 9.6.33 (requires ^5.1.5); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -26041,15 +26276,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "phpunit/phpunit",
-                        "constraint": "^9.6.22",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "phpunit/phpunit",
                         "version": "9.6.33",
@@ -26060,9 +26286,19 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
+                    },
+                    {
+                        "source": "package",
+                        "package": "phpunit/phpunit",
+                        "version": "9.6.38",
+                        "link": "require",
+                        "target": "sebastian/exporter",
+                        "constraint": "^4.0.9",
+                        "holder": null
                     }
                 ],
                 "clears": [
@@ -26090,13 +26326,23 @@
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "sebastian/type",
+                        "5.1.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "phpunit/phpunit",
@@ -26107,11 +26353,13 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/type to ^5.1 through phpunit/phpunit \u2014 clears left-behind; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires phpunit/phpunit ^9.6.22) and phpunit/phpunit 9.6.33 (requires ^3.2.1); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move sebastian/type to ^5.1 through phpunit/phpunit \u2014 clears left-behind; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/phpunit 9.6.33 (requires ^3.2.1) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -26391,6 +26639,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -26403,7 +26652,9 @@
                             "released": "2025-11-04T21:03:25+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "friendsofsymfony/rest-bundle",
@@ -26414,7 +26665,9 @@
                             "released": "2026-02-10T02:36:12+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
@@ -26711,6 +26964,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -26723,7 +26977,9 @@
                             "released": "2026-02-10T02:36:12+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
@@ -27007,6 +27263,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -27019,7 +27276,9 @@
                             "released": "2026-09-22T09:54:55+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -27290,6 +27549,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -27302,7 +27562,9 @@
                             "released": "2026-09-22T09:54:55+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -27574,6 +27836,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -27586,7 +27849,9 @@
                             "released": "2026-10-05T05:51:21+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -27857,6 +28122,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -27869,7 +28135,9 @@
                             "released": "2026-09-22T09:54:55+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],

@@ -191,8 +191,10 @@
    "check": {
     "result": "resolves",
     "form": "inline",
-    "reason": null
+    "reason": null,
+    "installs": null
    },
+   "moves_with": [],
    "composer_moves_because": [
     "crosses_major",
     "transitive"
@@ -214,7 +216,9 @@
       "released": "2026-03-17T20:54:53+00:00"
      },
      "newest_requires": true,
-     "newest_requires_unmeasured": null
+     "newest_requires_unmeasured": null,
+     "local": false,
+     "newest_is_installed": false
     }
    ],
    "also": [],

@@ -1280,15 +1280,9 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "guzzlehttp/guzzle",
-                        "8.2.0"
-                    ]
-                ],
+                "commands": [],
                 "through": [
                     {
                         "package": "guzzlehttp/guzzle",
@@ -1299,7 +1293,9 @@
                             "released": "2026-09-06T13:55:09+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],

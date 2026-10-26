@@ -1319,12 +1319,20 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
       "composer",
       "update",
       "ezyang/htmlpurifier"
+     ],
+     [
+      "composer",
+      "why-not",
+      "ezyang/htmlpurifier",
+      "v4.19.1",
+      "--locked"
      ]
     ],
     "through": [
@@ -1334,7 +1342,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "not_from_composer_repository"
+      "newest_requires_unmeasured": "not_from_composer_repository",
+      "local": true,
+      "newest_is_installed": null
      }
     ],
     "also": [],

@@ -577,6 +577,8 @@ def _(d): d['findings'][0]['next_step']['if_applied']['total'] = 1
 def _(d): d['findings'][0]['next_step']['through'][0]['newest_requires'] = None
 @case('relation-throughentry-1', 'rounded-dev-dagger', 'findings[0].next_step.through[0].installed_requires')
 def _(d): d['findings'][0]['next_step']['through'][0]['installed_requires'] = False
+@case('relation-throughentry-2', 'rounded-dev-dagger', 'findings[0].next_step.through[0].newest_is_installed')
+def _(d): d['findings'][0]['next_step']['through'][0]['newest_is_installed'] = None
 @case('relation-move-1', 'C-baselined-dagger', 'findings[0].next_step.replacement')
 def _(d): d['findings'][0]['next_step']['replacement'] = None
 @case('relation-move-2', 'stale-only', 'findings[0].next_step.constraint')

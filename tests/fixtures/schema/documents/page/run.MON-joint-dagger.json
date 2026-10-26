@@ -1,0 +1,8373 @@
+{
+ "$schema": "https://lockrot.dev/schema/report-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-10-01T17:39:09+00:00",
+ "run": {
+  "project": "djaiss/monica",
+  "root_package": "djaiss/monica",
+  "target_php": "8.4",
+  "target_php_source": "option",
+  "project_php": "^8.3",
+  "project_php_lowest": "8.3.0",
+  "lock_file": "composer.lock",
+  "fail_on": "high",
+  "fail_on_source": "option",
+  "gates": [
+   {
+    "value": "high",
+    "kind": "grade",
+    "threshold": "high"
+   }
+  ],
+  "strict_network": false,
+  "mode": "check",
+  "include_dev": false,
+  "thresholds": {
+   "release-warn-years": 3,
+   "release-high-years": 5,
+   "push-warn-years": 3,
+   "push-high-years": 5
+  },
+  "flag_ids": [
+   "abandoned",
+   "silent",
+   "pinned",
+   "left-behind",
+   "old-promise",
+   "stale",
+   "capped",
+   "vulnerable"
+  ],
+  "verdicts": [
+   "critical",
+   "high",
+   "medium",
+   "low",
+   "unknown",
+   "finished",
+   "ok"
+  ],
+  "graded_verdicts": [
+   "critical",
+   "high",
+   "medium",
+   "low"
+  ],
+  "signal_ids": [
+   "S1",
+   "S2",
+   "S3",
+   "S4",
+   "S5",
+   "S6",
+   "S7",
+   "S8",
+   "S9",
+   "S10",
+   "S11"
+  ],
+  "fix_model": 1,
+  "text_grammar": 1,
+  "score_model": {
+   "id": 1,
+   "score_text_grammar": 1,
+   "flag_order": [
+    "abandoned",
+    "silent",
+    "pinned",
+    "left-behind",
+    "old-promise",
+    "stale",
+    "capped",
+    "vulnerable"
+   ],
+   "parts": [
+    {
+     "id": "maintenance",
+     "flag_ids": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "capped"
+     ],
+     "combine": "lead_plus_share"
+    },
+    {
+     "id": "security",
+     "flag_ids": [
+      "vulnerable"
+     ],
+     "combine": "max"
+    }
+   ],
+   "flags": [
+    {
+     "id": "abandoned",
+     "part": "maintenance",
+     "points": 32,
+     "band": "critical",
+     "can_corroborate": false,
+     "corroborating_points": null,
+     "max_maintenance": 40,
+     "max_maintenance_flags": [
+      "abandoned",
+      "left-behind",
+      "old-promise"
+     ],
+     "raised_by": [
+      "S1",
+      "S3"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": "critical",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "silent",
+     "part": "maintenance",
+     "points": 32,
+     "band": "critical",
+     "can_corroborate": false,
+     "corroborating_points": null,
+     "max_maintenance": 40,
+     "max_maintenance_flags": [
+      "silent",
+      "pinned",
+      "old-promise"
+     ],
+     "raised_by": [
+      "S2",
+      "S4"
+     ],
+     "thresholds": [
+      "release-high-years",
+      "push-high-years"
+     ],
+     "basis": {
+      "v013_base": "critical",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "pinned",
+     "part": "maintenance",
+     "points": 16,
+     "band": "high",
+     "can_corroborate": true,
+     "corroborating_points": 4,
+     "max_maintenance": 22,
+     "max_maintenance_flags": [
+      "pinned",
+      "old-promise",
+      "stale"
+     ],
+     "raised_by": [
+      "S6"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": "high",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "left-behind",
+     "part": "maintenance",
+     "points": 16,
+     "band": "high",
+     "can_corroborate": true,
+     "corroborating_points": 4,
+     "max_maintenance": 20,
+     "max_maintenance_flags": [
+      "left-behind",
+      "old-promise"
+     ],
+     "raised_by": [
+      "S8"
+     ],
+     "thresholds": [
+      "release-warn-years"
+     ],
+     "basis": {
+      "v013_base": "high",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "old-promise",
+     "part": "maintenance",
+     "points": 16,
+     "band": "high",
+     "can_corroborate": true,
+     "corroborating_points": 4,
+     "max_maintenance": 18,
+     "max_maintenance_flags": [
+      "old-promise",
+      "stale"
+     ],
+     "raised_by": [
+      "S5"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": "high",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "stale",
+     "part": "maintenance",
+     "points": 8,
+     "band": "medium",
+     "can_corroborate": true,
+     "corroborating_points": 2,
+     "max_maintenance": 10,
+     "max_maintenance_flags": [
+      "stale",
+      "capped"
+     ],
+     "raised_by": [
+      "S2",
+      "S4"
+     ],
+     "thresholds": [
+      "release-warn-years",
+      "push-warn-years"
+     ],
+     "basis": {
+      "v013_base": "medium",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "capped",
+     "part": "maintenance",
+     "points": 8,
+     "band": "medium",
+     "can_corroborate": true,
+     "corroborating_points": 2,
+     "max_maintenance": 8,
+     "max_maintenance_flags": [
+      "capped"
+     ],
+     "raised_by": [
+      "S11"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": null,
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "vulnerable",
+     "part": "security",
+     "points": null,
+     "band": null,
+     "can_corroborate": false,
+     "corroborating_points": null,
+     "max_maintenance": null,
+     "max_maintenance_flags": null,
+     "raised_by": [
+      "S9"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": null,
+      "points": "severities"
+     },
+     "points_from": "severities"
+    }
+   ],
+   "severities": [
+    {
+     "id": "critical",
+     "points": 32,
+     "band": "critical",
+     "points_no_reachable_fix": 64,
+     "band_no_reachable_fix": "critical",
+     "gate_rank": 4,
+     "counts_as": null,
+     "basis": {
+      "points": "band_floor"
+     }
+    },
+    {
+     "id": "high",
+     "points": 16,
+     "band": "high",
+     "points_no_reachable_fix": 32,
+     "band_no_reachable_fix": "critical",
+     "gate_rank": 3,
+     "counts_as": null,
+     "basis": {
+      "points": "band_floor"
+     }
+    },
+    {
+     "id": "medium",
+     "points": 8,
+     "band": "medium",
+     "points_no_reachable_fix": 16,
+     "band_no_reachable_fix": "high",
+     "gate_rank": 2,
+     "counts_as": null,
+     "basis": {
+      "points": "band_floor"
+     }
+    },
+    {
+     "id": "unrated",
+     "points": 8,
+     "band": "medium",
+     "points_no_reachable_fix": 16,
+     "band_no_reachable_fix": "high",
+     "gate_rank": 2,
+     "counts_as": "medium",
+     "basis": {
+      "points": "counts_as"
+     }
+    },
+    {
+     "id": "low",
+     "points": 2,
+     "band": "low",
+     "points_no_reachable_fix": 4,
+     "band_no_reachable_fix": "low",
+     "gate_rank": 1,
+     "counts_as": null,
+     "basis": {
+      "points": "share",
+      "of": "medium",
+      "share": {
+       "num": 1,
+       "den": 4
+      }
+     }
+    }
+   ],
+   "fix_kinds": [
+    {
+     "id": "update",
+     "ease": 1,
+     "doubles": false
+    },
+    {
+     "id": "upgrade",
+     "ease": 2,
+     "doubles": false
+    },
+    {
+     "id": "raise-php",
+     "ease": 3,
+     "doubles": false
+    },
+    {
+     "id": "unknown",
+     "ease": 4,
+     "doubles": false
+    },
+    {
+     "id": "blocked",
+     "ease": 5,
+     "doubles": true
+    },
+    {
+     "id": "none",
+     "ease": 6,
+     "doubles": true
+    }
+   ],
+   "bands": [
+    {
+     "verdict": "critical",
+     "floor": 32
+    },
+    {
+     "verdict": "high",
+     "floor": 16
+    },
+    {
+     "verdict": "medium",
+     "floor": 8
+    },
+    {
+     "verdict": "low",
+     "floor": 1
+    }
+   ],
+   "zero_verdicts": [
+    {
+     "verdict": "finished",
+     "when": "allowlisted"
+    },
+    {
+     "verdict": "unknown",
+     "when": "no_metadata"
+    },
+    {
+     "verdict": "ok",
+     "when": "otherwise"
+    }
+   ],
+   "exact_unit": 0.5,
+   "rounding": "floor_once",
+   "max_total": 104,
+   "bar_max": 64,
+   "bar_overflow": "clip",
+   "exclusive_groups": [
+    {
+     "id": "liveness",
+     "flag_ids": [
+      "abandoned",
+      "silent",
+      "stale"
+     ],
+     "holds_unless": null
+    },
+    {
+     "id": "branch",
+     "flag_ids": [
+      "pinned",
+      "left-behind"
+     ],
+     "holds_unless": null
+    },
+    {
+     "id": "release_age",
+     "flag_ids": [
+      "silent",
+      "left-behind"
+     ],
+     "holds_unless": null
+    },
+    {
+     "id": "release_push",
+     "flag_ids": [
+      "left-behind",
+      "stale"
+     ],
+     "holds_unless": {
+      "threshold": "push-warn-years",
+      "below": "release-warn-years"
+     }
+    },
+    {
+     "id": "php_bound",
+     "flag_ids": [
+      "old-promise",
+      "capped"
+     ],
+     "holds_unless": null
+    }
+   ],
+   "sort": [
+    {
+     "key": "verdict",
+     "path": "verdict",
+     "dir": "order",
+     "order": [
+      [
+       "critical"
+      ],
+      [
+       "high"
+      ],
+      [
+       "medium"
+      ],
+      [
+       "low"
+      ],
+      [
+       "unknown"
+      ],
+      [
+       "finished",
+       "ok"
+      ]
+     ],
+     "default": null,
+     "collation": null
+    },
+    {
+     "key": "security",
+     "path": "score.parts.security.contribution",
+     "dir": "desc",
+     "default": 0,
+     "collation": null
+    },
+    {
+     "key": "score",
+     "path": "score.exact",
+     "dir": "desc",
+     "default": 0,
+     "collation": null
+    },
+    {
+     "key": "direct",
+     "path": "direct",
+     "dir": "true_first",
+     "default": null,
+     "collation": null
+    },
+    {
+     "key": "package",
+     "path": "package",
+     "dir": "asc",
+     "collation": "bytes",
+     "default": null
+    }
+   ],
+   "rules": [
+    {
+     "id": "counted",
+     "stage": 1,
+     "kind": "select",
+     "applies_to": "flags",
+     "accept_group": "liveness",
+     "accept_covers": "listed_and_below",
+     "why": "accepted-facts-shown-not-counted",
+     "doc": "score-counted",
+     "illustration": null
+    },
+    {
+     "id": "lead-first",
+     "stage": 2,
+     "kind": "select",
+     "applies_to": "maintenance",
+     "order": "flag_order",
+     "share": {
+      "num": 1,
+      "den": 1
+     },
+     "why": "strongest-fact-in-full",
+     "doc": "score-lead-first",
+     "illustration": null
+    },
+    {
+     "id": "corroborating-share",
+     "stage": 3,
+     "kind": "share",
+     "applies_to": "maintenance",
+     "share": {
+      "num": 1,
+      "den": 4
+     },
+     "why": "correlated-evidence",
+     "doc": "score-corroborating-share",
+     "illustration": {
+      "lead": "left-behind",
+      "flag": "old-promise",
+      "weight": 16,
+      "points": 4
+     }
+    },
+    {
+     "id": "advisory-points",
+     "stage": 4,
+     "kind": "lookup",
+     "applies_to": "security",
+     "table": "severities",
+     "why": "severity-points",
+     "doc": "score-advisory-points",
+     "illustration": null
+    },
+    {
+     "id": "no-reachable-fix-multiplier",
+     "stage": 5,
+     "kind": "multiply",
+     "applies_to": "advisory",
+     "factor": 2,
+     "when_fix": [
+      "none",
+      "blocked"
+     ],
+     "why": "one-band-up",
+     "doc": "score-no-reachable-fix-multiplier",
+     "illustration": {
+      "severity": "high",
+      "before": 16,
+      "after": 32,
+      "band_before": "high",
+      "band_after": "critical"
+     }
+    },
+    {
+     "id": "security-max",
+     "stage": 6,
+     "kind": "max",
+     "applies_to": "security",
+     "tie_break": [
+      {
+       "key": "points",
+       "dir": "desc",
+       "collation": null
+      },
+      {
+       "key": "severity",
+       "dir": "order",
+       "collation": null
+      },
+      {
+       "key": "id",
+       "dir": "asc",
+       "collation": "bytes"
+      }
+     ],
+     "why": "one-number-per-part",
+     "doc": "score-security-max",
+     "illustration": null
+    },
+    {
+     "id": "divide-reach",
+     "stage": 7,
+     "kind": "divide",
+     "applies_to": "maintenance",
+     "by": 2,
+     "when": [
+      "transitive",
+      "unreached"
+     ],
+     "why": "reach-halves-maintenance",
+     "doc": "score-divide-reach",
+     "illustration": {
+      "flag": "abandoned",
+      "before": 32,
+      "after": 16,
+      "band_before": "critical",
+      "band_after": "high"
+     }
+    },
+    {
+     "id": "security-exempt-from-reach",
+     "stage": 8,
+     "kind": "exempt",
+     "applies_to": "security",
+     "of": "divide-reach",
+     "why": "exploitability-independent-of-reach",
+     "doc": "score-security-exempt-from-reach",
+     "illustration": {
+      "severity": "critical",
+      "reach": "transitive",
+      "total": 32
+     }
+    },
+    {
+     "id": "sum",
+     "stage": 9,
+     "kind": "combine",
+     "applies_to": "total",
+     "op": "sum",
+     "ratio_from": "medium",
+     "why": "parts-add",
+     "doc": "score-sum",
+     "illustration": {
+      "maintenance": 16,
+      "security": 16,
+      "total": 32,
+      "band": "critical",
+      "low_maintenance": 4,
+      "low_security": 4,
+      "low_total": 8,
+      "low_band": "medium"
+     }
+    },
+    {
+     "id": "divide-dev",
+     "stage": 10,
+     "kind": "divide",
+     "applies_to": "total",
+     "by": 2,
+     "when": [
+      "dev"
+     ],
+     "why": "dev-halves-total",
+     "doc": "score-divide-dev",
+     "illustration": {
+      "before": 32,
+      "after": 16,
+      "band_before": "critical",
+      "band_after": "high"
+     }
+    },
+    {
+     "id": "floor-once",
+     "stage": 11,
+     "kind": "floor",
+     "applies_to": "total",
+     "why": "integer-band-edges",
+     "doc": "score-floor-once",
+     "illustration": {
+      "exact": 4.5,
+      "total": 4
+     }
+    },
+    {
+     "id": "band-floors",
+     "stage": 12,
+     "kind": "band",
+     "applies_to": "total",
+     "ratio": 2,
+     "ratio_from": "medium",
+     "why": "two-floor-parts-make-next",
+     "doc": "score-band-floors",
+     "illustration": null
+    },
+    {
+     "id": "zero-verdicts",
+     "stage": 13,
+     "kind": "zero",
+     "applies_to": "total",
+     "table": "zero_verdicts",
+     "why": "score-zero-says-why",
+     "doc": "score-zero-verdicts",
+     "illustration": null
+    },
+    {
+     "id": "sort",
+     "stage": 14,
+     "kind": "order",
+     "applies_to": "findings",
+     "why": "advisory-findings-first",
+     "doc": "score-sort",
+     "illustration": null
+    },
+    {
+     "id": "gate-bounded-new",
+     "stage": 15,
+     "kind": "gate",
+     "applies_to": "gate",
+     "cap_multiplier": 2,
+     "why": "new-fact-sets-level",
+     "doc": "score-gate-bounded-new",
+     "illustration": {
+      "score": 36,
+      "new": 16,
+      "gate": 32
+     }
+    },
+    {
+     "id": "baseline-cover",
+     "stage": 16,
+     "kind": "cover",
+     "applies_to": "gate",
+     "order": "flag_order",
+     "covers": "listed_and_below",
+     "why": "recorded-lead-covers-below",
+     "doc": "score-baseline-cover",
+     "illustration": null
+    }
+   ],
+   "docs": "https://lockrot.dev/verdicts/model-1/"
+  },
+  "score_rules_used": {
+   "counted": 8,
+   "lead-first": 4,
+   "corroborating-share": 0,
+   "advisory-points": 2,
+   "no-reachable-fix-multiplier": 0,
+   "security-max": 1,
+   "divide-reach": 11,
+   "security-exempt-from-reach": 2,
+   "sum": 0,
+   "divide-dev": 0,
+   "floor-once": 0,
+   "band-floors": 6,
+   "zero-verdicts": 29,
+   "sort": null,
+   "gate-bounded-new": 0,
+   "baseline-cover": 0
+  },
+  "advisory_lookup": {
+   "scope": "all",
+   "scope_source": "default",
+   "packages_asked": 35,
+   "packages_not_asked": 0,
+   "other_repositories": 0,
+   "repositories": [
+    {
+     "composer_repository": "composer repo (https://repo.packagist.org)",
+     "registry": "packagist.org",
+     "outcome": "answered",
+     "reason": null,
+     "message": null,
+     "packages_with_records": 6,
+     "records": 47
+    }
+   ]
+  },
+  "move_check": {
+   "composer": "2.10.3",
+   "blocks_advisories": true,
+   "ignores_extensions": true,
+   "baseline": "resolves",
+   "reason": null
+  },
+  "php_window": {
+   "platform_override": null,
+   "host_requires": [],
+   "with_dev": {
+    "minors": [
+     "8.3",
+     "8.4"
+    ],
+    "gaps": false,
+    "lower_edge": {
+     "php": "8.3.0",
+     "set_by": [
+      {
+       "name": null,
+       "version": null,
+       "link": "require",
+       "target": "php",
+       "constraint": "^8.3",
+       "dev": false
+      }
+     ]
+    },
+    "upper_edge": {
+     "excludes": "8.5",
+     "set_by": [
+      {
+       "name": "brianium/paratest",
+       "version": "v7.8.4",
+       "link": "require",
+       "target": "php",
+       "constraint": "~8.2.0 || ~8.3.0 || ~8.4.0",
+       "dev": true
+      },
+      {
+       "name": "moneyphp/money",
+       "version": "v4.7.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+       "dev": false
+      },
+      {
+       "name": "nette/schema",
+       "version": "v1.3.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "8.1 - 8.4",
+       "dev": false
+      }
+     ]
+    },
+    "closest": null
+   },
+   "without_dev": {
+    "minors": [
+     "8.3",
+     "8.4"
+    ],
+    "gaps": false,
+    "lower_edge": {
+     "php": "8.3.0",
+     "set_by": [
+      {
+       "name": null,
+       "version": null,
+       "link": "require",
+       "target": "php",
+       "constraint": "^8.3",
+       "dev": false
+      }
+     ]
+    },
+    "upper_edge": {
+     "excludes": "8.5",
+     "set_by": [
+      {
+       "name": "moneyphp/money",
+       "version": "v4.7.1",
+       "link": "require",
+       "target": "php",
+       "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+       "dev": false
+      },
+      {
+       "name": "nette/schema",
+       "version": "v1.3.2",
+       "link": "require",
+       "target": "php",
+       "constraint": "8.1 - 8.4",
+       "dev": false
+      }
+     ]
+    },
+    "closest": null
+   },
+   "target": {
+    "php": "8.4.99",
+    "inside": true
+   },
+   "target_fix": null
+  }
+ },
+ "activity_cache_oldest_at": "2026-10-01T16:03:14+00:00",
+ "activity_cache_age_hours": 1.6,
+ "packages_checked": 35,
+ "packages_flagged": 6,
+ "packages_multi_flag": 0,
+ "include_dev": false,
+ "not_from_composer_repository": 0,
+ "packages_unchecked_accepted": 0,
+ "network_failures": false,
+ "counts": {
+  "critical": 0,
+  "high": 1,
+  "medium": 2,
+  "low": 3,
+  "unknown": 0,
+  "finished": 8,
+  "ok": 21
+ },
+ "abandoned": {
+  "total": 0,
+  "with_replacement": 0,
+  "with_suggestion": 0
+ },
+ "priorities": {
+  "critical": 0,
+  "high": 1,
+  "medium": 2,
+  "low": 3,
+  "none": 29
+ },
+ "flags": {
+  "abandoned": {
+   "carrying": 0,
+   "leading": 0,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+   }
+  },
+  "silent": {
+   "carrying": 0,
+   "leading": 0,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+   }
+  },
+  "pinned": {
+   "carrying": 0,
+   "leading": 0,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+   }
+  },
+  "left-behind": {
+   "carrying": 0,
+   "leading": 0,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+   }
+  },
+  "old-promise": {
+   "carrying": 1,
+   "leading": 1,
+   "accepted": {
+    "all": 3,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 0
+   }
+  },
+  "stale": {
+   "carrying": 1,
+   "leading": 1,
+   "accepted": {
+    "all": 8,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 1
+   }
+  },
+  "capped": {
+   "carrying": 2,
+   "leading": 2,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 1
+   }
+  },
+  "vulnerable": {
+   "carrying": 2,
+   "leading": null,
+   "accepted": null,
+   "by_verdict": {
+    "critical": 0,
+    "high": 1,
+    "medium": 0,
+    "low": 1
+   }
+  }
+ },
+ "exposure": [
+  {
+   "package": "knuckleswtf/scribe",
+   "flagged": 3
+  },
+  {
+   "package": "inertiajs/inertia-laravel",
+   "flagged": 2
+  },
+  {
+   "package": "laravel/framework",
+   "flagged": 2
+  },
+  {
+   "package": "laravel/nightwatch",
+   "flagged": 2
+  },
+  {
+   "package": "laravel/socialite",
+   "flagged": 2
+  },
+  {
+   "package": "socialiteproviders/facebook",
+   "flagged": 2
+  },
+  {
+   "package": "socialiteproviders/github",
+   "flagged": 2
+  },
+  {
+   "package": "socialiteproviders/google",
+   "flagged": 2
+  },
+  {
+   "package": "socialiteproviders/kanidm",
+   "flagged": 2
+  },
+  {
+   "package": "socialiteproviders/keycloak",
+   "flagged": 2
+  },
+  {
+   "package": "socialiteproviders/linkedin",
+   "flagged": 2
+  },
+  {
+   "package": "socialiteproviders/microsoft-azure",
+   "flagged": 2
+  },
+  {
+   "package": "tightenco/ziggy",
+   "flagged": 2
+  }
+ ],
+ "exposure_rule": {
+  "max_fan_in": 8
+ },
+ "unattributed": [],
+ "rot_depth": {
+  "flagged": 6,
+  "measured": 6,
+  "unmeasured": {
+   "unreached": 0,
+   "no_composer_json": 0
+  },
+  "by_reach": {
+   "direct": 1,
+   "transitive": 5,
+   "unreached": 0
+  },
+  "not_in_composer_json": 5,
+  "require_dev_not_walked": 0,
+  "production": 6,
+  "development": 0,
+  "by_depth": [
+   {
+    "depth": 0,
+    "flagged": 1
+   },
+   {
+    "depth": 1,
+    "flagged": 3
+   },
+   {
+    "depth": 2,
+    "flagged": 1
+   },
+   {
+    "depth": 3,
+    "flagged": 1
+   }
+  ],
+  "max_depth": 3,
+  "deepest": [
+   {
+    "package": "nette/schema",
+    "chain": [
+     "laravel/framework",
+     "league/commonmark",
+     "league/config",
+     "nette/schema"
+    ]
+   }
+  ]
+ },
+ "libyears": {
+  "total": 45.2,
+  "direct_requirements": 12.42,
+  "measured": 26,
+  "at_least_count": 0,
+  "unmeasured": {
+   "not_from_composer_repository": 0,
+   "unavailable": 0,
+   "not_found": 0,
+   "branch_snapshot": 0,
+   "shared_commit": 0,
+   "undated": 0,
+   "no_stable_release": 0,
+   "undated_releases": 9
+  },
+  "furthest_behind": {
+   "package": "erusev/parsedown",
+   "version": "1.7.4",
+   "libyears": 6.13,
+   "at_least": false
+  },
+  "packages": 35
+ },
+ "baseline": null,
+ "gate": {
+  "fails": true,
+  "tripped_by": [
+   "fail_on"
+  ],
+  "fail_on_applied": true,
+  "reaching": 1,
+  "failing": 1,
+  "exempt": {
+   "baseline": 0
+  },
+  "standing": {
+   "known": 0,
+   "new": 0,
+   "worsened": 0,
+   "none": 1
+  },
+  "failing_packages": [
+   "phpseclib/phpseclib"
+  ],
+  "failing_by": [
+   {
+    "value": "high",
+    "failing": 1
+   }
+  ],
+  "not_applied": [],
+  "text": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)"
+ },
+ "security": {
+  "check": "complete",
+  "packages": {
+   "vulnerable": 2,
+   "unchecked": 0,
+   "ignored": 0,
+   "clear": 33
+  },
+  "advisories": {
+   "counted": 6,
+   "ignored": 0
+  },
+  "severities": {
+   "critical": 0,
+   "high": 2,
+   "medium": 2,
+   "unrated": 0,
+   "low": 2
+  },
+  "fixes": {
+   "update": 2,
+   "upgrade": 0,
+   "raise-php": 0,
+   "unknown": 0,
+   "blocked": 0,
+   "none": 0
+  },
+  "update_now": [
+   "phpseclib/phpseclib"
+  ],
+  "update_now_command": [
+   "composer",
+   "update",
+   "phpseclib/phpseclib:^3.0.57"
+  ],
+  "fix_unknown": 0
+ },
+ "data_date": "2026-10-01T17:39:09+00:00",
+ "notes": [],
+ "note_details": [],
+ "findings": [
+  {
+   "package": "phpseclib/phpseclib",
+   "version": "3.0.46",
+   "branch": "3.x",
+   "installed_php": {
+    "requires": ">=5.6.1",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "high",
+   "priority": "high",
+   "lead": null,
+   "rank": 1,
+   "flags": [
+    {
+     "id": "vulnerable",
+     "role": "security",
+     "baseline": null,
+     "signal_ids": [
+      "S9"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "advisories",
+      "value": 5,
+      "source": null
+     },
+     "summary": "5 advisories: 2 high, 2 medium, 1 low — all fixed on 3.x; worst: CVE-2026-32935 phpseclib's AES-CBC unpadding susceptible to padding oracle timing attack"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 16,
+    "exact": 16,
+    "rounded_down": false,
+    "band": {
+     "floor": 16,
+     "next": "critical",
+     "to_next": 16
+    },
+    "decided_by": "security",
+    "parts": {
+     "maintenance": {
+      "status": "none",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      }
+     },
+     "security": {
+      "status": "counted",
+      "contribution": 16,
+      "alone": {
+       "total": 16,
+       "verdict": "high"
+      },
+      "of": 5,
+      "tied": [
+       "PKSA-smrh-yx37-92ws"
+      ]
+     }
+    },
+    "terms": [
+     {
+      "part": "security",
+      "flag": "vulnerable",
+      "role": "security",
+      "advisory": "PKSA-km2b-zc3b-mjm3",
+      "severity": "high",
+      "fix_kind": "update",
+      "weight": 16,
+      "multiplier": 1,
+      "points": 16,
+      "contribution": 16
+     }
+    ],
+    "modifiers": [
+     {
+      "reason": "transitive",
+      "applies_to": "maintenance",
+      "divide_by": 2,
+      "before": 0,
+      "after": 0
+     }
+    ],
+    "accepted": [],
+    "without": [
+     {
+      "remove": {
+       "kind": "advisory",
+       "id": "PKSA-km2b-zc3b-mjm3"
+      },
+      "revealed": [],
+      "total": 16,
+      "verdict": "high",
+      "lead": null,
+      "deciding_advisory": "PKSA-smrh-yx37-92ws",
+      "at_least": false
+     }
+    ],
+    "text": "16 = vulnerable 16 [high advisory]"
+   },
+   "next_step": {
+    "kind": "update",
+    "source": "vulnerable",
+    "merged": [],
+    "fix_kind": "update",
+    "reason": null,
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": "3.x",
+    "version": "3.0.57",
+    "newest": "3.0.57",
+    "constraint": null,
+    "latest": null,
+    "php_check": {
+     "requires": ">=5.6.1",
+     "project_allows": true,
+     "target_runs": true,
+     "raise_to": null,
+     "raise_size": null
+    },
+    "crosses_major": false,
+    "held_by": [],
+    "clears": [
+     {
+      "kind": "advisory",
+      "id": "PKSA-km2b-zc3b-mjm3",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-smrh-yx37-92ws",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-12sz-bcny-pk4m",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-432p-hv1d-chf7",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-zh4j-by9m-7mz8",
+      "basis": "outside_range"
+     }
+    ],
+    "unverified": [],
+    "adds": [],
+    "leaves": [],
+    "clears_all": true,
+    "if_applied": {
+     "total": 0,
+     "verdict": "ok",
+     "lead": null,
+     "deciding_advisory": null,
+     "at_most": false,
+     "assumes": [
+      "clears_hold"
+     ]
+    },
+    "check": {
+     "result": "resolves",
+     "form": "inline",
+     "reason": null,
+     "installs": null
+    },
+    "moves_with": [],
+    "composer_moves_because": [],
+    "commands": [
+     [
+      "composer",
+      "update",
+      "phpseclib/phpseclib:^3.0.57"
+     ]
+    ],
+    "through": [
+     {
+      "package": "laravel/socialite",
+      "installed_version": "v5.13.2",
+      "installed_requires": true,
+      "newest_stable": {
+       "version": "v5.31.0",
+       "released": "2026-08-31T13:49:19+00:00"
+      },
+      "newest_requires": true,
+      "newest_requires_unmeasured": null,
+      "local": false,
+      "newest_is_installed": false
+     },
+     {
+      "package": "socialiteproviders/facebook",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "socialiteproviders/github",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "socialiteproviders/google",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "socialiteproviders/kanidm",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "socialiteproviders/keycloak",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "socialiteproviders/linkedin",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "socialiteproviders/microsoft-azure",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     }
+    ],
+    "also": [],
+    "text": "composer update 'phpseclib/phpseclib:^3.0.57' (gets 3.0.57) — clears 5 advisories; Composer's solver checked it against the lock"
+   },
+   "security": {
+    "status": "vulnerable",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 11,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 11,
+      "reason": null
+     }
+    ],
+    "worst": "high",
+    "counts": {
+     "critical": 0,
+     "high": 2,
+     "medium": 2,
+     "unrated": 0,
+     "low": 1
+    },
+    "ignored": [],
+    "ignored_count": 0,
+    "fix_kind": "update",
+    "installed_branch_fixes": {
+     "fixed": 5,
+     "unknown": 0,
+     "of": 5,
+     "fix_kind": "update",
+     "lowest": "3.0.57",
+     "newest": "3.0.57",
+     "held_by": [],
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "at_most": false,
+      "assumes": [
+       "clears_hold"
+      ]
+     },
+     "check": {
+      "result": "resolves",
+      "form": "inline",
+      "reason": null,
+      "installs": null
+     }
+    },
+    "move_in": "next_step",
+    "gets": {
+     "version": "3.0.57",
+     "php_check": {
+      "requires": ">=5.6.1",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "clears": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-km2b-zc3b-mjm3",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-smrh-yx37-92ws",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-12sz-bcny-pk4m",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-432p-hv1d-chf7",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-zh4j-by9m-7mz8",
+       "basis": "outside_range"
+      }
+     ],
+     "clears_all": true
+    },
+    "partial": null
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "phpseclib/phpseclib",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T16:03:14+00:00",
+    "cached_at": "2026-10-01T16:03:14+00:00"
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/phpseclib/phpseclib",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "laravel/socialite",
+    "phpseclib/phpseclib"
+   ],
+   "depth": 1,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "laravel/socialite",
+    "socialiteproviders/facebook",
+    "socialiteproviders/github",
+    "socialiteproviders/google",
+    "socialiteproviders/kanidm",
+    "socialiteproviders/keycloak",
+    "socialiteproviders/linkedin",
+    "socialiteproviders/microsoft-azure"
+   ],
+   "signals": [
+    {
+     "id": "S9",
+     "level": "high",
+     "summary": "5 security advisories affect 3.0.46 (CVE-2026-32935, CVE-2026-44167, CVE-2026-84308 and 2 more); 1 fixed in 3.0.57, 1 fixed in 3.0.51",
+     "data": {
+      "advisories": [
+       {
+        "id": "PKSA-km2b-zc3b-mjm3",
+        "cve": "CVE-2026-32935",
+        "title": "phpseclib's AES-CBC unpadding susceptible to padding oracle timing attack",
+        "link": "https://github.com/advisories/GHSA-94g3-g5v7-q4jg",
+        "reported_at": "2026-03-19T16:42:18+00:00",
+        "severity": "high",
+        "severity_published": "high",
+        "affected_versions": ">=0.1.1,<=1.0.26|>=2.0.0,<=2.0.51|>=3.0.0,<=3.0.49",
+        "counted": true,
+        "points": 16,
+        "deciding": true,
+        "fix": {
+         "kind": "update",
+         "to_branch": "3.x",
+         "version": null,
+         "newest": "3.0.57",
+         "on_installed_branch": true,
+         "php": ">=5.6.1",
+         "admits_target_php": true,
+         "admits_project_php": true,
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-smrh-yx37-92ws",
+        "cve": "CVE-2026-44167",
+        "title": "phpseclib has a CVE-2024-27355 mitigation bypass — OID amplification DoS in ASN1::decodeOID()",
+        "link": "https://github.com/advisories/GHSA-3qpq-r242-jqj7",
+        "reported_at": "2026-05-05T21:17:57+00:00",
+        "severity": "high",
+        "severity_published": "high",
+        "affected_versions": ">=0.1.1,<=1.0.28|>=3.0.0,<=3.0.51|>=2.0.0,<=2.0.53",
+        "counted": true,
+        "points": 16,
+        "deciding": false,
+        "fix": {
+         "kind": "update",
+         "to_branch": "3.x",
+         "version": null,
+         "newest": "3.0.57",
+         "on_installed_branch": true,
+         "php": ">=5.6.1",
+         "admits_target_php": true,
+         "admits_project_php": true,
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-12sz-bcny-pk4m",
+        "cve": "CVE-2026-84308",
+        "title": "phpseclib — non-constant-time X25519 scalar multiplication permits full private-key recovery",
+        "link": "https://github.com/advisories/GHSA-q97c-8qh3-fpc6",
+        "reported_at": "2026-09-08T21:24:29+00:00",
+        "severity": "medium",
+        "severity_published": "medium",
+        "affected_versions": ">=4.0.0,<4.0.1|<3.0.57",
+        "counted": true,
+        "points": 8,
+        "deciding": false,
+        "fix": {
+         "kind": "update",
+         "to_branch": "3.x",
+         "version": "3.0.57",
+         "newest": "3.0.57",
+         "on_installed_branch": true,
+         "php": ">=5.6.1",
+         "admits_target_php": true,
+         "admits_project_php": true,
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-432p-hv1d-chf7",
+        "cve": "CVE-2026-55599",
+        "title": "phpseclib: X.509 certificate validation sends attacker-controlled outbound requests (server-side request forgery) via Authority Information Access",
+        "link": "https://github.com/advisories/GHSA-m557-wrgg-6rp4",
+        "reported_at": "2026-06-16T15:03:58+00:00",
+        "severity": "medium",
+        "severity_published": "medium",
+        "affected_versions": ">=3.0.0,<=3.0.53|>=2.0.0,<=2.0.54|>=0.1.1,<=1.0.29",
+        "counted": true,
+        "points": 8,
+        "deciding": false,
+        "fix": {
+         "kind": "update",
+         "to_branch": "3.x",
+         "version": null,
+         "newest": "3.0.57",
+         "on_installed_branch": true,
+         "php": ">=5.6.1",
+         "admits_target_php": true,
+         "admits_project_php": true,
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-zh4j-by9m-7mz8",
+        "cve": "CVE-2026-40194",
+        "title": "phpseclib has a variable-time HMAC comparison in SSH2::get_binary_packet() using != instead of hash_equals()",
+        "link": "https://github.com/advisories/GHSA-r854-jrxh-36qx",
+        "reported_at": "2026-04-10T20:58:10+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=0.1.1,<1.0.28|>=3.0.0,<3.0.51|>=2.0.0,<2.0.53",
+        "counted": true,
+        "points": 2,
+        "deciding": false,
+        "fix": {
+         "kind": "update",
+         "to_branch": "3.x",
+         "version": "3.0.51",
+         "newest": "3.0.57",
+         "on_installed_branch": true,
+         "php": ">=5.6.1",
+         "admits_target_php": true,
+         "admits_project_php": true,
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       }
+      ],
+      "releases_read": true,
+      "complete": true
+     }
+    }
+   ],
+   "evidence": "vulnerable: 5 advisories: 2 high, 2 medium, 1 low — all fixed on 3.x; worst: CVE-2026-32935 phpseclib's AES-CBC unpadding susceptible to padding oracle timing attack",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 2.48,
+   "age": {
+    "installed": {
+     "at": "2024-03-03T02:14:58+00:00",
+     "years": 2.6,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "4.0.1",
+     "at": "2026-08-26T12:15:13+00:00",
+     "years": 0.1,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "3.0.57",
+     "at": "2026-08-26T12:13:21+00:00",
+     "years": 0.1,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-09-29T04:30:32+00:00",
+     "years": 0,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": true,
+    "fails": true,
+    "exempt_by": null,
+    "by": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "facts": [
+       {
+        "kind": "advisory",
+        "id": "PKSA-km2b-zc3b-mjm3"
+       }
+      ]
+     }
+    ],
+    "basis": null
+   }
+  },
+  {
+   "package": "moneyphp/money",
+   "version": "v4.7.1",
+   "branch": "4.x",
+   "installed_php": {
+    "requires": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "medium",
+   "priority": "medium",
+   "lead": "capped",
+   "rank": 2,
+   "flags": [
+    {
+     "id": "capped",
+     "role": "lead",
+     "baseline": null,
+     "signal_ids": [
+      "S11"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "php_minor",
+      "value": "8.4",
+      "source": null
+     },
+     "summary": "requires php ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 8,
+    "exact": 8,
+    "rounded_down": false,
+    "band": {
+     "floor": 8,
+     "next": "high",
+     "to_next": 8
+    },
+    "decided_by": "maintenance",
+    "parts": {
+     "maintenance": {
+      "status": "counted",
+      "contribution": 8,
+      "alone": {
+       "total": 8,
+       "verdict": "medium"
+      }
+     },
+     "security": {
+      "status": "clear",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      },
+      "of": 0,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "maintenance",
+      "flag": "capped",
+      "role": "lead",
+      "weight": 8,
+      "divisor": 1,
+      "points": 8,
+      "contribution": 8
+     }
+    ],
+    "modifiers": [],
+    "accepted": [],
+    "without": [],
+    "text": "8 = capped 8"
+   },
+   "next_step": {
+    "kind": "update",
+    "source": "capped",
+    "merged": [],
+    "fix_kind": null,
+    "reason": null,
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": "4.x",
+    "version": "v4.9.0",
+    "newest": "v4.9.0",
+    "constraint": null,
+    "latest": null,
+    "php_check": {
+     "requires": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+     "project_allows": true,
+     "target_runs": true,
+     "raise_to": null,
+     "raise_size": null
+    },
+    "crosses_major": false,
+    "held_by": [],
+    "clears": [
+     {
+      "kind": "flag",
+      "id": "capped",
+      "basis": "admits_newest_php"
+     }
+    ],
+    "unverified": [],
+    "adds": [],
+    "leaves": [],
+    "clears_all": true,
+    "if_applied": {
+     "total": 0,
+     "verdict": "ok",
+     "lead": null,
+     "deciding_advisory": null,
+     "at_most": false,
+     "assumes": [
+      "clears_hold"
+     ]
+    },
+    "check": {
+     "result": "resolves",
+     "form": "inline",
+     "reason": null,
+     "installs": null
+    },
+    "moves_with": [],
+    "composer_moves_because": [],
+    "commands": [
+     [
+      "composer",
+      "update",
+      "moneyphp/money:^4.9.0"
+     ]
+    ],
+    "through": [],
+    "also": [],
+    "text": "composer update 'moneyphp/money:^4.9.0' (gets v4.9.0) — clears capped; Composer's solver checked it against the lock"
+   },
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "moneyphp/money",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/moneyphp/money",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "moneyphp/money"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "moneyphp/money"
+   ],
+   "signals": [
+    {
+     "id": "S11",
+     "level": "warn",
+     "summary": "php \"~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0\" stops at 8.4; the newest PHP, 8.5, is excluded",
+     "data": {
+      "newest_php": "8.5",
+      "newest_php_source": "known",
+      "requires": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+      "stops_at": "8.4",
+      "excludes_target": false,
+      "admits_newest": {
+       "version": "v4.9.0",
+       "branch": "4.x",
+       "blocking": null
+      }
+     }
+    }
+   ],
+   "evidence": "capped: requires php ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 2.21,
+   "age": {
+    "installed": {
+     "at": "2025-06-06T07:12:38+00:00",
+     "years": 1.3,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v4.9.0",
+     "at": "2026-05-04T20:23:15+00:00",
+     "years": 0.4,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v4.9.0",
+     "at": "2026-05-04T20:23:15+00:00",
+     "years": 0.4,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-07-07T18:12:10Z",
+     "years": 0.2,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "erusev/parsedown",
+   "version": "1.7.4",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": ">=5.3.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "medium",
+   "priority": "medium",
+   "lead": "old-promise",
+   "rank": 3,
+   "flags": [
+    {
+     "id": "old-promise",
+     "role": "lead",
+     "baseline": null,
+     "signal_ids": [
+      "S5"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "php",
+      "value": 5,
+      "source": null
+     },
+     "summary": "released 2019-12-30 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 8,
+    "exact": 8,
+    "rounded_down": false,
+    "band": {
+     "floor": 8,
+     "next": "high",
+     "to_next": 8
+    },
+    "decided_by": "maintenance",
+    "parts": {
+     "maintenance": {
+      "status": "counted",
+      "contribution": 8,
+      "alone": {
+       "total": 8,
+       "verdict": "medium"
+      }
+     },
+     "security": {
+      "status": "clear",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      },
+      "of": 0,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "maintenance",
+      "flag": "old-promise",
+      "role": "lead",
+      "weight": 16,
+      "divisor": 1,
+      "points": 16,
+      "contribution": 8
+     }
+    ],
+    "modifiers": [
+     {
+      "reason": "transitive",
+      "applies_to": "maintenance",
+      "divide_by": 2,
+      "before": 16,
+      "after": 8
+     }
+    ],
+    "accepted": [],
+    "without": [],
+    "text": "8 = old-promise 16 ÷ 2 transitive"
+   },
+   "next_step": {
+    "kind": "require",
+    "source": "old-promise",
+    "merged": [],
+    "fix_kind": null,
+    "reason": null,
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": "1.x",
+    "version": "1.8.0",
+    "newest": "1.8.0",
+    "constraint": "^1.8.0",
+    "latest": null,
+    "php_check": {
+     "requires": ">=7.1",
+     "project_allows": true,
+     "target_runs": true,
+     "raise_to": null,
+     "raise_size": null
+    },
+    "crosses_major": false,
+    "held_by": [
+     {
+      "source": "package",
+      "package": "knuckleswtf/scribe",
+      "version": "5.3.0",
+      "link": "require",
+      "target": null,
+      "constraint": "1.7.4",
+      "holder": {
+       "verdict": "ok",
+       "lead": null,
+       "flag_ids": [],
+       "replacement": null,
+       "direct": true,
+       "next_step": null
+      }
+     }
+    ],
+    "clears": [
+     {
+      "kind": "flag",
+      "id": "old-promise",
+      "basis": "released_after_ga"
+     }
+    ],
+    "unverified": [],
+    "adds": [],
+    "leaves": [],
+    "clears_all": true,
+    "if_applied": {
+     "total": 0,
+     "verdict": "ok",
+     "lead": null,
+     "deciding_advisory": null,
+     "at_most": false,
+     "assumes": [
+      "clears_hold",
+      "composer_resolves"
+     ]
+    },
+    "check": {
+     "result": "refused",
+     "form": null,
+     "reason": null,
+     "installs": null
+    },
+    "moves_with": [],
+    "composer_moves_because": [
+     "holders"
+    ],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "erusev/parsedown",
+      "1.8.0",
+      "--locked"
+     ]
+    ],
+    "through": [
+     {
+      "package": "knuckleswtf/scribe",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     }
+    ],
+    "also": [],
+    "text": "move erusev/parsedown to ^1.8.0 through knuckleswtf/scribe — clears old-promise; 1.x needs php >=7.1, which require.php allows; the target php 8.4 runs it; held by knuckleswtf/scribe 5.3.0 (requires 1.7.4); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+   },
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 2,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 2,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "erusev/parsedown",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T16:03:14+00:00",
+    "cached_at": "2026-10-01T16:03:14+00:00"
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/erusev/parsedown",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "knuckleswtf/scribe",
+    "erusev/parsedown"
+   ],
+   "depth": 1,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "knuckleswtf/scribe"
+   ],
+   "signals": [
+    {
+     "id": "S5",
+     "level": "warn",
+     "summary": "released 2019-12-30 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "data": {
+      "target_php": "8.4",
+      "target_major": "8.0",
+      "ga_date": "2020-11-26",
+      "php_constraint": ">=5.3.0",
+      "written_for_php": 5,
+      "released": "2019-12-30T22:54:17+00:00"
+     }
+    }
+   ],
+   "evidence": "old-promise: released 2019-12-30 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 6.13,
+   "age": {
+    "installed": {
+     "at": "2019-12-30T22:54:17+00:00",
+     "years": 6.8,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "1.8.0",
+     "at": "2026-02-16T11:41:01+00:00",
+     "years": 0.6,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "1.8.0",
+     "at": "2026-02-16T11:41:01+00:00",
+     "years": 0.6,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-02-18T15:50:34+00:00",
+     "years": 0.6,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "firebase/php-jwt",
+   "version": "v6.11.1",
+   "branch": "6.x",
+   "installed_php": {
+    "requires": "^8.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "low",
+   "priority": "low",
+   "lead": null,
+   "rank": 4,
+   "flags": [
+    {
+     "id": "vulnerable",
+     "role": "security",
+     "baseline": null,
+     "signal_ids": [
+      "S9"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "advisories",
+      "value": 1,
+      "source": null
+     },
+     "summary": "1 advisory: 1 low — none fixed on 6.x; advisory: CVE-2025-45769 php-jwt contains weak encryption"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 2,
+    "exact": 2,
+    "rounded_down": false,
+    "band": {
+     "floor": 1,
+     "next": "medium",
+     "to_next": 6
+    },
+    "decided_by": "security",
+    "parts": {
+     "maintenance": {
+      "status": "none",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      }
+     },
+     "security": {
+      "status": "counted",
+      "contribution": 2,
+      "alone": {
+       "total": 2,
+       "verdict": "low"
+      },
+      "of": 1,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "security",
+      "flag": "vulnerable",
+      "role": "security",
+      "advisory": "PKSA-y2cr-5h3j-g3ys",
+      "severity": "low",
+      "fix_kind": "update",
+      "weight": 2,
+      "multiplier": 1,
+      "points": 2,
+      "contribution": 2
+     }
+    ],
+    "modifiers": [
+     {
+      "reason": "transitive",
+      "applies_to": "maintenance",
+      "divide_by": 2,
+      "before": 0,
+      "after": 0
+     }
+    ],
+    "accepted": [],
+    "without": [],
+    "text": "2 = vulnerable 2 [low advisory]"
+   },
+   "next_step": {
+    "kind": "require",
+    "source": "vulnerable",
+    "merged": [],
+    "fix_kind": "update",
+    "reason": null,
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": "7.x",
+    "version": "v7.0.0",
+    "newest": "v7.2.1",
+    "constraint": "^7.0.0",
+    "latest": null,
+    "php_check": {
+     "requires": "^8.0",
+     "project_allows": true,
+     "target_runs": true,
+     "raise_to": null,
+     "raise_size": null
+    },
+    "crosses_major": true,
+    "held_by": [],
+    "clears": [
+     {
+      "kind": "advisory",
+      "id": "PKSA-y2cr-5h3j-g3ys",
+      "basis": "outside_range"
+     }
+    ],
+    "unverified": [],
+    "adds": [],
+    "leaves": [],
+    "clears_all": true,
+    "if_applied": {
+     "total": 0,
+     "verdict": "ok",
+     "lead": null,
+     "deciding_advisory": null,
+     "at_most": false,
+     "assumes": [
+      "clears_hold"
+     ]
+    },
+    "check": {
+     "result": "resolves",
+     "form": "inline",
+     "reason": null,
+     "installs": "v7.2.1"
+    },
+    "moves_with": [
+     {
+      "package": "laravel/socialite",
+      "installed_version": "v5.23.0",
+      "version": "v5.30.0"
+     },
+     {
+      "package": "socialiteproviders/manager",
+      "installed_version": "v4.8.1",
+      "version": "4.10.0"
+     }
+    ],
+    "composer_moves_because": [
+     "crosses_major",
+     "transitive"
+    ],
+    "commands": [
+     [
+      "composer",
+      "update",
+      "firebase/php-jwt:^7.0.0",
+      "laravel/socialite",
+      "socialiteproviders/manager"
+     ]
+    ],
+    "through": [
+     {
+      "package": "laravel/socialite",
+      "installed_version": "v5.13.2",
+      "installed_requires": true,
+      "newest_stable": {
+       "version": "v5.31.0",
+       "released": "2026-08-31T13:49:19+00:00"
+      },
+      "newest_requires": true,
+      "newest_requires_unmeasured": null,
+      "local": false,
+      "newest_is_installed": false
+     },
+     {
+      "package": "socialiteproviders/facebook",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "socialiteproviders/github",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "socialiteproviders/google",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "socialiteproviders/kanidm",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "socialiteproviders/keycloak",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "socialiteproviders/linkedin",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "socialiteproviders/microsoft-azure",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     }
+    ],
+    "also": [],
+    "text": "move firebase/php-jwt to ^7.0.0 through laravel/socialite, socialiteproviders/facebook, socialiteproviders/github and 5 more — clears the advisory; 7.x needs php ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; what requires it must allow it; the newest release of laravel/socialite (v5.31.0) still requires it; Composer's solver checked it against the lock, with an update of laravel/socialite (to v5.30.0) and socialiteproviders/manager (to 4.10.0)"
+   },
+   "security": {
+    "status": "vulnerable",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 3,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 3,
+      "reason": null
+     }
+    ],
+    "worst": "low",
+    "counts": {
+     "critical": 0,
+     "high": 0,
+     "medium": 0,
+     "unrated": 0,
+     "low": 1
+    },
+    "ignored": [],
+    "ignored_count": 0,
+    "fix_kind": "update",
+    "installed_branch_fixes": {
+     "fixed": 0,
+     "unknown": 0,
+     "of": 1,
+     "fix_kind": null,
+     "lowest": null,
+     "newest": "v6.11.1",
+     "held_by": [],
+     "if_applied": null,
+     "check": null
+    },
+    "move_in": "next_step",
+    "gets": null,
+    "partial": null
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "googleapis/php-jwt",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T16:03:14+00:00",
+    "cached_at": "2026-10-01T16:03:14+00:00"
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/firebase/php-jwt",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "laravel/socialite",
+    "firebase/php-jwt"
+   ],
+   "depth": 1,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "laravel/socialite",
+    "socialiteproviders/facebook",
+    "socialiteproviders/github",
+    "socialiteproviders/google",
+    "socialiteproviders/kanidm",
+    "socialiteproviders/keycloak",
+    "socialiteproviders/linkedin",
+    "socialiteproviders/microsoft-azure"
+   ],
+   "signals": [
+    {
+     "id": "S9",
+     "level": "warn",
+     "summary": "1 security advisory affects v6.11.1 (CVE-2025-45769); fixed in v7.0.0",
+     "data": {
+      "advisories": [
+       {
+        "id": "PKSA-y2cr-5h3j-g3ys",
+        "cve": "CVE-2025-45769",
+        "title": "php-jwt contains weak encryption",
+        "link": "https://github.com/advisories/GHSA-2x45-7fc3-mxwq",
+        "reported_at": "2025-07-31T21:31:53+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": "<7.0.0",
+        "counted": true,
+        "points": 2,
+        "deciding": true,
+        "fix": {
+         "kind": "update",
+         "to_branch": "7.x",
+         "version": "v7.0.0",
+         "newest": "v7.2.1",
+         "on_installed_branch": false,
+         "php": "^8.0",
+         "admits_target_php": true,
+         "admits_project_php": true,
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       }
+      ],
+      "releases_read": true,
+      "complete": true
+     }
+    }
+   ],
+   "evidence": "vulnerable: 1 advisory: 1 low — none fixed on 6.x; advisory: CVE-2025-45769 php-jwt contains weak encryption",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 2.83,
+   "age": {
+    "installed": {
+     "at": "2023-12-01T16:26:39+00:00",
+     "years": 2.8,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v7.2.1",
+     "at": "2026-09-28T17:51:46+00:00",
+     "years": 0,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v6.11.1",
+     "at": "2025-04-09T20:32:01+00:00",
+     "years": 1.5,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-09-28T18:08:20+00:00",
+     "years": 0,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "league/config",
+   "version": "v1.2.0",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": "^7.4 || ^8.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "low",
+   "priority": "low",
+   "lead": "stale",
+   "rank": 5,
+   "flags": [
+    {
+     "id": "stale",
+     "role": "lead",
+     "baseline": null,
+     "signal_ids": [
+      "S2"
+     ],
+     "degree": {
+      "liveness_complete": true
+     },
+     "headline": {
+      "unit": "years",
+      "value": 3.8,
+      "source": "release"
+     },
+     "summary": "last release 2022-12-11 (3.8 years ago)"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 4,
+    "exact": 4,
+    "rounded_down": false,
+    "band": {
+     "floor": 1,
+     "next": "medium",
+     "to_next": 4
+    },
+    "decided_by": "maintenance",
+    "parts": {
+     "maintenance": {
+      "status": "counted",
+      "contribution": 4,
+      "alone": {
+       "total": 4,
+       "verdict": "low"
+      }
+     },
+     "security": {
+      "status": "clear",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      },
+      "of": 0,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "maintenance",
+      "flag": "stale",
+      "role": "lead",
+      "weight": 8,
+      "divisor": 1,
+      "points": 8,
+      "contribution": 4
+     }
+    ],
+    "modifiers": [
+     {
+      "reason": "transitive",
+      "applies_to": "maintenance",
+      "divide_by": 2,
+      "before": 8,
+      "after": 4
+     }
+    ],
+    "accepted": [],
+    "without": [],
+    "text": "4 = stale 8 ÷ 2 transitive"
+   },
+   "next_step": {
+    "kind": "no-move",
+    "source": "stale",
+    "merged": [],
+    "fix_kind": null,
+    "reason": "package_quiet",
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": null,
+    "version": null,
+    "newest": null,
+    "constraint": null,
+    "latest": null,
+    "php_check": null,
+    "crosses_major": null,
+    "held_by": [],
+    "clears": [],
+    "unverified": [],
+    "adds": [],
+    "leaves": [
+     {
+      "kind": "flag",
+      "id": "stale"
+     }
+    ],
+    "clears_all": false,
+    "if_applied": null,
+    "check": null,
+    "moves_with": [],
+    "composer_moves_because": [],
+    "commands": [],
+    "through": [
+     {
+      "package": "inertiajs/inertia-laravel",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "knuckleswtf/scribe",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "laravel/framework",
+      "installed_version": "v9.52.16",
+      "installed_requires": false,
+      "newest_stable": {
+       "version": "v13.34.0",
+       "released": "2026-09-29T12:46:21+00:00"
+      },
+      "newest_requires": null,
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
+     },
+     {
+      "package": "laravel/nightwatch",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "tightenco/ziggy",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     }
+    ],
+    "also": [],
+    "text": "—"
+   },
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "thephpleague/config",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T16:03:14+00:00",
+    "cached_at": "2026-10-01T16:03:14+00:00"
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/league/config",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "laravel/framework",
+    "league/commonmark",
+    "league/config"
+   ],
+   "depth": 2,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel/framework",
+    "laravel/nightwatch",
+    "tightenco/ziggy"
+   ],
+   "signals": [
+    {
+     "id": "S2",
+     "level": "warn",
+     "summary": "last release 2022-12-11 (3.8 years ago)",
+     "data": {
+      "last_release": "2022-12-11T20:36:23+00:00",
+      "last_version": "v1.2.0",
+      "years": 3.8,
+      "dated_by": null
+     }
+    }
+   ],
+   "evidence": "stale: last release 2022-12-11 (3.8 years ago)",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 0,
+   "age": {
+    "installed": {
+     "at": "2022-12-11T20:36:23+00:00",
+     "years": 3.8,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v1.2.0",
+     "at": "2022-12-11T20:36:23+00:00",
+     "years": 3.8,
+     "level": "warn",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v1.2.0",
+     "at": "2022-12-11T20:36:23+00:00",
+     "years": 3.8,
+     "level": "warn",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-10-01T03:50:25+00:00",
+     "years": 0,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "nette/schema",
+   "version": "v1.3.2",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": "8.1 - 8.4",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "low",
+   "priority": "low",
+   "lead": "capped",
+   "rank": 6,
+   "flags": [
+    {
+     "id": "capped",
+     "role": "lead",
+     "baseline": null,
+     "signal_ids": [
+      "S11"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "php_minor",
+      "value": "8.4",
+      "source": null
+     },
+     "summary": "requires php 8.1 - 8.4: it stops at 8.4, so the newest PHP, 8.5, is excluded"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 4,
+    "exact": 4,
+    "rounded_down": false,
+    "band": {
+     "floor": 1,
+     "next": "medium",
+     "to_next": 4
+    },
+    "decided_by": "maintenance",
+    "parts": {
+     "maintenance": {
+      "status": "counted",
+      "contribution": 4,
+      "alone": {
+       "total": 4,
+       "verdict": "low"
+      }
+     },
+     "security": {
+      "status": "clear",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      },
+      "of": 0,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "maintenance",
+      "flag": "capped",
+      "role": "lead",
+      "weight": 8,
+      "divisor": 1,
+      "points": 8,
+      "contribution": 4
+     }
+    ],
+    "modifiers": [
+     {
+      "reason": "transitive",
+      "applies_to": "maintenance",
+      "divide_by": 2,
+      "before": 8,
+      "after": 4
+     }
+    ],
+    "accepted": [],
+    "without": [],
+    "text": "4 = capped 8 ÷ 2 transitive"
+   },
+   "next_step": {
+    "kind": "update",
+    "source": "capped",
+    "merged": [],
+    "fix_kind": null,
+    "reason": null,
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": "1.x",
+    "version": "v1.3.6",
+    "newest": "v1.3.6",
+    "constraint": null,
+    "latest": null,
+    "php_check": {
+     "requires": "8.1 - 8.5",
+     "project_allows": true,
+     "target_runs": true,
+     "raise_to": null,
+     "raise_size": null
+    },
+    "crosses_major": false,
+    "held_by": [],
+    "clears": [
+     {
+      "kind": "flag",
+      "id": "capped",
+      "basis": "admits_newest_php"
+     }
+    ],
+    "unverified": [],
+    "adds": [],
+    "leaves": [],
+    "clears_all": true,
+    "if_applied": {
+     "total": 0,
+     "verdict": "ok",
+     "lead": null,
+     "deciding_advisory": null,
+     "at_most": false,
+     "assumes": [
+      "clears_hold"
+     ]
+    },
+    "check": {
+     "result": "resolves",
+     "form": "inline",
+     "reason": null,
+     "installs": null
+    },
+    "moves_with": [],
+    "composer_moves_because": [],
+    "commands": [
+     [
+      "composer",
+      "update",
+      "nette/schema:^1.3.6"
+     ]
+    ],
+    "through": [
+     {
+      "package": "inertiajs/inertia-laravel",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "knuckleswtf/scribe",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "laravel/framework",
+      "installed_version": "v9.52.16",
+      "installed_requires": false,
+      "newest_stable": {
+       "version": "v13.34.0",
+       "released": "2026-09-29T12:46:21+00:00"
+      },
+      "newest_requires": null,
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
+     },
+     {
+      "package": "laravel/nightwatch",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     },
+     {
+      "package": "tightenco/ziggy",
+      "installed_version": null,
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
+     }
+    ],
+    "also": [],
+    "text": "composer update 'nette/schema:^1.3.6' (gets v1.3.6) — clears capped; Composer's solver checked it against the lock"
+   },
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "nette/schema",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/nette/schema",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "laravel/framework",
+    "league/commonmark",
+    "league/config",
+    "nette/schema"
+   ],
+   "depth": 3,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel/framework",
+    "laravel/nightwatch",
+    "tightenco/ziggy"
+   ],
+   "signals": [
+    {
+     "id": "S11",
+     "level": "warn",
+     "summary": "php \"8.1 - 8.4\" stops at 8.4; the newest PHP, 8.5, is excluded",
+     "data": {
+      "newest_php": "8.5",
+      "newest_php_source": "known",
+      "requires": "8.1 - 8.4",
+      "stops_at": "8.4",
+      "excludes_target": false,
+      "admits_newest": {
+       "version": "v1.3.6",
+       "branch": "1.x",
+       "blocking": null
+      }
+     }
+    }
+   ],
+   "evidence": "capped: requires php 8.1 - 8.4: it stops at 8.4, so the newest PHP, 8.5, is excluded",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 2.68,
+   "age": {
+    "installed": {
+     "at": "2024-10-06T23:10:23+00:00",
+     "years": 2,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v1.3.6",
+     "at": "2026-08-16T21:58:41+00:00",
+     "years": 0.1,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v1.3.6",
+     "at": "2026-08-16T21:58:41+00:00",
+     "years": 0.1,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-09-10T09:53:48Z",
+     "years": 0.1,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "http-interop/http-factory-guzzle",
+   "version": "1.2.0",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 7,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "http-interop/http-factory-guzzle",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/http-interop/http-factory-guzzle",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "http-interop/http-factory-guzzle"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "http-interop/http-factory-guzzle"
+   ],
+   "signals": [],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 4.4,
+   "age": {
+    "installed": {
+     "at": "2021-07-21T13:50:14+00:00",
+     "years": 5.2,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "1.2.1",
+     "at": "2025-12-15T11:28:16+00:00",
+     "years": 0.8,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "1.2.1",
+     "at": "2025-12-15T11:28:16+00:00",
+     "years": 0.8,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2025-12-15T11:29:37Z",
+     "years": 0.8,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "inertiajs/inertia-laravel",
+   "version": "v2.0.4",
+   "branch": "2.x",
+   "installed_php": {
+    "requires": "^8.1.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 8,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "inertiajs/inertia-laravel",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/inertiajs/inertia-laravel",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": "undated_releases",
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "inertiajs/inertia-laravel"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "inertiajs/inertia-laravel"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 2 flagged packages: league/config (stale), nette/schema (capped)",
+     "data": {
+      "flagged": 2,
+      "packages": [
+       {
+        "package": "league/config",
+        "chain": [
+         "inertiajs/inertia-laravel",
+         "league/config"
+        ],
+        "verdict": "low",
+        "lead": "stale",
+        "flag_ids": [
+         "stale"
+        ]
+       },
+       {
+        "package": "nette/schema",
+        "chain": [
+         "inertiajs/inertia-laravel",
+         "nette/schema"
+        ],
+        "verdict": "low",
+        "lead": "capped",
+        "flag_ids": [
+         "capped"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "details_missing",
+    "release": null,
+    "release_unmeasured": "details_missing",
+    "branch_release": null,
+    "branch_release_unmeasured": "details_missing",
+    "push": null,
+    "push_unmeasured": "details_missing"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "knuckleswtf/scribe",
+   "version": "5.3.0",
+   "branch": "5.x",
+   "installed_php": {
+    "requires": ">=8.1",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 9,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "knuckleswtf/scribe",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/knuckleswtf/scribe",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": "undated_releases",
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "knuckleswtf/scribe"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "knuckleswtf/scribe"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 3 flagged packages: erusev/parsedown (old-promise), league/config (stale), nette/schema (capped)",
+     "data": {
+      "flagged": 3,
+      "packages": [
+       {
+        "package": "erusev/parsedown",
+        "chain": [
+         "knuckleswtf/scribe",
+         "erusev/parsedown"
+        ],
+        "verdict": "medium",
+        "lead": "old-promise",
+        "flag_ids": [
+         "old-promise"
+        ]
+       },
+       {
+        "package": "league/config",
+        "chain": [
+         "knuckleswtf/scribe",
+         "league/config"
+        ],
+        "verdict": "low",
+        "lead": "stale",
+        "flag_ids": [
+         "stale"
+        ]
+       },
+       {
+        "package": "nette/schema",
+        "chain": [
+         "knuckleswtf/scribe",
+         "nette/schema"
+        ],
+        "verdict": "low",
+        "lead": "capped",
+        "flag_ids": [
+         "capped"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "details_missing",
+    "release": null,
+    "release_unmeasured": "details_missing",
+    "branch_release": null,
+    "branch_release_unmeasured": "details_missing",
+    "push": null,
+    "push_unmeasured": "details_missing"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "laravel/framework",
+   "version": "v12.22.1",
+   "branch": "12.x",
+   "installed_php": {
+    "requires": "^8.2",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 10,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 28,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 28,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "laravel/framework",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/laravel/framework",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "laravel/framework"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel/framework",
+    "laravel/nightwatch",
+    "tightenco/ziggy"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 2 flagged packages: league/config (stale), nette/schema (capped)",
+     "data": {
+      "flagged": 2,
+      "packages": [
+       {
+        "package": "league/config",
+        "chain": [
+         "laravel/framework",
+         "league/commonmark",
+         "league/config"
+        ],
+        "verdict": "low",
+        "lead": "stale",
+        "flag_ids": [
+         "stale"
+        ]
+       },
+       {
+        "package": "nette/schema",
+        "chain": [
+         "laravel/framework",
+         "league/commonmark",
+         "league/config",
+         "nette/schema"
+        ],
+        "verdict": "low",
+        "lead": "capped",
+        "flag_ids": [
+         "capped"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 1.14,
+   "age": {
+    "installed": {
+     "at": "2025-08-08T13:58:03+00:00",
+     "years": 1.1,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v11.57.0",
+     "at": "2026-09-29T15:33:27+00:00",
+     "years": 0,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v12.69.3",
+     "at": "2026-09-29T12:53:25+00:00",
+     "years": 0,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-10-01T17:15:00Z",
+     "years": 0,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "laravel/nightwatch",
+   "version": "v1.11.5",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": "^8.2",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 11,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "laravel/nightwatch",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/laravel/nightwatch",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "laravel/nightwatch"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "laravel/nightwatch"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 2 flagged packages: league/config (stale), nette/schema (capped)",
+     "data": {
+      "flagged": 2,
+      "packages": [
+       {
+        "package": "league/config",
+        "chain": [
+         "laravel/nightwatch",
+         "league/config"
+        ],
+        "verdict": "low",
+        "lead": "stale",
+        "flag_ids": [
+         "stale"
+        ]
+       },
+       {
+        "package": "nette/schema",
+        "chain": [
+         "laravel/nightwatch",
+         "nette/schema"
+        ],
+        "verdict": "low",
+        "lead": "capped",
+        "flag_ids": [
+         "capped"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 1.12,
+   "age": {
+    "installed": {
+     "at": "2025-08-04T07:34:08+00:00",
+     "years": 1.2,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v1.30.2",
+     "at": "2026-09-18T00:37:28+00:00",
+     "years": 0,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v1.30.2",
+     "at": "2026-09-18T00:37:28+00:00",
+     "years": 0,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-09-30T03:25:25Z",
+     "years": 0,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "laravel/socialite",
+   "version": "v5.23.0",
+   "branch": "5.x",
+   "installed_php": {
+    "requires": "^7.2|^8.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 12,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 2,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 2,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "laravel/socialite",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/laravel/socialite",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "laravel/socialite"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "laravel/socialite",
+    "socialiteproviders/facebook",
+    "socialiteproviders/github",
+    "socialiteproviders/google",
+    "socialiteproviders/kanidm",
+    "socialiteproviders/keycloak",
+    "socialiteproviders/linkedin",
+    "socialiteproviders/microsoft-azure"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 2 flagged packages: phpseclib/phpseclib (vulnerable), firebase/php-jwt (vulnerable)",
+     "data": {
+      "flagged": 2,
+      "packages": [
+       {
+        "package": "phpseclib/phpseclib",
+        "chain": [
+         "laravel/socialite",
+         "phpseclib/phpseclib"
+        ],
+        "verdict": "high",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       },
+       {
+        "package": "firebase/php-jwt",
+        "chain": [
+         "laravel/socialite",
+         "firebase/php-jwt"
+        ],
+        "verdict": "low",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 1.11,
+   "age": {
+    "installed": {
+     "at": "2025-07-23T14:16:08+00:00",
+     "years": 1.2,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v5.31.0",
+     "at": "2026-08-31T13:49:19+00:00",
+     "years": 0.1,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v5.31.0",
+     "at": "2026-08-31T13:49:19+00:00",
+     "years": 0.1,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-09-04T16:54:53Z",
+     "years": 0.1,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "socialiteproviders/facebook",
+   "version": "4.1.0",
+   "branch": "4.x",
+   "installed_php": {
+    "requires": "^7.2 || ^8.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 13,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "socialiteproviders/facebook",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/socialiteproviders/facebook",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": "undated_releases",
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "socialiteproviders/facebook"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "socialiteproviders/facebook"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 2 flagged packages: phpseclib/phpseclib (vulnerable), firebase/php-jwt (vulnerable)",
+     "data": {
+      "flagged": 2,
+      "packages": [
+       {
+        "package": "phpseclib/phpseclib",
+        "chain": [
+         "socialiteproviders/facebook",
+         "phpseclib/phpseclib"
+        ],
+        "verdict": "high",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       },
+       {
+        "package": "firebase/php-jwt",
+        "chain": [
+         "socialiteproviders/facebook",
+         "firebase/php-jwt"
+        ],
+        "verdict": "low",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "details_missing",
+    "release": null,
+    "release_unmeasured": "details_missing",
+    "branch_release": null,
+    "branch_release_unmeasured": "details_missing",
+    "push": null,
+    "push_unmeasured": "details_missing"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "socialiteproviders/github",
+   "version": "4.1.0",
+   "branch": "4.x",
+   "installed_php": {
+    "requires": "^7.2 || ^8.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 14,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "socialiteproviders/github",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/socialiteproviders/github",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": "undated_releases",
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "socialiteproviders/github"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "socialiteproviders/github"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 2 flagged packages: phpseclib/phpseclib (vulnerable), firebase/php-jwt (vulnerable)",
+     "data": {
+      "flagged": 2,
+      "packages": [
+       {
+        "package": "phpseclib/phpseclib",
+        "chain": [
+         "socialiteproviders/github",
+         "phpseclib/phpseclib"
+        ],
+        "verdict": "high",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       },
+       {
+        "package": "firebase/php-jwt",
+        "chain": [
+         "socialiteproviders/github",
+         "firebase/php-jwt"
+        ],
+        "verdict": "low",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "details_missing",
+    "release": null,
+    "release_unmeasured": "details_missing",
+    "branch_release": null,
+    "branch_release_unmeasured": "details_missing",
+    "push": null,
+    "push_unmeasured": "details_missing"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "socialiteproviders/google",
+   "version": "4.1.0",
+   "branch": "4.x",
+   "installed_php": {
+    "requires": "^7.2 || ^8.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 15,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "socialiteproviders/google",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/socialiteproviders/google",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": "undated_releases",
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "socialiteproviders/google"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "socialiteproviders/google"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 2 flagged packages: phpseclib/phpseclib (vulnerable), firebase/php-jwt (vulnerable)",
+     "data": {
+      "flagged": 2,
+      "packages": [
+       {
+        "package": "phpseclib/phpseclib",
+        "chain": [
+         "socialiteproviders/google",
+         "phpseclib/phpseclib"
+        ],
+        "verdict": "high",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       },
+       {
+        "package": "firebase/php-jwt",
+        "chain": [
+         "socialiteproviders/google",
+         "firebase/php-jwt"
+        ],
+        "verdict": "low",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "details_missing",
+    "release": null,
+    "release_unmeasured": "details_missing",
+    "branch_release": null,
+    "branch_release_unmeasured": "details_missing",
+    "push": null,
+    "push_unmeasured": "details_missing"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "socialiteproviders/kanidm",
+   "version": "5.0.0",
+   "branch": "5.x",
+   "installed_php": {
+    "requires": "^8.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 16,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "socialiteproviders/kanidm",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/socialiteproviders/kanidm",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": "undated_releases",
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "socialiteproviders/kanidm"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "socialiteproviders/kanidm"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 2 flagged packages: phpseclib/phpseclib (vulnerable), firebase/php-jwt (vulnerable)",
+     "data": {
+      "flagged": 2,
+      "packages": [
+       {
+        "package": "phpseclib/phpseclib",
+        "chain": [
+         "socialiteproviders/kanidm",
+         "phpseclib/phpseclib"
+        ],
+        "verdict": "high",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       },
+       {
+        "package": "firebase/php-jwt",
+        "chain": [
+         "socialiteproviders/kanidm",
+         "firebase/php-jwt"
+        ],
+        "verdict": "low",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "details_missing",
+    "release": null,
+    "release_unmeasured": "details_missing",
+    "branch_release": null,
+    "branch_release_unmeasured": "details_missing",
+    "push": null,
+    "push_unmeasured": "details_missing"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "socialiteproviders/keycloak",
+   "version": "5.3.0",
+   "branch": "5.x",
+   "installed_php": {
+    "requires": "^7.4 || ^8.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 17,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "socialiteproviders/keycloak",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/socialiteproviders/keycloak",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": "undated_releases",
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "socialiteproviders/keycloak"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "socialiteproviders/keycloak"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 2 flagged packages: phpseclib/phpseclib (vulnerable), firebase/php-jwt (vulnerable)",
+     "data": {
+      "flagged": 2,
+      "packages": [
+       {
+        "package": "phpseclib/phpseclib",
+        "chain": [
+         "socialiteproviders/keycloak",
+         "phpseclib/phpseclib"
+        ],
+        "verdict": "high",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       },
+       {
+        "package": "firebase/php-jwt",
+        "chain": [
+         "socialiteproviders/keycloak",
+         "firebase/php-jwt"
+        ],
+        "verdict": "low",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "details_missing",
+    "release": null,
+    "release_unmeasured": "details_missing",
+    "branch_release": null,
+    "branch_release_unmeasured": "details_missing",
+    "push": null,
+    "push_unmeasured": "details_missing"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "socialiteproviders/linkedin",
+   "version": "5.0.0",
+   "branch": "5.x",
+   "installed_php": {
+    "requires": "^8.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 18,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "socialiteproviders/linkedin",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/socialiteproviders/linkedin",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": "undated_releases",
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "socialiteproviders/linkedin"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "socialiteproviders/linkedin"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 2 flagged packages: phpseclib/phpseclib (vulnerable), firebase/php-jwt (vulnerable)",
+     "data": {
+      "flagged": 2,
+      "packages": [
+       {
+        "package": "phpseclib/phpseclib",
+        "chain": [
+         "socialiteproviders/linkedin",
+         "phpseclib/phpseclib"
+        ],
+        "verdict": "high",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       },
+       {
+        "package": "firebase/php-jwt",
+        "chain": [
+         "socialiteproviders/linkedin",
+         "firebase/php-jwt"
+        ],
+        "verdict": "low",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "details_missing",
+    "release": null,
+    "release_unmeasured": "details_missing",
+    "branch_release": null,
+    "branch_release_unmeasured": "details_missing",
+    "push": null,
+    "push_unmeasured": "details_missing"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "socialiteproviders/microsoft-azure",
+   "version": "5.2.0",
+   "branch": "5.x",
+   "installed_php": {
+    "requires": "^8.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 19,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "SocialiteProviders/Microsoft-Azure",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/socialiteproviders/microsoft-azure",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "socialiteproviders/microsoft-azure"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "socialiteproviders/microsoft-azure"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 2 flagged packages: phpseclib/phpseclib (vulnerable), firebase/php-jwt (vulnerable)",
+     "data": {
+      "flagged": 2,
+      "packages": [
+       {
+        "package": "phpseclib/phpseclib",
+        "chain": [
+         "socialiteproviders/microsoft-azure",
+         "phpseclib/phpseclib"
+        ],
+        "verdict": "high",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       },
+       {
+        "package": "firebase/php-jwt",
+        "chain": [
+         "socialiteproviders/microsoft-azure",
+         "firebase/php-jwt"
+        ],
+        "verdict": "low",
+        "lead": null,
+        "flag_ids": [
+         "vulnerable"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 2.44,
+   "age": {
+    "installed": {
+     "at": "2024-03-15T03:02:10+00:00",
+     "years": 2.5,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "5.2.1",
+     "at": "2026-08-23T02:40:58+00:00",
+     "years": 0.1,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "5.2.1",
+     "at": "2026-08-23T02:40:58+00:00",
+     "years": 0.1,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-08-23T02:42:57Z",
+     "years": 0.1,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "tightenco/ziggy",
+   "version": "v2.5.3",
+   "branch": "2.x",
+   "installed_php": {
+    "requires": ">=8.1",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 20,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "tightenco/ziggy",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/tightenco/ziggy",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": "undated_releases",
+   "libyears_at_least": false,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "tightenco/ziggy"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
+   ],
+   "direct_dependents": [
+    "tightenco/ziggy"
+   ],
+   "signals": [
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 2 flagged packages: league/config (stale), nette/schema (capped)",
+     "data": {
+      "flagged": 2,
+      "packages": [
+       {
+        "package": "league/config",
+        "chain": [
+         "tightenco/ziggy",
+         "league/config"
+        ],
+        "verdict": "low",
+        "lead": "stale",
+        "flag_ids": [
+         "stale"
+        ]
+       },
+       {
+        "package": "nette/schema",
+        "chain": [
+         "tightenco/ziggy",
+         "nette/schema"
+        ],
+        "verdict": "low",
+        "lead": "capped",
+        "flag_ids": [
+         "capped"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "details_missing",
+    "release": null,
+    "release_unmeasured": "details_missing",
+    "branch_release": null,
+    "branch_release_unmeasured": "details_missing",
+    "push": null,
+    "push_unmeasured": "details_missing"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "clue/stream-filter",
+   "version": "v1.7.0",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 21,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "clue/stream-filter",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/clue/stream-filter",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "typesense/typesense-php",
+    "php-http/client-common",
+    "php-http/message",
+    "clue/stream-filter"
+   ],
+   "depth": 3,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "typesense/typesense-php"
+   ],
+   "signals": [],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 0,
+   "age": {
+    "installed": {
+     "at": "2023-12-20T15:40:13+00:00",
+     "years": 2.8,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v1.7.0",
+     "at": "2023-12-20T15:40:13+00:00",
+     "years": 2.8,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v1.7.0",
+     "at": "2023-12-20T15:40:13+00:00",
+     "years": 2.8,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-07-03T22:45:34Z",
+     "years": 0.2,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "doctrine/inflector",
+   "version": "2.0.10",
+   "branch": "2.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 22,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "doctrine/inflector",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/doctrine/inflector",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "laravel/framework",
+    "doctrine/inflector"
+   ],
+   "depth": 1,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel/framework",
+    "laravel/nightwatch",
+    "tightenco/ziggy"
+   ],
+   "signals": [],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 1.48,
+   "age": {
+    "installed": {
+     "at": "2024-02-18T20:23:39+00:00",
+     "years": 2.6,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "2.1.0",
+     "at": "2025-08-10T19:31:58+00:00",
+     "years": 1.1,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "2.1.0",
+     "at": "2025-08-10T19:31:58+00:00",
+     "years": 1.1,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-06-21T04:01:42Z",
+     "years": 0.3,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "doctrine/lexer",
+   "version": "3.0.1",
+   "branch": "3.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 23,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "doctrine/lexer",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/doctrine/lexer",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "laravel/framework",
+    "egulias/email-validator",
+    "doctrine/lexer"
+   ],
+   "depth": 2,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel/framework",
+    "laravel/nightwatch",
+    "tightenco/ziggy"
+   ],
+   "signals": [],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 2.65,
+   "age": {
+    "installed": {
+     "at": "2024-02-05T11:56:58+00:00",
+     "years": 2.7,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "3.0.3",
+     "at": "2026-10-01T06:59:29+00:00",
+     "years": 0,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "3.0.3",
+     "at": "2026-10-01T06:59:29+00:00",
+     "years": 0,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-10-01T06:59:29Z",
+     "years": 0,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "fruitcake/php-cors",
+   "version": "v1.3.0",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 24,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "fruitcake/php-cors",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/fruitcake/php-cors",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "laravel/framework",
+    "fruitcake/php-cors"
+   ],
+   "depth": 1,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel/framework",
+    "laravel/nightwatch",
+    "tightenco/ziggy"
+   ],
+   "signals": [],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 2.14,
+   "age": {
+    "installed": {
+     "at": "2023-10-12T05:21:21+00:00",
+     "years": 3,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v1.4.0",
+     "at": "2025-12-03T09:33:47+00:00",
+     "years": 0.8,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v1.4.0",
+     "at": "2025-12-03T09:33:47+00:00",
+     "years": 0.8,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2025-12-23T19:38:21Z",
+     "years": 0.8,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "paragonie/random_compat",
+   "version": "v9.99.100",
+   "branch": "9.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "finished",
+   "priority": "none",
+   "lead": null,
+   "rank": 25,
+   "flags": [
+    {
+     "id": "old-promise",
+     "role": "accepted",
+     "baseline": null,
+     "signal_ids": [
+      "S5"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "php",
+      "value": 7,
+      "source": null
+     },
+     "summary": "released 2020-10-15 for PHP 7 (php \">= 7\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+    },
+    {
+     "id": "stale",
+     "role": "accepted",
+     "baseline": null,
+     "signal_ids": [
+      "S2"
+     ],
+     "degree": {
+      "liveness_complete": false
+     },
+     "headline": {
+      "unit": "years",
+      "value": 4.6,
+      "source": "release"
+     },
+     "summary": "last release 2022-02-16 (4.6 years ago)"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [
+     {
+      "flag": "old-promise",
+      "weight": 16,
+      "if_counted": {
+       "total": 8,
+       "verdict": "medium",
+       "role": "lead",
+       "at_least": false,
+       "modifiers": [
+        {
+         "reason": "transitive",
+         "applies_to": "maintenance",
+         "divide_by": 2,
+         "before": 16,
+         "after": 8
+        }
+       ]
+      }
+     },
+     {
+      "flag": "stale",
+      "weight": 8,
+      "if_counted": {
+       "total": 4,
+       "verdict": "low",
+       "role": "lead",
+       "at_least": true,
+       "modifiers": [
+        {
+         "reason": "transitive",
+         "applies_to": "maintenance",
+         "divide_by": 2,
+         "before": 8,
+         "after": 4
+        }
+       ]
+      }
+     }
+    ],
+    "text": "0 (old-promise, stale accepted)"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 1,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 1,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [
+    {
+     "check": "repository_activity",
+     "reason": "allowlisted",
+     "blocks": [
+      "S3",
+      "S4"
+     ]
+    }
+   ],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "not_read",
+    "reason": "allowlisted",
+    "forge": "github",
+    "host": "github.com",
+    "repo": "paragonie/random_compat",
+    "event": null,
+    "archived": null,
+    "fetched_at": null,
+    "cached_at": null
+   },
+   "allowlist": {
+    "by": "builtin",
+    "pattern": "paragonie/random_compat",
+    "version": "9.99.100",
+    "reason": "intentionally empty package: PHP 7+ has random_bytes() built in",
+    "reason_id": "random-compat-empty",
+    "reason_by": "lockrot",
+    "expires": null,
+    "flag_ids": null
+   },
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/paragonie/random_compat",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "laravel/socialite",
+    "phpseclib/phpseclib",
+    "paragonie/random_compat"
+   ],
+   "depth": 2,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "laravel/socialite",
+    "socialiteproviders/facebook",
+    "socialiteproviders/github",
+    "socialiteproviders/google",
+    "socialiteproviders/kanidm",
+    "socialiteproviders/keycloak",
+    "socialiteproviders/linkedin",
+    "socialiteproviders/microsoft-azure"
+   ],
+   "signals": [
+    {
+     "id": "S2",
+     "level": "warn",
+     "summary": "last release 2022-02-16 (4.6 years ago)",
+     "data": {
+      "last_release": "2022-02-16T17:07:03+00:00",
+      "last_version": "v2.0.21",
+      "years": 4.6,
+      "dated_by": null
+     }
+    },
+    {
+     "id": "S5",
+     "level": "warn",
+     "summary": "released 2020-10-15 for PHP 7 (php \">= 7\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "data": {
+      "target_php": "8.4",
+      "target_major": "8.0",
+      "ga_date": "2020-11-26",
+      "php_constraint": ">= 7",
+      "written_for_php": 7,
+      "released": "2020-10-15T08:29:30+00:00"
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": "intentionally empty package: PHP 7+ has random_bytes() built in",
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 1.34,
+   "age": {
+    "installed": {
+     "at": "2020-10-15T08:29:30+00:00",
+     "years": 6,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v2.0.21",
+     "at": "2022-02-16T17:07:03+00:00",
+     "years": 4.6,
+     "level": "warn",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v9.99.100",
+     "at": "2020-10-15T08:29:30+00:00",
+     "years": 6,
+     "level": "high",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": null,
+    "push_unmeasured": "allowlisted"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "php-http/promise",
+   "version": "1.3.1",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 26,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "php-http/promise",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/php-http/promise",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "typesense/typesense-php",
+    "php-http/httplug",
+    "php-http/promise"
+   ],
+   "depth": 2,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "typesense/typesense-php"
+   ],
+   "signals": [],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 1.65,
+   "age": {
+    "installed": {
+     "at": "2024-03-15T13:55:21+00:00",
+     "years": 2.5,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "1.2.2",
+     "at": "2025-11-08T15:23:07+00:00",
+     "years": 0.9,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "1.3.1",
+     "at": "2024-03-15T13:55:21+00:00",
+     "years": 2.5,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2025-12-10T14:14:48Z",
+     "years": 0.8,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "phpdocumentor/reflection-common",
+   "version": "2.2.0",
+   "branch": "2.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 27,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "phpDocumentor/ReflectionCommon",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/phpdocumentor/reflection-common",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "asbiin/laravel-webauthn",
+    "phpdocumentor/reflection-docblock",
+    "phpdocumentor/reflection-common"
+   ],
+   "depth": 2,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "asbiin/laravel-webauthn"
+   ],
+   "signals": [],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 5.37,
+   "age": {
+    "installed": {
+     "at": "2020-06-27T09:03:43+00:00",
+     "years": 6.3,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "2.2.1",
+     "at": "2025-11-10T21:21:55+00:00",
+     "years": 0.9,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "2.2.1",
+     "at": "2025-11-10T21:21:55+00:00",
+     "years": 0.9,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-09-27T10:14:47Z",
+     "years": 0,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "psr/cache",
+   "version": "3.0.0",
+   "branch": "3.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "finished",
+   "priority": "none",
+   "lead": null,
+   "rank": 28,
+   "flags": [
+    {
+     "id": "stale",
+     "role": "accepted",
+     "baseline": null,
+     "signal_ids": [
+      "S2"
+     ],
+     "degree": {
+      "liveness_complete": false
+     },
+     "headline": {
+      "unit": "years",
+      "value": 5.7,
+      "source": "release"
+     },
+     "summary": "last release 2021-02-03 (5.7 years ago)"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [
+     {
+      "flag": "stale",
+      "weight": 8,
+      "if_counted": {
+       "total": 4,
+       "verdict": "low",
+       "role": "lead",
+       "at_least": true,
+       "modifiers": [
+        {
+         "reason": "transitive",
+         "applies_to": "maintenance",
+         "divide_by": 2,
+         "before": 8,
+         "after": 4
+        }
+       ]
+      }
+     }
+    ],
+    "text": "0 (stale accepted)"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [
+    {
+     "check": "repository_activity",
+     "reason": "allowlisted",
+     "blocks": [
+      "S3",
+      "S4"
+     ]
+    }
+   ],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "not_read",
+    "reason": "allowlisted",
+    "forge": "github",
+    "host": "github.com",
+    "repo": "php-fig/cache",
+    "event": null,
+    "archived": null,
+    "fetched_at": null,
+    "cached_at": null
+   },
+   "allowlist": {
+    "by": "builtin",
+    "pattern": "psr/*",
+    "version": null,
+    "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
+    "reason_id": "php-fig-interfaces",
+    "reason_by": "lockrot",
+    "expires": null,
+    "flag_ids": null
+   },
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/psr/cache",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "doctrine/dbal",
+    "psr/cache"
+   ],
+   "depth": 1,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "doctrine/dbal",
+    "laravel/jetstream"
+   ],
+   "signals": [
+    {
+     "id": "S2",
+     "level": "high",
+     "summary": "last release 2021-02-03 (5.7 years ago)",
+     "data": {
+      "last_release": "2021-02-03T23:26:27+00:00",
+      "last_version": "3.0.0",
+      "years": 5.7,
+      "dated_by": null
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 0,
+   "age": {
+    "installed": {
+     "at": "2021-02-03T23:26:27+00:00",
+     "years": 5.7,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "3.0.0",
+     "at": "2021-02-03T23:26:27+00:00",
+     "years": 5.7,
+     "level": "high",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "3.0.0",
+     "at": "2021-02-03T23:26:27+00:00",
+     "years": 5.7,
+     "level": "high",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": null,
+    "push_unmeasured": "allowlisted"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "psr/clock",
+   "version": "1.0.0",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "finished",
+   "priority": "none",
+   "lead": null,
+   "rank": 29,
+   "flags": [
+    {
+     "id": "stale",
+     "role": "accepted",
+     "baseline": null,
+     "signal_ids": [
+      "S2"
+     ],
+     "degree": {
+      "liveness_complete": false
+     },
+     "headline": {
+      "unit": "years",
+      "value": 3.8,
+      "source": "release"
+     },
+     "summary": "last release 2022-11-25 (3.8 years ago)"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [
+     {
+      "flag": "stale",
+      "weight": 8,
+      "if_counted": {
+       "total": 4,
+       "verdict": "low",
+       "role": "lead",
+       "at_least": true,
+       "modifiers": [
+        {
+         "reason": "transitive",
+         "applies_to": "maintenance",
+         "divide_by": 2,
+         "before": 8,
+         "after": 4
+        }
+       ]
+      }
+     }
+    ],
+    "text": "0 (stale accepted)"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [
+    {
+     "check": "repository_activity",
+     "reason": "allowlisted",
+     "blocks": [
+      "S3",
+      "S4"
+     ]
+    }
+   ],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "not_read",
+    "reason": "allowlisted",
+    "forge": "github",
+    "host": "github.com",
+    "repo": "php-fig/clock",
+    "event": null,
+    "archived": null,
+    "fetched_at": null,
+    "cached_at": null
+   },
+   "allowlist": {
+    "by": "builtin",
+    "pattern": "psr/*",
+    "version": null,
+    "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
+    "reason_id": "php-fig-interfaces",
+    "reason_by": "lockrot",
+    "expires": null,
+    "flag_ids": null
+   },
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/psr/clock",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "asbiin/laravel-webauthn",
+    "web-auth/webauthn-lib",
+    "psr/clock"
+   ],
+   "depth": 2,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "asbiin/laravel-webauthn",
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel/framework",
+    "laravel/nightwatch",
+    "laravel/pulse",
+    "tightenco/ziggy"
+   ],
+   "signals": [
+    {
+     "id": "S2",
+     "level": "warn",
+     "summary": "last release 2022-11-25 (3.8 years ago)",
+     "data": {
+      "last_release": "2022-11-25T14:36:26+00:00",
+      "last_version": "1.0.0",
+      "years": 3.8,
+      "dated_by": null
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 0,
+   "age": {
+    "installed": {
+     "at": "2022-11-25T14:36:26+00:00",
+     "years": 3.8,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "1.0.0",
+     "at": "2022-11-25T14:36:26+00:00",
+     "years": 3.8,
+     "level": "warn",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "1.0.0",
+     "at": "2022-11-25T14:36:26+00:00",
+     "years": 3.8,
+     "level": "warn",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": null,
+    "push_unmeasured": "allowlisted"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "psr/container",
+   "version": "2.0.2",
+   "branch": "2.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "finished",
+   "priority": "none",
+   "lead": null,
+   "rank": 30,
+   "flags": [
+    {
+     "id": "stale",
+     "role": "accepted",
+     "baseline": null,
+     "signal_ids": [
+      "S2"
+     ],
+     "degree": {
+      "liveness_complete": false
+     },
+     "headline": {
+      "unit": "years",
+      "value": 4.9,
+      "source": "release"
+     },
+     "summary": "last release 2021-11-05 (4.9 years ago)"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [
+     {
+      "flag": "stale",
+      "weight": 8,
+      "if_counted": {
+       "total": 4,
+       "verdict": "low",
+       "role": "lead",
+       "at_least": true,
+       "modifiers": [
+        {
+         "reason": "transitive",
+         "applies_to": "maintenance",
+         "divide_by": 2,
+         "before": 8,
+         "after": 4
+        }
+       ]
+      }
+     }
+    ],
+    "text": "0 (stale accepted)"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [
+    {
+     "check": "repository_activity",
+     "reason": "allowlisted",
+     "blocks": [
+      "S3",
+      "S4"
+     ]
+    }
+   ],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "not_read",
+    "reason": "allowlisted",
+    "forge": "github",
+    "host": "github.com",
+    "repo": "php-fig/container",
+    "event": null,
+    "archived": null,
+    "fetched_at": null,
+    "cached_at": null
+   },
+   "allowlist": {
+    "by": "builtin",
+    "pattern": "psr/*",
+    "version": null,
+    "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
+    "reason_id": "php-fig-interfaces",
+    "reason_by": "lockrot",
+    "expires": null,
+    "flag_ids": null
+   },
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/psr/container",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "laravel/framework",
+    "psr/container"
+   ],
+   "depth": 1,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "asbiin/laravel-webauthn",
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel/fortify",
+    "laravel/framework",
+    "laravel/jetstream",
+    "laravel/nightwatch",
+    "laravel/pulse",
+    "laravel/sanctum",
+    "laravel/scout",
+    "tightenco/ziggy"
+   ],
+   "signals": [
+    {
+     "id": "S2",
+     "level": "warn",
+     "summary": "last release 2021-11-05 (4.9 years ago)",
+     "data": {
+      "last_release": "2021-11-05T16:50:12+00:00",
+      "last_version": "1.1.2",
+      "years": 4.9,
+      "dated_by": null
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 0,
+   "age": {
+    "installed": {
+     "at": "2021-11-05T16:47:00+00:00",
+     "years": 4.9,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "1.1.2",
+     "at": "2021-11-05T16:50:12+00:00",
+     "years": 4.9,
+     "level": "warn",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "2.0.2",
+     "at": "2021-11-05T16:47:00+00:00",
+     "years": 4.9,
+     "level": "warn",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": null,
+    "push_unmeasured": "allowlisted"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "psr/event-dispatcher",
+   "version": "1.0.0",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "finished",
+   "priority": "none",
+   "lead": null,
+   "rank": 31,
+   "flags": [
+    {
+     "id": "old-promise",
+     "role": "accepted",
+     "baseline": null,
+     "signal_ids": [
+      "S5"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "php",
+      "value": 7,
+      "source": null
+     },
+     "summary": "released 2019-01-08 for PHP 7 (php \">=7.2.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+    },
+    {
+     "id": "stale",
+     "role": "accepted",
+     "baseline": null,
+     "signal_ids": [
+      "S2"
+     ],
+     "degree": {
+      "liveness_complete": false
+     },
+     "headline": {
+      "unit": "years",
+      "value": 7.7,
+      "source": "release"
+     },
+     "summary": "last release 2019-01-08 (7.7 years ago)"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [
+     {
+      "flag": "old-promise",
+      "weight": 16,
+      "if_counted": {
+       "total": 8,
+       "verdict": "medium",
+       "role": "lead",
+       "at_least": false,
+       "modifiers": [
+        {
+         "reason": "transitive",
+         "applies_to": "maintenance",
+         "divide_by": 2,
+         "before": 16,
+         "after": 8
+        }
+       ]
+      }
+     },
+     {
+      "flag": "stale",
+      "weight": 8,
+      "if_counted": {
+       "total": 4,
+       "verdict": "low",
+       "role": "lead",
+       "at_least": true,
+       "modifiers": [
+        {
+         "reason": "transitive",
+         "applies_to": "maintenance",
+         "divide_by": 2,
+         "before": 8,
+         "after": 4
+        }
+       ]
+      }
+     }
+    ],
+    "text": "0 (old-promise, stale accepted)"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [
+    {
+     "check": "repository_activity",
+     "reason": "allowlisted",
+     "blocks": [
+      "S3",
+      "S4"
+     ]
+    }
+   ],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "not_read",
+    "reason": "allowlisted",
+    "forge": "github",
+    "host": "github.com",
+    "repo": "php-fig/event-dispatcher",
+    "event": null,
+    "archived": null,
+    "fetched_at": null,
+    "cached_at": null
+   },
+   "allowlist": {
+    "by": "builtin",
+    "pattern": "psr/*",
+    "version": null,
+    "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
+    "reason_id": "php-fig-interfaces",
+    "reason_by": "lockrot",
+    "expires": null,
+    "flag_ids": null
+   },
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/psr/event-dispatcher",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "asbiin/laravel-webauthn",
+    "web-auth/webauthn-lib",
+    "psr/event-dispatcher"
+   ],
+   "depth": 2,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "asbiin/laravel-webauthn",
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel/framework",
+    "laravel/nightwatch",
+    "laravel/pulse",
+    "tightenco/ziggy"
+   ],
+   "signals": [
+    {
+     "id": "S2",
+     "level": "high",
+     "summary": "last release 2019-01-08 (7.7 years ago)",
+     "data": {
+      "last_release": "2019-01-08T18:20:26+00:00",
+      "last_version": "1.0.0",
+      "years": 7.7,
+      "dated_by": null
+     }
+    },
+    {
+     "id": "S5",
+     "level": "warn",
+     "summary": "released 2019-01-08 for PHP 7 (php \">=7.2.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "data": {
+      "target_php": "8.4",
+      "target_major": "8.0",
+      "ga_date": "2020-11-26",
+      "php_constraint": ">=7.2.0",
+      "written_for_php": 7,
+      "released": "2019-01-08T18:20:26+00:00"
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 0,
+   "age": {
+    "installed": {
+     "at": "2019-01-08T18:20:26+00:00",
+     "years": 7.7,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "1.0.0",
+     "at": "2019-01-08T18:20:26+00:00",
+     "years": 7.7,
+     "level": "high",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "1.0.0",
+     "at": "2019-01-08T18:20:26+00:00",
+     "years": 7.7,
+     "level": "high",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": null,
+    "push_unmeasured": "allowlisted"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "psr/http-client",
+   "version": "1.0.3",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "finished",
+   "priority": "none",
+   "lead": null,
+   "rank": 32,
+   "flags": [
+    {
+     "id": "stale",
+     "role": "accepted",
+     "baseline": null,
+     "signal_ids": [
+      "S2"
+     ],
+     "degree": {
+      "liveness_complete": false
+     },
+     "headline": {
+      "unit": "years",
+      "value": 3,
+      "source": "release"
+     },
+     "summary": "last release 2023-09-23 (3.0 years ago)"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [
+     {
+      "flag": "stale",
+      "weight": 8,
+      "if_counted": {
+       "total": 4,
+       "verdict": "low",
+       "role": "lead",
+       "at_least": true,
+       "modifiers": [
+        {
+         "reason": "transitive",
+         "applies_to": "maintenance",
+         "divide_by": 2,
+         "before": 8,
+         "after": 4
+        }
+       ]
+      }
+     }
+    ],
+    "text": "0 (stale accepted)"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [
+    {
+     "check": "repository_activity",
+     "reason": "allowlisted",
+     "blocks": [
+      "S3",
+      "S4"
+     ]
+    }
+   ],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "not_read",
+    "reason": "allowlisted",
+    "forge": "github",
+    "host": "github.com",
+    "repo": "php-fig/http-client",
+    "event": null,
+    "archived": null,
+    "fetched_at": null,
+    "cached_at": null
+   },
+   "allowlist": {
+    "by": "builtin",
+    "pattern": "psr/*",
+    "version": null,
+    "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
+    "reason_id": "php-fig-interfaces",
+    "reason_by": "lockrot",
+    "expires": null,
+    "flag_ids": null
+   },
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/psr/http-client",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "guzzlehttp/guzzle",
+    "psr/http-client"
+   ],
+   "depth": 1,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "guzzlehttp/guzzle",
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel-notification-channels/telegram",
+    "laravel/framework",
+    "laravel/nightwatch",
+    "laravel/socialite",
+    "meilisearch/meilisearch-php",
+    "socialiteproviders/facebook",
+    "socialiteproviders/github",
+    "socialiteproviders/google",
+    "socialiteproviders/kanidm",
+    "socialiteproviders/keycloak",
+    "socialiteproviders/linkedin",
+    "socialiteproviders/microsoft-azure",
+    "stevebauman/location",
+    "tightenco/ziggy",
+    "typesense/typesense-php",
+    "uploadcare/uploadcare-php"
+   ],
+   "signals": [
+    {
+     "id": "S2",
+     "level": "warn",
+     "summary": "last release 2023-09-23 (3.0 years ago)",
+     "data": {
+      "last_release": "2023-09-23T14:17:50+00:00",
+      "last_version": "1.0.3",
+      "years": 3,
+      "dated_by": null
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 0,
+   "age": {
+    "installed": {
+     "at": "2023-09-23T14:17:50+00:00",
+     "years": 3,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "1.0.3",
+     "at": "2023-09-23T14:17:50+00:00",
+     "years": 3,
+     "level": "warn",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "1.0.3",
+     "at": "2023-09-23T14:17:50+00:00",
+     "years": 3,
+     "level": "warn",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": null,
+    "push_unmeasured": "allowlisted"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "psr/simple-cache",
+   "version": "3.0.0",
+   "branch": "3.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "finished",
+   "priority": "none",
+   "lead": null,
+   "rank": 33,
+   "flags": [
+    {
+     "id": "stale",
+     "role": "accepted",
+     "baseline": null,
+     "signal_ids": [
+      "S2"
+     ],
+     "degree": {
+      "liveness_complete": false
+     },
+     "headline": {
+      "unit": "years",
+      "value": 4.9,
+      "source": "release"
+     },
+     "summary": "last release 2021-10-29 (4.9 years ago)"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [
+     {
+      "flag": "stale",
+      "weight": 8,
+      "if_counted": {
+       "total": 4,
+       "verdict": "low",
+       "role": "lead",
+       "at_least": true,
+       "modifiers": [
+        {
+         "reason": "transitive",
+         "applies_to": "maintenance",
+         "divide_by": 2,
+         "before": 8,
+         "after": 4
+        }
+       ]
+      }
+     }
+    ],
+    "text": "0 (stale accepted)"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [
+    {
+     "check": "repository_activity",
+     "reason": "allowlisted",
+     "blocks": [
+      "S3",
+      "S4"
+     ]
+    }
+   ],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "not_read",
+    "reason": "allowlisted",
+    "forge": "github",
+    "host": "github.com",
+    "repo": "php-fig/simple-cache",
+    "event": null,
+    "archived": null,
+    "fetched_at": null,
+    "cached_at": null
+   },
+   "allowlist": {
+    "by": "builtin",
+    "pattern": "psr/*",
+    "version": null,
+    "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
+    "reason_id": "php-fig-interfaces",
+    "reason_by": "lockrot",
+    "expires": null,
+    "flag_ids": null
+   },
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/psr/simple-cache",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "laravel/framework",
+    "psr/simple-cache"
+   ],
+   "depth": 1,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel/framework",
+    "laravel/jetstream",
+    "laravel/nightwatch",
+    "tightenco/ziggy"
+   ],
+   "signals": [
+    {
+     "id": "S2",
+     "level": "warn",
+     "summary": "last release 2021-10-29 (4.9 years ago)",
+     "data": {
+      "last_release": "2021-10-29T13:26:27+00:00",
+      "last_version": "3.0.0",
+      "years": 4.9,
+      "dated_by": null
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 0,
+   "age": {
+    "installed": {
+     "at": "2021-10-29T13:26:27+00:00",
+     "years": 4.9,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "3.0.0",
+     "at": "2021-10-29T13:26:27+00:00",
+     "years": 4.9,
+     "level": "warn",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "3.0.0",
+     "at": "2021-10-29T13:26:27+00:00",
+     "years": 4.9,
+     "level": "warn",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": null,
+    "push_unmeasured": "allowlisted"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "ralouphie/getallheaders",
+   "version": "3.0.3",
+   "branch": "3.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "finished",
+   "priority": "none",
+   "lead": null,
+   "rank": 34,
+   "flags": [
+    {
+     "id": "old-promise",
+     "role": "accepted",
+     "baseline": null,
+     "signal_ids": [
+      "S5"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "php",
+      "value": 5,
+      "source": null
+     },
+     "summary": "released 2019-03-08 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+    },
+    {
+     "id": "stale",
+     "role": "accepted",
+     "baseline": null,
+     "signal_ids": [
+      "S2"
+     ],
+     "degree": {
+      "liveness_complete": false
+     },
+     "headline": {
+      "unit": "years",
+      "value": 7.6,
+      "source": "release"
+     },
+     "summary": "last release 2019-03-08 (7.6 years ago)"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [
+     {
+      "flag": "old-promise",
+      "weight": 16,
+      "if_counted": {
+       "total": 8,
+       "verdict": "medium",
+       "role": "lead",
+       "at_least": false,
+       "modifiers": [
+        {
+         "reason": "transitive",
+         "applies_to": "maintenance",
+         "divide_by": 2,
+         "before": 16,
+         "after": 8
+        }
+       ]
+      }
+     },
+     {
+      "flag": "stale",
+      "weight": 8,
+      "if_counted": {
+       "total": 4,
+       "verdict": "low",
+       "role": "lead",
+       "at_least": true,
+       "modifiers": [
+        {
+         "reason": "transitive",
+         "applies_to": "maintenance",
+         "divide_by": 2,
+         "before": 8,
+         "after": 4
+        }
+       ]
+      }
+     }
+    ],
+    "text": "0 (old-promise, stale accepted)"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [
+    {
+     "check": "repository_activity",
+     "reason": "allowlisted",
+     "blocks": [
+      "S3",
+      "S4"
+     ]
+    }
+   ],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "not_read",
+    "reason": "allowlisted",
+    "forge": "github",
+    "host": "github.com",
+    "repo": "ralouphie/getallheaders",
+    "event": null,
+    "archived": null,
+    "fetched_at": null,
+    "cached_at": null
+   },
+   "allowlist": {
+    "by": "builtin",
+    "pattern": "ralouphie/getallheaders",
+    "version": null,
+    "reason": "single-function polyfill for getallheaders(); complete",
+    "reason_id": "getallheaders-polyfill",
+    "reason_by": "lockrot",
+    "expires": null,
+    "flag_ids": null
+   },
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/ralouphie/getallheaders",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "guzzlehttp/guzzle",
+    "guzzlehttp/psr7",
+    "ralouphie/getallheaders"
+   ],
+   "depth": 2,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "guzzlehttp/guzzle",
+    "http-interop/http-factory-guzzle",
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel-notification-channels/telegram",
+    "laravel/framework",
+    "laravel/nightwatch",
+    "laravel/socialite",
+    "sentry/sentry-laravel",
+    "socialiteproviders/facebook",
+    "socialiteproviders/github",
+    "socialiteproviders/google",
+    "socialiteproviders/kanidm",
+    "socialiteproviders/keycloak",
+    "socialiteproviders/linkedin",
+    "socialiteproviders/microsoft-azure",
+    "stevebauman/location",
+    "tightenco/ziggy",
+    "uploadcare/uploadcare-php"
+   ],
+   "signals": [
+    {
+     "id": "S2",
+     "level": "high",
+     "summary": "last release 2019-03-08 (7.6 years ago)",
+     "data": {
+      "last_release": "2019-03-08T08:55:37+00:00",
+      "last_version": "3.0.3",
+      "years": 7.6,
+      "dated_by": null
+     }
+    },
+    {
+     "id": "S5",
+     "level": "warn",
+     "summary": "released 2019-03-08 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "data": {
+      "target_php": "8.4",
+      "target_major": "8.0",
+      "ga_date": "2020-11-26",
+      "php_constraint": ">=5.6",
+      "written_for_php": 5,
+      "released": "2019-03-08T08:55:37+00:00"
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": "single-function polyfill for getallheaders(); complete",
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 0,
+   "age": {
+    "installed": {
+     "at": "2019-03-08T08:55:37+00:00",
+     "years": 7.6,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "3.0.3",
+     "at": "2019-03-08T08:55:37+00:00",
+     "years": 7.6,
+     "level": "high",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "3.0.3",
+     "at": "2019-03-08T08:55:37+00:00",
+     "years": 7.6,
+     "level": "high",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": null,
+    "push_unmeasured": "allowlisted"
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "webmozart/assert",
+   "version": "1.11.0",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
+   },
+   "verdict": "ok",
+   "priority": "none",
+   "lead": null,
+   "rank": 35,
+   "flags": [],
+   "score": {
+    "model": 1,
+    "total": 0,
+    "exact": 0,
+    "accepted": [],
+    "text": "0"
+   },
+   "next_step": null,
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "unchecked_accepted": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "webmozarts/assert",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:39:09+00:00",
+    "cached_at": null
+   },
+   "allowlist": null,
+   "abandoned_ignored": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/webmozart/assert",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "libyears_at_least": false,
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "asbiin/laravel-webauthn",
+    "phpdocumentor/reflection-docblock",
+    "webmozart/assert"
+   ],
+   "depth": 2,
+   "depth_unmeasured": null,
+   "named_in": [],
+   "direct_dependents": [
+    "asbiin/laravel-webauthn",
+    "inertiajs/inertia-laravel",
+    "knuckleswtf/scribe",
+    "laravel/framework",
+    "laravel/nightwatch",
+    "tightenco/ziggy"
+   ],
+   "signals": [],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:09+00:00",
+   "libyears": 4.03,
+   "age": {
+    "installed": {
+     "at": "2022-06-03T18:03:27+00:00",
+     "years": 4.3,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "2.4.1",
+     "at": "2026-06-15T15:31:57+00:00",
+     "years": 0.3,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "1.12.1",
+     "at": "2025-10-29T15:56:20+00:00",
+     "years": 0.9,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-06-15T15:31:57Z",
+     "years": 0.3,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  }
+ ]
+}

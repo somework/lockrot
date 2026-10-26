@@ -1334,12 +1334,20 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
       "composer",
       "update",
       "moneyphp/money"
+     ],
+     [
+      "composer",
+      "why-not",
+      "moneyphp/money",
+      "v4.9.0",
+      "--locked"
      ]
     ],
     "through": [],
@@ -1603,12 +1611,20 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
       "composer",
       "update",
       "erusev/parsedown"
+     ],
+     [
+      "composer",
+      "why-not",
+      "erusev/parsedown",
+      "1.8.0",
+      "--locked"
      ]
     ],
     "through": [
@@ -1618,7 +1634,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "releases_unknown"
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
      }
     ],
     "also": [],
@@ -1862,6 +1880,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [
@@ -1871,7 +1890,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "releases_unknown"
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
      },
      {
       "package": "knuckleswtf/scribe",
@@ -1879,7 +1900,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "releases_unknown"
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
      },
      {
       "package": "laravel/framework",
@@ -1890,7 +1913,9 @@
        "released": "2026-09-29T12:46:21+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "laravel/nightwatch",
@@ -1898,7 +1923,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "releases_unknown"
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
      },
      {
       "package": "tightenco/ziggy",
@@ -1906,7 +1933,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "releases_unknown"
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
      }
     ],
     "also": [],
@@ -2167,12 +2196,20 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
       "composer",
       "update",
       "nette/schema"
+     ],
+     [
+      "composer",
+      "why-not",
+      "nette/schema",
+      "v1.3.6",
+      "--locked"
      ]
     ],
     "through": [
@@ -2182,7 +2219,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "releases_unknown"
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
      },
      {
       "package": "knuckleswtf/scribe",
@@ -2190,7 +2229,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "releases_unknown"
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
      },
      {
       "package": "laravel/framework",
@@ -2201,7 +2242,9 @@
        "released": "2026-09-29T12:46:21+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "laravel/nightwatch",
@@ -2209,7 +2252,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "releases_unknown"
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
      },
      {
       "package": "tightenco/ziggy",
@@ -2217,7 +2262,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "releases_unknown"
+      "newest_requires_unmeasured": "releases_unknown",
+      "local": false,
+      "newest_is_installed": null
      }
     ],
     "also": [],

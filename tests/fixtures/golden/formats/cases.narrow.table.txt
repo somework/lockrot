@@ -236,7 +236,6 @@ high (20)
       do: require symfony/mailer ^6.4.40 — clears the
           advisory; 6.x needs php >=8.1, which require.php
           allows; the target php 8.4 runs it; held by
-          composer.json (requires acme/ml-widget ^1.0) and
           symfony/mailer v6.4.40, its own release (requires
           acme/ml-transport ^2.0) and acme/ml-widget 1.0.0
           (conflicts with acme/ml-transport >=2.0); the
@@ -342,8 +341,9 @@ high (20)
   hoa/consistency 1.17.05.02  via lorisleiva/laravel-search-string  ·  abandoned · old-promise
       18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive (baseline: new package)
       do: find a replacement (none named); it comes in
-          through lorisleiva/laravel-search-string: replace
-          or update that package
+          through lorisleiva/laravel-search-string
+          (hoa/compiler requires it): replace
+          lorisleiva/laravel-search-string
       abandoned    marked abandoned by its registry; its
                    repository is archived on GitHub; last
                    release 2017-08-29 (9.1 years ago); last
@@ -356,7 +356,7 @@ high (20)
       do: replace with web-auth/webauthn-lib (named by its
           registry; itself high: left-behind); it comes in
           through web-auth/webauthn-lib: replace or update
-          that package; the newest release of
+          web-auth/webauthn-lib; the newest release of
           web-auth/webauthn-lib (5.3.9) no longer requires
           it
       abandoned    marked abandoned by its registry,
@@ -459,7 +459,7 @@ high (20)
                    release 2022-12-19 (3.8 years ago); last
                    push 2023-04-23 (3.4 years ago)
 
-medium (12)
+medium (13)
   joomla/filter 2.0.5  direct  ·  vulnerable
       8 = vulnerable 8 [medium advisory] (baseline: new package)
       do: raise require.php to >=8.1, then require
@@ -530,6 +530,16 @@ medium (12)
       old-promise  released 2020-11-22 for PHP 7 (php
                    ">=7.2"), before PHP 8 existed (8.0 GA
                    2020-11-26); admits 8.4 untested
+  voku/stop-words 2.0.1  via mautic/core-lib  ·  old-promise · stale
+      9 = (old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive (baseline: new package)
+      do: test it on PHP 8.4 — 2.0.1 is its newest
+          release; it comes in through mautic/core-lib
+          (jbroadway/urlify requires it): change your own
+          package mautic/core-lib
+      old-promise  released 2018-11-23 for PHP 7 (php
+                   ">=7.0.0"), before PHP 8 existed (8.0 GA
+                   2020-11-26); admits 8.4 untested
+      stale        last release 2018-11-23 (7.9 years ago)
   akaunting/laravel-debugbar-collector 2.1.1  direct  ·  stale
       8 = stale 8 (baseline: new package)
       do: —
@@ -605,11 +615,8 @@ medium (12)
                    (2024-09-25)
   symfony/var-dumper v4.4.47  via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 31 more  ·  left-behind
       8 = left-behind 16 ÷ 2 transitive (baseline: new package)
-      do: move symfony/var-dumper to ^5.4 through
-          babdev/pagerfanta-bundle,
-          bdunogier/guzzle-site-authenticator,
-          craue/config-bundle and 31 more — clears
-          left-behind; 5.x needs php >=7.2.5, which
+      do: require symfony/var-dumper ^5.4 in require-dev —
+          clears left-behind; 5.x needs php >=7.2.5, which
           require.php allows; the target php 8.4 runs it; a
           new major brings its own requirements, which
           lockrot does not solve; what requires it must
@@ -705,13 +712,13 @@ not flagged (5)
       gate 0 = min(0, 2 × 0) (the new facts bound it); new: 0
       checks missing: S2 (undated releases)
 
-53 packages checked · 48 flagged: critical 11 · high 20 ·
-medium 12 · low 5
+54 packages checked · 49 flagged: critical 11 · high 20 ·
+medium 13 · low 5
 flags: abandoned 7 · silent 1 · pinned 5 ·
-left-behind 16 · old-promise 12 · stale 8 · capped 3 ·
-vulnerable 19 · 20 packages carry more than one
-depth: 18 of 48 flagged packages are named by no line of composer.json ·
-direct 29 · 1 hop 13 · 2 hops 2 · 4 hops 1 ·
+left-behind 16 · old-promise 13 · stale 9 · capped 3 ·
+vulnerable 19 · 21 packages carry more than one
+depth: 19 of 49 flagged packages are named by no line of composer.json ·
+direct 29 · 1 hop 13 · 2 hops 3 · 4 hops 1 ·
 unreached 3 ·
 deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs) ·
 1 more is named only in require-dev, which this run did not walk (pass --dev)
@@ -721,17 +728,17 @@ packages-dev not checked (pass --dev)
 fix, by package: composer update 7 · upgrade 4 ·
 php floor raise 6 · fix unknown 1 · no fix 1
 update now: composer update phpoffice/phpspreadsheet robrichards/xmlseclibs symfony/http-foundation league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn
-libyears: at least 117.7 behind across 43 of 53 packages ·
+libyears: at least 117.7 behind across 44 of 54 packages ·
 69.1 from direct requirements ·
 furthest behind symfony/monolog-bridge v2.6.13 at 10.6
-pulled in by: mautic/core-lib 5 · guzzlehttp/guzzle 2 ·
+pulled in by: mautic/core-lib 6 · guzzlehttp/guzzle 2 ·
 akaunting/laravel-apexcharts 1 ·
 genealabs/laravel-model-caching 1 · jfcherng/php-diff 1 ·
 … and 6 more
-advisories: 53 packages asked ·
+advisories: 54 packages asked ·
 packagist.org answered (286 on record for 22 packages)
 php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 10 packages that exclude it is not checked (the run checked no move)
-baseline: 3 known · 42 new · 4 worsened ·
+baseline: 3 known · 43 new · 4 worsened ·
 0 stale (lockrot-baseline.json)
 gate: fails · --fail-on=high,unchecked ·
 31 findings fail it (high 30, unchecked 3); 2 reach it and are known to the baseline ·

@@ -13,9 +13,9 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer why-not genealabs/laravel-model-caching 13.1.11"
+        "composer why-not genealabs/laravel-pivot-events 12.0.0 --locked"
     ],
     "commands_cmd": [
-        "composer why-not genealabs/laravel-model-caching 13.1.11"
+        "composer why-not genealabs/laravel-pivot-events 12.0.0 --locked"
     ]
 }

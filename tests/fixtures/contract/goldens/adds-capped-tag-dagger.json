@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer require 'matomo/referrer-spam-list:^4.0.5'"
+        "composer require 'matomo/referrer-spam-list:^4.0.5'",
+        "composer why-not matomo/referrer-spam-list 4.0.5 --locked"
     ],
     "commands_cmd": [
-        "composer require \"matomo/referrer-spam-list:^4.0.5\""
+        "composer require \"matomo/referrer-spam-list:^4.0.5\"",
+        "composer why-not matomo/referrer-spam-list 4.0.5 --locked"
     ]
 }

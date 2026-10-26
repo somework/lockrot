@@ -61,7 +61,7 @@ final class MoveCheckWallabagTest extends TestCase
     {
         $move = self::move('symfony/monolog-bridge');
 
-        self::assertSame(['result' => 'refused', 'form' => null, 'reason' => null], $move['check']);
+        self::assertSame(['result' => 'refused', 'form' => null, 'reason' => null, 'installs' => null], $move['check']);
         self::assertSame('upgrade', $move['fix_kind'], 'a refused move is held: SPEC §5.3 classes it upgrade');
         self::assertSame([], self::packageSteps($move), 'no update or require step that Composer refuses');
         self::assertContains(['source' => 'root', 'link' => 'root-require', 'target' => 'symfony/http-kernel', 'constraint' => '^4.4.51'], self::holds($move));
@@ -83,7 +83,7 @@ final class MoveCheckWallabagTest extends TestCase
     {
         $move = self::move('phpseclib/phpseclib');
 
-        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null], $move['check']);
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '3.0.57'], $move['check']);
         self::assertSame([['composer', 'update', 'phpseclib/phpseclib:^3.0.57']], $move['commands']);
     }
 

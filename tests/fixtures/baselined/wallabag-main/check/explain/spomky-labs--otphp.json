@@ -188,7 +188,7 @@
                     "package": null,
                     "version": null,
                     "link": "root-require",
-                    "target": "scheb/2fa-google-authenticator",
+                    "target": "scheb/2fa-bundle",
                     "constraint": "^5.13.2",
                     "holder": null
                 },
@@ -205,6 +205,7 @@
                         "flag_ids": [
                             "left-behind"
                         ],
+                        "direct": true,
                         "replacement": null,
                         "next_step": {
                             "kind": "require",
@@ -213,10 +214,20 @@
                             "check": {
                                 "result": "refused",
                                 "form": null,
-                                "reason": null
+                                "reason": null,
+                                "installs": null
                             }
                         }
                     }
+                },
+                {
+                    "source": "package",
+                    "package": "scheb/2fa-google-authenticator",
+                    "version": "5.x-dev",
+                    "link": "require",
+                    "target": "scheb/2fa-bundle",
+                    "constraint": "self.version",
+                    "holder": null
                 }
             ],
             "clears": [
@@ -254,13 +265,23 @@
             "check": {
                 "result": "refused",
                 "form": null,
-                "reason": null
+                "reason": null,
+                "installs": null
             },
+            "moves_with": [],
             "composer_moves_because": [
                 "holders",
                 "crosses_major"
             ],
-            "commands": [],
+            "commands": [
+                [
+                    "composer",
+                    "why-not",
+                    "spomky-labs/otphp",
+                    "11.5.0",
+                    "--locked"
+                ]
+            ],
             "through": [
                 {
                     "package": "scheb/2fa-google-authenticator",
@@ -271,11 +292,13 @@
                         "released": "2026-01-24T13:27:55+00:00"
                     },
                     "newest_requires": true,
-                    "newest_requires_unmeasured": null
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
                 }
             ],
             "also": [],
-            "text": "move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-google-authenticator ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+            "text": "move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
         },
         "security": {
             "status": "vulnerable",
@@ -429,7 +452,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "root-require",
-                                        "target": "scheb/2fa-google-authenticator",
+                                        "target": "scheb/2fa-bundle",
                                         "constraint": "^5.13.2",
                                         "holder": null
                                     },
@@ -446,6 +469,7 @@
                                             "flag_ids": [
                                                 "left-behind"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "require",
@@ -454,10 +478,20 @@
                                                 "check": {
                                                     "result": "refused",
                                                     "form": null,
-                                                    "reason": null
+                                                    "reason": null,
+                                                    "installs": null
                                                 }
                                             }
                                         }
+                                    },
+                                    {
+                                        "source": "package",
+                                        "package": "scheb/2fa-google-authenticator",
+                                        "version": "5.x-dev",
+                                        "link": "require",
+                                        "target": "scheb/2fa-bundle",
+                                        "constraint": "self.version",
+                                        "holder": null
                                     }
                                 ],
                                 "reason": null
@@ -495,7 +529,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "root-require",
-                                        "target": "scheb/2fa-google-authenticator",
+                                        "target": "scheb/2fa-bundle",
                                         "constraint": "^5.13.2",
                                         "holder": null
                                     },
@@ -512,6 +546,7 @@
                                             "flag_ids": [
                                                 "left-behind"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "require",
@@ -520,10 +555,20 @@
                                                 "check": {
                                                     "result": "refused",
                                                     "form": null,
-                                                    "reason": null
+                                                    "reason": null,
+                                                    "installs": null
                                                 }
                                             }
                                         }
+                                    },
+                                    {
+                                        "source": "package",
+                                        "package": "scheb/2fa-google-authenticator",
+                                        "version": "5.x-dev",
+                                        "link": "require",
+                                        "target": "scheb/2fa-bundle",
+                                        "constraint": "self.version",
+                                        "holder": null
                                     }
                                 ],
                                 "reason": null
@@ -692,7 +737,7 @@
                             "package": null,
                             "version": null,
                             "link": "root-require",
-                            "target": "scheb/2fa-google-authenticator",
+                            "target": "scheb/2fa-bundle",
                             "constraint": "^5.13.2",
                             "holder": null
                         },
@@ -709,6 +754,7 @@
                                 "flag_ids": [
                                     "left-behind"
                                 ],
+                                "direct": true,
                                 "replacement": null,
                                 "next_step": {
                                     "kind": "require",
@@ -717,10 +763,20 @@
                                     "check": {
                                         "result": "refused",
                                         "form": null,
-                                        "reason": null
+                                        "reason": null,
+                                        "installs": null
                                     }
                                 }
                             }
+                        },
+                        {
+                            "source": "package",
+                            "package": "scheb/2fa-google-authenticator",
+                            "version": "5.x-dev",
+                            "link": "require",
+                            "target": "scheb/2fa-bundle",
+                            "constraint": "self.version",
+                            "holder": null
                         }
                     ],
                     "if_applied": {
@@ -735,7 +791,8 @@
                     "check": {
                         "result": "refused",
                         "form": null,
-                        "reason": null
+                        "reason": null,
+                        "installs": null
                     }
                 }
             },

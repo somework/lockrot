@@ -63,7 +63,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "web-auth/metadata-service v2.1.7 \u2014 finding high, 18 = (abandoned 32 + left-behind 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry, replacement: web-auth/webauthn-lib. Do: replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it."
+                        "text": "web-auth/metadata-service v2.1.7 \u2014 finding high, 18 = (abandoned 32 + left-behind 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry, replacement: web-auth/webauthn-lib. Do: replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update web-auth/webauthn-lib; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "web-auth/metadata-service"
@@ -160,7 +160,7 @@
                     "level": "warning",
                     "rank": 25.0,
                     "message": {
-                        "text": "web-auth/metadata-service v2.1.7 \u2014 finding high, 18 = (abandoned 32 + left-behind 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 left-behind: branch 2.x last released 2019-09-04 (7.1 years ago); 4.x released 4.9.1 (2024-07-11). Do: replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it."
+                        "text": "web-auth/metadata-service v2.1.7 \u2014 finding high, 18 = (abandoned 32 + left-behind 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 left-behind: branch 2.x last released 2019-09-04 (7.1 years ago); 4.x released 4.9.1 (2024-07-11). Do: replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update web-auth/webauthn-lib; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "web-auth/metadata-service"

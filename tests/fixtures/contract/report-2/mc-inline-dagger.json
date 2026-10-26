@@ -1270,8 +1270,10 @@
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v2.3.2"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -1329,7 +1331,8 @@
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v2.3.2"
                     }
                 },
                 "move_in": "next_step",

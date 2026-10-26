@@ -39,11 +39,81 @@ final class ComposerSolverTest extends TestCase
         self::assertSame(['acme/lib' => '1.2.0', 'acme/zeta' => '1.0.0'], $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->installs());
     }
 
+    public function testAnUpdateNamesTheLockedReleaseOfEachNameThatItMoves(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => 'v1.0.0']],
+            ['acme/lib' => [['version' => 'v1.0.0'], ['version' => '1.2.0', 'require' => ['acme/zeta' => '^1.0']]], 'acme/zeta' => [['version' => '1.0.0']]]
+        );
+
+        self::assertSame(['acme/lib' => 'v1.0.0'], $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->updatedFrom());
+    }
+
+    /** monica's socialiteproviders/facebook: the solve takes another reference of the locked tag, which moves no version. */
+    public function testAnUpdateOfATagToAnotherReferenceIsNoChange(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0', 'acme/other' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/other', 'version' => '1.0.0', 'dist' => ['type' => 'zip', 'url' => 'https://example.org/a.zip', 'reference' => 'aaaa']]],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']], 'acme/other' => [['version' => '1.0.0', 'dist' => ['type' => 'zip', 'url' => 'https://example.org/b.zip', 'reference' => 'bbbb']]]]
+        );
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1'])->withJoined(['acme/other']));
+
+        self::assertSame([['acme/lib' => '1.1.0'], ['acme/lib' => '1.0.0']], [$solution->installs(), $solution->updatedFrom()]);
+    }
+
+    public function testAnUpdateOfABranchToAnotherCommitIsAChange(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0', 'acme/other' => 'dev-main']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $root->setMinimumStability('dev');
+        $locked = [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/other', 'version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'aaaa']]];
+        $remote = ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']], 'acme/other' => [['version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'bbbb']]]];
+        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote), []);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1'])->withJoined(['acme/other']));
+
+        self::assertSame([['acme/lib' => '1.1.0', 'acme/other' => 'dev-main'], ['acme/lib' => '1.0.0', 'acme/other' => 'dev-main']], [$solution->installs(), $solution->updatedFrom()]);
+    }
+
+    /** Composer updates a branch at the same commit when only its metadata differs, here `abandoned`. */
+    public function testAnUpdateOfABranchAtTheSameCommitIsNoChange(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0', 'acme/other' => 'dev-main']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $root->setMinimumStability('dev');
+        $locked = [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/other', 'version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'aaaa']]];
+        $remote = ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']], 'acme/other' => [['version' => 'dev-main', 'abandoned' => true, 'source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'aaaa']]]];
+        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote), []);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1'])->withJoined(['acme/other']));
+
+        self::assertSame([['acme/lib' => '1.1.0'], ['acme/lib' => '1.0.0']], [$solution->installs(), $solution->updatedFrom()]);
+    }
+
+    /** The commit is the source reference: a dist reference that names an archive differs from it. */
+    public function testABranchAtTheSameCommitWithAnotherDistReferenceIsNoChange(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0', 'acme/other' => 'dev-main']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $root->setMinimumStability('dev');
+        $other = ['source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'aaaa'], 'dist' => ['type' => 'zip', 'url' => 'https://example.org/other.zip', 'reference' => 'dddd']];
+        $locked = [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/other', 'version' => 'dev-main'] + $other];
+        $remote = ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']], 'acme/other' => [['version' => 'dev-main', 'abandoned' => true] + $other]];
+        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote), []);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1'])->withJoined(['acme/other']));
+
+        self::assertSame([['acme/lib' => '1.1.0'], ['acme/lib' => '1.0.0']], [$solution->installs(), $solution->updatedFrom()]);
+    }
+
     public function testARequireOfARequireDevPackageSolvesWithTheNewConstraint(): void
     {
         $solver = self::solver(['require-dev' => ['acme/dev' => '^1.0']], [], ['acme/dev' => [['version' => '1.0.0'], ['version' => '2.0.0']]], [['name' => 'acme/dev', 'version' => '1.0.0']]);
 
-        self::assertSame(['acme/dev' => '2.0.0'], $solver->solve(SolveRequest::require('acme/dev', ['acme/dev' => '^2.0']))->installs());
+        self::assertSame(['acme/dev' => '2.0.0'], $solver->solve(SolveRequest::require('acme/dev', ['acme/dev' => '^2.0'], false))->installs());
     }
 
     /** `composer require` without `--dev` moves a name out of require-dev, so the move's constraint is the only one left. */
@@ -51,7 +121,7 @@ final class ComposerSolverTest extends TestCase
     {
         $solver = self::solver(['require' => ['acme/lib' => '^1.0'], 'require-dev' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0']]]);
 
-        self::assertSame(['acme/lib' => '2.0.0'], $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0']))->installs());
+        self::assertSame(['acme/lib' => '2.0.0'], $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0'], false))->installs());
         self::assertSame(['acme/lib'], array_keys($solver->root()->getDevRequires()), 'the solve changes a copy of the root');
     }
 
@@ -238,7 +308,7 @@ final class ComposerSolverTest extends TestCase
     {
         $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0']]]);
 
-        $required = $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0']));
+        $required = $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0'], false));
         $updated = $solver->solve(SolveRequest::update(['acme/lib' => '^2.0']));
 
         self::assertSame([true, false], [$required->resolves(), $updated->resolves()]);

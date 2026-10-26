@@ -1759,6 +1759,28 @@
     "exempt": {
       "baseline": 0
     },
+    "standing": {
+      "known": 0,
+      "new": 0,
+      "worsened": 0,
+      "none": 14
+    },
+    "failing_packages": [
+      "mtdowling/jmespath.php",
+      "javiereguiluz/easyslugger",
+      "doctrine/cache",
+      "onnov/detect-encoding",
+      "unicodeveloper/laravel-password",
+      "league/commonmark",
+      "pragmarx/google2fa-laravel",
+      "neitanod/forceutf8",
+      "tmilos/lexer",
+      "tmilos/value",
+      "arietimmerman/laravel-scim-server",
+      "bacon/bacon-qr-code",
+      "doctrine/instantiator",
+      "intervention/image"
+    ],
     "failing_by": [
       {
         "value": "high",
@@ -1966,12 +1988,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "mtdowling/jmespath.php"
+          ],
+          [
+            "composer",
+            "why-not",
+            "mtdowling/jmespath.php",
+            "2.9.1",
+            "--locked"
           ]
         ],
         "through": [
@@ -1984,7 +2014,9 @@
               "released": "2026-08-08T16:19:23+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -2357,6 +2389,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2633,6 +2666,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2890,6 +2924,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -3150,6 +3185,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -3444,12 +3480,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "league/commonmark"
+          ],
+          [
+            "composer",
+            "why-not",
+            "league/commonmark",
+            "2.10.3",
+            "--locked"
           ]
         ],
         "through": [],
@@ -3895,6 +3939,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -4278,6 +4323,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -4612,6 +4658,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -4623,11 +4670,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "not_from_composer_repository"
+            "newest_requires_unmeasured": "not_from_composer_repository",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 9.8 years; it comes in through arietimmerman/laravel-scim-server: replace or update that package"
+        "text": "find a maintained alternative: nothing released for 9.8 years; it comes in through arietimmerman/laravel-scim-server (tmilos/scim-filter-parser requires it): replace or update arietimmerman/laravel-scim-server"
       },
       "security": {
         "status": "clear",
@@ -4957,6 +5006,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -4968,11 +5018,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "not_from_composer_repository"
+            "newest_requires_unmeasured": "not_from_composer_repository",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 9.8 years; it comes in through arietimmerman/laravel-scim-server: replace or update that package"
+        "text": "find a maintained alternative: nothing released for 9.8 years; it comes in through arietimmerman/laravel-scim-server (tmilos/scim-filter-parser requires it): replace or update arietimmerman/laravel-scim-server"
       },
       "security": {
         "status": "clear",
@@ -5238,6 +5290,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -5593,6 +5646,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -5882,6 +5936,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -6174,6 +6229,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -6491,6 +6547,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -6852,12 +6909,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "livewire/livewire"
+          ],
+          [
+            "composer",
+            "why-not",
+            "livewire/livewire",
+            "v4.4.7",
+            "--locked"
           ]
         ],
         "through": [],
@@ -7183,12 +7248,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "paragonie/sodium_compat"
+          ],
+          [
+            "composer",
+            "why-not",
+            "paragonie/sodium_compat",
+            "v1.24.1",
+            "--locked"
           ]
         ],
         "through": [],
@@ -7542,12 +7615,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "phpseclib/phpseclib"
+          ],
+          [
+            "composer",
+            "why-not",
+            "phpseclib/phpseclib",
+            "3.0.57",
+            "--locked"
           ]
         ],
         "through": [
@@ -7560,7 +7641,9 @@
               "released": "2026-10-08T20:13:55+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "laravel/socialite",
@@ -7571,7 +7654,9 @@
               "released": "2026-08-31T13:49:19+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -7987,11 +8072,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major",
           "transitive"
         ],
-        "commands": [],
+        "commands": [
+          [
+            "composer",
+            "why-not",
+            "pragmarx/google2fa-qrcode",
+            "v4.0.0",
+            "--locked"
+          ]
+        ],
         "through": [
           {
             "package": "pragmarx/google2fa-laravel",
@@ -8002,7 +8096,9 @@
               "released": "2026-03-17T20:54:53+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -8269,6 +8365,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -8534,12 +8631,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "laravel/framework"
+          ],
+          [
+            "composer",
+            "why-not",
+            "laravel/framework",
+            "v12.69.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -8881,6 +8986,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -8893,7 +8999,9 @@
               "released": "2026-10-08T20:13:55+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -9136,6 +9244,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -9148,7 +9257,9 @@
               "released": "2026-10-13T13:21:00+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "league/commonmark",
@@ -9159,7 +9270,9 @@
               "released": "2026-09-21T13:07:34+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "pragmarx/google2fa-laravel",
@@ -9170,7 +9283,9 @@
               "released": "2026-03-17T20:54:53+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "tabuna/breadcrumbs",
@@ -9181,7 +9296,9 @@
               "released": "2026-03-30T21:01:06+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -9426,6 +9543,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -9435,7 +9553,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "not_from_composer_repository"
+            "newest_requires_unmeasured": "not_from_composer_repository",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],
@@ -9677,6 +9797,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -9686,7 +9807,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "not_from_composer_repository"
+            "newest_requires_unmeasured": "not_from_composer_repository",
+            "local": false,
+            "newest_is_installed": null
           }
         ],
         "also": [],

@@ -89,6 +89,20 @@ final class CommandArgumentTest extends TestCase
         }
     }
 
+    public function testLockedPassesOnWhyNotOnlyAndDevOnRequireOnly(): void
+    {
+        self::assertSame(
+            [true, true, false, false, false],
+            [
+                CommandArgument::allPass(['composer', 'why-not', 'a/b', '2.0.0', '--locked']),
+                CommandArgument::allPass(['composer', 'require', 'a/b:^2.0', '--dev', '--no-update']),
+                CommandArgument::allPass(['composer', 'update', 'a/b', '--locked']),
+                CommandArgument::allPass(['composer', 'update', 'a/b', '--dev']),
+                CommandArgument::allPass(['composer', 'why-not', 'a/b', '--dev']),
+            ]
+        );
+    }
+
     public function testAnEmptyArgumentFails(): void
     {
         self::assertFalse(CommandArgument::passes(''));

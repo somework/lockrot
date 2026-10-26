@@ -198,6 +198,7 @@
        "vulnerable"
       ],
       "replacement": null,
+      "direct": true,
       "next_step": {
        "kind": "raise-php",
        "to_branch": "7.x",
@@ -250,6 +251,7 @@
     ]
    },
    "check": null,
+   "moves_with": [],
    "composer_moves_because": [
     "holders",
     "crosses_major"
@@ -272,7 +274,9 @@
       "released": "2026-09-06T13:55:09+00:00"
      },
      "newest_requires": true,
-     "newest_requires_unmeasured": null
+     "newest_requires_unmeasured": null,
+     "local": false,
+     "newest_is_installed": false
     }
    ],
    "also": [],
@@ -437,6 +441,7 @@
             "vulnerable"
            ],
            "replacement": null,
+           "direct": true,
            "next_step": {
             "kind": "raise-php",
             "to_branch": "7.x",
@@ -487,6 +492,7 @@
             "vulnerable"
            ],
            "replacement": null,
+           "direct": true,
            "next_step": {
             "kind": "raise-php",
             "to_branch": "7.x",
@@ -537,6 +543,7 @@
             "vulnerable"
            ],
            "replacement": null,
+           "direct": true,
            "next_step": {
             "kind": "raise-php",
             "to_branch": "7.x",
@@ -587,6 +594,7 @@
             "vulnerable"
            ],
            "replacement": null,
+           "direct": true,
            "next_step": {
             "kind": "raise-php",
             "to_branch": "7.x",
@@ -731,6 +739,7 @@
          "vulnerable"
         ],
         "replacement": null,
+        "direct": true,
         "next_step": {
          "kind": "raise-php",
          "to_branch": "7.x",
@@ -795,6 +804,7 @@
          "vulnerable"
         ],
         "replacement": null,
+        "direct": true,
         "next_step": {
          "kind": "raise-php",
          "to_branch": "7.x",

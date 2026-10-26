@@ -135,12 +135,20 @@
     ]
    },
    "check": null,
+   "moves_with": [],
    "composer_moves_because": [],
    "commands": [
     [
      "composer",
      "update",
      "nette/schema"
+    ],
+    [
+     "composer",
+     "why-not",
+     "nette/schema",
+     "v1.3.6",
+     "--locked"
     ]
    ],
    "through": [
@@ -153,7 +161,9 @@
       "released": "2026-09-29T12:46:21+00:00"
      },
      "newest_requires": null,
-     "newest_requires_unmeasured": "through_other_package"
+     "newest_requires_unmeasured": "through_other_package",
+     "local": false,
+     "newest_is_installed": false
     },
     {
      "package": "pragmarx/google2fa-laravel",
@@ -164,7 +174,9 @@
       "released": "2026-03-17T20:54:53+00:00"
      },
      "newest_requires": null,
-     "newest_requires_unmeasured": "through_other_package"
+     "newest_requires_unmeasured": "through_other_package",
+     "local": false,
+     "newest_is_installed": false
     }
    ],
    "also": [],

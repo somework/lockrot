@@ -308,7 +308,7 @@ score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     hig
   reach        via lorisleiva/laravel-search-string: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package
+do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string
 
 flags
   abandoned    S1 high, S3 high · marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.1 years ago); last push 2021-04-28 (5.4 years ago)
@@ -1349,6 +1349,37 @@ repository metadata
    * 2.x      2.0.6         2025-09-30   ^7.2.5|~8.0.0|~8.1.0 1 of 1 · blocked
      1.x      1.4.7         2024-08-20   ^5.3.10|~7.0|^8.0 0 of 1
 
+== case through-own
+voku/stop-words 2.0.1 — medium: old-promise · stale
+  via mautic/core-lib > jbroadway/urlify > voku/stop-words: 2 hops from the nearest composer.json line; no line of composer.json names it
+
+age       installed  2.0.1     2018-11-23   7.9 years ago
+          2.x        2.0.1     2018-11-23   7.9 years ago                 past release-high-years 5
+          newest     2.0.1     2018-11-23   7.9 years ago                 past release-high-years 5
+          last push            2026-08-28   0.1 years ago                 below push-warn-years 3
+          libyears 0.0 behind the newest stable release
+repository GitHub github.com/voku/stop-words: last push 2026-08-28 · fetched 2026-09-14
+
+score     9 = (old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive     medium from 8
+  maintenance  old-promise 16 (lead) · stale 2 (¼ of 8)
+  reach        via mautic/core-lib: maintenance halved; security is never halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        test it on PHP 8.4 — 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): change your own package mautic/core-lib
+
+flags
+  old-promise  S5 · released 2018-11-23 for PHP 7 (php ">=7.0.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  stale        S2 high · last release 2018-11-23 (7.9 years ago)
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 2.x      2.0.1         2018-11-23   >=7.0.0
+     1.x      1.2.0         2017-05-22   >=5.3.0
+note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
+
 == case B-also‡
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
@@ -1879,7 +1910,7 @@ score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     hig
   reach        via lorisleiva/laravel-search-string: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package
+do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string
 
 flags
   abandoned    S1 high · marked abandoned by its registry; last release 2017-08-29 (9.1 years ago)
@@ -1945,7 +1976,7 @@ score     18 = (left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high 
   dev          packages-dev: the score ÷ 2
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 (require-dev)); a new major brings its own requirements, which lockrot does not solve
+do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 in require-dev); a new major brings its own requirements, which lockrot does not solve
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
@@ -1968,6 +1999,48 @@ repository metadata
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
 branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
+
+== case routing-self‡
+symfony/routing v4.4.41 — high: left-behind · vulnerable
+  via mautic/core-lib > symfony/routing: 1 hop from the nearest composer.json line; no line of composer.json names it
+
+age       installed  v4.4.41   2022-04-12   4.5 years ago
+          4.x        v4.4.44   2022-07-20   4.2 years ago                 past release-warn-years 3
+          newest     v8.1.8    2026-09-28   less than three weeks ago     below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 4.5 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = left-behind 16 ÷ 2 transitive + vulnerable 8 [medium advisory]     high from 16
+  maintenance  left-behind 16 (lead)
+  security     vulnerable 8 (medium advisory CVE-2026-48784)
+  reach        via mautic/core-lib: maintenance halved; security is never halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        move symfony/routing to ^5.4.53 through mautic/core-lib — clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; held by mautic/core-lib 4.3.x-dev (requires ~4.4.0; itself pinned) and acme/routing-bridge v4.4.41 (requires self.version (v4.4.41)); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
+          clears left-behind, PKSA-bf7t-jnpz-492k, PKSA-yc7t-91v9-99xs
+
+flags
+  left-behind  S8 · branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.8 (2026-09-28)
+  vulnerable   S9 · 2 advisories: 2 medium — none fixed on 4.x; worst: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    medium     CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 8 points · fix: upgrade to 5.x from v5.4.53
+    medium     CVE-2026-45065  UrlGenerator Route-Requirement Bypass via Unanchored Regex Alternation → Off-Site //host URL Injection
+               PKSA-yc7t-91v9-99xs · reported 2026-05-20 · 8 points · fix: upgrade to 5.x from v5.4.52
+  feeds        packagist.org: 4 on record, 2 affect v4.4.41
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     8.x      v8.1.8        2026-09-28   >=8.4.1    2 of 2 · upgrade; held by mautic/core-lib and symfony/framework-bundle and acme/routing-bridge and friendsofsymfony/rest-bundle; after it: 0, ok, if Composer resolves it
+     7.x      v7.4.20       2026-09-28   >=8.2      2 of 2 · upgrade; held by mautic/core-lib and symfony/framework-bundle and acme/routing-bridge and friendsofsymfony/rest-bundle; after it: 0, ok, if Composer resolves it
+     6.x      v6.4.47       2026-09-28   >=8.1      2 of 2 · upgrade; held by mautic/core-lib and symfony/framework-bundle and acme/routing-bridge; after it: 0, ok, if Composer resolves it
+     5.x      v5.4.53       2026-05-22   >=7.2.5    2 of 2 · upgrade (lowest fix); held by mautic/core-lib and acme/routing-bridge; after it: 0, ok, if Composer resolves it
+   * 4.x      v4.4.44       2022-07-20   >=7.1.3    0 of 2
+     3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 2
+     2.x      v2.8.52       commit 2018-11-20 >=5.3.9    0 of 2
+note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 
 == case twig-dev‡
 twig/twig v2.16.1 — high: vulnerable
@@ -2623,7 +2696,7 @@ score     18 = (abandoned 32 + left-behind 4 [¼ of 16]) ÷ 2 transitive     hig
   reach        via web-auth/webauthn-lib: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it
+do        replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update web-auth/webauthn-lib; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it
 
 flags
   abandoned    S1 high · marked abandoned by its registry, replacement: web-auth/webauthn-lib
@@ -2785,7 +2858,7 @@ score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     hig
   reach        via lorisleiva/laravel-search-string: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package
+do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string
 
 flags
   abandoned    S1 high · marked abandoned by its registry; last release 2017-08-29 (9.1 years ago)
@@ -2817,7 +2890,7 @@ score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     hig
   reach        via lorisleiva/laravel-search-string: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package
+do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string
 
 flags
   abandoned    S1 high · marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); last commit 2021-04-28 (5.4 years ago)
@@ -3847,7 +3920,7 @@ score     8 = left-behind 16 ÷ 2 transitive     medium from 8
   reach        via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, php-http/httplug-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, sentry/sentry-symfony, stof/doctrine-extensions-bundle, symfony/error-handler, symfony/framework-bundle, symfony/http-kernel, symfony/monolog-bundle, symfony/security-bundle, symfony/security-http, symfony/twig-bundle, twig/extra-bundle, willdurand/hateoas-bundle: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        move symfony/var-dumper to ^5.4 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 31 more — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.8) still requires it
+do        require symfony/var-dumper ^5.4 in require-dev — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.8) still requires it
           clears left-behind
 
 flags
@@ -4316,7 +4389,7 @@ score     16 = vulnerable 16 [high advisory]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock
+do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock
           clears PKSA-28rh-rzzn-djk4
 
 flags
@@ -4329,7 +4402,7 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json and symfony/mailer v6.4.40, its own release and acme/ml-widget; after it: 0, ok; Composer's solver refuses it
+   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by symfony/mailer v6.4.40, its own release and acme/ml-widget; after it: 0, ok; Composer's solver refuses it
 
 == case mc-pass-cap‡
 symfony/mailer v6.4.27 — high: vulnerable
@@ -4347,7 +4420,7 @@ score     16 = vulnerable 16 [high advisory]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it
+do        require symfony/mailer ^6.4.40 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it
           clears PKSA-28rh-rzzn-djk4
 
 flags
@@ -4360,7 +4433,101 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json and symfony/mailer v6.4.40, its own release and acme/ml-widget; after it: 0, ok, if Composer resolves it
+   * 6.x      v6.4.40       2026-07-04   >=8.1      1 of 1 · upgrade (lowest fix); held by symfony/mailer v6.4.40, its own release and acme/ml-widget; after it: 0, ok, if Composer resolves it
+
+== case mc-joint‡
+guzzlehttp/guzzle 7.10.0 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  7.10.0    2025-08-23   1.1 years ago
+          7.x        7.15.2    2026-07-03   0.2 years ago                 below release-warn-years 3
+          newest     8.0.1     2026-07-04   0.2 years ago                 below release-warn-years 3
+          last push            2026-09-06   0.1 years ago                 below push-warn-years 3
+          libyears 0.9 behind the newest stable release
+repository GitHub github.com/guzzle/guzzle: last push 2026-09-06 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-69246)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require guzzlehttp/guzzle ^8.0.1 — clears the advisory; 8.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock, with an update of acme/gz-client (to 1.1.0)
+          clears PKSA-gcrk-3vtt-1r14
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — none fixed on 7.x; advisory: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks · lookup complete
+    high       CVE-2026-69246  Guzzle: Noncanonical host can bypass host-based checks
+               PKSA-gcrk-3vtt-1r14 · reported 2026-08-03 · 16 points · fix: composer update to 8.x from 8.0.1
+  feeds        packagist.org: 15 on record, 1 affects 7.10.0
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     8.x      8.0.1         2026-07-04   ^8.1       1 of 1 · composer update (lowest fix); after it: 0, ok; Composer's solver resolves it
+   * 7.x      7.15.2        2026-07-03   ^7.2.5 || ^8.0 0 of 1
+
+== case mc-gets-next-form‡
+symfony/routing v6.4.28 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-04   0.2 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-04   0.2 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update 'symfony/routing:^6.4.40' --with-dependencies (gets v6.4.41) — clears the advisory; Composer's solver checked it against the lock
+          clears PKSA-bf7t-jnpz-492k
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: composer update to 6.x from v6.4.40
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-04   >=8.1      1 of 1 · composer update (lowest fix); after it: 0, ok; Composer's solver resolves it
+
+== case mc-gets-below‡
+symfony/routing v6.4.28 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-04   0.2 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-04   0.2 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update 'symfony/routing:^6.4.40' (gets v6.4.40, below the newest v6.4.41) — clears the advisory; Composer's solver checked it against the lock
+          clears PKSA-bf7t-jnpz-492k
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: composer update to 6.x from v6.4.40
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-04   >=8.1      1 of 1 · composer update (lowest fix); after it: 0, ok; Composer's solver resolves it
 
 == case mc-raise-php‡
 symfony/yaml v6.4.26 — high: vulnerable

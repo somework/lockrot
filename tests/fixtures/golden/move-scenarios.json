@@ -32,6 +32,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -72,6 +73,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -112,6 +114,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -175,12 +178,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^2.3.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "v2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -248,12 +259,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^1.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "v1.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -321,12 +340,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^1.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "v1.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -396,12 +423,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^0.3.5"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "0.3.5",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -460,6 +495,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major",
                 "transitive"
@@ -474,20 +510,9 @@
                 [
                     "composer",
                     "why-not",
-                    "d/one",
-                    "2.0.0"
-                ],
-                [
-                    "composer",
-                    "why-not",
-                    "d/three",
-                    "2.0.0"
-                ],
-                [
-                    "composer",
-                    "why-not",
-                    "d/two",
-                    "2.0.0"
+                    "a/b",
+                    "2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [
@@ -500,7 +525,9 @@
                         "released": "2026-01-01T00:00:00+00:00"
                     },
                     "newest_requires": false,
-                    "newest_requires_unmeasured": null
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
                 },
                 {
                     "package": "d/three",
@@ -511,7 +538,9 @@
                         "released": "2026-01-01T00:00:00+00:00"
                     },
                     "newest_requires": false,
-                    "newest_requires_unmeasured": null
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
                 },
                 {
                     "package": "d/two",
@@ -522,7 +551,9 @@
                         "released": "2026-01-01T00:00:00+00:00"
                     },
                     "newest_requires": false,
-                    "newest_requires_unmeasured": null
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
                 }
             ],
             "also": [],
@@ -580,6 +611,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major",
                 "transitive"
@@ -594,26 +626,9 @@
                 [
                     "composer",
                     "why-not",
-                    "d/four",
-                    "2.0.0"
-                ],
-                [
-                    "composer",
-                    "why-not",
-                    "d/one",
-                    "2.0.0"
-                ],
-                [
-                    "composer",
-                    "why-not",
-                    "d/three",
-                    "2.0.0"
-                ],
-                [
-                    "composer",
-                    "why-not",
-                    "d/two",
-                    "2.0.0"
+                    "a/b",
+                    "2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [
@@ -626,7 +641,9 @@
                         "released": "2026-01-01T00:00:00+00:00"
                     },
                     "newest_requires": false,
-                    "newest_requires_unmeasured": null
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
                 },
                 {
                     "package": "d/one",
@@ -637,7 +654,9 @@
                         "released": "2026-01-01T00:00:00+00:00"
                     },
                     "newest_requires": false,
-                    "newest_requires_unmeasured": null
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
                 },
                 {
                     "package": "d/three",
@@ -648,7 +667,9 @@
                         "released": "2026-01-01T00:00:00+00:00"
                     },
                     "newest_requires": false,
-                    "newest_requires_unmeasured": null
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
                 },
                 {
                     "package": "d/two",
@@ -659,7 +680,9 @@
                         "released": "2026-01-01T00:00:00+00:00"
                     },
                     "newest_requires": false,
-                    "newest_requires_unmeasured": null
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
                 }
             ],
             "also": [],
@@ -712,6 +735,7 @@
                             "stale",
                             "capped"
                         ],
+                        "direct": false,
                         "replacement": null,
                         "next_step": {
                             "kind": "no-move",
@@ -734,6 +758,7 @@
                         "flag_ids": [
                             "pinned"
                         ],
+                        "direct": false,
                         "replacement": null,
                         "next_step": {
                             "kind": "no-move",
@@ -772,6 +797,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "holders",
                 "crosses_major"
@@ -787,6 +813,13 @@
                     "composer",
                     "require",
                     "a/b:^2.3"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -837,6 +870,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -883,6 +917,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -951,6 +986,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -959,6 +995,13 @@
                     "composer",
                     "require",
                     "a/b:^2.3"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -1027,6 +1070,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -1041,6 +1085,13 @@
                     "composer",
                     "require",
                     "a/b:^2.3"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -1087,6 +1138,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -1156,6 +1208,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -1170,6 +1223,13 @@
                     "composer",
                     "require",
                     "a/b:^2.3"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -1238,6 +1298,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -1246,6 +1307,13 @@
                     "composer",
                     "require",
                     "a/b:^2.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -1288,6 +1356,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -1330,6 +1399,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -1372,6 +1442,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -1418,6 +1489,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -1486,6 +1558,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -1500,6 +1573,13 @@
                     "composer",
                     "require",
                     "a/b:^2.3.5"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.3.5",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -1568,6 +1648,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -1582,6 +1663,13 @@
                     "composer",
                     "require",
                     "a/b:^2.3"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -1657,6 +1745,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -1671,6 +1760,13 @@
                     "composer",
                     "require",
                     "a/b:^2.3.4"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.3.4",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -1760,6 +1856,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -1774,6 +1871,13 @@
                     "composer",
                     "require",
                     "a/b:^2.3"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -1861,6 +1965,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -1869,6 +1974,13 @@
                     "composer",
                     "require",
                     "a/b:^2.3"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -1938,6 +2050,7 @@
                         ]
                     },
                     "check": null,
+                    "moves_with": [],
                     "composer_moves_because": [
                         "crosses_major"
                     ],
@@ -1952,6 +2065,13 @@
                             "composer",
                             "require",
                             "a/b:^3.0.0"
+                        ],
+                        [
+                            "composer",
+                            "why-not",
+                            "a/b",
+                            "3.0.0",
+                            "--locked"
                         ]
                     ],
                     "text": "raise require.php to >=8.1, then require a/b ^3.0.0 \u2014 clears left-behind, old-promise and the advisory; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
@@ -2028,12 +2148,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "update",
                     "a/b"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "1.5.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -2103,6 +2231,7 @@
                         ]
                     },
                     "check": null,
+                    "moves_with": [],
                     "composer_moves_because": [
                         "crosses_major"
                     ],
@@ -2117,6 +2246,13 @@
                             "composer",
                             "require",
                             "a/b:^2.3"
+                        ],
+                        [
+                            "composer",
+                            "why-not",
+                            "a/b",
+                            "2.3.0",
+                            "--locked"
                         ]
                     ],
                     "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; 1 advisory stays; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
@@ -2205,12 +2341,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "update",
                     "a/b"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "1.5.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -2255,6 +2399,7 @@
                     "clears_all": false,
                     "if_applied": null,
                     "check": null,
+                    "moves_with": [],
                     "composer_moves_because": [],
                     "commands": [],
                     "text": "no single release fixes every advisory; see each advisory"
@@ -2325,6 +2470,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -2375,6 +2521,7 @@
                     "clears_all": false,
                     "if_applied": null,
                     "check": null,
+                    "moves_with": [],
                     "composer_moves_because": [],
                     "commands": [],
                     "text": "test it on PHP 8.4"
@@ -2462,6 +2609,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -2508,6 +2656,7 @@
                     "clears_all": false,
                     "if_applied": null,
                     "check": null,
+                    "moves_with": [],
                     "composer_moves_because": [],
                     "commands": [],
                     "text": "test it on PHP 8.4 \u2014 1.0.0 is its newest release"
@@ -2600,6 +2749,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -2614,6 +2764,13 @@
                     "composer",
                     "require",
                     "a/b:^2.3"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -2658,6 +2815,7 @@
                     "clears_all": false,
                     "if_applied": null,
                     "check": null,
+                    "moves_with": [],
                     "composer_moves_because": [],
                     "commands": [],
                     "text": "no release fixes it"
@@ -2743,6 +2901,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -2751,6 +2910,13 @@
                     "composer",
                     "require",
                     "a/b:^2.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -2824,12 +2990,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^2.3.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "v2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -2897,12 +3071,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^2.3.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -2972,12 +3154,20 @@
                         ]
                     },
                     "check": null,
+                    "moves_with": [],
                     "composer_moves_because": [],
                     "commands": [
                         [
                             "composer",
                             "require",
                             "a/b:^2.3.0"
+                        ],
+                        [
+                            "composer",
+                            "why-not",
+                            "a/b",
+                            "2.3.0",
+                            "--locked"
                         ]
                     ],
                     "text": "require a/b ^2.3.0 \u2014 clears old-promise and the advisory; 2.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; pinned stays; held by composer.json (requires ^1.0)"
@@ -3056,6 +3246,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -3070,6 +3261,13 @@
                     "composer",
                     "require",
                     "a/b:^3.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "3.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -3134,6 +3332,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -3186,6 +3385,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -3250,12 +3450,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^1.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "v1.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -3319,6 +3527,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -3333,6 +3542,13 @@
                     "composer",
                     "require",
                     "a/b:^2.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -3416,12 +3632,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^1.9.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "1.9.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -3491,12 +3715,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^1.9.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "1.9.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -3556,6 +3788,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -3564,6 +3797,13 @@
                     "composer",
                     "require",
                     "a/b:^2.3.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.3.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -3628,12 +3868,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^2.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -3703,12 +3951,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^1.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "1.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -3779,12 +4035,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^1.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "1.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -3854,12 +4118,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^1.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "1.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -3928,6 +4200,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -3942,6 +4215,13 @@
                     "composer",
                     "require",
                     "a/b:^3.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "3.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -3999,6 +4279,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -4077,6 +4358,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -4085,6 +4367,13 @@
                     "composer",
                     "require",
                     "a/b:^2.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "2.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -4129,6 +4418,7 @@
                     "clears_all": false,
                     "if_applied": null,
                     "check": null,
+                    "moves_with": [],
                     "composer_moves_because": [],
                     "commands": [],
                     "text": "no single release fixes every advisory; see each advisory"
@@ -4233,12 +4523,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "require",
                     "a/b:^1.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "1.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -4303,12 +4601,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "update",
                     "a/b"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "1.9.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -4374,6 +4680,7 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [],
             "through": [],
@@ -4420,6 +4727,7 @@
                     "clears_all": false,
                     "if_applied": null,
                     "check": null,
+                    "moves_with": [],
                     "composer_moves_because": [],
                     "commands": [],
                     "text": "no move runs on the target: 2.x needs php >=9.0 and the target php 8.4 does not run it"
@@ -4496,12 +4804,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "update",
                     "a/b"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "a/b",
+                    "0.3.5",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -4571,6 +4887,7 @@
                         ]
                     },
                     "check": null,
+                    "moves_with": [],
                     "composer_moves_because": [
                         "crosses_major"
                     ],
@@ -4579,6 +4896,13 @@
                             "composer",
                             "require",
                             "a/b:^0.4.0"
+                        ],
+                        [
+                            "composer",
+                            "why-not",
+                            "a/b",
+                            "0.4.0",
+                            "--locked"
                         ]
                     ],
                     "text": "require a/b ^0.4.0 \u2014 clears left-behind, old-promise and the advisory; 0.4.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^0.3); a new 0.x line (Composer treats 0.x minors as breaking) brings its own requirements, which lockrot does not solve"

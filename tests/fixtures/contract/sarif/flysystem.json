@@ -255,6 +255,7 @@
                                             "left-behind",
                                             "old-promise"
                                         ],
+                                        "direct": false,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -277,6 +278,7 @@
                                         "flag_ids": [
                                             "stale"
                                         ],
+                                        "direct": false,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "no-move",

@@ -18,13 +18,17 @@ final class MoveQuery
     private string $version;
     private bool $isRequire;
     private ?string $php;
+    private ?string $newest;
+    private bool $dev = false;
 
     /**
      * @param string  $version the release that the move names, which the hold scan reads
      * @param ?string $php     the `require.php` that the move writes first, null for none
+     * @param ?string $newest  the release that the move installs, `newest`: a form resolves the move only when it installs it; null for any release
      */
-    private function __construct(string $package, string $constraint, string $version, bool $isRequire, ?string $php)
+    private function __construct(string $package, string $constraint, string $version, bool $isRequire, ?string $php, ?string $newest)
     {
+        $this->newest = $newest;
         $this->package = $package;
         $this->constraint = $constraint;
         $this->version = $version;
@@ -32,14 +36,23 @@ final class MoveQuery
         $this->php = $php;
     }
 
-    public static function update(string $package, string $constraint, string $version, ?string $php = null): self
+    public static function update(string $package, string $constraint, string $version, ?string $php = null, ?string $newest = null): self
     {
-        return new self($package, $constraint, $version, false, $php);
+        return new self($package, $constraint, $version, false, $php, $newest);
     }
 
-    public static function require(string $package, string $constraint, string $version, ?string $php = null): self
+    public static function require(string $package, string $constraint, string $version, ?string $php = null, ?string $newest = null): self
     {
-        return new self($package, $constraint, $version, true, $php);
+        return new self($package, $constraint, $version, true, $php, $newest);
+    }
+
+    /** A copy that writes the requirement into `require-dev` when $requireDev is set: `composer require --dev`. */
+    public function withRequireDev(bool $requireDev): self
+    {
+        $clone = clone $this;
+        $clone->dev = $requireDev && $this->isRequire;
+
+        return $clone;
     }
 
     public function package(): string
@@ -67,6 +80,11 @@ final class MoveQuery
         return $this->php;
     }
 
+    public function newest(): ?string
+    {
+        return $this->newest;
+    }
+
     /** One key per Composer request: two moves with one request share one check. */
     public function key(): string
     {
@@ -78,7 +96,17 @@ final class MoveQuery
         $php = $this->php === null ? [] : ['php' => $this->php];
 
         return $this->isRequire
-            ? SolveRequest::require($this->package, [$this->package => $this->constraint] + $php)
+            ? SolveRequest::require($this->package, [$this->package => $this->constraint] + $php, $this->dev)
             : SolveRequest::update([$this->package => $this->constraint])->withRootChanges($php);
+    }
+
+    /**
+     * The same request that also updates the holders of its refusal: one request, inline form.
+     *
+     * @param list<string> $holders
+     */
+    public function jointRequest(array $holders): SolveRequest
+    {
+        return $this->request()->withJoined($holders);
     }
 }

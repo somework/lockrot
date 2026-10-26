@@ -2264,8 +2264,10 @@
     "check": {
      "result": "resolves",
      "form": "inline",
-     "reason": null
+     "reason": null,
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
@@ -2284,7 +2286,9 @@
        "released": "2026-08-08T16:19:23+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      }
     ],
     "also": [],
@@ -2661,6 +2665,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -2937,6 +2942,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -3194,6 +3200,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -3454,6 +3461,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -3750,8 +3758,10 @@
     "check": {
      "result": "resolves",
      "form": "inline",
-     "reason": null
+     "reason": null,
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
@@ -4213,8 +4223,10 @@
     "check": {
      "result": "not_checked",
      "form": null,
-     "reason": "unloaded_name"
+     "reason": "unloaded_name",
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -4584,6 +4596,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -4918,6 +4931,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "transitive"
     ],
@@ -4929,7 +4943,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "not_from_composer_repository"
+      "newest_requires_unmeasured": "not_from_composer_repository",
+      "local": false,
+      "newest_is_installed": null
      }
     ],
     "also": [],
@@ -5263,6 +5279,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "transitive"
     ],
@@ -5274,7 +5291,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "not_from_composer_repository"
+      "newest_requires_unmeasured": "not_from_composer_repository",
+      "local": false,
+      "newest_is_installed": null
      }
     ],
     "also": [],
@@ -5544,6 +5563,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -5909,6 +5929,7 @@
         "old-promise"
        ],
        "replacement": null,
+       "direct": true,
        "next_step": {
         "kind": "require",
         "to_branch": "2.x",
@@ -5916,7 +5937,8 @@
         "check": {
          "result": "not_checked",
          "form": null,
-         "reason": "unloaded_name"
+         "reason": "unloaded_name",
+         "installs": null
         }
        }
       }
@@ -5936,6 +5958,7 @@
         "old-promise"
        ],
        "replacement": null,
+       "direct": false,
        "next_step": {
         "kind": "require",
         "to_branch": "4.x",
@@ -5974,8 +5997,10 @@
     "check": {
      "result": "refused",
      "form": null,
-     "reason": null
+     "reason": null,
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [
      "holders",
      "crosses_major"
@@ -6271,8 +6296,10 @@
     "check": {
      "result": "resolves",
      "form": "inline",
-     "reason": null
+     "reason": null,
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -6565,6 +6592,7 @@
         "left-behind"
        ],
        "replacement": null,
+       "direct": true,
        "next_step": {
         "kind": "require",
         "to_branch": "3.x",
@@ -6603,8 +6631,10 @@
     "check": {
      "result": "refused",
      "form": null,
-     "reason": null
+     "reason": null,
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [
      "holders",
      "crosses_major"
@@ -6928,8 +6958,10 @@
     "check": {
      "result": "resolves",
      "form": "inline",
-     "reason": null
+     "reason": null,
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -7323,8 +7355,10 @@
     "check": {
      "result": "resolves",
      "form": "inline",
-     "reason": null
+     "reason": null,
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
@@ -7662,8 +7696,10 @@
     "check": {
      "result": "resolves",
      "form": "inline",
-     "reason": null
+     "reason": null,
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
@@ -8029,8 +8065,10 @@
     "check": {
      "result": "resolves",
      "form": "inline",
-     "reason": null
+     "reason": null,
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
@@ -8049,7 +8087,9 @@
        "released": "2026-10-08T20:13:55+00:00"
       },
       "newest_requires": true,
-      "newest_requires_unmeasured": null
+      "newest_requires_unmeasured": null,
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "laravel/socialite",
@@ -8060,7 +8100,9 @@
        "released": "2026-08-31T13:49:19+00:00"
       },
       "newest_requires": true,
-      "newest_requires_unmeasured": null
+      "newest_requires_unmeasured": null,
+      "local": false,
+      "newest_is_installed": false
      }
     ],
     "also": [],
@@ -8476,6 +8518,7 @@
         "old-promise"
        ],
        "replacement": null,
+       "direct": true,
        "next_step": {
         "kind": "require",
         "to_branch": "2.x",
@@ -8483,7 +8526,8 @@
         "check": {
          "result": "not_checked",
          "form": null,
-         "reason": "unloaded_name"
+         "reason": "unloaded_name",
+         "installs": null
         }
        }
       }
@@ -8519,8 +8563,10 @@
     "check": {
      "result": "refused",
      "form": null,
-     "reason": null
+     "reason": null,
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [
      "holders",
      "crosses_major"
@@ -8536,7 +8582,9 @@
        "released": "2026-03-17T20:54:53+00:00"
       },
       "newest_requires": true,
-      "newest_requires_unmeasured": null
+      "newest_requires_unmeasured": null,
+      "local": false,
+      "newest_is_installed": false
      }
     ],
     "also": [],
@@ -8803,6 +8851,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -9071,8 +9120,10 @@
     "check": {
      "result": "resolves",
      "form": "inline",
-     "reason": null
+     "reason": null,
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
@@ -9418,6 +9469,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [
@@ -9430,7 +9482,9 @@
        "released": "2026-10-08T20:13:55+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      }
     ],
     "also": [],
@@ -9673,6 +9727,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [
@@ -9682,7 +9737,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "not_from_composer_repository"
+      "newest_requires_unmeasured": "not_from_composer_repository",
+      "local": false,
+      "newest_is_installed": null
      },
      {
       "package": "eduardokum/laravel-mail-auto-embed",
@@ -9693,7 +9750,9 @@
        "released": "2026-06-08T19:33:17+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "innoge/laravel-msgraph-mail",
@@ -9704,7 +9763,9 @@
        "released": "2026-08-03T13:08:40+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": true
      },
      {
       "package": "laravel-notification-channels/google-chat",
@@ -9715,7 +9776,9 @@
        "released": "2026-09-01T07:50:09+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "laravel-notification-channels/microsoft-teams",
@@ -9726,7 +9789,9 @@
        "released": "2026-03-26T23:55:01+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "laravel/framework",
@@ -9737,7 +9802,9 @@
        "released": "2026-10-13T13:21:00+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "laravel/helpers",
@@ -9748,7 +9815,9 @@
        "released": "2026-03-17T16:40:11+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": true
      },
      {
       "package": "laravel/passport",
@@ -9759,7 +9828,9 @@
        "released": "2026-10-08T20:13:55+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "laravel/slack-notification-channel",
@@ -9770,7 +9841,9 @@
        "released": "2026-07-24T20:53:54+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "laravel/socialite",
@@ -9781,7 +9854,9 @@
        "released": "2026-08-31T13:49:19+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "laravel/tinker",
@@ -9792,7 +9867,9 @@
        "released": "2026-03-17T14:54:13+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "laravel/ui",
@@ -9803,7 +9880,9 @@
        "released": "2026-03-17T13:41:52+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": true
      },
      {
       "package": "league/commonmark",
@@ -9814,7 +9893,9 @@
        "released": "2026-09-21T13:07:34+00:00"
       },
       "newest_requires": true,
-      "newest_requires_unmeasured": null
+      "newest_requires_unmeasured": null,
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "livewire/livewire",
@@ -9825,7 +9906,9 @@
        "released": "2026-09-28T18:12:51+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "osa-eg/laravel-teams-notification",
@@ -9836,7 +9919,9 @@
        "released": "2025-02-25T08:49:16+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": true
      },
      {
       "package": "pragmarx/google2fa-laravel",
@@ -9847,7 +9932,9 @@
        "released": "2026-03-17T20:54:53+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "rollbar/rollbar-laravel",
@@ -9858,7 +9945,9 @@
        "released": "2026-03-20T16:03:35+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": true
      },
      {
       "package": "spatie/laravel-backup",
@@ -9869,7 +9958,9 @@
        "released": "2026-09-14T12:01:22+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "spatie/laravel-ignition",
@@ -9880,7 +9971,9 @@
        "released": "2026-03-17T12:20:04+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": true
      },
      {
       "package": "tabuna/breadcrumbs",
@@ -9891,7 +9984,9 @@
        "released": "2026-03-30T21:01:06+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      },
      {
       "package": "watson/validating",
@@ -9902,7 +9997,9 @@
        "released": "2026-04-22T10:16:18+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "through_other_package"
+      "newest_requires_unmeasured": "through_other_package",
+      "local": false,
+      "newest_is_installed": false
      }
     ],
     "also": [],
@@ -10164,6 +10261,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [
@@ -10173,7 +10271,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "not_from_composer_repository"
+      "newest_requires_unmeasured": "not_from_composer_repository",
+      "local": false,
+      "newest_is_installed": null
      }
     ],
     "also": [],
@@ -10415,6 +10515,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [
@@ -10424,7 +10525,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "not_from_composer_repository"
+      "newest_requires_unmeasured": "not_from_composer_repository",
+      "local": false,
+      "newest_is_installed": null
      }
     ],
     "also": [],

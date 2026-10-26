@@ -135,6 +135,7 @@
     ]
    },
    "check": null,
+   "moves_with": [],
    "composer_moves_because": [],
    "commands": [
     [
@@ -146,7 +147,15 @@
     [
      "composer",
      "require",
-     "laminas/laminas-code:^4.17.0"
+     "laminas/laminas-code:^4.17.0",
+     "--dev"
+    ],
+    [
+     "composer",
+     "why-not",
+     "laminas/laminas-code",
+     "4.17.0",
+     "--locked"
     ]
    ],
    "through": [],

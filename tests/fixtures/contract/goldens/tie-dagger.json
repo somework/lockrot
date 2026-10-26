@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer require 'symfony/monolog-bridge:^5.4'"
+        "composer require 'symfony/monolog-bridge:^5.4'",
+        "composer why-not symfony/monolog-bridge v5.4.0 --locked"
     ],
     "commands_cmd": [
-        "composer require \"symfony/monolog-bridge:^5.4\""
+        "composer require \"symfony/monolog-bridge:^5.4\"",
+        "composer why-not symfony/monolog-bridge v5.4.0 --locked"
     ]
 }

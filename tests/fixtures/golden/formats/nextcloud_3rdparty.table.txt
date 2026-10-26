@@ -14,8 +14,8 @@
   pear/console_getopt v1.4.3  via pear/archive_tar, pear/pear-core-minimal  ·  silent
       16 = silent 32 ÷ 2 transitive
       do: find a maintained alternative: nothing released for 6.8 years; it comes in through pear/archive_tar,
-          pear/pear-core-minimal: replace or update them; the newest release of pear/pear-core-minimal (v1.10.18) still
-          requires it
+          pear/pear-core-minimal: replace or update pear/archive_tar, or replace pear/pear-core-minimal; the newest
+          release of pear/pear-core-minimal (v1.10.18) still requires it
       silent       last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago)
 
 <options=bold><fg=yellow>medium (3)</fg=yellow></options=bold>

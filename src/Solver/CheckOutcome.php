@@ -19,16 +19,119 @@ final class CheckOutcome
     private MoveCheck $check;
     /** @var list<Holder> */
     private array $holds;
-    private ?string $installs;
     private ?string $problem;
+    /** @var array<string, string> */
+    private array $changes = [];
+    /** @var array<string, string> */
+    private array $updatedFrom = [];
+    /** @var list<array{package: string, installed_version: ?string, version: string}> */
+    private array $movesWith = [];
+    private bool $joint = false;
 
     /** @param list<Holder> $holds */
-    public function __construct(MoveCheck $check, array $holds = [], ?string $installs = null, ?string $problem = null)
+    public function __construct(MoveCheck $check, array $holds = [], ?string $problem = null)
     {
         $this->check = $check;
         $this->holds = $holds;
-        $this->installs = $installs;
         $this->problem = $problem;
+    }
+
+    /**
+     * A copy that knows every release that the solve installs or moves to, by name, and the
+     * locked release of each name that it updates.
+     *
+     * @param array<string, string> $changes
+     * @param array<string, string> $updatedFrom
+     */
+    public function withChanges(array $changes, array $updatedFrom = []): self
+    {
+        $clone = clone $this;
+        $clone->changes = $changes;
+        $clone->updatedFrom = $updatedFrom;
+
+        return $clone;
+    }
+
+    /** @return array<string, string> name => the release that the solve installs, for each name it changes */
+    public function changes(): array
+    {
+        return $this->changes;
+    }
+
+    /**
+     * The move after its joint request ({@see \Lockrot\Verdict\MoveChecks}): the joint solve
+     * resolves the move only when it installs the moved package inside the move's constraint and
+     * changes the release of a holder. Then the move resolves with no hold, and it lists each holder
+     * whose release the solve changes.
+     * A joint refusal gives its own holds. Any other answer leaves this refusal.
+     *
+     * @param list<string> $holders
+     */
+    public function joinedWith(self $joint, string $package, string $constraint, array $holders): self
+    {
+        $check = $joint->check();
+        if ($check->isRefused()) {
+            return $joint;
+        }
+        $installs = $joint->changes()[$package] ?? null;
+        if (!$check->isResolved() || $installs === null || !self::satisfies($constraint, $installs)) {
+            return $this;
+        }
+        $movesWith = [];
+        foreach ($holders as $holder) {
+            $version = $joint->changes()[$holder] ?? null;
+            if ($version !== null) {
+                $movesWith[] = ['package' => $holder, 'installed_version' => $joint->updatedFrom[$holder] ?? $this->holderVersion($holder), 'version' => $version];
+            }
+        }
+        if ($movesWith === []) {
+            return $this;
+        }
+        $resolved = new self(MoveCheck::resolves(MoveCheck::INLINE, $installs));
+        $resolved->movesWith = $movesWith;
+        $resolved->joint = true;
+
+        return $resolved;
+    }
+
+    /** Whether the joint request resolves the move: then nothing holds it. */
+    public function isJoint(): bool
+    {
+        return $this->joint;
+    }
+
+    /** @return list<array{package: string, installed_version: ?string, version: string}> the holders that the joint solve moves, in holder order */
+    public function movesWith(): array
+    {
+        return $this->movesWith;
+    }
+
+    /** @return list<string> the packages of the package holds other than $package, in hold order */
+    public function holders(string $package): array
+    {
+        $holders = [];
+        foreach ($this->holds as $hold) {
+            $name = $hold->package();
+            if ($hold->source() === Holder::PACKAGE && $name !== null && $name !== $package && !\in_array($name, $holders, true)) {
+                $holders[] = $name;
+            }
+        }
+
+        return $holders;
+    }
+
+    /**
+     * A copy without each root hold on a package that a package hold names as its `package`: that
+     * package's own requirement is the hold, and the root hold is the head of its chain.
+     */
+    public function withoutRootOnHolders(): self
+    {
+        $holders = $this->holders('');
+        $holds = array_values(array_filter($this->holds, static fn (Holder $hold): bool => $hold->source() !== Holder::ROOT || !\in_array($hold->target(), $holders, true)));
+        $clone = clone $this;
+        $clone->holds = $holds;
+
+        return $clone;
     }
 
     public function check(): MoveCheck
@@ -59,13 +162,36 @@ final class CheckOutcome
     /** The version of the moved package that a resolved move installs, null otherwise. */
     public function installs(): ?string
     {
-        return $this->installs;
+        return $this->check->installs();
     }
 
     public function problem(): ?string
     {
         return $this->problem;
     }
+
+    /** The version that the holds name for $holder: its locked release in the first refusal. */
+    private function holderVersion(string $holder): ?string
+    {
+        foreach ($this->holds as $hold) {
+            if ($hold->source() === Holder::PACKAGE && $hold->package() === $holder && $hold->version() !== null) {
+                return $hold->version();
+            }
+        }
+
+        return null;
+    }
+
+    private static function satisfies(string $constraint, string $version): bool
+    {
+        $parser = new VersionParser();
+        try {
+            return $parser->parseConstraints($constraint)->matches(new Constraint('==', $parser->normalize($version)));
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
+    }
+
 
     private static function admits(Holder $hold, string $version): bool
     {

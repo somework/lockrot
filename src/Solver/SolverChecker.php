@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Solver;
 
 use Composer\Package\BasePackage;
+use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\VersionParser;
 use Lockrot\Deadline;
@@ -65,7 +66,7 @@ final class SolverChecker implements MoveChecker
             if ($solution === null || $this->failed($solution)) {
                 $this->baseline = new CheckOutcome(MoveCheck::notChecked($solution === null ? MoveCheck::INSTALL_TIME_BUDGET : MoveCheck::SOLVER_ERROR));
             } else {
-                $this->baseline = $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), [], null, $solution->problem());
+                $this->baseline = $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), [], $solution->problem());
             }
         }
 
@@ -102,7 +103,7 @@ final class SolverChecker implements MoveChecker
 
         return $solution->resolves()
             ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE))
-            : new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds()), null, $solution->problem());
+            : new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds()), $solution->problem());
     }
 
     public function platformPhp(): string
@@ -152,7 +153,7 @@ final class SolverChecker implements MoveChecker
         if (array_intersect($names, $this->notFromComposerRepository) !== []) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::NOT_FROM_COMPOSER_REPOSITORY));
         }
-        $tried = $this->forms(SolveRequest::unlock($names), ...$names);
+        $tried = $this->forms(SolveRequest::unlock($names), $names);
         if ($tried instanceof CheckOutcome) {
             return $tried;
         }
@@ -170,7 +171,7 @@ final class SolverChecker implements MoveChecker
         if (\in_array($query->package(), $this->notFromComposerRepository, true)) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::NOT_FROM_COMPOSER_REPOSITORY));
         }
-        $tried = $this->forms($query->request(), $query->package());
+        $tried = $this->forms($query->request(), [$query->package()], $query->newest());
         if ($tried instanceof CheckOutcome) {
             return $tried;
         }
@@ -179,29 +180,88 @@ final class SolverChecker implements MoveChecker
         return $form === null ? $this->refusal($solution, $query) : $this->resolved($form, $solution, $query);
     }
 
+    public function joint(MoveQuery $query, array $holders): CheckOutcome
+    {
+        $unchecked = $this->unchecked();
+        if ($unchecked !== null) {
+            return $unchecked;
+        }
+        $solution = $this->attempt($query->jointRequest($holders), $query->package(), ...$holders);
+        if (!$solution instanceof Solution) {
+            return $solution;
+        }
+        if (!$solution->resolves()) {
+            return $this->refusal($solution, $query);
+        }
+
+        return (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, $solution->installs()[$query->package()] ?? null)))->withChanges($solution->installs(), $solution->updatedFrom());
+    }
+
     /**
-     * The request as listed, then `-w`, then `-W`: the first form that resolves and its solution,
-     * a null form and the last refusal, or the outcome of a solve that did not run.
+     * The request as listed, then `-w`, then `-W`: the first form that resolves and installs
+     * $newest, else the resolving form that installs the highest release, the first on a tie, with
+     * its solution; a null form and the last refusal; or the outcome of a solve that did not run.
+     *
+     * @param non-empty-list<string> $moved the names that the request moves, the move's package first
      *
      * @return array{0: MoveCheck::INLINE|MoveCheck::WITH_DEPENDENCIES|MoveCheck::WITH_ALL_DEPENDENCIES|null, 1: Solution}|CheckOutcome
      */
-    private function forms(SolveRequest $request, string ...$moved)
+    private function forms(SolveRequest $request, array $moved, ?string $newest = null)
     {
         $last = null;
+        $resolved = null;
         // `-W` frees more packages than `-w`, and Composer 2.9 and later then block more of their
         // locked versions, so `-W` can refuse a move that `-w` resolves: each form is asked in turn.
         foreach ([SolveRequest::LISTED => MoveCheck::INLINE, SolveRequest::WITH_DEPENDENCIES => MoveCheck::WITH_DEPENDENCIES, SolveRequest::WITH_ALL_DEPENDENCIES => MoveCheck::WITH_ALL_DEPENDENCIES] as $transitive => $form) {
             $solution = $this->attempt($request->withTransitive($transitive), ...$moved);
             if (!$solution instanceof Solution) {
-                return $solution;
+                return $resolved ?? $solution;
             }
-            if ($solution->resolves()) {
+            if ($solution->resolves() && self::installsNewest($solution, $moved[0], $newest)) {
                 return [$form, $solution];
             }
-            $last = $solution;
+            if ($solution->resolves()) {
+                $resolved = $resolved !== null && !self::installsHigher($solution, $resolved[1], $moved[0]) ? $resolved : [$form, $solution];
+            } else {
+                $last = $solution;
+            }
         }
 
-        return [null, $last];
+        return $resolved ?? [null, $last];
+    }
+
+    /** Whether the solve installs $newest of $package, or $newest is null. */
+    private static function installsNewest(Solution $solution, string $package, ?string $newest): bool
+    {
+        if ($newest === null) {
+            return true;
+        }
+        $installs = $solution->installs()[$package] ?? null;
+        $parser = new VersionParser();
+        try {
+            return $installs !== null && $parser->normalize($installs) === $parser->normalize($newest);
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Whether $solution installs a higher release of $package than $than. A solve that installs a
+     * release is higher than one that keeps or drops the package. False when a release does not parse.
+     */
+    private static function installsHigher(Solution $solution, Solution $than, string $package): bool
+    {
+        $installs = $solution->installs()[$package] ?? null;
+        $thanInstalls = $than->installs()[$package] ?? null;
+        if ($installs === null || $thanInstalls === null) {
+            return $installs !== null;
+        }
+        $parser = new VersionParser();
+        try {
+            return Comparator::greaterThan($parser->normalize($installs), $parser->normalize($thanInstalls));
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
     }
 
     /** A move is not checked while the baseline does not resolve: for the baseline's reason, or because it is refused. */
@@ -238,7 +298,7 @@ final class SolverChecker implements MoveChecker
     /** @param MoveCheck::INLINE|MoveCheck::WITH_DEPENDENCIES|MoveCheck::WITH_ALL_DEPENDENCIES $form */
     private function resolved(string $form, Solution $solution, MoveQuery $query): CheckOutcome
     {
-        return new CheckOutcome(MoveCheck::resolves($form), [], $solution->installs()[$query->package()] ?? null);
+        return new CheckOutcome(MoveCheck::resolves($form, $solution->installs()[$query->package()] ?? null));
     }
 
     private function refusal(Solution $last, MoveQuery $query): CheckOutcome

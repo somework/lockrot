@@ -54,7 +54,7 @@ final class HostileCommandArgumentsTest extends TestCase
         self::assertSame(['tag', '1.6.2+!PATH!', []], [$move['kind'], JsonPath::stringAt($move, ['latest', 'version']), $move['commands']]);
     }
 
-    public function testAHostileDependentVersionLeavesOutTheWhyNotStep(): void
+    public function testAHostileDependentVersionStaysOutOfTheSteps(): void
     {
         $move = $this->move('psr7', 'guzzlehttp/psr7', static function (array $inputs): array {
             $releases = JsonPath::arrayAt($inputs, ['packages', 'guzzlehttp/guzzle', 'releases']);
@@ -66,7 +66,7 @@ final class HostileCommandArgumentsTest extends TestCase
             ]);
         });
 
-        self::assertSame([['composer', 'require', 'php:>=7.2.5', '--no-update']], $move['commands']);
+        self::assertSame([['composer', 'require', 'php:>=7.2.5', '--no-update'], ['composer', 'why-not', 'guzzlehttp/psr7', '2.13.0', '--locked']], $move['commands']);
         self::assertSame([false], array_column(JsonPath::arrayAt($move, ['through']), 'newest_requires'));
         self::assertSame('8.2.0+%PATH%', JsonPath::stringAt($move, ['through', 0, 'newest_stable', 'version']));
     }
@@ -98,7 +98,7 @@ final class HostileCommandArgumentsTest extends TestCase
             return $inputs;
         });
 
-        self::assertSame([['composer', 'update', 'symfony/yaml']], $move['commands']);
+        self::assertSame([['composer', 'update', 'symfony/yaml'], ['composer', 'why-not', 'symfony/yaml', 'v5.4.52', '--locked']], $move['commands']);
         self::assertSame('composer update symfony/yaml (gets v5.4.53) — clears 3 advisories', $move['text']);
     }
 
@@ -106,8 +106,8 @@ final class HostileCommandArgumentsTest extends TestCase
     public function testAHostileBranchInTheLockKeepsTheStepsOfTheReleases(): void
     {
         $expected = [
-            'E' => ['symfony/yaml', [['composer', 'require', 'php:>=8.4.1', '--no-update'], ['composer', 'require', 'symfony/yaml:^8.1.8']]],
-            'G-tag‡' => ['friendsofsymfony/oauth-server-bundle', [['composer', 'require', 'friendsofsymfony/oauth-server-bundle:^1.6.2']]],
+            'E' => ['symfony/yaml', [['composer', 'require', 'php:>=8.4.1', '--no-update'], ['composer', 'require', 'symfony/yaml:^8.1.8'], ['composer', 'why-not', 'symfony/yaml', 'v8.1.8', '--locked']]],
+            'G-tag‡' => ['friendsofsymfony/oauth-server-bundle', [['composer', 'require', 'friendsofsymfony/oauth-server-bundle:^1.6.2'], ['composer', 'why-not', 'friendsofsymfony/oauth-server-bundle', '1.6.2', '--locked']]],
         ];
         foreach ($expected as $id => [$package, $commands]) {
             $move = $this->move($id, $package, static function (array $inputs): array {

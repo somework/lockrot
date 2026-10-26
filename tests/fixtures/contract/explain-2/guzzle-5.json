@@ -233,6 +233,7 @@
                         "flag_ids": [
                             "stale"
                         ],
+                        "direct": true,
                         "replacement": null,
                         "next_step": {
                             "kind": "no-move",
@@ -256,6 +257,7 @@
                             "abandoned",
                             "capped"
                         ],
+                        "direct": true,
                         "replacement": "php-http/guzzle7-adapter",
                         "next_step": {
                             "kind": "replace",
@@ -364,6 +366,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "holders",
                 "crosses_major"
@@ -373,6 +376,13 @@
                     "composer",
                     "require",
                     "guzzlehttp/guzzle:^8.2"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "guzzlehttp/guzzle",
+                    "8.2.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -601,6 +611,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -624,6 +635,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -682,6 +694,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -705,6 +718,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -763,6 +777,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -786,6 +801,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -844,6 +860,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -867,6 +884,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -925,6 +943,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -948,6 +967,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -1006,6 +1026,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1029,6 +1050,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -1087,6 +1109,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1110,6 +1133,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -1168,6 +1192,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1191,6 +1216,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -1249,6 +1275,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1272,6 +1299,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -1330,6 +1358,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1353,6 +1382,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -1411,6 +1441,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1434,6 +1465,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -1492,6 +1524,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1515,6 +1548,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -1573,6 +1607,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1596,6 +1631,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -1654,6 +1690,7 @@
                                             "flag_ids": [
                                                 "stale"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1677,6 +1714,7 @@
                                                 "abandoned",
                                                 "capped"
                                             ],
+                                            "direct": true,
                                             "replacement": "php-http/guzzle7-adapter",
                                             "next_step": {
                                                 "kind": "replace",
@@ -1828,6 +1866,7 @@
                                 "flag_ids": [
                                     "stale"
                                 ],
+                                "direct": true,
                                 "replacement": null,
                                 "next_step": {
                                     "kind": "no-move",
@@ -1851,6 +1890,7 @@
                                     "abandoned",
                                     "capped"
                                 ],
+                                "direct": true,
                                 "replacement": "php-http/guzzle7-adapter",
                                 "next_step": {
                                     "kind": "replace",
@@ -1923,6 +1963,7 @@
                                 "flag_ids": [
                                     "stale"
                                 ],
+                                "direct": true,
                                 "replacement": null,
                                 "next_step": {
                                     "kind": "no-move",
@@ -1946,6 +1987,7 @@
                                     "abandoned",
                                     "capped"
                                 ],
+                                "direct": true,
                                 "replacement": "php-http/guzzle7-adapter",
                                 "next_step": {
                                     "kind": "replace",
@@ -2018,6 +2060,7 @@
                                 "flag_ids": [
                                     "stale"
                                 ],
+                                "direct": true,
                                 "replacement": null,
                                 "next_step": {
                                     "kind": "no-move",
@@ -2041,6 +2084,7 @@
                                     "abandoned",
                                     "capped"
                                 ],
+                                "direct": true,
                                 "replacement": "php-http/guzzle7-adapter",
                                 "next_step": {
                                     "kind": "replace",

@@ -315,13 +315,22 @@ final class FindingDetails
             'installed_branch_fixes' => $installed === null ? null : $this->rowFixes($installed),
             'move_in' => $this->moves()->moveIn(),
             'gets' => $gets === null ? null : [
-                'version' => $gets->version(),
+                'version' => $this->getsVersion($gets->version(), $installed),
                 'php_check' => $gets->phpCheck(),
                 'clears' => array_map(static fn (string $id): array => ['kind' => 'advisory', 'id' => $id, 'basis' => 'outside_range'], self::inS9Order($gets->clears(), $rows)),
                 'clears_all' => $gets->clearsAll(),
             ],
             'partial' => $this->moves()->partial(),
         ];
+    }
+
+    /** The release that the installed branch's checked move installs, when it sorts below the release `composer update` targets. */
+    private function getsVersion(?string $version, ?BranchFixes $installed): ?string
+    {
+        $check = $installed === null ? null : $this->moves()->rowCheck($installed->branch());
+        $below = $check === null ? null : $check->installsBelow($version);
+
+        return $below ?? $version;
     }
 
     /**

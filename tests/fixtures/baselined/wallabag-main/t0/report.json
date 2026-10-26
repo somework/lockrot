@@ -1660,8 +1660,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -1674,6 +1676,13 @@
                         "composer",
                         "require",
                         "twig/twig:^3.27.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "twig/twig",
+                        "v3.27.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -1725,7 +1734,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -2649,6 +2659,7 @@
                                 "abandoned",
                                 "capped"
                             ],
+                            "direct": true,
                             "replacement": "php-http/guzzle7-adapter",
                             "next_step": {
                                 "kind": "replace",
@@ -2759,8 +2770,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -2770,6 +2783,13 @@
                         "composer",
                         "require",
                         "guzzlehttp/guzzle:^8.2"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "guzzlehttp/guzzle",
+                        "8.2.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -2985,6 +3005,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3044,6 +3065,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3103,6 +3125,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3162,6 +3185,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3221,6 +3245,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3280,6 +3305,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3339,6 +3365,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3398,6 +3425,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3457,6 +3485,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3516,6 +3545,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3575,6 +3605,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3634,6 +3665,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3693,6 +3725,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3752,6 +3785,7 @@
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -3987,6 +4021,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -4325,6 +4360,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -4656,6 +4692,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -4954,6 +4991,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -5231,6 +5269,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -5534,14 +5573,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/http-foundation:^5.4.50"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/http-foundation",
+                        "v5.4.50",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -5593,7 +5641,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -5960,14 +6009,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/mime:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/mime",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -6019,7 +6077,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -6372,14 +6431,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/process:^5.4.51"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/process",
+                        "v5.4.51",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -6431,7 +6499,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -6810,14 +6879,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/security-http:^5.4.53"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/security-http",
+                        "v5.4.53",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -6869,7 +6947,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -7256,14 +7335,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "tecnickcom/tcpdf:^6.8.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "tecnickcom/tcpdf",
+                        "6.8.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -7315,7 +7403,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -7762,14 +7851,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "phpseclib/phpseclib:^3.0.57"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "phpseclib/phpseclib",
+                        "3.0.57",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -7782,7 +7880,9 @@
                             "released": "2024-04-15T18:31:22+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "php-amqplib/rabbitmq-bundle",
@@ -7793,7 +7893,9 @@
                             "released": "2024-03-25T12:12:05+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
@@ -7844,7 +7946,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -8256,6 +8359,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -8291,8 +8395,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -8303,6 +8409,13 @@
                         "require",
                         "php:>=8.1",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "spomky-labs/otphp",
+                        "11.4.3",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -8315,7 +8428,9 @@
                             "released": "2024-01-18T20:20:03+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -8449,6 +8564,7 @@
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }
@@ -8491,6 +8607,7 @@
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }
@@ -8683,14 +8800,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/monolog-bridge:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -8703,7 +8829,9 @@
                             "released": "2023-11-06T17:08:13+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
@@ -8754,7 +8882,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -9107,6 +9236,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -9643,6 +9773,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -9972,6 +10103,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -10280,6 +10412,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -10603,6 +10736,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -10617,11 +10751,13 @@
                             "released": "2022-03-21T19:27:18+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a maintained alternative: nothing released for 8.8 years; it comes in through wallabag/phpepub: replace or update that package"
+                "text": "find a maintained alternative: nothing released for 8.8 years; it comes in through wallabag/phpepub (grandt/phpresizegif requires it): replace wallabag/phpepub"
             },
             "security": {
                 "status": "clear",
@@ -10940,6 +11076,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -10954,11 +11091,13 @@
                             "released": "2022-03-21T19:27:18+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a maintained alternative: nothing released for 9.0 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it"
+                "text": "find a maintained alternative: nothing released for 9.0 years; it comes in through wallabag/phpepub: replace wallabag/phpepub; the newest release of wallabag/phpepub (4.0.10) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -11276,6 +11415,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -11290,11 +11430,13 @@
                             "released": "2022-03-21T19:27:18+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a maintained alternative: nothing released for 8.7 years; it comes in through wallabag/phpepub: replace or update that package"
+                "text": "find a maintained alternative: nothing released for 8.7 years; it comes in through wallabag/phpepub (phpzip/phpzip requires it): replace wallabag/phpepub"
             },
             "security": {
                 "status": "clear",
@@ -11624,17 +11766,11 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "guzzlehttp/guzzle",
-                        "7.8.1"
-                    ]
-                ],
+                "commands": [],
                 "through": [
                     {
                         "package": "guzzlehttp/guzzle",
@@ -11645,7 +11781,9 @@
                             "released": "2023-12-03T20:35:24+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "php-http/guzzle5-adapter",
@@ -11656,7 +11794,9 @@
                             "released": "2019-02-05T12:28:45+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "php-http/httplug-bundle",
@@ -11667,11 +11807,13 @@
                             "released": "2024-02-27T16:04:16+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. find a replacement (none named); it comes in through guzzlehttp/guzzle, php-http/guzzle5-adapter, php-http/httplug-bundle: replace or update them; the newest release of guzzlehttp/guzzle (7.8.1) no longer requires it"
+                "text": "find a replacement (none named); it comes in through guzzlehttp/guzzle, php-http/guzzle5-adapter, php-http/httplug-bundle: replace or update guzzlehttp/guzzle, or replace php-http/guzzle5-adapter, php-http/httplug-bundle; the newest release of guzzlehttp/guzzle (7.8.1) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -12022,6 +12164,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12033,7 +12176,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -12041,7 +12186,9 @@
                         "installed_requires": true,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "no_stable_release"
+                        "newest_requires_unmeasured": "no_stable_release",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -12049,11 +12196,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -12393,6 +12542,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12407,11 +12557,13 @@
                             "released": "2022-03-21T19:27:18+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a maintained alternative: nothing released for 8.5 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it"
+                "text": "find a maintained alternative: nothing released for 8.5 years; it comes in through wallabag/phpepub: replace wallabag/phpepub; the newest release of wallabag/phpepub (4.0.10) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -12729,6 +12881,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12743,11 +12896,13 @@
                             "released": "2021-08-15T12:26:51+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a maintained alternative: nothing released for 6.5 years; it comes in through pragmarx/recovery: replace or update that package; the newest release of pragmarx/recovery (v0.2.1) still requires it"
+                "text": "find a maintained alternative: nothing released for 6.5 years; it comes in through pragmarx/recovery: replace pragmarx/recovery; the newest release of pragmarx/recovery (v0.2.1) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -13075,6 +13230,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -13089,11 +13245,13 @@
                             "released": "2024-01-04T08:46:05+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through j0k3r/graby: replace or update that package; the newest release of j0k3r/graby (2.4.5) still requires it"
+                "text": "find a replacement (none named); it comes in through j0k3r/graby: replace j0k3r/graby; the newest release of j0k3r/graby (2.4.5) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -13369,6 +13527,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -13611,6 +13770,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -14042,6 +14202,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -14512,6 +14673,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14526,11 +14688,13 @@
                             "released": "2024-02-13T14:43:20+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through stof/doctrine-extensions-bundle: replace or update that package"
+                "text": "find a replacement (none named); it comes in through stof/doctrine-extensions-bundle (gedmo/doctrine-extensions requires it): replace stof/doctrine-extensions-bundle"
             },
             "security": {
                 "status": "clear",
@@ -14781,6 +14945,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14795,7 +14960,9 @@
                             "released": "2023-02-24T14:57:12+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "willdurand/hateoas",
@@ -14806,7 +14973,9 @@
                             "released": "2023-12-12T13:35:06+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "willdurand/hateoas-bundle",
@@ -14817,11 +14986,13 @@
                             "released": "2023-12-13T11:29:05+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through sensio/framework-extra-bundle, willdurand/hateoas, willdurand/hateoas-bundle: replace or update them; the newest releases of sensio/framework-extra-bundle (v6.2.10) and willdurand/hateoas (3.10.0) still require it"
+                "text": "find a replacement (none named); it comes in through sensio/framework-extra-bundle, willdurand/hateoas, willdurand/hateoas-bundle: replace sensio/framework-extra-bundle, willdurand/hateoas, willdurand/hateoas-bundle; the newest releases of sensio/framework-extra-bundle (v6.2.10) and willdurand/hateoas (3.10.0) still require it"
             },
             "security": {
                 "status": "clear",
@@ -15063,23 +15234,11 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "doctrine/dbal",
-                        "4.0.2"
-                    ],
-                    [
-                        "composer",
-                        "why-not",
-                        "doctrine/orm",
-                        "3.1.3"
-                    ]
-                ],
+                "commands": [],
                 "through": [
                     {
                         "package": "craue/config-bundle",
@@ -15090,7 +15249,9 @@
                             "released": "2023-08-06T22:32:54+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "dama/doctrine-test-bundle",
@@ -15101,7 +15262,9 @@
                             "released": "2024-02-15T08:28:14+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "doctrine/dbal",
@@ -15112,7 +15275,9 @@
                             "released": "2024-04-25T08:29:52+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/doctrine-bundle",
@@ -15123,7 +15288,9 @@
                             "released": "2024-03-19T07:20:37+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "doctrine/doctrine-fixtures-bundle",
@@ -15134,7 +15301,9 @@
                             "released": "2024-05-07T07:16:35+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/doctrine-migrations-bundle",
@@ -15145,7 +15314,9 @@
                             "released": "2024-05-14T20:32:18+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "doctrine/migrations",
@@ -15156,7 +15327,9 @@
                             "released": "2024-03-06T13:41:11+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/orm",
@@ -15167,7 +15340,9 @@
                             "released": "2024-04-30T07:14:13+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "pagerfanta/doctrine-orm-adapter",
@@ -15178,7 +15353,9 @@
                             "released": "2024-03-06T23:51:47+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "rulerz-php/doctrine-orm",
@@ -15186,7 +15363,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "spiriitlabs/form-filter-bundle",
@@ -15197,11 +15376,13 @@
                             "released": "2024-04-15T12:32:23+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. find a replacement (none named); it comes in through craue/config-bundle, dama/doctrine-test-bundle, doctrine/dbal and 8 more: replace or update them; the newest releases of doctrine/dbal (4.0.2) and doctrine/orm (3.1.3) no longer require it"
+                "text": "find a replacement (none named); it comes in through craue/config-bundle, dama/doctrine-test-bundle, doctrine/dbal and 8 more: replace craue/config-bundle, dama/doctrine-test-bundle, doctrine/doctrine-bundle and 1 more, or replace or update doctrine/dbal, doctrine/doctrine-fixtures-bundle, doctrine/migrations and 4 more; the newest releases of doctrine/dbal (4.0.2) and doctrine/orm (3.1.3) no longer require it"
             },
             "security": {
                 "status": "clear",
@@ -15455,6 +15636,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15466,7 +15648,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -15474,7 +15658,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -15482,11 +15668,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -15767,6 +15955,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15778,7 +15967,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -15786,7 +15977,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -15794,11 +15987,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/exception requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16080,6 +16275,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16091,7 +16287,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -16099,7 +16297,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -16107,11 +16307,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/consistency requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16392,6 +16594,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16403,7 +16606,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -16411,7 +16616,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -16419,11 +16626,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16704,6 +16913,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16715,7 +16925,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -16723,7 +16935,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -16731,11 +16945,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -17017,6 +17233,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -17028,7 +17245,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -17036,7 +17255,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -17044,11 +17265,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -17330,6 +17553,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -17341,7 +17565,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -17349,7 +17575,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -17357,11 +17585,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -17642,6 +17872,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -17653,7 +17884,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -17661,7 +17894,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -17669,11 +17904,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -17954,6 +18191,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -17965,7 +18203,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -17973,7 +18213,9 @@
                         "installed_requires": true,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "no_stable_release"
+                        "newest_requires_unmeasured": "no_stable_release",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -17981,11 +18223,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -18251,6 +18495,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -18262,7 +18507,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -18270,7 +18517,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -18278,11 +18527,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/file requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -18551,6 +18802,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -18562,7 +18814,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -18570,7 +18824,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -18578,11 +18834,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/regex requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -18865,6 +19123,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -18876,7 +19135,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -18884,7 +19145,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -18892,11 +19155,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -19177,6 +19442,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -19188,7 +19454,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz",
@@ -19196,7 +19464,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -19204,11 +19474,13 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update them"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/math requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -19495,6 +19767,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -19509,7 +19782,9 @@
                             "released": "2024-01-04T08:46:05+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "php-http/httplug-bundle",
@@ -19520,7 +19795,9 @@
                             "released": "2024-02-27T16:04:16+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "sentry/sentry-symfony",
@@ -19531,11 +19808,13 @@
                             "released": "2024-04-09T05:14:27+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "replace with psr/http-factory (named by its registry); it comes in through j0k3r/graby, php-http/httplug-bundle, sentry/sentry-symfony: replace or update them; the newest release of php-http/httplug-bundle (1.33.0) still requires it"
+                "text": "replace with psr/http-factory (named by its registry); it comes in through j0k3r/graby, php-http/httplug-bundle, sentry/sentry-symfony: replace j0k3r/graby, php-http/httplug-bundle, or replace or update sentry/sentry-symfony; the newest release of php-http/httplug-bundle (1.33.0) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -19789,17 +20068,11 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "symfony/security-bundle",
-                        "v7.0.7"
-                    ]
-                ],
+                "commands": [],
                 "through": [
                     {
                         "package": "friendsofsymfony/oauth-server-bundle",
@@ -19810,7 +20083,9 @@
                             "released": "2019-01-23T15:23:04+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "installed_unlisted"
+                        "newest_requires_unmeasured": "installed_unlisted",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/user-bundle",
@@ -19821,7 +20096,9 @@
                             "released": "2023-07-06T10:38:55+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "scheb/2fa-backup-code",
@@ -19832,7 +20109,9 @@
                             "released": "2023-12-03T16:24:13+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-bundle",
@@ -19843,7 +20122,9 @@
                             "released": "2024-04-20T14:21:34+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-email",
@@ -19854,7 +20135,9 @@
                             "released": "2024-01-18T20:20:03+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-google-authenticator",
@@ -19865,7 +20148,9 @@
                             "released": "2024-01-18T20:20:03+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-qr-code",
@@ -19876,7 +20161,9 @@
                             "released": "2022-01-03T10:21:24+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "scheb/2fa-trusted-device",
@@ -19887,7 +20174,9 @@
                             "released": "2024-01-18T20:20:03+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/security-bundle",
@@ -19898,11 +20187,13 @@
                             "released": "2024-04-18T09:29:19+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update them; the newest release of symfony/security-bundle (v7.0.7) no longer requires it"
+                "text": "find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update friendsofsymfony/oauth-server-bundle, scheb/2fa-backup-code, scheb/2fa-bundle and 4 more, or replace friendsofsymfony/user-bundle, scheb/2fa-qr-code; the newest release of symfony/security-bundle (v7.0.7) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -20179,8 +20470,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -20189,6 +20482,13 @@
                         "composer",
                         "require",
                         "enshrined/svg-sanitize:^0.22.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "enshrined/svg-sanitize",
+                        "0.22.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -20534,14 +20834,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "guzzlehttp/psr7:^2.12.3"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "guzzlehttp/psr7",
+                        "2.12.3",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -20593,7 +20902,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -20978,14 +21288,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "phpunit/phpunit:^9.6.33"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "phpunit/phpunit",
+                        "9.6.33",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -21037,7 +21356,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -21463,14 +21783,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/http-client:^5.4.53"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/http-client",
+                        "v5.4.53",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -21522,7 +21851,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -21835,14 +22165,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/mailer:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/mailer",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -21894,7 +22233,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -22218,14 +22558,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/routing:^5.4.53"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/routing",
+                        "v5.4.53",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -22277,7 +22626,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -22624,14 +22974,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/cache:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/cache",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -22644,7 +23003,9 @@
                             "released": "2023-08-06T22:32:54+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "dama/doctrine-test-bundle",
@@ -22655,7 +23016,9 @@
                             "released": "2024-02-15T08:28:14+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "doctrine/doctrine-bundle",
@@ -22666,7 +23029,9 @@
                             "released": "2024-03-19T07:20:37+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "doctrine/doctrine-fixtures-bundle",
@@ -22677,7 +23042,9 @@
                             "released": "2024-05-07T07:16:35+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/doctrine-migrations-bundle",
@@ -22688,7 +23055,9 @@
                             "released": "2024-05-14T20:32:18+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "friendsofsymfony/jsrouting-bundle",
@@ -22699,7 +23068,9 @@
                             "released": "2024-01-23T21:30:47+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/oauth-server-bundle",
@@ -22710,7 +23081,9 @@
                             "released": "2019-01-23T15:23:04+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "installed_unlisted"
+                        "newest_requires_unmeasured": "installed_unlisted",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/rest-bundle",
@@ -22721,7 +23094,9 @@
                             "released": "2024-04-12T22:57:10+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "friendsofsymfony/user-bundle",
@@ -22732,7 +23107,9 @@
                             "released": "2023-07-06T10:38:55+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "jms/serializer-bundle",
@@ -22743,7 +23120,9 @@
                             "released": "2023-12-12T15:33:15+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "nelmio/api-doc-bundle",
@@ -22754,7 +23133,9 @@
                             "released": "2024-04-20T11:19:38+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "nelmio/cors-bundle",
@@ -22765,7 +23146,9 @@
                             "released": "2023-11-30T16:41:19+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "php-amqplib/rabbitmq-bundle",
@@ -22776,7 +23159,9 @@
                             "released": "2024-03-25T12:12:05+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "scheb/2fa-backup-code",
@@ -22787,7 +23172,9 @@
                             "released": "2023-12-03T16:24:13+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-bundle",
@@ -22798,7 +23185,9 @@
                             "released": "2024-04-20T14:21:34+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-email",
@@ -22809,7 +23198,9 @@
                             "released": "2024-01-18T20:20:03+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-google-authenticator",
@@ -22820,7 +23211,9 @@
                             "released": "2024-01-18T20:20:03+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-qr-code",
@@ -22831,7 +23224,9 @@
                             "released": "2022-01-03T10:21:24+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "scheb/2fa-trusted-device",
@@ -22842,7 +23237,9 @@
                             "released": "2024-01-18T20:20:03+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "sensio/framework-extra-bundle",
@@ -22853,7 +23250,9 @@
                             "released": "2023-02-24T14:57:12+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "spiriitlabs/form-filter-bundle",
@@ -22864,7 +23263,9 @@
                             "released": "2024-04-15T12:32:23+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "stof/doctrine-extensions-bundle",
@@ -22875,7 +23276,9 @@
                             "released": "2024-02-13T14:43:20+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "symfony/expression-language",
@@ -22886,7 +23289,9 @@
                             "released": "2024-04-18T09:29:19+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/framework-bundle",
@@ -22897,7 +23302,9 @@
                             "released": "2024-05-02T09:18:50+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/maker-bundle",
@@ -22908,7 +23315,9 @@
                             "released": "2024-05-06T03:59:59+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/web-profiler-bundle",
@@ -22919,7 +23328,9 @@
                             "released": "2024-05-11T14:52:12+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "twig/extra-bundle",
@@ -22930,7 +23341,9 @@
                             "released": "2024-05-11T07:35:57+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "wallabag/rulerz-bundle",
@@ -22938,7 +23351,9 @@
                         "installed_requires": false,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": null
                     },
                     {
                         "package": "willdurand/hateoas",
@@ -22949,7 +23364,9 @@
                             "released": "2023-12-12T13:35:06+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "willdurand/hateoas-bundle",
@@ -22960,7 +23377,9 @@
                             "released": "2023-12-13T11:29:05+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
@@ -23011,7 +23430,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -23362,6 +23782,7 @@
                             "flag_ids": [
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "update",
@@ -23370,7 +23791,8 @@
                                 "check": {
                                     "result": "not_checked",
                                     "form": null,
-                                    "reason": "baseline_refused"
+                                    "reason": "baseline_refused",
+                                    "installs": null
                                 }
                             }
                         }
@@ -23406,13 +23828,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "j0k3r/httplug-ssrf-plugin",
+                        "v3.0.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "j0k3r/graby",
@@ -23423,11 +23855,13 @@
                             "released": "2024-01-04T08:46:05+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "move j0k3r/httplug-ssrf-plugin to ^3.0 through j0k3r/graby \u2014 clears left-behind and old-promise; 3.x needs php >=7.4, which require.php allows; the target php 8.4 runs it; held by j0k3r/graby 2.4.5 (requires ^2.0; itself low: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. move j0k3r/httplug-ssrf-plugin to ^3.0 through j0k3r/graby \u2014 clears left-behind and old-promise; 3.x needs php >=7.4, which require.php allows; the target php 8.4 runs it; held by j0k3r/graby 2.4.5 (requires ^2.0; itself low: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -23768,8 +24202,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
@@ -23780,6 +24216,13 @@
                         "require",
                         "php:>=8.0",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "thecodingmachine/safe",
+                        "v2.5.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -23792,7 +24235,9 @@
                             "released": "2024-01-18T20:20:03+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -24116,6 +24561,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -24151,13 +24597,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "willdurand/jsonp-callback-validator",
+                        "v2.0.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "friendsofsymfony/jsrouting-bundle",
@@ -24168,7 +24624,9 @@
                             "released": "2024-01-23T21:30:47+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/rest-bundle",
@@ -24179,11 +24637,13 @@
                             "released": "2024-04-12T22:57:10+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "move willdurand/jsonp-callback-validator to ^2.0 through friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle \u2014 clears left-behind and old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; held by friendsofsymfony/jsrouting-bundle 2.8.0 (requires ~1.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. move willdurand/jsonp-callback-validator to ^2.0 through friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle \u2014 clears left-behind and old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; held by friendsofsymfony/jsrouting-bundle 2.8.0 (requires ~1.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -24514,6 +24974,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -24528,11 +24989,13 @@
                             "released": "2022-03-21T19:27:18+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "test it on PHP 8.4 \u2014 1.0.2 is its newest release; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it"
+                "text": "test it on PHP 8.4 \u2014 1.0.2 is its newest release; it comes in through wallabag/phpepub: replace wallabag/phpepub; the newest release of wallabag/phpepub (4.0.10) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -24804,8 +25267,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -24818,6 +25283,13 @@
                         "composer",
                         "require",
                         "laminas/laminas-code:^4.17.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "laminas/laminas-code",
+                        "4.17.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -25076,6 +25548,7 @@
                             "flag_ids": [
                                 "abandoned"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "find-alternative",
@@ -25111,8 +25584,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -25123,6 +25598,13 @@
                         "require",
                         "php:>=8.1",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "endroid/qr-code",
+                        "4.8.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -25135,7 +25617,9 @@
                             "released": "2022-01-03T10:21:24+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
@@ -25403,17 +25887,11 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "phpunit/phpunit",
-                        "11.1.3"
-                    ]
-                ],
+                "commands": [],
                 "through": [
                     {
                         "package": "phpunit/phpunit",
@@ -25424,11 +25902,13 @@
                             "released": "2024-04-24T06:34:25+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. find a replacement (none named); it comes in through phpunit/phpunit: replace or update that package; the newest release of phpunit/phpunit (11.1.3) no longer requires it"
+                "text": "find a replacement (none named); it comes in through phpunit/phpunit: replace or update phpunit/phpunit; the newest release of phpunit/phpunit (11.1.3) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -25663,6 +26143,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -25672,7 +26153,9 @@
                         "installed_requires": true,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "no_stable_release"
+                        "newest_requires_unmeasured": "no_stable_release",
+                        "local": false,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
@@ -25921,14 +26404,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "j0k3r/graby:^2.5.1"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "j0k3r/graby",
+                        "2.5.1",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -25980,7 +26472,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -26309,14 +26802,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/dom-crawler:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/dom-crawler",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -26368,7 +26870,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -26649,14 +27152,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/validator:^5.4.43"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/validator",
+                        "v5.4.43",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -26708,7 +27220,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -26999,14 +27512,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/polyfill-intl-idn:^1.38.1"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/polyfill-intl-idn",
+                        "v1.38.1",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -27019,7 +27541,9 @@
                             "released": "2023-10-06T06:47:41+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/google-mailer",
@@ -27030,7 +27554,9 @@
                             "released": "2024-04-18T09:32:20+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/mailer",
@@ -27041,7 +27567,9 @@
                             "released": "2024-04-18T09:29:19+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/mime",
@@ -27052,7 +27580,9 @@
                             "released": "2024-04-18T09:29:19+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -27103,7 +27633,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -27433,14 +27964,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/yaml:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/yaml",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -27453,7 +27993,9 @@
                             "released": "2023-12-09T10:31:14+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "nelmio/api-doc-bundle",
@@ -27464,7 +28006,9 @@
                             "released": "2024-04-20T11:19:38+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "php-amqplib/rabbitmq-bundle",
@@ -27475,7 +28019,9 @@
                             "released": "2024-03-25T12:12:05+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
@@ -27526,7 +28072,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -27919,6 +28466,7 @@
                             "flag_ids": [
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "update",
@@ -27927,7 +28475,8 @@
                                 "check": {
                                     "result": "not_checked",
                                     "form": null,
-                                    "reason": "baseline_refused"
+                                    "reason": "baseline_refused",
+                                    "installs": null
                                 }
                             }
                         }
@@ -27963,8 +28512,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -27975,6 +28526,13 @@
                         "require",
                         "php:>=8.1",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "phpunit/php-invoker",
+                        "4.0.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -27987,7 +28545,9 @@
                             "released": "2024-04-24T06:34:25+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -28317,6 +28877,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": false,
                             "replacement": null,
                             "next_step": null
                         }
@@ -28334,6 +28895,7 @@
                             "flag_ids": [
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "update",
@@ -28342,7 +28904,8 @@
                                 "check": {
                                     "result": "not_checked",
                                     "form": null,
-                                    "reason": "baseline_refused"
+                                    "reason": "baseline_refused",
+                                    "installs": null
                                 }
                             }
                         }
@@ -28378,8 +28941,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -28390,6 +28955,13 @@
                         "require",
                         "php:>=8.1",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "phpunit/php-text-template",
+                        "3.0.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -28402,7 +28974,9 @@
                             "released": "2024-04-24T06:34:25+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -28734,6 +29308,7 @@
                             "flag_ids": [
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "update",
@@ -28742,7 +29317,8 @@
                                 "check": {
                                     "result": "not_checked",
                                     "form": null,
-                                    "reason": "baseline_refused"
+                                    "reason": "baseline_refused",
+                                    "installs": null
                                 }
                             }
                         }
@@ -28778,8 +29354,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -28790,6 +29368,13 @@
                         "require",
                         "php:>=8.1",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "phpunit/php-timer",
+                        "6.0.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -28802,7 +29387,9 @@
                             "released": "2024-04-24T06:34:25+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -29134,6 +29721,7 @@
                             "flag_ids": [
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "update",
@@ -29142,7 +29730,8 @@
                                 "check": {
                                     "result": "not_checked",
                                     "form": null,
-                                    "reason": "baseline_refused"
+                                    "reason": "baseline_refused",
+                                    "installs": null
                                 }
                             }
                         }
@@ -29178,8 +29767,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -29190,6 +29781,13 @@
                         "require",
                         "php:>=8.1",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "sebastian/code-unit",
+                        "2.0.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -29202,7 +29800,9 @@
                             "released": "2024-04-24T06:34:25+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -29532,6 +30132,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": false,
                             "replacement": null,
                             "next_step": null
                         }
@@ -29567,8 +30168,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -29579,6 +30182,13 @@
                         "require",
                         "php:>=8.1",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "sebastian/code-unit-reverse-lookup",
+                        "3.0.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -29591,7 +30201,9 @@
                             "released": "2024-04-24T06:34:25+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -29924,6 +30536,7 @@
                             "flag_ids": [
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "update",
@@ -29932,7 +30545,8 @@
                                 "check": {
                                     "result": "not_checked",
                                     "form": null,
-                                    "reason": "baseline_refused"
+                                    "reason": "baseline_refused",
+                                    "installs": null
                                 }
                             }
                         }
@@ -29968,8 +30582,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -29980,6 +30596,13 @@
                         "require",
                         "php:>=8.1",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "sebastian/object-enumerator",
+                        "5.0.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -29992,7 +30615,9 @@
                             "released": "2024-04-24T06:34:25+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -30322,6 +30947,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": false,
                             "replacement": null,
                             "next_step": null
                         }
@@ -30340,6 +30966,7 @@
                                 "left-behind",
                                 "old-promise"
                             ],
+                            "direct": false,
                             "replacement": null,
                             "next_step": {
                                 "kind": "raise-php",
@@ -30348,7 +30975,8 @@
                                 "check": {
                                     "result": "not_checked",
                                     "form": null,
-                                    "reason": "baseline_refused"
+                                    "reason": "baseline_refused",
+                                    "installs": null
                                 }
                             }
                         }
@@ -30384,8 +31012,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -30396,6 +31026,13 @@
                         "require",
                         "php:>=8.1",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "sebastian/object-reflector",
+                        "3.0.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -30408,7 +31045,9 @@
                             "released": "2024-04-24T06:34:25+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -30739,6 +31378,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": false,
                             "replacement": null,
                             "next_step": null
                         }
@@ -30756,6 +31396,7 @@
                             "flag_ids": [
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "update",
@@ -30764,7 +31405,8 @@
                                 "check": {
                                     "result": "not_checked",
                                     "form": null,
-                                    "reason": "baseline_refused"
+                                    "reason": "baseline_refused",
+                                    "installs": null
                                 }
                             }
                         }
@@ -30800,8 +31442,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -30812,6 +31456,13 @@
                         "require",
                         "php:>=8.1",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "sebastian/version",
+                        "4.0.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -30824,7 +31475,9 @@
                             "released": "2024-04-24T06:34:25+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -31111,8 +31764,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -31124,7 +31779,15 @@
                     [
                         "composer",
                         "require",
-                        "friendsoftwig/twigcs:^6.6.1"
+                        "friendsoftwig/twigcs:^6.6.1",
+                        "--dev"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "friendsoftwig/twigcs",
+                        "v6.6.1",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -31374,6 +32037,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -31386,7 +32050,9 @@
                             "released": "2019-01-23T15:23:04+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "installed_unlisted"
+                        "newest_requires_unmeasured": "installed_unlisted",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -31628,6 +32294,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -31640,7 +32307,9 @@
                             "released": "2024-04-20T11:19:38+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],

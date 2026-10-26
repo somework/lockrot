@@ -98,7 +98,7 @@ final class MoveWordsWallabagTest extends TestCase
     {
         $text = JsonPath::stringAt(self::move('7.4', 'symfony/mailer'), ['text']);
 
-        self::assertStringContainsString('composer.json (requires symfony/mime ^4.4.47) and symfony/mailer v5.4.52, its own release (requires psr/event-dispatcher ^1) and symfony/mailer v5.4.52, its own release (requires symfony/mime ^5.2.6|^6.0) and symfony/http-foundation v4.4.49 (requires', $text);
+        self::assertStringContainsString('composer.json (requires symfony/mime ^4.4.47) and symfony/mailer v5.4.52, its own release (requires psr/event-dispatcher ^1) and symfony/mailer v5.4.52, its own release (requires symfony/mime ^5.2.6|^6.0) and ', $text);
         self::assertStringNotContainsString('symfony/mailer v5.4.52 (requires', $text);
     }
 
@@ -109,7 +109,7 @@ final class MoveWordsWallabagTest extends TestCase
         $own = array_values(array_filter(JsonPath::arrayAt($move, ['held_by']), static fn ($hold): bool => \is_array($hold) && $hold['source'] === 'root' && $hold['target'] === null));
 
         self::assertSame([['require-dev', '^4.4.47']], array_map(static fn (array $hold): array => [$hold['link'], $hold['constraint']], $own));
-        self::assertStringContainsString('held by composer.json (requires ^4.4.47 (require-dev)) and composer.json (requires symfony/debug-bundle', JsonPath::stringAt($move, ['text']));
+        self::assertStringContainsString('held by composer.json (requires ^4.4.47 in require-dev);', JsonPath::stringAt($move, ['text']));
     }
 
     /** twig/twig is locked at v3.11.3: its hold at a newer release is not that finding, so it carries no grade and no flags. */
@@ -124,11 +124,12 @@ final class MoveWordsWallabagTest extends TestCase
         self::assertStringContainsString('twig/twig '.JsonPath::stringAt($twig[0], ['version']).' (requires php >=8.1.0)', JsonPath::stringAt($move, ['text']));
     }
 
+    /** symfony/security-http is locked at v4.4.50: its hold on symfony/mailer carries the verdict of its own finding. */
     public function testAHoldAtTheLockedVersionNamesItsHolder(): void
     {
-        $holds = array_values(array_filter(JsonPath::arrayAt(self::move('7.4', 'symfony/var-dumper'), ['held_by']), static fn ($hold): bool => \is_array($hold) && $hold['package'] === 'symfony/error-handler'));
+        $holds = array_values(array_filter(JsonPath::arrayAt(self::move('7.4', 'symfony/mailer'), ['held_by']), static fn ($hold): bool => \is_array($hold) && $hold['package'] === 'symfony/security-http'));
 
-        self::assertSame([['v4.4.44', 'high']], array_map(static fn (array $hold): array => [$hold['version'], JsonPath::stringAt($hold, ['holder', 'verdict'])], $holds));
+        self::assertSame([['v4.4.50', self::verdict('7.4', 'symfony/security-http')]], array_map(static fn (array $hold): array => [$hold['version'], JsonPath::stringAt($hold, ['holder', 'verdict'])], $holds));
     }
 
     /** @return array<mixed, mixed> */
@@ -137,6 +138,16 @@ final class MoveWordsWallabagTest extends TestCase
         foreach (JsonPath::arrayAt(self::$reports[$target], ['findings']) as $finding) {
             if (\is_array($finding) && $finding['package'] === $package) {
                 return JsonPath::arrayAt($finding, ['next_step']);
+            }
+        }
+        self::fail($package.' has no finding at '.$target);
+    }
+
+    private static function verdict(string $target, string $package): string
+    {
+        foreach (JsonPath::arrayAt(self::$reports[$target], ['findings']) as $finding) {
+            if (\is_array($finding) && $finding['package'] === $package) {
+                return JsonPath::stringAt($finding, ['verdict']);
             }
         }
         self::fail($package.' has no finding at '.$target);

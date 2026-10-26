@@ -2,8 +2,8 @@
   web-auth/metadata-service v2.1.7  via web-auth/webauthn-lib  ·  abandoned · left-behind
       18 = (abandoned 32 + left-behind 4 [¼ of 16]) ÷ 2 transitive
       do: replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through
-          web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no
-          longer requires it
+          web-auth/webauthn-lib: replace or update web-auth/webauthn-lib; the newest release of web-auth/webauthn-lib
+          (5.3.9) no longer requires it
       abandoned    marked abandoned by its registry, replacement: web-auth/webauthn-lib
       left-behind  branch 2.x last released 2019-09-04 (7.1 years ago); 4.x released 4.9.1 (2024-07-11)
 

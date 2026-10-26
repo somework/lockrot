@@ -132,14 +132,23 @@
    "check": {
     "result": "not_checked",
     "form": null,
-    "reason": "pass_cap"
+    "reason": "pass_cap",
+    "installs": null
    },
+   "moves_with": [],
    "composer_moves_because": [],
    "commands": [
     [
      "composer",
      "update",
      "livewire/livewire:^4.4.7"
+    ],
+    [
+     "composer",
+     "why-not",
+     "livewire/livewire",
+     "v4.4.7",
+     "--locked"
     ]
    ],
    "through": [],
@@ -191,7 +200,8 @@
     "check": {
      "result": "not_checked",
      "form": null,
-     "reason": "pass_cap"
+     "reason": "pass_cap",
+     "installs": null
     }
    },
    "move_in": "next_step",

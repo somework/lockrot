@@ -160,14 +160,23 @@
    "check": {
     "result": "not_checked",
     "form": null,
-    "reason": "offline"
+    "reason": "offline",
+    "installs": null
    },
+   "moves_with": [],
    "composer_moves_because": [],
    "commands": [
     [
      "composer",
      "update",
      "phpseclib/phpseclib:^3.0.57"
+    ],
+    [
+     "composer",
+     "why-not",
+     "phpseclib/phpseclib",
+     "3.0.57",
+     "--locked"
     ]
    ],
    "through": [
@@ -180,7 +189,9 @@
       "released": "2026-08-28T14:24:54+00:00"
      },
      "newest_requires": true,
-     "newest_requires_unmeasured": null
+     "newest_requires_unmeasured": null,
+     "local": false,
+     "newest_is_installed": false
     },
     {
      "package": "laravel/socialite",
@@ -191,7 +202,9 @@
       "released": "2026-08-31T13:49:19+00:00"
      },
      "newest_requires": true,
-     "newest_requires_unmeasured": null
+     "newest_requires_unmeasured": null,
+     "local": false,
+     "newest_is_installed": false
     }
    ],
    "also": [],
@@ -242,7 +255,8 @@
     "check": {
      "result": "not_checked",
      "form": null,
-     "reason": "offline"
+     "reason": "offline",
+     "installs": null
     }
    },
    "move_in": "next_step",

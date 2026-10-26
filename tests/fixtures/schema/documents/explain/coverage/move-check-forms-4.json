@@ -129,8 +129,10 @@
    "check": {
     "result": "resolves",
     "form": "with-all-dependencies",
-    "reason": null
+    "reason": null,
+    "installs": null
    },
+   "moves_with": [],
    "composer_moves_because": [
     "crosses_major"
    ],

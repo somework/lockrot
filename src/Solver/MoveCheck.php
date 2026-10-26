@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
+use Composer\Semver\Comparator;
+use Composer\Semver\VersionParser;
+
 /**
  * A move's `check`: whether Composer's solver installs it from the lock, in which command form,
  * or why lockrot did not ask (docs/verdicts.md#the-move-check).
@@ -61,19 +64,24 @@ final class MoveCheck implements \JsonSerializable
     private string $result;
     private ?string $form;
     private ?string $reason;
+    private ?string $installs;
 
     /** @param self::RESOLVES|self::REFUSED|self::NOT_CHECKED $result */
-    private function __construct(string $result, ?string $form, ?string $reason)
+    private function __construct(string $result, ?string $form, ?string $reason, ?string $installs = null)
     {
         $this->result = $result;
         $this->form = $form;
         $this->reason = $reason;
+        $this->installs = $installs;
     }
 
-    /** @param self::INLINE|self::WITH_DEPENDENCIES|self::WITH_ALL_DEPENDENCIES $form */
-    public static function resolves(string $form): self
+    /**
+     * @param self::INLINE|self::WITH_DEPENDENCIES|self::WITH_ALL_DEPENDENCIES $form
+     * @param ?string                                                         $installs the release of the moved package that the form installs, null when the solve does not say
+     */
+    public static function resolves(string $form, ?string $installs = null): self
     {
-        return new self(self::RESOLVES, $form, null);
+        return new self(self::RESOLVES, $form, null, $installs);
     }
 
     public static function refused(): self
@@ -108,6 +116,23 @@ final class MoveCheck implements \JsonSerializable
         return $this->reason;
     }
 
+    /** The release that the resolving form installs, null unless the check resolves. */
+    public function installs(): ?string
+    {
+        return $this->installs;
+    }
+
+    /** The installed release when it sorts below `$newest`, else null: also when either one is missing or does not parse. */
+    public function installsBelow(?string $newest): ?string
+    {
+        $parser = new VersionParser();
+        try {
+            return Comparator::lessThan($parser->normalize((string) $this->installs), $parser->normalize((string) $newest)) ? $this->installs : null;
+        } catch (\UnexpectedValueException $e) {
+            return null;
+        }
+    }
+
     public function isResolved(): bool
     {
         return $this->result === self::RESOLVES;
@@ -118,9 +143,9 @@ final class MoveCheck implements \JsonSerializable
         return $this->result === self::REFUSED;
     }
 
-    /** @return array{result: string, form: ?string, reason: ?string} */
+    /** @return array{result: string, form: ?string, reason: ?string, installs: ?string} */
     public function jsonSerialize(): array
     {
-        return ['result' => $this->result, 'form' => $this->form, 'reason' => $this->reason];
+        return ['result' => $this->result, 'form' => $this->form, 'reason' => $this->reason, 'installs' => $this->installs];
     }
 }

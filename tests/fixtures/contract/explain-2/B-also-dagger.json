@@ -224,12 +224,20 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
                     "update",
                     "symfony/monolog-bridge"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/monolog-bridge",
+                    "v2.8.52",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -300,6 +308,7 @@
                         ]
                     },
                     "check": null,
+                    "moves_with": [],
                     "composer_moves_because": [
                         "crosses_major"
                     ],
@@ -308,6 +317,13 @@
                             "composer",
                             "require",
                             "symfony/monolog-bridge:^5.4"
+                        ],
+                        [
+                            "composer",
+                            "why-not",
+                            "symfony/monolog-bridge",
+                            "v5.4.0",
+                            "--locked"
                         ]
                     ],
                     "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"

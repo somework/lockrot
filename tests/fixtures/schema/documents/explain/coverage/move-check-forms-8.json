@@ -130,8 +130,10 @@
    "check": {
     "result": "not_checked",
     "form": null,
-    "reason": "install_time_budget"
+    "reason": "install_time_budget",
+    "installs": null
    },
+   "moves_with": [],
    "composer_moves_because": [
     "crosses_major"
    ],

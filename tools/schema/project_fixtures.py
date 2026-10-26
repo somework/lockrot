@@ -449,8 +449,9 @@ def inputs_of(case):
         """A lock entry of another package: a link of the case's package, a holder or a dependent."""
         if name not in lock:
             e = through.get(name) or {}
-            lock[name] = {'name': name, 'version': e.get('installed_version') or '1.0.0', 'dev': False,
-                          'origin': 'vcs' if e.get('newest_requires_unmeasured') == 'not_from_composer_repository' else 'packagist'}
+            # A dependent that the run installs from a local path (`through[].local`) keeps that origin.
+            origin = 'path' if e.get('local') else 'vcs' if e.get('newest_requires_unmeasured') == 'not_from_composer_repository' else 'packagist'
+            lock[name] = {'name': name, 'version': e.get('installed_version') or '1.0.0', 'dev': False, 'origin': origin}
         return lock[name]
     chain = f['chain']
     if len(chain) >= 2:

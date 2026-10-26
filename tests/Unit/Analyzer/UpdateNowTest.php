@@ -6,10 +6,12 @@ namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\UpdateNow;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingRelations;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\RecordedMoveChecker;
+use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\MoveChecks;
 use PHPUnit\Framework\TestCase;
 
@@ -50,6 +52,26 @@ final class UpdateNowTest extends TestCase
         self::assertSame([[], null], [JsonPath::arrayAt($document, ['security', 'update_now']), JsonPath::arrayAt($document, ['security'])['update_now_command']]);
         self::assertArrayHasKey('problem', JsonPath::arrayAt(self::note($document, 'update_now_refused'), ['data']));
         self::assertSame([], FindingRelations::violations($document), 'the root recount agrees');
+    }
+
+    /** An update that resolves only beside its holder runs its own command: it is no member of the combined update. */
+    public function testAnUpdateThatResolvesOnlyThroughTheJointRequestMakesNoMember(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = [
+            '*' => [
+                'result' => 'refused', 'form' => null, 'reason' => null,
+                'holds' => [['source' => 'package', 'package' => 'h/x', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^2.0']],
+            ],
+            'joint *' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => [self::PACKAGE => 'v2.3.2', 'h/x' => '2.0.0'], 'holds' => []],
+        ];
+        $case['inputs'] = $inputs;
+
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+
+        self::assertSame([['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.0.0']], JsonPath::arrayAt(self::finding($document, self::PACKAGE), ['next_step', 'moves_with']));
+        self::assertSame([[], null], [JsonPath::arrayAt($document, ['security', 'update_now']), JsonPath::arrayAt($document, ['security'])['update_now_command']]);
     }
 
     /** Case `B`: the vulnerable package's move is a `require`, which Composer resolves, so no command updates it. */
@@ -113,6 +135,19 @@ final class UpdateNowTest extends TestCase
         self::assertSame(['composer', 'update', self::COMMONMARK, self::LARAVEL.':^12.69.0'], $updateNow->command());
     }
 
+    /** A package that only require-dev lists is a root requirement, also in a run without `--dev`: its constraint stays inline (ruling R13). */
+    public function testOnAComposerWithoutInlineConstraintsOnAnyPackageARequireDevPackageKeepsItsConstraint(): void
+    {
+        $findings = array_map(
+            static fn (Finding $finding): Finding => $finding->package() === self::COMMONMARK ? $finding->withComposerJson(true, [ProjectConfig::REQUIRE_DEV]) : $finding,
+            self::reportOf('commonmark', [])->sorted()
+        );
+
+        $updateNow = UpdateNow::of($findings, new MoveChecks(new RecordedMoveChecker([], []), false));
+
+        self::assertSame(['composer', 'update', self::COMMONMARK.':^2.10.3', self::LARAVEL.':^12.69.0'], $updateNow->command());
+    }
+
     /**
      * @param array<string, mixed>|null $combined
      *
@@ -150,6 +185,21 @@ final class UpdateNowTest extends TestCase
         $holds = array_map(static fn (string $package): array => ['source' => 'package', 'package' => $package, 'version' => '1.0.0', 'link' => 'conflict', 'target' => null, 'constraint' => '*'], $packages);
 
         return ['result' => 'refused', 'form' => null, 'reason' => null, 'holds' => $holds];
+    }
+
+    /**
+     * @param array<mixed, mixed> $document
+     *
+     * @return array<mixed, mixed>
+     */
+    private static function finding(array $document, string $package): array
+    {
+        foreach (JsonPath::arrayAt($document, ['findings']) as $finding) {
+            if (\is_array($finding) && $finding['package'] === $package) {
+                return $finding;
+            }
+        }
+        self::fail('the report has no finding '.$package);
     }
 
     /**

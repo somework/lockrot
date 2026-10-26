@@ -1414,6 +1414,20 @@
     "exempt": {
       "baseline": 0
     },
+    "standing": {
+      "known": 0,
+      "new": 0,
+      "worsened": 0,
+      "none": 6
+    },
+    "failing_packages": [
+      "lox/xhprof",
+      "mustangostang/spyc",
+      "matomo/searchengine-and-social-list",
+      "matomo/referrer-spam-list",
+      "matomo/doctrine-cache-fork",
+      "pear/console_getopt"
+    ],
     "failing_by": [
       {
         "value": "high",
@@ -1669,6 +1683,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2011,6 +2026,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2360,12 +2376,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "require",
             "matomo/searchengine-and-social-list:^3.14.0"
+          ],
+          [
+            "composer",
+            "why-not",
+            "matomo/searchengine-and-social-list",
+            "3.14.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -2645,12 +2669,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "require",
             "matomo/referrer-spam-list:^4.0.5"
+          ],
+          [
+            "composer",
+            "why-not",
+            "matomo/referrer-spam-list",
+            "4.0.5",
+            "--locked"
           ]
         ],
         "through": [],
@@ -2908,6 +2940,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -2922,11 +2955,13 @@
               "released": "2026-01-19T07:58:59+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 5.1 years; it comes in through matomo/cache: replace or update that package; the newest release of matomo/cache (3.0.0) still requires it"
+        "text": "find a maintained alternative: nothing released for 5.1 years; it comes in through matomo/cache: replace matomo/cache; the newest release of matomo/cache (3.0.0) still requires it"
       },
       "security": {
         "status": "clear",
@@ -3189,6 +3224,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -3203,11 +3239,13 @@
               "released": "2024-11-21T15:00:48+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 6.9 years; it comes in through matomo/decompress: replace or update that package"
+        "text": "find a maintained alternative: nothing released for 6.9 years; it comes in through matomo/decompress (pear/pear-core-minimal requires it): replace matomo/decompress"
       },
       "security": {
         "status": "clear",
@@ -3463,6 +3501,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],

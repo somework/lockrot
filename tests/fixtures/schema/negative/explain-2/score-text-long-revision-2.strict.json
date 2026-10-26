@@ -239,6 +239,7 @@
     ]
    },
    "check": null,
+   "moves_with": [],
    "composer_moves_because": [
     "crosses_major"
    ],
@@ -247,6 +248,13 @@
      "composer",
      "require",
      "symfony/monolog-bridge:^5.4.52"
+    ],
+    [
+     "composer",
+     "why-not",
+     "symfony/monolog-bridge",
+     "v5.4.52",
+     "--locked"
     ]
    ],
    "through": [],

@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer require 'scheb/2fa-bundle:^6.13'"
+        "composer require 'scheb/2fa-bundle:^6.13'",
+        "composer why-not scheb/2fa-bundle v6.13.0 --locked"
     ],
     "commands_cmd": [
-        "composer require \"scheb/2fa-bundle:^6.13\""
+        "composer require \"scheb/2fa-bundle:^6.13\"",
+        "composer why-not scheb/2fa-bundle v6.13.0 --locked"
     ]
 }

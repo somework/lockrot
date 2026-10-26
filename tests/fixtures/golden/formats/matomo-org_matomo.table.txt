@@ -29,8 +29,8 @@
       age: newest release 4.0.5 2026-04-15 (0.4 years ago); last push 2026-09-04 (less than three weeks ago)
   pear/console_getopt v1.4.3  via matomo/decompress  ·  silent
       16 = silent 32 ÷ 2 transitive
-      do: find a maintained alternative: nothing released for 6.8 years; it comes in through matomo/decompress: replace
-          or update that package
+      do: find a maintained alternative: nothing released for 6.8 years; it comes in through matomo/decompress
+          (pear/pear-core-minimal requires it): replace matomo/decompress
       silent       last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago)
 
 <options=bold><fg=yellow>medium (1)</fg=yellow></options=bold>

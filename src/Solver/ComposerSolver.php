@@ -7,6 +7,7 @@ namespace Lockrot\Solver;
 use Composer\DependencyResolver\DefaultPolicy;
 use Composer\DependencyResolver\LockTransaction;
 use Composer\DependencyResolver\Operation\InstallOperation;
+use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\DependencyResolver\Pool;
 use Composer\DependencyResolver\PoolOptimizer;
@@ -147,7 +148,7 @@ final class ComposerSolver
 
     private function solveOrThrow(SolveRequest $request): Solution
     {
-        $root = $this->rootWith($request->rootChanges());
+        $root = $this->rootWith($request->rootChanges(), $request->devChanges());
         $links = array_merge($root->getRequires(), $root->getDevRequires());
         $requires = [];
         foreach ($links as $name => $link) {
@@ -159,8 +160,10 @@ final class ComposerSolver
         foreach ($request->inline() as $name => $constraint) {
             $temporary[$name] = $parser->parseConstraints($constraint);
         }
+        $unrequired = [];
         if (!ComposerFeatures::hasTemporaryConstraints()) {
             // Composer 2.2 and 2.3 have no temporary constraints: the inline constraint joins the root requirement.
+            $unrequired = array_keys(array_diff_key($temporary, $requires));
             foreach ($temporary as $name => $constraint) {
                 $requires[$name] = isset($requires[$name]) ? MultiConstraint::create([$requires[$name], $constraint], true) : $constraint;
             }
@@ -185,7 +188,40 @@ final class ComposerSolver
             return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $unloaded);
         }
 
-        return Solution::resolved(self::installs($answer));
+        $installs = self::installs($answer);
+        $from = self::updatedFrom($answer);
+        foreach ($unrequired as $name) {
+            // Composer before 2.4 has no temporary constraint, so the inline name became a root requirement: drop what that requirement alone keeps.
+            if (!$this->requiredAfter($answer, $name)) {
+                unset($installs[$name], $from[$name]);
+            }
+        }
+
+        return Solution::resolved($installs, $from);
+    }
+
+    private function requiredAfter(LockTransaction $transaction, string $name): bool
+    {
+        $packages = [];
+        foreach ($this->locked->getPackages() as $package) {
+            $packages[$package->getName()] = $package;
+        }
+        foreach ($transaction->getOperations() as $operation) {
+            if ($operation instanceof UpdateOperation) {
+                $packages[$operation->getTargetPackage()->getName()] = $operation->getTargetPackage();
+            } elseif ($operation instanceof InstallOperation) {
+                $packages[$operation->getPackage()->getName()] = $operation->getPackage();
+            } elseif ($operation instanceof UninstallOperation) {
+                unset($packages[$operation->getPackage()->getName()]);
+            }
+        }
+        foreach ($packages as $package) {
+            if (isset($package->getRequires()[$name])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -322,14 +358,19 @@ final class ComposerSolver
     /**
      * @param array<string, string> $changes name => constraint, as `require name:constraint` without
      *                                       `--dev` writes it: in `require`, and out of `require-dev`
+     * @param array<string, string> $dev     name => name, the changes that `require --dev` writes in `require-dev` instead
      */
-    private function rootWith(array $changes): RootPackageInterface
+    private function rootWith(array $changes, array $dev = []): RootPackageInterface
     {
         $root = clone $this->root;
         $parser = new VersionParser();
         $requires = $root->getRequires();
         $devRequires = $root->getDevRequires();
         foreach ($changes as $name => $constraint) {
+            if (isset($dev[$name])) {
+                $devRequires[$name] = new Link($root->getName(), $name, $parser->parseConstraints($constraint), Link::TYPE_DEV_REQUIRE, $constraint);
+                continue;
+            }
             $requires[$name] = new Link($root->getName(), $name, $parser->parseConstraints($constraint), Link::TYPE_REQUIRE, $constraint);
             unset($devRequires[$name]);
         }
@@ -382,12 +423,12 @@ final class ComposerSolver
         return trim((string) preg_replace('/, (?:actual: [^)]*|same as actual)\)/', ')', $text));
     }
 
-    /** @return array<string, string> name => the pretty version that the solve installs, for each name it installs or moves */
+    /** @return array<string, string> name => the pretty version that the solve installs, for each name it installs or moves to another version */
     private static function installs(LockTransaction $transaction): array
     {
         $installs = [];
         foreach ($transaction->getOperations() as $operation) {
-            if ($operation instanceof UpdateOperation) {
+            if ($operation instanceof UpdateOperation && self::movesVersion($operation)) {
                 $installs[$operation->getTargetPackage()->getName()] = $operation->getTargetPackage()->getPrettyVersion();
             } elseif ($operation instanceof InstallOperation) {
                 $installs[$operation->getPackage()->getName()] = $operation->getPackage()->getPrettyVersion();
@@ -396,5 +437,30 @@ final class ComposerSolver
         ksort($installs);
 
         return $installs;
+    }
+
+    /** Another reference of the same tag is no move. A branch moves with its commit, not with its metadata. */
+    private static function movesVersion(UpdateOperation $operation): bool
+    {
+        $target = $operation->getTargetPackage();
+        $initial = $operation->getInitialPackage();
+        if (!$target->isDev()) {
+            return $target->getVersion() !== $initial->getVersion();
+        }
+
+        return $target->getVersion() !== $initial->getVersion() || ($target->getSourceReference() ?? $target->getDistReference()) !== ($initial->getSourceReference() ?? $initial->getDistReference());
+    }
+
+    /** @return array<string, string> name => the locked pretty version, for each name that the solve updates */
+    private static function updatedFrom(LockTransaction $transaction): array
+    {
+        $from = [];
+        foreach ($transaction->getOperations() as $operation) {
+            if ($operation instanceof UpdateOperation && self::movesVersion($operation)) {
+                $from[$operation->getInitialPackage()->getName()] = $operation->getInitialPackage()->getPrettyVersion();
+            }
+        }
+
+        return $from;
     }
 }

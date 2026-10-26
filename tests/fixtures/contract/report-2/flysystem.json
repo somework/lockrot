@@ -1346,6 +1346,7 @@
                                 "left-behind",
                                 "old-promise"
                             ],
+                            "direct": false,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -1368,6 +1369,7 @@
                             "flag_ids": [
                                 "stale"
                             ],
+                            "direct": false,
                             "replacement": null,
                             "next_step": {
                                 "kind": "no-move",
@@ -1406,11 +1408,20 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "league/flysystem",
+                        "3.36.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "mautic/core-lib",
@@ -1418,7 +1429,9 @@
                         "installed_requires": null,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "not_from_composer_repository"
+                        "newest_requires_unmeasured": "not_from_composer_repository",
+                        "local": true,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
@@ -1597,6 +1610,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -1619,6 +1633,7 @@
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",

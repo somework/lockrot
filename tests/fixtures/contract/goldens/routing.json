@@ -12,6 +12,10 @@
         "libyears 4.5 behind the newest stable release"
     ],
     "baseline_suffix": null,
-    "commands_posix": [],
-    "commands_cmd": []
+    "commands_posix": [
+        "composer why-not symfony/routing v5.4.53 --locked"
+    ],
+    "commands_cmd": [
+        "composer why-not symfony/routing v5.4.53 --locked"
+    ]
 }

@@ -220,7 +220,7 @@ final class RunFooterTest extends TestCase
 
         $line = self::phpLine($lock, [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'refused', 'holds' => $holds]], []));
 
-        self::assertStringEndsWith('refuses the update of the 2 packages that exclude it: composer.json requires acme/a ^1.0 and composer.json requires acme/tool ^2.0 (require-dev)', (string) $line);
+        self::assertStringEndsWith('refuses the update of the 2 packages that exclude it: composer.json requires acme/a ^1.0 and composer.json requires acme/tool ^2.0 in require-dev', (string) $line);
     }
 
     /** @return iterable<string, array{string, string}> */

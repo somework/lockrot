@@ -1434,6 +1434,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -1977,12 +1978,20 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
       "composer",
       "update",
       "robrichards/xmlseclibs"
+     ],
+     [
+      "composer",
+      "why-not",
+      "robrichards/xmlseclibs",
+      "3.1.5",
+      "--locked"
      ]
     ],
     "through": [
@@ -1992,7 +2001,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "not_from_composer_repository"
+      "newest_requires_unmeasured": "not_from_composer_repository",
+      "local": true,
+      "newest_is_installed": null
      }
     ],
     "also": [],

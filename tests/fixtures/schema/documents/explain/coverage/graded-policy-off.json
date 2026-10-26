@@ -178,12 +178,20 @@
     ]
    },
    "check": null,
+   "moves_with": [],
    "composer_moves_because": [],
    "commands": [
     [
      "composer",
      "update",
      "composer/composer"
+    ],
+    [
+     "composer",
+     "why-not",
+     "composer/composer",
+     "2.10.3",
+     "--locked"
     ]
    ],
    "through": [],

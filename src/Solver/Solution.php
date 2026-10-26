@@ -23,6 +23,8 @@ final class Solution
     private $problem;
     /** @var array<string, string> */
     private array $unloaded;
+    /** @var array<string, string> */
+    private array $updatedFrom = [];
     /** @var array{class: string, message: string}|null */
     private ?array $error = null;
 
@@ -40,10 +42,16 @@ final class Solution
         $this->unloaded = $unloaded;
     }
 
-    /** @param array<string, string> $installs */
-    public static function resolved(array $installs): self
+    /**
+     * @param array<string, string> $installs
+     * @param array<string, string> $updatedFrom name => the locked pretty version, for each name that the solve updates
+     */
+    public static function resolved(array $installs, array $updatedFrom = []): self
     {
-        return new self($installs, [], null, []);
+        $solution = new self($installs, [], null, []);
+        $solution->updatedFrom = $updatedFrom;
+
+        return $solution;
     }
 
     /**
@@ -80,6 +88,12 @@ final class Solution
     public function installs(): array
     {
         return $this->installs;
+    }
+
+    /** @return array<string, string> name => the locked pretty version, for each name that the solve updates */
+    public function updatedFrom(): array
+    {
+        return $this->updatedFrom;
     }
 
     /** @return list<Holder> */

@@ -1278,14 +1278,23 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "typo3/html-sanitizer:^2.3.2"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "typo3/html-sanitizer",
+                        "v2.3.2",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -1337,7 +1346,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",

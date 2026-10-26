@@ -14,10 +14,12 @@
     "baseline_suffix": null,
     "commands_posix": [
         "composer require 'php:>=7.2.5' --no-update",
-        "composer require 'guzzlehttp/guzzle:^7.15.2'"
+        "composer require 'guzzlehttp/guzzle:^7.15.2'",
+        "composer why-not guzzlehttp/guzzle 7.15.2 --locked"
     ],
     "commands_cmd": [
         "composer require \"php:>=7.2.5\" --no-update",
-        "composer require \"guzzlehttp/guzzle:^7.15.2\""
+        "composer require \"guzzlehttp/guzzle:^7.15.2\"",
+        "composer why-not guzzlehttp/guzzle 7.15.2 --locked"
     ]
 }

@@ -118,6 +118,7 @@
                         "flag_ids": [
                             "vulnerable"
                         ],
+                        "direct": true,
                         "replacement": null,
                         "next_step": {
                             "kind": "raise-php",
@@ -151,6 +152,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "holders",
                 "crosses_major"
@@ -166,6 +168,13 @@
                     "composer",
                     "require",
                     "joomla/string:^3.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "joomla/string",
+                    "3.0.0",
+                    "--locked"
                 ]
             ],
             "through": [],

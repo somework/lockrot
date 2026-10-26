@@ -1107,6 +1107,19 @@
     "exempt": {
       "baseline": 0
     },
+    "standing": {
+      "known": 0,
+      "new": 0,
+      "worsened": 0,
+      "none": 5
+    },
+    "failing_packages": [
+      "drupal/core",
+      "drupal/core-project-message",
+      "drupal/core-recipe-unpack",
+      "drupal/core-vendor-hardening",
+      "pear/console_getopt"
+    ],
     "failing_by": [
       {
         "value": "high",
@@ -1286,6 +1299,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1608,6 +1622,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1880,6 +1895,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2152,6 +2168,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2435,6 +2452,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -2446,11 +2464,13 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "not_from_composer_repository"
+            "newest_requires_unmeasured": "not_from_composer_repository",
+            "local": true,
+            "newest_is_installed": null
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 6.9 years; it comes in through drupal/core: replace or update that package"
+        "text": "find a maintained alternative: nothing released for 6.9 years; it comes in through drupal/core (pear/pear-core-minimal requires it): change your own package drupal/core"
       },
       "security": {
         "status": "unchecked",
@@ -2739,6 +2759,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -2748,7 +2769,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "not_from_composer_repository"
+            "newest_requires_unmeasured": "not_from_composer_repository",
+            "local": true,
+            "newest_is_installed": null
           }
         ],
         "also": [],
@@ -3018,6 +3041,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -3027,7 +3051,9 @@
             "installed_requires": null,
             "newest_stable": null,
             "newest_requires": null,
-            "newest_requires_unmeasured": "not_from_composer_repository"
+            "newest_requires_unmeasured": "not_from_composer_repository",
+            "local": true,
+            "newest_is_installed": null
           }
         ],
         "also": [],

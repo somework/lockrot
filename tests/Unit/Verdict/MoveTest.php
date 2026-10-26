@@ -14,7 +14,10 @@ use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Golden;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\GradedPackage;
+use Lockrot\Verdict\Move;
+use Lockrot\Verdict\MoveSubject;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -136,7 +139,7 @@ final class MoveTest extends TestCase
         $before = JsonPath::decoded($finding->toArray());
         $bare = (new FindingBuilder())->withPackage('a/b')->build();
 
-        $copy = $finding->withHolders(['h/old' => new GradedPackage('critical', null, ['vulnerable'], null, null, '1.0.0')]);
+        $copy = $finding->withHolders(['h/old' => new GradedPackage('critical', null, ['vulnerable'], null, null, '1.0.0', true)]);
         $filled = JsonPath::decoded($copy->toArray());
         $moved = $bare->withMoves($finding->details()->moves());
         $lead = $finding->nextStep();
@@ -171,7 +174,7 @@ final class MoveTest extends TestCase
         }
         foreach ($holders as $where => $list) {
             $own = array_values(array_filter($list, static fn ($holder): bool => \is_array($holder) && $holder['source'] === 'package'));
-            self::assertSame([['verdict' => 'critical', 'lead' => null, 'flag_ids' => ['vulnerable'], 'replacement' => null, 'next_step' => null]], array_column($own, 'holder'), $where);
+            self::assertSame([['verdict' => 'critical', 'lead' => null, 'flag_ids' => ['vulnerable'], 'direct' => true, 'replacement' => null, 'next_step' => null]], array_column($own, 'holder'), $where);
         }
         self::assertStringContainsString('h/old 1.0.0 (requires <1.5; itself critical: vulnerable)', implode("\n", array_map(static fn ($move): string => \is_array($move) ? JsonPath::stringAt($move, ['text']) : '', $moves)));
         $fixes = $copy->details()->fixes();
@@ -190,7 +193,7 @@ final class MoveTest extends TestCase
         $move = JsonPath::arrayAt(self::hydrated(CaseHydrator::case('B')), ['next_step']);
 
         self::assertSame(['require', '^5.4.52', 'v5.4.52'], [$move['kind'], $move['constraint'], $move['version']]);
-        self::assertSame([['composer', 'require', 'symfony/monolog-bridge:^5.4.52']], $move['commands']);
+        self::assertSame([['composer', 'require', 'symfony/monolog-bridge:^5.4.52'], ['composer', 'why-not', 'symfony/monolog-bridge', 'v5.4.52', '--locked']], $move['commands']);
         self::assertContains('vulnerable', array_merge([$move['source']], JsonPath::arrayAt($move, ['merged'])));
     }
 
@@ -266,7 +269,7 @@ final class MoveTest extends TestCase
         $move = JsonPath::arrayAt($finding, ['next_step']);
 
         self::assertSame(['raise-php', '^3.27.0', 'raise-php'], [$move['kind'], $move['constraint'], $move['fix_kind']]);
-        self::assertSame([['composer', 'require', 'php:>=8.1', '--no-update'], ['composer', 'require', 'twig/twig:^3.27.0']], $move['commands']);
+        self::assertSame([['composer', 'require', 'php:>=8.1', '--no-update'], ['composer', 'require', 'twig/twig:^3.27.0'], ['composer', 'why-not', 'twig/twig', 'v3.27.0', '--locked']], $move['commands']);
         self::assertSame(['next_step', 'raise-php'], [JsonPath::stringAt($finding, ['security', 'move_in']), JsonPath::stringAt($finding, ['security', 'fix_kind'])]);
         self::assertSame(['holders', 'crosses_major'], $move['composer_moves_because']);
         self::assertSame(['clears_hold', 'composer_resolves'], JsonPath::arrayAt($move, ['if_applied', 'assumes']));
@@ -306,9 +309,23 @@ final class MoveTest extends TestCase
         $move = JsonPath::arrayAt(self::hydrated(CaseHydrator::case('routing')), ['next_step']);
 
         self::assertSame('require', $move['kind']);
-        self::assertSame([], $move['commands']);
+        self::assertSame([['composer', 'why-not', 'symfony/routing', 'v5.4.53', '--locked']], $move['commands']);
         self::assertSame(['holders', 'crosses_major'], $move['composer_moves_because']);
         self::assertStringStartsWith('move symfony/routing to ^5.4.53 through mautic/core-lib', JsonPath::stringAt($move, ['text']));
+    }
+
+    /** Case `E`: the resolving form installs v5.4.52, below the branch's newest v5.4.53, so the move and `security.gets` name v5.4.52. */
+    public function testAnUpdateThatInstallsBelowTheNewestReleaseNamesTheReleaseItGets(): void
+    {
+        $case = CaseHydrator::case('E');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => [], 'installs' => 'v5.4.52']];
+        $case['inputs'] = $inputs;
+
+        $finding = self::hydrated($case);
+
+        self::assertSame('v5.4.52', JsonPath::stringAt($finding, ['security', 'gets', 'version']));
+        self::assertStringContainsString('(gets v5.4.52, below the newest v5.4.53)', JsonPath::stringAt($finding, ['next_step', 'text']));
     }
 
     /** Offline, the move's own versions were never asked about: every rerun says so. */
@@ -338,7 +355,7 @@ final class MoveTest extends TestCase
         $move = JsonPath::arrayAt(self::analyse([]), ['next_step']);
 
         self::assertSame(['raise-php', 'left-behind', '2.x', '^2.3', '2.3.0', '2.3.0'], [$move['kind'], $move['source'], $move['to_branch'], $move['constraint'], $move['version'], $move['newest']]);
-        self::assertSame([['composer', 'require', 'php:>=8.1', '--no-update'], ['composer', 'require', 'a/b:^2.3']], $move['commands']);
+        self::assertSame([['composer', 'require', 'php:>=8.1', '--no-update'], ['composer', 'require', 'a/b:^2.3'], ['composer', 'why-not', 'a/b', '2.3.0', '--locked']], $move['commands']);
         self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '^1.0', 'holder' => null]], $move['held_by']);
         self::assertSame(['crosses_major'], $move['composer_moves_because']);
         self::assertSame(['left-behind', 'old-promise'], array_column(JsonPath::arrayAt($move, ['clears']), 'id'));
@@ -372,7 +389,7 @@ final class MoveTest extends TestCase
         $move = JsonPath::arrayAt($finding, ['next_step']);
 
         self::assertSame(['update', 'vulnerable', '1.9.0', '1.9.0', null], [$move['kind'], $move['source'], $move['version'], $move['newest'], $move['constraint']]);
-        self::assertSame([['composer', 'update', 'a/b']], $move['commands']);
+        self::assertSame([['composer', 'update', 'a/b'], ['composer', 'why-not', 'a/b', '1.9.0', '--locked']], $move['commands']);
         self::assertSame(['raise-php'], array_column(JsonPath::arrayAt($move, ['also']), 'kind'));
         self::assertArrayNotHasKey('through', JsonPath::arrayAt($move, ['also', 0]));
         self::assertSame('composer update a/b (gets 1.9.0) — clears the advisory; left-behind, old-promise stay', $move['text']);
@@ -507,7 +524,7 @@ final class MoveTest extends TestCase
         self::assertCount(1, JsonPath::arrayAt($move, ['held_by']));
         self::assertSame(['package', 'h/hold', '1.0.0', 'require', '1.0.0'], array_map(static fn (string $key): string => JsonPath::stringAt($move, ['held_by', 0, $key]), ['source', 'package', 'version', 'link', 'constraint']));
         self::assertSame([['kind' => 'flag', 'id' => 'old-promise', 'basis' => 'released_after_ga']], $move['clears']);
-        self::assertSame([['composer', 'require', 'a/b:^1.5.0']], $move['commands']);
+        self::assertSame([['composer', 'require', 'a/b:^1.5.0'], ['composer', 'why-not', 'a/b', 'v1.5.0', '--locked']], $move['commands']);
     }
 
     public function testAnOldPromiseWithNoLaterReleaseIsTested(): void
@@ -703,5 +720,16 @@ final class MoveTest extends TestCase
             'a blocked move beside an advisory' => ['releases' => array_merge($one, [self::release('2.3.0', '2026-06-01', '>=9.0')]), 'advisories' => [self::advisory('PKSA-1', 'high', '<99.0')]],
             'two 0.x lines' => ['lock' => [['version' => '0.3.1']], 'root' => ['require' => ['a/b' => '^0.3']], 'releases' => [self::release('0.3.1', '2019-01-01', '>=7.2'), self::release('0.3.5', '2020-01-01', '>=7.2'), self::release('0.4.0', '2026-01-01', '>=7.2')], 'advisories' => [self::advisory('PKSA-1', 'high', '<0.3.5')]],
         ];
+    }
+
+    public function testTheCopyWithTheHoldersThatMoveLeavesTheMoveAsItWas(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null);
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], [['composer', 'update', 'acme/lib']], $subject);
+        $movesWith = [['package' => 'acme/holder', 'installed_version' => '1.0.0', 'version' => '2.0.0']];
+
+        $copy = $move->withMovesWith($movesWith);
+
+        self::assertSame([[], $movesWith], [$move->movesWith(), $copy->movesWith()]);
     }
 }

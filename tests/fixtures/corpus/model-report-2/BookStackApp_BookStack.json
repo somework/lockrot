@@ -1466,6 +1466,15 @@
     "exempt": {
       "baseline": 0
     },
+    "standing": {
+      "known": 0,
+      "new": 0,
+      "worsened": 0,
+      "none": 1
+    },
+    "failing_packages": [
+      "league/commonmark"
+    ],
     "failing_by": [
       {
         "value": "high",
@@ -1680,12 +1689,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "league/commonmark"
+          ],
+          [
+            "composer",
+            "why-not",
+            "league/commonmark",
+            "2.10.3",
+            "--locked"
           ]
         ],
         "through": [],
@@ -2076,12 +2093,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "phpseclib/phpseclib"
+          ],
+          [
+            "composer",
+            "why-not",
+            "phpseclib/phpseclib",
+            "3.0.57",
+            "--locked"
           ]
         ],
         "through": [],
@@ -2396,6 +2421,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2631,6 +2657,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2883,12 +2910,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "laravel/framework"
+          ],
+          [
+            "composer",
+            "why-not",
+            "laravel/framework",
+            "v12.69.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -3228,6 +3263,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -3240,7 +3276,9 @@
               "released": "2026-10-13T13:21:00+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "league/commonmark",
@@ -3251,7 +3289,9 @@
               "released": "2026-09-21T13:07:34+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],

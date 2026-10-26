@@ -35,6 +35,29 @@ final class PageGoldensTest extends TestCase
      */
     private const OVERVIEW_LINES = ['grade_line', 'figure_line', 'load_line'];
 
+    // HARDEN-SRC removes every MODEL_R7_PENDING entry when it projects the MODEL-R7 shas.
+    /** The model page documents that omit a key at each listed path, the key by path: MODEL-R7 adds it. */
+    private const MODEL_R7_PENDING_KEYS = [
+        'snipe-it.unloaded‡' => [
+            'findings[].next_step.held_by[].holder.next_step.check' => 'installs',
+            'findings[].security.installed_branch_fixes.check' => 'installs',
+        ],
+        'drupal-site.other-release‡' => [
+            'findings[].next_step.held_by[].holder.next_step.check' => 'installs',
+            'findings[].next_step.also[].held_by[].holder.next_step.check' => 'installs',
+            'findings[].security.installed_branch_fixes.check' => 'installs',
+            'findings[].security.installed_branch_fixes.held_by[].holder' => 'direct',
+            'findings[].security.installed_branch_fixes.held_by[].holder.next_step.check' => 'installs',
+            'findings[].signals[].data.advisories[].fix.held_by[].holder' => 'direct',
+            'findings[].signals[].data.advisories[].fix.held_by[].holder.next_step.check' => 'installs',
+        ],
+    ];
+    /** The schema definition of each key that a MODEL_R7_PENDING_KEYS path omits. */
+    private const MODEL_R7_PENDING_DEFINITIONS = ['installs' => 'moveCheck', 'direct' => 'holder'];
+
+    /** The Held by items of the model's goldens that keep a root hold which ruling R1b drops: MODEL-R7 drops it. */
+    private const MODEL_R7_PENDING_HOLDS = ['snipe-it bacon/bacon-qr-code your composer.json requires pragmarx/google2fa-laravel ^1.3'];
+
     /** The goldens whose PHP inputs differ from the model's, with the reason. */
     private const PINNED = [
         'policy-off' => 'the hydrated lock holds joomla/filter and the three packages that require it, and the model\'s case document counts its one finding',
@@ -224,7 +247,8 @@ final class PageGoldensTest extends TestCase
 
     /**
      * SPEC-0.14.md §7.9.21 "The move": the sheet's move cards of a page case hold the check line of
-     * each move. The page cases show a resolved, a refused and two unchecked moves.
+     * each move that runs a Composer request. The page cases show a resolved, a refused and two
+     * unchecked moves.
      */
     public function testTheSheetMoveCardsHoldTheCheckLineOfEachMove(): void
     {
@@ -243,6 +267,14 @@ final class PageGoldensTest extends TestCase
                 $lead = JsonPath::arrayAt($findings[$package], ['next_step']);
                 foreach (array_values(array_merge([$lead], JsonPath::arrayAt($lead, ['also']))) as $i => $move) {
                     $move = JsonPath::decoded($move);
+                    if ($move['check'] === null) {
+                        $after = JsonPath::arrayAt(JsonPath::decoded($cards), [$i])['after'];
+                        $checkLines = array_values(array_filter(\is_array($after) ? JsonPath::arrayAt($after, ['conditions']) : [], static fn ($condition): bool => \is_string($condition) && (\in_array($condition, ['checked with Composer', 'Composer refuses the move'], true) || strpos($condition, 'if Composer resolves it') === 0)));
+                        if ($checkLines !== []) {
+                            $differ[$id.' '.$package.' card '.$i] = ['expected' => 'no check line on a move that runs no Composer request', 'conditions' => $checkLines];
+                        }
+                        continue;
+                    }
                     $result = JsonPath::stringAt($move, ['check', 'result']);
                     $expected = [
                         'resolves' => 'checked with Composer',
@@ -367,8 +399,58 @@ final class PageGoldensTest extends TestCase
     public function testEveryPageDocumentFollowsTheReportSchema(string $id): void
     {
         $golden = JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens', $id]);
+        $json = self::documentJson(JsonPath::stringAt($golden, ['document']));
+        $pending = self::MODEL_R7_PENDING_KEYS[$id] ?? [];
+        if ($pending === []) {
+            $this->assertValid(Schemas::REPORT, $json, $id);
 
-        $this->assertValid(Schemas::REPORT, self::documentJson(JsonPath::stringAt($golden, ['document'])), $id);
+            return;
+        }
+        $omitted = self::omittedKeys(json_decode($json, true), '');
+        foreach ($pending as $path => $key) {
+            self::assertContains($path.' '.$key, $omitted, $id.': '.$path.' holds '.$key.' again: take it off MODEL_R7_PENDING_KEYS');
+        }
+        $schema = json_decode((string) file_get_contents(Schemas::path(Schemas::REPORT, 2)));
+        self::assertInstanceOf(\stdClass::class, $schema);
+        foreach (array_unique($pending) as $key) {
+            $definitions = $schema->definitions;
+            self::assertInstanceOf(\stdClass::class, $definitions);
+            $definition = $definitions->{self::MODEL_R7_PENDING_DEFINITIONS[$key]};
+            self::assertInstanceOf(\stdClass::class, $definition);
+            self::assertIsArray($definition->oneOf);
+            $first = $definition->oneOf[0];
+            self::assertInstanceOf(\stdClass::class, $first);
+            self::assertIsArray($first->required);
+            $first->required = array_values(array_filter($first->required, static fn ($required): bool => $required !== $key));
+        }
+
+        self::assertSame([], array_values(array_diff($omitted, array_map(static fn (string $path, string $key): string => $path.' '.$key, array_keys($pending), $pending))), $id.': a key is missing outside MODEL_R7_PENDING_KEYS');
+        $this->assertValidAgainst($schema, $json, $id.', with the MODEL_R7_PENDING_KEYS keys optional');
+    }
+
+    /**
+     * @param mixed $node
+     *
+     * @return list<string> `<path> <key>` for each check without `installs` and each holder without `direct`, `[]` for each list index
+     */
+    private static function omittedKeys($node, string $path): array
+    {
+        if (!\is_array($node)) {
+            return [];
+        }
+        $general = (string) preg_replace('/\[\d+\]/', '[]', $path);
+        $found = [];
+        if (\array_key_exists('result', $node) && \array_key_exists('form', $node) && !\array_key_exists('installs', $node)) {
+            $found[] = $general.' installs';
+        }
+        if (substr($path, -\strlen('.holder')) === '.holder' && \array_key_exists('verdict', $node) && !\array_key_exists('direct', $node)) {
+            $found[] = $general.' direct';
+        }
+        foreach ($node as $key => $child) {
+            $found = array_merge($found, self::omittedKeys($child, \is_int($key) ? $path.'['.$key.']' : ($path === '' ? $key : $path.'.'.$key)));
+        }
+
+        return array_values(array_unique($found));
     }
 
     /**
@@ -449,6 +531,10 @@ final class PageGoldensTest extends TestCase
             }
         }
 
+        foreach (self::MODEL_R7_PENDING_HOLDS as $pending) {
+            self::assertArrayHasKey($pending, $differ, $pending.' agrees with the model again: take it off MODEL_R7_PENDING_HOLDS');
+            unset($differ[$pending]);
+        }
         self::assertSame([], $differ);
         foreach (['require', 'require, a target', 'root-require, a target'] as $form) {
             self::assertContains($form, $forms, 'no Held by item of a page case names a hold of the form: '.$form);
@@ -456,7 +542,8 @@ final class PageGoldensTest extends TestCase
     }
 
     /**
-     * SPEC-0.14.md §7.9.21, the link words.
+     * SPEC-0.14.md §7.9.21, the link words, with the words of a `self.version` constraint (ruling R9)
+     * and of a `require-dev` link (ruling REQ-DEV).
      *
      * @param array<mixed, mixed> $hold
      */
@@ -472,7 +559,9 @@ final class PageGoldensTest extends TestCase
             return 'no release of '.$constraint.' can install';
         }
 
-        return ($link === 'conflict' ? 'conflicts with ' : 'requires ').($target === null ? '' : $target.' ').$constraint;
+        $words = $constraint === 'self.version' ? 'self.version ('.self::textAt($hold, ['version']).')' : $constraint;
+
+        return ($link === 'conflict' ? 'conflicts with ' : 'requires ').($target === null ? '' : $target.' ').$words.($link === 'require-dev' ? ' in require-dev' : '');
     }
 
     /**

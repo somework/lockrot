@@ -1341,12 +1341,20 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
       "composer",
       "update",
       "symfony/yaml"
+     ],
+     [
+      "composer",
+      "why-not",
+      "symfony/yaml",
+      "v5.4.52",
+      "--locked"
      ]
     ],
     "through": [],

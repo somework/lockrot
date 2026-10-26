@@ -185,6 +185,7 @@
     ]
    },
    "check": null,
+   "moves_with": [],
    "composer_moves_because": [
     "crosses_major"
    ],
@@ -229,6 +230,7 @@
      "clears_all": false,
      "if_applied": null,
      "check": null,
+     "moves_with": [],
      "composer_moves_because": [],
      "commands": [],
      "text": "no release fixes it"

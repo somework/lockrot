@@ -18,38 +18,44 @@ use PHPUnit\Framework\TestCase;
  */
 final class MoveContractTest extends TestCase
 {
-    private const VERSION = 'the model leaves `version` null on a move whose constraint comes from S8 : lockrot names the lowest admitted release';
+    private const VERSION = 'the model leaves `version` null on a move whose constraint comes from S8 : lockrot names the lowest admitted release, and the why-not step of a move that does not resolve names it';
     private const DATED = 'the model dates a branch by its newest release only : a lower release leaves old-promise unverified, where lockrot dates it';
+    // HARDEN-SRC removes every MODEL_R7_PENDING entry when it projects the MODEL-R7 shas.
+    private const MODEL_R7_PENDING = 'MODEL-R7 corrects the model value or the inputs of the case : lockrot follows SPEC-0.14.md for the inputs that the case gives';
     private const TIE = 'the model removes S5 from the case to make the tie : the installed release is older than PHP 8.0, so lockrot raises S5 and the move differs';
 
     /**
      * The fields of a hydrated finding that differ from the case's, each list with its reason. Every
      * other field of `next_step`, `also[]`, `security.move_in`, `security.fix_kind`, each branch
-     * row's `fixes` (`rows.`) and each S9 `fix` (`s9.`) must be equal. Each reference also leaves
+     * row's `fixes` (`rows.`) and each S9 `fix` (`s9.`) must be equal. A listed `commands` leaves out
+     * only lockrot's trailing `composer why-not` step of the move's own package and version: every
+     * other command must be equal. Each reference also leaves
      * out the text, the replacement's url and finding, and each holder's finding: they read other
      * packages' findings.
      */
     private const DIFFERENCES = [
-        'psr7' => [[['version'], self::VERSION]],
-        'unreached-move' => [[['version'], self::VERSION]],
-        'many-dependents' => [[['version'], self::VERSION]],
-        'pagerfanta' => [[['version'], self::VERSION]],
-        'B-also‡' => [[['also.version'], self::VERSION], [['rows.if_applied'], self::DATED]],
-        'tie‡' => [[['version', 'unverified', 'if_applied', 'also.leaves'], self::TIE]],
-        'B-offline‡' => [[['version'], self::VERSION]],
-        'holder-vuln‡' => [[['version'], self::VERSION]],
-        'partial-op‡' => [[['version'], self::VERSION]],
-        'unreached-dev‡' => [[['version'], self::VERSION]],
-        'B-offline-high‡' => [[['version'], self::VERSION]],
-        'require-dev-name‡' => [[['version'], self::VERSION]],
-        'capped-require-php' => [[['version'], self::VERSION]],
-        'adds-capped-raise-php' => [[['version'], self::VERSION]],
-        'adds-capped-require‡' => [[['version'], self::VERSION]],
-        'php-edge-lower‡' => [[['version'], self::VERSION]],
-        'php-edge-equal‡' => [[['version'], self::VERSION]],
-        'php-edge-upper‡' => [[['version'], self::VERSION]],
-        'platform-step‡' => [[['version'], self::VERSION]],
-        'platform-step-inside‡' => [[['version'], self::VERSION]],
+        'psr7' => [[['version', 'commands'], self::VERSION]],
+        'unreached-move' => [[['version', 'commands'], self::VERSION]],
+        'many-dependents' => [[['version', 'commands'], self::VERSION]],
+        'pagerfanta' => [[['version', 'commands'], self::VERSION]],
+        'B-also‡' => [[['also.version', 'also.commands'], self::VERSION], [['rows.if_applied'], self::DATED]],
+        'tie‡' => [[['version', 'commands', 'unverified', 'if_applied', 'also.leaves'], self::TIE]],
+        'B-offline‡' => [[['version', 'commands'], self::VERSION]],
+        'holder-vuln‡' => [[['version', 'commands'], self::VERSION]],
+        'partial-op‡' => [[['version', 'commands'], self::VERSION]],
+        'unreached-dev‡' => [[['version', 'commands'], self::VERSION]],
+        'B-offline-high‡' => [[['version', 'commands'], self::VERSION]],
+        'require-dev-name‡' => [[['version', 'commands'], self::VERSION]],
+        'capped-require-php' => [[['version', 'commands'], self::VERSION]],
+        'adds-capped-raise-php' => [[['version', 'commands'], self::VERSION]],
+        'adds-capped-require‡' => [[['version', 'commands'], self::VERSION]],
+        'php-edge-lower‡' => [[['version', 'commands'], self::VERSION]],
+        'php-edge-equal‡' => [[['version', 'commands'], self::VERSION]],
+        'php-edge-upper‡' => [[['version', 'commands'], self::VERSION]],
+        'platform-step‡' => [[['version', 'commands'], self::VERSION]],
+        'platform-step-inside‡' => [[['version', 'commands'], self::VERSION]],
+        'routing-self‡' => [[['held_by', 'rows.held_by', 's9.held_by'], self::MODEL_R7_PENDING]],
+        'mc-joint‡' => [[['fix_kind', 'security.fix_kind', 'rows.fix_kind', 's9.kind'], self::MODEL_R7_PENDING]],
     ];
 
     private const NO_SCORE_AFTER = ['replace', 'find-alternative', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'];
@@ -203,12 +209,13 @@ final class MoveContractTest extends TestCase
                 foreach ($argv as $argument) {
                     self::assertIsString($argument);
                 }
-                if ($finding['reach'] !== 'direct') {
+                if ($finding['reach'] !== 'direct' && $finding['named_in'] === []) {
                     $target = $argv[2] ?? '';
                     self::assertIsString($target);
-                    self::assertFalse($argv[1] === 'require' && strpos($target, JsonPath::stringAt($finding, ['package']).':') === 0, 'no root requirement of a package the project does not require');
+                    self::assertFalse($argv[1] === 'require' && strpos($target, JsonPath::stringAt($finding, ['package']).':') === 0, 'no root requirement of a package that composer.json does not list');
                 }
             }
+            self::assertWhyNot($finding, $move);
             self::assertSame($i === 0, \array_key_exists('through', $move), 'through[] on the lead move only');
             if ($i === 0) {
                 self::assertThrough($finding, $move);
@@ -483,8 +490,7 @@ final class MoveContractTest extends TestCase
     }
 
     /**
-     * one entry per direct dependent of a transitive package, `[]` otherwise, and a `why-not`
-     * command for each dependent whose newest release no longer requires the package.
+     * one entry per direct dependent of a transitive package, `[]` otherwise.
      *
      * @param array<mixed, mixed> $finding
      * @param array<mixed, mixed> $move
@@ -498,7 +504,6 @@ final class MoveContractTest extends TestCase
             return;
         }
         self::assertSame($finding['direct_dependents'], array_column($through, 'package'), 'direct_dependents order');
-        $whyNot = [];
         foreach ($through as $entry) {
             self::assertIsArray($entry);
             self::assertSame($entry['newest_requires'] === null, $entry['newest_requires_unmeasured'] !== null);
@@ -507,11 +512,28 @@ final class MoveContractTest extends TestCase
                 self::assertNotNull($entry['newest_stable']);
             }
             self::assertSame($entry['installed_requires'] === false, $entry['newest_requires_unmeasured'] === 'through_other_package');
-            if ($entry['newest_requires'] === false) {
-                $whyNot[] = ['composer', 'why-not', $entry['package'], JsonPath::stringAt($entry, ['newest_stable', 'version'])];
-            }
         }
-        self::assertSame($whyNot, array_values(array_filter(JsonPath::arrayAt($move, ['commands']), static fn ($argv): bool => \is_array($argv) && ($argv[1] ?? null) === 'why-not')));
+    }
+
+    /**
+     * SPEC 5.6: an update, require, raise-php or tag move whose check does not resolve, a null
+     * check included, ends with one `composer why-not` of its package and version, read from the lock.
+     *
+     * @param array<mixed, mixed> $finding
+     * @param array<mixed, mixed> $move
+     */
+    private static function assertWhyNot(array $finding, array $move): void
+    {
+        $check = $move['check'];
+        $asks = \in_array($move['kind'], ['update', 'require', 'raise-php', 'tag'], true) && \is_string($move['version'])
+            && (!\is_array($check) || $check['result'] !== 'resolves');
+        $commands = JsonPath::arrayAt($move, ['commands']);
+        $whyNot = array_values(array_filter($commands, static fn ($argv): bool => \is_array($argv) && ($argv[1] ?? null) === 'why-not'));
+        $step = ['composer', 'why-not', $finding['package'], $move['version'], '--locked'];
+        self::assertSame($asks ? [$step] : [], $whyNot, JsonPath::stringAt($move, ['kind']).' why-not');
+        if ($asks) {
+            self::assertSame($step, end($commands), 'why-not is the last step');
+        }
     }
 
     /**
@@ -574,8 +596,15 @@ final class MoveContractTest extends TestCase
                 $s9[JsonPath::stringAt($advisory, ['id'])] = self::withoutHolders(JsonPath::arrayAt($advisory, ['fix']));
             }
         }
+        $package = JsonPath::stringAt($finding, ['package']);
+        if (\is_array($move) && \in_array('commands', $skipped, true)) {
+            $move = self::withoutWhyNot($move, $package);
+        }
+        if (\is_array($move) && \in_array('also.commands', $skipped, true)) {
+            $move['also'] = array_map(static fn ($also): array => self::withoutWhyNot(JsonPath::decoded($also), $package), JsonPath::arrayAt($move, ['also']));
+        }
         $out = ['next_step' => $move, 'security.move_in' => $security['move_in'] ?? null, 'security.fix_kind' => $security['fix_kind'] ?? null, 'rows' => $fixes, 's9' => $s9];
-        foreach ($skipped as $field) {
+        foreach (array_diff($skipped, ['commands', 'also.commands']) as $field) {
             unset($out[$field]);
             if (\is_array($out['next_step'] ?? null)) {
                 unset($out['next_step'][$field]);
@@ -591,6 +620,22 @@ final class MoveContractTest extends TestCase
         }
 
         return $out;
+    }
+
+    /**
+     * @param array<mixed, mixed> $move
+     *
+     * @return array<mixed, mixed> the move without a trailing `composer why-not` step of $package at the move's own `version`
+     */
+    private static function withoutWhyNot(array $move, string $package): array
+    {
+        $commands = JsonPath::arrayAt($move, ['commands']);
+        if ($commands !== [] && end($commands) === ['composer', 'why-not', $package, $move['version'], '--locked']) {
+            array_pop($commands);
+            $move['commands'] = $commands;
+        }
+
+        return $move;
     }
 
     /**

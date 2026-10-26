@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer require 'friendsofsymfony/oauth-server-bundle:^1.6.2'"
+        "composer require 'friendsofsymfony/oauth-server-bundle:^1.6.2'",
+        "composer why-not friendsofsymfony/oauth-server-bundle 1.6.2 --locked"
     ],
     "commands_cmd": [
-        "composer require \"friendsofsymfony/oauth-server-bundle:^1.6.2\""
+        "composer require \"friendsofsymfony/oauth-server-bundle:^1.6.2\"",
+        "composer why-not friendsofsymfony/oauth-server-bundle 1.6.2 --locked"
     ]
 }

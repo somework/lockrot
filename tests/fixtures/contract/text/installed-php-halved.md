@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **high** | `web-auth/metadata-service` | v2.1.7 | abandoned · left-behind | `18 = (abandoned 32 + left-behind 4 [¼ of 16]) ÷ 2 transitive`<br>**Do:** replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it<br>*abandoned:* marked abandoned by its registry, replacement: web-auth/webauthn-lib<br>*left-behind:* branch 2.x last released 2019-09-04 (7.1 years ago); 4.x released 4.9.1 (2024-07-11) | web-auth/webauthn-lib |
+| **high** | `web-auth/metadata-service` | v2.1.7 | abandoned · left-behind | `18 = (abandoned 32 + left-behind 4 [¼ of 16]) ÷ 2 transitive`<br>**Do:** replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update web-auth/webauthn-lib; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it<br>*abandoned:* marked abandoned by its registry, replacement: web-auth/webauthn-lib<br>*left-behind:* branch 2.x last released 2019-09-04 (7.1 years ago); 4.x released 4.9.1 (2024-07-11) | web-auth/webauthn-lib |
 
 flags: abandoned 1 · left-behind 1 · 1 package carries more than one
 depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: `web-auth/metadata-service`, 1 hop (`web-auth/webauthn-lib` › `web-auth/metadata-service`)

@@ -1,8 +1,8 @@
 {
     "written_by": "security-axis/spec_flags_r3_docs.py reports <dir> <out> --cache tests/fixtures/corpus/cache --php-fit <file>, in the private model folder, then tools/corpus/differential.php --adopt-model",
     "model": {
-        "spec_flags_r3.py": "ee3dade4df123a3e287451d32625c936837f1c34c73aa58d1ce752c21283143a",
-        "spec_flags_r3_docs.py": "89a30c5d2ca90e6dc671a461c3f432b54481ad3a232f33af6e2b1a1255aaa98a"
+        "spec_flags_r3.py": "c9b03b2385b0b48f0c8551d64dbeccd812d8ccd561b9aa0cfb8d4fbd512a2ee3",
+        "spec_flags_r3_docs.py": "a73ed1b3e5e57a9ac588a074c2ef03e2bcc3671dcfb8394834ffaf43961af648"
     },
     "model_inputs": {
         "written_by": "php tools/corpus/differential.php --model-input <phar> <dir>",
@@ -1416,18 +1416,18 @@
     },
     "fail_on": "high",
     "outputs": {
-        "BookStackApp_BookStack.json": "8b29094e7865564d38c9dadbe459d01ff01e979b73a04beb2e8cc7dc3567c625",
-        "PrestaShop_PrestaShop.json": "7eeaf643f7b0246f177180ca215fb7ca8112876a2054871e8f093fb3b13f3f01",
-        "drupal_drupal.feed-failed.json": "89a962f0154a7d3bc5abae4b6f591cb794c3ce2570de140ae5734b9198e2066b",
-        "drupal_drupal.json": "7ed1b718e94f1128a4a5080bd988de16162f730a39bede8c97a80630b7b36c55",
-        "firefly-iii_firefly-iii.json": "96a4963dc4cc219952cf3020e5a173588f81f5248324947c154540bc6329b977",
-        "grokability_snipe-it.json": "91b47287512ba1d1117ada22a0101dca8268fa1926122bc98c3953a6472d8da9",
-        "koel_koel.json": "f7e041e5354904bc5b5817a67e3dddd0aa5fb79df387c172e3335c3e8eda986e",
-        "magento_magento2.json": "9cf72302d2cdfe34bb91815db52c24074474b98317403b1aec3611eb67b322db",
-        "matomo-org_matomo.json": "86c22bd4fee033d3a9e3b9acb4e401c4f2446420670a874f92b1b4312e8d6116",
-        "mautic_mautic.json": "7ea55133d968a823a7c32a1fb02d33a6497277cecfe918e4964bd48e47038d48",
-        "monicahq_monica.json": "30e0760a45523816251c787a57ce22e9fb19b2ac835a4fa947f10359ac374e2a",
-        "nextcloud_3rdparty.json": "6a5d459cfacfc2857600148a9110d1c9edfff462db2ae08afc62256f1e89f17b",
-        "wallabag_wallabag.json": "3426dcb85db3a7737ee768db6ccda6e227059bdfebb1066516feca92330aaf28"
+        "BookStackApp_BookStack.json": "fd0dc4c9caaa310dce20dc7de15a50c7c8901ba4a32b1a9e097a7a6031821408",
+        "PrestaShop_PrestaShop.json": "fc03f9d15911208764d90fbf157b8054946727e04ef852323e0e9d390f7230e7",
+        "drupal_drupal.feed-failed.json": "eb0b21e56ef3df7af34383f5bd78e23d547812d694af64b4fcd106bc2ada78ff",
+        "drupal_drupal.json": "ee1b32c3017bf2badbd32869960d10e5dfa4037c80950ae551817d4c43b4527c",
+        "firefly-iii_firefly-iii.json": "40b2c1852e96693d9529452e1f3b26de7983c1b5aadff536c3b887af03c0b295",
+        "grokability_snipe-it.json": "708104aa35a4d3aa31416a3f7f1e361ecdb1d43d795e6ea2ca45a02190a2a988",
+        "koel_koel.json": "0cd064f84d132047d9d01cf918b5045560392ffbe6feb3a17ec6c5297610438d",
+        "magento_magento2.json": "ff372792e7cfa1231ba381967d184aa42c6f8de744ac0fcfbb7841747b68ff3e",
+        "matomo-org_matomo.json": "7d051966ddac57f01c3f4aebcbf961feb18acd6054de5a076c17ba075efac14c",
+        "mautic_mautic.json": "0cba8fab48ad53694183997965c396fb24c602094f62f2cb7e0e82a37112f4fa",
+        "monicahq_monica.json": "17ce5aeeb410880ab252a7641c6ac2333ece4dbbae433413bc9c6f3a2cae4bc2",
+        "nextcloud_3rdparty.json": "c49d79b7301a804e8b75b0e9213dc7f0691d1b473d26fe6f0847854625f00674",
+        "wallabag_wallabag.json": "0dcdd2b612523f7e1f6366870dabe8c14300e4102df76e1d46d1ab833a920335"
     }
 }

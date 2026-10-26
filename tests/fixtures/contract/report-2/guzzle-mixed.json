@@ -1438,6 +1438,7 @@
                             "flag_ids": [
                                 "pinned"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "no-move",
@@ -1461,6 +1462,7 @@
                                 "abandoned",
                                 "old-promise"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "find-alternative",
@@ -1484,6 +1486,7 @@
                                 "abandoned",
                                 "old-promise"
                             ],
+                            "direct": false,
                             "replacement": null,
                             "next_step": {
                                 "kind": "find-alternative",
@@ -1507,6 +1510,7 @@
                                 "left-behind",
                                 "old-promise"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "raise-php",
@@ -1616,6 +1620,7 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -1631,6 +1636,13 @@
                         "composer",
                         "require",
                         "guzzlehttp/guzzle:^7.15.2"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "guzzlehttp/guzzle",
+                        "7.15.2",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -1857,6 +1869,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -1880,6 +1893,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -1903,6 +1917,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -1926,6 +1941,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -1984,6 +2000,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -2007,6 +2024,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2030,6 +2048,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2053,6 +2072,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -2111,6 +2131,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -2134,6 +2155,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2157,6 +2179,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2180,6 +2203,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -2238,6 +2262,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -2261,6 +2286,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2284,6 +2310,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2307,6 +2334,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -2365,6 +2393,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -2388,6 +2417,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2411,6 +2441,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2434,6 +2465,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -2492,6 +2524,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -2515,6 +2548,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2538,6 +2572,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2561,6 +2596,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -2619,6 +2655,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -2642,6 +2679,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2665,6 +2703,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2688,6 +2727,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -2746,6 +2786,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -2769,6 +2810,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2792,6 +2834,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2815,6 +2858,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -2873,6 +2917,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -2896,6 +2941,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2919,6 +2965,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -2942,6 +2989,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -3000,6 +3048,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -3023,6 +3072,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -3046,6 +3096,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -3069,6 +3120,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -3127,6 +3179,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -3150,6 +3203,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -3173,6 +3227,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -3196,6 +3251,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -3254,6 +3310,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -3277,6 +3334,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -3300,6 +3358,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -3323,6 +3382,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -3381,6 +3441,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -3404,6 +3465,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -3427,6 +3489,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -3450,6 +3513,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -3508,6 +3572,7 @@
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -3531,6 +3596,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -3554,6 +3620,7 @@
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -3577,6 +3644,7 @@
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",

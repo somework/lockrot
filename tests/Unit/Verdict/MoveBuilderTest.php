@@ -51,7 +51,7 @@ final class MoveBuilderTest extends TestCase
 
         self::assertNull($move->version());
         self::assertNotNull($check);
-        self::assertSame(['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::NO_RELEASE_READ], $check->jsonSerialize());
+        self::assertSame(['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::NO_RELEASE_READ, 'installs' => null], $check->jsonSerialize());
     }
 
     public function testARefusedMoveKeepsTheHoldsOfItsReleaseAddsTheRefusalsAndPrintsNoStep(): void
@@ -66,7 +66,7 @@ final class MoveBuilderTest extends TestCase
             [['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '^1.0', 'holder' => null], $refusal],
             array_map(static fn (Holder $holder): array => $holder->jsonSerialize(), $move->heldBy())
         );
-        self::assertSame([], $move->commands());
+        self::assertSame([['composer', 'why-not', 'a/b', '2.0.0', '--locked']], $move->commands());
     }
 
     /** composer.json holds the release at ^1.0, and Composer's check of the move settles that hold. */
@@ -277,14 +277,104 @@ final class MoveBuilderTest extends TestCase
         self::assertSame([], $move->commands());
     }
 
-    public function testATransitiveRequireThatIsNotCheckedGetsNoStep(): void
+    public function testATransitiveRequireThatIsNotCheckedGetsOnlyItsWhyNotStep(): void
     {
         [$row, $context] = self::checked(['*' => ['result' => 'not_checked', 'form' => null, 'reason' => 'offline', 'holds' => []]], false);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
 
-        self::assertSame([], $move->commands());
+        self::assertSame([['composer', 'why-not', 'a/b', '2.0.0', '--locked']], $move->commands());
+    }
+
+    /** monica's firebase/php-jwt: Composer refuses the move alone, and one request of the package and its holder h/x resolves it. */
+    public function testARootRequirementThatAJointRequestResolvesWritesItThenUpdatesThePackageWithItsHolders(): void
+    {
+        [$row, $context] = self::checked(self::refusedThenJoint('require a/b ^2.0 '), true, true, null, ['a/b' => '^1.0']);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+        $check = $move->check();
+
+        self::assertNotNull($check);
+        self::assertSame(
+            [MoveCheck::RESOLVES, [], [['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.1.0']], [['composer', 'require', 'a/b:^2.0', '--no-update'], ['composer', 'update', 'a/b', 'h/x']]],
+            [$check->result(), $move->heldBy(), $move->movesWith(), $move->commands()]
+        );
+    }
+
+    public function testAnUpdateThatAJointRequestResolvesNamesItsHoldersInTheSameStep(): void
+    {
+        [$row, $context] = self::checked(self::refusedThenJoint('update a/b ^2.0.0 '), false);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::LEFT_BEHIND)->to($row, $lower, null), [], null, $context);
+
+        self::assertSame([['composer', 'update', 'a/b:^2.0.0', 'h/x']], $move->commands());
+    }
+
+    public function testAPackageThatOnlyRequireDevListsGetsTheRequireCommandOfThatSection(): void
+    {
+        [$row, $context] = self::checked(['require a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, true, null, [], null, [], ['require-dev']);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        $check = $move->check();
+
+        self::assertNotNull($check);
+        self::assertSame([MoveCheck::RESOLVES, [['composer', 'require', 'a/b:^2.0', '--dev']]], [$check->result(), $move->commands()]);
+    }
+
+    /** SPEC 5.6: `transitive` reads `direct`, so a require-dev name in a run without --dev keeps it (case require-dev-name). */
+    public function testARequireDevNameThatTheRunDoesNotReachDirectlyMovesBecauseItIsTransitive(): void
+    {
+        [$row, $context] = self::checked(['require a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, true, null, [], null, [], ['require-dev']);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertContains(Move::TRANSITIVE, $move->composerMovesBecause());
+    }
+
+    public function testAJointSolveThatChangesNoHolderKeepsTheMoveRefusedWithOnlyTheWhyNotStep(): void
+    {
+        $checks = self::refusedThenJoint('update a/b ^2.0.0 ');
+        $checks['joint update a/b ^2.0.0 with h/x']['installs'] = ['a/b' => '2.0.0'];
+        [$row, $context] = self::checked($checks, false);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::LEFT_BEHIND)->to($row, $lower, null), [], null, $context);
+        $check = $move->check();
+
+        self::assertNotNull($check);
+        self::assertSame(
+            [MoveCheck::REFUSED, ['h/x'], [], [['composer', 'why-not', 'a/b', '2.0.0', '--locked']]],
+            [$check->result(), array_map(static fn (Holder $holder): ?string => $holder->package(), $move->heldBy()), $move->movesWith(), $move->commands()]
+        );
+    }
+
+    /** `transitive` stays a fact of the move: the through note explains the joint request. */
+    public function testATransitiveMoveThatTheJointRequestResolvesKeepsItsTransitiveReason(): void
+    {
+        [$row, $context] = self::checked(self::refusedThenJoint('update a/b ^2.0 '), false);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertSame([[['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.1.0']], [Move::CROSSES_MAJOR, Move::TRANSITIVE]], [$move->movesWith(), $move->composerMovesBecause()]);
+    }
+
+    /** @return array<string, array<string, mixed>> the refusal of $key by the holder h/x 1.0.0, and the joint request that moves h/x to 2.1.0 */
+    private static function refusedThenJoint(string $key): array
+    {
+        return [
+            $key => [
+                'result' => 'refused', 'form' => null, 'reason' => null,
+                'holds' => [['source' => 'package', 'package' => 'h/x', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^1.0', 'holder' => null]],
+            ],
+            'joint '.rtrim($key).' with h/x' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => ['a/b' => '2.0.0', 'h/x' => '2.1.0'], 'holds' => []],
+        ];
     }
 
     /**
@@ -293,10 +383,11 @@ final class MoveBuilderTest extends TestCase
      * @param array<string, array<mixed, mixed>> $checks the recorded checks ({@see RecordedMoveChecker})
      * @param array<string, string>              $require composer.json's `require`
      * @param array<string, ConstraintInterface> $ranges  each advisory's affected range, by id
+     * @param list<string>                       $namedIn the composer.json sections that list a/b
      *
      * @return array{0: BranchRow, 1: MoveContext}
      */
-    private static function checked(array $checks, bool $direct = true, bool $inlineOnAnyPackage = true, ?string $php = null, array $require = [], ?string $projectPhp = null, array $ranges = []): array
+    private static function checked(array $checks, bool $direct = true, bool $inlineOnAnyPackage = true, ?string $php = null, array $require = [], ?string $projectPhp = null, array $ranges = [], array $namedIn = []): array
     {
         $facts = self::facts($php);
         $floor = new PhpFloor('8.4', $projectPhp);
@@ -304,7 +395,7 @@ final class MoveBuilderTest extends TestCase
         $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
         $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
         $project = ProjectConfig::fromArray(['require' => $require]);
-        $context = (new MoveContext($finding, new MoveSubject('a/b', '1.0.0', $direct, $direct ? [] : ['c/d'], '8.4', null), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, $project)), $floor, new \DateTimeImmutable(self::NOW), 2, null, $ranges, [], true))
+        $context = (new MoveContext($finding, (new MoveSubject('a/b', '1.0.0', $direct, $direct ? [] : ['c/d'], '8.4', null))->withNamedIn($namedIn), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, $project)), $floor, new \DateTimeImmutable(self::NOW), 2, null, $ranges, [], true))
             ->withChecks(new MoveChecks(new RecordedMoveChecker($checks, []), $inlineOnAnyPackage));
 
         return [$row, $context];

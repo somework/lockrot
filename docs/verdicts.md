@@ -626,8 +626,13 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
   by the same rules. It reads `at most` when a fact could not be checked.
 
 - **Through a dependency.** For a package that you do not require, the line names the packages it
-  comes in through. When the newest release of such a package no longer requires it, the line says
-  so, and `next_step.commands[]` holds a `composer why-not` command to check the path.
+  comes in through. When the chain passes another package, the first one reads "({requirer}
+  requires it)". Then the line names one action per group of those packages:
+    - "change your own package" for your own path package (`through[].local`);
+    - "replace" for a package whose locked release is its newest (`through[].newest_is_installed`);
+    - "replace or update" for each other package.
+
+    When the newest release of such a package does not require it, the line says so.
 
 - **A new major.** A move to a higher branch says that a new major brings its own requirements.
 
@@ -656,9 +661,9 @@ holds. JSON writes the answer as the move's `check`.
 
 | `check.result` | What it says | The steps in `commands[]` |
 |---|---|---|
-| `resolves` | Composer installs the move from the lock in `form`: `inline`, `with-dependencies` or `with-all-dependencies` | the form that resolves, with `--with-dependencies` or `--with-all-dependencies` when it needs one |
-| `refused` | no form installs it: `held_by[]` names the holds that the refusal and a `composer prohibits`-style scan find | no `update` or `require` step |
-| `not_checked` | lockrot did not ask. `check.reason` says why | the inline form, unchecked. A `require`, `raise-php` or `tag` move of a package that composer.json does not require gets no package step |
+| `resolves` | Composer installs the move from the lock in `form`: `inline`, `with-dependencies` or `with-all-dependencies`. `check.installs` names the release that it installs | the form that resolves, with `--with-dependencies` or `--with-all-dependencies` when it needs one |
+| `refused` | no form installs it: `held_by[]` names the holds that the refusal and a `composer prohibits`-style scan find | no `update` or `require` step, only the `why-not` step |
+| `not_checked` | lockrot did not ask. `check.reason` says why | the inline form, unchecked, then the `why-not` step. A `require`, `raise-php` or `tag` move of a package that composer.json does not require gets no package step |
 
 - **Holds.** `held_by[]` adds the links that the solver names, with the package that a link points
   to in `target`:
@@ -673,18 +678,41 @@ holds. JSON writes the answer as the move's `check`.
     A hold of the package's own release reads `<package> <version>, its own release`, then its
     link. A hold names its holder's verdict only at the holder's locked version, because a
     verdict grades the installed release. A root hold names the composer.json section that lists
-    the package, and a `require-dev` hold ends its link with "(require-dev)". A root requirement
+    the package, and a `require-dev` hold ends its link with " in require-dev". A root requirement
     that admits the move's release is no hold.
 
     The text lists the holds of composer.json first, then the package's own releases, then the
     holds on the package, then the other holds. Within each group, a higher verdict comes first,
     then the package name decides.
 
+- **The form.** The first form that installs `newest` resolves the move. When no form installs
+  it, the form that installs the highest release resolves the move, the first form on a tie. The
+  line then reads "(gets 5.3.8, below the newest 5.3.9)", and `security.gets.version` reads
+  `check.installs`.
+- **A joint request.** When Composer refuses a move, lockrot asks once more: the move and an update
+  of each package that a package hold names. The joint request resolves only when it installs the
+  package inside the move's constraint and changes the release of a holder. Then `held_by[]` is
+  empty, and `moves_with[]` names each holder whose release the joint request changes. The joint
+  request moves the packages that require the package. So the `transitive` reason adds no words,
+  and the `unreached` words end at "lockrot found no path from your requirements to it". The step
+  names those holders:
+  `composer update 'firebase/php-jwt:^7.0.0' laravel/socialite`. The line ends with ", with an
+  update of laravel/socialite (to v5.30.0)". A package that composer.json
+  requires gets `composer require <package>:<constraint> --no-update` first, then
+  `composer update <package>` and the holders. When the joint request is refused, `held_by[]`
+  names its holds.
+- **The why-not step.** An `update`, `require`, `raise-php` or `tag` move whose check does not
+  resolve ends with `composer why-not <package> <version> --locked`. The version is the move's
+  `version`.
 - **A refusal that names no hold.** The release is `blocked`, so the advisory counts as having no
   reachable fix. The text says that Composer names no hold.
 - **A package that you do not require.** When its check resolves, the step is `composer update
   <package>:<constraint>`, which adds no root requirement.
-- **Update now.** lockrot solves the candidates of `update now:` as one request. It leaves out the
+- **A package that composer.json lists.** It gets the `composer require` step of the section that
+  lists it, also in a run without `--dev`. For a package that only `require-dev` lists, the step
+  adds `--dev`, and the line reads "require <package> <constraint> in require-dev".
+- **Update now.** lockrot solves the candidates of `update now:` as one request. A move that
+  resolves only through a joint request is no candidate: its own step moves its holders. It leaves out the
   candidates that Composer refuses together with the others, and writes a run note. The members of
   `security.update_now` are the names of the command that Composer resolves. When Composer refuses
   them together, or does not check them, `update now:` is empty, and the note
@@ -823,7 +851,7 @@ The `php:` line of the table, markdown and github formats prints the window. Whe
 `with_dev` differ, the line prints `with_dev` and `without_dev`. The line adds the target when the
 window excludes it. With `target_fix`, the line ends with its answer. That is the command, the holds
 of the refusal, the root links of the root ceiling, or the reason that the run did not check it. A
-root hold on a package of `packages-dev` ends with "(require-dev)". Without
+root hold on a package of `packages-dev` ends with " in require-dev". Without
 `target_fix`, the line adds the PHP of `platform_override` and the links that set one edge. That is
 the lowest edge when the target lies below it, else the edge after the last minor of the analysed
 set. Abridged from the [example run](example-run.md):

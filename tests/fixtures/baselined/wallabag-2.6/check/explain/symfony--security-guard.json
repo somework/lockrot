@@ -187,17 +187,11 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "transitive"
             ],
-            "commands": [
-                [
-                    "composer",
-                    "why-not",
-                    "symfony/security-bundle",
-                    "v8.1.6"
-                ]
-            ],
+            "commands": [],
             "through": [
                 {
                     "package": "friendsofsymfony/oauth-server-bundle",
@@ -208,7 +202,9 @@
                         "released": "2019-01-23T15:23:04+00:00"
                     },
                     "newest_requires": null,
-                    "newest_requires_unmeasured": "installed_unlisted"
+                    "newest_requires_unmeasured": "installed_unlisted",
+                    "local": false,
+                    "newest_is_installed": false
                 },
                 {
                     "package": "friendsofsymfony/user-bundle",
@@ -219,7 +215,9 @@
                         "released": "2026-02-13T21:22:55+00:00"
                     },
                     "newest_requires": null,
-                    "newest_requires_unmeasured": "through_other_package"
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": false
                 },
                 {
                     "package": "scheb/2fa-backup-code",
@@ -230,7 +228,9 @@
                         "released": "2026-01-24T13:26:10+00:00"
                     },
                     "newest_requires": null,
-                    "newest_requires_unmeasured": "through_other_package"
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": false
                 },
                 {
                     "package": "scheb/2fa-bundle",
@@ -241,7 +241,9 @@
                         "released": "2026-07-10T18:29:30+00:00"
                     },
                     "newest_requires": null,
-                    "newest_requires_unmeasured": "through_other_package"
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": false
                 },
                 {
                     "package": "scheb/2fa-email",
@@ -252,7 +254,9 @@
                         "released": "2026-06-02T20:21:59+00:00"
                     },
                     "newest_requires": null,
-                    "newest_requires_unmeasured": "through_other_package"
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": false
                 },
                 {
                     "package": "scheb/2fa-google-authenticator",
@@ -263,7 +267,9 @@
                         "released": "2026-01-24T13:27:55+00:00"
                     },
                     "newest_requires": null,
-                    "newest_requires_unmeasured": "through_other_package"
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": false
                 },
                 {
                     "package": "scheb/2fa-qr-code",
@@ -274,7 +280,9 @@
                         "released": "2022-01-03T10:21:24+00:00"
                     },
                     "newest_requires": null,
-                    "newest_requires_unmeasured": "through_other_package"
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": true
                 },
                 {
                     "package": "scheb/2fa-trusted-device",
@@ -285,7 +293,9 @@
                         "released": "2026-01-24T13:26:10+00:00"
                     },
                     "newest_requires": null,
-                    "newest_requires_unmeasured": "through_other_package"
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": false
                 },
                 {
                     "package": "symfony/security-bundle",
@@ -296,11 +306,13 @@
                         "released": "2026-08-30T17:31:45+00:00"
                     },
                     "newest_requires": false,
-                    "newest_requires_unmeasured": null
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
                 }
             ],
             "also": [],
-            "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update them; the newest release of symfony/security-bundle (v8.1.6) no longer requires it"
+            "text": "find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more, or replace scheb/2fa-qr-code; the newest release of symfony/security-bundle (v8.1.6) no longer requires it"
         },
         "security": {
             "status": "clear",

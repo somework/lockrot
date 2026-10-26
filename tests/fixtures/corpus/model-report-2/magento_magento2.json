@@ -1165,6 +1165,28 @@
     "exempt": {
       "baseline": 0
     },
+    "standing": {
+      "known": 0,
+      "new": 0,
+      "worsened": 0,
+      "none": 14
+    },
+    "failing_packages": [
+      "mtdowling/jmespath.php",
+      "composer/composer",
+      "guzzlehttp/guzzle",
+      "phpseclib/phpseclib",
+      "symfony/mime",
+      "web-token/jwt-framework",
+      "webonyx/graphql-php",
+      "symfony/http-kernel",
+      "tubalmartin/cssmin",
+      "magento/magento-composer-installer",
+      "laminas/laminas-config",
+      "laminas/laminas-json",
+      "laminas/laminas-loader",
+      "laminas/laminas-text"
+    ],
     "failing_by": [
       {
         "value": "high",
@@ -1375,12 +1397,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "mtdowling/jmespath.php"
+          ],
+          [
+            "composer",
+            "why-not",
+            "mtdowling/jmespath.php",
+            "2.9.1",
+            "--locked"
           ]
         ],
         "through": [
@@ -1393,7 +1423,9 @@
               "released": "2026-08-08T16:19:23+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -1717,7 +1749,7 @@
         "constraint": null,
         "latest": null,
         "php_check": {
-          "requires": "^5.3.2 || ^7.0 || ^8.0",
+          "requires": "^7.2.5 || ^8.0",
           "project_allows": true,
           "target_runs": true,
           "raise_to": null,
@@ -1782,12 +1814,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "composer/composer"
+          ],
+          [
+            "composer",
+            "why-not",
+            "composer/composer",
+            "2.10.3",
+            "--locked"
           ]
         ],
         "through": [],
@@ -1842,7 +1882,7 @@
         "gets": {
           "version": "2.10.3",
           "php_check": {
-            "requires": "^5.3.2 || ^7.0 || ^8.0",
+            "requires": "^7.2.5 || ^8.0",
             "project_allows": true,
             "target_runs": true,
             "raise_to": null,
@@ -2419,12 +2459,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "guzzlehttp/guzzle"
+          ],
+          [
+            "composer",
+            "why-not",
+            "guzzlehttp/guzzle",
+            "7.15.2",
+            "--locked"
           ]
         ],
         "through": [],
@@ -3068,12 +3116,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "phpseclib/phpseclib"
+          ],
+          [
+            "composer",
+            "why-not",
+            "phpseclib/phpseclib",
+            "3.0.57",
+            "--locked"
           ]
         ],
         "through": [],
@@ -3554,12 +3610,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "symfony/mime"
+          ],
+          [
+            "composer",
+            "why-not",
+            "symfony/mime",
+            "v7.4.12",
+            "--locked"
           ]
         ],
         "through": [],
@@ -3980,12 +4044,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "web-token/jwt-framework"
+          ],
+          [
+            "composer",
+            "why-not",
+            "web-token/jwt-framework",
+            "4.1.7",
+            "--locked"
           ]
         ],
         "through": [],
@@ -4475,12 +4547,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "webonyx/graphql-php"
+          ],
+          [
+            "composer",
+            "why-not",
+            "webonyx/graphql-php",
+            "v15.38.1",
+            "--locked"
           ]
         ],
         "through": [],
@@ -4887,12 +4967,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "symfony/http-kernel"
+          ],
+          [
+            "composer",
+            "why-not",
+            "symfony/http-kernel",
+            "v7.4.12",
+            "--locked"
           ]
         ],
         "through": [
@@ -4905,7 +4993,9 @@
               "released": "2026-09-12T18:50:35+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -5282,6 +5372,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -5556,6 +5647,7 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -5564,6 +5656,13 @@
             "composer",
             "require",
             "magento/magento-composer-installer:^0.5.0"
+          ],
+          [
+            "composer",
+            "why-not",
+            "magento/magento-composer-installer",
+            "0.5.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -5865,6 +5964,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -5879,11 +5979,13 @@
               "released": "2025-10-17T22:17:10+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through laminas/laminas-modulemanager: replace or update that package; the newest release of laminas/laminas-modulemanager (2.19.0) still requires it"
+        "text": "find a replacement (none named); it comes in through laminas/laminas-modulemanager: replace laminas/laminas-modulemanager; the newest release of laminas/laminas-modulemanager (2.19.0) still requires it"
       },
       "security": {
         "status": "clear",
@@ -6146,17 +6248,11 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
-        "commands": [
-          [
-            "composer",
-            "why-not",
-            "laminas/laminas-view",
-            "3.1.0"
-          ]
-        ],
+        "commands": [],
         "through": [
           {
             "package": "laminas/laminas-view",
@@ -6167,11 +6263,13 @@
               "released": "2026-06-02T22:39:05+00:00"
             },
             "newest_requires": false,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through laminas/laminas-view: replace or update that package; the newest release of laminas/laminas-view (3.1.0) no longer requires it"
+        "text": "find a replacement (none named); it comes in through laminas/laminas-view: replace or update laminas/laminas-view; the newest release of laminas/laminas-view (3.1.0) no longer requires it"
       },
       "security": {
         "status": "clear",
@@ -6434,6 +6532,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -6448,7 +6547,9 @@
               "released": "2026-03-31T17:11:06+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": true
           },
           {
             "package": "laminas/laminas-http",
@@ -6459,11 +6560,13 @@
               "released": "2025-12-05T11:02:08+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through laminas/laminas-captcha, laminas/laminas-http: replace or update them; the newest release of laminas/laminas-http (2.23.0) still requires it"
+        "text": "find a replacement (none named); it comes in through laminas/laminas-captcha, laminas/laminas-http: replace laminas/laminas-captcha, laminas/laminas-http; the newest release of laminas/laminas-http (2.23.0) still requires it"
       },
       "security": {
         "status": "clear",
@@ -6727,6 +6830,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [
           "transitive"
         ],
@@ -6741,11 +6845,13 @@
               "released": "2026-03-31T17:11:06+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through laminas/laminas-captcha: replace or update that package; the newest release of laminas/laminas-captcha (2.20.0) still requires it"
+        "text": "find a replacement (none named); it comes in through laminas/laminas-captcha: replace laminas/laminas-captcha; the newest release of laminas/laminas-captcha (2.20.0) still requires it"
       },
       "security": {
         "status": "clear",
@@ -7012,12 +7118,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "symfony/cache"
+          ],
+          [
+            "composer",
+            "why-not",
+            "symfony/cache",
+            "v7.4.12",
+            "--locked"
           ]
         ],
         "through": [],
@@ -7343,12 +7457,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "symfony/mailer"
+          ],
+          [
+            "composer",
+            "why-not",
+            "symfony/mailer",
+            "v7.4.12",
+            "--locked"
           ]
         ],
         "through": [],
@@ -7736,12 +7858,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "guzzlehttp/psr7"
+          ],
+          [
+            "composer",
+            "why-not",
+            "guzzlehttp/psr7",
+            "2.12.3",
+            "--locked"
           ]
         ],
         "through": [
@@ -7754,7 +7884,9 @@
               "released": "2026-08-04T14:31:01+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "guzzlehttp/guzzle",
@@ -7765,7 +7897,9 @@
               "released": "2026-09-06T13:55:09+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "league/flysystem-aws-s3-v3",
@@ -7776,7 +7910,9 @@
               "released": "2026-08-08T16:19:23+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -8203,12 +8339,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "symfony/http-foundation"
+          ],
+          [
+            "composer",
+            "why-not",
+            "symfony/http-foundation",
+            "v7.4.13",
+            "--locked"
           ]
         ],
         "through": [
@@ -8221,7 +8365,9 @@
               "released": "2026-09-12T18:50:35+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -8529,6 +8675,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -8765,6 +8912,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -9030,12 +9178,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "league/flysystem"
+          ],
+          [
+            "composer",
+            "why-not",
+            "league/flysystem",
+            "3.36.0",
+            "--locked"
           ]
         ],
         "through": [],
@@ -9370,12 +9526,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "symfony/polyfill-intl-idn"
+          ],
+          [
+            "composer",
+            "why-not",
+            "symfony/polyfill-intl-idn",
+            "v1.38.1",
+            "--locked"
           ]
         ],
         "through": [
@@ -9388,7 +9552,9 @@
               "released": "2026-09-15T06:01:24+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "symfony/mime",
@@ -9399,7 +9565,9 @@
               "released": "2026-09-04T11:02:17+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -9768,12 +9936,20 @@
           ]
         },
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [
           [
             "composer",
             "update",
             "symfony/yaml"
+          ],
+          [
+            "composer",
+            "why-not",
+            "symfony/yaml",
+            "v7.4.12",
+            "--locked"
           ]
         ],
         "through": [
@@ -9786,7 +9962,9 @@
               "released": "2026-09-14T04:51:09+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -10164,6 +10342,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -10176,7 +10355,9 @@
               "released": "2026-08-03T11:45:35+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -10431,6 +10612,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -10443,7 +10625,9 @@
               "released": "2026-08-27T11:34:23+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "magento/composer",
@@ -10454,7 +10638,9 @@
               "released": "2026-05-26T16:07:55+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           },
           {
             "package": "magento/composer-dependency-version-audit-plugin",
@@ -10465,7 +10651,9 @@
               "released": "2024-12-18T09:52:06+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": true
           },
           {
             "package": "magento/magento-composer-installer",
@@ -10476,7 +10664,9 @@
               "released": "2026-08-31T07:36:33+00:00"
             },
             "newest_requires": null,
-            "newest_requires_unmeasured": "through_other_package"
+            "newest_requires_unmeasured": "through_other_package",
+            "local": false,
+            "newest_is_installed": false
           }
         ],
         "also": [],
@@ -10721,6 +10911,7 @@
         "clears_all": false,
         "if_applied": null,
         "check": null,
+        "moves_with": [],
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -10733,7 +10924,9 @@
               "released": "2025-10-17T22:17:10+00:00"
             },
             "newest_requires": true,
-            "newest_requires_unmeasured": null
+            "newest_requires_unmeasured": null,
+            "local": false,
+            "newest_is_installed": true
           }
         ],
         "also": [],

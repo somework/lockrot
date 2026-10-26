@@ -320,6 +320,7 @@
                                             "left-behind",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "raise-php",
@@ -418,6 +419,7 @@
                                             "left-behind",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "raise-php",
@@ -504,6 +506,7 @@
                                             "left-behind",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "raise-php",
@@ -590,6 +593,7 @@
                                             "left-behind",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "raise-php",

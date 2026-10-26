@@ -142,8 +142,10 @@
    "check": {
     "result": "resolves",
     "form": "inline",
-    "reason": null
+    "reason": null,
+    "installs": "8.0.1"
    },
+   "moves_with": [],
    "composer_moves_because": [
     "crosses_major"
    ],
@@ -223,7 +225,8 @@
     "check": {
      "result": "refused",
      "form": null,
-     "reason": null
+     "reason": null,
+     "installs": null
     }
    },
    "move_in": "next_step",
@@ -471,7 +474,8 @@
      "check": {
       "result": "resolves",
       "form": "inline",
-      "reason": null
+      "reason": null,
+      "installs": "8.0.1"
      }
     }
    },
@@ -534,7 +538,8 @@
      "check": {
       "result": "refused",
       "form": null,
-      "reason": null
+      "reason": null,
+      "installs": null
      }
     }
    }

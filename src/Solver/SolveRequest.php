@@ -33,6 +33,10 @@ final class SolveRequest
     /** @var self::LISTED|self::WITH_DEPENDENCIES|self::WITH_ALL_DEPENDENCIES */
     private int $transitive;
     private bool $keepsTargets = false;
+    /** @var array<string, string> */
+    private array $joined = [];
+    /** @var array<string, string> */
+    private array $dev = [];
 
     /**
      * @param array<string, string>                                       $allow       the update allow list, name => name
@@ -67,10 +71,14 @@ final class SolveRequest
     /**
      * @param array<string, string> $rootChanges name => constraint; a platform name such as `php`
      *                                           changes the root requirement without an update
+     * @param bool                  $dev         `require --dev`: the package's change goes to `require-dev`
      */
-    public static function require(string $package, array $rootChanges): self
+    public static function require(string $package, array $rootChanges, bool $dev): self
     {
-        return new self([$package => $package], [], $rootChanges, self::LISTED);
+        $request = new self([$package => $package], [], $rootChanges, self::LISTED);
+        $request->dev = $dev ? [$package => $package] : [];
+
+        return $request;
     }
 
     /**
@@ -100,6 +108,22 @@ final class SolveRequest
         return $clone;
     }
 
+    /**
+     * A copy that also updates the holders of a refused move, with no constraint of their own.
+     * A link to a holder keeps its target in a hold.
+     *
+     * @param list<string> $holders
+     */
+    public function withJoined(array $holders): self
+    {
+        $clone = clone $this;
+        foreach ($holders as $name) {
+            $clone->joined[$name] = $name;
+        }
+
+        return $clone;
+    }
+
     /** @param self::LISTED|self::WITH_DEPENDENCIES|self::WITH_ALL_DEPENDENCIES $transitive */
     public function withTransitive(int $transitive): self
     {
@@ -112,7 +136,7 @@ final class SolveRequest
     /** @return array<string, string> name => name: Composer before 2.6 reads the allow list's keys, later versions its values */
     public function allow(): array
     {
-        return $this->allow;
+        return $this->allow + $this->joined;
     }
 
     /** @return array<string, string> name => name: a link to one of them has no target in a hold ({@see ProblemHolds}) */
@@ -131,6 +155,12 @@ final class SolveRequest
     public function rootChanges(): array
     {
         return $this->rootChanges;
+    }
+
+    /** @return array<string, string> name => name, the root changes that `require --dev` writes in `require-dev` */
+    public function devChanges(): array
+    {
+        return $this->dev;
     }
 
     /** @return self::LISTED|self::WITH_DEPENDENCIES|self::WITH_ALL_DEPENDENCIES */

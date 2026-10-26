@@ -5,7 +5,7 @@ description: "A recorded lockrot run on wallabag's public composer.lock: the ful
 
 # Example run
 
-What lockrot prints on a real lock, and how to read it. Recorded on 2026-10-18 with lockrot 0.14.0
+What lockrot prints on a real lock, and how to read it. Recorded on 2026-10-26 with lockrot 0.14.0
 on a snapshot of [wallabag](https://github.com/wallabag/wallabag)'s public `composer.lock`, with
 `GITHUB_TOKEN` set, so no repository check was capped, and `COLUMNS=120`, so the wrapping is fixed.
 
@@ -33,7 +33,7 @@ critical (3)
       32 = abandoned 32
       do: replace it: its registry suggests "Symfony"
       abandoned    marked abandoned by its registry, replacement: Symfony; its repository is archived on GitHub; last
-                   release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago)
+                   release 2023-02-24 (3.7 years ago); last push 2023-02-24 (3.7 years ago)
       pulls in 1 flagged package: doctrine/annotations (abandoned)
 
 high (39)
@@ -41,9 +41,10 @@ high (39)
       24 = left-behind 16 ÷ 2 transitive + vulnerable 16 [high advisory]
       do: move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator — clears left-behind and 2
           advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json
-          (requires scheb/2fa-google-authenticator ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires
-          ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own
-          requirements; Composer's solver refuses it against the lock
+          (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself
+          left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev));
+          the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver
+          refuses it against the lock
       left-behind  branch 10.x last released 2022-03-17 (4.6 years ago); 11.x released 11.5.0 (2026-06-06)
       vulnerable   2 advisories: 1 high, 1 medium — none fixed on 10.x; worst: PKSA-kbc7-dq62-pt7d Unbounded digits
                    parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation
@@ -52,14 +53,14 @@ high (39)
       do: no release fixes it
       vulnerable   1 advisory: 1 unrated — none fixed on 3.x; advisory: PKSA-px1b-j2dd-31r6 Server-side Request
                    Forgery (SSRF)
-      age: installed v3.0.1 released 2025-01-06 (1.8 years ago), its newest release; last push 2026-10-13 (less
+      age: installed v3.0.1 released 2025-01-06 (1.8 years ago), its newest release; last push 2026-10-19 (less
            than three weeks ago)
   friendsofsymfony/oauth-server-bundle dev-master  direct  ·  pinned · stale
       18 = pinned 16 + stale 2 [¼ of 8]
       do: no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it;
           replace it
       pinned       pinned to branch snapshot dev-master
-      stale        last release 2019-01-23 (7.7 years ago)
+      stale        last release 2019-01-23 (7.8 years ago)
       pulls in 2 flagged packages: symfony/security-guard (abandoned), friendsofsymfony/oauth2-php (stale)
   mgargano/simplehtmldom 1.5  direct  ·  old-promise · stale
       18 = old-promise 16 + stale 2 [¼ of 8]
@@ -69,52 +70,52 @@ high (39)
       stale        last release 2014-01-05 (12.8 years ago); last push 2022-08-04 (4.2 years ago)
   grandt/binstring 1.0.0  via wallabag/phpepub  ·  silent · old-promise
       18 = (silent 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive
-      do: find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub: replace
-          or update that package
+      do: find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub
+          (grandt/phpresizegif requires it): replace wallabag/phpepub
       silent       last release 2015-08-13 (11.2 years ago); last push 2015-08-13 (11.2 years ago)
       old-promise  released 2015-08-13 for PHP 5 (php ">=5.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
   grandt/phpresizegif 1.0.3  via wallabag/phpepub  ·  silent · old-promise
       18 = (silent 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive
-      do: find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace
-          or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it
-      silent       last release 2015-05-10 (11.4 years ago); last push 2015-08-13 (11.2 years ago)
+      do: find a maintained alternative: nothing released for 11.5 years; it comes in through wallabag/phpepub: replace
+          wallabag/phpepub; the newest release of wallabag/phpepub (4.0.10) still requires it
+      silent       last release 2015-05-10 (11.5 years ago); last push 2015-08-13 (11.2 years ago)
       old-promise  released 2015-05-10 for PHP 5 (php ">=5.3.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
   grandt/phpzipmerge 1.0.4  via wallabag/phpepub  ·  silent · old-promise
       18 = (silent 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive
-      do: find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub: replace
-          or update that package
+      do: find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub
+          (phpzip/phpzip requires it): replace wallabag/phpepub
       silent       last release 2015-08-18 (11.2 years ago); last push 2015-08-18 (11.2 years ago)
       old-promise  released 2015-08-18 for PHP 5 (php ">=5.3.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
   grandt/relativepath 1.0.2  via wallabag/phpepub  ·  silent · old-promise
       18 = (silent 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive
-      do: find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace
-          or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it
-      silent       last release 2015-05-14 (11.4 years ago); last push 2020-04-01 (6.5 years ago)
+      do: find a maintained alternative: nothing released for 11.5 years; it comes in through wallabag/phpepub: replace
+          wallabag/phpepub; the newest release of wallabag/phpepub (4.0.10) still requires it
+      silent       last release 2015-05-14 (11.5 years ago); last push 2020-04-01 (6.6 years ago)
       old-promise  released 2015-05-14 for PHP 5 (php ">=5.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
   hoa/consistency 1.17.05.02  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned · old-promise
       18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive
       do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
-      abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.1
+          update wallabag/rulerz, wallabag/rulerz-bundle
+      abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.2
                    years ago); last push 2021-04-28 (5.5 years ago)
       old-promise  released 2017-05-02 for PHP 5 (php ">=5.5.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
   phpzip/phpzip 2.0.8  via wallabag/phpepub  ·  silent · old-promise
       18 = (silent 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive
       do: find a maintained alternative: nothing released for 10.9 years; it comes in through wallabag/phpepub: replace
-          or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it
+          wallabag/phpepub; the newest release of wallabag/phpepub (4.0.10) still requires it
       silent       last release 2015-11-16 (10.9 years ago); last push 2015-11-16 (10.9 years ago)
       old-promise  released 2015-11-16 for PHP 5 (php ">=5.3.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
   pragmarx/random v0.2.2  via pragmarx/recovery  ·  silent · old-promise
       18 = (silent 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive
       do: find a maintained alternative: nothing released for 8.9 years; it comes in through pragmarx/recovery: replace
-          or update that package; the newest release of pragmarx/recovery (v0.2.1) still requires it
-      silent       last release 2017-11-21 (8.9 years ago); last push 2017-12-18 (8.8 years ago)
+          pragmarx/recovery; the newest release of pragmarx/recovery (v0.2.1) still requires it
+      silent       last release 2017-11-21 (8.9 years ago); last push 2017-12-18 (8.9 years ago)
       old-promise  released 2017-11-21 for PHP 7 (php ">=7.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
   craue/config-bundle 2.7.0  direct  ·  left-behind
@@ -127,32 +128,28 @@ high (39)
   doctrine/event-manager 1.2.0  direct  ·  left-behind
       16 = left-behind 16
       do: require doctrine/event-manager ^2.1 — clears left-behind; 2.x needs php ^8.1, which require.php allows; the
-          target php 8.4 runs it; held by composer.json (requires ^1.2) and composer.json (requires
-          dama/doctrine-test-bundle ^8.2.2) and composer.json (requires doctrine/dbal ^3.9.4) and composer.json
-          (requires doctrine/migrations ^3.8.2) and composer.json (requires doctrine/orm ^2.20.2) and composer.json
-          (requires doctrine/persistence ^3.4) and composer.json (requires symfony/doctrine-bridge ^5.4.48) and
-          dama/doctrine-test-bundle v8.2.2 (requires doctrine/dbal ^3.3 || ^4.0) and doctrine/dbal 3.10.5 (requires
-          ^1|^2) and doctrine/migrations 3.9.7 (requires ^1.2 || ^2.0) and doctrine/orm 2.20.9 (requires ^1.2 || ^2) and
-          doctrine/persistence 3.4.3 (requires ^1 || ^2) and symfony/doctrine-bridge v5.4.48 (requires ~1.0); the
-          packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses
-          it against the lock
+          target php 8.4 runs it; held by composer.json (requires ^1.2) and symfony/doctrine-bridge v5.4.48 (requires
+          ~1.0) and doctrine/doctrine-fixtures-bundle 3.7.1 (requires symfony/doctrine-bridge ^5.4.48 || ^6.4.16 ||
+          ^7.1.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's
+          solver refuses it against the lock
       left-behind  branch 1.x last released 2022-10-12 (4.0 years ago); 2.x released 2.1.1 (2026-01-29)
   lcobucci/jwt 4.3.0  direct  ·  left-behind
       16 = left-behind 16
       do: require lcobucci/jwt ^5.6 — clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which
           require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3) and composer.json
-          (requires scheb/2fa-trusted-device ^5.13.2) and scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself
-          left-behind); the packages that hold it may need to move too; a new major brings its own requirements;
-          Composer's solver refuses it against the lock
+          (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself
+          left-behind) and scheb/2fa-trusted-device 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the
+          packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses
+          it against the lock
       left-behind  branch 4.x last released 2023-01-02 (3.8 years ago); 5.x released 5.6.1 (2026-10-10)
       pulls in 1 flagged package: lcobucci/clock (capped)
   scheb/2fa-backup-code v5.13.2  direct  ·  left-behind
       16 = left-behind 16
       do: require scheb/2fa-backup-code ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 ||
           ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and
-          composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-backup-code v7.14.0 (requires scheb/2fa-bundle
-          self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own
-          requirements; Composer's solver refuses it against the lock
+          composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-backup-code v7.14.0, its own release (requires
+          scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings
+          its own requirements; Composer's solver refuses it against the lock
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)
       pulls in 1 flagged package: symfony/security-guard (abandoned)
       checks missing: S2 (undated releases)
@@ -160,26 +157,25 @@ high (39)
       16 = left-behind 16
       do: require scheb/2fa-bundle ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0,
           which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and
-          composer.json (requires scheb/2fa-backup-code ^5.13.2) and composer.json (requires scheb/2fa-email ^5.13.2)
-          and composer.json (requires scheb/2fa-google-authenticator ^5.13.2) and composer.json (requires
-          scheb/2fa-trusted-device ^5.13.2) and composer.json (requires symfony/config ^5.4.46) and composer.json
-          (requires symfony/dependency-injection ^5.4.48) and composer.json (requires symfony/event-dispatcher ^5.4.45)
-          and composer.json (requires symfony/framework-bundle ^5.4.45) and composer.json (requires
-          symfony/http-foundation ^5.4.48) and composer.json (requires symfony/http-kernel ^5.4.48) and composer.json
-          (requires symfony/security-bundle ^5.4.45) and composer.json (requires symfony/twig-bundle ^5.4.45) and
-          scheb/2fa-backup-code v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-bundle v7.14.0
-          (requires symfony/config ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires
-          symfony/dependency-injection ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires
-          symfony/event-dispatcher ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires
-          symfony/framework-bundle ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires
-          symfony/http-foundation ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires
-          symfony/http-kernel ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires
-          symfony/property-access ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires
-          symfony/security-bundle ^6.4 || ^7.0; itself left-behind) and scheb/2fa-bundle v7.14.0 (requires
-          symfony/twig-bundle ^6.4 || ^7.0; itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version;
-          itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version; itself left-behind) and
-          scheb/2fa-trusted-device v5.13.2 (requires self.version; itself left-behind); the packages that hold it may
-          need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock
+          composer.json (requires symfony/config ^5.4.46) and composer.json (requires symfony/dependency-injection
+          ^5.4.48) and composer.json (requires symfony/event-dispatcher ^5.4.45) and composer.json (requires
+          symfony/framework-bundle ^5.4.45) and composer.json (requires symfony/http-foundation ^5.4.48) and
+          composer.json (requires symfony/http-kernel ^5.4.48) and composer.json (requires symfony/security-bundle
+          ^5.4.45) and composer.json (requires symfony/twig-bundle ^5.4.45) and scheb/2fa-bundle v7.14.0, its own
+          release (requires symfony/config ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires
+          symfony/dependency-injection ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires
+          symfony/event-dispatcher ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires
+          symfony/framework-bundle ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires
+          symfony/http-foundation ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires
+          symfony/http-kernel ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires
+          symfony/property-access ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires
+          symfony/security-bundle ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires
+          symfony/twig-bundle ^6.4 || ^7.0) and scheb/2fa-backup-code v5.13.2 (requires self.version (v5.13.2); itself
+          left-behind) and scheb/2fa-email v5.13.2 (requires self.version (v5.13.2); itself left-behind) and
+          scheb/2fa-google-authenticator v5.13.2 (requires self.version (v5.13.2); itself left-behind) and
+          scheb/2fa-trusted-device v5.13.2 (requires self.version (v5.13.2); itself left-behind); the packages that hold
+          it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the
+          lock
       left-behind  branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php
                    ~8.4.0 || ~8.5.0 above the project's php >=8.2; 7.x released v7.14.0 (2026-06-12)
       pulls in 1 flagged package: symfony/security-guard (abandoned)
@@ -187,19 +183,19 @@ high (39)
       16 = left-behind 16
       do: require scheb/2fa-email ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0,
           which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and
-          composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-email v7.14.0 (requires scheb/2fa-bundle
-          self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own
-          requirements; Composer's solver refuses it against the lock
+          composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-email v7.14.0, its own release (requires
+          scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings
+          its own requirements; Composer's solver refuses it against the lock
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-06-08)
       pulls in 1 flagged package: symfony/security-guard (abandoned)
   scheb/2fa-google-authenticator v5.13.2  direct  ·  left-behind
       16 = left-behind 16
       do: require scheb/2fa-google-authenticator ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0
           || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and
-          composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v7.14.0 (requires
-          scheb/2fa-bundle self.version; itself left-behind) and scheb/2fa-google-authenticator v7.14.0 (requires
-          spomky-labs/otphp ^11.0; itself left-behind); the packages that hold it may need to move too; a new major
-          brings its own requirements; Composer's solver refuses it against the lock
+          composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v7.14.0, its own release
+          (requires scheb/2fa-bundle self.version (v7.14.0)) and scheb/2fa-google-authenticator v7.14.0, its own release
+          (requires spomky-labs/otphp ^11.0); the packages that hold it may need to move too; a new major brings its own
+          requirements; Composer's solver refuses it against the lock
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)
       pulls in 3 flagged packages: spomky-labs/otphp (left-behind · vulnerable), symfony/security-guard (abandoned),
       thecodingmachine/safe (left-behind)
@@ -209,9 +205,9 @@ high (39)
       do: require scheb/2fa-trusted-device ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 ||
           ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and
           composer.json (requires lcobucci/jwt ^4.3) and composer.json (requires scheb/2fa-bundle ^5.13.2) and
-          scheb/2fa-trusted-device v7.14.0 (requires lcobucci/jwt ^5.0; itself left-behind) and scheb/2fa-trusted-device
-          v7.14.0 (requires scheb/2fa-bundle self.version; itself left-behind); the packages that hold it may need to
-          move too; a new major brings its own requirements; Composer's solver refuses it against the lock
+          scheb/2fa-trusted-device v7.14.0, its own release (requires lcobucci/jwt ^5.0) and scheb/2fa-trusted-device
+          v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may
+          need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)
       pulls in 2 flagged packages: symfony/security-guard (abandoned), lcobucci/clock (capped)
       checks missing: S2 (undated releases)
@@ -237,106 +233,108 @@ high (39)
       (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 10 more
   behat/transliterator v1.5.0  via stof/doctrine-extensions-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through stof/doctrine-extensions-bundle: replace or update that
-          package
+      do: find a replacement (none named); it comes in through stof/doctrine-extensions-bundle
+          (gedmo/doctrine-extensions requires it): replace or update stof/doctrine-extensions-bundle
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2022-03-30 (4.6
                    years ago)
   doctrine/annotations 2.0.2  via sensio/framework-extra-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through sensio/framework-extra-bundle: replace or update that
-          package; the newest release of sensio/framework-extra-bundle (v6.2.10) still requires it
+      do: find a replacement (none named); it comes in through sensio/framework-extra-bundle: replace
+          sensio/framework-extra-bundle; the newest release of sensio/framework-extra-bundle (v6.2.10) still requires it
       abandoned    marked abandoned by its registry
       age: installed 2.0.2 released 2024-09-05 (2.1 years ago), its newest release; last push 2025-12-11 (0.9 years
            ago)
   doctrine/cache 2.2.0  via craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 3 more  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
       do: find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle,
-          doctrine/doctrine-migrations-bundle and 3 more: replace or update them; the newest releases of
-          doctrine/doctrine-bundle (3.3.2) and doctrine/orm (3.7.5) no longer require it
+          doctrine/doctrine-migrations-bundle and 3 more: replace or update craue/config-bundle,
+          doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 3 more; the newest releases of
+          doctrine/doctrine-bundle (3.3.3) and doctrine/orm (3.7.5) no longer require it
       abandoned    marked abandoned by its registry; last release 2022-05-20 (4.4 years ago)
   hoa/compiler 3.17.08.08  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
+      do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it),
+          wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-08 (9.2
                    years ago); last push 2021-04-29 (5.5 years ago)
   hoa/event 1.17.01.13  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
-      abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.1
+      do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/exception requires it),
+          wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle
+      abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.2
                    years ago); last push 2021-04-29 (5.5 years ago)
   hoa/exception 1.17.01.16  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
-      abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.1
+      do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/consistency requires it),
+          wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle
+      abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.2
                    years ago); last push 2021-04-29 (5.5 years ago)
   hoa/file 1.17.07.11  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
+      do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it),
+          wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-07-11 (9.3
-                   years ago); last push 2018-01-23 (8.7 years ago)
+                   years ago); last push 2018-01-23 (8.8 years ago)
   hoa/iterator 2.17.01.10  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
+      do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it),
+          wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8
                    years ago); last push 2021-04-29 (5.5 years ago)
   hoa/math 1.17.05.16  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
+      do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it),
+          wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.4
                    years ago); last push 2021-04-29 (5.5 years ago)
   hoa/protocol 1.17.01.14  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
+      do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it),
+          wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-14 (9.8
                    years ago); last push 2021-04-29 (5.5 years ago)
   hoa/regex 1.17.01.13  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
+      do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it),
+          wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-13 (9.8
-                   years ago); last push 2018-07-20 (8.2 years ago)
+                   years ago); last push 2018-07-20 (8.3 years ago)
   hoa/ruler 2.17.05.16  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
       do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
+          update wallabag/rulerz, wallabag/rulerz-bundle
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.4
                    years ago); last push 2021-07-10 (5.3 years ago)
   hoa/stream 1.17.02.21  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
+      do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/file requires it),
+          wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-02-21 (9.7
                    years ago); last push 2021-08-09 (5.2 years ago)
   hoa/ustring 4.17.01.16  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
+      do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/regex requires it),
+          wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.8
                    years ago); last push 2021-04-29 (5.5 years ago)
   hoa/visitor 2.17.01.16  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
+      do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it),
+          wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.8
                    years ago); last push 2021-04-28 (5.5 years ago)
   hoa/zformat 1.17.01.10  via wallabag/rulerz, wallabag/rulerz-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
-      do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or
-          update them
+      do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/math requires it),
+          wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8
                    years ago); last push 2018-02-12 (8.7 years ago)
   symfony/security-guard v5.4.45  via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
       do: find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle,
-          friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more: replace or update them; the newest release of
-          symfony/security-bundle (v8.1.9) no longer requires it
+          friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more: replace or update
+          friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more; the
+          newest release of symfony/security-bundle (v8.1.9) no longer requires it
       abandoned    marked abandoned by its registry; its repository is archived on GitHub
       age: installed v5.4.45 released 2024-09-25 (2.1 years ago), its newest release; last push 2024-10-27 (2.0
            years ago)
@@ -349,15 +347,15 @@ medium (12)
           requirements; Composer's solver checked it against the lock
       vulnerable   3 advisories: 3 medium — none fixed on 0.22.x; worst: CVE-2026-107381 svg-sanitizer: Mixed-case
                    xlink:HrEf skips the `<use>` nesting-DoS check in Resolver::processReferences
-      age: installed 0.22.0 released 2025-08-12 (1.2 years ago), the newest on 0.22.x; newest release 1.0.0
-           2026-09-01 (0.1 years ago); last push 2026-09-01 (0.1 years ago)
+      age: installed 0.22.0 released 2025-08-12 (1.2 years ago), the newest on 0.22.x; newest release 1.1.1
+           2026-10-20 (less than three weeks ago); last push 2026-10-20 (less than three weeks ago)
   symfony/expression-language v5.4.45  direct  ·  vulnerable
       8 = vulnerable 8 [unrated advisory]
       do: composer update 'symfony/expression-language:^5.4.54' (gets v5.4.54) — clears the advisory; Composer's
           solver checked it against the lock
       vulnerable   1 advisory: 1 unrated — all fixed on 5.x; advisory: CVE-2026-109449 Unbounded Nesting in the
                    Expression Parser Lets Untrusted Expressions Crash the Process
-      age: installed v5.4.45 released 2024-10-04 (2.0 years ago); 5.x last released v5.4.54 2026-10-09 (less than
+      age: installed v5.4.45 released 2024-10-04 (2.1 years ago); 5.x last released v5.4.54 2026-10-09 (less than
            three weeks ago); newest release v8.1.9 2026-10-09 (less than three weeks ago); last push 2026-10-15 (less
            than three weeks ago)
   symfony/http-foundation v5.4.50  direct  ·  vulnerable
@@ -366,31 +364,30 @@ medium (12)
           checked it against the lock
       vulnerable   1 advisory: 1 unrated — all fixed on 5.x; advisory: CVE-2026-108082 ReDoS in HeaderUtils::split()
                    Reachable Through the Cache-Control Request Header
-      age: installed v5.4.50 released 2025-11-03 (1.0 years ago); 5.x last released v5.4.54 2026-09-30 (less than
-           three weeks ago); newest release v8.1.9 2026-10-08 (less than three weeks ago); last push 2026-10-17 (less
-           than three weeks ago)
+      age: installed v5.4.50 released 2025-11-03 (1.0 years ago); 5.x last released v5.4.54 2026-09-30 (0.1 years
+           ago); newest release v8.1.9 2026-10-08 (less than three weeks ago); last push 2026-10-25 (less than three
+           weeks ago)
   phpseclib/phpseclib 3.0.55  via php-amqplib/php-amqplib, php-amqplib/rabbitmq-bundle  ·  vulnerable
       8 = vulnerable 8 [medium advisory]
       do: composer update 'phpseclib/phpseclib:^3.0.57' (gets 3.0.57) — clears the advisory; Composer's solver checked
           it against the lock
       vulnerable   1 advisory: 1 medium — all fixed on 3.x; advisory: CVE-2026-84308 phpseclib — non-constant-time
                    X25519 scalar multiplication permits full private-key recovery
-      age: installed 3.0.55 released 2026-06-14 (0.3 years ago); 3.x last released 3.0.57 2026-08-26 (0.1 years
-           ago); newest release 4.0.2 2026-10-07 (less than three weeks ago); last push 2026-10-16 (less than three
-           weeks ago)
+      age: installed 3.0.55 released 2026-06-14 (0.4 years ago); 3.x last released 3.0.57 2026-08-26 (0.2 years
+           ago); newest release 4.0.2 2026-10-07 (0.1 years ago); last push 2026-10-26 (less than three weeks ago)
   symfony/yaml v6.4.43  via nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle, sentry/sentry-symfony  ·  vulnerable
       8 = vulnerable 8 [unrated advisory]
       do: composer update 'symfony/yaml:^6.4.45' (gets v6.4.48) — clears the advisory; Composer's solver checked it
           against the lock
       vulnerable   1 advisory: 1 unrated — all fixed on 6.x; advisory: CVE-2026-109413 Unbounded Recursion in the YAML
                    Inline Lexer Lets a Single Document Crash the Process
-      age: installed v6.4.43 released 2026-07-20 (0.2 years ago); 6.x last released v6.4.48 2026-10-12 (less than
-           three weeks ago); newest release v8.1.9 2026-10-12 (less than three weeks ago); last push 2026-10-15 (less
+      age: installed v6.4.43 released 2026-07-20 (0.3 years ago); 6.x last released v6.4.48 2026-10-12 (less than
+           three weeks ago); newest release v8.1.9 2026-10-12 (less than three weeks ago); last push 2026-10-24 (less
            than three weeks ago)
   defuse/php-encryption v2.4.0  direct  ·  stale
       8 = stale 8
       do: —
-      stale        last release 2023-06-19 (3.3 years ago)
+      stale        last release 2023-06-19 (3.4 years ago)
   pragmarx/recovery v0.2.1  direct  ·  stale
       8 = stale 8
       do: —
@@ -406,31 +403,33 @@ medium (12)
   smalot/pdfparser v1.1.0  via j0k3r/graby  ·  left-behind
       8 = left-behind 16 ÷ 2 transitive
       do: move smalot/pdfparser to ^2.13 through j0k3r/graby — clears left-behind; 2.x needs php >=7.1, which
-          require.php allows; the target php 8.4 runs it; held by composer.json (requires j0k3r/graby ^2.4.6) and
-          j0k3r/graby 2.5.2 (requires ^1.1); the packages that hold it may need to move too; a new major brings its own
-          requirements; Composer's solver refuses it against the lock
+          require.php allows; the target php 8.4 runs it; held by j0k3r/graby 2.5.2 (requires ^1.1); the packages that
+          hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against
+          the lock
       left-behind  branch 1.x last released 2021-08-03 (5.2 years ago); 2.x released v2.13.1 (2026-10-13)
   symfony/psr-http-message-bridge v2.3.1  via sentry/sentry-symfony  ·  left-behind
       8 = left-behind 16 ÷ 2 transitive
       do: move symfony/psr-http-message-bridge to ^7.4 through sentry/sentry-symfony — clears left-behind; 7.x needs
           php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires
-          sentry/sentry-symfony ^5.2.0) and composer.json (requires symfony/http-foundation ^5.4.48) and
-          sentry/sentry-symfony 5.12.0 (requires ^1.2||^2.0||^6.4||^7.0||^8.0) and symfony/psr-http-message-bridge
-          v7.4.21 (requires symfony/http-foundation ^6.4|^7.0|^8.0; itself left-behind) and
-          symfony/psr-http-message-bridge v7.4.0 (conflicts with symfony/http-kernel <6.4; itself left-behind); the
+          symfony/http-foundation ^5.4.48) and symfony/psr-http-message-bridge v7.4.21, its own release (requires
+          symfony/http-foundation ^6.4|^7.0|^8.0) and symfony/psr-http-message-bridge v7.4.0, its own release (conflicts
+          with symfony/http-kernel <6.4) and sentry/sentry-symfony 5.6.0 (requires ^1.2||^2.0||^6.4||^7.0) and
+          sentry/sentry-symfony 5.12.0 (requires ^1.2||^2.0||^6.4||^7.0||^8.0) and sentry/sentry-symfony 5.13.0
+          (requires sentry/sentry ^4.31.0) and sentry/sentry-symfony 5.14.0 (requires sentry/sentry ^4.34.0); the
           packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses
           it against the lock
-      left-behind  branch 2.x last released 2023-07-26 (3.2 years ago); 8.x released v8.1.9 (2026-10-07), needs php
+      left-behind  branch 2.x last released 2023-07-26 (3.3 years ago); 8.x released v8.1.9 (2026-10-07), needs php
                    >=8.4.1 above the project's php >=8.2; 7.x released v7.4.21 (2026-10-07)
   thecodingmachine/safe v2.5.0  via scheb/2fa-google-authenticator  ·  left-behind
       8 = left-behind 16 ÷ 2 transitive
       do: move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator — clears left-behind; 3.x needs
           php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires
-          scheb/2fa-google-authenticator ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp
-          ^9.1|^10.0; itself left-behind) and spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself
-          left-behind); the packages that hold it may need to move too; a new major brings its own requirements;
-          Composer's solver refuses it against the lock
-      left-behind  branch 2.x last released 2023-04-05 (3.5 years ago); 3.x released v3.4.0 (2026-02-04)
+          scheb/2fa-bundle ^5.13.2) and spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind) and
+          scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp ^9.1|^10.0; itself left-behind) and
+          scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that
+          hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against
+          the lock
+      left-behind  branch 2.x last released 2023-04-05 (3.6 years ago); 3.x released v3.4.0 (2026-02-04)
   wallabag/rulerz-bridge dev-master  via wallabag/rulerz-bundle  ·  pinned
       8 = pinned 16 ÷ 2 transitive
       do: no tagged release to move to; review the snapshot, or replace it
@@ -441,16 +440,16 @@ low (4)
   friendsofsymfony/oauth2-php 1.3.1  via friendsofsymfony/oauth-server-bundle  ·  stale
       4 = stale 8 ÷ 2 transitive
       do: —
-      stale        last release 2021-04-06 (5.5 years ago)
+      stale        last release 2021-04-06 (5.6 years ago)
   lcobucci/clock 3.3.1  via lcobucci/jwt, scheb/2fa-trusted-device  ·  capped
       4 = capped 8 ÷ 2 transitive
       do: raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt, scheb/2fa-trusted-device
           — clears capped; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 8.2 (a minor raise); the target php 8.4
-          runs it; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it;
+          runs it; what requires it must allow it; the newest release of lcobucci/jwt (5.6.1) no longer requires it;
           Composer's solver checked it against the lock
       capped       requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded
       age: installed 3.3.1 released 2024-09-24 (2.1 years ago); 3.x last released 3.6.0 2026-04-13 (0.5 years ago),
-           its newest release; last push 2026-09-13 (0.1 years ago)
+           its newest release; last push 2026-10-24 (less than three weeks ago)
   willdurand/jsonp-callback-validator v2.0.0  via friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle  ·  stale
       4 = stale 8 ÷ 2 transitive
       do: —
@@ -461,15 +460,15 @@ low (4)
       stale        last release 2022-01-30 (4.7 years ago); last push 2023-08-03 (3.2 years ago)
 
 200 packages checked · 58 flagged: critical 3 · high 39 · medium 12 · low 4
-flags: abandoned 19 · silent 8 · pinned 4 · left-behind 13 · old-promise 10 · stale 8 · capped 1 · vulnerable 7 ·
-12 packages carry more than one
+flags: abandoned 19 · silent 8 · pinned 4 · left-behind 13 · old-promise 10 · stale 8 · capped 1 ·
+vulnerable 7 · 12 packages carry more than one
 depth: 36 of 58 flagged packages are named by no line of composer.json · direct 22 · 1 hop 20 · 2 hops 9 ·
 3 hops 5 · 4 hops 2 ·
 deepest: hoa/ustring and hoa/zformat, 4 hops (wallabag/rulerz › hoa/ruler › hoa/compiler › hoa/regex › hoa/ustring)
 security: 7 vulnerable packages · 10 advisories: 1 high, 5 medium, 4 unrated · packages-dev not checked (pass --dev)
 fix, by package: composer update 4 · upgrade 2 · no fix 1
 update now: composer update 'symfony/expression-language:^5.4.54' 'symfony/http-foundation:^5.4.54' 'phpseclib/phpseclib:^3.0.57' 'symfony/yaml:^6.4.45'
-libyears: at least 189.3 behind across 194 of 200 packages · 119.9 from direct requirements ·
+libyears: at least 189.8 behind across 194 of 200 packages · 120.2 from direct requirements ·
 furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
 scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 23 more
@@ -477,8 +476,8 @@ advisories: 200 packages asked · packagist.org answered (184 on record for 50 p
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
 gate: off · --fail-on=none (default) · target php 8.4 (--target-php)
-Data as of 2026-10-18 (package repositories; repository activity from lockrot's cache, up to 21 h old) · score model 1.
-Run composer lockrot --format=json for details.
+Data as of 2026-10-26 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+details.
 ```
 
 ## Reading the table {#the-table-format}
@@ -545,7 +544,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         "version": "0.14.0",
         "schema": 2
     },
-    "generated_at": "2026-10-18T14:33:08+00:00",
+    "generated_at": "2026-10-26T03:27:24+00:00",
     "run": {
         "project": "wallabag/wallabag",
         "root_package": "wallabag/wallabag",
@@ -1039,8 +1038,8 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             "baseline-cover": 0
         }
     },
-    "activity_cache_oldest_at": "2026-10-17T18:03:03+00:00",
-    "activity_cache_age_hours": 20.5,
+    "activity_cache_oldest_at": null,
+    "activity_cache_age_hours": null,
     "packages_checked": 200,
     "packages_flagged": 58,
     "packages_multi_flag": 12,
@@ -1255,8 +1254,8 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         ]
     },
     "libyears": {
-        "total": 189.23,
-        "direct_requirements": 119.93,
+        "total": 189.74,
+        "direct_requirements": 120.24,
         "measured": 194,
         "at_least_count": 3,
         "unmeasured": {
@@ -1341,7 +1340,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         ],
         "fix_unknown": 0
     },
-    "data_date": "2026-10-18T14:33:08+00:00",
+    "data_date": "2026-10-26T03:27:24+00:00",
     "notes": [],
     "note_details": [],
     "findings": [
@@ -1523,7 +1522,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                         "package": null,
                         "version": null,
                         "link": "root-require",
-                        "target": "scheb/2fa-google-authenticator",
+                        "target": "scheb/2fa-bundle",
                         "constraint": "^5.13.2",
                         "holder": null
                     },
@@ -1540,6 +1539,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                             "flag_ids": [
                                 "left-behind"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -1548,10 +1548,20 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                                 "check": {
                                     "result": "refused",
                                     "form": null,
-                                    "reason": null
+                                    "reason": null,
+                                    "installs": null
                                 }
                             }
                         }
+                    },
+                    {
+                        "source": "package",
+                        "package": "scheb/2fa-google-authenticator",
+                        "version": "5.x-dev",
+                        "link": "require",
+                        "target": "scheb/2fa-bundle",
+                        "constraint": "self.version",
+                        "holder": null
                     }
                 ],
                 "clears": [
@@ -1589,13 +1599,23 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "spomky-labs/otphp",
+                        "11.5.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "scheb/2fa-google-authenticator",
@@ -1606,11 +1626,13 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                             "released": "2026-01-24T13:27:55+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator — clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-google-authenticator ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator — clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "vulnerable",
@@ -1670,8 +1692,8 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                 "repo": "Spomky-Labs/otphp",
                 "event": "push",
                 "archived": false,
-                "fetched_at": "2026-10-17T18:12:09+00:00",
-                "cached_at": "2026-10-17T18:12:09+00:00"
+                "fetched_at": "2026-10-26T03:27:24+00:00",
+                "cached_at": null
             },
             "allowlist": null,
             "abandoned_ignored": null,
@@ -1764,7 +1786,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                                             "package": null,
                                             "version": null,
                                             "link": "root-require",
-                                            "target": "scheb/2fa-google-authenticator",
+                                            "target": "scheb/2fa-bundle",
                                             "constraint": "^5.13.2",
                                             "holder": null
                                         },
@@ -1781,6 +1803,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                                                 "flag_ids": [
                                                     "left-behind"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -1789,10 +1812,20 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                                                     "check": {
                                                         "result": "refused",
                                                         "form": null,
-                                                        "reason": null
+                                                        "reason": null,
+                                                        "installs": null
                                                     }
                                                 }
                                             }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "scheb/2fa-google-authenticator",
+                                            "version": "5.x-dev",
+                                            "link": "require",
+                                            "target": "scheb/2fa-bundle",
+                                            "constraint": "self.version",
+                                            "holder": null
                                         }
                                     ],
                                     "reason": null
@@ -1826,7 +1859,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                                             "package": null,
                                             "version": null,
                                             "link": "root-require",
-                                            "target": "scheb/2fa-google-authenticator",
+                                            "target": "scheb/2fa-bundle",
                                             "constraint": "^5.13.2",
                                             "holder": null
                                         },
@@ -1843,6 +1876,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                                                 "flag_ids": [
                                                     "left-behind"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -1851,10 +1885,20 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                                                     "check": {
                                                         "result": "refused",
                                                         "form": null,
-                                                        "reason": null
+                                                        "reason": null,
+                                                        "installs": null
                                                     }
                                                 }
                                             }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "scheb/2fa-google-authenticator",
+                                            "version": "5.x-dev",
+                                            "link": "require",
+                                            "target": "scheb/2fa-bundle",
+                                            "constraint": "self.version",
+                                            "holder": null
                                         }
                                     ],
                                     "reason": null
@@ -1869,7 +1913,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             ],
             "evidence": "left-behind: branch 10.x last released 2022-03-17 (4.6 years ago); 11.x released 11.5.0 (2026-06-06); vulnerable: 2 advisories: 1 high, 1 medium — none fixed on 10.x; worst: PKSA-kbc7-dq62-pt7d Unbounded digits parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation",
             "allowlist_reason": null,
-            "data_date": "2026-10-18T14:33:08+00:00",
+            "data_date": "2026-10-26T03:27:24+00:00",
             "libyears": 4.22,
             "age": {
                 "installed": {
@@ -1895,7 +1939,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                 },
                 "branch_release_unmeasured": null,
                 "push": {
-                    "at": "2026-10-01T09:04:17+00:00",
+                    "at": "2026-10-22T18:36:19+00:00",
                     "years": 0,
                     "level": null
                 },
@@ -1946,8 +1990,8 @@ advisories: 20 packages asked · packagist.org answered (25 on record for 3 pack
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
 php: without require-dev the lock installs on PHP 8.2 to 8.5, and with require-dev on PHP 8.4 to 8.5
 gate: off · --fail-on=none (default) · target php 8.4 (--target-php)
-Data as of 2026-10-18 (package repositories; repository activity from lockrot's cache, up to 23 h old) · score model 1.
-Run composer lockrot --format=json for details.
+Data as of 2026-10-26 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+details.
 ```
 
 ## Related

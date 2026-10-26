@@ -1,0 +1,6 @@
+::warning file=composer.lock,line=23,title=lockrot%3A medium — old-promise · stale::voku/stop-words 2.0.1: 9 = (old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive. Do: test it on PHP 8.4 — 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): change your own package mautic/core-lib. old-promise: released 2018-11-23 for PHP 7 (php ">=7.0.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. stale: last release 2018-11-23 (7.9 years ago). (via mautic/core-lib)
+::notice title=lockrot::1 package is not from a Composer repository: its release metadata and repository activity were not read
+flags: old-promise 1 · stale 1 · 1 package carries more than one
+depth: 1 of 1 flagged package is named by no line of composer.json · 2 hops 1 · deepest: voku/stop-words, 2 hops (mautic/core-lib › jbroadway/urlify › voku/stop-words)
+php: the lock installs on PHP 7.0 to 8.5
+gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

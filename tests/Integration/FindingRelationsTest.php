@@ -40,7 +40,7 @@ final class FindingRelationsTest extends TestCase
     public function testEveryFixtureDocumentHoldsEveryRelation(): void
     {
         $paths = self::documents();
-        self::assertCount(332, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
+        self::assertCount(337, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
         $broken = [];
         foreach (array_merge($paths, [self::COMPOSITE]) as $path) {
             $document = self::read($path);
@@ -74,8 +74,8 @@ final class FindingRelationsTest extends TestCase
         yield 'S9 without a counted advisory' => [['findings', 0, 'flags'], static fn ($flags): array => array_values(array_filter(\is_array($flags) ? $flags : [], static fn ($flag): bool => !\is_array($flag) || $flag['id'] !== 'vulnerable')), 'S9 is present'];
         yield 'the oldest cache read moved' => [['activity_cache_oldest_at'], static fn (): string => '2020-01-01T00:00:00+00:00', 'activity_cache_oldest_at'];
         yield 'a score model that is not the run one' => [['findings', 0, 'score', 'model'], static fn (): int => 99, 'score.model'];
-        yield 'a step of a move that the check refuses' => [['findings', 0, 'next_step', 'check'], static fn (): array => ['result' => 'refused', 'form' => null, 'reason' => null], 'has no update or require step'];
-        yield 'a step without its form\'s option' => [['findings', 0, 'next_step', 'check'], static fn (): array => ['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null], 'ends with --with-dependencies'];
+        yield 'a step of a move that the check refuses' => [['findings', 0, 'next_step', 'check'], static fn (): array => ['result' => 'refused', 'form' => null, 'reason' => null, 'installs' => null], 'has no update or require step'];
+        yield 'a step without its form\'s option' => [['findings', 0, 'next_step', 'check'], static fn (): array => ['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'installs' => null], 'ends with --with-dependencies'];
         yield 'an ignored advisory that S9 counts' => [['findings', 0, 'security', 'ignored'], static fn (): array => [['id' => 'PKSA-h8hf-ytnd-5t9q']], 'disjoint from the S9 rows'];
     }
 

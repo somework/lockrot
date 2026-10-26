@@ -182,15 +182,9 @@
             "clears_all": false,
             "if_applied": null,
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [],
-            "commands": [
-                [
-                    "composer",
-                    "why-not",
-                    "symfony/proxy-manager-bridge",
-                    "v6.4.28"
-                ]
-            ],
+            "commands": [],
             "through": [
                 {
                     "package": "symfony/proxy-manager-bridge",
@@ -201,7 +195,9 @@
                         "released": "2025-11-02T18:11:54+00:00"
                     },
                     "newest_requires": false,
-                    "newest_requires_unmeasured": null
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
                 }
             ],
             "also": [],

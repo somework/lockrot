@@ -12,8 +12,8 @@ use Lockrot\Solver\MoveQuery;
 
 /**
  * The move checks that a case records (`inputs.checks`), as Composer's solver answered them, with
- * their `problem` text. A key is a {@see MoveQuery::key()}, `combined <names>`, `baseline` or
- * `target_fix` ({@see solveAt()}). `*` and `combined` answer every other request and combined
+ * their `problem` text. A key is a {@see MoveQuery::key()}, `joint <key> with <holders>` (SPEC
+ * 5.6, "The requests"), `combined <names>`, `baseline` or `target_fix` ({@see solveAt()}). `*` and `combined` answer every other request and combined
  * update, and an absent `baseline` or `combined` resolves. A lenient checker leaves another request
  * `not_checked`. A strict checker, for a case with a `solver_world`, fails the test on it.
  */
@@ -26,7 +26,9 @@ final class RecordedMoveChecker implements MoveChecker
     private bool $strict;
 
     /**
-     * @param array<string, array<mixed, mixed>> $checks key => `{result, form, reason, holds, problem}`
+     * @param array<string, array<mixed, mixed>> $checks key => `{result, form, reason, installs, holds, problem}`, with
+     *                                                  `installs` the release of each name that the solve changes, or
+     *                                                  the release of the move's package
      * @param array<mixed, mixed>                $run    the case's `run.move_check`
      */
     public function __construct(array $checks, array $run, bool $strict = false)
@@ -50,7 +52,22 @@ final class RecordedMoveChecker implements MoveChecker
         }
         $check = $this->recorded($query->key(), '*');
 
-        return $check === null ? new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME)) : self::outcome($check);
+        return $check === null ? new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME)) : self::outcome($check, $query->package());
+    }
+
+    /**
+     * The answer recorded under `joint <key> with <holders>`, the holders in name order. `joint *`
+     * answers every other joint request. A request that records none is not checked.
+     */
+    public function joint(MoveQuery $query, array $holders): CheckOutcome
+    {
+        sort($holders);
+        $joint = $this->recorded('joint '.rtrim($query->key()).' with '.implode(' ', $holders), 'joint *');
+        if ($joint === null) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME));
+        }
+
+        return self::outcome($joint, $query->package())->withChanges(self::installs($joint));
     }
 
     /** As {@see \Lockrot\Solver\SolverChecker}: Composer refuses the lock itself, so lockrot asks no move of it. */
@@ -79,7 +96,7 @@ final class RecordedMoveChecker implements MoveChecker
     }
 
     /** @param array<mixed, mixed> $check */
-    private static function outcome(array $check): CheckOutcome
+    private static function outcome(array $check, ?string $package = null): CheckOutcome
     {
         $holds = [];
         foreach (\is_array($check['holds'] ?? null) ? $check['holds'] : [] as $hold) {
@@ -92,11 +109,11 @@ final class RecordedMoveChecker implements MoveChecker
             $holds[] = new Holder($source, self::text($hold, 'package'), self::text($hold, 'version'), $link, self::required($hold, 'constraint'), self::text($hold, 'target'));
         }
 
-        $outcome = self::checkOf($check);
+        $outcome = self::checkOf($check, self::text($check, 'installs') ?? ($package === null ? null : self::installs($check)[$package] ?? null));
 
         $problem = self::text($check, 'problem') ?? 'Your requirements could not be resolved to an installable set of packages.';
 
-        return new CheckOutcome($outcome, $holds, null, $outcome->isRefused() ? $problem : null);
+        return new CheckOutcome($outcome, $holds, $outcome->isRefused() ? $problem : null);
     }
 
     public function combined(array $inline): CheckOutcome
@@ -152,7 +169,7 @@ final class RecordedMoveChecker implements MoveChecker
     }
 
     /** @param array<mixed, mixed> $check */
-    private static function checkOf(array $check): MoveCheck
+    private static function checkOf(array $check, ?string $installs): MoveCheck
     {
         switch ($check['result'] ?? null) {
             case MoveCheck::RESOLVES:
@@ -161,12 +178,29 @@ final class RecordedMoveChecker implements MoveChecker
                     throw new \InvalidArgumentException('a recorded check has an unknown form');
                 }
 
-                return MoveCheck::resolves($form);
+                return MoveCheck::resolves($form, $installs);
             case MoveCheck::REFUSED:
                 return MoveCheck::refused();
             default:
                 return MoveCheck::notChecked(self::required($check, 'reason'));
         }
+    }
+
+    /**
+     * @param array<mixed, mixed> $check
+     *
+     * @return array<string, string>
+     */
+    private static function installs(array $check): array
+    {
+        $installs = [];
+        foreach (\is_array($check['installs'] ?? null) ? $check['installs'] : [] as $name => $version) {
+            if (\is_string($version)) {
+                $installs[(string) $name] = $version;
+            }
+        }
+
+        return $installs;
     }
 
     /** @param array<mixed, mixed> $row */

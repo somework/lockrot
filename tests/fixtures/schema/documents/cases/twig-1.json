@@ -1398,6 +1398,7 @@
         "pinned"
        ],
        "replacement": null,
+       "direct": true,
        "next_step": {
         "kind": "no-move",
         "to_branch": null,
@@ -1421,6 +1422,7 @@
         "vulnerable"
        ],
        "replacement": null,
+       "direct": true,
        "next_step": {
         "kind": "raise-php",
         "to_branch": "5.x",
@@ -1534,6 +1536,7 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "holders",
      "crosses_major"
@@ -1549,6 +1552,13 @@
       "composer",
       "require",
       "twig/twig:^3.27.0"
+     ],
+     [
+      "composer",
+      "why-not",
+      "twig/twig",
+      "v3.27.0",
+      "--locked"
      ]
     ],
     "through": [],
@@ -1741,6 +1751,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -1764,6 +1775,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -1822,6 +1834,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -1845,6 +1858,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -1903,6 +1917,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -1926,6 +1941,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -2020,6 +2036,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2043,6 +2060,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -2101,6 +2119,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2124,6 +2143,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -2218,6 +2238,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2241,6 +2262,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -2299,6 +2321,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2322,6 +2345,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -2380,6 +2404,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2403,6 +2428,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -2461,6 +2487,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2484,6 +2511,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -2542,6 +2570,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2565,6 +2594,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -2623,6 +2653,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2646,6 +2677,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -2704,6 +2736,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2727,6 +2760,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -2785,6 +2819,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2808,6 +2843,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",
@@ -2866,6 +2902,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2889,6 +2926,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "5.x",

@@ -1357,6 +1357,7 @@ export const d_A_baselined_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -1371,6 +1372,13 @@ export const d_A_baselined_dagger = {
                         "composer",
                         "require",
                         "twig/twig:^3.27.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "twig/twig",
+                        "v3.27.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -3378,6 +3386,7 @@ export const d_A_blocked_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -5215,6 +5224,7 @@ export const d_A_gate_critical = {
                                 "old-promise",
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -5318,6 +5328,7 @@ export const d_A_gate_critical = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -5333,6 +5344,13 @@ export const d_A_gate_critical = {
                         "composer",
                         "require",
                         "twig/twig:^3.27.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "twig/twig",
+                        "v3.27.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -5482,6 +5500,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -5542,6 +5561,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -5602,6 +5622,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -5662,6 +5683,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -5722,6 +5744,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -5782,6 +5805,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -5842,6 +5866,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -5902,6 +5927,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -5962,6 +5988,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -6022,6 +6049,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -6082,6 +6110,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -6142,6 +6171,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -6202,6 +6232,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -6262,6 +6293,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -6322,6 +6354,7 @@ export const d_A_gate_critical = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -7680,6 +7713,7 @@ export const d_A_gate_vulnerable = {
                                 "old-promise",
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -7783,6 +7817,7 @@ export const d_A_gate_vulnerable = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -7798,6 +7833,13 @@ export const d_A_gate_vulnerable = {
                         "composer",
                         "require",
                         "twig/twig:^3.27.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "twig/twig",
+                        "v3.27.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -7947,6 +7989,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8007,6 +8050,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8067,6 +8111,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8127,6 +8172,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8187,6 +8233,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8247,6 +8294,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8307,6 +8355,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8367,6 +8416,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8427,6 +8477,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8487,6 +8538,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8547,6 +8599,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8607,6 +8660,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8667,6 +8721,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8727,6 +8782,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -8787,6 +8843,7 @@ export const d_A_gate_vulnerable = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -10159,6 +10216,7 @@ export const d_A_php_star_dagger = {
                                 "old-promise",
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -10262,6 +10320,7 @@ export const d_A_php_star_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -10271,6 +10330,13 @@ export const d_A_php_star_dagger = {
                         "composer",
                         "require",
                         "twig/twig:^3.27.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "twig/twig",
+                        "v3.27.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -10420,6 +10486,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -10480,6 +10547,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -10540,6 +10608,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -10600,6 +10669,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -10660,6 +10730,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -10720,6 +10791,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -10780,6 +10852,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -10840,6 +10913,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -10900,6 +10974,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -10960,6 +11035,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -11020,6 +11096,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -11080,6 +11157,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -11140,6 +11218,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -11200,6 +11279,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -11260,6 +11340,7 @@ export const d_A_php_star_dagger = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -12618,6 +12699,7 @@ export const d_A = {
                                 "old-promise",
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -12721,6 +12803,7 @@ export const d_A = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -12736,6 +12819,13 @@ export const d_A = {
                         "composer",
                         "require",
                         "twig/twig:^3.27.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "twig/twig",
+                        "v3.27.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -12885,6 +12975,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -12945,6 +13036,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13005,6 +13097,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13065,6 +13158,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13125,6 +13219,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13185,6 +13280,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13245,6 +13341,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13305,6 +13402,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13365,6 +13463,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13425,6 +13524,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13485,6 +13585,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13545,6 +13646,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13605,6 +13707,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13665,6 +13768,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -13725,6 +13829,7 @@ export const d_A = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -15152,6 +15257,7 @@ export const d_B_accepted_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -15160,6 +15266,13 @@ export const d_B_accepted_dagger = {
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -16793,12 +16906,20 @@ export const d_B_also_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/monolog-bridge"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v2.8.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -16869,6 +16990,7 @@ export const d_B_also_dagger = {
                             ]
                         },
                         "check": null,
+                        "moves_with": [],
                         "composer_moves_because": [
                             "crosses_major"
                         ],
@@ -16877,6 +16999,13 @@ export const d_B_also_dagger = {
                                 "composer",
                                 "require",
                                 "symfony/monolog-bridge:^5.4"
+                            ],
+                            [
+                                "composer",
+                                "why-not",
+                                "symfony/monolog-bridge",
+                                "v5.4.0",
+                                "--locked"
                             ]
                         ],
                         "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
@@ -18528,6 +18657,7 @@ export const d_B_baselined_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -18536,6 +18666,13 @@ export const d_B_baselined_dagger = {
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -20234,6 +20371,7 @@ export const d_B_dev_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -20241,12 +20379,20 @@ export const d_B_dev_dagger = {
                     [
                         "composer",
                         "require",
-                        "symfony/monolog-bridge:^5.4.52"
+                        "symfony/monolog-bridge:^5.4.52",
+                        "--dev"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 (require-dev)); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 in require-dev); a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
@@ -21875,6 +22021,7 @@ export const d_B_gate_flag = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -21883,6 +22030,13 @@ export const d_B_gate_flag = {
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -23525,6 +23679,7 @@ export const d_B_gate_list = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -23533,6 +23688,13 @@ export const d_B_gate_list = {
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -25157,6 +25319,7 @@ export const d_B_gate_none = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -25165,6 +25328,13 @@ export const d_B_gate_none = {
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -26738,6 +26908,7 @@ export const d_B_offline_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -26746,6 +26917,13 @@ export const d_B_offline_dagger = {
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -28275,6 +28453,7 @@ export const d_B_offline_high_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -28283,6 +28462,13 @@ export const d_B_offline_high_dagger = {
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -29850,6 +30036,7 @@ export const d_B = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -29858,6 +30045,13 @@ export const d_B = {
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -31447,6 +31641,7 @@ export const d_C_baselined_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -32977,6 +33172,7 @@ export const d_C_bitbucket_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -34477,6 +34673,7 @@ export const d_C_gitlab_hosted_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -36020,6 +36217,7 @@ export const d_C_offline_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -37553,6 +37751,7 @@ export const d_C_tokenless_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -39045,6 +39244,7 @@ export const d_C = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -40500,6 +40700,7 @@ export const d_D_partial_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -41957,6 +42158,7 @@ export const d_D = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -43451,12 +43653,20 @@ export const d_E_ignored_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/yaml"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/yaml",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -45094,12 +45304,20 @@ export const d_E_ignored_whole_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/yaml"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/yaml",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -46719,12 +46937,20 @@ export const d_E = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/yaml"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/yaml",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -48295,6 +48521,7 @@ export const d_F = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -48305,8 +48532,9 @@ export const d_F = {
                     [
                         "composer",
                         "why-not",
-                        "guzzlehttp/guzzle",
-                        "8.2.0"
+                        "symfony/polyfill-intl-idn",
+                        "v1.38.1",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -48319,7 +48547,9 @@ export const d_F = {
                             "released": "2026-09-06T13:55:09+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -49854,12 +50084,20 @@ export const d_G_tag_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "require",
                         "friendsofsymfony/oauth-server-bundle:^1.6.2"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "friendsofsymfony/oauth-server-bundle",
+                        "1.6.2",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -51342,6 +51580,7 @@ export const d_G = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -52839,6 +53078,7 @@ export const d_abandoned_audit_ignore_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -54349,6 +54589,7 @@ export const d_abandoned_ignore_unreadable_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -55805,6 +56046,7 @@ export const d_adds_capped_raise_php = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -55819,6 +56061,13 @@ export const d_adds_capped_raise_php = {
                         "composer",
                         "require",
                         "scheb/2fa-bundle:^6.13"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-bundle",
+                        "v6.13.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -57246,6 +57495,7 @@ export const d_adds_capped_require_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -57254,6 +57504,13 @@ export const d_adds_capped_require_dagger = {
                         "composer",
                         "require",
                         "scheb/2fa-bundle:^6.13"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-bundle",
+                        "v6.13.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -58690,12 +58947,20 @@ export const d_adds_capped_tag_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "require",
                         "matomo/referrer-spam-list:^4.0.5"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "matomo/referrer-spam-list",
+                        "4.0.5",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -60304,12 +60569,20 @@ export const d_adds_capped_update = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "phpoffice/phpspreadsheet"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "phpoffice/phpspreadsheet",
+                        "1.30.7",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -60319,7 +60592,9 @@ export const d_adds_capped_update = {
                         "installed_requires": null,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "not_from_composer_repository"
+                        "newest_requires_unmeasured": "not_from_composer_repository",
+                        "local": true,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
@@ -62652,15 +62927,9 @@ export const d_affected_range_unknown_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "guzzlehttp/guzzle",
-                        "8.2.0"
-                    ]
-                ],
+                "commands": [],
                 "through": [
                     {
                         "package": "guzzlehttp/guzzle",
@@ -62671,7 +62940,9 @@ export const d_affected_range_unknown_dagger = {
                             "released": "2026-09-06T13:55:09+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -64211,6 +64482,7 @@ export const d_cache_subscriber = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -65819,15 +66091,9 @@ export const d_capped_covered_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "symfony/proxy-manager-bridge",
-                        "v6.4.28"
-                    ]
-                ],
+                "commands": [],
                 "through": [
                     {
                         "package": "symfony/proxy-manager-bridge",
@@ -65838,7 +66104,9 @@ export const d_capped_covered_dagger = {
                             "released": "2025-11-02T18:11:54+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -67444,6 +67712,7 @@ export const d_capped_local_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -70653,6 +70922,7 @@ export const d_capped_require_php = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -70667,6 +70937,13 @@ export const d_capped_require_php = {
                         "composer",
                         "require",
                         "pelago/emogrifier:^7.3"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "pelago/emogrifier",
+                        "v7.3.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -72183,12 +72460,20 @@ export const d_capped_tag_unverified_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "require",
                         "matomo/referrer-spam-list:^4.0.5"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "matomo/referrer-spam-list",
+                        "4.0.5",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -73668,12 +73953,20 @@ export const d_commonmark = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "league/commonmark"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "league/commonmark",
+                        "2.10.3",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -73686,7 +73979,9 @@ export const d_commonmark = {
                             "released": "2026-09-29T12:46:21+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "laravel/nightwatch",
@@ -73697,7 +73992,9 @@ export const d_commonmark = {
                             "released": "2026-09-18T00:37:28+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "spatie/laravel-markdown",
@@ -73708,7 +74005,9 @@ export const d_commonmark = {
                             "released": "2026-02-22T18:53:36+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
@@ -74107,12 +74406,20 @@ export const d_commonmark = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "laravel/framework"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "laravel/framework",
+                        "v12.69.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -75971,6 +76278,7 @@ export const d_composite = {
                                 "old-promise",
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -76074,6 +76382,7 @@ export const d_composite = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -76089,6 +76398,13 @@ export const d_composite = {
                         "composer",
                         "require",
                         "twig/twig:^3.27.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "twig/twig",
+                        "v3.27.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -76238,6 +76554,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -76298,6 +76615,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -76358,6 +76676,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -76418,6 +76737,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -76478,6 +76798,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -76538,6 +76859,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -76598,6 +76920,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -76658,6 +76981,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -76718,6 +77042,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -76778,6 +77103,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -76838,6 +77164,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -76898,6 +77225,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -76958,6 +77286,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -77018,6 +77347,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -77078,6 +77408,7 @@ export const d_composite = {
                                                     "old-promise",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -77384,6 +77715,7 @@ export const d_composite = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -77392,6 +77724,13 @@ export const d_composite = {
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -77881,6 +78220,7 @@ export const d_composite = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -77895,6 +78235,13 @@ export const d_composite = {
                         "composer",
                         "require",
                         "guzzlehttp/guzzle:^7.15.2"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "guzzlehttp/guzzle",
+                        "7.15.2",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -78522,6 +78869,7 @@ export const d_composite = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -78881,6 +79229,7 @@ export const d_composite = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -79221,6 +79570,7 @@ export const d_composite = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -79523,12 +79873,20 @@ export const d_composite = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "symfony/yaml"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/yaml",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -79924,6 +80282,7 @@ export const d_composite = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -79934,8 +80293,9 @@ export const d_composite = {
                     [
                         "composer",
                         "why-not",
-                        "guzzlehttp/guzzle",
-                        "8.2.0"
+                        "symfony/polyfill-intl-idn",
+                        "v1.38.1",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -79948,7 +80308,9 @@ export const d_composite = {
                             "released": "2026-09-06T13:55:09+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -80273,6 +80635,7 @@ export const d_composite = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -80285,7 +80648,9 @@ export const d_composite = {
                             "released": "2019-01-23T15:23:04+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -81778,6 +82143,7 @@ export const d_either_critical_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -81848,6 +82214,7 @@ export const d_either_critical_dagger = {
                             ]
                         },
                         "check": null,
+                        "moves_with": [],
                         "composer_moves_because": [
                             "crosses_major"
                         ],
@@ -81856,6 +82223,13 @@ export const d_either_critical_dagger = {
                                 "composer",
                                 "require",
                                 "symfony/debug:^4.4.0"
+                            ],
+                            [
+                                "composer",
+                                "why-not",
+                                "symfony/debug",
+                                "v4.4.0",
+                                "--locked"
                             ]
                         ],
                         "text": "require symfony/debug ^4.4.0 \u2014 clears the advisory; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; abandoned stays; not checked: old-promise; held by composer.json (requires ~3.4); a new major brings its own requirements, which lockrot does not solve"
@@ -83442,6 +83816,7 @@ export const d_either_low_dev_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -83454,7 +83829,9 @@ export const d_either_low_dev_dagger = {
                             "released": "2026-05-17T19:32:55+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -85031,6 +85408,7 @@ export const d_fail_on_config_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -85039,6 +85417,13 @@ export const d_fail_on_config_dagger = {
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -86657,6 +87042,7 @@ export const d_fail_on_default_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -86665,6 +87051,13 @@ export const d_fail_on_default_dagger = {
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -88259,6 +88652,7 @@ export const d_feeds_drupal_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -88273,6 +88667,13 @@ export const d_feeds_drupal_dagger = {
                         "composer",
                         "require",
                         "twig/twig:^3.27.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "twig/twig",
+                        "v3.27.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -90177,6 +90578,7 @@ export const d_flysystem = {
                                 "left-behind",
                                 "old-promise"
                             ],
+                            "direct": false,
                             "replacement": null,
                             "next_step": {
                                 "kind": "require",
@@ -90199,6 +90601,7 @@ export const d_flysystem = {
                             "flag_ids": [
                                 "stale"
                             ],
+                            "direct": false,
                             "replacement": null,
                             "next_step": {
                                 "kind": "no-move",
@@ -90237,11 +90640,20 @@ export const d_flysystem = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "league/flysystem",
+                        "3.36.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "mautic/core-lib",
@@ -90249,7 +90661,9 @@ export const d_flysystem = {
                         "installed_requires": null,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "not_from_composer_repository"
+                        "newest_requires_unmeasured": "not_from_composer_repository",
+                        "local": true,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
@@ -90428,6 +90842,7 @@ export const d_flysystem = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "require",
@@ -90450,6 +90865,7 @@ export const d_flysystem = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -91850,6 +92266,7 @@ export const d_gitlab_anon_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -91864,11 +92281,13 @@ export const d_gitlab_anon_dagger = {
                             "released": "2023-03-11T10:11:33+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package"
+                "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string"
             },
             "security": {
                 "status": "clear",
@@ -93443,6 +93862,7 @@ export const d_guzzle_5 = {
                             "flag_ids": [
                                 "stale"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "no-move",
@@ -93466,6 +93886,7 @@ export const d_guzzle_5 = {
                                 "abandoned",
                                 "capped"
                             ],
+                            "direct": true,
                             "replacement": "php-http/guzzle7-adapter",
                             "next_step": {
                                 "kind": "replace",
@@ -93574,6 +93995,7 @@ export const d_guzzle_5 = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -93583,6 +94005,13 @@ export const d_guzzle_5 = {
                         "composer",
                         "require",
                         "guzzlehttp/guzzle:^8.2"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "guzzlehttp/guzzle",
+                        "8.2.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -93811,6 +94240,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -93834,6 +94264,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -93892,6 +94323,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -93915,6 +94347,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -93973,6 +94406,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -93996,6 +94430,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -94054,6 +94489,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -94077,6 +94513,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -94135,6 +94572,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -94158,6 +94596,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -94216,6 +94655,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -94239,6 +94679,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -94297,6 +94738,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -94320,6 +94762,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -94378,6 +94821,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -94401,6 +94845,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -94459,6 +94904,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -94482,6 +94928,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -94540,6 +94987,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -94563,6 +95011,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -94621,6 +95070,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -94644,6 +95094,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -94702,6 +95153,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -94725,6 +95177,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -94783,6 +95236,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -94806,6 +95260,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -94864,6 +95319,7 @@ export const d_guzzle_5 = {
                                                 "flag_ids": [
                                                     "stale"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -94887,6 +95343,7 @@ export const d_guzzle_5 = {
                                                     "abandoned",
                                                     "capped"
                                                 ],
+                                                "direct": true,
                                                 "replacement": "php-http/guzzle7-adapter",
                                                 "next_step": {
                                                     "kind": "replace",
@@ -96408,6 +96865,7 @@ export const d_guzzle_mixed = {
                             "flag_ids": [
                                 "pinned"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "no-move",
@@ -96431,6 +96889,7 @@ export const d_guzzle_mixed = {
                                 "abandoned",
                                 "old-promise"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "find-alternative",
@@ -96454,6 +96913,7 @@ export const d_guzzle_mixed = {
                                 "abandoned",
                                 "old-promise"
                             ],
+                            "direct": false,
                             "replacement": null,
                             "next_step": {
                                 "kind": "find-alternative",
@@ -96477,6 +96937,7 @@ export const d_guzzle_mixed = {
                                 "left-behind",
                                 "old-promise"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "raise-php",
@@ -96586,6 +97047,7 @@ export const d_guzzle_mixed = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -96601,6 +97063,13 @@ export const d_guzzle_mixed = {
                         "composer",
                         "require",
                         "guzzlehttp/guzzle:^7.15.2"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "guzzlehttp/guzzle",
+                        "7.15.2",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -96827,6 +97296,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -96850,6 +97320,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -96873,6 +97344,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -96896,6 +97368,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -96954,6 +97427,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -96977,6 +97451,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97000,6 +97475,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97023,6 +97499,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -97081,6 +97558,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -97104,6 +97582,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97127,6 +97606,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97150,6 +97630,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -97208,6 +97689,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -97231,6 +97713,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97254,6 +97737,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97277,6 +97761,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -97335,6 +97820,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -97358,6 +97844,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97381,6 +97868,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97404,6 +97892,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -97462,6 +97951,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -97485,6 +97975,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97508,6 +97999,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97531,6 +98023,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -97589,6 +98082,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -97612,6 +98106,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97635,6 +98130,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97658,6 +98154,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -97716,6 +98213,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -97739,6 +98237,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97762,6 +98261,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97785,6 +98285,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -97843,6 +98344,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -97866,6 +98368,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97889,6 +98392,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -97912,6 +98416,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -97970,6 +98475,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -97993,6 +98499,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -98016,6 +98523,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -98039,6 +98547,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -98097,6 +98606,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -98120,6 +98630,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -98143,6 +98654,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -98166,6 +98678,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -98224,6 +98737,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -98247,6 +98761,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -98270,6 +98785,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -98293,6 +98809,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -98351,6 +98868,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -98374,6 +98892,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -98397,6 +98916,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -98420,6 +98940,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -98478,6 +98999,7 @@ export const d_guzzle_mixed = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -98501,6 +99023,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -98524,6 +99047,7 @@ export const d_guzzle_mixed = {
                                                     "abandoned",
                                                     "old-promise"
                                                 ],
+                                                "direct": false,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "find-alternative",
@@ -98547,6 +99071,7 @@ export const d_guzzle_mixed = {
                                                     "left-behind",
                                                     "old-promise"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -100019,6 +100544,7 @@ export const d_guzzle = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -100033,6 +100559,13 @@ export const d_guzzle = {
                         "composer",
                         "require",
                         "guzzlehttp/guzzle:^7.15.2"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "guzzlehttp/guzzle",
+                        "7.15.2",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -101858,6 +102391,7 @@ export const d_hoa_tokenless_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -101872,11 +102406,13 @@ export const d_hoa_tokenless_dagger = {
                             "released": "2023-03-11T10:11:33+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package"
+                "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string"
             },
             "security": {
                 "status": "clear",
@@ -103378,6 +103914,7 @@ export const d_hoa = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -103392,11 +103929,13 @@ export const d_hoa = {
                             "released": "2023-03-11T10:11:33+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package"
+                "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string"
             },
             "security": {
                 "status": "clear",
@@ -104912,6 +105451,7 @@ export const d_holder_vuln_dagger = {
                             "flag_ids": [
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "raise-php",
@@ -104945,6 +105485,7 @@ export const d_holder_vuln_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -104960,6 +105501,13 @@ export const d_holder_vuln_dagger = {
                         "composer",
                         "require",
                         "joomla/string:^3.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "joomla/string",
+                        "3.0.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -106460,6 +107008,7 @@ export const d_ignored_marking_archived_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -110579,6 +111128,7 @@ export const d_ignored_marking_stale_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -112095,6 +112645,7 @@ export const d_ignored_marking_unchecked_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -112103,6 +112654,13 @@ export const d_ignored_marking_unchecked_dagger = {
                         "composer",
                         "require",
                         "symfony/debug:^4.4.44"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/debug",
+                        "v4.4.44",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -113734,17 +114292,11 @@ export const d_installed_php_halved = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "web-auth/webauthn-lib",
-                        "5.3.9"
-                    ]
-                ],
+                "commands": [],
                 "through": [
                     {
                         "package": "web-auth/webauthn-lib",
@@ -113755,11 +114307,13 @@ export const d_installed_php_halved = {
                             "released": "2026-09-10T21:10:45+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it"
+                "text": "replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update web-auth/webauthn-lib; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -115242,6 +115796,7 @@ export const d_joomla_filter = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -115256,6 +115811,13 @@ export const d_joomla_filter = {
                         "composer",
                         "require",
                         "joomla/filter:^3.0.5"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "joomla/filter",
+                        "3.0.5",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -116871,6 +117433,7 @@ export const d_local_path_advisory = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -120036,6 +120599,7 @@ export const d_lock_only_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "unreached"
                 ],
@@ -121524,6 +122088,7 @@ export const d_long_range_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -121534,8 +122099,9 @@ export const d_long_range_dagger = {
                     [
                         "composer",
                         "why-not",
-                        "guzzlehttp/guzzle",
-                        "8.2.0"
+                        "symfony/polyfill-intl-idn",
+                        "v1.38.1",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -121548,7 +122114,9 @@ export const d_long_range_dagger = {
                             "released": "2026-09-06T13:55:09+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -123047,11 +123615,20 @@ export const d_many_dependents = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/event-dispatcher-contracts",
+                        "v2.5.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "babdev/pagerfanta-bundle",
@@ -123062,7 +123639,9 @@ export const d_many_dependents = {
                             "released": "2025-11-29T13:01:51+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "bdunogier/guzzle-site-authenticator",
@@ -123073,7 +123652,9 @@ export const d_many_dependents = {
                             "released": "2023-08-21T14:33:48+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "craue/config-bundle",
@@ -123084,7 +123665,9 @@ export const d_many_dependents = {
                             "released": "2026-09-15T09:43:34+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/doctrine-bundle",
@@ -123095,7 +123678,9 @@ export const d_many_dependents = {
                             "released": "2026-09-09T11:58:04+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/doctrine-migrations-bundle",
@@ -123106,7 +123691,9 @@ export const d_many_dependents = {
                             "released": "2026-08-26T05:54:54+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/jsrouting-bundle",
@@ -123117,7 +123704,9 @@ export const d_many_dependents = {
                             "released": "2025-11-04T21:03:25+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/oauth-server-bundle",
@@ -123128,7 +123717,9 @@ export const d_many_dependents = {
                             "released": "2019-01-23T15:23:04+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "installed_unlisted"
+                        "newest_requires_unmeasured": "installed_unlisted",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/rest-bundle",
@@ -123139,7 +123730,9 @@ export const d_many_dependents = {
                             "released": "2026-02-10T02:36:12+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/user-bundle",
@@ -123150,7 +123743,9 @@ export const d_many_dependents = {
                             "released": "2026-02-13T21:22:55+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "jms/serializer-bundle",
@@ -123161,7 +123756,9 @@ export const d_many_dependents = {
                             "released": "2025-11-25T21:41:31+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "kphoen/rulerz-bundle",
@@ -123172,7 +123769,9 @@ export const d_many_dependents = {
                             "released": "2018-09-17T09:02:32+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "lexik/form-filter-bundle",
@@ -123183,7 +123782,9 @@ export const d_many_dependents = {
                             "released": "2023-05-19T06:37:47+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "nelmio/api-doc-bundle",
@@ -123194,7 +123795,9 @@ export const d_many_dependents = {
                             "released": "2026-09-14T11:12:11+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "nelmio/cors-bundle",
@@ -123205,7 +123808,9 @@ export const d_many_dependents = {
                             "released": "2026-01-12T15:59:08+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "php-amqplib/rabbitmq-bundle",
@@ -123216,7 +123821,9 @@ export const d_many_dependents = {
                             "released": "2026-01-16T12:34:27+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "php-http/httplug-bundle",
@@ -123227,7 +123834,9 @@ export const d_many_dependents = {
                             "released": "2026-04-25T08:45:32+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-backup-code",
@@ -123238,7 +123847,9 @@ export const d_many_dependents = {
                             "released": "2026-01-24T13:26:10+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-bundle",
@@ -123249,7 +123860,9 @@ export const d_many_dependents = {
                             "released": "2026-07-10T18:29:30+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-email",
@@ -123260,7 +123873,9 @@ export const d_many_dependents = {
                             "released": "2026-06-02T20:21:59+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-google-authenticator",
@@ -123271,7 +123886,9 @@ export const d_many_dependents = {
                             "released": "2026-01-24T13:27:55+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-qr-code",
@@ -123282,7 +123899,9 @@ export const d_many_dependents = {
                             "released": "2022-01-03T10:21:24+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "scheb/2fa-trusted-device",
@@ -123293,7 +123912,9 @@ export const d_many_dependents = {
                             "released": "2026-01-24T13:26:10+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "sensio/framework-extra-bundle",
@@ -123304,7 +123925,9 @@ export const d_many_dependents = {
                             "released": "2023-02-24T14:57:12+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "sentry/sentry-symfony",
@@ -123315,7 +123938,9 @@ export const d_many_dependents = {
                             "released": "2026-08-28T10:41:44+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "stof/doctrine-extensions-bundle",
@@ -123326,7 +123951,9 @@ export const d_many_dependents = {
                             "released": "2026-01-23T08:45:07+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/event-dispatcher",
@@ -123337,7 +123964,9 @@ export const d_many_dependents = {
                             "released": "2026-08-21T17:47:34+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/form",
@@ -123348,7 +123977,9 @@ export const d_many_dependents = {
                             "released": "2026-09-29T12:38:40+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/framework-bundle",
@@ -123359,7 +123990,9 @@ export const d_many_dependents = {
                             "released": "2026-09-28T19:13:15+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/google-mailer",
@@ -123370,7 +124003,9 @@ export const d_many_dependents = {
                             "released": "2026-05-29T05:06:50+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/http-kernel",
@@ -123381,7 +124016,9 @@ export const d_many_dependents = {
                             "released": "2026-09-29T14:08:01+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/mailer",
@@ -123392,7 +124029,9 @@ export const d_many_dependents = {
                             "released": "2026-09-15T06:01:24+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/monolog-bundle",
@@ -123403,7 +124042,9 @@ export const d_many_dependents = {
                             "released": "2026-09-10T19:32:07+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/security-bundle",
@@ -123414,7 +124055,9 @@ export const d_many_dependents = {
                             "released": "2026-09-24T11:09:32+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/security-core",
@@ -123425,7 +124068,9 @@ export const d_many_dependents = {
                             "released": "2026-09-28T19:13:15+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/security-http",
@@ -123436,7 +124081,9 @@ export const d_many_dependents = {
                             "released": "2026-09-28T19:13:15+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/twig-bundle",
@@ -123447,7 +124094,9 @@ export const d_many_dependents = {
                             "released": "2026-09-11T14:51:16+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "twig/extra-bundle",
@@ -123458,7 +124107,9 @@ export const d_many_dependents = {
                             "released": "2026-09-11T08:59:50+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "willdurand/hateoas-bundle",
@@ -123469,7 +124120,9 @@ export const d_many_dependents = {
                             "released": "2026-07-17T20:45:53+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -124935,14 +125588,23 @@ export const d_mc_baseline_refused_dagger = {
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "typo3/html-sanitizer:^2.3.2"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "typo3/html-sanitizer",
+                        "v2.3.2",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -124994,7 +125656,8 @@ export const d_mc_baseline_refused_dagger = {
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -126519,8 +127182,10 @@ export const d_mc_composite_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "8.0.1"
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -126600,7 +127265,8 @@ export const d_mc_composite_dagger = {
                     "check": {
                         "result": "refused",
                         "form": null,
-                        "reason": null
+                        "reason": null,
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -126874,8 +127540,10 @@ export const d_mc_composite_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "with-all-dependencies",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v6.4.41"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -126934,7 +127602,8 @@ export const d_mc_composite_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "with-all-dependencies",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v6.4.41"
                     }
                 },
                 "move_in": "next_step",
@@ -127202,15 +127871,6 @@ export const d_mc_composite_dagger = {
                 "crosses_major": false,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "acme/ml-widget",
-                        "constraint": "^1.0",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "acme/ml-widget",
                         "version": "1.0.0",
@@ -127221,6 +127881,7 @@ export const d_mc_composite_dagger = {
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -127260,15 +127921,25 @@ export const d_mc_composite_dagger = {
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/mailer",
+                        "v6.4.40",
+                        "--locked"
+                    ]
+                ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+                "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "vulnerable",
@@ -127305,15 +127976,6 @@ export const d_mc_composite_dagger = {
                     "newest": "v6.4.40",
                     "held_by": [
                         {
-                            "source": "root",
-                            "package": null,
-                            "version": null,
-                            "link": "root-require",
-                            "target": "acme/ml-widget",
-                            "constraint": "^1.0",
-                            "holder": null
-                        },
-                        {
                             "source": "package",
                             "package": "acme/ml-widget",
                             "version": "1.0.0",
@@ -127324,6 +127986,7 @@ export const d_mc_composite_dagger = {
                                 "verdict": "ok",
                                 "lead": null,
                                 "flag_ids": [],
+                                "direct": true,
                                 "replacement": null,
                                 "next_step": null
                             }
@@ -127350,7 +128013,8 @@ export const d_mc_composite_dagger = {
                     "check": {
                         "result": "refused",
                         "form": null,
-                        "reason": null
+                        "reason": null,
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -127435,15 +128099,6 @@ export const d_mc_composite_dagger = {
                                     "admits_project_php": true,
                                     "held_by": [
                                         {
-                                            "source": "root",
-                                            "package": null,
-                                            "version": null,
-                                            "link": "root-require",
-                                            "target": "acme/ml-widget",
-                                            "constraint": "^1.0",
-                                            "holder": null
-                                        },
-                                        {
                                             "source": "package",
                                             "package": "acme/ml-widget",
                                             "version": "1.0.0",
@@ -127454,6 +128109,7 @@ export const d_mc_composite_dagger = {
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }
@@ -127658,8 +128314,10 @@ export const d_mc_composite_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "with-dependencies",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v6.4.41"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -127718,7 +128376,8 @@ export const d_mc_composite_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "with-dependencies",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v6.4.41"
                     }
                 },
                 "move_in": "next_step",
@@ -128009,8 +128668,10 @@ export const d_mc_composite_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v6.4.40"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -128074,7 +128735,8 @@ export const d_mc_composite_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v6.4.40"
                     }
                 },
                 "move_in": "next_step",
@@ -128365,8 +129027,10 @@ export const d_mc_composite_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v2.3.2"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -128424,7 +129088,8 @@ export const d_mc_composite_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v2.3.2"
                     }
                 },
                 "move_in": "next_step",
@@ -129889,8 +130554,10 @@ export const d_mc_dev_update_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "2.12.3"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -129909,7 +130576,9 @@ export const d_mc_dev_update_dagger = {
                             "released": "2026-09-06T13:55:09+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -129960,7 +130629,8 @@ export const d_mc_dev_update_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "2.12.3"
                     }
                 },
                 "move_in": "next_step",
@@ -130119,6 +130789,3037 @@ export const d_mc_dev_update_dagger = {
                             {
                                 "kind": "advisory",
                                 "id": "PKSA-vznr-tgp9-fd7d"
+                            }
+                        ]
+                    }
+                ],
+                "basis": null
+            }
+        }
+    ]
+} satisfies Report2;
+
+export const d_mc_gets_below_dagger = {
+    "$schema": "https://lockrot.dev/schema/report-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-10-01T17:41:20+00:00",
+    "run": {
+        "project": "typo3/cms",
+        "root_package": "typo3/cms",
+        "target_php": "8.4",
+        "target_php_source": "option",
+        "project_php": "^8.1",
+        "project_php_lowest": "8.1.0",
+        "lock_file": "composer.lock",
+        "fail_on": "high",
+        "fail_on_source": "option",
+        "gates": [
+            {
+                "value": "high",
+                "kind": "grade",
+                "threshold": "high"
+            }
+        ],
+        "strict_network": false,
+        "mode": "check",
+        "include_dev": false,
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flag_ids": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale",
+            "capped",
+            "vulnerable"
+        ],
+        "verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "unknown",
+            "finished",
+            "ok"
+        ],
+        "graded_verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+        ],
+        "signal_ids": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10",
+            "S11"
+        ],
+        "fix_model": 1,
+        "text_grammar": 1,
+        "score_model": {
+            "id": 1,
+            "score_text_grammar": 1,
+            "flag_order": [
+                "abandoned",
+                "silent",
+                "pinned",
+                "left-behind",
+                "old-promise",
+                "stale",
+                "capped",
+                "vulnerable"
+            ],
+            "parts": [
+                {
+                    "id": "maintenance",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "pinned",
+                        "left-behind",
+                        "old-promise",
+                        "stale",
+                        "capped"
+                    ],
+                    "combine": "lead_plus_share"
+                },
+                {
+                    "id": "security",
+                    "flag_ids": [
+                        "vulnerable"
+                    ],
+                    "combine": "max"
+                }
+            ],
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "abandoned",
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S1",
+                        "S3"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "silent",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "silent",
+                        "pinned",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-high-years",
+                        "push-high-years"
+                    ],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "pinned",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 22,
+                    "max_maintenance_flags": [
+                        "pinned",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S6"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "left-behind",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 20,
+                    "max_maintenance_flags": [
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S8"
+                    ],
+                    "thresholds": [
+                        "release-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "old-promise",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 18,
+                    "max_maintenance_flags": [
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S5"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "stale",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 10,
+                    "max_maintenance_flags": [
+                        "stale",
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-warn-years",
+                        "push-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "vulnerable",
+                    "part": "security",
+                    "points": null,
+                    "band": null,
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": null,
+                    "max_maintenance_flags": null,
+                    "raised_by": [
+                        "S9"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "severities"
+                    },
+                    "points_from": "severities"
+                }
+            ],
+            "severities": [
+                {
+                    "id": "critical",
+                    "points": 32,
+                    "band": "critical",
+                    "points_no_reachable_fix": 64,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 4,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "high",
+                    "points": 16,
+                    "band": "high",
+                    "points_no_reachable_fix": 32,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 3,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "unrated",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": "medium",
+                    "basis": {
+                        "points": "counts_as"
+                    }
+                },
+                {
+                    "id": "low",
+                    "points": 2,
+                    "band": "low",
+                    "points_no_reachable_fix": 4,
+                    "band_no_reachable_fix": "low",
+                    "gate_rank": 1,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "share",
+                        "of": "medium",
+                        "share": {
+                            "num": 1,
+                            "den": 4
+                        }
+                    }
+                }
+            ],
+            "fix_kinds": [
+                {
+                    "id": "update",
+                    "ease": 1,
+                    "doubles": false
+                },
+                {
+                    "id": "upgrade",
+                    "ease": 2,
+                    "doubles": false
+                },
+                {
+                    "id": "raise-php",
+                    "ease": 3,
+                    "doubles": false
+                },
+                {
+                    "id": "unknown",
+                    "ease": 4,
+                    "doubles": false
+                },
+                {
+                    "id": "blocked",
+                    "ease": 5,
+                    "doubles": true
+                },
+                {
+                    "id": "none",
+                    "ease": 6,
+                    "doubles": true
+                }
+            ],
+            "bands": [
+                {
+                    "verdict": "critical",
+                    "floor": 32
+                },
+                {
+                    "verdict": "high",
+                    "floor": 16
+                },
+                {
+                    "verdict": "medium",
+                    "floor": 8
+                },
+                {
+                    "verdict": "low",
+                    "floor": 1
+                }
+            ],
+            "zero_verdicts": [
+                {
+                    "verdict": "finished",
+                    "when": "allowlisted"
+                },
+                {
+                    "verdict": "unknown",
+                    "when": "no_metadata"
+                },
+                {
+                    "verdict": "ok",
+                    "when": "otherwise"
+                }
+            ],
+            "exact_unit": 0.5,
+            "rounding": "floor_once",
+            "max_total": 104,
+            "bar_max": 64,
+            "bar_overflow": "clip",
+            "exclusive_groups": [
+                {
+                    "id": "liveness",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "stale"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "branch",
+                    "flag_ids": [
+                        "pinned",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_age",
+                    "flag_ids": [
+                        "silent",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_push",
+                    "flag_ids": [
+                        "left-behind",
+                        "stale"
+                    ],
+                    "holds_unless": {
+                        "threshold": "push-warn-years",
+                        "below": "release-warn-years"
+                    }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
+                }
+            ],
+            "sort": [
+                {
+                    "key": "verdict",
+                    "path": "verdict",
+                    "dir": "order",
+                    "order": [
+                        [
+                            "critical"
+                        ],
+                        [
+                            "high"
+                        ],
+                        [
+                            "medium"
+                        ],
+                        [
+                            "low"
+                        ],
+                        [
+                            "unknown"
+                        ],
+                        [
+                            "finished",
+                            "ok"
+                        ]
+                    ],
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "security",
+                    "path": "score.parts.security.contribution",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "score",
+                    "path": "score.exact",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "direct",
+                    "path": "direct",
+                    "dir": "true_first",
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "package",
+                    "path": "package",
+                    "dir": "asc",
+                    "collation": "bytes",
+                    "default": null
+                }
+            ],
+            "rules": [
+                {
+                    "id": "counted",
+                    "stage": 1,
+                    "kind": "select",
+                    "applies_to": "flags",
+                    "accept_group": "liveness",
+                    "accept_covers": "listed_and_below",
+                    "why": "accepted-facts-shown-not-counted",
+                    "doc": "score-counted",
+                    "illustration": null
+                },
+                {
+                    "id": "lead-first",
+                    "stage": 2,
+                    "kind": "select",
+                    "applies_to": "maintenance",
+                    "order": "flag_order",
+                    "share": {
+                        "num": 1,
+                        "den": 1
+                    },
+                    "why": "strongest-fact-in-full",
+                    "doc": "score-lead-first",
+                    "illustration": null
+                },
+                {
+                    "id": "corroborating-share",
+                    "stage": 3,
+                    "kind": "share",
+                    "applies_to": "maintenance",
+                    "share": {
+                        "num": 1,
+                        "den": 4
+                    },
+                    "why": "correlated-evidence",
+                    "doc": "score-corroborating-share",
+                    "illustration": {
+                        "lead": "left-behind",
+                        "flag": "old-promise",
+                        "weight": 16,
+                        "points": 4
+                    }
+                },
+                {
+                    "id": "advisory-points",
+                    "stage": 4,
+                    "kind": "lookup",
+                    "applies_to": "security",
+                    "table": "severities",
+                    "why": "severity-points",
+                    "doc": "score-advisory-points",
+                    "illustration": null
+                },
+                {
+                    "id": "no-reachable-fix-multiplier",
+                    "stage": 5,
+                    "kind": "multiply",
+                    "applies_to": "advisory",
+                    "factor": 2,
+                    "when_fix": [
+                        "none",
+                        "blocked"
+                    ],
+                    "why": "one-band-up",
+                    "doc": "score-no-reachable-fix-multiplier",
+                    "illustration": {
+                        "severity": "high",
+                        "before": 16,
+                        "after": 32,
+                        "band_before": "high",
+                        "band_after": "critical"
+                    }
+                },
+                {
+                    "id": "security-max",
+                    "stage": 6,
+                    "kind": "max",
+                    "applies_to": "security",
+                    "tie_break": [
+                        {
+                            "key": "points",
+                            "dir": "desc",
+                            "collation": null
+                        },
+                        {
+                            "key": "severity",
+                            "dir": "order",
+                            "collation": null
+                        },
+                        {
+                            "key": "id",
+                            "dir": "asc",
+                            "collation": "bytes"
+                        }
+                    ],
+                    "why": "one-number-per-part",
+                    "doc": "score-security-max",
+                    "illustration": null
+                },
+                {
+                    "id": "divide-reach",
+                    "stage": 7,
+                    "kind": "divide",
+                    "applies_to": "maintenance",
+                    "by": 2,
+                    "when": [
+                        "transitive",
+                        "unreached"
+                    ],
+                    "why": "reach-halves-maintenance",
+                    "doc": "score-divide-reach",
+                    "illustration": {
+                        "flag": "abandoned",
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "security-exempt-from-reach",
+                    "stage": 8,
+                    "kind": "exempt",
+                    "applies_to": "security",
+                    "of": "divide-reach",
+                    "why": "exploitability-independent-of-reach",
+                    "doc": "score-security-exempt-from-reach",
+                    "illustration": {
+                        "severity": "critical",
+                        "reach": "transitive",
+                        "total": 32
+                    }
+                },
+                {
+                    "id": "sum",
+                    "stage": 9,
+                    "kind": "combine",
+                    "applies_to": "total",
+                    "op": "sum",
+                    "ratio_from": "medium",
+                    "why": "parts-add",
+                    "doc": "score-sum",
+                    "illustration": {
+                        "maintenance": 16,
+                        "security": 16,
+                        "total": 32,
+                        "band": "critical",
+                        "low_maintenance": 4,
+                        "low_security": 4,
+                        "low_total": 8,
+                        "low_band": "medium"
+                    }
+                },
+                {
+                    "id": "divide-dev",
+                    "stage": 10,
+                    "kind": "divide",
+                    "applies_to": "total",
+                    "by": 2,
+                    "when": [
+                        "dev"
+                    ],
+                    "why": "dev-halves-total",
+                    "doc": "score-divide-dev",
+                    "illustration": {
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "floor-once",
+                    "stage": 11,
+                    "kind": "floor",
+                    "applies_to": "total",
+                    "why": "integer-band-edges",
+                    "doc": "score-floor-once",
+                    "illustration": {
+                        "exact": 4.5,
+                        "total": 4
+                    }
+                },
+                {
+                    "id": "band-floors",
+                    "stage": 12,
+                    "kind": "band",
+                    "applies_to": "total",
+                    "ratio": 2,
+                    "ratio_from": "medium",
+                    "why": "two-floor-parts-make-next",
+                    "doc": "score-band-floors",
+                    "illustration": null
+                },
+                {
+                    "id": "zero-verdicts",
+                    "stage": 13,
+                    "kind": "zero",
+                    "applies_to": "total",
+                    "table": "zero_verdicts",
+                    "why": "score-zero-says-why",
+                    "doc": "score-zero-verdicts",
+                    "illustration": null
+                },
+                {
+                    "id": "sort",
+                    "stage": 14,
+                    "kind": "order",
+                    "applies_to": "findings",
+                    "why": "advisory-findings-first",
+                    "doc": "score-sort",
+                    "illustration": null
+                },
+                {
+                    "id": "gate-bounded-new",
+                    "stage": 15,
+                    "kind": "gate",
+                    "applies_to": "gate",
+                    "cap_multiplier": 2,
+                    "why": "new-fact-sets-level",
+                    "doc": "score-gate-bounded-new",
+                    "illustration": {
+                        "score": 36,
+                        "new": 16,
+                        "gate": 32
+                    }
+                },
+                {
+                    "id": "baseline-cover",
+                    "stage": 16,
+                    "kind": "cover",
+                    "applies_to": "gate",
+                    "order": "flag_order",
+                    "covers": "listed_and_below",
+                    "why": "recorded-lead-covers-below",
+                    "doc": "score-baseline-cover",
+                    "illustration": null
+                }
+            ],
+            "docs": "https://lockrot.dev/verdicts/model-1/"
+        },
+        "advisory_lookup": {
+            "scope": "all",
+            "scope_source": "default",
+            "packages_asked": 1,
+            "packages_not_asked": 0,
+            "other_repositories": 0,
+            "repositories": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "outcome": "answered",
+                    "reason": null,
+                    "message": null,
+                    "packages_with_records": 1,
+                    "records": 4
+                }
+            ]
+        },
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": false,
+            "ignores_extensions": true,
+            "baseline": "resolves",
+            "reason": null
+        },
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.1.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^8.1",
+                            "dev": false
+                        },
+                        {
+                            "name": "symfony/routing",
+                            "version": "v6.4.28",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.1.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^8.1",
+                            "dev": false
+                        },
+                        {
+                            "name": "symfony/routing",
+                            "version": "v6.4.28",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": true
+            },
+            "target_fix": null
+        },
+        "score_rules_used": {
+            "counted": 0,
+            "lead-first": 0,
+            "corroborating-share": 0,
+            "advisory-points": 1,
+            "no-reachable-fix-multiplier": 0,
+            "security-max": 0,
+            "divide-reach": 0,
+            "security-exempt-from-reach": 0,
+            "sum": 0,
+            "divide-dev": 0,
+            "floor-once": 0,
+            "band-floors": 1,
+            "zero-verdicts": 0,
+            "sort": null,
+            "gate-bounded-new": 0,
+            "baseline-cover": 0
+        }
+    },
+    "activity_cache_oldest_at": null,
+    "activity_cache_age_hours": null,
+    "packages_checked": 1,
+    "packages_flagged": 1,
+    "packages_multi_flag": 0,
+    "include_dev": false,
+    "not_from_composer_repository": 0,
+    "packages_unchecked_accepted": 0,
+    "network_failures": false,
+    "counts": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0,
+        "unknown": 0,
+        "finished": 0,
+        "ok": 0
+    },
+    "abandoned": {
+        "total": 0,
+        "with_replacement": 0,
+        "with_suggestion": 0
+    },
+    "priorities": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0,
+        "none": 0
+    },
+    "flags": {
+        "abandoned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "silent": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "pinned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "left-behind": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "old-promise": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "stale": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "capped": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "vulnerable": {
+            "carrying": 1,
+            "leading": null,
+            "accepted": null,
+            "by_verdict": {
+                "critical": 0,
+                "high": 1,
+                "medium": 0,
+                "low": 0
+            }
+        }
+    },
+    "exposure": [],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
+    "rot_depth": {
+        "flagged": 1,
+        "measured": 1,
+        "unmeasured": {
+            "unreached": 0,
+            "no_composer_json": 0
+        },
+        "by_reach": {
+            "direct": 1,
+            "transitive": 0,
+            "unreached": 0
+        },
+        "not_in_composer_json": 0,
+        "require_dev_not_walked": 0,
+        "production": 1,
+        "development": 0,
+        "by_depth": [
+            {
+                "depth": 0,
+                "flagged": 1
+            }
+        ],
+        "max_depth": 0,
+        "deepest": []
+    },
+    "libyears": {
+        "total": 0.67,
+        "direct_requirements": 0.67,
+        "measured": 1,
+        "at_least_count": 0,
+        "unmeasured": {
+            "not_from_composer_repository": 0,
+            "unavailable": 0,
+            "not_found": 0,
+            "branch_snapshot": 0,
+            "shared_commit": 0,
+            "undated": 0,
+            "no_stable_release": 0,
+            "undated_releases": 0
+        },
+        "furthest_behind": {
+            "package": "symfony/routing",
+            "version": "v6.4.28",
+            "libyears": 0.67,
+            "at_least": false
+        },
+        "packages": 1
+    },
+    "baseline": null,
+    "gate": {
+        "fails": true,
+        "tripped_by": [
+            "fail_on"
+        ],
+        "fail_on_applied": true,
+        "reaching": 1,
+        "failing": 1,
+        "exempt": {
+            "baseline": 0
+        },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/routing"
+        ],
+        "failing_by": [
+            {
+                "value": "high",
+                "failing": 1
+            }
+        ],
+        "not_applied": [],
+        "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+    },
+    "security": {
+        "check": "complete",
+        "packages": {
+            "vulnerable": 1,
+            "unchecked": 0,
+            "ignored": 0,
+            "clear": 0
+        },
+        "advisories": {
+            "counted": 1,
+            "ignored": 0
+        },
+        "severities": {
+            "critical": 0,
+            "high": 1,
+            "medium": 0,
+            "unrated": 0,
+            "low": 0
+        },
+        "fixes": {
+            "update": 1,
+            "upgrade": 0,
+            "raise-php": 0,
+            "unknown": 0,
+            "blocked": 0,
+            "none": 0
+        },
+        "update_now": [
+            "symfony/routing"
+        ],
+        "update_now_command": [
+            "composer",
+            "update",
+            "symfony/routing:^6.4.40"
+        ],
+        "fix_unknown": 0
+    },
+    "data_date": "2026-10-01T17:41:20+00:00",
+    "notes": [],
+    "note_details": [],
+    "findings": [
+        {
+            "package": "symfony/routing",
+            "version": "v6.4.28",
+            "branch": "6.x",
+            "installed_php": {
+                "requires": ">=8.1",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "high",
+            "priority": "high",
+            "lead": null,
+            "rank": 1,
+            "flags": [
+                {
+                    "id": "vulnerable",
+                    "role": "security",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S9"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "advisories",
+                        "value": 1,
+                        "source": null
+                    },
+                    "summary": "1 advisory: 1 high \u2014 all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 16,
+                "exact": 16,
+                "rounded_down": false,
+                "band": {
+                    "floor": 16,
+                    "next": "critical",
+                    "to_next": 16
+                },
+                "decided_by": "security",
+                "parts": {
+                    "maintenance": {
+                        "status": "none",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        }
+                    },
+                    "security": {
+                        "status": "counted",
+                        "contribution": 16,
+                        "alone": {
+                            "total": 16,
+                            "verdict": "high"
+                        },
+                        "of": 1,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "security",
+                        "flag": "vulnerable",
+                        "role": "security",
+                        "advisory": "PKSA-bf7t-jnpz-492k",
+                        "severity": "high",
+                        "fix_kind": "update",
+                        "weight": 16,
+                        "multiplier": 1,
+                        "points": 16,
+                        "contribution": 16
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [],
+                "text": "16 = vulnerable 16 [high advisory]"
+            },
+            "next_step": {
+                "kind": "update",
+                "source": "vulnerable",
+                "merged": [],
+                "fix_kind": "update",
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "6.x",
+                "version": "v6.4.40",
+                "newest": "v6.4.41",
+                "constraint": null,
+                "latest": null,
+                "php_check": {
+                    "requires": ">=8.1",
+                    "project_allows": true,
+                    "target_runs": true,
+                    "raise_to": null,
+                    "raise_size": null
+                },
+                "crosses_major": false,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-bf7t-jnpz-492k",
+                        "basis": "outside_range"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold"
+                    ]
+                },
+                "check": {
+                    "result": "resolves",
+                    "form": "inline",
+                    "reason": null,
+                    "installs": "v6.4.40"
+                },
+                "moves_with": [],
+                "composer_moves_because": [],
+                "commands": [
+                    [
+                        "composer",
+                        "update",
+                        "symfony/routing:^6.4.40"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "composer update 'symfony/routing:^6.4.40' (gets v6.4.40, below the newest v6.4.41) \u2014 clears the advisory; Composer's solver checked it against the lock"
+            },
+            "security": {
+                "status": "vulnerable",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 4,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 4,
+                        "reason": null
+                    }
+                ],
+                "worst": "high",
+                "counts": {
+                    "critical": 0,
+                    "high": 1,
+                    "medium": 0,
+                    "unrated": 0,
+                    "low": 0
+                },
+                "ignored": [],
+                "ignored_count": 0,
+                "fix_kind": "update",
+                "installed_branch_fixes": {
+                    "fixed": 1,
+                    "unknown": 0,
+                    "of": 1,
+                    "fix_kind": "update",
+                    "lowest": "v6.4.40",
+                    "newest": "v6.4.41",
+                    "held_by": [],
+                    "if_applied": {
+                        "total": 0,
+                        "verdict": "ok",
+                        "at_most": false,
+                        "assumes": [
+                            "clears_hold"
+                        ]
+                    },
+                    "check": {
+                        "result": "resolves",
+                        "form": "inline",
+                        "reason": null,
+                        "installs": "v6.4.40"
+                    }
+                },
+                "move_in": "next_step",
+                "gets": {
+                    "version": "v6.4.40",
+                    "php_check": {
+                        "requires": ">=8.1",
+                        "project_allows": true,
+                        "target_runs": true,
+                        "raise_to": null,
+                        "raise_size": null
+                    },
+                    "clears": [
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-bf7t-jnpz-492k",
+                            "basis": "outside_range"
+                        }
+                    ],
+                    "clears_all": true
+                },
+                "partial": null
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "symfony/routing",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/symfony/routing",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "symfony/routing"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "symfony/routing"
+            ],
+            "signals": [
+                {
+                    "id": "S9",
+                    "level": "high",
+                    "summary": "1 security advisory affects v6.4.28 (CVE-2026-48784); fixed in v6.4.40",
+                    "data": {
+                        "advisories": [
+                            {
+                                "id": "PKSA-bf7t-jnpz-492k",
+                                "cve": "CVE-2026-48784",
+                                "title": "UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+                                "link": "https://symfony.com/cve-2026-48784",
+                                "reported_at": "2026-05-26T08:00:00+00:00",
+                                "severity": "high",
+                                "severity_published": "high",
+                                "affected_versions": ">=6.4.0,<6.4.40",
+                                "counted": true,
+                                "points": 16,
+                                "deciding": true,
+                                "fix": {
+                                    "kind": "update",
+                                    "to_branch": "6.x",
+                                    "version": "v6.4.40",
+                                    "newest": "v6.4.41",
+                                    "on_installed_branch": true,
+                                    "php": ">=8.1",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            }
+                        ],
+                        "releases_read": true,
+                        "complete": true
+                    }
+                }
+            ],
+            "evidence": "vulnerable: 1 advisory: 1 high \u2014 all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0.67,
+            "age": {
+                "installed": {
+                    "at": "2025-10-31T16:43:05+00:00",
+                    "years": 0.9,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "v6.4.41",
+                    "at": "2026-07-04T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "v6.4.41",
+                    "at": "2026-07-04T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-29T14:09:10+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": true,
+                "fails": true,
+                "exempt_by": null,
+                "by": [
+                    {
+                        "value": "high",
+                        "kind": "grade",
+                        "facts": [
+                            {
+                                "kind": "advisory",
+                                "id": "PKSA-bf7t-jnpz-492k"
+                            }
+                        ]
+                    }
+                ],
+                "basis": null
+            }
+        }
+    ]
+} satisfies Report2;
+
+export const d_mc_gets_next_form_dagger = {
+    "$schema": "https://lockrot.dev/schema/report-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-10-01T17:41:20+00:00",
+    "run": {
+        "project": "typo3/cms",
+        "root_package": "typo3/cms",
+        "target_php": "8.4",
+        "target_php_source": "option",
+        "project_php": "^8.1",
+        "project_php_lowest": "8.1.0",
+        "lock_file": "composer.lock",
+        "fail_on": "high",
+        "fail_on_source": "option",
+        "gates": [
+            {
+                "value": "high",
+                "kind": "grade",
+                "threshold": "high"
+            }
+        ],
+        "strict_network": false,
+        "mode": "check",
+        "include_dev": false,
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flag_ids": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale",
+            "capped",
+            "vulnerable"
+        ],
+        "verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "unknown",
+            "finished",
+            "ok"
+        ],
+        "graded_verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+        ],
+        "signal_ids": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10",
+            "S11"
+        ],
+        "fix_model": 1,
+        "text_grammar": 1,
+        "score_model": {
+            "id": 1,
+            "score_text_grammar": 1,
+            "flag_order": [
+                "abandoned",
+                "silent",
+                "pinned",
+                "left-behind",
+                "old-promise",
+                "stale",
+                "capped",
+                "vulnerable"
+            ],
+            "parts": [
+                {
+                    "id": "maintenance",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "pinned",
+                        "left-behind",
+                        "old-promise",
+                        "stale",
+                        "capped"
+                    ],
+                    "combine": "lead_plus_share"
+                },
+                {
+                    "id": "security",
+                    "flag_ids": [
+                        "vulnerable"
+                    ],
+                    "combine": "max"
+                }
+            ],
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "abandoned",
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S1",
+                        "S3"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "silent",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "silent",
+                        "pinned",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-high-years",
+                        "push-high-years"
+                    ],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "pinned",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 22,
+                    "max_maintenance_flags": [
+                        "pinned",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S6"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "left-behind",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 20,
+                    "max_maintenance_flags": [
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S8"
+                    ],
+                    "thresholds": [
+                        "release-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "old-promise",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 18,
+                    "max_maintenance_flags": [
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S5"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "stale",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 10,
+                    "max_maintenance_flags": [
+                        "stale",
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-warn-years",
+                        "push-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "vulnerable",
+                    "part": "security",
+                    "points": null,
+                    "band": null,
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": null,
+                    "max_maintenance_flags": null,
+                    "raised_by": [
+                        "S9"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "severities"
+                    },
+                    "points_from": "severities"
+                }
+            ],
+            "severities": [
+                {
+                    "id": "critical",
+                    "points": 32,
+                    "band": "critical",
+                    "points_no_reachable_fix": 64,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 4,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "high",
+                    "points": 16,
+                    "band": "high",
+                    "points_no_reachable_fix": 32,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 3,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "unrated",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": "medium",
+                    "basis": {
+                        "points": "counts_as"
+                    }
+                },
+                {
+                    "id": "low",
+                    "points": 2,
+                    "band": "low",
+                    "points_no_reachable_fix": 4,
+                    "band_no_reachable_fix": "low",
+                    "gate_rank": 1,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "share",
+                        "of": "medium",
+                        "share": {
+                            "num": 1,
+                            "den": 4
+                        }
+                    }
+                }
+            ],
+            "fix_kinds": [
+                {
+                    "id": "update",
+                    "ease": 1,
+                    "doubles": false
+                },
+                {
+                    "id": "upgrade",
+                    "ease": 2,
+                    "doubles": false
+                },
+                {
+                    "id": "raise-php",
+                    "ease": 3,
+                    "doubles": false
+                },
+                {
+                    "id": "unknown",
+                    "ease": 4,
+                    "doubles": false
+                },
+                {
+                    "id": "blocked",
+                    "ease": 5,
+                    "doubles": true
+                },
+                {
+                    "id": "none",
+                    "ease": 6,
+                    "doubles": true
+                }
+            ],
+            "bands": [
+                {
+                    "verdict": "critical",
+                    "floor": 32
+                },
+                {
+                    "verdict": "high",
+                    "floor": 16
+                },
+                {
+                    "verdict": "medium",
+                    "floor": 8
+                },
+                {
+                    "verdict": "low",
+                    "floor": 1
+                }
+            ],
+            "zero_verdicts": [
+                {
+                    "verdict": "finished",
+                    "when": "allowlisted"
+                },
+                {
+                    "verdict": "unknown",
+                    "when": "no_metadata"
+                },
+                {
+                    "verdict": "ok",
+                    "when": "otherwise"
+                }
+            ],
+            "exact_unit": 0.5,
+            "rounding": "floor_once",
+            "max_total": 104,
+            "bar_max": 64,
+            "bar_overflow": "clip",
+            "exclusive_groups": [
+                {
+                    "id": "liveness",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "stale"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "branch",
+                    "flag_ids": [
+                        "pinned",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_age",
+                    "flag_ids": [
+                        "silent",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_push",
+                    "flag_ids": [
+                        "left-behind",
+                        "stale"
+                    ],
+                    "holds_unless": {
+                        "threshold": "push-warn-years",
+                        "below": "release-warn-years"
+                    }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
+                }
+            ],
+            "sort": [
+                {
+                    "key": "verdict",
+                    "path": "verdict",
+                    "dir": "order",
+                    "order": [
+                        [
+                            "critical"
+                        ],
+                        [
+                            "high"
+                        ],
+                        [
+                            "medium"
+                        ],
+                        [
+                            "low"
+                        ],
+                        [
+                            "unknown"
+                        ],
+                        [
+                            "finished",
+                            "ok"
+                        ]
+                    ],
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "security",
+                    "path": "score.parts.security.contribution",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "score",
+                    "path": "score.exact",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "direct",
+                    "path": "direct",
+                    "dir": "true_first",
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "package",
+                    "path": "package",
+                    "dir": "asc",
+                    "collation": "bytes",
+                    "default": null
+                }
+            ],
+            "rules": [
+                {
+                    "id": "counted",
+                    "stage": 1,
+                    "kind": "select",
+                    "applies_to": "flags",
+                    "accept_group": "liveness",
+                    "accept_covers": "listed_and_below",
+                    "why": "accepted-facts-shown-not-counted",
+                    "doc": "score-counted",
+                    "illustration": null
+                },
+                {
+                    "id": "lead-first",
+                    "stage": 2,
+                    "kind": "select",
+                    "applies_to": "maintenance",
+                    "order": "flag_order",
+                    "share": {
+                        "num": 1,
+                        "den": 1
+                    },
+                    "why": "strongest-fact-in-full",
+                    "doc": "score-lead-first",
+                    "illustration": null
+                },
+                {
+                    "id": "corroborating-share",
+                    "stage": 3,
+                    "kind": "share",
+                    "applies_to": "maintenance",
+                    "share": {
+                        "num": 1,
+                        "den": 4
+                    },
+                    "why": "correlated-evidence",
+                    "doc": "score-corroborating-share",
+                    "illustration": {
+                        "lead": "left-behind",
+                        "flag": "old-promise",
+                        "weight": 16,
+                        "points": 4
+                    }
+                },
+                {
+                    "id": "advisory-points",
+                    "stage": 4,
+                    "kind": "lookup",
+                    "applies_to": "security",
+                    "table": "severities",
+                    "why": "severity-points",
+                    "doc": "score-advisory-points",
+                    "illustration": null
+                },
+                {
+                    "id": "no-reachable-fix-multiplier",
+                    "stage": 5,
+                    "kind": "multiply",
+                    "applies_to": "advisory",
+                    "factor": 2,
+                    "when_fix": [
+                        "none",
+                        "blocked"
+                    ],
+                    "why": "one-band-up",
+                    "doc": "score-no-reachable-fix-multiplier",
+                    "illustration": {
+                        "severity": "high",
+                        "before": 16,
+                        "after": 32,
+                        "band_before": "high",
+                        "band_after": "critical"
+                    }
+                },
+                {
+                    "id": "security-max",
+                    "stage": 6,
+                    "kind": "max",
+                    "applies_to": "security",
+                    "tie_break": [
+                        {
+                            "key": "points",
+                            "dir": "desc",
+                            "collation": null
+                        },
+                        {
+                            "key": "severity",
+                            "dir": "order",
+                            "collation": null
+                        },
+                        {
+                            "key": "id",
+                            "dir": "asc",
+                            "collation": "bytes"
+                        }
+                    ],
+                    "why": "one-number-per-part",
+                    "doc": "score-security-max",
+                    "illustration": null
+                },
+                {
+                    "id": "divide-reach",
+                    "stage": 7,
+                    "kind": "divide",
+                    "applies_to": "maintenance",
+                    "by": 2,
+                    "when": [
+                        "transitive",
+                        "unreached"
+                    ],
+                    "why": "reach-halves-maintenance",
+                    "doc": "score-divide-reach",
+                    "illustration": {
+                        "flag": "abandoned",
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "security-exempt-from-reach",
+                    "stage": 8,
+                    "kind": "exempt",
+                    "applies_to": "security",
+                    "of": "divide-reach",
+                    "why": "exploitability-independent-of-reach",
+                    "doc": "score-security-exempt-from-reach",
+                    "illustration": {
+                        "severity": "critical",
+                        "reach": "transitive",
+                        "total": 32
+                    }
+                },
+                {
+                    "id": "sum",
+                    "stage": 9,
+                    "kind": "combine",
+                    "applies_to": "total",
+                    "op": "sum",
+                    "ratio_from": "medium",
+                    "why": "parts-add",
+                    "doc": "score-sum",
+                    "illustration": {
+                        "maintenance": 16,
+                        "security": 16,
+                        "total": 32,
+                        "band": "critical",
+                        "low_maintenance": 4,
+                        "low_security": 4,
+                        "low_total": 8,
+                        "low_band": "medium"
+                    }
+                },
+                {
+                    "id": "divide-dev",
+                    "stage": 10,
+                    "kind": "divide",
+                    "applies_to": "total",
+                    "by": 2,
+                    "when": [
+                        "dev"
+                    ],
+                    "why": "dev-halves-total",
+                    "doc": "score-divide-dev",
+                    "illustration": {
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "floor-once",
+                    "stage": 11,
+                    "kind": "floor",
+                    "applies_to": "total",
+                    "why": "integer-band-edges",
+                    "doc": "score-floor-once",
+                    "illustration": {
+                        "exact": 4.5,
+                        "total": 4
+                    }
+                },
+                {
+                    "id": "band-floors",
+                    "stage": 12,
+                    "kind": "band",
+                    "applies_to": "total",
+                    "ratio": 2,
+                    "ratio_from": "medium",
+                    "why": "two-floor-parts-make-next",
+                    "doc": "score-band-floors",
+                    "illustration": null
+                },
+                {
+                    "id": "zero-verdicts",
+                    "stage": 13,
+                    "kind": "zero",
+                    "applies_to": "total",
+                    "table": "zero_verdicts",
+                    "why": "score-zero-says-why",
+                    "doc": "score-zero-verdicts",
+                    "illustration": null
+                },
+                {
+                    "id": "sort",
+                    "stage": 14,
+                    "kind": "order",
+                    "applies_to": "findings",
+                    "why": "advisory-findings-first",
+                    "doc": "score-sort",
+                    "illustration": null
+                },
+                {
+                    "id": "gate-bounded-new",
+                    "stage": 15,
+                    "kind": "gate",
+                    "applies_to": "gate",
+                    "cap_multiplier": 2,
+                    "why": "new-fact-sets-level",
+                    "doc": "score-gate-bounded-new",
+                    "illustration": {
+                        "score": 36,
+                        "new": 16,
+                        "gate": 32
+                    }
+                },
+                {
+                    "id": "baseline-cover",
+                    "stage": 16,
+                    "kind": "cover",
+                    "applies_to": "gate",
+                    "order": "flag_order",
+                    "covers": "listed_and_below",
+                    "why": "recorded-lead-covers-below",
+                    "doc": "score-baseline-cover",
+                    "illustration": null
+                }
+            ],
+            "docs": "https://lockrot.dev/verdicts/model-1/"
+        },
+        "advisory_lookup": {
+            "scope": "all",
+            "scope_source": "default",
+            "packages_asked": 1,
+            "packages_not_asked": 0,
+            "other_repositories": 0,
+            "repositories": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "outcome": "answered",
+                    "reason": null,
+                    "message": null,
+                    "packages_with_records": 1,
+                    "records": 4
+                }
+            ]
+        },
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": false,
+            "ignores_extensions": true,
+            "baseline": "resolves",
+            "reason": null
+        },
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.1.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^8.1",
+                            "dev": false
+                        },
+                        {
+                            "name": "symfony/routing",
+                            "version": "v6.4.28",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.1.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^8.1",
+                            "dev": false
+                        },
+                        {
+                            "name": "symfony/routing",
+                            "version": "v6.4.28",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": true
+            },
+            "target_fix": null
+        },
+        "score_rules_used": {
+            "counted": 0,
+            "lead-first": 0,
+            "corroborating-share": 0,
+            "advisory-points": 1,
+            "no-reachable-fix-multiplier": 0,
+            "security-max": 0,
+            "divide-reach": 0,
+            "security-exempt-from-reach": 0,
+            "sum": 0,
+            "divide-dev": 0,
+            "floor-once": 0,
+            "band-floors": 1,
+            "zero-verdicts": 0,
+            "sort": null,
+            "gate-bounded-new": 0,
+            "baseline-cover": 0
+        }
+    },
+    "activity_cache_oldest_at": null,
+    "activity_cache_age_hours": null,
+    "packages_checked": 1,
+    "packages_flagged": 1,
+    "packages_multi_flag": 0,
+    "include_dev": false,
+    "not_from_composer_repository": 0,
+    "packages_unchecked_accepted": 0,
+    "network_failures": false,
+    "counts": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0,
+        "unknown": 0,
+        "finished": 0,
+        "ok": 0
+    },
+    "abandoned": {
+        "total": 0,
+        "with_replacement": 0,
+        "with_suggestion": 0
+    },
+    "priorities": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0,
+        "none": 0
+    },
+    "flags": {
+        "abandoned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "silent": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "pinned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "left-behind": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "old-promise": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "stale": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "capped": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "vulnerable": {
+            "carrying": 1,
+            "leading": null,
+            "accepted": null,
+            "by_verdict": {
+                "critical": 0,
+                "high": 1,
+                "medium": 0,
+                "low": 0
+            }
+        }
+    },
+    "exposure": [],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
+    "rot_depth": {
+        "flagged": 1,
+        "measured": 1,
+        "unmeasured": {
+            "unreached": 0,
+            "no_composer_json": 0
+        },
+        "by_reach": {
+            "direct": 1,
+            "transitive": 0,
+            "unreached": 0
+        },
+        "not_in_composer_json": 0,
+        "require_dev_not_walked": 0,
+        "production": 1,
+        "development": 0,
+        "by_depth": [
+            {
+                "depth": 0,
+                "flagged": 1
+            }
+        ],
+        "max_depth": 0,
+        "deepest": []
+    },
+    "libyears": {
+        "total": 0.67,
+        "direct_requirements": 0.67,
+        "measured": 1,
+        "at_least_count": 0,
+        "unmeasured": {
+            "not_from_composer_repository": 0,
+            "unavailable": 0,
+            "not_found": 0,
+            "branch_snapshot": 0,
+            "shared_commit": 0,
+            "undated": 0,
+            "no_stable_release": 0,
+            "undated_releases": 0
+        },
+        "furthest_behind": {
+            "package": "symfony/routing",
+            "version": "v6.4.28",
+            "libyears": 0.67,
+            "at_least": false
+        },
+        "packages": 1
+    },
+    "baseline": null,
+    "gate": {
+        "fails": true,
+        "tripped_by": [
+            "fail_on"
+        ],
+        "fail_on_applied": true,
+        "reaching": 1,
+        "failing": 1,
+        "exempt": {
+            "baseline": 0
+        },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/routing"
+        ],
+        "failing_by": [
+            {
+                "value": "high",
+                "failing": 1
+            }
+        ],
+        "not_applied": [],
+        "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+    },
+    "security": {
+        "check": "complete",
+        "packages": {
+            "vulnerable": 1,
+            "unchecked": 0,
+            "ignored": 0,
+            "clear": 0
+        },
+        "advisories": {
+            "counted": 1,
+            "ignored": 0
+        },
+        "severities": {
+            "critical": 0,
+            "high": 1,
+            "medium": 0,
+            "unrated": 0,
+            "low": 0
+        },
+        "fixes": {
+            "update": 1,
+            "upgrade": 0,
+            "raise-php": 0,
+            "unknown": 0,
+            "blocked": 0,
+            "none": 0
+        },
+        "update_now": [],
+        "update_now_command": null,
+        "fix_unknown": 0
+    },
+    "data_date": "2026-10-01T17:41:20+00:00",
+    "notes": [],
+    "note_details": [],
+    "findings": [
+        {
+            "package": "symfony/routing",
+            "version": "v6.4.28",
+            "branch": "6.x",
+            "installed_php": {
+                "requires": ">=8.1",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "high",
+            "priority": "high",
+            "lead": null,
+            "rank": 1,
+            "flags": [
+                {
+                    "id": "vulnerable",
+                    "role": "security",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S9"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "advisories",
+                        "value": 1,
+                        "source": null
+                    },
+                    "summary": "1 advisory: 1 high \u2014 all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 16,
+                "exact": 16,
+                "rounded_down": false,
+                "band": {
+                    "floor": 16,
+                    "next": "critical",
+                    "to_next": 16
+                },
+                "decided_by": "security",
+                "parts": {
+                    "maintenance": {
+                        "status": "none",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        }
+                    },
+                    "security": {
+                        "status": "counted",
+                        "contribution": 16,
+                        "alone": {
+                            "total": 16,
+                            "verdict": "high"
+                        },
+                        "of": 1,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "security",
+                        "flag": "vulnerable",
+                        "role": "security",
+                        "advisory": "PKSA-bf7t-jnpz-492k",
+                        "severity": "high",
+                        "fix_kind": "update",
+                        "weight": 16,
+                        "multiplier": 1,
+                        "points": 16,
+                        "contribution": 16
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [],
+                "text": "16 = vulnerable 16 [high advisory]"
+            },
+            "next_step": {
+                "kind": "update",
+                "source": "vulnerable",
+                "merged": [],
+                "fix_kind": "update",
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "6.x",
+                "version": "v6.4.40",
+                "newest": "v6.4.41",
+                "constraint": null,
+                "latest": null,
+                "php_check": {
+                    "requires": ">=8.1",
+                    "project_allows": true,
+                    "target_runs": true,
+                    "raise_to": null,
+                    "raise_size": null
+                },
+                "crosses_major": false,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-bf7t-jnpz-492k",
+                        "basis": "outside_range"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold"
+                    ]
+                },
+                "check": {
+                    "result": "resolves",
+                    "form": "with-dependencies",
+                    "reason": null,
+                    "installs": "v6.4.41"
+                },
+                "moves_with": [],
+                "composer_moves_because": [],
+                "commands": [
+                    [
+                        "composer",
+                        "update",
+                        "symfony/routing:^6.4.40",
+                        "--with-dependencies"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "composer update 'symfony/routing:^6.4.40' --with-dependencies (gets v6.4.41) \u2014 clears the advisory; Composer's solver checked it against the lock"
+            },
+            "security": {
+                "status": "vulnerable",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 4,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 4,
+                        "reason": null
+                    }
+                ],
+                "worst": "high",
+                "counts": {
+                    "critical": 0,
+                    "high": 1,
+                    "medium": 0,
+                    "unrated": 0,
+                    "low": 0
+                },
+                "ignored": [],
+                "ignored_count": 0,
+                "fix_kind": "update",
+                "installed_branch_fixes": {
+                    "fixed": 1,
+                    "unknown": 0,
+                    "of": 1,
+                    "fix_kind": "update",
+                    "lowest": "v6.4.40",
+                    "newest": "v6.4.41",
+                    "held_by": [],
+                    "if_applied": {
+                        "total": 0,
+                        "verdict": "ok",
+                        "at_most": false,
+                        "assumes": [
+                            "clears_hold"
+                        ]
+                    },
+                    "check": {
+                        "result": "resolves",
+                        "form": "with-dependencies",
+                        "reason": null,
+                        "installs": "v6.4.41"
+                    }
+                },
+                "move_in": "next_step",
+                "gets": {
+                    "version": "v6.4.41",
+                    "php_check": {
+                        "requires": ">=8.1",
+                        "project_allows": true,
+                        "target_runs": true,
+                        "raise_to": null,
+                        "raise_size": null
+                    },
+                    "clears": [
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-bf7t-jnpz-492k",
+                            "basis": "outside_range"
+                        }
+                    ],
+                    "clears_all": true
+                },
+                "partial": null
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "symfony/routing",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/symfony/routing",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "symfony/routing"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "symfony/routing"
+            ],
+            "signals": [
+                {
+                    "id": "S9",
+                    "level": "high",
+                    "summary": "1 security advisory affects v6.4.28 (CVE-2026-48784); fixed in v6.4.40",
+                    "data": {
+                        "advisories": [
+                            {
+                                "id": "PKSA-bf7t-jnpz-492k",
+                                "cve": "CVE-2026-48784",
+                                "title": "UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+                                "link": "https://symfony.com/cve-2026-48784",
+                                "reported_at": "2026-05-26T08:00:00+00:00",
+                                "severity": "high",
+                                "severity_published": "high",
+                                "affected_versions": ">=6.4.0,<6.4.40",
+                                "counted": true,
+                                "points": 16,
+                                "deciding": true,
+                                "fix": {
+                                    "kind": "update",
+                                    "to_branch": "6.x",
+                                    "version": "v6.4.40",
+                                    "newest": "v6.4.41",
+                                    "on_installed_branch": true,
+                                    "php": ">=8.1",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            }
+                        ],
+                        "releases_read": true,
+                        "complete": true
+                    }
+                }
+            ],
+            "evidence": "vulnerable: 1 advisory: 1 high \u2014 all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0.67,
+            "age": {
+                "installed": {
+                    "at": "2025-10-31T16:43:05+00:00",
+                    "years": 0.9,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "v6.4.41",
+                    "at": "2026-07-04T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "v6.4.41",
+                    "at": "2026-07-04T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-29T14:09:10+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": true,
+                "fails": true,
+                "exempt_by": null,
+                "by": [
+                    {
+                        "value": "high",
+                        "kind": "grade",
+                        "facts": [
+                            {
+                                "kind": "advisory",
+                                "id": "PKSA-bf7t-jnpz-492k"
                             }
                         ]
                     }
@@ -131401,8 +135102,10 @@ export const d_mc_inline_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v2.3.2"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -131460,7 +135163,8 @@ export const d_mc_inline_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v2.3.2"
                     }
                 },
                 "move_in": "next_step",
@@ -131618,6 +135322,1499 @@ export const d_mc_inline_dagger = {
                             {
                                 "kind": "advisory",
                                 "id": "PKSA-7jn3-yc49-35c6"
+                            }
+                        ]
+                    }
+                ],
+                "basis": null
+            }
+        }
+    ]
+} satisfies Report2;
+
+export const d_mc_joint_dagger = {
+    "$schema": "https://lockrot.dev/schema/report-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-10-01T17:41:20+00:00",
+    "run": {
+        "project": "typo3/cms",
+        "root_package": "typo3/cms",
+        "target_php": "8.4",
+        "target_php_source": "option",
+        "project_php": "^8.1",
+        "project_php_lowest": "8.1.0",
+        "lock_file": "composer.lock",
+        "fail_on": "high",
+        "fail_on_source": "option",
+        "gates": [
+            {
+                "value": "high",
+                "kind": "grade",
+                "threshold": "high"
+            }
+        ],
+        "strict_network": false,
+        "mode": "check",
+        "include_dev": false,
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flag_ids": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale",
+            "capped",
+            "vulnerable"
+        ],
+        "verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "unknown",
+            "finished",
+            "ok"
+        ],
+        "graded_verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+        ],
+        "signal_ids": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10",
+            "S11"
+        ],
+        "fix_model": 1,
+        "text_grammar": 1,
+        "score_model": {
+            "id": 1,
+            "score_text_grammar": 1,
+            "flag_order": [
+                "abandoned",
+                "silent",
+                "pinned",
+                "left-behind",
+                "old-promise",
+                "stale",
+                "capped",
+                "vulnerable"
+            ],
+            "parts": [
+                {
+                    "id": "maintenance",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "pinned",
+                        "left-behind",
+                        "old-promise",
+                        "stale",
+                        "capped"
+                    ],
+                    "combine": "lead_plus_share"
+                },
+                {
+                    "id": "security",
+                    "flag_ids": [
+                        "vulnerable"
+                    ],
+                    "combine": "max"
+                }
+            ],
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "abandoned",
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S1",
+                        "S3"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "silent",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "silent",
+                        "pinned",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-high-years",
+                        "push-high-years"
+                    ],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "pinned",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 22,
+                    "max_maintenance_flags": [
+                        "pinned",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S6"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "left-behind",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 20,
+                    "max_maintenance_flags": [
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S8"
+                    ],
+                    "thresholds": [
+                        "release-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "old-promise",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 18,
+                    "max_maintenance_flags": [
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S5"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "stale",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 10,
+                    "max_maintenance_flags": [
+                        "stale",
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-warn-years",
+                        "push-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "vulnerable",
+                    "part": "security",
+                    "points": null,
+                    "band": null,
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": null,
+                    "max_maintenance_flags": null,
+                    "raised_by": [
+                        "S9"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "severities"
+                    },
+                    "points_from": "severities"
+                }
+            ],
+            "severities": [
+                {
+                    "id": "critical",
+                    "points": 32,
+                    "band": "critical",
+                    "points_no_reachable_fix": 64,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 4,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "high",
+                    "points": 16,
+                    "band": "high",
+                    "points_no_reachable_fix": 32,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 3,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "unrated",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": "medium",
+                    "basis": {
+                        "points": "counts_as"
+                    }
+                },
+                {
+                    "id": "low",
+                    "points": 2,
+                    "band": "low",
+                    "points_no_reachable_fix": 4,
+                    "band_no_reachable_fix": "low",
+                    "gate_rank": 1,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "share",
+                        "of": "medium",
+                        "share": {
+                            "num": 1,
+                            "den": 4
+                        }
+                    }
+                }
+            ],
+            "fix_kinds": [
+                {
+                    "id": "update",
+                    "ease": 1,
+                    "doubles": false
+                },
+                {
+                    "id": "upgrade",
+                    "ease": 2,
+                    "doubles": false
+                },
+                {
+                    "id": "raise-php",
+                    "ease": 3,
+                    "doubles": false
+                },
+                {
+                    "id": "unknown",
+                    "ease": 4,
+                    "doubles": false
+                },
+                {
+                    "id": "blocked",
+                    "ease": 5,
+                    "doubles": true
+                },
+                {
+                    "id": "none",
+                    "ease": 6,
+                    "doubles": true
+                }
+            ],
+            "bands": [
+                {
+                    "verdict": "critical",
+                    "floor": 32
+                },
+                {
+                    "verdict": "high",
+                    "floor": 16
+                },
+                {
+                    "verdict": "medium",
+                    "floor": 8
+                },
+                {
+                    "verdict": "low",
+                    "floor": 1
+                }
+            ],
+            "zero_verdicts": [
+                {
+                    "verdict": "finished",
+                    "when": "allowlisted"
+                },
+                {
+                    "verdict": "unknown",
+                    "when": "no_metadata"
+                },
+                {
+                    "verdict": "ok",
+                    "when": "otherwise"
+                }
+            ],
+            "exact_unit": 0.5,
+            "rounding": "floor_once",
+            "max_total": 104,
+            "bar_max": 64,
+            "bar_overflow": "clip",
+            "exclusive_groups": [
+                {
+                    "id": "liveness",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "stale"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "branch",
+                    "flag_ids": [
+                        "pinned",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_age",
+                    "flag_ids": [
+                        "silent",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_push",
+                    "flag_ids": [
+                        "left-behind",
+                        "stale"
+                    ],
+                    "holds_unless": {
+                        "threshold": "push-warn-years",
+                        "below": "release-warn-years"
+                    }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
+                }
+            ],
+            "sort": [
+                {
+                    "key": "verdict",
+                    "path": "verdict",
+                    "dir": "order",
+                    "order": [
+                        [
+                            "critical"
+                        ],
+                        [
+                            "high"
+                        ],
+                        [
+                            "medium"
+                        ],
+                        [
+                            "low"
+                        ],
+                        [
+                            "unknown"
+                        ],
+                        [
+                            "finished",
+                            "ok"
+                        ]
+                    ],
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "security",
+                    "path": "score.parts.security.contribution",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "score",
+                    "path": "score.exact",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "direct",
+                    "path": "direct",
+                    "dir": "true_first",
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "package",
+                    "path": "package",
+                    "dir": "asc",
+                    "collation": "bytes",
+                    "default": null
+                }
+            ],
+            "rules": [
+                {
+                    "id": "counted",
+                    "stage": 1,
+                    "kind": "select",
+                    "applies_to": "flags",
+                    "accept_group": "liveness",
+                    "accept_covers": "listed_and_below",
+                    "why": "accepted-facts-shown-not-counted",
+                    "doc": "score-counted",
+                    "illustration": null
+                },
+                {
+                    "id": "lead-first",
+                    "stage": 2,
+                    "kind": "select",
+                    "applies_to": "maintenance",
+                    "order": "flag_order",
+                    "share": {
+                        "num": 1,
+                        "den": 1
+                    },
+                    "why": "strongest-fact-in-full",
+                    "doc": "score-lead-first",
+                    "illustration": null
+                },
+                {
+                    "id": "corroborating-share",
+                    "stage": 3,
+                    "kind": "share",
+                    "applies_to": "maintenance",
+                    "share": {
+                        "num": 1,
+                        "den": 4
+                    },
+                    "why": "correlated-evidence",
+                    "doc": "score-corroborating-share",
+                    "illustration": {
+                        "lead": "left-behind",
+                        "flag": "old-promise",
+                        "weight": 16,
+                        "points": 4
+                    }
+                },
+                {
+                    "id": "advisory-points",
+                    "stage": 4,
+                    "kind": "lookup",
+                    "applies_to": "security",
+                    "table": "severities",
+                    "why": "severity-points",
+                    "doc": "score-advisory-points",
+                    "illustration": null
+                },
+                {
+                    "id": "no-reachable-fix-multiplier",
+                    "stage": 5,
+                    "kind": "multiply",
+                    "applies_to": "advisory",
+                    "factor": 2,
+                    "when_fix": [
+                        "none",
+                        "blocked"
+                    ],
+                    "why": "one-band-up",
+                    "doc": "score-no-reachable-fix-multiplier",
+                    "illustration": {
+                        "severity": "high",
+                        "before": 16,
+                        "after": 32,
+                        "band_before": "high",
+                        "band_after": "critical"
+                    }
+                },
+                {
+                    "id": "security-max",
+                    "stage": 6,
+                    "kind": "max",
+                    "applies_to": "security",
+                    "tie_break": [
+                        {
+                            "key": "points",
+                            "dir": "desc",
+                            "collation": null
+                        },
+                        {
+                            "key": "severity",
+                            "dir": "order",
+                            "collation": null
+                        },
+                        {
+                            "key": "id",
+                            "dir": "asc",
+                            "collation": "bytes"
+                        }
+                    ],
+                    "why": "one-number-per-part",
+                    "doc": "score-security-max",
+                    "illustration": null
+                },
+                {
+                    "id": "divide-reach",
+                    "stage": 7,
+                    "kind": "divide",
+                    "applies_to": "maintenance",
+                    "by": 2,
+                    "when": [
+                        "transitive",
+                        "unreached"
+                    ],
+                    "why": "reach-halves-maintenance",
+                    "doc": "score-divide-reach",
+                    "illustration": {
+                        "flag": "abandoned",
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "security-exempt-from-reach",
+                    "stage": 8,
+                    "kind": "exempt",
+                    "applies_to": "security",
+                    "of": "divide-reach",
+                    "why": "exploitability-independent-of-reach",
+                    "doc": "score-security-exempt-from-reach",
+                    "illustration": {
+                        "severity": "critical",
+                        "reach": "transitive",
+                        "total": 32
+                    }
+                },
+                {
+                    "id": "sum",
+                    "stage": 9,
+                    "kind": "combine",
+                    "applies_to": "total",
+                    "op": "sum",
+                    "ratio_from": "medium",
+                    "why": "parts-add",
+                    "doc": "score-sum",
+                    "illustration": {
+                        "maintenance": 16,
+                        "security": 16,
+                        "total": 32,
+                        "band": "critical",
+                        "low_maintenance": 4,
+                        "low_security": 4,
+                        "low_total": 8,
+                        "low_band": "medium"
+                    }
+                },
+                {
+                    "id": "divide-dev",
+                    "stage": 10,
+                    "kind": "divide",
+                    "applies_to": "total",
+                    "by": 2,
+                    "when": [
+                        "dev"
+                    ],
+                    "why": "dev-halves-total",
+                    "doc": "score-divide-dev",
+                    "illustration": {
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "floor-once",
+                    "stage": 11,
+                    "kind": "floor",
+                    "applies_to": "total",
+                    "why": "integer-band-edges",
+                    "doc": "score-floor-once",
+                    "illustration": {
+                        "exact": 4.5,
+                        "total": 4
+                    }
+                },
+                {
+                    "id": "band-floors",
+                    "stage": 12,
+                    "kind": "band",
+                    "applies_to": "total",
+                    "ratio": 2,
+                    "ratio_from": "medium",
+                    "why": "two-floor-parts-make-next",
+                    "doc": "score-band-floors",
+                    "illustration": null
+                },
+                {
+                    "id": "zero-verdicts",
+                    "stage": 13,
+                    "kind": "zero",
+                    "applies_to": "total",
+                    "table": "zero_verdicts",
+                    "why": "score-zero-says-why",
+                    "doc": "score-zero-verdicts",
+                    "illustration": null
+                },
+                {
+                    "id": "sort",
+                    "stage": 14,
+                    "kind": "order",
+                    "applies_to": "findings",
+                    "why": "advisory-findings-first",
+                    "doc": "score-sort",
+                    "illustration": null
+                },
+                {
+                    "id": "gate-bounded-new",
+                    "stage": 15,
+                    "kind": "gate",
+                    "applies_to": "gate",
+                    "cap_multiplier": 2,
+                    "why": "new-fact-sets-level",
+                    "doc": "score-gate-bounded-new",
+                    "illustration": {
+                        "score": 36,
+                        "new": 16,
+                        "gate": 32
+                    }
+                },
+                {
+                    "id": "baseline-cover",
+                    "stage": 16,
+                    "kind": "cover",
+                    "applies_to": "gate",
+                    "order": "flag_order",
+                    "covers": "listed_and_below",
+                    "why": "recorded-lead-covers-below",
+                    "doc": "score-baseline-cover",
+                    "illustration": null
+                }
+            ],
+            "docs": "https://lockrot.dev/verdicts/model-1/"
+        },
+        "advisory_lookup": {
+            "scope": "all",
+            "scope_source": "default",
+            "packages_asked": 1,
+            "packages_not_asked": 0,
+            "other_repositories": 0,
+            "repositories": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "outcome": "answered",
+                    "reason": null,
+                    "message": null,
+                    "packages_with_records": 1,
+                    "records": 15
+                }
+            ]
+        },
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": false,
+            "ignores_extensions": true,
+            "baseline": "resolves",
+            "reason": null
+        },
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.1.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.1.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": true
+            },
+            "target_fix": null
+        },
+        "score_rules_used": {
+            "counted": 0,
+            "lead-first": 0,
+            "corroborating-share": 0,
+            "advisory-points": 1,
+            "no-reachable-fix-multiplier": 0,
+            "security-max": 0,
+            "divide-reach": 0,
+            "security-exempt-from-reach": 0,
+            "sum": 0,
+            "divide-dev": 0,
+            "floor-once": 0,
+            "band-floors": 1,
+            "zero-verdicts": 0,
+            "sort": null,
+            "gate-bounded-new": 0,
+            "baseline-cover": 0
+        }
+    },
+    "activity_cache_oldest_at": null,
+    "activity_cache_age_hours": null,
+    "packages_checked": 1,
+    "packages_flagged": 1,
+    "packages_multi_flag": 0,
+    "include_dev": false,
+    "not_from_composer_repository": 0,
+    "packages_unchecked_accepted": 0,
+    "network_failures": false,
+    "counts": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0,
+        "unknown": 0,
+        "finished": 0,
+        "ok": 0
+    },
+    "abandoned": {
+        "total": 0,
+        "with_replacement": 0,
+        "with_suggestion": 0
+    },
+    "priorities": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0,
+        "none": 0
+    },
+    "flags": {
+        "abandoned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "silent": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "pinned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "left-behind": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "old-promise": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "stale": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "capped": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "vulnerable": {
+            "carrying": 1,
+            "leading": null,
+            "accepted": null,
+            "by_verdict": {
+                "critical": 0,
+                "high": 1,
+                "medium": 0,
+                "low": 0
+            }
+        }
+    },
+    "exposure": [],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
+    "rot_depth": {
+        "flagged": 1,
+        "measured": 1,
+        "unmeasured": {
+            "unreached": 0,
+            "no_composer_json": 0
+        },
+        "by_reach": {
+            "direct": 1,
+            "transitive": 0,
+            "unreached": 0
+        },
+        "not_in_composer_json": 0,
+        "require_dev_not_walked": 0,
+        "production": 1,
+        "development": 0,
+        "by_depth": [
+            {
+                "depth": 0,
+                "flagged": 1
+            }
+        ],
+        "max_depth": 0,
+        "deepest": []
+    },
+    "libyears": {
+        "total": 0.86,
+        "direct_requirements": 0.86,
+        "measured": 1,
+        "at_least_count": 0,
+        "unmeasured": {
+            "not_from_composer_repository": 0,
+            "unavailable": 0,
+            "not_found": 0,
+            "branch_snapshot": 0,
+            "shared_commit": 0,
+            "undated": 0,
+            "no_stable_release": 0,
+            "undated_releases": 0
+        },
+        "furthest_behind": {
+            "package": "guzzlehttp/guzzle",
+            "version": "7.10.0",
+            "libyears": 0.86,
+            "at_least": false
+        },
+        "packages": 1
+    },
+    "baseline": null,
+    "gate": {
+        "fails": true,
+        "tripped_by": [
+            "fail_on"
+        ],
+        "fail_on_applied": true,
+        "reaching": 1,
+        "failing": 1,
+        "exempt": {
+            "baseline": 0
+        },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "guzzlehttp/guzzle"
+        ],
+        "failing_by": [
+            {
+                "value": "high",
+                "failing": 1
+            }
+        ],
+        "not_applied": [],
+        "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+    },
+    "security": {
+        "check": "complete",
+        "packages": {
+            "vulnerable": 1,
+            "unchecked": 0,
+            "ignored": 0,
+            "clear": 0
+        },
+        "advisories": {
+            "counted": 1,
+            "ignored": 0
+        },
+        "severities": {
+            "critical": 0,
+            "high": 1,
+            "medium": 0,
+            "unrated": 0,
+            "low": 0
+        },
+        "fixes": {
+            "update": 1,
+            "upgrade": 0,
+            "raise-php": 0,
+            "unknown": 0,
+            "blocked": 0,
+            "none": 0
+        },
+        "update_now": [],
+        "update_now_command": null,
+        "fix_unknown": 0
+    },
+    "data_date": "2026-10-01T17:41:20+00:00",
+    "notes": [],
+    "note_details": [],
+    "findings": [
+        {
+            "package": "guzzlehttp/guzzle",
+            "version": "7.10.0",
+            "branch": "7.x",
+            "installed_php": {
+                "requires": "^7.2.5 || ^8.0",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "high",
+            "priority": "high",
+            "lead": null,
+            "rank": 1,
+            "flags": [
+                {
+                    "id": "vulnerable",
+                    "role": "security",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S9"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "advisories",
+                        "value": 1,
+                        "source": null
+                    },
+                    "summary": "1 advisory: 1 high \u2014 none fixed on 7.x; advisory: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 16,
+                "exact": 16,
+                "rounded_down": false,
+                "band": {
+                    "floor": 16,
+                    "next": "critical",
+                    "to_next": 16
+                },
+                "decided_by": "security",
+                "parts": {
+                    "maintenance": {
+                        "status": "none",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        }
+                    },
+                    "security": {
+                        "status": "counted",
+                        "contribution": 16,
+                        "alone": {
+                            "total": 16,
+                            "verdict": "high"
+                        },
+                        "of": 1,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "security",
+                        "flag": "vulnerable",
+                        "role": "security",
+                        "advisory": "PKSA-gcrk-3vtt-1r14",
+                        "severity": "high",
+                        "fix_kind": "update",
+                        "weight": 16,
+                        "multiplier": 1,
+                        "points": 16,
+                        "contribution": 16
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [],
+                "text": "16 = vulnerable 16 [high advisory]"
+            },
+            "next_step": {
+                "kind": "require",
+                "source": "vulnerable",
+                "merged": [],
+                "fix_kind": "update",
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "8.x",
+                "version": "8.0.1",
+                "newest": "8.0.1",
+                "constraint": "^8.0.1",
+                "latest": null,
+                "php_check": {
+                    "requires": "^8.1",
+                    "project_allows": true,
+                    "target_runs": true,
+                    "raise_to": null,
+                    "raise_size": null
+                },
+                "crosses_major": true,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-gcrk-3vtt-1r14",
+                        "basis": "outside_range"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold"
+                    ]
+                },
+                "check": {
+                    "result": "resolves",
+                    "form": "inline",
+                    "reason": null,
+                    "installs": "8.0.1"
+                },
+                "moves_with": [
+                    {
+                        "package": "acme/gz-client",
+                        "installed_version": "1.0.0",
+                        "version": "1.1.0"
+                    }
+                ],
+                "composer_moves_because": [
+                    "crosses_major"
+                ],
+                "commands": [
+                    [
+                        "composer",
+                        "require",
+                        "guzzlehttp/guzzle:^8.0.1",
+                        "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "update",
+                        "guzzlehttp/guzzle",
+                        "acme/gz-client"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "require guzzlehttp/guzzle ^8.0.1 \u2014 clears the advisory; 8.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock, with an update of acme/gz-client (to 1.1.0)"
+            },
+            "security": {
+                "status": "vulnerable",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 15,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 15,
+                        "reason": null
+                    }
+                ],
+                "worst": "high",
+                "counts": {
+                    "critical": 0,
+                    "high": 1,
+                    "medium": 0,
+                    "unrated": 0,
+                    "low": 0
+                },
+                "ignored": [],
+                "ignored_count": 0,
+                "fix_kind": "update",
+                "installed_branch_fixes": {
+                    "fixed": 0,
+                    "unknown": 0,
+                    "of": 1,
+                    "fix_kind": null,
+                    "lowest": null,
+                    "newest": "7.15.2",
+                    "held_by": [],
+                    "if_applied": null,
+                    "check": null
+                },
+                "move_in": "next_step",
+                "gets": {
+                    "version": "7.15.2",
+                    "php_check": {
+                        "requires": "^7.2.5 || ^8.0",
+                        "project_allows": true,
+                        "target_runs": true,
+                        "raise_to": null,
+                        "raise_size": null
+                    },
+                    "clears": [],
+                    "clears_all": false
+                },
+                "partial": null
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "guzzle/guzzle",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/guzzlehttp/guzzle",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "guzzlehttp/guzzle"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "guzzlehttp/guzzle"
+            ],
+            "signals": [
+                {
+                    "id": "S9",
+                    "level": "high",
+                    "summary": "1 security advisory affects 7.10.0 (CVE-2026-69246); fixed in 8.0.1",
+                    "data": {
+                        "advisories": [
+                            {
+                                "id": "PKSA-gcrk-3vtt-1r14",
+                                "cve": "CVE-2026-69246",
+                                "title": "Guzzle: Noncanonical host can bypass host-based checks",
+                                "link": "https://github.com/advisories/GHSA-v5mv-p594-2x33",
+                                "reported_at": "2026-08-03T21:07:26+00:00",
+                                "severity": "high",
+                                "severity_published": "high",
+                                "affected_versions": "<8.0.1",
+                                "counted": true,
+                                "points": 16,
+                                "deciding": true,
+                                "fix": {
+                                    "kind": "update",
+                                    "to_branch": "8.x",
+                                    "version": "8.0.1",
+                                    "newest": "8.0.1",
+                                    "on_installed_branch": false,
+                                    "php": "^8.1",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            }
+                        ],
+                        "releases_read": true,
+                        "complete": true
+                    }
+                }
+            ],
+            "evidence": "vulnerable: 1 advisory: 1 high \u2014 none fixed on 7.x; advisory: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0.86,
+            "age": {
+                "installed": {
+                    "at": "2025-08-23T22:36:01+00:00",
+                    "years": 1.1,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "8.0.1",
+                    "at": "2026-07-04T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "7.15.2",
+                    "at": "2026-07-03T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-06T13:55:34+00:00",
+                    "years": 0.1,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": true,
+                "fails": true,
+                "exempt_by": null,
+                "by": [
+                    {
+                        "value": "high",
+                        "kind": "grade",
+                        "facts": [
+                            {
+                                "kind": "advisory",
+                                "id": "PKSA-gcrk-3vtt-1r14"
                             }
                         ]
                     }
@@ -132903,15 +138100,6 @@ export const d_mc_package_hold_dagger = {
                 "crosses_major": false,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "acme/ml-widget",
-                        "constraint": "^1.0",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "acme/ml-widget",
                         "version": "1.0.0",
@@ -132922,6 +138110,7 @@ export const d_mc_package_hold_dagger = {
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -132961,15 +138150,25 @@ export const d_mc_package_hold_dagger = {
                 "check": {
                     "result": "refused",
                     "form": null,
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/mailer",
+                        "v6.4.40",
+                        "--locked"
+                    ]
+                ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+                "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "vulnerable",
@@ -133006,15 +138205,6 @@ export const d_mc_package_hold_dagger = {
                     "newest": "v6.4.40",
                     "held_by": [
                         {
-                            "source": "root",
-                            "package": null,
-                            "version": null,
-                            "link": "root-require",
-                            "target": "acme/ml-widget",
-                            "constraint": "^1.0",
-                            "holder": null
-                        },
-                        {
                             "source": "package",
                             "package": "acme/ml-widget",
                             "version": "1.0.0",
@@ -133025,6 +138215,7 @@ export const d_mc_package_hold_dagger = {
                                 "verdict": "ok",
                                 "lead": null,
                                 "flag_ids": [],
+                                "direct": true,
                                 "replacement": null,
                                 "next_step": null
                             }
@@ -133051,7 +138242,8 @@ export const d_mc_package_hold_dagger = {
                     "check": {
                         "result": "refused",
                         "form": null,
-                        "reason": null
+                        "reason": null,
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -133136,15 +138328,6 @@ export const d_mc_package_hold_dagger = {
                                     "admits_project_php": true,
                                     "held_by": [
                                         {
-                                            "source": "root",
-                                            "package": null,
-                                            "version": null,
-                                            "link": "root-require",
-                                            "target": "acme/ml-widget",
-                                            "constraint": "^1.0",
-                                            "holder": null
-                                        },
-                                        {
                                             "source": "package",
                                             "package": "acme/ml-widget",
                                             "version": "1.0.0",
@@ -133155,6 +138338,7 @@ export const d_mc_package_hold_dagger = {
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }
@@ -134511,15 +139695,6 @@ export const d_mc_pass_cap_dagger = {
                 "crosses_major": false,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "acme/ml-widget",
-                        "constraint": "^1.0",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "acme/ml-widget",
                         "version": "1.0.0",
@@ -134530,6 +139705,7 @@ export const d_mc_pass_cap_dagger = {
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -134569,8 +139745,10 @@ export const d_mc_pass_cap_dagger = {
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "pass_cap"
+                    "reason": "pass_cap",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders"
                 ],
@@ -134579,11 +139757,18 @@ export const d_mc_pass_cap_dagger = {
                         "composer",
                         "require",
                         "symfony/mailer:^6.4.40"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/mailer",
+                        "v6.4.40",
+                        "--locked"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it"
+                "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -134620,15 +139805,6 @@ export const d_mc_pass_cap_dagger = {
                     "newest": "v6.4.40",
                     "held_by": [
                         {
-                            "source": "root",
-                            "package": null,
-                            "version": null,
-                            "link": "root-require",
-                            "target": "acme/ml-widget",
-                            "constraint": "^1.0",
-                            "holder": null
-                        },
-                        {
                             "source": "package",
                             "package": "acme/ml-widget",
                             "version": "1.0.0",
@@ -134639,6 +139815,7 @@ export const d_mc_pass_cap_dagger = {
                                 "verdict": "ok",
                                 "lead": null,
                                 "flag_ids": [],
+                                "direct": true,
                                 "replacement": null,
                                 "next_step": null
                             }
@@ -134665,7 +139842,8 @@ export const d_mc_pass_cap_dagger = {
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "pass_cap"
+                        "reason": "pass_cap",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -134750,15 +139928,6 @@ export const d_mc_pass_cap_dagger = {
                                     "admits_project_php": true,
                                     "held_by": [
                                         {
-                                            "source": "root",
-                                            "package": null,
-                                            "version": null,
-                                            "link": "root-require",
-                                            "target": "acme/ml-widget",
-                                            "constraint": "^1.0",
-                                            "holder": null
-                                        },
-                                        {
                                             "source": "package",
                                             "package": "acme/ml-widget",
                                             "version": "1.0.0",
@@ -134769,6 +139938,7 @@ export const d_mc_pass_cap_dagger = {
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }
@@ -136132,8 +141302,10 @@ export const d_mc_raise_php_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v6.4.40"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -136197,7 +141369,8 @@ export const d_mc_raise_php_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v6.4.40"
                     }
                 },
                 "move_in": "next_step",
@@ -137641,8 +142814,10 @@ export const d_mc_replan_major_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "8.0.1"
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -137722,7 +142897,8 @@ export const d_mc_replan_major_dagger = {
                     "check": {
                         "result": "refused",
                         "form": null,
-                        "reason": null
+                        "reason": null,
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -139149,8 +144325,10 @@ export const d_mc_root_hold_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "8.0.1"
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -139230,7 +144408,8 @@ export const d_mc_root_hold_dagger = {
                     "check": {
                         "result": "refused",
                         "form": null,
-                        "reason": null
+                        "reason": null,
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -140703,8 +145882,10 @@ export const d_mc_update_now_reduced_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v6.4.41"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -140762,7 +145943,8 @@ export const d_mc_update_now_reduced_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v6.4.41"
                     }
                 },
                 "move_in": "next_step",
@@ -141053,8 +146235,10 @@ export const d_mc_update_now_reduced_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v6.4.40"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -141112,7 +146296,8 @@ export const d_mc_update_now_reduced_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v6.4.40"
                     }
                 },
                 "move_in": "next_step",
@@ -141403,8 +146588,10 @@ export const d_mc_update_now_reduced_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v2.3.2"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -141462,7 +146649,8 @@ export const d_mc_update_now_reduced_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v2.3.2"
                     }
                 },
                 "move_in": "next_step",
@@ -142925,8 +148113,10 @@ export const d_mc_update_now_refused_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v6.4.40"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -142984,7 +148174,8 @@ export const d_mc_update_now_refused_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v6.4.40"
                     }
                 },
                 "move_in": "next_step",
@@ -143275,8 +148466,10 @@ export const d_mc_update_now_refused_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v2.3.2"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -143334,7 +148527,8 @@ export const d_mc_update_now_refused_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v2.3.2"
                     }
                 },
                 "move_in": "next_step",
@@ -144784,8 +149978,10 @@ export const d_mc_with_all_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "with-all-dependencies",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v6.4.41"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -144844,7 +150040,8 @@ export const d_mc_with_all_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "with-all-dependencies",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v6.4.41"
                     }
                 },
                 "move_in": "next_step",
@@ -146294,8 +151491,10 @@ export const d_mc_with_deps_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "with-dependencies",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v6.4.41"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -146354,7 +151553,8 @@ export const d_mc_with_deps_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "with-dependencies",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v6.4.41"
                     }
                 },
                 "move_in": "next_step",
@@ -147802,8 +153002,10 @@ export const d_move_check_dagger = {
                 "check": {
                     "result": "resolves",
                     "form": "with-dependencies",
-                    "reason": null
+                    "reason": null,
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -147862,7 +153064,8 @@ export const d_move_check_dagger = {
                     "check": {
                         "result": "resolves",
                         "form": "with-dependencies",
-                        "reason": null
+                        "reason": null,
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -149410,6 +154613,7 @@ export const d_not_found_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -149424,11 +154628,13 @@ export const d_not_found_dagger = {
                             "released": "2023-03-11T10:11:33+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package"
+                "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string"
             },
             "security": {
                 "status": "clear",
@@ -152160,12 +157366,20 @@ export const d_op_update = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "matomo/network"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "matomo/network",
+                        "2.0.3",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -153602,6 +158816,7 @@ export const d_pagerfanta = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -153616,6 +158831,13 @@ export const d_pagerfanta = {
                         "composer",
                         "require",
                         "pagerfanta/twig:^4.9"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "pagerfanta/twig",
+                        "v4.9.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -155198,6 +160420,7 @@ export const d_partial_op_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -155212,6 +160435,13 @@ export const d_partial_op_dagger = {
                         "composer",
                         "require",
                         "geoip2/geoip2:^3.4"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "geoip2/geoip2",
+                        "v3.4.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -156894,6 +162124,7 @@ export const d_partial = {
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -156947,6 +162178,7 @@ export const d_partial = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -156962,6 +162194,13 @@ export const d_partial = {
                         "composer",
                         "require",
                         "laravel/framework:^12.69.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "laravel/framework",
+                        "v12.69.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -157294,6 +162533,7 @@ export const d_partial = {
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }
@@ -157407,6 +162647,7 @@ export const d_partial = {
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }
@@ -157458,6 +162699,7 @@ export const d_partial = {
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }
@@ -157509,6 +162751,7 @@ export const d_partial = {
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }
@@ -158859,6 +164102,7 @@ export const d_php_edge_equal_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -158867,6 +164111,13 @@ export const d_php_edge_equal_dagger = {
                         "composer",
                         "require",
                         "scheb/2fa-bundle:^6.13"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-bundle",
+                        "v6.13.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -160295,6 +165546,7 @@ export const d_php_edge_lower_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -160309,6 +165561,13 @@ export const d_php_edge_lower_dagger = {
                         "composer",
                         "require",
                         "scheb/2fa-bundle:^6.13"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-bundle",
+                        "v6.13.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -161760,6 +167019,7 @@ export const d_php_edge_upper_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -161774,6 +167034,13 @@ export const d_php_edge_upper_dagger = {
                         "composer",
                         "require",
                         "scheb/2fa-bundle:^6.13"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-bundle",
+                        "v6.13.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -163214,6 +168481,7 @@ export const d_php_null = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
@@ -163222,8 +168490,9 @@ export const d_php_null = {
                     [
                         "composer",
                         "why-not",
-                        "genealabs/laravel-model-caching",
-                        "13.1.11"
+                        "genealabs/laravel-pivot-events",
+                        "12.0.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -163236,7 +168505,9 @@ export const d_php_null = {
                             "released": "2026-09-19T19:55:47+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -164669,6 +169940,7 @@ export const d_pinned_unread = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -166204,8 +171476,10 @@ export const d_platform_step_dagger = {
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -166220,6 +171494,13 @@ export const d_platform_step_dagger = {
                         "composer",
                         "require",
                         "scheb/2fa-bundle:^6.13"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-bundle",
+                        "v6.13.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -167671,8 +172952,10 @@ export const d_platform_step_inside_dagger = {
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -167687,6 +172970,13 @@ export const d_platform_step_inside_dagger = {
                         "composer",
                         "require",
                         "scheb/2fa-bundle:^6.13"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-bundle",
+                        "v6.13.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -169176,6 +174466,7 @@ export const d_policy_off_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -169190,6 +174481,13 @@ export const d_policy_off_dagger = {
                         "composer",
                         "require",
                         "joomla/filter:^3.0.5"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "joomla/filter",
+                        "3.0.5",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -170734,6 +176032,7 @@ export const d_psr7 = {
                                 "left-behind",
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "raise-php",
@@ -170787,6 +176086,7 @@ export const d_psr7 = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -170797,6 +176097,13 @@ export const d_psr7 = {
                         "require",
                         "php:>=7.2.5",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "guzzlehttp/psr7",
+                        "2.13.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -170809,7 +176116,9 @@ export const d_psr7 = {
                             "released": "2026-09-06T13:55:09+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -170973,6 +176282,7 @@ export const d_psr7 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -171023,6 +176333,7 @@ export const d_psr7 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -171073,6 +176384,7 @@ export const d_psr7 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -171123,6 +176435,7 @@ export const d_psr7 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -172487,6 +177800,7 @@ export const d_replace_graded = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -173912,6 +179226,7 @@ export const d_replace_text = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -175395,11 +180710,26 @@ export const d_require_dev_name_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "require",
+                        "symfony/var-dumper:^5.4",
+                        "--dev"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/var-dumper",
+                        "v5.4.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "babdev/pagerfanta-bundle",
@@ -175410,7 +180740,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2025-11-29T13:01:51+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "bdunogier/guzzle-site-authenticator",
@@ -175421,7 +180753,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2023-08-21T14:33:48+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "craue/config-bundle",
@@ -175432,7 +180766,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-09-15T09:43:34+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/doctrine-bundle",
@@ -175443,7 +180779,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-09-09T11:58:04+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/doctrine-migrations-bundle",
@@ -175454,7 +180792,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-08-26T05:54:54+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/jsrouting-bundle",
@@ -175465,7 +180805,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2025-11-04T21:03:25+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/oauth-server-bundle",
@@ -175476,7 +180818,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2019-01-23T15:23:04+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "installed_unlisted"
+                        "newest_requires_unmeasured": "installed_unlisted",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/rest-bundle",
@@ -175487,7 +180831,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-02-10T02:36:12+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/user-bundle",
@@ -175498,7 +180844,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-02-13T21:22:55+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "jms/serializer-bundle",
@@ -175509,7 +180857,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2025-11-25T21:41:31+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "kphoen/rulerz-bundle",
@@ -175520,7 +180870,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2018-09-17T09:02:32+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "lexik/form-filter-bundle",
@@ -175531,7 +180883,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2023-05-19T06:37:47+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "nelmio/api-doc-bundle",
@@ -175542,7 +180896,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-09-14T11:12:11+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "nelmio/cors-bundle",
@@ -175553,7 +180909,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-01-12T15:59:08+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "php-amqplib/rabbitmq-bundle",
@@ -175564,7 +180922,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-01-16T12:34:27+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "php-http/httplug-bundle",
@@ -175575,7 +180935,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-04-25T08:45:32+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-backup-code",
@@ -175586,7 +180948,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-01-24T13:26:10+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-bundle",
@@ -175597,7 +180961,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-07-10T18:29:30+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-email",
@@ -175608,7 +180974,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-06-02T20:21:59+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-google-authenticator",
@@ -175619,7 +180987,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-01-24T13:27:55+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-qr-code",
@@ -175630,7 +181000,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2022-01-03T10:21:24+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "scheb/2fa-trusted-device",
@@ -175641,7 +181013,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-01-24T13:26:10+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "sensio/framework-extra-bundle",
@@ -175652,7 +181026,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2023-02-24T14:57:12+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "sentry/sentry-symfony",
@@ -175663,7 +181039,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-08-28T10:41:44+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "stof/doctrine-extensions-bundle",
@@ -175674,7 +181052,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-01-23T08:45:07+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/error-handler",
@@ -175685,7 +181065,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-09-22T18:58:53+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/framework-bundle",
@@ -175696,7 +181078,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-09-28T19:13:15+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/http-kernel",
@@ -175707,7 +181091,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-09-29T14:08:01+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/monolog-bundle",
@@ -175718,7 +181104,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-09-10T19:32:07+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/security-bundle",
@@ -175729,7 +181117,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-09-24T11:09:32+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/security-http",
@@ -175740,7 +181130,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-09-28T19:13:15+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/twig-bundle",
@@ -175751,7 +181143,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-09-11T14:51:16+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "twig/extra-bundle",
@@ -175762,7 +181156,9 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-09-11T08:59:50+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "willdurand/hateoas-bundle",
@@ -175773,11 +181169,13 @@ export const d_require_dev_name_dagger = {
                             "released": "2026-07-17T20:45:53+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move symfony/var-dumper to ^5.4 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 31 more \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.8) still requires it"
+                "text": "require symfony/var-dumper ^5.4 in require-dev \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.8) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -177334,11 +182732,20 @@ export const d_rounded_dev_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "jfcherng/php-color-output",
+                        "3.0.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "jfcherng/php-diff",
@@ -177349,7 +182756,9 @@ export const d_rounded_dev_dagger = {
                             "released": "2026-06-22T13:04:52+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -177486,6 +182895,1809 @@ export const d_rounded_dev_dagger = {
                 "fails": false,
                 "exempt_by": null,
                 "by": [],
+                "basis": null
+            }
+        }
+    ]
+} satisfies Report2;
+
+export const d_routing_self_dagger = {
+    "$schema": "https://lockrot.dev/schema/report-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-10-01T17:41:20+00:00",
+    "run": {
+        "project": "mautic/mautic",
+        "root_package": "mautic/mautic",
+        "target_php": "8.4",
+        "target_php_source": "option",
+        "project_php": null,
+        "project_php_lowest": null,
+        "lock_file": "composer.lock",
+        "fail_on": "high",
+        "fail_on_source": "option",
+        "gates": [
+            {
+                "value": "high",
+                "kind": "grade",
+                "threshold": "high"
+            }
+        ],
+        "strict_network": false,
+        "mode": "check",
+        "include_dev": false,
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flag_ids": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale",
+            "capped",
+            "vulnerable"
+        ],
+        "verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "unknown",
+            "finished",
+            "ok"
+        ],
+        "graded_verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+        ],
+        "signal_ids": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10",
+            "S11"
+        ],
+        "fix_model": 1,
+        "text_grammar": 1,
+        "score_model": {
+            "id": 1,
+            "score_text_grammar": 1,
+            "flag_order": [
+                "abandoned",
+                "silent",
+                "pinned",
+                "left-behind",
+                "old-promise",
+                "stale",
+                "capped",
+                "vulnerable"
+            ],
+            "parts": [
+                {
+                    "id": "maintenance",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "pinned",
+                        "left-behind",
+                        "old-promise",
+                        "stale",
+                        "capped"
+                    ],
+                    "combine": "lead_plus_share"
+                },
+                {
+                    "id": "security",
+                    "flag_ids": [
+                        "vulnerable"
+                    ],
+                    "combine": "max"
+                }
+            ],
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "abandoned",
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S1",
+                        "S3"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "silent",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "silent",
+                        "pinned",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-high-years",
+                        "push-high-years"
+                    ],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "pinned",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 22,
+                    "max_maintenance_flags": [
+                        "pinned",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S6"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "left-behind",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 20,
+                    "max_maintenance_flags": [
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S8"
+                    ],
+                    "thresholds": [
+                        "release-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "old-promise",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 18,
+                    "max_maintenance_flags": [
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S5"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "stale",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 10,
+                    "max_maintenance_flags": [
+                        "stale",
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-warn-years",
+                        "push-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "vulnerable",
+                    "part": "security",
+                    "points": null,
+                    "band": null,
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": null,
+                    "max_maintenance_flags": null,
+                    "raised_by": [
+                        "S9"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "severities"
+                    },
+                    "points_from": "severities"
+                }
+            ],
+            "severities": [
+                {
+                    "id": "critical",
+                    "points": 32,
+                    "band": "critical",
+                    "points_no_reachable_fix": 64,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 4,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "high",
+                    "points": 16,
+                    "band": "high",
+                    "points_no_reachable_fix": 32,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 3,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "unrated",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": "medium",
+                    "basis": {
+                        "points": "counts_as"
+                    }
+                },
+                {
+                    "id": "low",
+                    "points": 2,
+                    "band": "low",
+                    "points_no_reachable_fix": 4,
+                    "band_no_reachable_fix": "low",
+                    "gate_rank": 1,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "share",
+                        "of": "medium",
+                        "share": {
+                            "num": 1,
+                            "den": 4
+                        }
+                    }
+                }
+            ],
+            "fix_kinds": [
+                {
+                    "id": "update",
+                    "ease": 1,
+                    "doubles": false
+                },
+                {
+                    "id": "upgrade",
+                    "ease": 2,
+                    "doubles": false
+                },
+                {
+                    "id": "raise-php",
+                    "ease": 3,
+                    "doubles": false
+                },
+                {
+                    "id": "unknown",
+                    "ease": 4,
+                    "doubles": false
+                },
+                {
+                    "id": "blocked",
+                    "ease": 5,
+                    "doubles": true
+                },
+                {
+                    "id": "none",
+                    "ease": 6,
+                    "doubles": true
+                }
+            ],
+            "bands": [
+                {
+                    "verdict": "critical",
+                    "floor": 32
+                },
+                {
+                    "verdict": "high",
+                    "floor": 16
+                },
+                {
+                    "verdict": "medium",
+                    "floor": 8
+                },
+                {
+                    "verdict": "low",
+                    "floor": 1
+                }
+            ],
+            "zero_verdicts": [
+                {
+                    "verdict": "finished",
+                    "when": "allowlisted"
+                },
+                {
+                    "verdict": "unknown",
+                    "when": "no_metadata"
+                },
+                {
+                    "verdict": "ok",
+                    "when": "otherwise"
+                }
+            ],
+            "exact_unit": 0.5,
+            "rounding": "floor_once",
+            "max_total": 104,
+            "bar_max": 64,
+            "bar_overflow": "clip",
+            "exclusive_groups": [
+                {
+                    "id": "liveness",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "stale"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "branch",
+                    "flag_ids": [
+                        "pinned",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_age",
+                    "flag_ids": [
+                        "silent",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_push",
+                    "flag_ids": [
+                        "left-behind",
+                        "stale"
+                    ],
+                    "holds_unless": {
+                        "threshold": "push-warn-years",
+                        "below": "release-warn-years"
+                    }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
+                }
+            ],
+            "sort": [
+                {
+                    "key": "verdict",
+                    "path": "verdict",
+                    "dir": "order",
+                    "order": [
+                        [
+                            "critical"
+                        ],
+                        [
+                            "high"
+                        ],
+                        [
+                            "medium"
+                        ],
+                        [
+                            "low"
+                        ],
+                        [
+                            "unknown"
+                        ],
+                        [
+                            "finished",
+                            "ok"
+                        ]
+                    ],
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "security",
+                    "path": "score.parts.security.contribution",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "score",
+                    "path": "score.exact",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "direct",
+                    "path": "direct",
+                    "dir": "true_first",
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "package",
+                    "path": "package",
+                    "dir": "asc",
+                    "collation": "bytes",
+                    "default": null
+                }
+            ],
+            "rules": [
+                {
+                    "id": "counted",
+                    "stage": 1,
+                    "kind": "select",
+                    "applies_to": "flags",
+                    "accept_group": "liveness",
+                    "accept_covers": "listed_and_below",
+                    "why": "accepted-facts-shown-not-counted",
+                    "doc": "score-counted",
+                    "illustration": null
+                },
+                {
+                    "id": "lead-first",
+                    "stage": 2,
+                    "kind": "select",
+                    "applies_to": "maintenance",
+                    "order": "flag_order",
+                    "share": {
+                        "num": 1,
+                        "den": 1
+                    },
+                    "why": "strongest-fact-in-full",
+                    "doc": "score-lead-first",
+                    "illustration": null
+                },
+                {
+                    "id": "corroborating-share",
+                    "stage": 3,
+                    "kind": "share",
+                    "applies_to": "maintenance",
+                    "share": {
+                        "num": 1,
+                        "den": 4
+                    },
+                    "why": "correlated-evidence",
+                    "doc": "score-corroborating-share",
+                    "illustration": {
+                        "lead": "left-behind",
+                        "flag": "old-promise",
+                        "weight": 16,
+                        "points": 4
+                    }
+                },
+                {
+                    "id": "advisory-points",
+                    "stage": 4,
+                    "kind": "lookup",
+                    "applies_to": "security",
+                    "table": "severities",
+                    "why": "severity-points",
+                    "doc": "score-advisory-points",
+                    "illustration": null
+                },
+                {
+                    "id": "no-reachable-fix-multiplier",
+                    "stage": 5,
+                    "kind": "multiply",
+                    "applies_to": "advisory",
+                    "factor": 2,
+                    "when_fix": [
+                        "none",
+                        "blocked"
+                    ],
+                    "why": "one-band-up",
+                    "doc": "score-no-reachable-fix-multiplier",
+                    "illustration": {
+                        "severity": "high",
+                        "before": 16,
+                        "after": 32,
+                        "band_before": "high",
+                        "band_after": "critical"
+                    }
+                },
+                {
+                    "id": "security-max",
+                    "stage": 6,
+                    "kind": "max",
+                    "applies_to": "security",
+                    "tie_break": [
+                        {
+                            "key": "points",
+                            "dir": "desc",
+                            "collation": null
+                        },
+                        {
+                            "key": "severity",
+                            "dir": "order",
+                            "collation": null
+                        },
+                        {
+                            "key": "id",
+                            "dir": "asc",
+                            "collation": "bytes"
+                        }
+                    ],
+                    "why": "one-number-per-part",
+                    "doc": "score-security-max",
+                    "illustration": null
+                },
+                {
+                    "id": "divide-reach",
+                    "stage": 7,
+                    "kind": "divide",
+                    "applies_to": "maintenance",
+                    "by": 2,
+                    "when": [
+                        "transitive",
+                        "unreached"
+                    ],
+                    "why": "reach-halves-maintenance",
+                    "doc": "score-divide-reach",
+                    "illustration": {
+                        "flag": "abandoned",
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "security-exempt-from-reach",
+                    "stage": 8,
+                    "kind": "exempt",
+                    "applies_to": "security",
+                    "of": "divide-reach",
+                    "why": "exploitability-independent-of-reach",
+                    "doc": "score-security-exempt-from-reach",
+                    "illustration": {
+                        "severity": "critical",
+                        "reach": "transitive",
+                        "total": 32
+                    }
+                },
+                {
+                    "id": "sum",
+                    "stage": 9,
+                    "kind": "combine",
+                    "applies_to": "total",
+                    "op": "sum",
+                    "ratio_from": "medium",
+                    "why": "parts-add",
+                    "doc": "score-sum",
+                    "illustration": {
+                        "maintenance": 16,
+                        "security": 16,
+                        "total": 32,
+                        "band": "critical",
+                        "low_maintenance": 4,
+                        "low_security": 4,
+                        "low_total": 8,
+                        "low_band": "medium"
+                    }
+                },
+                {
+                    "id": "divide-dev",
+                    "stage": 10,
+                    "kind": "divide",
+                    "applies_to": "total",
+                    "by": 2,
+                    "when": [
+                        "dev"
+                    ],
+                    "why": "dev-halves-total",
+                    "doc": "score-divide-dev",
+                    "illustration": {
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "floor-once",
+                    "stage": 11,
+                    "kind": "floor",
+                    "applies_to": "total",
+                    "why": "integer-band-edges",
+                    "doc": "score-floor-once",
+                    "illustration": {
+                        "exact": 4.5,
+                        "total": 4
+                    }
+                },
+                {
+                    "id": "band-floors",
+                    "stage": 12,
+                    "kind": "band",
+                    "applies_to": "total",
+                    "ratio": 2,
+                    "ratio_from": "medium",
+                    "why": "two-floor-parts-make-next",
+                    "doc": "score-band-floors",
+                    "illustration": null
+                },
+                {
+                    "id": "zero-verdicts",
+                    "stage": 13,
+                    "kind": "zero",
+                    "applies_to": "total",
+                    "table": "zero_verdicts",
+                    "why": "score-zero-says-why",
+                    "doc": "score-zero-verdicts",
+                    "illustration": null
+                },
+                {
+                    "id": "sort",
+                    "stage": 14,
+                    "kind": "order",
+                    "applies_to": "findings",
+                    "why": "advisory-findings-first",
+                    "doc": "score-sort",
+                    "illustration": null
+                },
+                {
+                    "id": "gate-bounded-new",
+                    "stage": 15,
+                    "kind": "gate",
+                    "applies_to": "gate",
+                    "cap_multiplier": 2,
+                    "why": "new-fact-sets-level",
+                    "doc": "score-gate-bounded-new",
+                    "illustration": {
+                        "score": 36,
+                        "new": 16,
+                        "gate": 32
+                    }
+                },
+                {
+                    "id": "baseline-cover",
+                    "stage": 16,
+                    "kind": "cover",
+                    "applies_to": "gate",
+                    "order": "flag_order",
+                    "covers": "listed_and_below",
+                    "why": "recorded-lead-covers-below",
+                    "doc": "score-baseline-cover",
+                    "illustration": null
+                }
+            ],
+            "docs": "https://lockrot.dev/verdicts/model-1/"
+        },
+        "advisory_lookup": {
+            "scope": "all",
+            "scope_source": "default",
+            "packages_asked": 1,
+            "packages_not_asked": 0,
+            "other_repositories": 0,
+            "repositories": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "outcome": "answered",
+                    "reason": null,
+                    "message": null,
+                    "packages_with_records": 4,
+                    "records": 13
+                }
+            ]
+        },
+        "move_check": null,
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "7.4",
+                    "8.0"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "7.4.0",
+                    "set_by": [
+                        {
+                            "name": "mautic/core-lib",
+                            "version": "4.3.x-dev",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.4.0 <8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": {
+                    "excludes": "8.1",
+                    "set_by": [
+                        {
+                            "name": "mautic/core-lib",
+                            "version": "4.3.x-dev",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.4.0 <8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "7.4",
+                    "8.0"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "7.4.0",
+                    "set_by": [
+                        {
+                            "name": "mautic/core-lib",
+                            "version": "4.3.x-dev",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.4.0 <8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": {
+                    "excludes": "8.1",
+                    "set_by": [
+                        {
+                            "name": "mautic/core-lib",
+                            "version": "4.3.x-dev",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.4.0 <8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": false
+            },
+            "target_fix": {
+                "packages": [
+                    {
+                        "name": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "link": "require",
+                        "target": "php",
+                        "constraint": ">=7.4.0 <8.1",
+                        "dev": false
+                    }
+                ],
+                "command": null,
+                "check": "not_checked",
+                "reason": null,
+                "held_by": [],
+                "platform_step": false
+            }
+        },
+        "score_rules_used": {
+            "counted": 0,
+            "lead-first": 1,
+            "corroborating-share": 0,
+            "advisory-points": 1,
+            "no-reachable-fix-multiplier": 0,
+            "security-max": 1,
+            "divide-reach": 1,
+            "security-exempt-from-reach": 1,
+            "sum": 1,
+            "divide-dev": 0,
+            "floor-once": 0,
+            "band-floors": 1,
+            "zero-verdicts": 0,
+            "sort": null,
+            "gate-bounded-new": 0,
+            "baseline-cover": 0
+        }
+    },
+    "activity_cache_oldest_at": null,
+    "activity_cache_age_hours": null,
+    "packages_checked": 5,
+    "packages_flagged": 1,
+    "packages_multi_flag": 1,
+    "include_dev": false,
+    "not_from_composer_repository": 1,
+    "packages_unchecked_accepted": 0,
+    "network_failures": false,
+    "counts": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0,
+        "unknown": 0,
+        "finished": 0,
+        "ok": 0
+    },
+    "abandoned": {
+        "total": 0,
+        "with_replacement": 0,
+        "with_suggestion": 0
+    },
+    "priorities": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0,
+        "none": 0
+    },
+    "flags": {
+        "abandoned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "silent": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "pinned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "left-behind": {
+            "carrying": 1,
+            "leading": 1,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 1,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "old-promise": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "stale": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "capped": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "vulnerable": {
+            "carrying": 1,
+            "leading": null,
+            "accepted": null,
+            "by_verdict": {
+                "critical": 0,
+                "high": 1,
+                "medium": 0,
+                "low": 0
+            }
+        }
+    },
+    "exposure": [
+        {
+            "package": "mautic/core-lib",
+            "flagged": 1
+        }
+    ],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
+    "rot_depth": {
+        "flagged": 1,
+        "measured": 1,
+        "unmeasured": {
+            "unreached": 0,
+            "no_composer_json": 0
+        },
+        "by_reach": {
+            "direct": 0,
+            "transitive": 1,
+            "unreached": 0
+        },
+        "not_in_composer_json": 1,
+        "require_dev_not_walked": 0,
+        "production": 1,
+        "development": 0,
+        "by_depth": [
+            {
+                "depth": 0,
+                "flagged": 0
+            },
+            {
+                "depth": 1,
+                "flagged": 1
+            }
+        ],
+        "max_depth": 1,
+        "deepest": [
+            {
+                "package": "symfony/routing",
+                "chain": [
+                    "mautic/core-lib",
+                    "symfony/routing"
+                ]
+            }
+        ]
+    },
+    "libyears": {
+        "total": 4.46,
+        "direct_requirements": 0,
+        "measured": 1,
+        "at_least_count": 0,
+        "unmeasured": {
+            "not_from_composer_repository": 0,
+            "unavailable": 0,
+            "not_found": 0,
+            "branch_snapshot": 0,
+            "shared_commit": 0,
+            "undated": 0,
+            "no_stable_release": 0,
+            "undated_releases": 0
+        },
+        "furthest_behind": {
+            "package": "symfony/routing",
+            "version": "v4.4.41",
+            "libyears": 4.46,
+            "at_least": false
+        },
+        "packages": 1
+    },
+    "baseline": null,
+    "gate": {
+        "fails": true,
+        "tripped_by": [
+            "fail_on"
+        ],
+        "fail_on_applied": true,
+        "reaching": 1,
+        "failing": 1,
+        "exempt": {
+            "baseline": 0
+        },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/routing"
+        ],
+        "failing_by": [
+            {
+                "value": "high",
+                "failing": 1
+            }
+        ],
+        "not_applied": [],
+        "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+    },
+    "security": {
+        "check": "complete",
+        "packages": {
+            "vulnerable": 1,
+            "unchecked": 0,
+            "ignored": 0,
+            "clear": 0
+        },
+        "advisories": {
+            "counted": 2,
+            "ignored": 0
+        },
+        "severities": {
+            "critical": 0,
+            "high": 0,
+            "medium": 2,
+            "unrated": 0,
+            "low": 0
+        },
+        "fixes": {
+            "update": 0,
+            "upgrade": 1,
+            "raise-php": 0,
+            "unknown": 0,
+            "blocked": 0,
+            "none": 0
+        },
+        "update_now": [],
+        "update_now_command": null,
+        "fix_unknown": 0
+    },
+    "data_date": "2026-10-01T17:41:20+00:00",
+    "notes": [
+        "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+    ],
+    "note_details": [
+        {
+            "code": "not_from_composer_repository",
+            "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read",
+            "docs_url": "https://lockrot.dev/notes/#not_from_composer_repository",
+            "sets_network_failures": false,
+            "data": {
+                "package_count": 1,
+                "advisories_asked": true
+            }
+        }
+    ],
+    "findings": [
+        {
+            "package": "symfony/routing",
+            "version": "v4.4.41",
+            "branch": "4.x",
+            "installed_php": {
+                "requires": ">=7.1.3",
+                "target_runs": true,
+                "project_allows": null
+            },
+            "verdict": "high",
+            "priority": "high",
+            "lead": "left-behind",
+            "rank": 1,
+            "flags": [
+                {
+                    "id": "left-behind",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S8"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "years",
+                        "value": 4.2,
+                        "source": "branch"
+                    },
+                    "summary": "branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.8 (2026-09-28)"
+                },
+                {
+                    "id": "vulnerable",
+                    "role": "security",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S9"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "advisories",
+                        "value": 2,
+                        "source": null
+                    },
+                    "summary": "2 advisories: 2 medium \u2014 none fixed on 4.x; worst: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 16,
+                "exact": 16,
+                "rounded_down": false,
+                "band": {
+                    "floor": 16,
+                    "next": "critical",
+                    "to_next": 16
+                },
+                "decided_by": "combination",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 8,
+                        "alone": {
+                            "total": 8,
+                            "verdict": "medium"
+                        }
+                    },
+                    "security": {
+                        "status": "counted",
+                        "contribution": 8,
+                        "alone": {
+                            "total": 8,
+                            "verdict": "medium"
+                        },
+                        "of": 2,
+                        "tied": [
+                            "PKSA-yc7t-91v9-99xs"
+                        ]
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "left-behind",
+                        "role": "lead",
+                        "weight": 16,
+                        "divisor": 1,
+                        "points": 16,
+                        "contribution": 8
+                    },
+                    {
+                        "part": "security",
+                        "flag": "vulnerable",
+                        "role": "security",
+                        "advisory": "PKSA-bf7t-jnpz-492k",
+                        "severity": "medium",
+                        "fix_kind": "upgrade",
+                        "weight": 8,
+                        "multiplier": 1,
+                        "points": 8,
+                        "contribution": 8
+                    }
+                ],
+                "modifiers": [
+                    {
+                        "reason": "transitive",
+                        "applies_to": "maintenance",
+                        "divide_by": 2,
+                        "before": 16,
+                        "after": 8
+                    }
+                ],
+                "accepted": [],
+                "without": [
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "left-behind"
+                        },
+                        "revealed": [],
+                        "total": 8,
+                        "verdict": "medium",
+                        "lead": null,
+                        "deciding_advisory": "PKSA-bf7t-jnpz-492k",
+                        "at_least": false
+                    },
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "vulnerable"
+                        },
+                        "revealed": [],
+                        "total": 8,
+                        "verdict": "medium",
+                        "lead": "left-behind",
+                        "deciding_advisory": null,
+                        "at_least": false
+                    },
+                    {
+                        "remove": {
+                            "kind": "advisory",
+                            "id": "PKSA-bf7t-jnpz-492k"
+                        },
+                        "revealed": [],
+                        "total": 16,
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "deciding_advisory": "PKSA-yc7t-91v9-99xs",
+                        "at_least": false
+                    }
+                ],
+                "text": "16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory]"
+            },
+            "next_step": {
+                "kind": "require",
+                "source": "vulnerable",
+                "merged": [],
+                "fix_kind": "upgrade",
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "5.x",
+                "version": "v5.4.53",
+                "newest": "v5.4.53",
+                "constraint": "^5.4.53",
+                "latest": null,
+                "php_check": {
+                    "requires": ">=7.2.5",
+                    "project_allows": null,
+                    "target_runs": true,
+                    "raise_to": null,
+                    "raise_size": null
+                },
+                "crosses_major": true,
+                "held_by": [
+                    {
+                        "source": "package",
+                        "package": "acme/routing-bridge",
+                        "version": "v4.4.41",
+                        "link": "require",
+                        "target": null,
+                        "constraint": "self.version",
+                        "holder": {
+                            "verdict": "unknown",
+                            "lead": null,
+                            "flag_ids": [],
+                            "direct": false,
+                            "replacement": null,
+                            "next_step": null
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "link": "require",
+                        "target": null,
+                        "constraint": "~4.4.0",
+                        "holder": {
+                            "verdict": "critical",
+                            "lead": "pinned",
+                            "flag_ids": [
+                                "pinned",
+                                "capped",
+                                "vulnerable"
+                            ],
+                            "direct": true,
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "no-move",
+                                "to_branch": null,
+                                "constraint": null,
+                                "check": null
+                            }
+                        }
+                    }
+                ],
+                "clears": [
+                    {
+                        "kind": "flag",
+                        "id": "left-behind",
+                        "basis": "branch_releasing"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-bf7t-jnpz-492k",
+                        "basis": "outside_range"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-yc7t-91v9-99xs",
+                        "basis": "outside_range"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold",
+                        "composer_resolves"
+                    ]
+                },
+                "check": null,
+                "moves_with": [],
+                "composer_moves_because": [
+                    "holders",
+                    "crosses_major"
+                ],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/routing",
+                        "v5.4.53",
+                        "--locked"
+                    ]
+                ],
+                "through": [
+                    {
+                        "package": "mautic/core-lib",
+                        "installed_version": "4.3.x-dev",
+                        "installed_requires": null,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "not_from_composer_repository",
+                        "local": true,
+                        "newest_is_installed": null
+                    }
+                ],
+                "also": [],
+                "text": "move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; held by mautic/core-lib 4.3.x-dev (requires ~4.4.0; itself pinned) and acme/routing-bridge v4.4.41 (requires self.version (v4.4.41)); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            },
+            "security": {
+                "status": "vulnerable",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 4,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 4,
+                        "reason": null
+                    }
+                ],
+                "worst": "medium",
+                "counts": {
+                    "critical": 0,
+                    "high": 0,
+                    "medium": 2,
+                    "unrated": 0,
+                    "low": 0
+                },
+                "ignored": [],
+                "ignored_count": 0,
+                "fix_kind": "upgrade",
+                "installed_branch_fixes": {
+                    "fixed": 0,
+                    "unknown": 0,
+                    "of": 2,
+                    "fix_kind": null,
+                    "lowest": null,
+                    "newest": "v4.4.44",
+                    "held_by": [],
+                    "if_applied": null,
+                    "check": null
+                },
+                "move_in": "next_step",
+                "gets": null,
+                "partial": null
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "symfony/routing",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/symfony/routing",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": false,
+            "dev": false,
+            "reach": "transitive",
+            "chain": [
+                "mautic/core-lib",
+                "symfony/routing"
+            ],
+            "depth": 1,
+            "depth_unmeasured": null,
+            "named_in": [],
+            "direct_dependents": [
+                "mautic/core-lib"
+            ],
+            "signals": [
+                {
+                    "id": "S8",
+                    "level": "warn",
+                    "summary": "branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.8 (2026-09-28)",
+                    "data": {
+                        "branch": "4.x",
+                        "branch_last_release": "2022-07-20T09:59:04+00:00",
+                        "branch_last_version": "v4.4.44",
+                        "years": 4.2,
+                        "newest_branch": "8.x",
+                        "newest_version": "v8.1.8",
+                        "newest_release": "2026-09-28T19:13:15+00:00",
+                        "newest_php": ">=8.4.1",
+                        "newest_within_reach": true,
+                        "floor_php": null,
+                        "floor_source": null,
+                        "reachable_branch": "8.x",
+                        "reachable_version": "v8.1.8",
+                        "reachable_release": "2026-09-28T19:13:15+00:00",
+                        "suggested_constraint": "^8.1",
+                        "dated_by": null,
+                        "reachable_php": ">=8.4.1",
+                        "reachable_admits": {
+                            "project": null,
+                            "target": true
+                        },
+                        "newest_years": 0,
+                        "reachable_years": 0
+                    }
+                },
+                {
+                    "id": "S9",
+                    "level": "warn",
+                    "summary": "2 security advisories affect v4.4.41 (CVE-2026-48784, CVE-2026-45065); 1 fixed in v5.4.53, 1 fixed in v5.4.52",
+                    "data": {
+                        "advisories": [
+                            {
+                                "id": "PKSA-bf7t-jnpz-492k",
+                                "cve": "CVE-2026-48784",
+                                "title": "UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+                                "link": "https://symfony.com/cve-2026-48784",
+                                "reported_at": "2026-05-26T08:00:00+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.53|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.41|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.13|>=8.0.0,<8.0.13",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": true,
+                                "fix": {
+                                    "kind": "upgrade",
+                                    "to_branch": "5.x",
+                                    "version": "v5.4.53",
+                                    "newest": "v5.4.53",
+                                    "on_installed_branch": false,
+                                    "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
+                                    "held_by": [
+                                        {
+                                            "source": "package",
+                                            "package": "acme/routing-bridge",
+                                            "version": "v4.4.41",
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "self.version",
+                                            "holder": {
+                                                "verdict": "unknown",
+                                                "lead": null,
+                                                "flag_ids": [],
+                                                "direct": false,
+                                                "replacement": null,
+                                                "next_step": null
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "mautic/core-lib",
+                                            "version": "4.3.x-dev",
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "~4.4.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned",
+                                                    "capped",
+                                                    "vulnerable"
+                                                ],
+                                                "direct": true,
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null,
+                                                    "check": null
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-yc7t-91v9-99xs",
+                                "cve": "CVE-2026-45065",
+                                "title": "UrlGenerator Route-Requirement Bypass via Unanchored Regex Alternation \u2192 Off-Site //host URL Injection",
+                                "link": "https://symfony.com/cve-2026-45065",
+                                "reported_at": "2026-05-20T08:00:00+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "upgrade",
+                                    "to_branch": "5.x",
+                                    "version": "v5.4.52",
+                                    "newest": "v5.4.53",
+                                    "on_installed_branch": false,
+                                    "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": null,
+                                    "held_by": [
+                                        {
+                                            "source": "package",
+                                            "package": "acme/routing-bridge",
+                                            "version": "v4.4.41",
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "self.version",
+                                            "holder": {
+                                                "verdict": "unknown",
+                                                "lead": null,
+                                                "flag_ids": [],
+                                                "direct": false,
+                                                "replacement": null,
+                                                "next_step": null
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "mautic/core-lib",
+                                            "version": "4.3.x-dev",
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "~4.4.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned",
+                                                    "capped",
+                                                    "vulnerable"
+                                                ],
+                                                "direct": true,
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null,
+                                                    "check": null
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            }
+                        ],
+                        "releases_read": true,
+                        "complete": true
+                    }
+                }
+            ],
+            "evidence": "left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.8 (2026-09-28); vulnerable: 2 advisories: 2 medium \u2014 none fixed on 4.x; worst: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 4.46,
+            "age": {
+                "installed": {
+                    "at": "2022-04-12T15:19:55+00:00",
+                    "years": 4.5,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "v8.1.8",
+                    "at": "2026-09-28T19:13:15+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "v4.4.44",
+                    "at": "2022-07-20T09:59:04+00:00",
+                    "years": 4.2,
+                    "level": "warn",
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-29T14:09:10+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": true,
+                "fails": true,
+                "exempt_by": null,
+                "by": [
+                    {
+                        "value": "high",
+                        "kind": "grade",
+                        "facts": [
+                            {
+                                "kind": "flag",
+                                "id": "left-behind"
+                            },
+                            {
+                                "kind": "advisory",
+                                "id": "PKSA-bf7t-jnpz-492k"
+                            }
+                        ]
+                    }
+                ],
                 "basis": null
             }
         }
@@ -178878,6 +186090,7 @@ export const d_routing = {
                                 "capped",
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "no-move",
@@ -178921,11 +186134,20 @@ export const d_routing = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/routing",
+                        "v5.4.53",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "mautic/core-lib",
@@ -178933,7 +186155,9 @@ export const d_routing = {
                         "installed_requires": null,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "not_from_composer_repository"
+                        "newest_requires_unmeasured": "not_from_composer_repository",
+                        "local": true,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
@@ -179112,6 +186336,7 @@ export const d_routing = {
                                                     "capped",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -179163,6 +186388,7 @@ export const d_routing = {
                                                     "capped",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -180528,6 +187754,7 @@ export const d_silent = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -182018,10 +189245,19 @@ export const d_snapshot_alias = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/event-dispatcher",
+                        "v5.4.45",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "mautic/core-lib",
@@ -182029,7 +189265,9 @@ export const d_snapshot_alias = {
                         "installed_requires": null,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "not_from_composer_repository"
+                        "newest_requires_unmeasured": "not_from_composer_repository",
+                        "local": true,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
@@ -183472,10 +190710,19 @@ export const d_snapshot_dead_line_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/event-dispatcher",
+                        "v4.4.44",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "mautic/core-lib",
@@ -183483,7 +190730,9 @@ export const d_snapshot_dead_line_dagger = {
                         "installed_requires": null,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "not_from_composer_repository"
+                        "newest_requires_unmeasured": "not_from_composer_repository",
+                        "local": true,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
@@ -184931,10 +192180,19 @@ export const d_snapshot_undated_line_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "transitive"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/event-dispatcher",
+                        "v4.4.44",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "mautic/core-lib",
@@ -184942,7 +192200,9 @@ export const d_snapshot_undated_line_dagger = {
                         "installed_requires": null,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "not_from_composer_repository"
+                        "newest_requires_unmeasured": "not_from_composer_repository",
+                        "local": true,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
@@ -187763,15 +195023,9 @@ export const d_stale_capped = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
-                "commands": [
-                    [
-                        "composer",
-                        "why-not",
-                        "symfony/proxy-manager-bridge",
-                        "v6.4.28"
-                    ]
-                ],
+                "commands": [],
                 "through": [
                     {
                         "package": "symfony/proxy-manager-bridge",
@@ -187782,7 +195036,9 @@ export const d_stale_capped = {
                             "released": "2025-11-02T18:11:54+00:00"
                         },
                         "newest_requires": false,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -189158,6 +196414,7 @@ export const d_stale_only = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -189287,6 +196544,1510 @@ export const d_stale_only = {
                     "at": "2023-06-02T07:23:06+00:00",
                     "years": 3.3,
                     "level": "warn"
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        }
+    ]
+} satisfies Report2;
+
+export const d_through_own = {
+    "$schema": "https://lockrot.dev/schema/report-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-10-01T17:41:20+00:00",
+    "run": {
+        "project": "mautic/mautic",
+        "root_package": "mautic/mautic",
+        "target_php": "8.4",
+        "target_php_source": "option",
+        "project_php": null,
+        "project_php_lowest": null,
+        "lock_file": "composer.lock",
+        "fail_on": "high",
+        "fail_on_source": "option",
+        "gates": [
+            {
+                "value": "high",
+                "kind": "grade",
+                "threshold": "high"
+            }
+        ],
+        "strict_network": false,
+        "mode": "check",
+        "include_dev": false,
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flag_ids": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale",
+            "capped",
+            "vulnerable"
+        ],
+        "verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "unknown",
+            "finished",
+            "ok"
+        ],
+        "graded_verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+        ],
+        "signal_ids": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10",
+            "S11"
+        ],
+        "fix_model": 1,
+        "text_grammar": 1,
+        "score_model": {
+            "id": 1,
+            "score_text_grammar": 1,
+            "flag_order": [
+                "abandoned",
+                "silent",
+                "pinned",
+                "left-behind",
+                "old-promise",
+                "stale",
+                "capped",
+                "vulnerable"
+            ],
+            "parts": [
+                {
+                    "id": "maintenance",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "pinned",
+                        "left-behind",
+                        "old-promise",
+                        "stale",
+                        "capped"
+                    ],
+                    "combine": "lead_plus_share"
+                },
+                {
+                    "id": "security",
+                    "flag_ids": [
+                        "vulnerable"
+                    ],
+                    "combine": "max"
+                }
+            ],
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "abandoned",
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S1",
+                        "S3"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "silent",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "silent",
+                        "pinned",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-high-years",
+                        "push-high-years"
+                    ],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "pinned",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 22,
+                    "max_maintenance_flags": [
+                        "pinned",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S6"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "left-behind",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 20,
+                    "max_maintenance_flags": [
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S8"
+                    ],
+                    "thresholds": [
+                        "release-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "old-promise",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 18,
+                    "max_maintenance_flags": [
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S5"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "stale",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 10,
+                    "max_maintenance_flags": [
+                        "stale",
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-warn-years",
+                        "push-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "vulnerable",
+                    "part": "security",
+                    "points": null,
+                    "band": null,
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": null,
+                    "max_maintenance_flags": null,
+                    "raised_by": [
+                        "S9"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "severities"
+                    },
+                    "points_from": "severities"
+                }
+            ],
+            "severities": [
+                {
+                    "id": "critical",
+                    "points": 32,
+                    "band": "critical",
+                    "points_no_reachable_fix": 64,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 4,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "high",
+                    "points": 16,
+                    "band": "high",
+                    "points_no_reachable_fix": 32,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 3,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "unrated",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": "medium",
+                    "basis": {
+                        "points": "counts_as"
+                    }
+                },
+                {
+                    "id": "low",
+                    "points": 2,
+                    "band": "low",
+                    "points_no_reachable_fix": 4,
+                    "band_no_reachable_fix": "low",
+                    "gate_rank": 1,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "share",
+                        "of": "medium",
+                        "share": {
+                            "num": 1,
+                            "den": 4
+                        }
+                    }
+                }
+            ],
+            "fix_kinds": [
+                {
+                    "id": "update",
+                    "ease": 1,
+                    "doubles": false
+                },
+                {
+                    "id": "upgrade",
+                    "ease": 2,
+                    "doubles": false
+                },
+                {
+                    "id": "raise-php",
+                    "ease": 3,
+                    "doubles": false
+                },
+                {
+                    "id": "unknown",
+                    "ease": 4,
+                    "doubles": false
+                },
+                {
+                    "id": "blocked",
+                    "ease": 5,
+                    "doubles": true
+                },
+                {
+                    "id": "none",
+                    "ease": 6,
+                    "doubles": true
+                }
+            ],
+            "bands": [
+                {
+                    "verdict": "critical",
+                    "floor": 32
+                },
+                {
+                    "verdict": "high",
+                    "floor": 16
+                },
+                {
+                    "verdict": "medium",
+                    "floor": 8
+                },
+                {
+                    "verdict": "low",
+                    "floor": 1
+                }
+            ],
+            "zero_verdicts": [
+                {
+                    "verdict": "finished",
+                    "when": "allowlisted"
+                },
+                {
+                    "verdict": "unknown",
+                    "when": "no_metadata"
+                },
+                {
+                    "verdict": "ok",
+                    "when": "otherwise"
+                }
+            ],
+            "exact_unit": 0.5,
+            "rounding": "floor_once",
+            "max_total": 104,
+            "bar_max": 64,
+            "bar_overflow": "clip",
+            "exclusive_groups": [
+                {
+                    "id": "liveness",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "stale"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "branch",
+                    "flag_ids": [
+                        "pinned",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_age",
+                    "flag_ids": [
+                        "silent",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_push",
+                    "flag_ids": [
+                        "left-behind",
+                        "stale"
+                    ],
+                    "holds_unless": {
+                        "threshold": "push-warn-years",
+                        "below": "release-warn-years"
+                    }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
+                }
+            ],
+            "sort": [
+                {
+                    "key": "verdict",
+                    "path": "verdict",
+                    "dir": "order",
+                    "order": [
+                        [
+                            "critical"
+                        ],
+                        [
+                            "high"
+                        ],
+                        [
+                            "medium"
+                        ],
+                        [
+                            "low"
+                        ],
+                        [
+                            "unknown"
+                        ],
+                        [
+                            "finished",
+                            "ok"
+                        ]
+                    ],
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "security",
+                    "path": "score.parts.security.contribution",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "score",
+                    "path": "score.exact",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "direct",
+                    "path": "direct",
+                    "dir": "true_first",
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "package",
+                    "path": "package",
+                    "dir": "asc",
+                    "collation": "bytes",
+                    "default": null
+                }
+            ],
+            "rules": [
+                {
+                    "id": "counted",
+                    "stage": 1,
+                    "kind": "select",
+                    "applies_to": "flags",
+                    "accept_group": "liveness",
+                    "accept_covers": "listed_and_below",
+                    "why": "accepted-facts-shown-not-counted",
+                    "doc": "score-counted",
+                    "illustration": null
+                },
+                {
+                    "id": "lead-first",
+                    "stage": 2,
+                    "kind": "select",
+                    "applies_to": "maintenance",
+                    "order": "flag_order",
+                    "share": {
+                        "num": 1,
+                        "den": 1
+                    },
+                    "why": "strongest-fact-in-full",
+                    "doc": "score-lead-first",
+                    "illustration": null
+                },
+                {
+                    "id": "corroborating-share",
+                    "stage": 3,
+                    "kind": "share",
+                    "applies_to": "maintenance",
+                    "share": {
+                        "num": 1,
+                        "den": 4
+                    },
+                    "why": "correlated-evidence",
+                    "doc": "score-corroborating-share",
+                    "illustration": {
+                        "lead": "left-behind",
+                        "flag": "old-promise",
+                        "weight": 16,
+                        "points": 4
+                    }
+                },
+                {
+                    "id": "advisory-points",
+                    "stage": 4,
+                    "kind": "lookup",
+                    "applies_to": "security",
+                    "table": "severities",
+                    "why": "severity-points",
+                    "doc": "score-advisory-points",
+                    "illustration": null
+                },
+                {
+                    "id": "no-reachable-fix-multiplier",
+                    "stage": 5,
+                    "kind": "multiply",
+                    "applies_to": "advisory",
+                    "factor": 2,
+                    "when_fix": [
+                        "none",
+                        "blocked"
+                    ],
+                    "why": "one-band-up",
+                    "doc": "score-no-reachable-fix-multiplier",
+                    "illustration": {
+                        "severity": "high",
+                        "before": 16,
+                        "after": 32,
+                        "band_before": "high",
+                        "band_after": "critical"
+                    }
+                },
+                {
+                    "id": "security-max",
+                    "stage": 6,
+                    "kind": "max",
+                    "applies_to": "security",
+                    "tie_break": [
+                        {
+                            "key": "points",
+                            "dir": "desc",
+                            "collation": null
+                        },
+                        {
+                            "key": "severity",
+                            "dir": "order",
+                            "collation": null
+                        },
+                        {
+                            "key": "id",
+                            "dir": "asc",
+                            "collation": "bytes"
+                        }
+                    ],
+                    "why": "one-number-per-part",
+                    "doc": "score-security-max",
+                    "illustration": null
+                },
+                {
+                    "id": "divide-reach",
+                    "stage": 7,
+                    "kind": "divide",
+                    "applies_to": "maintenance",
+                    "by": 2,
+                    "when": [
+                        "transitive",
+                        "unreached"
+                    ],
+                    "why": "reach-halves-maintenance",
+                    "doc": "score-divide-reach",
+                    "illustration": {
+                        "flag": "abandoned",
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "security-exempt-from-reach",
+                    "stage": 8,
+                    "kind": "exempt",
+                    "applies_to": "security",
+                    "of": "divide-reach",
+                    "why": "exploitability-independent-of-reach",
+                    "doc": "score-security-exempt-from-reach",
+                    "illustration": {
+                        "severity": "critical",
+                        "reach": "transitive",
+                        "total": 32
+                    }
+                },
+                {
+                    "id": "sum",
+                    "stage": 9,
+                    "kind": "combine",
+                    "applies_to": "total",
+                    "op": "sum",
+                    "ratio_from": "medium",
+                    "why": "parts-add",
+                    "doc": "score-sum",
+                    "illustration": {
+                        "maintenance": 16,
+                        "security": 16,
+                        "total": 32,
+                        "band": "critical",
+                        "low_maintenance": 4,
+                        "low_security": 4,
+                        "low_total": 8,
+                        "low_band": "medium"
+                    }
+                },
+                {
+                    "id": "divide-dev",
+                    "stage": 10,
+                    "kind": "divide",
+                    "applies_to": "total",
+                    "by": 2,
+                    "when": [
+                        "dev"
+                    ],
+                    "why": "dev-halves-total",
+                    "doc": "score-divide-dev",
+                    "illustration": {
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "floor-once",
+                    "stage": 11,
+                    "kind": "floor",
+                    "applies_to": "total",
+                    "why": "integer-band-edges",
+                    "doc": "score-floor-once",
+                    "illustration": {
+                        "exact": 4.5,
+                        "total": 4
+                    }
+                },
+                {
+                    "id": "band-floors",
+                    "stage": 12,
+                    "kind": "band",
+                    "applies_to": "total",
+                    "ratio": 2,
+                    "ratio_from": "medium",
+                    "why": "two-floor-parts-make-next",
+                    "doc": "score-band-floors",
+                    "illustration": null
+                },
+                {
+                    "id": "zero-verdicts",
+                    "stage": 13,
+                    "kind": "zero",
+                    "applies_to": "total",
+                    "table": "zero_verdicts",
+                    "why": "score-zero-says-why",
+                    "doc": "score-zero-verdicts",
+                    "illustration": null
+                },
+                {
+                    "id": "sort",
+                    "stage": 14,
+                    "kind": "order",
+                    "applies_to": "findings",
+                    "why": "advisory-findings-first",
+                    "doc": "score-sort",
+                    "illustration": null
+                },
+                {
+                    "id": "gate-bounded-new",
+                    "stage": 15,
+                    "kind": "gate",
+                    "applies_to": "gate",
+                    "cap_multiplier": 2,
+                    "why": "new-fact-sets-level",
+                    "doc": "score-gate-bounded-new",
+                    "illustration": {
+                        "score": 36,
+                        "new": 16,
+                        "gate": 32
+                    }
+                },
+                {
+                    "id": "baseline-cover",
+                    "stage": 16,
+                    "kind": "cover",
+                    "applies_to": "gate",
+                    "order": "flag_order",
+                    "covers": "listed_and_below",
+                    "why": "recorded-lead-covers-below",
+                    "doc": "score-baseline-cover",
+                    "illustration": null
+                }
+            ],
+            "docs": "https://lockrot.dev/verdicts/model-1/"
+        },
+        "advisory_lookup": {
+            "scope": "all",
+            "scope_source": "default",
+            "packages_asked": 1,
+            "packages_not_asked": 0,
+            "other_repositories": 0,
+            "repositories": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "outcome": "answered",
+                    "reason": null,
+                    "message": null,
+                    "packages_with_records": 0,
+                    "records": 0
+                }
+            ]
+        },
+        "move_check": null,
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "7.0",
+                    "7.1",
+                    "7.2",
+                    "7.3",
+                    "7.4",
+                    "8.0",
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "7.0.0",
+                    "set_by": [
+                        {
+                            "name": "voku/stop-words",
+                            "version": "2.0.1",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.0.0",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "7.0",
+                    "7.1",
+                    "7.2",
+                    "7.3",
+                    "7.4",
+                    "8.0",
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "7.0.0",
+                    "set_by": [
+                        {
+                            "name": "voku/stop-words",
+                            "version": "2.0.1",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.0.0",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": true
+            },
+            "target_fix": null
+        },
+        "score_rules_used": {
+            "counted": 0,
+            "lead-first": 1,
+            "corroborating-share": 1,
+            "advisory-points": 0,
+            "no-reachable-fix-multiplier": 0,
+            "security-max": 0,
+            "divide-reach": 1,
+            "security-exempt-from-reach": 0,
+            "sum": 0,
+            "divide-dev": 0,
+            "floor-once": 0,
+            "band-floors": 1,
+            "zero-verdicts": 0,
+            "sort": null,
+            "gate-bounded-new": 0,
+            "baseline-cover": 0
+        }
+    },
+    "activity_cache_oldest_at": null,
+    "activity_cache_age_hours": null,
+    "packages_checked": 3,
+    "packages_flagged": 1,
+    "packages_multi_flag": 1,
+    "include_dev": false,
+    "not_from_composer_repository": 1,
+    "packages_unchecked_accepted": 0,
+    "network_failures": false,
+    "counts": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0,
+        "unknown": 0,
+        "finished": 0,
+        "ok": 0
+    },
+    "abandoned": {
+        "total": 0,
+        "with_replacement": 0,
+        "with_suggestion": 0
+    },
+    "priorities": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0,
+        "none": 0
+    },
+    "flags": {
+        "abandoned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "silent": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "pinned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "left-behind": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "old-promise": {
+            "carrying": 1,
+            "leading": 1,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 1,
+                "low": 0
+            }
+        },
+        "stale": {
+            "carrying": 1,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 1,
+                "low": 0
+            }
+        },
+        "capped": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "vulnerable": {
+            "carrying": 0,
+            "leading": null,
+            "accepted": null,
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        }
+    },
+    "exposure": [
+        {
+            "package": "mautic/core-lib",
+            "flagged": 1
+        }
+    ],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
+    "rot_depth": {
+        "flagged": 1,
+        "measured": 1,
+        "unmeasured": {
+            "unreached": 0,
+            "no_composer_json": 0
+        },
+        "by_reach": {
+            "direct": 0,
+            "transitive": 1,
+            "unreached": 0
+        },
+        "not_in_composer_json": 1,
+        "require_dev_not_walked": 0,
+        "production": 1,
+        "development": 0,
+        "by_depth": [
+            {
+                "depth": 0,
+                "flagged": 0
+            },
+            {
+                "depth": 1,
+                "flagged": 0
+            },
+            {
+                "depth": 2,
+                "flagged": 1
+            }
+        ],
+        "max_depth": 2,
+        "deepest": [
+            {
+                "package": "voku/stop-words",
+                "chain": [
+                    "mautic/core-lib",
+                    "jbroadway/urlify",
+                    "voku/stop-words"
+                ]
+            }
+        ]
+    },
+    "libyears": {
+        "total": 0,
+        "direct_requirements": 0,
+        "measured": 1,
+        "at_least_count": 0,
+        "unmeasured": {
+            "not_from_composer_repository": 0,
+            "unavailable": 0,
+            "not_found": 0,
+            "branch_snapshot": 0,
+            "shared_commit": 0,
+            "undated": 0,
+            "no_stable_release": 0,
+            "undated_releases": 0
+        },
+        "furthest_behind": null,
+        "packages": 1
+    },
+    "baseline": null,
+    "gate": {
+        "fails": false,
+        "tripped_by": [],
+        "fail_on_applied": true,
+        "reaching": 0,
+        "failing": 0,
+        "exempt": {
+            "baseline": 0
+        },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
+        "failing_by": [
+            {
+                "value": "high",
+                "failing": 0
+            }
+        ],
+        "not_applied": [],
+        "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+    },
+    "security": {
+        "check": "complete",
+        "packages": {
+            "vulnerable": 0,
+            "unchecked": 0,
+            "ignored": 0,
+            "clear": 1
+        },
+        "advisories": {
+            "counted": 0,
+            "ignored": 0
+        },
+        "severities": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "unrated": 0,
+            "low": 0
+        },
+        "fixes": {
+            "update": 0,
+            "upgrade": 0,
+            "raise-php": 0,
+            "unknown": 0,
+            "blocked": 0,
+            "none": 0
+        },
+        "update_now": [],
+        "update_now_command": null,
+        "fix_unknown": 0
+    },
+    "data_date": "2026-10-01T17:41:20+00:00",
+    "notes": [
+        "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+    ],
+    "note_details": [
+        {
+            "code": "not_from_composer_repository",
+            "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read",
+            "docs_url": "https://lockrot.dev/notes/#not_from_composer_repository",
+            "sets_network_failures": false,
+            "data": {
+                "package_count": 1,
+                "advisories_asked": true
+            }
+        }
+    ],
+    "findings": [
+        {
+            "package": "voku/stop-words",
+            "version": "2.0.1",
+            "branch": "2.x",
+            "installed_php": {
+                "requires": ">=7.0.0",
+                "target_runs": true,
+                "project_allows": null
+            },
+            "verdict": "medium",
+            "priority": "medium",
+            "lead": "old-promise",
+            "rank": 1,
+            "flags": [
+                {
+                    "id": "old-promise",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S5"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "php",
+                        "value": 7,
+                        "source": null
+                    },
+                    "summary": "released 2018-11-23 for PHP 7 (php \">=7.0.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                },
+                {
+                    "id": "stale",
+                    "role": "corroborating",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S2"
+                    ],
+                    "degree": {
+                        "liveness_complete": true
+                    },
+                    "headline": {
+                        "unit": "years",
+                        "value": 7.9,
+                        "source": "release"
+                    },
+                    "summary": "last release 2018-11-23 (7.9 years ago)"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 9,
+                "exact": 9,
+                "rounded_down": false,
+                "band": {
+                    "floor": 8,
+                    "next": "high",
+                    "to_next": 7
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 9,
+                        "alone": {
+                            "total": 9,
+                            "verdict": "medium"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "old-promise",
+                        "role": "lead",
+                        "weight": 16,
+                        "divisor": 1,
+                        "points": 16,
+                        "contribution": 8
+                    },
+                    {
+                        "part": "maintenance",
+                        "flag": "stale",
+                        "role": "corroborating",
+                        "weight": 8,
+                        "divisor": 4,
+                        "points": 2,
+                        "contribution": 1
+                    }
+                ],
+                "modifiers": [
+                    {
+                        "reason": "transitive",
+                        "applies_to": "maintenance",
+                        "divide_by": 2,
+                        "before": 18,
+                        "after": 9
+                    }
+                ],
+                "accepted": [],
+                "without": [
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "old-promise"
+                        },
+                        "revealed": [],
+                        "total": 4,
+                        "verdict": "low",
+                        "lead": "stale",
+                        "deciding_advisory": null,
+                        "at_least": false
+                    },
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "stale"
+                        },
+                        "revealed": [],
+                        "total": 8,
+                        "verdict": "medium",
+                        "lead": "old-promise",
+                        "deciding_advisory": null,
+                        "at_least": false
+                    }
+                ],
+                "text": "9 = (old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive"
+            },
+            "next_step": {
+                "kind": "test",
+                "source": "old-promise",
+                "merged": [],
+                "fix_kind": null,
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": null,
+                "version": null,
+                "newest": null,
+                "constraint": null,
+                "latest": {
+                    "version": "2.0.1",
+                    "released": "2018-11-23T01:37:27+00:00",
+                    "is_installed": true,
+                    "relation": null,
+                    "snapshot_time": null
+                },
+                "php_check": null,
+                "crosses_major": null,
+                "held_by": [],
+                "clears": [],
+                "unverified": [],
+                "adds": [],
+                "leaves": [
+                    {
+                        "kind": "flag",
+                        "id": "old-promise"
+                    },
+                    {
+                        "kind": "flag",
+                        "id": "stale"
+                    }
+                ],
+                "clears_all": false,
+                "if_applied": null,
+                "check": null,
+                "moves_with": [],
+                "composer_moves_because": [
+                    "transitive"
+                ],
+                "commands": [],
+                "through": [
+                    {
+                        "package": "mautic/core-lib",
+                        "installed_version": "4.3.x-dev",
+                        "installed_requires": null,
+                        "newest_stable": null,
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "not_from_composer_repository",
+                        "local": true,
+                        "newest_is_installed": null
+                    }
+                ],
+                "also": [],
+                "text": "test it on PHP 8.4 \u2014 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): change your own package mautic/core-lib"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "voku/stop-words",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/voku/stop-words",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": false,
+            "dev": false,
+            "reach": "transitive",
+            "chain": [
+                "mautic/core-lib",
+                "jbroadway/urlify",
+                "voku/stop-words"
+            ],
+            "depth": 2,
+            "depth_unmeasured": null,
+            "named_in": [],
+            "direct_dependents": [
+                "mautic/core-lib"
+            ],
+            "signals": [
+                {
+                    "id": "S2",
+                    "level": "high",
+                    "summary": "last release 2018-11-23 (7.9 years ago)",
+                    "data": {
+                        "last_release": "2018-11-23T01:37:27+00:00",
+                        "last_version": "2.0.1",
+                        "years": 7.9,
+                        "dated_by": null
+                    }
+                },
+                {
+                    "id": "S5",
+                    "level": "warn",
+                    "summary": "released 2018-11-23 for PHP 7 (php \">=7.0.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "data": {
+                        "target_php": "8.4",
+                        "target_major": "8.0",
+                        "ga_date": "2020-11-26",
+                        "php_constraint": ">=7.0.0",
+                        "written_for_php": 7,
+                        "released": "2018-11-23T01:37:27+00:00"
+                    }
+                }
+            ],
+            "evidence": "old-promise: released 2018-11-23 for PHP 7 (php \">=7.0.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; stale: last release 2018-11-23 (7.9 years ago)",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0,
+            "age": {
+                "installed": {
+                    "at": "2018-11-23T01:37:27+00:00",
+                    "years": 7.9,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "2.0.1",
+                    "at": "2018-11-23T01:37:27+00:00",
+                    "years": 7.9,
+                    "level": "high",
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "2.0.1",
+                    "at": "2018-11-23T01:37:27+00:00",
+                    "years": 7.9,
+                    "level": "high",
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-08-28T10:55:29+00:00",
+                    "years": 0.1,
+                    "level": null
                 },
                 "push_unmeasured": null
             },
@@ -190665,6 +199426,7 @@ export const d_tie_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -190673,6 +199435,13 @@ export const d_tie_dagger = {
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -190713,6 +199482,7 @@ export const d_tie_dagger = {
                         "clears_all": false,
                         "if_applied": null,
                         "check": null,
+                        "moves_with": [],
                         "composer_moves_because": [],
                         "commands": [],
                         "text": "no release fixes it"
@@ -192375,6 +201145,7 @@ export const d_twig_1 = {
                             "flag_ids": [
                                 "pinned"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "no-move",
@@ -192398,6 +201169,7 @@ export const d_twig_1 = {
                                 "left-behind",
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "raise-php",
@@ -192512,6 +201284,7 @@ export const d_twig_1 = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -192527,6 +201300,13 @@ export const d_twig_1 = {
                         "composer",
                         "require",
                         "twig/twig:^3.27.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "twig/twig",
+                        "v3.27.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -192718,6 +201498,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -192741,6 +201522,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -192799,6 +201581,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -192822,6 +201605,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -192880,6 +201664,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -192903,6 +201688,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -192997,6 +201783,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -193020,6 +201807,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -193078,6 +201866,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -193101,6 +201890,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -193195,6 +201985,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -193218,6 +202009,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -193276,6 +202068,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -193299,6 +202092,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -193357,6 +202151,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -193380,6 +202175,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -193438,6 +202234,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -193461,6 +202258,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -193519,6 +202317,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -193542,6 +202341,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -193600,6 +202400,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -193623,6 +202424,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -193681,6 +202483,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -193704,6 +202507,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -193762,6 +202566,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -193785,6 +202590,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -193843,6 +202649,7 @@ export const d_twig_1 = {
                                                 "flag_ids": [
                                                     "pinned"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -193866,6 +202673,7 @@ export const d_twig_1 = {
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -195305,6 +204113,7 @@ export const d_twig_dev_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -195318,7 +204127,15 @@ export const d_twig_dev_dagger = {
                     [
                         "composer",
                         "require",
-                        "twig/twig:^3.27.0"
+                        "twig/twig:^3.27.0",
+                        "--dev"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "twig/twig",
+                        "v3.27.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -199851,6 +208668,7 @@ export const d_unrated_dagger = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -201410,6 +210228,7 @@ export const d_unreached_dev_dagger = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major",
                     "unreached"
@@ -201420,6 +210239,13 @@ export const d_unreached_dev_dagger = {
                         "require",
                         "php:>=8.1",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "bacon/bacon-qr-code",
+                        "v3.1.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -202879,6 +211705,7 @@ export const d_unreached_move = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major",
                     "unreached"
@@ -202889,6 +211716,13 @@ export const d_unreached_move = {
                         "require",
                         "php:>=8.1",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "league/uri",
+                        "7.8.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -204297,6 +213131,7 @@ export const d_unreached = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "unreached"
                 ],
@@ -205709,6 +214544,7 @@ export const d_wp_config = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -207302,6 +216138,7 @@ export const d_xmlseclibs = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -207845,12 +216682,20 @@ export const d_xmlseclibs = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "robrichards/xmlseclibs"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "robrichards/xmlseclibs",
+                        "3.1.5",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -207860,7 +216705,9 @@ export const d_xmlseclibs = {
                         "installed_requires": null,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "not_from_composer_repository"
+                        "newest_requires_unmeasured": "not_from_composer_repository",
+                        "local": true,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
@@ -209515,6 +218362,7 @@ export const d_yaml_3_4 = {
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -209529,6 +218377,13 @@ export const d_yaml_3_4 = {
                         "composer",
                         "require",
                         "symfony/yaml:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/yaml",
+                        "v5.4.52",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -211042,6 +219897,7 @@ export const d_zero_n = {
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],

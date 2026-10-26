@@ -20,15 +20,17 @@ final class GradedPackage implements \JsonSerializable
     private ?string $replacement;
     private ?Move $move;
     private string $version;
+    private bool $direct;
     private bool $short = false;
 
     /**
      * @param list<string> $flagIds the counted flags
      * @param string       $version the locked version that the finding grades
      */
-    public function __construct(string $verdict, ?string $lead, array $flagIds, ?string $replacement, ?Move $move, string $version)
+    public function __construct(string $verdict, ?string $lead, array $flagIds, ?string $replacement, ?Move $move, string $version, bool $direct)
     {
         $this->version = $version;
+        $this->direct = $direct;
         $this->verdict = $verdict;
         $this->lead = $lead;
         $this->flagIds = $flagIds;
@@ -38,7 +40,7 @@ final class GradedPackage implements \JsonSerializable
 
     public static function of(Finding $finding): self
     {
-        return new self($finding->verdict(), $finding->lead(), $finding->flagIds(), $finding->countedSuccessor(), $finding->nextStep(), $finding->version());
+        return new self($finding->verdict(), $finding->lead(), $finding->flagIds(), $finding->countedSuccessor(), $finding->nextStep(), $finding->version(), $finding->isDirect());
     }
 
     /** `replacement.finding`: the verdict, the lead and the flags. */
@@ -76,7 +78,7 @@ final class GradedPackage implements \JsonSerializable
         return $this->flagIds;
     }
 
-    /** @return array{verdict: string, lead: ?string, flag_ids: list<string>, replacement?: ?string, next_step?: ?array{kind: string, to_branch: ?string, constraint: ?string, check: ?\Lockrot\Solver\MoveCheck}} */
+    /** @return array{verdict: string, lead: ?string, flag_ids: list<string>, direct?: bool, replacement?: ?string, next_step?: ?array{kind: string, to_branch: ?string, constraint: ?string, check: ?\Lockrot\Solver\MoveCheck}} */
     public function jsonSerialize(): array
     {
         $out = ['verdict' => $this->verdict, 'lead' => $this->lead, 'flag_ids' => $this->flagIds];
@@ -86,6 +88,7 @@ final class GradedPackage implements \JsonSerializable
         $move = $this->move;
 
         return $out + [
+            'direct' => $this->direct,
             'replacement' => $this->replacement,
             'next_step' => $move === null ? null : ['kind' => $move->kind(), 'to_branch' => $move->toBranch(), 'constraint' => $move->constraint(), 'check' => $move->check()],
         ];

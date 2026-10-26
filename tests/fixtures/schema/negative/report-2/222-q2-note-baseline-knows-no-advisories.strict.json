@@ -1350,6 +1350,7 @@
         "vulnerable"
        ],
        "replacement": null,
+       "direct": true,
        "next_step": {
         "kind": "require",
         "to_branch": "4.x",
@@ -1452,6 +1453,7 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "holders",
      "crosses_major"
@@ -1467,6 +1469,13 @@
       "composer",
       "require",
       "twig/twig:^3.27.0"
+     ],
+     [
+      "composer",
+      "why-not",
+      "twig/twig",
+      "v3.27.0",
+      "--locked"
      ]
     ],
     "through": [],
@@ -1617,6 +1626,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -1677,6 +1687,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -1737,6 +1748,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -1797,6 +1809,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -1857,6 +1870,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -1917,6 +1931,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -1977,6 +1992,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -2037,6 +2053,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -2097,6 +2114,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -2157,6 +2175,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -2217,6 +2236,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -2277,6 +2297,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -2337,6 +2358,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -2397,6 +2419,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -2457,6 +2480,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "require",
              "to_branch": "4.x",
@@ -2762,6 +2786,7 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -2770,6 +2795,13 @@
       "composer",
       "require",
       "symfony/monolog-bridge:^5.4.52"
+     ],
+     [
+      "composer",
+      "why-not",
+      "symfony/monolog-bridge",
+      "v5.4.52",
+      "--locked"
      ]
     ],
     "through": [],
@@ -3259,6 +3291,7 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -3273,6 +3306,13 @@
       "composer",
       "require",
       "guzzlehttp/guzzle:^7.15.2"
+     ],
+     [
+      "composer",
+      "why-not",
+      "guzzlehttp/guzzle",
+      "7.15.2",
+      "--locked"
      ]
     ],
     "through": [],
@@ -3900,6 +3940,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -4259,6 +4300,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -4599,6 +4641,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [],
@@ -4901,12 +4944,20 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
       "composer",
       "update",
       "symfony/yaml"
+     ],
+     [
+      "composer",
+      "why-not",
+      "symfony/yaml",
+      "v5.4.52",
+      "--locked"
      ]
     ],
     "through": [],
@@ -5302,6 +5353,7 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
@@ -5312,8 +5364,9 @@
      [
       "composer",
       "why-not",
-      "guzzlehttp/guzzle",
-      "8.2.0"
+      "symfony/polyfill-intl-idn",
+      "v1.38.1",
+      "--locked"
      ]
     ],
     "through": [
@@ -5326,7 +5379,9 @@
        "released": "2026-09-06T13:55:09+00:00"
       },
       "newest_requires": false,
-      "newest_requires_unmeasured": null
+      "newest_requires_unmeasured": null,
+      "local": false,
+      "newest_is_installed": false
      }
     ],
     "also": [],
@@ -5651,6 +5706,7 @@
     "clears_all": false,
     "if_applied": null,
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [],
     "through": [
@@ -5663,7 +5719,9 @@
        "released": "2019-01-23T15:23:04+00:00"
       },
       "newest_requires": null,
-      "newest_requires_unmeasured": "installed_unlisted"
+      "newest_requires_unmeasured": "installed_unlisted",
+      "local": false,
+      "newest_is_installed": false
      }
     ],
     "also": [],

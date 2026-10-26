@@ -251,6 +251,7 @@
                                         "verdict": "ok",
                                         "lead": null,
                                         "flag_ids": [],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": null
                                     }
@@ -481,6 +482,7 @@
                                         "verdict": "ok",
                                         "lead": null,
                                         "flag_ids": [],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": null
                                     }
@@ -567,6 +569,7 @@
                                         "verdict": "ok",
                                         "lead": null,
                                         "flag_ids": [],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": null
                                     }
@@ -653,6 +656,7 @@
                                         "verdict": "ok",
                                         "lead": null,
                                         "flag_ids": [],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": null
                                     }

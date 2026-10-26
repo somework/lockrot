@@ -1384,6 +1384,7 @@
                                 "capped",
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "no-move",
@@ -1427,11 +1428,20 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/routing",
+                        "v5.4.53",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "mautic/core-lib",
@@ -1439,7 +1449,9 @@
                         "installed_requires": null,
                         "newest_stable": null,
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "not_from_composer_repository"
+                        "newest_requires_unmeasured": "not_from_composer_repository",
+                        "local": true,
+                        "newest_is_installed": null
                     }
                 ],
                 "also": [],
@@ -1618,6 +1630,7 @@
                                                     "capped",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",
@@ -1669,6 +1682,7 @@
                                                     "capped",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "no-move",

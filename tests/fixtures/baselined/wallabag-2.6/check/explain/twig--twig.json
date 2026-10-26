@@ -215,8 +215,10 @@
             "check": {
                 "result": "not_checked",
                 "form": null,
-                "reason": "baseline_refused"
+                "reason": "baseline_refused",
+                "installs": null
             },
+            "moves_with": [],
             "composer_moves_because": [],
             "commands": [
                 [
@@ -229,6 +231,13 @@
                     "composer",
                     "require",
                     "twig/twig:^3.27.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "twig/twig",
+                    "v3.27.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -280,7 +289,8 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "baseline_refused"
+                    "reason": "baseline_refused",
+                    "installs": null
                 }
             },
             "move_in": "next_step",
@@ -1207,7 +1217,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "baseline_refused"
+                        "reason": "baseline_refused",
+                        "installs": null
                     }
                 }
             },

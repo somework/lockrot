@@ -186,6 +186,7 @@
    "clears_all": false,
    "if_applied": null,
    "check": null,
+   "moves_with": [],
    "composer_moves_because": [
     "transitive"
    ],
@@ -200,11 +201,13 @@
       "released": "2023-03-11T10:11:33+00:00"
      },
      "newest_requires": null,
-     "newest_requires_unmeasured": "through_other_package"
+     "newest_requires_unmeasured": "through_other_package",
+     "local": false,
+     "newest_is_installed": true
     }
    ],
    "also": [],
-   "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package"
+   "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string"
   },
   "security": {
    "status": "clear",

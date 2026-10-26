@@ -1276,6 +1276,7 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -1284,6 +1285,13 @@
                         "composer",
                         "require",
                         "scheb/2fa-bundle:^6.13"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "scheb/2fa-bundle",
+                        "v6.13.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],

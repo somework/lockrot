@@ -9,6 +9,7 @@ use Composer\Factory;
 use Composer\IO\NullIO;
 use Composer\Package\Loader\RootPackageLoader;
 use Composer\Repository\RepositoryFactory;
+use Composer\Semver\Semver;
 use Composer\Semver\VersionParser;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Deadline;
@@ -31,7 +32,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Each case of train 7d records the Composer CLI's answers to the requests of its designed world
  * (`inputs.solver_world`, SPEC-0.14.md §5.6). lockrot's move checker solves the same requests on
- * that world, served over HTTP, and gives the same result, form, holds and `{cause}` (§6.2). The
+ * that world, served over HTTP, and gives the same result, form, installs, holds and `{cause}` (§6.2). The
  * test runs only on the Composer version that recorded the answers (`inputs.move_check.composer`),
  * and skips on another one, except where {@see ComposerOracle::REQUIRED} makes that a failure.
  * It covers nothing: each solve outlasts a mutant's time limit, and the rule tests kill the mutants.
@@ -91,9 +92,10 @@ final class MoveCheckComposerOracleTest extends TestCase
                 self::assertIsArray($answer);
                 $outcome = self::ask($checker, (string) $key, $answers, JsonPath::arrayAt($world, ['repo']));
                 $withProblem = $key === 'baseline' || strpos((string) $key, 'combined ') === 0;
+                [$installs, $actualInstalls] = self::installs((string) $key, $answer, $outcome);
                 // lockrot reads no hold of a refused baseline: every move is then not checked.
-                $expected[$key] = self::answerOf(JsonPath::stringAt($answer, ['result']), \is_string($answer['form'] ?? null) ? $answer['form'] : null, null, $key === 'baseline' ? [] : JsonPath::arrayAt($answer, ['holds']), $answer['problem'], $withProblem);
-                $actual[$key] = self::answerOf($outcome->check()->result(), $outcome->check()->form(), $outcome->check()->reason(), array_map(static fn (Holder $hold): array => $hold->jsonSerialize(), $outcome->holds()), $outcome->problem(), $withProblem);
+                $expected[$key] = self::answerOf(JsonPath::stringAt($answer, ['result']), \is_string($answer['form'] ?? null) ? $answer['form'] : null, null, $key === 'baseline' ? [] : JsonPath::arrayAt($answer, ['holds']), $answer['problem'], $withProblem) + ['installs' => $installs];
+                $actual[$key] = self::answerOf($outcome->check()->result(), $outcome->check()->form(), $outcome->check()->reason(), array_map(static fn (Holder $hold): array => $hold->jsonSerialize(), $outcome->holds()), $outcome->problem(), $withProblem) + ['installs' => $actualInstalls];
             }
         } finally {
             $server->stop();
@@ -143,9 +145,34 @@ final class MoveCheckComposerOracleTest extends TestCase
     }
 
     /**
-     * Asks the request of one answer key: `baseline`, `combined <names>`, or `<verb> <package>
-     * <constraint> <php>` ({@see MoveQuery::key()}). A combined update writes each name's lead
-     * constraint, the one of its recorded `update` request.
+     * The installs of a resolved answer, recorded and lockrot's: every changed name of a joint
+     * request, the moved package's release of a move, null for the baseline and a combined update.
+     *
+     * @param array<mixed, mixed> $answer
+     *
+     * @return array{mixed, mixed}
+     */
+    private static function installs(string $key, array $answer, CheckOutcome $outcome): array
+    {
+        $recorded = \is_array($answer['installs'] ?? null) && $answer['result'] === 'resolves' ? $answer['installs'] : null;
+        if ($recorded === null || $key === 'baseline' || strpos($key, 'combined ') === 0) {
+            return [null, null];
+        }
+        if (strpos($key, 'joint ') === 0) {
+            $changes = $outcome->changes();
+            ksort($recorded);
+            ksort($changes);
+
+            return [$recorded, $changes];
+        }
+
+        return [$recorded[explode(' ', $key)[1]] ?? null, $outcome->installs()];
+    }
+
+    /**
+     * Asks the request of one answer key: `baseline`, `combined <names>`, `joint <move key> with
+     * <holders>`, or `<verb> <package> <constraint> <php>` ({@see MoveQuery::key()}). A combined
+     * update writes each name's lead constraint, the one of its recorded `update` request.
      *
      * @param array<mixed, mixed> $answers
      * @param array<mixed, mixed> $repo
@@ -166,10 +193,30 @@ final class MoveCheckComposerOracleTest extends TestCase
 
             return $checker->combined($inline);
         }
-        [$verb, $package, $constraint, $php] = $words;
-        $version = self::release($repo, $package, $constraint);
+        if ($words[0] === 'joint') {
+            [$move, $holders] = explode(' with ', substr($key, \strlen('joint ')), 2);
 
-        return $verb === 'require' ? $checker->check(MoveQuery::require($package, $constraint, $version, $php === '' ? null : $php)) : $checker->check(MoveQuery::update($package, $constraint, $version, $php === '' ? null : $php));
+            return $checker->joint(self::query($move, $repo), explode(' ', $holders));
+        }
+
+        return $checker->check(self::query($key, $repo));
+    }
+
+    /**
+     * The query of a move key, with the move's `newest`: the highest release of the world that the
+     * constraint admits.
+     *
+     * @param array<mixed, mixed> $repo
+     */
+    private static function query(string $key, array $repo): MoveQuery
+    {
+        [$verb, $package, $constraint] = explode(' ', $key);
+        $php = explode(' ', $key)[3] ?? '';
+        $version = self::release($repo, $package, $constraint);
+        $admitted = Semver::rsort(Semver::satisfiedBy(array_map(static fn ($release): string => JsonPath::stringAt(JsonPath::decoded($release), ['version']), JsonPath::arrayAt($repo, [$package])), $constraint));
+        $newest = $admitted[0] ?? null;
+
+        return $verb === 'require' ? MoveQuery::require($package, $constraint, $version, $php === '' ? null : $php, $newest) : MoveQuery::update($package, $constraint, $version, $php === '' ? null : $php, $newest);
     }
 
     /**

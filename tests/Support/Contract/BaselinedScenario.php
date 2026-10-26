@@ -380,13 +380,19 @@ final class BaselinedScenario
         ))->withMoveChecks($checks);
     }
 
-    /** The scenario's Composer repository, not started: the recorded answers of both locks' names, and their advisories. */
+    /**
+     * The scenario's Composer repository, not started: the recorded answers of both locks' names,
+     * and their advisories. The move checks also ask names that no lock lists: the answers of
+     * `corpus/solver-p2` serve each one that the scenario's own recordings do not answer.
+     */
     public static function repositoryServer(string $name): FixtureRepositoryServer
     {
         $scenario = self::SCENARIOS[$name];
         $http = self::FIXTURES.'baselined/'.$name.'/http/';
         $locks = [self::FIXTURES.$scenario['before'].'/composer.lock', self::FIXTURES.$scenario['after'].'/composer.lock'];
-        $server = FixtureRepositoryServer::fromLockFiles($locks, self::FIXTURES.'http/p2', [], [['https://repo.packagist.org/p2/', $http.'p2']]);
+        $solverP2 = self::FIXTURES.'corpus/solver-p2';
+        $solverNames = array_values(array_filter(JsonPath::decodeFile($solverP2.'/names.json'), 'is_string'));
+        $server = FixtureRepositoryServer::fromLockFiles($locks, self::FIXTURES.'http/p2', $solverNames, [['https://repo.packagist.org/p2/', $http.'p2'], ['https://repo.packagist.org/p2/', $solverP2]]);
         $advisories = [];
         foreach ([$scenario['before'], $scenario['after']] as $side) {
             $recorded = is_file($http.'advisories/'.basename((string) $side).'.json') ? $http.'advisories/' : self::FIXTURES.'http/advisories/';

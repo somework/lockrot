@@ -229,10 +229,12 @@ defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the mov
                        "`pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: "
                        "the `move_check_failed` note). An open set (§8.2)."),
                       {'type': 'string', 'pattern': SNAKE, 'x-known-values': MOVE_CHECK_REASONS}),
-    }, allOf=[{'description': '`form` is set exactly on `resolves`, and `reason` exactly on `not_checked`.',
+        'installs': nul(("The release of the moved package that the resolving form installs, as its repository lists it. "
+                         "Null unless `result` is `resolves`, and null when the check was recorded without it."), {'type': 'string', 'minLength': 1}),
+    }, allOf=[{'description': '`form` is set exactly on `resolves`, `reason` exactly on `not_checked`, and `installs` only on `resolves`.',
                'anyOf': [{'properties': {'result': {'enum': ['resolves']}, 'form': {'type': 'string'}, 'reason': {'type': 'null'}}},
-                         {'properties': {'result': {'enum': ['refused']}, 'form': {'type': 'null'}, 'reason': {'type': 'null'}}},
-                         {'properties': {'result': {'enum': ['not_checked']}, 'form': {'type': 'null'}, 'reason': {'type': 'string'}}}]}]))
+                         {'properties': {'result': {'enum': ['refused']}, 'form': {'type': 'null'}, 'reason': {'type': 'null'}, 'installs': {'type': 'null'}}},
+                         {'properties': {'result': {'enum': ['not_checked']}, 'form': {'type': 'null'}, 'reason': {'type': 'string'}, 'installs': {'type': 'null'}}}]}]))
 HOLDER_MOVE = obj("The holder's own move, `{kind, to_branch, constraint, check}` of its `next_step`, so a sentence writes \"its own move, require ^4.4.51\" without reading another finding (§5.3, round 2).", {
     'kind': open_set(['replace', 'find-alternative', 'tag', 'require', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'],
                      "The holder's `next_step.kind` (an open set, as `next_step.kind`).", HYPHEN),
@@ -246,6 +248,7 @@ defs['holder'] = nul(("The holder's own finding in this report, for display only
         'verdict': ref('verdict'),
         'lead': nul("The holder's `lead`.", ref('maintenanceFlag')),
         'flag_ids': arr("The holder's counted flag ids, in flag order (every list of bare flag ids is `flag_ids`, §8.2 \"One name, one type\").", ref('flag'), uniqueItems=True),
+        'direct': d("The holder's own `direct`: whether the run requires the holder directly.", {'type': 'boolean'}),
         'replacement': nul("The holder's `replacement` (a Composer package name), so an abandoned holder reads \"held by abandoned symfony/x (replacement: …)\".", ref('packageName')),
         'next_step': nul("The holder's own move; null when the holder's finding has no move (score 0).", HOLDER_MOVE),
     }))
@@ -454,9 +457,14 @@ defs['throughEntry'] = obj("One direct dependent of a transitive package, and wh
                        "`no_stable_release` (no stable release on the run date). An open set: read an unknown reason as another reason it was not checked."),
                       {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['not_from_composer_repository', 'releases_unknown', 'installed_unlisted',
                                                                               'through_other_package', 'no_stable_release']}),
+    'local': d("The dependent's own `origin.local`: the project's own path package. A move then changes that package instead of replacing it.", {'type': 'boolean'}),
+    'newest_is_installed': nul("Whether its locked release is `newest_stable`, so only a replacement moves it; null when `newest_stable` is null.", {'type': 'boolean'}),
 }, allOf=[{'description': '`newest_requires` is null exactly when `newest_requires_unmeasured` is set.',
            'anyOf': [{'properties': {'newest_requires': {'type': 'null'}, 'newest_requires_unmeasured': {'type': 'string'}}},
                      {'properties': {'newest_requires': {'type': 'boolean'}, 'newest_requires_unmeasured': {'type': 'null'}}}]},
+          {'description': '`newest_is_installed` is null exactly when `newest_stable` is null.',
+           'anyOf': [{'properties': {'newest_stable': {'type': 'null'}, 'newest_is_installed': {'type': 'null'}}},
+                     {'properties': {'newest_stable': {'type': 'object'}, 'newest_is_installed': {'type': 'boolean'}}}]},
           {'description': 'A measured entry has a newest stable release and an installed release that requires the package.',
            'anyOf': [{'properties': {'newest_requires': {'type': 'null'}}},
                      {'properties': {'installed_requires': {'enum': [True]}, 'newest_stable': {'type': 'object'}}}]}])
@@ -497,6 +505,13 @@ def move_props(with_also):
         'clears_all': d('`leaves` and `unverified` both empty (§7.6): "it clears all three" is read, not counted.', {'type': 'boolean'}),
         'if_applied': ref('ifApplied'),
         'check': ref('moveCheck'),
+        'moves_with': arr(("The holders that move beside the package when Composer refuses the move alone and resolves one joint request of the package and its holders. "
+                           "Each entry names a holder whose release the joint request changes. Not empty only when `check` resolves and `held_by` is empty."),
+                          obj('A holder that moves with the package.', {
+                              'package': d('The holder.', ref('packageName')),
+                              'installed_version': nul('Its locked version, or null when lockrot reads no locked version.', {'type': 'string', 'minLength': 1}),
+                              'version': d('The version that the joint request installs.', {'type': 'string', 'minLength': 1}),
+                          })),
         'composer_moves_because': arr(("Why the move needs more than the project's own command, one clause each: `holders` (`held_by` names a package), `crosses_major` (a "
                                        "`require`, `raise-php` or `tag` move to a new major), `transitive` (not direct, `direct_dependents` not empty, and `held_by` names none of "
                                        "them), `unreached` (not direct and no direct dependent: lockrot found no path from the requirements it walked). `transitive` and `unreached` "
@@ -505,23 +520,25 @@ def move_props(with_also):
                                       closed(['holders', 'crosses_major', 'transitive', 'unreached']), uniqueItems=True),
         'commands': arr(("The ordered commands a user runs, each an argv list (round 4), rendered per shell by §5.6's quoting (POSIX, cmd.exe, PowerShell). The kinds without a command have `[]`. "
                          "A transitive `require`, `raise-php` or `tag` move has no step for its package unless `check` resolves it. Then the step is `composer update vendor/pkg:<constraint>` with the form's option, on a Composer that takes an inline constraint there. "
-                         "A `raise-php` move starts with its php step (`composer require php:>=8.1 --no-update`, attack round 1). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. "
+                         "A `raise-php` move starts with its php step (`composer require php:>=8.1 --no-update`, attack round 1). An `update`, `require`, `raise-php` or `tag` move whose `check` does not resolve it ends with `composer why-not vendor/pkg <version> --locked`. "
+                         "A move with `moves_with` entries runs the joint request: `composer update vendor/pkg:<constraint>` followed by the holders. "
+                         "A root requirement writes it in two steps: `composer require vendor/pkg:<constraint> --no-update`, then `composer update vendor/pkg` followed by the holders. "
+                         "A `require` step on a package that composer.json lists only in `require-dev` adds `--dev`. "
                          "The command argument rule (§5.6): each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. "
                          "An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. "
                          "A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. "
-                         "Only lockrot's own options start with `-`: `--no-update` in a `require` step, and `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. "
+                         "Only lockrot's own options start with `-`: `--no-update` and `--dev` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. "
                          "lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. "
                          "A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell."),
                         arr('One command as its argument list (`["composer", "require", "php:>=8.1", "--no-update"]`).', {'type': 'string', 'minLength': 1}, minItems=1)),
     }
     if with_also:
         p['through'] = arr(("On the lead move only: one entry per direct dependent of a transitive package, in `direct_dependents` order; `[]` when the "
-                            "package is direct or has no direct dependent. For each dependent whose newest release no longer requires the package, "
-                            "`commands` ends with `composer why-not <dependent> <version>`, which says what holds the dependent back."), ref('throughEntry'))
+                            "package is direct or has no direct dependent. `text` names one action per group of dependents: `local`, `newest_is_installed`, then the others."), ref('throughEntry'))
     if with_also:
         p['also'] = arr("The other part's move, the same object without `also` (§5.6 rule 3); empty when the lead move's `clears` and `unverified` hold every fact of that part.", ref('alsoMove'))
     p['text'] = rendered('The `do:` line, `MoveText` (§5.6, §7.11; versioned by `run.text_grammar`); never empty. A renderer that does not know `kind` (or a `no-move` `reason`) prints this string (§7.9).',
-                         [('next_step' if with_also else 'next_step.also[]'), 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'])
+                         [('next_step' if with_also else 'next_step.also[]'), 'package', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'])
     p['text']['minLength'] = 1
     return p
 
@@ -1828,8 +1845,8 @@ def add_relations_round4(defs):
     sev1 = {'critical': 32, 'high': 16, 'medium': 8, 'unrated': 8, 'low': 2}
     relate(f, ['`evidence` is empty on the score-0 shape (no flag counts).',
                'An entry that accepts the whole package (`allowlist.flag_ids` null) leaves no maintenance term and no lead.',
-               "A transitive or unreached package's `require` or `tag` move writes no `composer require` command (the package itself is never required at the root); its only commands are `composer why-not` checks.",
-               "Each `also[]` move of a transitive or unreached package's `require` or `tag` kind writes no command.",
+               "A `require` or `tag` move of a transitive or unreached package that composer.json does not list writes no `composer require` command: the root does not require the package (ruling R13).",
+               "Each `also[]` move of the `require` or `tag` kind of a transitive or unreached package that composer.json does not list writes no `composer require` command.",
                'Without a counted advisory no move carries a fix kind: `next_step.fix_kind` and every `also[].fix_kind` are null.',
                "`installed_php.requires` null (the lock entry declares no php) makes both of its answers null.",
                'An accepted flag\'s `if_counted.at_least` is true only for `stale` (decided without S4).',
@@ -1838,8 +1855,8 @@ def add_relations_round4(defs):
                'A snapshot whose release metadata was read carries the `release_branch` skip (`branch_snapshot`) in `checks_skipped`.'],
            [P(score={'required': ['terms']}), P(evidence={'maxLength': 0})],
            [P(allowlist=P(flag_ids={'not': NULL})), P(lead=NULL, score=P(terms=NONE(P(part=E('maintenance')))))],
-           [P(direct=E(True)), P(next_step=P(kind=NOT('require', 'tag'))), P(next_step=P(commands={'items': {'not': {'items': [{'enum': ['composer']}, {'enum': ['require']}]}}}))],
-           [P(direct=E(True)), P(next_step=P(also={'items': {'anyOf': [P(kind=NOT('require', 'tag')), P(commands=EMPTY)]}}))],
+           [P(direct=E(True)), P(named_in={'minItems': 1}), P(next_step=P(kind=NOT('require', 'tag'))), P(next_step=P(commands={'items': {'not': {'items': [{'enum': ['composer']}, {'enum': ['require']}]}}}))],
+           [P(direct=E(True)), P(named_in={'minItems': 1}), P(next_step=P(also={'items': {'anyOf': [P(kind=NOT('require', 'tag')), P(commands={'items': {'not': {'items': [{'enum': ['composer']}, {'enum': ['require']}]}}})]}}))],
            [P(security=P(status=NOT('clear', 'unchecked'))), P(next_step=P(fix_kind=NULL, also={'items': P(fix_kind=NULL)}))],
            [P(installed_php=P(requires=STR)), P(installed_php=P(requires=NULL, project_allows=NULL, target_runs=NULL))],
            [P(score=dict(P(accepted=dict({'items': {'anyOf': [P(flag=E('stale')), P(if_counted=P(at_least=E(False)))]}}, description='Each accepted flag.')),

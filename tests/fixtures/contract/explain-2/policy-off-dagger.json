@@ -131,6 +131,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -145,6 +146,13 @@
                     "composer",
                     "require",
                     "joomla/filter:^3.0.5"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "joomla/filter",
+                    "3.0.5",
+                    "--locked"
                 ]
             ],
             "through": [],

@@ -1329,6 +1329,7 @@
         "old-promise"
        ],
        "replacement": null,
+       "direct": false,
        "next_step": {
         "kind": "require",
         "to_branch": "0.6.x",
@@ -1351,6 +1352,7 @@
         "stale"
        ],
        "replacement": null,
+       "direct": false,
        "next_step": {
         "kind": "no-move",
         "to_branch": null,
@@ -1388,11 +1390,20 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "league/flysystem",
+      "3.36.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "mautic/core-lib",
@@ -1400,7 +1411,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "not_from_composer_repository"
+      "newest_requires_unmeasured": "not_from_composer_repository",
+      "local": true,
+      "newest_is_installed": null
      }
     ],
     "also": [],
@@ -1580,6 +1593,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "require",
              "to_branch": "0.6.x",
@@ -1602,6 +1616,7 @@
              "stale"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,

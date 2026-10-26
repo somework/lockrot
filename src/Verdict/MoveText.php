@@ -50,7 +50,8 @@ final class MoveText
             $text .= '; held by '.implode(' and ', $holders);
         }
         foreach ($move->composerMovesBecause() as $reason) {
-            $text .= '; '.self::because($reason, $move, $subject);
+            $words = self::because($reason, $move, $subject);
+            $text .= $words === '' ? '' : '; '.$words;
         }
         $through = self::throughWords($move->through());
         if ($through !== '' && \in_array(Move::TRANSITIVE, $move->composerMovesBecause(), true)) {
@@ -59,7 +60,7 @@ final class MoveText
 
         $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->refusedTargetInside());
 
-        return $step.$text.self::checked($move->check());
+        return $step.$text.self::checked($move->check()).self::movesWith($move);
     }
 
     /**
@@ -96,6 +97,17 @@ final class MoveText
         }
     }
 
+    /** ", with an update of h/x (to 2.1.0)", one entry per holder that the joint request moves. */
+    private static function movesWith(Move $move): string
+    {
+        $parts = [];
+        foreach ($move->movesWith() as $moved) {
+            $parts[] = $moved['package'].' (to '.$moved['version'].')';
+        }
+
+        return $parts === [] ? '' : ', with an update of '.self::join($parts);
+    }
+
     /** @param list<string> $names */
     private static function dependents(array $names): string
     {
@@ -120,7 +132,9 @@ final class MoveText
 
                 return 'test it on PHP '.$subject->targetPhp().($latest !== null && $latest->isInstalled() ? ' — '.$latest->version().' is its newest release' : '');
             case Move::UPDATE:
-                return self::raise($move).self::update($move).' (gets '.$move->newest().')'.self::clears($move).self::adds($move);
+                $below = self::below($move, $move->newest());
+
+                return self::raise($move).self::update($move).($below === '' ? ' (gets '.$move->newest().')' : $below).self::clears($move).self::adds($move);
             case Move::REQUIRE:
             case Move::RAISE_PHP:
                 return self::requirement($move, $subject);
@@ -180,14 +194,14 @@ final class MoveText
         $version = $latest === null ? '' : $latest->version();
         $ownLine = $move->toBranch() !== null && $move->crossesMajor() === false && self::isBranchAlias($subject->version());
         $word = $ownLine ? 'the newest on its own line' : 'the newest';
-        if ($subject->isDirect()) {
-            $text = self::raise($move).'require a tag — '.$word.' is '.$version;
+        if ($subject->isListed()) {
+            $text = self::raise($move).'require a tag'.self::inRequireDev($subject).' — '.$word.' is '.$version;
         } else {
             $via = self::dependents($subject->dependents());
             $text = self::raise($move).'move it to a tag — '.$word.' is '.$version.($via === '' ? '' : ', through '.$via);
         }
         $released = $latest === null ? null : $latest->released();
-        $text .= $released === null ? '' : ' ('.substr($released, 0, 10).')';
+        $text .= ($released === null ? '' : ' ('.substr($released, 0, 10).')').self::below($move, $version);
         if ($latest !== null && $latest->relation() === 'older') {
             $text .= ', older than your snapshot ('.substr((string) $latest->snapshotTime(), 0, 10).'); review, or replace';
         }
@@ -197,14 +211,29 @@ final class MoveText
     private static function requirement(Move $move, MoveSubject $subject): string
     {
         $raise = self::raise($move);
-        if ($subject->isDirect()) {
-            $text = $raise.'require '.$subject->package().' '.$move->constraint();
+        if ($subject->isListed()) {
+            $text = $raise.'require '.$subject->package().' '.$move->constraint().self::inRequireDev($subject);
         } else {
             $via = self::dependents($subject->dependents());
             $text = $raise.'move '.$subject->package().' to '.$move->constraint().($via === '' ? '' : ' through '.$via);
         }
 
-        return $text.self::clears($move).self::adds($move).self::phpClause($move, $subject, true);
+        return $text.self::below($move, $move->newest()).self::clears($move).self::adds($move).self::phpClause($move, $subject, true);
+    }
+
+    /** " in require-dev" for a package that only require-dev lists, when the run does not require it directly. */
+    private static function inRequireDev(MoveSubject $subject): string
+    {
+        return $subject->isListedInRequireDevOnly() && !$subject->isDirect() ? ' in require-dev' : '';
+    }
+
+    /** " (gets 5.3.8, below the newest 5.3.9)" when the resolving form installs a release below `$newest`, else an empty string. */
+    private static function below(Move $move, ?string $newest): string
+    {
+        $check = $move->check();
+        $installs = $check === null ? null : $check->installsBelow($newest);
+
+        return $installs === null ? '' : ' (gets '.$installs.', below the newest '.$newest.')';
     }
 
     private static function raise(Move $move): string
@@ -386,12 +415,16 @@ final class MoveText
         }
         $verb = ['conflict' => 'conflicts with ', 'replace' => 'replaces '][$holder->link()] ?? 'requires ';
 
-        return $verb.($target === null ? '' : ($name === null ? $target : $name($target)).' ').$holder->constraint().($holder->link() === Holder::REQUIRE_DEV ? ' (require-dev)' : '');
+        $constraint = $holder->constraint() === 'self.version' && $holder->version() !== null ? 'self.version ('.$holder->version().')' : $holder->constraint();
+
+        return $verb.($target === null ? '' : ($name === null ? $target : $name($target)).' ').$constraint.($holder->link() === Holder::REQUIRE_DEV ? ' in require-dev' : '');
     }
 
+    /** The joint request moves what requires the package, so a move that it resolves asks nothing of them. */
     private static function because(string $reason, Move $move, MoveSubject $subject): string
     {
         $resolved = \in_array($move->kind(), [Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true);
+        $joint = $move->movesWith() !== [];
         switch ($reason) {
             case Move::HOLDERS:
                 return 'the packages that hold it may need to move too';
@@ -401,12 +434,56 @@ final class MoveText
 
                 return (strpos((string) $move->toBranch(), '0.') === 0 ? 'a new 0.x line (Composer treats 0.x minors as breaking)' : 'a new major').' brings its own requirements'.($solved ? '' : ', which lockrot does not solve');
             case Move::TRANSITIVE:
-                $dependents = $subject->dependents();
+                if ($joint) {
+                    return '';
+                }
 
-                return $resolved ? 'what requires it must allow it' : 'it comes in through '.self::dependents($dependents).': replace or update '.(\count($dependents) === 1 ? 'that package' : 'them');
+                return $resolved ? 'what requires it must allow it' : 'it comes in through '.self::dependents(self::withRequirer($subject)).': '.self::throughActions($subject->dependents(), $move->through());
             default:
+                if ($joint) {
+                    return 'lockrot found no path from your requirements to it';
+                }
+
                 return $resolved ? 'lockrot found no path from your requirements to it, so what requires it must allow it' : 'lockrot found no path from your requirements to it: `composer why` names what requires it';
         }
+    }
+
+    /**
+     * `direct_dependents`, with "({requirer} requires it)" after `chain[0]` when the chain passes
+     * another package.
+     *
+     * @return list<string>
+     */
+    private static function withRequirer(MoveSubject $subject): array
+    {
+        $requirer = $subject->requirer();
+        $head = $subject->chainHead();
+
+        return array_map(static fn (string $name): string => $requirer !== null && $name === $head ? $name.' ('.$requirer.' requires it)' : $name, $subject->dependents());
+    }
+
+    /**
+     * One action per group of dependents, in `through[]` order: "change your own package" for
+     * a local one, "replace" for one whose locked release is its newest, else "replace or update".
+     *
+     * @param list<string>       $dependents
+     * @param list<ThroughEntry> $through    empty on an `also[]` move: every dependent then reads "replace or update"
+     */
+    private static function throughActions(array $dependents, array $through): string
+    {
+        $groups = [];
+        foreach ($through === [] ? $dependents : $through as $entry) {
+            $name = $entry instanceof ThroughEntry ? $entry->package() : $entry;
+            $group = !$entry instanceof ThroughEntry ? 'update' : ($entry->isLocal() ? 'local' : ($entry->newestIsInstalled() === true ? 'replace' : 'update'));
+            $groups[$group][] = $name;
+        }
+        $actions = [];
+        foreach ($groups as $group => $names) {
+            $verb = ['local' => \count($names) === 1 ? 'change your own package' : 'change your own packages', 'replace' => 'replace'][$group] ?? 'replace or update';
+            $actions[] = $verb.' '.self::dependents($names);
+        }
+
+        return implode(', or ', $actions);
     }
 
     /** @param list<ThroughEntry> $through */

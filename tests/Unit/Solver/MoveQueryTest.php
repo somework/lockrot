@@ -43,4 +43,19 @@ final class MoveQueryTest extends TestCase
         self::assertNotSame($key, MoveQuery::update('acme/lib', '^2.0', '2.0.0', '>=8.1')->key());
         self::assertNotSame($key, MoveQuery::require('acme/lib', '^2.0', '2.0.0')->key());
     }
+
+    public function testARequireDevCopyAsksRequireDevAndLeavesTheQueryAsItWas(): void
+    {
+        $query = MoveQuery::require('acme/lib', '^2.0', '2.0.0');
+
+        $dev = $query->withRequireDev(true);
+
+        self::assertSame([[], ['acme/lib' => 'acme/lib'], []], [$query->request()->devChanges(), $dev->request()->devChanges(), $query->withRequireDev(false)->request()->devChanges()]);
+    }
+
+    /** `composer update` has no `--dev`: an update stays an update of the lock. */
+    public function testARequireDevCopyOfAnUpdateAsksNoRequireDev(): void
+    {
+        self::assertSame([], MoveQuery::update('acme/lib', '^2.0', '2.0.0')->withRequireDev(true)->request()->devChanges());
+    }
 }

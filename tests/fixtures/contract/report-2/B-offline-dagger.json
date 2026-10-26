@@ -1327,6 +1327,7 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -1335,6 +1336,13 @@
                         "composer",
                         "require",
                         "symfony/monolog-bridge:^5.4"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],

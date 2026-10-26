@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer update 'typo3/html-sanitizer:^2.3.2'"
+        "composer update 'typo3/html-sanitizer:^2.3.2'",
+        "composer why-not typo3/html-sanitizer v2.3.2 --locked"
     ],
     "commands_cmd": [
-        "composer update \"typo3/html-sanitizer:^2.3.2\""
+        "composer update \"typo3/html-sanitizer:^2.3.2\"",
+        "composer why-not typo3/html-sanitizer v2.3.2 --locked"
     ]
 }

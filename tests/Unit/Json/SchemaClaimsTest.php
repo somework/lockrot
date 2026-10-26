@@ -38,7 +38,9 @@ final class SchemaClaimsTest extends TestCase
 
     /** The claims that draft-04 cannot express, each with the reason. */
     private const ENGINE = [
-        'move.through' => 'engine (one entry per direct_dependents name of a transitive package, [] otherwise; the why-not commands follow newest_requires)',
+        'move.through' => 'engine (one entry per direct_dependents name of a transitive package, [] otherwise)',
+        'move.moves_with' => 'engine (the holders whose release one joint solve changes; set only beside a resolving check and an empty held_by)',
+        'alsoMove.moves_with' => 'as move.moves_with',
         '#.exposure' => 'membership against another list (S7 counts)',
         '#.unattributed' => 'fan-in against exposure_rule.max_fan_in (a number in another object)',
         '#.libyears' => 'a sum over findings',
