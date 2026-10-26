@@ -104,6 +104,18 @@ final class TargetFixTest extends TestCase
         self::assertSame([null, 'acme/other'], array_map(static fn (Holder $hold): ?string => $hold->source() === Holder::ROOT ? null : $hold->package(), $fix['held_by']));
     }
 
+    public function testARefusedFixDropsTheListedPackagesOwnPhp64bitHold(): void
+    {
+        $holds = [
+            ['source' => 'package', 'package' => 'acme/capped', 'version' => '1.0.0', 'link' => 'platform', 'target' => 'php-64bit', 'constraint' => '<8.3'],
+            ['source' => 'package', 'package' => 'acme/other', 'version' => '3.0.0', 'link' => 'platform', 'target' => 'php-64bit', 'constraint' => '<8.0'],
+        ];
+
+        $fix = self::fix(['packages' => [self::CAPPED], 'packages-dev' => []], [], self::recorded(['result' => 'refused', 'holds' => $holds]));
+
+        self::assertSame(['acme/other'], array_map(static fn (Holder $hold): ?string => $hold->package(), $fix['held_by']), 'the listed package\'s php-64bit hold restates packages; another package\'s stays');
+    }
+
     public function testARefusedFixKeepsEveryHoldOfAListedPackageThatIsNotOnPhp(): void
     {
         $holds = [['source' => 'package', 'package' => 'acme/capped', 'version' => '2.0.0', 'link' => 'require', 'target' => 'acme/lib', 'constraint' => '^2.0']];

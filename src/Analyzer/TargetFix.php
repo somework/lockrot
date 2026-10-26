@@ -67,8 +67,8 @@ final class TargetFix
             return array_replace($fix, ['command' => array_merge(['composer', 'update'], $names, $option === null ? [] : [$option]), 'check' => MoveCheck::RESOLVES]);
         }
         if ($check->isRefused()) {
-            // A listed package's own php requirement restates `packages`. Composer names packages in lower case.
-            $holds = array_values(array_filter($outcome->holds(), static fn (Holder $hold): bool => !($hold->target() === 'php' && \in_array($hold->package(), $lower, true))));
+            // A listed package's own php or php-64bit requirement restates `packages`. Composer names packages in lower case.
+            $holds = array_values(array_filter($outcome->holds(), static fn (Holder $hold): bool => !(\in_array($hold->target(), PhpWindow::VERSIONED, true) && \in_array($hold->package(), $lower, true))));
 
             return array_replace($fix, ['check' => MoveCheck::REFUSED, 'held_by' => $holds]);
         }
