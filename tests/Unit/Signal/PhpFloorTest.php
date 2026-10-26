@@ -276,6 +276,8 @@ final class PhpFloorTest extends TestCase
         yield 'a tilde on a patch' => ['~8.0.0', '8.0.0'];
         yield 'a pre-release bound' => ['>=7.4.0-RC1', '7.4.0'];
         yield 'an exclusive pre-release bound' => ['>7.4.0-RC1', '7.4.0'];
+        yield 'a post-release bound' => ['>=7.4.0-p1', '7.4.1'];
+        yield 'an exclusive post-release bound' => ['>7.4.0-patch1', '7.4.1'];
         yield 'a wildcard' => ['7.*', '7.0.0'];
         yield 'a caret on a patch' => ['^7.2.5', '7.2.5'];
         yield 'an inclusive bound' => ['>=8.2', '8.2.0'];
