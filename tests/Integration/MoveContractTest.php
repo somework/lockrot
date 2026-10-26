@@ -529,10 +529,10 @@ final class MoveContractTest extends TestCase
             && (!\is_array($check) || $check['result'] !== 'resolves');
         $commands = JsonPath::arrayAt($move, ['commands']);
         $whyNot = array_values(array_filter($commands, static fn ($argv): bool => \is_array($argv) && ($argv[1] ?? null) === 'why-not'));
-        $expected = $asks ? [['composer', 'why-not', $finding['package'], $move['version'], '--locked']] : [];
-        self::assertSame($expected, $whyNot, ''.$move['kind'].' why-not');
+        $step = ['composer', 'why-not', $finding['package'], $move['version'], '--locked'];
+        self::assertSame($asks ? [$step] : [], $whyNot, JsonPath::stringAt($move, ['kind']).' why-not');
         if ($asks) {
-            self::assertSame($expected[0], end($commands), 'why-not is the last step');
+            self::assertSame($step, end($commands), 'why-not is the last step');
         }
     }
 
@@ -601,7 +601,7 @@ final class MoveContractTest extends TestCase
             $move = self::withoutWhyNot($move, $package);
         }
         if (\is_array($move) && \in_array('also.commands', $skipped, true)) {
-            $move['also'] = array_map(static fn (array $also): array => self::withoutWhyNot($also, $package), JsonPath::arrayAt($move, ['also']));
+            $move['also'] = array_map(static fn ($also): array => self::withoutWhyNot(JsonPath::decoded($also), $package), JsonPath::arrayAt($move, ['also']));
         }
         $out = ['next_step' => $move, 'security.move_in' => $security['move_in'] ?? null, 'security.fix_kind' => $security['fix_kind'] ?? null, 'rows' => $fixes, 's9' => $s9];
         foreach (array_diff($skipped, ['commands', 'also.commands']) as $field) {

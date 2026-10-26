@@ -213,7 +213,7 @@ final class MoveCheckComposerOracleTest extends TestCase
         [$verb, $package, $constraint] = explode(' ', $key);
         $php = explode(' ', $key)[3] ?? '';
         $version = self::release($repo, $package, $constraint);
-        $admitted = Semver::rsort(Semver::satisfiedBy(array_column(JsonPath::arrayAt($repo, [$package]), 'version'), $constraint));
+        $admitted = Semver::rsort(Semver::satisfiedBy(array_map(static fn ($release): string => JsonPath::stringAt(JsonPath::decoded($release), ['version']), JsonPath::arrayAt($repo, [$package])), $constraint));
         $newest = $admitted[0] ?? null;
 
         return $verb === 'require' ? MoveQuery::require($package, $constraint, $version, $php === '' ? null : $php, $newest) : MoveQuery::update($package, $constraint, $version, $php === '' ? null : $php, $newest);

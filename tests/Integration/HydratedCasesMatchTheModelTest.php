@@ -467,7 +467,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         };
         if (\is_array($document['next_step'] ?? null)) {
             $document['next_step'] = $strip($document['next_step']);
-            $document['next_step']['also'] = array_map($strip, JsonPath::arrayAt($document, ['next_step', 'also']));
+            $document['next_step']['also'] = array_map(static fn ($also): array => $strip(JsonPath::decoded($also)), JsonPath::arrayAt($document, ['next_step', 'also']));
         }
 
         return $document;

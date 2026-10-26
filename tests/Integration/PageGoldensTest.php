@@ -268,7 +268,7 @@ final class PageGoldensTest extends TestCase
                 foreach (array_values(array_merge([$lead], JsonPath::arrayAt($lead, ['also']))) as $i => $move) {
                     $move = JsonPath::decoded($move);
                     if ($move['check'] === null) {
-                        if (JsonPath::decoded($cards)[$i]['after'] !== null) {
+                        if (JsonPath::arrayAt(JsonPath::decoded($cards), [$i])['after'] !== null) {
                             $differ[$id.' '.$package.' card '.$i] = ['expected' => 'no check line on a move that runs no Composer request'];
                         }
                         continue;
@@ -411,8 +411,15 @@ final class PageGoldensTest extends TestCase
         $schema = json_decode((string) file_get_contents(Schemas::path(Schemas::REPORT, 2)));
         self::assertInstanceOf(\stdClass::class, $schema);
         foreach (array_unique($pending) as $key) {
-            $definition = $schema->definitions->{self::MODEL_R7_PENDING_DEFINITIONS[$key]}->oneOf[0];
-            $definition->required = array_values(array_diff($definition->required, [$key]));
+            $definitions = $schema->definitions;
+            self::assertInstanceOf(\stdClass::class, $definitions);
+            $definition = $definitions->{self::MODEL_R7_PENDING_DEFINITIONS[$key]};
+            self::assertInstanceOf(\stdClass::class, $definition);
+            self::assertIsArray($definition->oneOf);
+            $first = $definition->oneOf[0];
+            self::assertInstanceOf(\stdClass::class, $first);
+            self::assertIsArray($first->required);
+            $first->required = array_values(array_filter($first->required, static fn ($required): bool => $required !== $key));
         }
 
         self::assertSame([], array_values(array_diff($omitted, array_map(static fn (string $path, string $key): string => $path.' '.$key, array_keys($pending), $pending))), $id.': a key is missing outside MODEL_R7_PENDING_KEYS');
