@@ -253,11 +253,6 @@ final class Baseline
         return $this->fixModel;
     }
 
-    public function scoreModelId(): int
-    {
-        return $this->scoreModelId;
-    }
-
     /** @return list<string> the packages whose recorded advisories a writer kept after an incomplete lookup */
     public function carriedForward(): array
     {
