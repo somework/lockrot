@@ -17,6 +17,7 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\Holder;
 use Lockrot\Solver\CheckOutcome;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveChecker;
 use Lockrot\Solver\MoveCheckers;
 use Lockrot\Solver\MoveQuery;
@@ -186,8 +187,10 @@ final class MoveCheckComposerOracleTest extends TestCase
         if ($words[0] === 'combined') {
             $inline = [];
             foreach (\array_slice($words, 1) as $name) {
-                $update = array_values(array_filter(array_keys($answers), static fn ($other): bool => strpos((string) $other, 'update '.$name.' ') === 0));
-                self::assertCount(1, $update, $key.': one update request of '.$name);
+                // The combined update takes the candidates of update now: a lead update that resolves inline (SPEC §5.6).
+                $update = array_values(array_filter(array_keys($answers), static fn ($other): bool => strpos((string) $other, 'update '.$name.' ') === 0
+                    && (($answers[$other] ?? [])['result'] ?? null) === MoveCheck::RESOLVES && (($answers[$other] ?? [])['form'] ?? null) === MoveCheck::INLINE));
+                self::assertCount(1, $update, $key.': one update request of '.$name.' that resolves inline');
                 $inline[$name] = explode(' ', (string) $update[0])[2];
             }
 
