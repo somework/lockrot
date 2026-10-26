@@ -691,8 +691,10 @@ holds. JSON writes the answer as the move's `check`.
   `check.installs`.
 - **A joint request.** When Composer refuses a move, lockrot asks once more: the move and an update
   of each package that a package hold names. The joint request resolves only when it installs the
-  package inside the move's constraint. Then `held_by[]` is empty, and `moves_with[]` names each
-  holder whose release the joint request changes. The step names those holders:
+  package inside the move's constraint and changes the release of a holder. Then `held_by[]` is
+  empty, and `moves_with[]` names each holder whose release the joint request changes. The line
+  drops "what requires it must allow it", because the joint request moves the packages that require
+  it. The step names those holders:
   `composer update 'firebase/php-jwt:^7.0.0' laravel/socialite`. The line ends with ", with an
   update of laravel/socialite (to v5.30.0)". A package that composer.json
   requires gets `composer require <package>:<constraint> --no-update` first, then
