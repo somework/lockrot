@@ -59,5 +59,38 @@ class TheMoveCheckNamesThePhpOfTheSolve(unittest.TestCase):
         self.assertEqual(self.RUN, project_fixtures.move_check_of(self.RUN, None, None))
 
 
+class TheRunInputsGiveTheLockItsLinks(unittest.TestCase):
+    def test_a_link_of_the_run_inputs_replaces_the_projected_link_and_sets_the_version(self):
+        lock = {'acme/h': {'name': 'acme/h', 'version': '1.0.0', 'dev': False, 'origin': 'packagist', 'require': {'guzzlehttp/guzzle': '*', 'psr/log': '*'}}}
+
+        project_fixtures.lock_links(lock, {'acme/h': {'version': '1.2.0', 'require': {'guzzlehttp/guzzle': '^7.10'}}})
+
+        self.assertEqual({'name': 'acme/h', 'version': '1.2.0', 'dev': False, 'origin': 'packagist',
+                          'require': {'guzzlehttp/guzzle': '^7.10', 'psr/log': '*'}}, lock['acme/h'])
+
+    def test_a_name_that_the_lock_lacks_joins_it_from_packagist(self):
+        lock = {}
+
+        project_fixtures.lock_links(lock, {'acme/san-cap': {'version': '1.0.0', 'conflict': {'typo3/html-sanitizer': '~2.3.5'}}})
+
+        self.assertEqual({'acme/san-cap': {'name': 'acme/san-cap', 'version': '1.0.0', 'dev': False, 'origin': 'packagist',
+                                           'conflict': {'typo3/html-sanitizer': '~2.3.5'}}}, lock)
+
+
+class APackageThatIsNotFoundHasNoReleases(unittest.TestCase):
+    FINDING = {'package': 'acme/routing-bridge', 'version': 'v4.4.41', 'dev': False, 'origin': {'kind': 'packagist'},
+               'installed_php': {'requires': None}, 'signals': [], 'security': {'records': 0, 'ignored': []}, 'activity': {}}
+
+    def test_a_package_that_the_registry_does_not_find_has_no_releases(self):
+        facts = project_fixtures.package_facts(dict(self.FINDING, metadata={'status': 'not_found'}), [])
+
+        self.assertNotIn('releases', facts)
+
+    def test_a_package_that_the_registry_reads_keeps_its_installed_release(self):
+        facts = project_fixtures.package_facts(dict(self.FINDING, metadata={'status': 'read'}), [])
+
+        self.assertEqual([{'version': 'v4.4.41', 'time': None, 'php': None}], facts['releases'])
+
+
 if __name__ == '__main__':
     unittest.main()

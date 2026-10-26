@@ -413,8 +413,8 @@ def package_facts(f, rows):
     }
     if parent:
         facts['parent'] = parent
-    if f['metadata']['status'] == 'not_from_composer_repository':
-        # lockrot reads no release of a package that is not from a Composer repository.
+    if f['metadata']['status'] in ('not_from_composer_repository', 'not_found'):
+        # lockrot reads no release of a package that is not from a Composer repository or that the registry does not find.
         del facts['releases']
     return facts
 
@@ -488,6 +488,8 @@ def inputs_of(case):
         if newest and newest['version'] != e['installed_version']:
             own.append({'version': newest['version'], 'time': newest['released'], 'require': {f['package']: '*'} if e['newest_requires'] else {}})
         dependents[name] = own
+    # The links of lock entries that the model's ‡ run inputs give exactly, which the findings do not carry.
+    lock_links(lock, (case.get('run_inputs') or {}).get('_lock_links') or {})
     root = dict({'name': run['root_package'], 'require': dict({'php': run['project_php']} if run['project_php'] else {}, **dict(root_require, **root_links.pop('require', {})))}, **root_links)
     if root_dev:
         root['require-dev'] = dict(root_dev, **root.get('require-dev', {}))
@@ -541,6 +543,17 @@ def inputs_of(case):
         # The project's vcs repository serves the package: lockrot names its origin from it.
         inputs['root']['repositories'] = [{'type': 'vcs', 'url': 'https://%s/%s.git' % (act['host'], act['repo'])}]
     return inputs
+
+
+def lock_links(lock, links):
+    """Sets each lock entry that the run inputs' `_lock_links` names to its version and its links: a link there replaces
+    the projected `*` of the same target. A name that the lock lacks joins it."""
+    for name, given in links.items():
+        e = lock.setdefault(name, {'name': name, 'version': given['version'], 'dev': False, 'origin': 'packagist'})
+        e['version'] = given['version']
+        for link, targets in given.items():
+            if link != 'version':
+                e.setdefault(link, {}).update(targets)
 
 
 def world_releases(world, releases):
