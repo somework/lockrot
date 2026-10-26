@@ -1290,6 +1290,7 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -1304,6 +1305,13 @@
                         "composer",
                         "require",
                         "pagerfanta/twig:^4.9"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "pagerfanta/twig",
+                        "v4.9.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],

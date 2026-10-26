@@ -189,6 +189,7 @@
    "clears_all": false,
    "if_applied": null,
    "check": null,
+   "moves_with": [],
    "composer_moves_because": [
     "transitive"
    ],
@@ -203,11 +204,13 @@
       "released": "2025-11-02T18:11:54+00:00"
      },
      "newest_requires": null,
-     "newest_requires_unmeasured": "through_other_package"
+     "newest_requires_unmeasured": "through_other_package",
+     "local": false,
+     "newest_is_installed": false
     }
    ],
    "also": [],
-   "text": "replace with laminas/laminas-code (named by its registry); it comes in through symfony/proxy-manager-bridge: replace or update that package"
+   "text": "replace with laminas/laminas-code (named by its registry); it comes in through symfony/proxy-manager-bridge (ocramius/proxy-manager requires it): replace or update symfony/proxy-manager-bridge"
   },
   "security": {
    "status": "clear",

@@ -1287,12 +1287,20 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
       "composer",
       "update",
       "moneyphp/money"
+     ],
+     [
+      "composer",
+      "why-not",
+      "moneyphp/money",
+      "v4.9.0",
+      "--locked"
      ]
     ],
     "through": [],

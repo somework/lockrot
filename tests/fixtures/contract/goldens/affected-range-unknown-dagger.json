@@ -12,10 +12,6 @@
         "libyears not measured: no date"
     ],
     "baseline_suffix": null,
-    "commands_posix": [
-        "composer why-not guzzlehttp/guzzle 8.2.0"
-    ],
-    "commands_cmd": [
-        "composer why-not guzzlehttp/guzzle 8.2.0"
-    ]
+    "commands_posix": [],
+    "commands_cmd": []
 }

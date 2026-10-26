@@ -1361,6 +1361,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -1431,6 +1432,7 @@
                             ]
                         },
                         "check": null,
+                        "moves_with": [],
                         "composer_moves_because": [
                             "crosses_major"
                         ],
@@ -1439,6 +1441,13 @@
                                 "composer",
                                 "require",
                                 "symfony/debug:^4.4.0"
+                            ],
+                            [
+                                "composer",
+                                "why-not",
+                                "symfony/debug",
+                                "v4.4.0",
+                                "--locked"
                             ]
                         ],
                         "text": "require symfony/debug ^4.4.0 \u2014 clears the advisory; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; abandoned stays; not checked: old-promise; held by composer.json (requires ~3.4); a new major brings its own requirements, which lockrot does not solve"

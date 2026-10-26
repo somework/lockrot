@@ -85,6 +85,17 @@
             "argv": [
                 "composer",
                 "require",
+                "guzzlehttp/guzzle:^8.0.1",
+                "--no-update"
+            ],
+            "posix": "composer require 'guzzlehttp/guzzle:^8.0.1' --no-update",
+            "cmd": "composer require \"guzzlehttp/guzzle:^8.0.1\" --no-update",
+            "powershell": "composer --% require \"guzzlehttp/guzzle:^8.0.1\" --no-update"
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "guzzlehttp/guzzle:^8.2"
             ],
             "posix": "composer require 'guzzlehttp/guzzle:^8.2'",
@@ -270,6 +281,28 @@
             "argv": [
                 "composer",
                 "require",
+                "symfony/monolog-bridge:^5.4.52",
+                "--dev"
+            ],
+            "posix": "composer require 'symfony/monolog-bridge:^5.4.52' --dev",
+            "cmd": "composer require \"symfony/monolog-bridge:^5.4.52\" --dev",
+            "powershell": "composer --% require \"symfony/monolog-bridge:^5.4.52\" --dev"
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "symfony/var-dumper:^5.4",
+                "--dev"
+            ],
+            "posix": "composer require 'symfony/var-dumper:^5.4' --dev",
+            "cmd": "composer require \"symfony/var-dumper:^5.4\" --dev",
+            "powershell": "composer --% require \"symfony/var-dumper:^5.4\" --dev"
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "symfony/yaml:^5.4.52"
             ],
             "posix": "composer require 'symfony/yaml:^5.4.52'",
@@ -295,6 +328,17 @@
             "posix": "composer require 'twig/twig:^3.27.0'",
             "cmd": "composer require \"twig/twig:^3.27.0\"",
             "powershell": "composer --% require \"twig/twig:^3.27.0\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "twig/twig:^3.27.0",
+                "--dev"
+            ],
+            "posix": "composer require 'twig/twig:^3.27.0' --dev",
+            "cmd": "composer require \"twig/twig:^3.27.0\" --dev",
+            "powershell": "composer --% require \"twig/twig:^3.27.0\" --dev"
         },
         {
             "argv": [
@@ -420,6 +464,17 @@
             "argv": [
                 "composer",
                 "update",
+                "guzzlehttp/guzzle",
+                "acme/gz-client"
+            ],
+            "posix": "composer update guzzlehttp/guzzle acme/gz-client",
+            "cmd": "composer update guzzlehttp/guzzle acme/gz-client",
+            "powershell": "composer --% update guzzlehttp/guzzle acme/gz-client"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
                 "guzzlehttp/psr7:^2.12.3"
             ],
             "posix": "composer update 'guzzlehttp/psr7:^2.12.3'",
@@ -506,6 +561,27 @@
             "posix": "composer update symfony/polyfill-intl-idn",
             "cmd": "composer update symfony/polyfill-intl-idn",
             "powershell": "composer --% update symfony/polyfill-intl-idn"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "symfony/routing:^6.4.40"
+            ],
+            "posix": "composer update 'symfony/routing:^6.4.40'",
+            "cmd": "composer update \"symfony/routing:^6.4.40\"",
+            "powershell": "composer --% update \"symfony/routing:^6.4.40\""
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "symfony/routing:^6.4.40",
+                "--with-dependencies"
+            ],
+            "posix": "composer update 'symfony/routing:^6.4.40' --with-dependencies",
+            "cmd": "composer update \"symfony/routing:^6.4.40\" --with-dependencies",
+            "powershell": "composer --% update \"symfony/routing:^6.4.40\" --with-dependencies"
         },
         {
             "argv": [
@@ -603,34 +679,433 @@
             "argv": [
                 "composer",
                 "why-not",
-                "genealabs/laravel-model-caching",
-                "13.1.11"
+                "bacon/bacon-qr-code",
+                "v3.1.0",
+                "--locked"
             ],
-            "posix": "composer why-not genealabs/laravel-model-caching 13.1.11",
-            "cmd": "composer why-not genealabs/laravel-model-caching 13.1.11",
-            "powershell": "composer --% why-not genealabs/laravel-model-caching 13.1.11"
+            "posix": "composer why-not bacon/bacon-qr-code v3.1.0 --locked",
+            "cmd": "composer why-not bacon/bacon-qr-code v3.1.0 --locked",
+            "powershell": "composer --% why-not bacon/bacon-qr-code v3.1.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "friendsofsymfony/oauth-server-bundle",
+                "1.6.2",
+                "--locked"
+            ],
+            "posix": "composer why-not friendsofsymfony/oauth-server-bundle 1.6.2 --locked",
+            "cmd": "composer why-not friendsofsymfony/oauth-server-bundle 1.6.2 --locked",
+            "powershell": "composer --% why-not friendsofsymfony/oauth-server-bundle 1.6.2 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "genealabs/laravel-pivot-events",
+                "12.0.0",
+                "--locked"
+            ],
+            "posix": "composer why-not genealabs/laravel-pivot-events 12.0.0 --locked",
+            "cmd": "composer why-not genealabs/laravel-pivot-events 12.0.0 --locked",
+            "powershell": "composer --% why-not genealabs/laravel-pivot-events 12.0.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "geoip2/geoip2",
+                "v3.4.0",
+                "--locked"
+            ],
+            "posix": "composer why-not geoip2/geoip2 v3.4.0 --locked",
+            "cmd": "composer why-not geoip2/geoip2 v3.4.0 --locked",
+            "powershell": "composer --% why-not geoip2/geoip2 v3.4.0 --locked"
         },
         {
             "argv": [
                 "composer",
                 "why-not",
                 "guzzlehttp/guzzle",
-                "8.2.0"
+                "7.15.2",
+                "--locked"
             ],
-            "posix": "composer why-not guzzlehttp/guzzle 8.2.0",
-            "cmd": "composer why-not guzzlehttp/guzzle 8.2.0",
-            "powershell": "composer --% why-not guzzlehttp/guzzle 8.2.0"
+            "posix": "composer why-not guzzlehttp/guzzle 7.15.2 --locked",
+            "cmd": "composer why-not guzzlehttp/guzzle 7.15.2 --locked",
+            "powershell": "composer --% why-not guzzlehttp/guzzle 7.15.2 --locked"
         },
         {
             "argv": [
                 "composer",
                 "why-not",
-                "symfony/proxy-manager-bridge",
-                "v6.4.28"
+                "guzzlehttp/guzzle",
+                "8.2.0",
+                "--locked"
             ],
-            "posix": "composer why-not symfony/proxy-manager-bridge v6.4.28",
-            "cmd": "composer why-not symfony/proxy-manager-bridge v6.4.28",
-            "powershell": "composer --% why-not symfony/proxy-manager-bridge v6.4.28"
+            "posix": "composer why-not guzzlehttp/guzzle 8.2.0 --locked",
+            "cmd": "composer why-not guzzlehttp/guzzle 8.2.0 --locked",
+            "powershell": "composer --% why-not guzzlehttp/guzzle 8.2.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "guzzlehttp/psr7",
+                "2.13.0",
+                "--locked"
+            ],
+            "posix": "composer why-not guzzlehttp/psr7 2.13.0 --locked",
+            "cmd": "composer why-not guzzlehttp/psr7 2.13.0 --locked",
+            "powershell": "composer --% why-not guzzlehttp/psr7 2.13.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "jfcherng/php-color-output",
+                "3.0.0",
+                "--locked"
+            ],
+            "posix": "composer why-not jfcherng/php-color-output 3.0.0 --locked",
+            "cmd": "composer why-not jfcherng/php-color-output 3.0.0 --locked",
+            "powershell": "composer --% why-not jfcherng/php-color-output 3.0.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "joomla/filter",
+                "3.0.5",
+                "--locked"
+            ],
+            "posix": "composer why-not joomla/filter 3.0.5 --locked",
+            "cmd": "composer why-not joomla/filter 3.0.5 --locked",
+            "powershell": "composer --% why-not joomla/filter 3.0.5 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "joomla/string",
+                "3.0.0",
+                "--locked"
+            ],
+            "posix": "composer why-not joomla/string 3.0.0 --locked",
+            "cmd": "composer why-not joomla/string 3.0.0 --locked",
+            "powershell": "composer --% why-not joomla/string 3.0.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "laravel/framework",
+                "v12.69.0",
+                "--locked"
+            ],
+            "posix": "composer why-not laravel/framework v12.69.0 --locked",
+            "cmd": "composer why-not laravel/framework v12.69.0 --locked",
+            "powershell": "composer --% why-not laravel/framework v12.69.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "league/commonmark",
+                "2.10.3",
+                "--locked"
+            ],
+            "posix": "composer why-not league/commonmark 2.10.3 --locked",
+            "cmd": "composer why-not league/commonmark 2.10.3 --locked",
+            "powershell": "composer --% why-not league/commonmark 2.10.3 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "league/flysystem",
+                "3.36.0",
+                "--locked"
+            ],
+            "posix": "composer why-not league/flysystem 3.36.0 --locked",
+            "cmd": "composer why-not league/flysystem 3.36.0 --locked",
+            "powershell": "composer --% why-not league/flysystem 3.36.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "league/uri",
+                "7.8.0",
+                "--locked"
+            ],
+            "posix": "composer why-not league/uri 7.8.0 --locked",
+            "cmd": "composer why-not league/uri 7.8.0 --locked",
+            "powershell": "composer --% why-not league/uri 7.8.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "matomo/network",
+                "2.0.3",
+                "--locked"
+            ],
+            "posix": "composer why-not matomo/network 2.0.3 --locked",
+            "cmd": "composer why-not matomo/network 2.0.3 --locked",
+            "powershell": "composer --% why-not matomo/network 2.0.3 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "matomo/referrer-spam-list",
+                "4.0.5",
+                "--locked"
+            ],
+            "posix": "composer why-not matomo/referrer-spam-list 4.0.5 --locked",
+            "cmd": "composer why-not matomo/referrer-spam-list 4.0.5 --locked",
+            "powershell": "composer --% why-not matomo/referrer-spam-list 4.0.5 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "pagerfanta/twig",
+                "v4.9.0",
+                "--locked"
+            ],
+            "posix": "composer why-not pagerfanta/twig v4.9.0 --locked",
+            "cmd": "composer why-not pagerfanta/twig v4.9.0 --locked",
+            "powershell": "composer --% why-not pagerfanta/twig v4.9.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "pelago/emogrifier",
+                "v7.3.0",
+                "--locked"
+            ],
+            "posix": "composer why-not pelago/emogrifier v7.3.0 --locked",
+            "cmd": "composer why-not pelago/emogrifier v7.3.0 --locked",
+            "powershell": "composer --% why-not pelago/emogrifier v7.3.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "phpoffice/phpspreadsheet",
+                "1.30.7",
+                "--locked"
+            ],
+            "posix": "composer why-not phpoffice/phpspreadsheet 1.30.7 --locked",
+            "cmd": "composer why-not phpoffice/phpspreadsheet 1.30.7 --locked",
+            "powershell": "composer --% why-not phpoffice/phpspreadsheet 1.30.7 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "robrichards/xmlseclibs",
+                "3.1.5",
+                "--locked"
+            ],
+            "posix": "composer why-not robrichards/xmlseclibs 3.1.5 --locked",
+            "cmd": "composer why-not robrichards/xmlseclibs 3.1.5 --locked",
+            "powershell": "composer --% why-not robrichards/xmlseclibs 3.1.5 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "scheb/2fa-bundle",
+                "v6.13.0",
+                "--locked"
+            ],
+            "posix": "composer why-not scheb/2fa-bundle v6.13.0 --locked",
+            "cmd": "composer why-not scheb/2fa-bundle v6.13.0 --locked",
+            "powershell": "composer --% why-not scheb/2fa-bundle v6.13.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/debug",
+                "v4.4.0",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/debug v4.4.0 --locked",
+            "cmd": "composer why-not symfony/debug v4.4.0 --locked",
+            "powershell": "composer --% why-not symfony/debug v4.4.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/debug",
+                "v4.4.44",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/debug v4.4.44 --locked",
+            "cmd": "composer why-not symfony/debug v4.4.44 --locked",
+            "powershell": "composer --% why-not symfony/debug v4.4.44 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/event-dispatcher",
+                "v4.4.44",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/event-dispatcher v4.4.44 --locked",
+            "cmd": "composer why-not symfony/event-dispatcher v4.4.44 --locked",
+            "powershell": "composer --% why-not symfony/event-dispatcher v4.4.44 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/event-dispatcher",
+                "v5.4.45",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/event-dispatcher v5.4.45 --locked",
+            "cmd": "composer why-not symfony/event-dispatcher v5.4.45 --locked",
+            "powershell": "composer --% why-not symfony/event-dispatcher v5.4.45 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/event-dispatcher-contracts",
+                "v2.5.0",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/event-dispatcher-contracts v2.5.0 --locked",
+            "cmd": "composer why-not symfony/event-dispatcher-contracts v2.5.0 --locked",
+            "powershell": "composer --% why-not symfony/event-dispatcher-contracts v2.5.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/mailer",
+                "v6.4.40",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/mailer v6.4.40 --locked",
+            "cmd": "composer why-not symfony/mailer v6.4.40 --locked",
+            "powershell": "composer --% why-not symfony/mailer v6.4.40 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/monolog-bridge",
+                "v2.8.52",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/monolog-bridge v2.8.52 --locked",
+            "cmd": "composer why-not symfony/monolog-bridge v2.8.52 --locked",
+            "powershell": "composer --% why-not symfony/monolog-bridge v2.8.52 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/monolog-bridge",
+                "v5.4.0",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/monolog-bridge v5.4.0 --locked",
+            "cmd": "composer why-not symfony/monolog-bridge v5.4.0 --locked",
+            "powershell": "composer --% why-not symfony/monolog-bridge v5.4.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/monolog-bridge",
+                "v5.4.52",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/monolog-bridge v5.4.52 --locked",
+            "cmd": "composer why-not symfony/monolog-bridge v5.4.52 --locked",
+            "powershell": "composer --% why-not symfony/monolog-bridge v5.4.52 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/polyfill-intl-idn",
+                "v1.38.1",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/polyfill-intl-idn v1.38.1 --locked",
+            "cmd": "composer why-not symfony/polyfill-intl-idn v1.38.1 --locked",
+            "powershell": "composer --% why-not symfony/polyfill-intl-idn v1.38.1 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/routing",
+                "v5.4.53",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/routing v5.4.53 --locked",
+            "cmd": "composer why-not symfony/routing v5.4.53 --locked",
+            "powershell": "composer --% why-not symfony/routing v5.4.53 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/var-dumper",
+                "v5.4.0",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/var-dumper v5.4.0 --locked",
+            "cmd": "composer why-not symfony/var-dumper v5.4.0 --locked",
+            "powershell": "composer --% why-not symfony/var-dumper v5.4.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/yaml",
+                "v5.4.52",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/yaml v5.4.52 --locked",
+            "cmd": "composer why-not symfony/yaml v5.4.52 --locked",
+            "powershell": "composer --% why-not symfony/yaml v5.4.52 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "twig/twig",
+                "v3.27.0",
+                "--locked"
+            ],
+            "posix": "composer why-not twig/twig v3.27.0 --locked",
+            "cmd": "composer why-not twig/twig v3.27.0 --locked",
+            "powershell": "composer --% why-not twig/twig v3.27.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "typo3/html-sanitizer",
+                "v2.3.2",
+                "--locked"
+            ],
+            "posix": "composer why-not typo3/html-sanitizer v2.3.2 --locked",
+            "cmd": "composer why-not typo3/html-sanitizer v2.3.2 --locked",
+            "powershell": "composer --% why-not typo3/html-sanitizer v2.3.2 --locked"
         },
         {
             "argv": [
@@ -642,17 +1117,6 @@
             "posix": null,
             "cmd": null,
             "powershell": null
-        },
-        {
-            "argv": [
-                "composer",
-                "why-not",
-                "web-auth/webauthn-lib",
-                "5.3.9"
-            ],
-            "posix": "composer why-not web-auth/webauthn-lib 5.3.9",
-            "cmd": "composer why-not web-auth/webauthn-lib 5.3.9",
-            "powershell": "composer --% why-not web-auth/webauthn-lib 5.3.9"
         },
         {
             "argv": [

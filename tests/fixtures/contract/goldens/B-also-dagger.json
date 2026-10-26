@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer update symfony/monolog-bridge"
+        "composer update symfony/monolog-bridge",
+        "composer why-not symfony/monolog-bridge v2.8.52 --locked"
     ],
     "commands_cmd": [
-        "composer update symfony/monolog-bridge"
+        "composer update symfony/monolog-bridge",
+        "composer why-not symfony/monolog-bridge v2.8.52 --locked"
     ]
 }

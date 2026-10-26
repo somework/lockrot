@@ -14,10 +14,12 @@
     "baseline_suffix": null,
     "commands_posix": [
         "composer require 'php:>=7.2.5' --no-update",
-        "composer require 'symfony/yaml:^5.4.52'"
+        "composer require 'symfony/yaml:^5.4.52'",
+        "composer why-not symfony/yaml v5.4.52 --locked"
     ],
     "commands_cmd": [
         "composer require \"php:>=7.2.5\" --no-update",
-        "composer require \"symfony/yaml:^5.4.52\""
+        "composer require \"symfony/yaml:^5.4.52\"",
+        "composer why-not symfony/yaml v5.4.52 --locked"
     ]
 }

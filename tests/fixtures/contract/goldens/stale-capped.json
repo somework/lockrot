@@ -12,10 +12,6 @@
         "libyears 0.0 behind the newest stable release"
     ],
     "baseline_suffix": null,
-    "commands_posix": [
-        "composer why-not symfony/proxy-manager-bridge v6.4.28"
-    ],
-    "commands_cmd": [
-        "composer why-not symfony/proxy-manager-bridge v6.4.28"
-    ]
+    "commands_posix": [],
+    "commands_cmd": []
 }

@@ -1,4 +1,4 @@
-### lockrot: 48 of 53 packages flagged — critical 11 · high 20 · medium 12 · low 5
+### lockrot: 49 of 54 packages flagged — critical 11 · high 20 · medium 13 · low 5
 
 **gate: fails** · --fail-on=high,unchecked · 31 findings fail it (high 30, unchecked 3); 2 reach it and are known to the baseline · target php 8.4 (--target-php)
 
@@ -39,6 +39,7 @@
 | medium | `typo3/html-sanitizer` | v2.2.0 | vulnerable | `8 = vulnerable 8 [medium advisory] (baseline: new package)`<br>**Do:** composer update 'typo3/html-sanitizer:^2.3.2' --with-dependencies (gets v2.3.2) — clears 2 advisories; Composer's solver checked it against the lock<br>*vulnerable:* 2 advisories: 1 medium, 1 low — all fixed on 2.x; worst: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting<br>*age:* installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.2 2026-06-08 (0.3 years ago), its newest release; last push 2026-06-08 (0.3 years ago) | direct |
 | medium | `league/flysystem` | 1.1.9 | left-behind · vulnerable | `10 = left-behind 16 ÷ 2 transitive + vulnerable 2 [low advisory] (baseline: new package)`<br>**Do:** move league/flysystem to ^3.36 through mautic/core-lib — clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; held by barryvdh/elfinder-flysystem-driver v0.2.1 (requires ^1.0; itself left-behind) and league/flysystem-cached-adapter 1.1.0 (requires \~1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve<br>*left-behind:* branch 1.x last released 2022-10-04 (4.0 years ago); 3.x released 3.36.0 (2026-09-02)<br>*vulnerable:* 1 advisory: 1 low — none fixed on 1.x; advisory: CVE-2026-102601 Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter | mautic/core-lib |
 | medium | `league/uri` | 6.4.0 | left-behind · old-promise | `10 = (left-behind 16 + old-promise 4 [¼ of 16]) ÷ 2 unreached (baseline: new package)`<br>**Do:** raise require.php to \>=8.1, then move league/uri to ^7.8 — clears left-behind; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it<br>*left-behind:* branch 6.x last released 2022-09-13 (4.0 years ago); 7.x released 7.8.1 (2026-03-15), needs php ^8.1 above the project's php ^7.2.5 \|\| ^8.0; no releasing branch within reach<br>*old-promise:* released 2020-11-22 for PHP 7 (php "\>=7.2"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested |  |
+| medium | `voku/stop-words` | 2.0.1 | old-promise · stale | `9 = (old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive (baseline: new package)`<br>**Do:** test it on PHP 8.4 — 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): replace or update mautic/core-lib<br>*old-promise:* released 2018-11-23 for PHP 7 (php "\>=7.0.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested<br>*stale:* last release 2018-11-23 (7.9 years ago) | mautic/core-lib |
 | medium | `akaunting/laravel-debugbar-collector` | 2.1.1 | stale | `8 = stale 8 (baseline: new package)`<br>**Do:** —<br>*stale:* last release 2023-06-02 (3.3 years ago); last push 2023-06-02 (3.3 years ago) | direct |
 | medium | `doctrine/cache` | 2.1.1 | stale | `8 = stale 8 (baseline: new package)`<br>**Do:** —<br>*stale:* last release 2022-05-20 (4.4 years ago)<br>*abandoned marking ignored* (policy.abandoned: doctrine/cache): PSR-6 migration is planned for 9.0 | direct |
 | medium | `hyvor/php-json-exporter` | 0.0.3 | stale | `8 = stale 8 (baseline: new package)`<br>**Do:** —<br>*stale:* last release 2023-04-11 (3.5 years ago) | direct |
@@ -58,17 +59,17 @@
 | ok | `doctrine/annotations` | 2.0.2 | ok | `0`<br>*abandoned marking ignored* (policy.abandoned: doctrine/\*): the annotations reader goes with the ORM 3 upgrade | mautic/core-lib |
 | ok | `scheb/2fa-google-authenticator` | v8.6.1 | ok | `0`<br>`gate 0 = min(0, 2 × 0) (the new facts bound it); new: 0`<br>checks missing: S2 (undated releases) | pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more |
 
-flags: abandoned 7 · silent 1 · pinned 5 · left-behind 16 · old-promise 12 · stale 8 · capped 3 · vulnerable 19 · 20 packages carry more than one
-depth: 18 of 48 flagged packages are named by no line of composer.json · direct 29 · 1 hop 13 · 2 hops 2 · 4 hops 1 · unreached 3 · deepest: `robrichards/xmlseclibs`, 4 hops (`mautic/core-lib` › `lightsaml/sp-bundle` › `lightsaml/symfony-bridge` › `lightsaml/lightsaml` › `robrichards/xmlseclibs`) · 1 more is named only in require-dev, which this run did not walk (pass --dev)
+flags: abandoned 7 · silent 1 · pinned 5 · left-behind 16 · old-promise 13 · stale 9 · capped 3 · vulnerable 19 · 21 packages carry more than one
+depth: 19 of 49 flagged packages are named by no line of composer.json · direct 29 · 1 hop 13 · 2 hops 3 · 4 hops 1 · unreached 3 · deepest: `robrichards/xmlseclibs`, 4 hops (`mautic/core-lib` › `lightsaml/sp-bundle` › `lightsaml/symfony-bridge` › `lightsaml/lightsaml` › `robrichards/xmlseclibs`) · 1 more is named only in require-dev, which this run did not walk (pass --dev)
 security: 19 vulnerable packages · 88 advisories: 3 critical, 29 high, 40 medium, 3 unrated, 13 low
-libyears: at least 117.7 behind across 43 of 53 packages · 69.1 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
-pulled in by: `mautic/core-lib` 5 · `guzzlehttp/guzzle` 2 · `akaunting/laravel-apexcharts` 1 · `genealabs/laravel-model-caching` 1 · `jfcherng/php-diff` 1 · … and 6 more
-advisories: 53 packages asked · packagist.org answered (286 on record for 22 packages)
+libyears: at least 117.7 behind across 44 of 54 packages · 69.1 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
+pulled in by: `mautic/core-lib` 6 · `guzzlehttp/guzzle` 2 · `akaunting/laravel-apexcharts` 1 · `genealabs/laravel-model-caching` 1 · `jfcherng/php-diff` 1 · … and 6 more
+advisories: 54 packages asked · packagist.org answered (286 on record for 22 packages)
 php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 10 packages that exclude it is not checked (the run checked no move)
-baseline: 3 known · 42 new · 4 worsened · 0 stale (lockrot-baseline.json)
+baseline: 3 known · 43 new · 4 worsened · 0 stale (lockrot-baseline.json)
 
 **Update now:** `composer update phpoffice/phpspreadsheet robrichards/xmlseclibs symfony/http-foundation league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn`
 
 - note: the baseline was written for php 8.5 (the PHP running lockrot) and this run targets php 8.4 (--target-php): fix changes against the baseline are not compared
 
-<sub>53 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>54 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

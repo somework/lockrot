@@ -14,10 +14,10 @@
     "baseline_suffix": null,
     "commands_posix": [
         "composer update symfony/polyfill-intl-idn",
-        "composer why-not guzzlehttp/guzzle 8.2.0"
+        "composer why-not symfony/polyfill-intl-idn v1.38.1 --locked"
     ],
     "commands_cmd": [
         "composer update symfony/polyfill-intl-idn",
-        "composer why-not guzzlehttp/guzzle 8.2.0"
+        "composer why-not symfony/polyfill-intl-idn v1.38.1 --locked"
     ]
 }

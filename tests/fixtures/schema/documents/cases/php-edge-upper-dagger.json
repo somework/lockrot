@@ -1286,6 +1286,7 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "crosses_major"
     ],

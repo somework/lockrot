@@ -1284,11 +1284,25 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
-                    "crosses_major",
-                    "transitive"
+                    "crosses_major"
                 ],
-                "commands": [],
+                "commands": [
+                    [
+                        "composer",
+                        "require",
+                        "symfony/var-dumper:^5.4",
+                        "--dev"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/var-dumper",
+                        "v5.4.0",
+                        "--locked"
+                    ]
+                ],
                 "through": [
                     {
                         "package": "babdev/pagerfanta-bundle",
@@ -1299,7 +1313,9 @@
                             "released": "2025-11-29T13:01:51+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "bdunogier/guzzle-site-authenticator",
@@ -1310,7 +1326,9 @@
                             "released": "2023-08-21T14:33:48+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "craue/config-bundle",
@@ -1321,7 +1339,9 @@
                             "released": "2026-09-15T09:43:34+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/doctrine-bundle",
@@ -1332,7 +1352,9 @@
                             "released": "2026-09-09T11:58:04+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "doctrine/doctrine-migrations-bundle",
@@ -1343,7 +1365,9 @@
                             "released": "2026-08-26T05:54:54+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/jsrouting-bundle",
@@ -1354,7 +1378,9 @@
                             "released": "2025-11-04T21:03:25+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/oauth-server-bundle",
@@ -1365,7 +1391,9 @@
                             "released": "2019-01-23T15:23:04+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "installed_unlisted"
+                        "newest_requires_unmeasured": "installed_unlisted",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/rest-bundle",
@@ -1376,7 +1404,9 @@
                             "released": "2026-02-10T02:36:12+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "friendsofsymfony/user-bundle",
@@ -1387,7 +1417,9 @@
                             "released": "2026-02-13T21:22:55+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "jms/serializer-bundle",
@@ -1398,7 +1430,9 @@
                             "released": "2025-11-25T21:41:31+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "kphoen/rulerz-bundle",
@@ -1409,7 +1443,9 @@
                             "released": "2018-09-17T09:02:32+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "lexik/form-filter-bundle",
@@ -1420,7 +1456,9 @@
                             "released": "2023-05-19T06:37:47+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "nelmio/api-doc-bundle",
@@ -1431,7 +1469,9 @@
                             "released": "2026-09-14T11:12:11+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "nelmio/cors-bundle",
@@ -1442,7 +1482,9 @@
                             "released": "2026-01-12T15:59:08+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "php-amqplib/rabbitmq-bundle",
@@ -1453,7 +1495,9 @@
                             "released": "2026-01-16T12:34:27+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "php-http/httplug-bundle",
@@ -1464,7 +1508,9 @@
                             "released": "2026-04-25T08:45:32+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-backup-code",
@@ -1475,7 +1521,9 @@
                             "released": "2026-01-24T13:26:10+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-bundle",
@@ -1486,7 +1534,9 @@
                             "released": "2026-07-10T18:29:30+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-email",
@@ -1497,7 +1547,9 @@
                             "released": "2026-06-02T20:21:59+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-google-authenticator",
@@ -1508,7 +1560,9 @@
                             "released": "2026-01-24T13:27:55+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "scheb/2fa-qr-code",
@@ -1519,7 +1573,9 @@
                             "released": "2022-01-03T10:21:24+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "scheb/2fa-trusted-device",
@@ -1530,7 +1586,9 @@
                             "released": "2026-01-24T13:26:10+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "sensio/framework-extra-bundle",
@@ -1541,7 +1599,9 @@
                             "released": "2023-02-24T14:57:12+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": true
                     },
                     {
                         "package": "sentry/sentry-symfony",
@@ -1552,7 +1612,9 @@
                             "released": "2026-08-28T10:41:44+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "stof/doctrine-extensions-bundle",
@@ -1563,7 +1625,9 @@
                             "released": "2026-01-23T08:45:07+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/error-handler",
@@ -1574,7 +1638,9 @@
                             "released": "2026-09-22T18:58:53+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/framework-bundle",
@@ -1585,7 +1651,9 @@
                             "released": "2026-09-28T19:13:15+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/http-kernel",
@@ -1596,7 +1664,9 @@
                             "released": "2026-09-29T14:08:01+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/monolog-bundle",
@@ -1607,7 +1677,9 @@
                             "released": "2026-09-10T19:32:07+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/security-bundle",
@@ -1618,7 +1690,9 @@
                             "released": "2026-09-24T11:09:32+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/security-http",
@@ -1629,7 +1703,9 @@
                             "released": "2026-09-28T19:13:15+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "symfony/twig-bundle",
@@ -1640,7 +1716,9 @@
                             "released": "2026-09-11T14:51:16+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "twig/extra-bundle",
@@ -1651,7 +1729,9 @@
                             "released": "2026-09-11T08:59:50+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     },
                     {
                         "package": "willdurand/hateoas-bundle",
@@ -1662,11 +1742,13 @@
                             "released": "2026-07-17T20:45:53+00:00"
                         },
                         "newest_requires": null,
-                        "newest_requires_unmeasured": "through_other_package"
+                        "newest_requires_unmeasured": "through_other_package",
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
-                "text": "move symfony/var-dumper to ^5.4 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 31 more \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.8) still requires it"
+                "text": "require symfony/var-dumper ^5.4 in require-dev \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "clear",

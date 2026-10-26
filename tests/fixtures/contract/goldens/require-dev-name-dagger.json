@@ -1,6 +1,6 @@
 {
     "score_text": "8 = left-behind 16 ÷ 2 transitive",
-    "next_step_text": "move symfony/var-dumper to ^5.4 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 31 more — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.8) still requires it",
+    "next_step_text": "require symfony/var-dumper ^5.4 in require-dev — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve",
     "gate_line": null,
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v4.4.47 released 2022-10-03 (4.0 years ago), the newest on 4.x; newest release v8.1.7 2026-09-03 (0.1 years ago); last push 2026-09-26 (less than three weeks ago)",
@@ -12,6 +12,12 @@
         "libyears 3.9 behind the newest stable release"
     ],
     "baseline_suffix": null,
-    "commands_posix": [],
-    "commands_cmd": []
+    "commands_posix": [
+        "composer require 'symfony/var-dumper:^5.4' --dev",
+        "composer why-not symfony/var-dumper v5.4.0 --locked"
+    ],
+    "commands_cmd": [
+        "composer require \"symfony/var-dumper:^5.4\" --dev",
+        "composer why-not symfony/var-dumper v5.4.0 --locked"
+    ]
 }

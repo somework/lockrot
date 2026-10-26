@@ -12,6 +12,10 @@
         "libyears not measured: a branch snapshot has no release branch"
     ],
     "baseline_suffix": null,
-    "commands_posix": [],
-    "commands_cmd": []
+    "commands_posix": [
+        "composer why-not symfony/event-dispatcher v4.4.44 --locked"
+    ],
+    "commands_cmd": [
+        "composer why-not symfony/event-dispatcher v4.4.44 --locked"
+    ]
 }

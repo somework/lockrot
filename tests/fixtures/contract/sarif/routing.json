@@ -279,6 +279,7 @@
                                             "capped",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "no-move",
@@ -378,6 +379,7 @@
                                             "capped",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "no-move",

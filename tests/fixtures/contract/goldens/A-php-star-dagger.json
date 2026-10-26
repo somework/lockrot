@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer require 'twig/twig:^3.27.0'"
+        "composer require 'twig/twig:^3.27.0'",
+        "composer why-not twig/twig v3.27.0 --locked"
     ],
     "commands_cmd": [
-        "composer require \"twig/twig:^3.27.0\""
+        "composer require \"twig/twig:^3.27.0\"",
+        "composer why-not twig/twig v3.27.0 --locked"
     ]
 }

@@ -1293,8 +1293,10 @@
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v6.4.40"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -1352,7 +1354,8 @@
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v6.4.40"
                     }
                 },
                 "move_in": "next_step",
@@ -1643,8 +1646,10 @@
                 "check": {
                     "result": "resolves",
                     "form": "inline",
-                    "reason": null
+                    "reason": null,
+                    "installs": "v2.3.2"
                 },
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -1702,7 +1707,8 @@
                     "check": {
                         "result": "resolves",
                         "form": "inline",
-                        "reason": null
+                        "reason": null,
+                        "installs": "v2.3.2"
                     }
                 },
                 "move_in": "next_step",

@@ -1354,6 +1354,7 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -1368,6 +1369,13 @@
                         "composer",
                         "require",
                         "pelago/emogrifier:^7.3"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "pelago/emogrifier",
+                        "v7.3.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],

@@ -1348,6 +1348,7 @@
                                 "left-behind",
                                 "vulnerable"
                             ],
+                            "direct": true,
                             "replacement": null,
                             "next_step": {
                                 "kind": "raise-php",
@@ -1401,6 +1402,7 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -1411,6 +1413,13 @@
                         "require",
                         "php:>=7.2.5",
                         "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "guzzlehttp/psr7",
+                        "2.13.0",
+                        "--locked"
                     ]
                 ],
                 "through": [
@@ -1423,7 +1432,9 @@
                             "released": "2026-09-06T13:55:09+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],
@@ -1587,6 +1598,7 @@
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -1637,6 +1649,7 @@
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -1687,6 +1700,7 @@
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",
@@ -1737,6 +1751,7 @@
                                                     "left-behind",
                                                     "vulnerable"
                                                 ],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": {
                                                     "kind": "raise-php",

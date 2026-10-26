@@ -142,10 +142,19 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "transitive"
             ],
-            "commands": [],
+            "commands": [
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/event-dispatcher",
+                    "v5.4.45",
+                    "--locked"
+                ]
+            ],
             "through": [
                 {
                     "package": "mautic/core-lib",
@@ -153,7 +162,9 @@
                     "installed_requires": null,
                     "newest_stable": null,
                     "newest_requires": null,
-                    "newest_requires_unmeasured": "not_from_composer_repository"
+                    "newest_requires_unmeasured": "not_from_composer_repository",
+                    "local": false,
+                    "newest_is_installed": null
                 }
             ],
             "also": [],

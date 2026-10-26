@@ -144,6 +144,7 @@
       "lead": null,
       "flag_ids": [],
       "replacement": null,
+      "direct": true,
       "next_step": null
      }
     }
@@ -196,6 +197,7 @@
     ]
    },
    "check": null,
+   "moves_with": [],
    "composer_moves_because": [
     "holders",
     "crosses_major"
@@ -211,6 +213,13 @@
      "composer",
      "require",
      "laravel/framework:^12.69.0"
+    ],
+    [
+     "composer",
+     "why-not",
+     "laravel/framework",
+     "v12.69.0",
+     "--locked"
     ]
    ],
    "through": [],
@@ -544,6 +553,7 @@
            "lead": null,
            "flag_ids": [],
            "replacement": null,
+           "direct": true,
            "next_step": null
           }
          }
@@ -657,6 +667,7 @@
            "lead": null,
            "flag_ids": [],
            "replacement": null,
+           "direct": true,
            "next_step": null
           }
          }
@@ -708,6 +719,7 @@
            "lead": null,
            "flag_ids": [],
            "replacement": null,
+           "direct": true,
            "next_step": null
           }
          }
@@ -759,6 +771,7 @@
            "lead": null,
            "flag_ids": [],
            "replacement": null,
+           "direct": true,
            "next_step": null
           }
          }
@@ -900,6 +913,7 @@
         "lead": null,
         "flag_ids": [],
         "replacement": null,
+        "direct": true,
         "next_step": null
        }
       }
@@ -965,6 +979,7 @@
         "lead": null,
         "flag_ids": [],
         "replacement": null,
+        "direct": true,
         "next_step": null
        }
       }

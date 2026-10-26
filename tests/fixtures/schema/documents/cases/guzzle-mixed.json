@@ -1431,6 +1431,7 @@
         "pinned"
        ],
        "replacement": null,
+       "direct": true,
        "next_step": {
         "kind": "no-move",
         "to_branch": null,
@@ -1454,6 +1455,7 @@
         "old-promise"
        ],
        "replacement": null,
+       "direct": true,
        "next_step": {
         "kind": "find-alternative",
         "to_branch": null,
@@ -1477,6 +1479,7 @@
         "old-promise"
        ],
        "replacement": null,
+       "direct": false,
        "next_step": {
         "kind": "find-alternative",
         "to_branch": null,
@@ -1500,6 +1503,7 @@
         "old-promise"
        ],
        "replacement": null,
+       "direct": true,
        "next_step": {
         "kind": "raise-php",
         "to_branch": "4.x",
@@ -1608,6 +1612,7 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "holders",
      "crosses_major"
@@ -1623,6 +1628,13 @@
       "composer",
       "require",
       "guzzlehttp/guzzle:^7.15.2"
+     ],
+     [
+      "composer",
+      "why-not",
+      "guzzlehttp/guzzle",
+      "7.15.2",
+      "--locked"
      ]
     ],
     "through": [],
@@ -1850,6 +1862,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -1873,6 +1886,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -1896,6 +1910,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -1919,6 +1934,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -1977,6 +1993,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2000,6 +2017,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2023,6 +2041,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2046,6 +2065,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -2104,6 +2124,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2127,6 +2148,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2150,6 +2172,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2173,6 +2196,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -2231,6 +2255,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2254,6 +2279,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2277,6 +2303,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2300,6 +2327,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -2358,6 +2386,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2381,6 +2410,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2404,6 +2434,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2427,6 +2458,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -2485,6 +2517,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2508,6 +2541,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2531,6 +2565,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2554,6 +2589,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -2612,6 +2648,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2635,6 +2672,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2658,6 +2696,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2681,6 +2720,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -2739,6 +2779,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2762,6 +2803,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2785,6 +2827,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2808,6 +2851,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -2866,6 +2910,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -2889,6 +2934,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2912,6 +2958,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -2935,6 +2982,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -2993,6 +3041,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -3016,6 +3065,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -3039,6 +3089,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -3062,6 +3113,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -3120,6 +3172,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -3143,6 +3196,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -3166,6 +3220,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -3189,6 +3244,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -3247,6 +3303,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -3270,6 +3327,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -3293,6 +3351,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -3316,6 +3375,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -3374,6 +3434,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -3397,6 +3458,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -3420,6 +3482,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -3443,6 +3506,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",
@@ -3501,6 +3565,7 @@
              "pinned"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -3524,6 +3589,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -3547,6 +3613,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": false,
             "next_step": {
              "kind": "find-alternative",
              "to_branch": null,
@@ -3570,6 +3637,7 @@
              "old-promise"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "raise-php",
              "to_branch": "4.x",

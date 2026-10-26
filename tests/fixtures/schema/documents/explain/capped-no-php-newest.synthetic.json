@@ -118,12 +118,20 @@
    "clears_all": false,
    "if_applied": null,
    "check": null,
+   "moves_with": [],
    "composer_moves_because": [],
    "commands": [
     [
      "composer",
      "update",
      "laminas/laminas-code"
+    ],
+    [
+     "composer",
+     "why-not",
+     "laminas/laminas-code",
+     "4.18.0",
+     "--locked"
     ]
    ],
    "through": [],

@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "0f9dee3c22a50f7834c93060f158a5edf0fac99cf9dea8e16daab47ae6bfcadb",
-        "tests/fixtures/flags/composite.json": "97b982c33c1b4bfe46d41ca53c2d59452b490902ab96ffca5e80e49280731a6f",
-        "tests/fixtures/flags/provenance.json": "93af40aa33addb941b7f51e1986054bf1fbc7e9cf55920238aa8ed044bb690ce"
+        "tests/fixtures/flags/cases.json": "5604cfed0bdd962a525cf2af68b88063f3a33fb4481a0e30eb2b36d74386cb9d",
+        "tests/fixtures/flags/composite.json": "931aa288bfbfee92d7103d91a1d3c78a9d0d5625dd044f214ca72e1c9c73a6e7",
+        "tests/fixtures/flags/provenance.json": "c294233f8e2cd4afd61d128f7836b0be6b7f4f1ef51c1ef1c4ea728fd34cd0ea"
     },
     "version_mask": {
         "paths": [
@@ -71,27 +71,29 @@
     "case_lock": "each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out",
     "model_goldens": {
         "compared": {
-            "age_line": 117,
-            "baseline_suffix": 119,
-            "commands_cmd": 121,
-            "commands_posix": 121,
-            "gate_line": 120,
-            "next_step_text": 100,
-            "run_gate_line": 121,
-            "score_text": 120
+            "age_line": 122,
+            "baseline_suffix": 124,
+            "commands_cmd": 107,
+            "commands_posix": 107,
+            "gate_line": 125,
+            "next_step_text": 87,
+            "run_gate_line": 126,
+            "score_text": 124
         },
         "inputs_differ": {
             "age_line": 4,
             "baseline_suffix": 2,
+            "commands_cmd": 19,
+            "commands_posix": 19,
             "gate_line": 1,
-            "next_step_text": 21,
-            "score_text": 1
+            "next_step_text": 39,
+            "score_text": 2
         }
     },
     "page_goldens": {
         "file": "page-goldens.json",
         "source": "the model's page goldens (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded",
-        "sha256": "98b214656292e0e738b6787c5e8b5ce3ba46c1de9e8e96a7e43c9e971be35907",
+        "sha256": "2dd3592558ce561c1b621d5528a5517974fec49524d1776a813813fe3351e298",
         "read_by": "tests/Integration/PageGoldensTest.php validates each page document against the report-2 schema and reads title, description, grade_line, figure_line, load_line, gate_partition, ready, run_notes, flags_notes, advisory_groups, sheet_moves, sheet_holders and sheet_ladder. The other keys are the renderer's"
     },
     "engine_pages": "page/ holds the report-2 that bin/lockrot writes for each case of Lockrot\\Tests\\Support\\Contract\\EnginePage::CASES. tools/report/record --engine-pages records them",

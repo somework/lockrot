@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer update matomo/network"
+        "composer update matomo/network",
+        "composer why-not matomo/network 2.0.3 --locked"
     ],
     "commands_cmd": [
-        "composer update matomo/network"
+        "composer update matomo/network",
+        "composer why-not matomo/network 2.0.3 --locked"
     ]
 }

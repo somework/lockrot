@@ -191,6 +191,7 @@
                         "flag_ids": [
                             "pinned"
                         ],
+                        "direct": true,
                         "replacement": null,
                         "next_step": {
                             "kind": "no-move",
@@ -214,6 +215,7 @@
                             "left-behind",
                             "vulnerable"
                         ],
+                        "direct": true,
                         "replacement": null,
                         "next_step": {
                             "kind": "raise-php",
@@ -328,6 +330,7 @@
                 ]
             },
             "check": null,
+            "moves_with": [],
             "composer_moves_because": [
                 "holders",
                 "crosses_major"
@@ -343,6 +346,13 @@
                     "composer",
                     "require",
                     "twig/twig:^3.27.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "twig/twig",
+                    "v3.27.0",
+                    "--locked"
                 ]
             ],
             "through": [],
@@ -534,6 +544,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -557,6 +568,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -615,6 +627,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -638,6 +651,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -696,6 +710,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -719,6 +734,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -813,6 +829,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -836,6 +853,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -894,6 +912,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -917,6 +936,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -1011,6 +1031,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1034,6 +1055,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -1092,6 +1114,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1115,6 +1138,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -1173,6 +1197,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1196,6 +1221,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -1254,6 +1280,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1277,6 +1304,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -1335,6 +1363,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1358,6 +1387,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -1416,6 +1446,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1439,6 +1470,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -1497,6 +1529,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1520,6 +1553,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -1578,6 +1612,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1601,6 +1636,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -1659,6 +1695,7 @@
                                             "flag_ids": [
                                                 "pinned"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "no-move",
@@ -1682,6 +1719,7 @@
                                                 "left-behind",
                                                 "vulnerable"
                                             ],
+                                            "direct": true,
                                             "replacement": null,
                                             "next_step": {
                                                 "kind": "raise-php",
@@ -1833,6 +1871,7 @@
                                 "flag_ids": [
                                     "pinned"
                                 ],
+                                "direct": true,
                                 "replacement": null,
                                 "next_step": {
                                     "kind": "no-move",
@@ -1856,6 +1895,7 @@
                                     "left-behind",
                                     "vulnerable"
                                 ],
+                                "direct": true,
                                 "replacement": null,
                                 "next_step": {
                                     "kind": "raise-php",

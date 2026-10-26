@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer update league/commonmark"
+        "composer update league/commonmark",
+        "composer why-not league/commonmark 2.10.3 --locked"
     ],
     "commands_cmd": [
-        "composer update league/commonmark"
+        "composer update league/commonmark",
+        "composer why-not league/commonmark 2.10.3 --locked"
     ]
 }

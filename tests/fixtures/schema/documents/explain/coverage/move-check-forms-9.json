@@ -185,8 +185,10 @@
    "check": {
     "result": "not_checked",
     "form": null,
-    "reason": "not_from_composer_repository"
+    "reason": "not_from_composer_repository",
+    "installs": null
    },
+   "moves_with": [],
    "composer_moves_because": [
     "crosses_major"
    ],

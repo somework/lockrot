@@ -1297,6 +1297,7 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
@@ -1307,8 +1308,9 @@
      [
       "composer",
       "why-not",
-      "guzzlehttp/guzzle",
-      "8.2.0"
+      "symfony/polyfill-intl-idn",
+      "v1.38.1",
+      "--locked"
      ]
     ],
     "through": [
@@ -1321,7 +1323,9 @@
        "released": "2026-09-06T13:55:09+00:00"
       },
       "newest_requires": false,
-      "newest_requires_unmeasured": null
+      "newest_requires_unmeasured": null,
+      "local": false,
+      "newest_is_installed": false
      }
     ],
     "also": [],

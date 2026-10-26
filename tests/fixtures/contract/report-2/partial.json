@@ -1349,6 +1349,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -1402,6 +1403,7 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -1417,6 +1419,13 @@
                         "composer",
                         "require",
                         "laravel/framework:^12.69.0"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "laravel/framework",
+                        "v12.69.0",
+                        "--locked"
                     ]
                 ],
                 "through": [],
@@ -1749,6 +1758,7 @@
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }
@@ -1862,6 +1872,7 @@
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }
@@ -1913,6 +1924,7 @@
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }
@@ -1964,6 +1976,7 @@
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }

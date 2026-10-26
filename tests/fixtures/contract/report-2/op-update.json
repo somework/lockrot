@@ -1261,12 +1261,20 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
                         "matomo/network"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "matomo/network",
+                        "2.0.3",
+                        "--locked"
                     ]
                 ],
                 "through": [],

@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer require 'symfony/debug:^4.4.44'"
+        "composer require 'symfony/debug:^4.4.44'",
+        "composer why-not symfony/debug v4.4.44 --locked"
     ],
     "commands_cmd": [
-        "composer require \"symfony/debug:^4.4.44\""
+        "composer require \"symfony/debug:^4.4.44\"",
+        "composer why-not symfony/debug v4.4.44 --locked"
     ]
 }

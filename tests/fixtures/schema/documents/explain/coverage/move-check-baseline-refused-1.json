@@ -132,14 +132,23 @@
    "check": {
     "result": "not_checked",
     "form": null,
-    "reason": "baseline_refused"
+    "reason": "baseline_refused",
+    "installs": null
    },
+   "moves_with": [],
    "composer_moves_because": [],
    "commands": [
     [
      "composer",
      "update",
      "laravel/framework:^12.69.0"
+    ],
+    [
+     "composer",
+     "why-not",
+     "laravel/framework",
+     "v12.69.0",
+     "--locked"
     ]
    ],
    "through": [],
@@ -191,7 +200,8 @@
     "check": {
      "result": "not_checked",
      "form": null,
-     "reason": "baseline_refused"
+     "reason": "baseline_refused",
+     "installs": null
     }
    },
    "move_in": "next_step",

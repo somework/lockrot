@@ -140,8 +140,10 @@
    "check": {
     "result": "resolves",
     "form": "inline",
-    "reason": null
+    "reason": null,
+    "installs": "2.12.3"
    },
+   "moves_with": [],
    "composer_moves_because": [],
    "commands": [
     [
@@ -160,7 +162,9 @@
       "released": "2026-09-06T13:55:09+00:00"
      },
      "newest_requires": true,
-     "newest_requires_unmeasured": null
+     "newest_requires_unmeasured": null,
+     "local": false,
+     "newest_is_installed": false
     }
    ],
    "also": [],
@@ -211,7 +215,8 @@
     "check": {
      "result": "resolves",
      "form": "inline",
-     "reason": null
+     "reason": null,
+     "installs": "2.12.3"
     }
    },
    "move_in": "next_step",
@@ -440,7 +445,8 @@
      "check": {
       "result": "resolves",
       "form": "inline",
-      "reason": null
+      "reason": null,
+      "installs": "2.12.3"
      }
     }
    }

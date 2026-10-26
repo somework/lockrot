@@ -1370,11 +1370,20 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "crosses_major",
      "transitive"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "jfcherng/php-color-output",
+      "3.0.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "jfcherng/php-diff",
@@ -1385,7 +1394,9 @@
        "released": "2026-06-22T13:04:52+00:00"
       },
       "newest_requires": true,
-      "newest_requires_unmeasured": null
+      "newest_requires_unmeasured": null,
+      "local": false,
+      "newest_is_installed": false
      }
     ],
     "also": [],

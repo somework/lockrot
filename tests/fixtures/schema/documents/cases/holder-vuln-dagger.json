@@ -1331,6 +1331,7 @@
         "vulnerable"
        ],
        "replacement": null,
+       "direct": true,
        "next_step": {
         "kind": "raise-php",
         "to_branch": "3.x",
@@ -1363,6 +1364,7 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "holders",
      "crosses_major"

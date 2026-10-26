@@ -12,6 +12,10 @@
         "libyears 3.9 behind the newest stable release"
     ],
     "baseline_suffix": null,
-    "commands_posix": [],
-    "commands_cmd": []
+    "commands_posix": [
+        "composer why-not symfony/event-dispatcher-contracts v2.5.0 --locked"
+    ],
+    "commands_cmd": [
+        "composer why-not symfony/event-dispatcher-contracts v2.5.0 --locked"
+    ]
 }

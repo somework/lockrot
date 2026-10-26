@@ -1325,12 +1325,20 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
       "composer",
       "require",
       "friendsofsymfony/oauth-server-bundle:^1.6.2"
+     ],
+     [
+      "composer",
+      "why-not",
+      "friendsofsymfony/oauth-server-bundle",
+      "1.6.2",
+      "--locked"
      ]
     ],
     "through": [],

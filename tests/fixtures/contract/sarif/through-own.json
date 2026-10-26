@@ -1,0 +1,290 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/old-promise",
+                            "name": "old-promise",
+                            "shortDescription": {
+                                "text": "old-promise: Released before the target PHP's major with an open-ended php constraint"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version was released before the target PHP's GA date, and its php constraint admits that target untested."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/stale",
+                            "name": "stale",
+                            "shortDescription": {
+                                "text": "stale: Old release or old push, below the silent thresholds"
+                            },
+                            "fullDescription": {
+                                "text": "No stable release or no repository push for release-warn-years or push-warn-years."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
+            "results": [
+                {
+                    "ruleId": "lockrot/old-promise",
+                    "ruleIndex": 0,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "voku/stop-words 2.0.1 \u2014 finding medium, 9 = (old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive \u2014 old-promise: released 2018-11-23 for PHP 7 (php \">=7.0.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: test it on PHP 8.4 \u2014 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): replace or update mautic/core-lib."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "voku/stop-words"
+                    },
+                    "properties": {
+                        "package": "voku/stop-words",
+                        "version": "2.0.1",
+                        "verdict": "medium",
+                        "priority": "medium",
+                        "lead": "old-promise",
+                        "score_total": 9,
+                        "score_text": "9 = (old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "old-promise",
+                            "stale"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "mautic/core-lib",
+                            "jbroadway/urlify",
+                            "voku/stop-words"
+                        ],
+                        "depth": 2,
+                        "direct_dependents": [
+                            "mautic/core-lib"
+                        ],
+                        "signal_ids": [
+                            "S2",
+                            "S5"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2018-11-23T01:37:27+00:00",
+                                "years": 7.9,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "2.0.1",
+                                "at": "2018-11-23T01:37:27+00:00",
+                                "years": 7.9,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "2.0.1",
+                                "at": "2018-11-23T01:37:27+00:00",
+                                "years": 7.9,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-08-28T10:55:29+00:00",
+                                "years": 0.1,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "old-promise",
+                            "role": "lead",
+                            "weight": 16,
+                            "divisor": 1,
+                            "points": 16,
+                            "contribution": 8
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 19
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 1,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "voku/stop-words 2.0.1 \u2014 finding medium, 9 = (old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive \u2014 stale: last release 2018-11-23 (7.9 years ago). Do: test it on PHP 8.4 \u2014 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): replace or update mautic/core-lib."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "voku/stop-words"
+                    },
+                    "properties": {
+                        "package": "voku/stop-words",
+                        "version": "2.0.1",
+                        "verdict": "medium",
+                        "priority": "medium",
+                        "lead": "old-promise",
+                        "score_total": 9,
+                        "score_text": "9 = (old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "old-promise",
+                            "stale"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "stale",
+                            "role": "corroborating",
+                            "weight": 8,
+                            "divisor": 4,
+                            "points": 2,
+                            "contribution": 1
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 19
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 0,
+                    "exitCodeDescription": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": false,
+                            "tripped_by": [],
+                            "fail_on_applied": true,
+                            "reaching": 0,
+                            "failing": 0,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "standing": {
+                                "known": 0,
+                                "new": 0,
+                                "worsened": 0,
+                                "none": 0
+                            },
+                            "failing_packages": [],
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 0
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    },
+                    "toolExecutionNotifications": [
+                        {
+                            "level": "note",
+                            "message": {
+                                "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 0,
+                            "records": 0
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

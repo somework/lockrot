@@ -1273,15 +1273,6 @@
                 "crosses_major": false,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "acme/ml-widget",
-                        "constraint": "^1.0",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "acme/ml-widget",
                         "version": "1.0.0",
@@ -1292,6 +1283,7 @@
                             "verdict": "ok",
                             "lead": null,
                             "flag_ids": [],
+                            "direct": true,
                             "replacement": null,
                             "next_step": null
                         }
@@ -1331,8 +1323,10 @@
                 "check": {
                     "result": "not_checked",
                     "form": null,
-                    "reason": "pass_cap"
+                    "reason": "pass_cap",
+                    "installs": null
                 },
+                "moves_with": [],
                 "composer_moves_because": [
                     "holders"
                 ],
@@ -1341,11 +1335,18 @@
                         "composer",
                         "require",
                         "symfony/mailer:^6.4.40"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/mailer",
+                        "v6.4.40",
+                        "--locked"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires acme/ml-widget ^1.0) and symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it"
+                "text": "require symfony/mailer ^6.4.40 \u2014 clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by symfony/mailer v6.4.40, its own release (requires acme/ml-transport ^2.0) and acme/ml-widget 1.0.0 (conflicts with acme/ml-transport >=2.0); the packages that hold it may need to move too; not checked with Composer's solver (Composer refused each move before it), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -1382,15 +1383,6 @@
                     "newest": "v6.4.40",
                     "held_by": [
                         {
-                            "source": "root",
-                            "package": null,
-                            "version": null,
-                            "link": "root-require",
-                            "target": "acme/ml-widget",
-                            "constraint": "^1.0",
-                            "holder": null
-                        },
-                        {
                             "source": "package",
                             "package": "acme/ml-widget",
                             "version": "1.0.0",
@@ -1401,6 +1393,7 @@
                                 "verdict": "ok",
                                 "lead": null,
                                 "flag_ids": [],
+                                "direct": true,
                                 "replacement": null,
                                 "next_step": null
                             }
@@ -1427,7 +1420,8 @@
                     "check": {
                         "result": "not_checked",
                         "form": null,
-                        "reason": "pass_cap"
+                        "reason": "pass_cap",
+                        "installs": null
                     }
                 },
                 "move_in": "next_step",
@@ -1512,15 +1506,6 @@
                                     "admits_project_php": true,
                                     "held_by": [
                                         {
-                                            "source": "root",
-                                            "package": null,
-                                            "version": null,
-                                            "link": "root-require",
-                                            "target": "acme/ml-widget",
-                                            "constraint": "^1.0",
-                                            "holder": null
-                                        },
-                                        {
                                             "source": "package",
                                             "package": "acme/ml-widget",
                                             "version": "1.0.0",
@@ -1531,6 +1516,7 @@
                                                 "verdict": "ok",
                                                 "lead": null,
                                                 "flag_ids": [],
+                                                "direct": true,
                                                 "replacement": null,
                                                 "next_step": null
                                             }

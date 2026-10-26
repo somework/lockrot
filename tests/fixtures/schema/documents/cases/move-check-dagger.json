@@ -1278,8 +1278,10 @@
     "check": {
      "result": "resolves",
      "form": "with-dependencies",
-     "reason": null
+     "reason": null,
+     "installs": null
     },
+    "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
@@ -1338,7 +1340,8 @@
      "check": {
       "result": "resolves",
       "form": "with-dependencies",
-      "reason": null
+      "reason": null,
+      "installs": null
      }
     },
     "move_in": "next_step",

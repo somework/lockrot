@@ -1319,6 +1319,7 @@
                 "clears_all": false,
                 "if_applied": null,
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -1331,7 +1332,9 @@
                             "released": "2026-05-17T19:32:55+00:00"
                         },
                         "newest_requires": true,
-                        "newest_requires_unmeasured": null
+                        "newest_requires_unmeasured": null,
+                        "local": false,
+                        "newest_is_installed": false
                     }
                 ],
                 "also": [],

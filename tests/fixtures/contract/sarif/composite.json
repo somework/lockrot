@@ -832,6 +832,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -939,6 +940,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -1034,6 +1036,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -1129,6 +1132,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -1224,6 +1228,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -1319,6 +1324,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -1414,6 +1420,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -1509,6 +1516,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -1604,6 +1612,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -1699,6 +1708,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -1794,6 +1804,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -1889,6 +1900,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -1984,6 +1996,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -2079,6 +2092,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",
@@ -2174,6 +2188,7 @@
                                             "old-promise",
                                             "vulnerable"
                                         ],
+                                        "direct": true,
                                         "replacement": null,
                                         "next_step": {
                                             "kind": "require",

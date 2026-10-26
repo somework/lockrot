@@ -1286,6 +1286,7 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -1294,6 +1295,13 @@
       "composer",
       "require",
       "laminas/laminas-code:^5.0.0"
+     ],
+     [
+      "composer",
+      "why-not",
+      "laminas/laminas-code",
+      "5.0.0",
+      "--locked"
      ]
     ],
     "through": [],

@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer update symfony/yaml"
+        "composer update symfony/yaml",
+        "composer why-not symfony/yaml v5.4.52 --locked"
     ],
     "commands_cmd": [
-        "composer update symfony/yaml"
+        "composer update symfony/yaml",
+        "composer why-not symfony/yaml v5.4.52 --locked"
     ]
 }

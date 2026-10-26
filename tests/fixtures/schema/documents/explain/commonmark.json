@@ -163,12 +163,20 @@
     ]
    },
    "check": null,
+   "moves_with": [],
    "composer_moves_because": [],
    "commands": [
     [
      "composer",
      "update",
      "league/commonmark"
+    ],
+    [
+     "composer",
+     "why-not",
+     "league/commonmark",
+     "2.10.3",
+     "--locked"
     ]
    ],
    "through": [
@@ -181,7 +189,9 @@
       "released": "2026-09-29T12:46:21+00:00"
      },
      "newest_requires": true,
-     "newest_requires_unmeasured": null
+     "newest_requires_unmeasured": null,
+     "local": false,
+     "newest_is_installed": false
     },
     {
      "package": "laravel/nightwatch",
@@ -192,7 +202,9 @@
       "released": "2026-09-18T00:37:28+00:00"
      },
      "newest_requires": null,
-     "newest_requires_unmeasured": "through_other_package"
+     "newest_requires_unmeasured": "through_other_package",
+     "local": false,
+     "newest_is_installed": false
     },
     {
      "package": "spatie/laravel-markdown",
@@ -203,7 +215,9 @@
       "released": "2026-02-22T18:53:36+00:00"
      },
      "newest_requires": true,
-     "newest_requires_unmeasured": null
+     "newest_requires_unmeasured": null,
+     "local": false,
+     "newest_is_installed": true
     }
    ],
    "also": [],

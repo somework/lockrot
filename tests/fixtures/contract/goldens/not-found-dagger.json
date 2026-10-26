@@ -1,6 +1,6 @@
 {
     "score_text": "18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive",
-    "next_step_text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package",
+    "next_step_text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high,unchecked · 1 finding fails it (high 1) · target php 8.4 (--target-php)",
     "age_line": "age: installed 1.17.05.02 released 2017-05-02 (9.4 years ago), the newest on 1.x; newest release 2.17.08.29 2017-08-29 (9.1 years ago)",

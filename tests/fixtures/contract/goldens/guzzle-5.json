@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer require 'guzzlehttp/guzzle:^8.2'"
+        "composer require 'guzzlehttp/guzzle:^8.2'",
+        "composer why-not guzzlehttp/guzzle 8.2.0 --locked"
     ],
     "commands_cmd": [
-        "composer require \"guzzlehttp/guzzle:^8.2\""
+        "composer require \"guzzlehttp/guzzle:^8.2\"",
+        "composer why-not guzzlehttp/guzzle 8.2.0 --locked"
     ]
 }

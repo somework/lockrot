@@ -12,6 +12,10 @@
         "libyears 4.7 behind the newest stable release"
     ],
     "baseline_suffix": null,
-    "commands_posix": [],
-    "commands_cmd": []
+    "commands_posix": [
+        "composer why-not league/flysystem 3.36.0 --locked"
+    ],
+    "commands_cmd": [
+        "composer why-not league/flysystem 3.36.0 --locked"
+    ]
 }

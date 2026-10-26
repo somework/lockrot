@@ -1371,6 +1371,7 @@
         "vulnerable"
        ],
        "replacement": null,
+       "direct": true,
        "next_step": {
         "kind": "no-move",
         "to_branch": null,
@@ -1413,6 +1414,7 @@
      ]
     },
     "check": null,
+    "moves_with": [],
     "composer_moves_because": [
      "holders",
      "crosses_major"
@@ -1431,7 +1433,9 @@
       "installed_requires": null,
       "newest_stable": null,
       "newest_requires": null,
-      "newest_requires_unmeasured": "not_from_composer_repository"
+      "newest_requires_unmeasured": "not_from_composer_repository",
+      "local": true,
+      "newest_is_installed": null
      }
     ],
     "also": [],
@@ -1611,6 +1615,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
@@ -1662,6 +1667,7 @@
              "vulnerable"
             ],
             "replacement": null,
+            "direct": true,
             "next_step": {
              "kind": "no-move",
              "to_branch": null,

@@ -12,6 +12,10 @@
         "libyears 1.0 behind the newest stable release"
     ],
     "baseline_suffix": null,
-    "commands_posix": [],
-    "commands_cmd": []
+    "commands_posix": [
+        "composer why-not jfcherng/php-color-output 3.0.0 --locked"
+    ],
+    "commands_cmd": [
+        "composer why-not jfcherng/php-color-output 3.0.0 --locked"
+    ]
 }

@@ -1365,6 +1365,7 @@
                     ]
                 },
                 "check": null,
+                "moves_with": [],
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -1373,6 +1374,13 @@
                         "composer",
                         "require",
                         "symfony/debug:^4.4.44"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/debug",
+                        "v4.4.44",
+                        "--locked"
                     ]
                 ],
                 "through": [],

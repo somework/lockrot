@@ -6955,7 +6955,7 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "v2.3.2"
             },
             "moves_with": [],
             "composer_moves_because": [],
@@ -6991,7 +6991,7 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "v2.3.2"
             }
         },
         "move_in": "next_step",
@@ -7045,7 +7045,7 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "2.12.3"
             },
             "moves_with": [],
             "composer_moves_because": [],
@@ -7095,7 +7095,188 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "2.12.3"
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "mc-gets-below\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "6.x",
+            "version": "v6.4.40",
+            "newest": "v6.4.41",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-bf7t-jnpz-492k",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "inline",
+                "reason": null,
+                "installs": "v6.4.40"
+            },
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "symfony/routing:^6.4.40"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update 'symfony/routing:^6.4.40' (gets v6.4.40, below the newest v6.4.41) \u2014 clears the advisory; Composer's solver checked it against the lock"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "update",
+            "lowest": "v6.4.40",
+            "newest": "v6.4.41",
+            "held_by": [],
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "inline",
+                "reason": null,
+                "installs": "v6.4.40"
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "mc-gets-next-form\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "6.x",
+            "version": "v6.4.40",
+            "newest": "v6.4.41",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-bf7t-jnpz-492k",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "with-dependencies",
+                "reason": null,
+                "installs": "v6.4.41"
+            },
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "symfony/routing:^6.4.40",
+                    "--with-dependencies"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update 'symfony/routing:^6.4.40' --with-dependencies (gets v6.4.41) \u2014 clears the advisory; Composer's solver checked it against the lock"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "update",
+            "lowest": "v6.4.40",
+            "newest": "v6.4.41",
+            "held_by": [],
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "with-dependencies",
+                "reason": null,
+                "installs": "v6.4.41"
             }
         },
         "move_in": "next_step",
@@ -7149,7 +7330,7 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "v2.3.2"
             },
             "moves_with": [],
             "composer_moves_because": [],
@@ -7185,8 +7366,101 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "v2.3.2"
             }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "mc-joint\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "8.x",
+            "version": "8.0.1",
+            "newest": "8.0.1",
+            "constraint": "^8.0.1",
+            "latest": null,
+            "php_check": {
+                "requires": "^8.1",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-gcrk-3vtt-1r14",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "inline",
+                "reason": null,
+                "installs": "8.0.1"
+            },
+            "moves_with": [
+                {
+                    "package": "acme/gz-client",
+                    "installed_version": "1.0.0",
+                    "version": "1.1.0"
+                }
+            ],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "guzzlehttp/guzzle:^8.0.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "update",
+                    "guzzlehttp/guzzle",
+                    "acme/gz-client"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require guzzlehttp/guzzle ^8.0.1 \u2014 clears the advisory; 8.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock, with an update of acme/gz-client (to 1.1.0)"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "7.15.2",
+            "held_by": [],
+            "if_applied": null,
+            "check": null
         },
         "move_in": "next_step",
         "partial": null
@@ -7540,7 +7814,7 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "v6.4.40"
             },
             "moves_with": [],
             "composer_moves_because": [],
@@ -7582,7 +7856,7 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "v6.4.40"
             }
         },
         "move_in": "next_step",
@@ -7646,7 +7920,7 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "8.0.1"
             },
             "moves_with": [],
             "composer_moves_because": [
@@ -7758,7 +8032,7 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "8.0.1"
             },
             "moves_with": [],
             "composer_moves_because": [
@@ -7870,7 +8144,7 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "v6.4.41"
             },
             "moves_with": [],
             "composer_moves_because": [],
@@ -7906,7 +8180,7 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "v6.4.41"
             }
         },
         "move_in": "next_step",
@@ -7960,7 +8234,7 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "v2.3.2"
             },
             "moves_with": [],
             "composer_moves_because": [],
@@ -7996,7 +8270,7 @@
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": null
+                "installs": "v2.3.2"
             }
         },
         "move_in": "next_step",
@@ -8050,7 +8324,7 @@
                 "result": "resolves",
                 "form": "with-all-dependencies",
                 "reason": null,
-                "installs": null
+                "installs": "v6.4.41"
             },
             "moves_with": [],
             "composer_moves_because": [],
@@ -8087,7 +8361,7 @@
                 "result": "resolves",
                 "form": "with-all-dependencies",
                 "reason": null,
-                "installs": null
+                "installs": "v6.4.41"
             }
         },
         "move_in": "next_step",
@@ -8141,7 +8415,7 @@
                 "result": "resolves",
                 "form": "with-dependencies",
                 "reason": null,
-                "installs": null
+                "installs": "v6.4.41"
             },
             "moves_with": [],
             "composer_moves_because": [],
@@ -8178,7 +8452,7 @@
                 "result": "resolves",
                 "form": "with-dependencies",
                 "reason": null,
-                "installs": null
+                "installs": "v6.4.41"
             }
         },
         "move_in": "next_step",
@@ -10360,6 +10634,148 @@
         "move_in": "next_step",
         "partial": null
     },
+    "routing-self\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.4.53",
+            "newest": "v5.4.53",
+            "constraint": "^5.4.53",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2.5",
+                "project_allows": null,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "package",
+                    "package": "acme/routing-bridge",
+                    "version": "v4.4.41",
+                    "link": "require",
+                    "target": null,
+                    "constraint": "self.version",
+                    "holder": {
+                        "verdict": "unknown",
+                        "lead": null,
+                        "flag_ids": [],
+                        "direct": false,
+                        "replacement": null,
+                        "next_step": null
+                    }
+                },
+                {
+                    "source": "package",
+                    "package": "mautic/core-lib",
+                    "version": "4.3.x-dev",
+                    "link": "require",
+                    "target": null,
+                    "constraint": "~4.4.0",
+                    "holder": {
+                        "verdict": "critical",
+                        "lead": "pinned",
+                        "flag_ids": [
+                            "pinned",
+                            "capped",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "no-move",
+                            "to_branch": null,
+                            "constraint": null,
+                            "check": null
+                        }
+                    }
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-bf7t-jnpz-492k",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-yc7t-91v9-99xs",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "holders",
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/routing",
+                    "v5.4.53",
+                    "--locked"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "mautic/core-lib",
+                    "installed_version": "4.3.x-dev",
+                    "installed_requires": null,
+                    "newest_stable": null,
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "not_from_composer_repository",
+                    "local": true,
+                    "newest_is_installed": null
+                }
+            ],
+            "also": [],
+            "text": "move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; held by mautic/core-lib 4.3.x-dev (requires ~4.4.0; itself pinned) and acme/routing-bridge v4.4.41 (requires self.version (v4.4.41)); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 2,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "v4.4.44",
+            "held_by": [],
+            "if_applied": null,
+            "check": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "silent": {
         "next_step": {
             "kind": "find-alternative",
@@ -10754,6 +11170,66 @@
             "through": [],
             "also": [],
             "text": "\u2014"
+        }
+    },
+    "through-own": {
+        "next_step": {
+            "kind": "test",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "2.0.1",
+                "released": "2018-11-23T01:37:27+00:00",
+                "is_installed": true,
+                "relation": null,
+                "snapshot_time": null
+            },
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                },
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "transitive"
+            ],
+            "commands": [],
+            "through": [
+                {
+                    "package": "mautic/core-lib",
+                    "installed_version": "4.3.x-dev",
+                    "installed_requires": null,
+                    "newest_stable": null,
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "not_from_composer_repository",
+                    "local": false,
+                    "newest_is_installed": null
+                }
+            ],
+            "also": [],
+            "text": "test it on PHP 8.4 \u2014 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): replace or update mautic/core-lib"
         }
     },
     "tie\u2021": {

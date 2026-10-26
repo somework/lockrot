@@ -44,7 +44,7 @@
                     "level": "warning",
                     "rank": 50.0,
                     "message": {
-                        "text": "symfony/var-dumper v4.4.47 \u2014 finding medium, 8 = left-behind 16 \u00f7 2 transitive \u2014 left-behind: branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.7 (2026-09-03), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-08). Do: move symfony/var-dumper to ^5.4 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 31 more \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.8) still requires it."
+                        "text": "symfony/var-dumper v4.4.47 \u2014 finding medium, 8 = left-behind 16 \u00f7 2 transitive \u2014 left-behind: branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.7 (2026-09-03), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-08). Do: require symfony/var-dumper ^5.4 in require-dev \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/var-dumper"

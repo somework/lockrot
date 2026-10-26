@@ -13,9 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer update phpoffice/phpspreadsheet"
+        "composer update phpoffice/phpspreadsheet",
+        "composer why-not phpoffice/phpspreadsheet 1.30.7 --locked"
     ],
     "commands_cmd": [
-        "composer update phpoffice/phpspreadsheet"
+        "composer update phpoffice/phpspreadsheet",
+        "composer why-not phpoffice/phpspreadsheet 1.30.7 --locked"
     ]
 }
