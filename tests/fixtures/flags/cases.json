@@ -315163,7 +315163,30 @@
      "direct_dependents": [
       "guzzlehttp/guzzle"
      ],
-     "signals": [],
+     "signals": [
+      {
+       "id": "S7",
+       "level": "info",
+       "summary": "pulls in 1 flagged package: guzzlehttp/psr7 (vulnerable)",
+       "data": {
+        "flagged": 1,
+        "packages": [
+         {
+          "package": "guzzlehttp/psr7",
+          "chain": [
+           "guzzlehttp/guzzle",
+           "guzzlehttp/psr7"
+          ],
+          "verdict": "high",
+          "lead": null,
+          "flag_ids": [
+           "vulnerable"
+          ]
+         }
+        ]
+       }
+      }
+     ],
      "evidence": "",
      "allowlist_reason": null,
      "data_date": "2026-10-01T17:41:59+00:00",
