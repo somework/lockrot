@@ -28,10 +28,12 @@ jobs:
       # that composer.json allows, because the majors read options and events differently. The
       # rows resolve 9.6 on 7.4 and 8.0, 10.5 on 8.1 only, and 11.5 on 8.2 and later. They also
       # hold both PHPUnit configurations, both ends of the PHP range and the middle of
-      # composer/composer. main's ruleset requires the name of every row, so a pull request into
-      # main and a push run them all.
+      # composer/composer. A pull request into main and a push run them all. A ruleset requires a
+      # check by its job name, so a renamed row drops out of the ruleset.
       # The move check solves with the classes of composer/composer, which change at 2.4, 2.6 and
       # 2.9 (src/Solver). The 2.2 and latest rows cover the ends, and the 2.6 row the middle.
+      # The ignore-list readers (src/Data/Advisory, src/Data/Abandoned) read Composer 2.9's
+      # AuditConfig by property name, and only the 2.9 row has that class.
       # The covers-nothing tests pin their target PHP, so they run on the two covers_nothing rows,
       # at both ends of PHP and of composer/composer. Each row runs the runtime-php group.
       matrix: >-
@@ -41,12 +43,14 @@ jobs:
         {"php": "8.0", "composer": "latest"},
         {"php": "8.1", "composer": "latest"},
         {"php": "8.3", "composer": "2.6"},
+        {"php": "8.3", "composer": "2.9"},
         {"php": "8.5", "composer": "latest", "covers_nothing": true}]}' || '{
         "php": ["7.4", "8.0", "8.1", "8.2", "8.3", "8.4", "8.5"],
         "composer": ["2.2", "latest"],
         "exclude": [{"php": "8.5", "composer": "2.2"}],
         "include": [
         {"php": "8.3", "composer": "2.6"},
+        {"php": "8.3", "composer": "2.9"},
         {"php": "7.4", "composer": "2.2", "covers_nothing": true},
         {"php": "8.5", "composer": "latest", "covers_nothing": true}]}') }}
     steps:
@@ -61,6 +65,7 @@ jobs:
           if [ "${{ matrix.composer }}" = "2.2" ]; then composer require --dev --no-update "composer/composer:~2.2.25"; fi
           # Composer 2.9 and later block every 2.6 release of composer/composer for its advisories. The job tests lockrot against that library and never runs it.
           if [ "${{ matrix.composer }}" = "2.6" ]; then composer require --dev --no-update "composer/composer:~2.6.6" && composer config --json policy.advisories.ignore '["composer/composer"]'; fi
+          if [ "${{ matrix.composer }}" = "2.9" ]; then composer require --dev --no-update "composer/composer:~2.9.2" && composer config --json policy.advisories.ignore '["composer/composer"]'; fi
           composer update --no-interaction --prefer-dist
       - name: Run tests with the matrix Composer binary
         run: |
@@ -82,6 +87,13 @@ jobs:
           if [ "${{ matrix.composer }}" = "2.6" ]; then
             groups_config phpunit-ci.xml "<exclude>$slow<group>covers-nothing</group></exclude>"
             vendor/bin/phpunit -c phpunit-ci.xml tests/Unit/Solver tests/Unit/Verdict tests/Unit/Analyzer
+          elif [ "${{ matrix.composer }}" = "2.9" ]; then
+            # The Composer 2.9 legs of the parity tests must run here, so a skip or an empty run fails
+            # the row.
+            groups_config phpunit-ci.xml "<exclude>$slow</exclude>"
+            vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AuditParityTest.php
+            vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AbandonedIgnoreParityTest.php
+            vendor/bin/phpunit -c phpunit-ci.xml tests/Unit/Data
           else
             # Processes side by side shorten the row. Each writes its own log, and the step checks every exit code.
             # A runtime-php test reads the PHP that runs it, so a row without covers-nothing still runs it.
@@ -123,8 +135,8 @@ jobs:
           fi
   # The tests rows exclude MoveCheckComposerOracleTest, or skip it on another composer/composer than
   # the one that recorded train 7d's answers. The latest rows follow each new Composer release. This
-  # job pins the recorded version, so the oracle test runs on every head. main's ruleset requires
-  # checks by job name, so keep the name.
+  # job pins the recorded version, so the oracle test runs on every head. A ruleset requires a check
+  # by its job name, so a renamed job drops out of the ruleset.
   move-check-oracle:
     runs-on: ubuntu-latest
     steps:
@@ -241,7 +253,8 @@ jobs:
       # A push to main or release/** mutates the whole tree against the shard's minimum MSI. A pull
       # request mutates only its changed lines, where a minimum MSI over few mutants is noise. There,
       # tools/mutation/pr_gate.py fails on an escape that tests/infection-equivalents.md does not
-      # account for. Keep the job names: main's ruleset requires them. Reasons: https://github.com/somework/lockrot/pull/65
+      # account for. A ruleset requires a check by its job name, so a renamed shard drops out of the
+      # ruleset. Reasons: https://github.com/somework/lockrot/pull/65
       - name: What this shard mutates
         id: scope
         env: {EVENT: '${{ github.event_name }}', BASE_REF: '${{ github.base_ref }}', FILTER: '${{ matrix.shard.filter }}'}
@@ -394,6 +407,10 @@ jobs:
       - run: git diff --exit-code build/phar/composer.lock
       - run: build/build-phar.sh
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
+      # The PHAR validates extra.lockrot and the baseline with the justinrainbow/json-schema of
+      # build/phar/composer.lock, which the tests rows do not install.
+      - name: The schema fixtures validate with the PHAR's justinrainbow/json-schema
+        run: LOCKROT_JR_VENDOR=build/phar/vendor vendor/bin/phpunit --bootstrap tests/json-schema-bootstrap.php tests/Integration/JsonSchemaConformanceTest.php
       # This step runs the release workflow's signing helper with a throw-away key: wrap and unwrap
       # must round-trip, openssl must accept the unwrapped bytes, and the archive's verifier must
       # refuse a signature by a key that is not the release key.

@@ -379,6 +379,57 @@ final class MoveTest extends TestCase
         self::assertSame(['next_step', 'update', null], [JsonPath::stringAt($finding, ['security', 'move_in']), JsonPath::stringAt($finding, ['security', 'fix_kind']), JsonPath::arrayAt($finding, ['security'])['partial']]);
     }
 
+    /**
+     * Locks whose parts tie at 16. Each has left-behind and no old-promise. The advisory is high, or
+     * medium with no reachable fix. ~1.0.0 makes the 1.x fix a `raise-php` move.
+     *
+     * @return iterable<string, array{array<string, mixed>, array{string, string, string, ?int}, array{string, string}}>
+     */
+    public static function tiedParts(): iterable
+    {
+        $releases = [self::release('1.0.0', '2019-01-01', '>=8.0'), self::release('1.9.0', '2020-01-01', '>=8.0'), self::release('2.0.0', '2026-05-01', '>=8.1'), self::release('2.3.0', '2026-06-01', '>=8.1')];
+        $lock = ['lock' => [['php' => '>=8.0']], 'root' => ['require' => ['a/b' => '~1.0.0']], 'releases' => $releases];
+        $high = self::advisory('PKSA-1', 'high', '<1.9.0');
+
+        yield 'the maintenance move leaves less' => [
+            $lock + ['advisories' => [$high, self::advisory('PKSA-2', 'low', '<1.0.1 || >=2.0.0')]],
+            ['raise-php', 'left-behind', '2.x', 2],
+            ['raise-php', 'vulnerable'],
+        ];
+        yield 'both moves leave as much' => [
+            $lock + ['advisories' => [$high, self::advisory('PKSA-2', 'high', '<1.0.1 || >=2.0.0')]],
+            ['raise-php', 'vulnerable', '1.x', 16],
+            ['raise-php', 'left-behind'],
+        ];
+        yield 'the security move is blocked' => [
+            ['releases' => array_merge($releases, [self::release('3.0.0', '2026-07-01', '>=9.0')]), 'advisories' => [self::advisory('PKSA-1', 'medium', '<3.0.0')]] + $lock,
+            ['raise-php', 'left-behind', '2.x', 16],
+            ['blocked', 'vulnerable'],
+        ];
+    }
+
+    /**
+     * On tied parts, the move with the lower total after it leads (docs/verdicts.md#move). A null
+     * `if_applied` counts as the current total. An equal total goes to the security move.
+     *
+     * @dataProvider tiedParts
+     *
+     * @param array<string, mixed>                 $over
+     * @param array{string, string, string, ?int} $lead
+     * @param array{string, string}               $other
+     */
+    #[DataProvider('tiedParts')]
+    public function testOnTiedPartsTheMoveThatLeavesTheLowerScoreLeads(array $over, array $lead, array $other): void
+    {
+        $finding = self::analyse($over);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+        $also = JsonPath::arrayAt($move, ['also', 0]);
+
+        self::assertSame([16, 16], [JsonPath::intAt($finding, ['score', 'parts', 'maintenance', 'contribution']), JsonPath::intAt($finding, ['score', 'parts', 'security', 'contribution'])]);
+        self::assertSame($lead, [$move['kind'], $move['source'], $move['to_branch'], \is_array($move['if_applied']) ? $move['if_applied']['total'] : null]);
+        self::assertSame($other, [$also['kind'], $also['source']]);
+    }
+
     /** Release data that never came names no move: lockrot claims nothing about releases it did not read. */
     public function testAnAdvisoryWithoutReleaseDataNamesNoMove(): void
     {

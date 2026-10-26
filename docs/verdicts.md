@@ -588,7 +588,7 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 ```text
   phpseclib/phpseclib 3.0.55  via php-amqplib/php-amqplib, php-amqplib/rabbitmq-bundle  ·  vulnerable
       8 = vulnerable 8 [medium advisory]
-      do: composer update phpseclib/phpseclib:^3.0.57 (gets 3.0.57) — clears the advisory; Composer's solver checked it against the lock
+      do: composer update 'phpseclib/phpseclib:^3.0.57' (gets 3.0.57) — clears the advisory; Composer's solver checked it against the lock
 ```
 
 | Kind | For | The line |
@@ -607,6 +607,9 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
   moves to one branch merge into one, with the tightest constraint. Two `blocked` moves to one
   branch merge too, unless one of them names a tag. A `blocked` move never merges with a move that
   runs on the target PHP.
+
+- **A tie of the parts.** The move whose `if_applied.total` is lower leads. A move with a null
+  `if_applied` counts as the score of the finding. On an equal total, the security move leads.
 
 - **The PHP it needs.** `next_step.php_check` reads the branch's highest release, the release
   that Composer installs at the top of the constraint. A `blocked` move reads the release that
@@ -639,6 +642,10 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 The `update now:` footer line lists every package whose `update` move Composer's solver resolves
 with the constraint inline, with one command for all of them.
 
+The table, markdown and github formats, `--explain` and the install-time block print each command
+in its POSIX form, for a POSIX shell. For cmd.exe or PowerShell, render `commands[]` as
+[The move](schema.md#the-move) shows, or use the copy menu of the html page.
+
 ### The move check {#the-move-check}
 
 lockrot asks Composer's own solver about every move that runs a Composer request: the lead move,
@@ -651,7 +658,7 @@ holds. JSON writes the answer as the move's `check`.
 |---|---|---|
 | `resolves` | Composer installs the move from the lock in `form`: `inline`, `with-dependencies` or `with-all-dependencies` | the form that resolves, with `--with-dependencies` or `--with-all-dependencies` when it needs one |
 | `refused` | no form installs it: `held_by[]` names the holds that the refusal and a `composer prohibits`-style scan find | no `update` or `require` step |
-| `not_checked` | lockrot did not ask. `check.reason` says why | the inline form, unchecked |
+| `not_checked` | lockrot did not ask. `check.reason` says why | the inline form, unchecked. A `require`, `raise-php` or `tag` move of a package that composer.json does not require gets no package step |
 
 - **Holds.** `held_by[]` adds the links that the solver names, with the package that a link points
   to in `target`:
@@ -717,14 +724,18 @@ Limits of the check:
   an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
   severities and the blocking of abandoned packages. It blocks every name that the update can move,
   packages-dev and new dependencies included.
+- On Composer 2.10 and later, an update also removes the versions that a filter list names. Such a
+  list is the `malware` list under `config.policy`, which blocks by default, or a custom list there.
+  The check does not read these lists. So a move that resolves in lockrot can fail in Composer, or
+  install another version.
 - It stops a chain of refusals after `Analyzer::CHECK_PASSES` passes. A new request after the
   last one is not checked (`check.reason` `pass_cap`).
 - When Composer's solver fails on a request, the move is not checked (`check.reason`
   `solver_error`), and the run note [`move_check_failed`](notes.md#move_check_failed) names the
   failure. The run still writes its report.
-- Composer 2.2 and 2.3 accept an inline constraint only on a root requirement. There, the step of
-  a package that composer.json does not require is the plain `composer update <package>`, and a
-  package that you do not require gets no `update` step.
+- Composer 2.2 and 2.3 accept an inline constraint only on a root requirement. There, the
+  `update` move of a package that composer.json does not require gets the plain `composer update
+  <package>`. A `require`, `raise-php` or `tag` move of such a package gets no package step.
 - The solver stops at the first failing chain. The scan adds what `composer prohibits` names, but
   `held_by[]` can still miss a hold that a deeper chain holds.
 - A run without composer.json checks no move (`check.reason` `no_composer_json`).

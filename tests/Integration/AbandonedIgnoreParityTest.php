@@ -59,11 +59,10 @@ final class AbandonedIgnoreParityTest extends TestCase
         }
     }
 
-    /** Composer 2.9 only. No CI leg has such a Composer. */
     public function testTheAuditConfigLegMatchesComposersFilter(): void
     {
         if (class_exists(PolicyConfig::class)) {
-            self::markTestSkipped('Composer 2.10 or later: this leg runs only on Composer 2.9, which no CI leg has');
+            self::markTestSkipped('Composer 2.10 or later: this leg runs only on Composer 2.9');
         }
         if (!class_exists(AuditConfig::class) || !method_exists(AuditConfig::class, 'fromConfig')) {
             self::markTestSkipped('Composer 2.2 to 2.8 have no abandoned ignore list');

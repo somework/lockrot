@@ -17,19 +17,50 @@ jobs:
   phar:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # release assets
+      contents: read
+      actions: read # the main run of the tagged commit
       id-token: write # build provenance attestation
       attestations: write
     steps:
-      # Full history and tags: the self-update verification reads the previous release's key from its tag.
+      # Full history and tags: the self-update verification reads the previous release's key from its
+      # tag, and the main check reads origin/main.
       - uses: actions/checkout@v7
         with: {fetch-depth: 0}
+      # CONTRIBUTING, "Cutting a release": the tag goes on the commit that the release pull request
+      # merged into main. A tag on another commit would publish a signed archive that main never built.
+      - name: The tagged commit is on main
+        if: startsWith(github.ref, 'refs/tags/')
+        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main || { echo "::error::$GITHUB_REF_NAME is not on main"; exit 1; }
+      # main's push run holds the whole-tree gates, so a tag waits for that run to pass.
+      - name: The main run of the tagged commit passed
+        if: startsWith(github.ref, 'refs/tags/')
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          conclusion="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml --branch main --event push --commit "$GITHUB_SHA" --json conclusion --jq '.[0].conclusion // "none"')"
+          [ "$conclusion" = success ] || { echo "::error::the ci.yml push run of $GITHUB_SHA on main is $conclusion"; exit 1; }
+      # tools/report/README.md: a release vendors a renderer release, never a pre-release or a local
+      # build. The attestation must come from the renderer's release workflow, for the tag that the
+      # manifest names.
+      - name: The vendored renderer is an attested release
+        if: startsWith(github.ref, 'refs/tags/')
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          version=$(jq -r .version resources/report/manifest.json)
+          [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::resources/report/ holds lockrot-report $version, not a release"; exit 1; }
+          for file in report.html manifest.json; do
+            gh attestation verify "resources/report/$file" --repo somework/lockrot-report --signer-workflow somework/lockrot-report/.github/workflows/release.yml --source-ref "refs/tags/v$version"
+          done
       # Composer is part of the reproducible-build recipe: it writes vendor/composer/*.php from its own
       # source. A rebuilder uses the version that this file pins at the tag.
       - uses: shivammathur/setup-php@v2
         with: {php-version: '8.4', tools: 'composer:2.10.3'}
       - run: composer install --no-interaction
       - run: build/build-phar.sh
+      # The archive writes its version into every report and compares it with the newest release in
+      # self-update, so it must print the tag's version.
+      - name: The archive prints the tag's version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: test "$(php build/lockrot.phar --version)" = "lockrot ${GITHUB_REF_NAME#v}" || { echo "::error::src/Version.php does not hold ${GITHUB_REF_NAME#v}"; exit 1; }
       # Run from inside build/ so the file reads "<hex>  lockrot.phar": a downloader runs `sha256sum -c`
       # next to their own copy, not against a build/ path. lockrot.phar self-update ignores the name.
       - run: cd build && sha256sum lockrot.phar > lockrot.phar.sha256
@@ -106,10 +137,34 @@ jobs:
         with: {subject-path: build/lockrot.phar}
       - uses: actions/upload-artifact@v7
         with: {name: lockrot.phar, path: 'build/lockrot.phar*'}
+  # The phar job builds on PHP 8.4, and the archive must run on the floor of the plugin. This job runs
+  # it once on PHP 7.4, before the release job publishes it.
+  smoke-php74:
+    needs: phar
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with: {php-version: '7.4'}
+      - uses: actions/download-artifact@v8
+        with: {name: lockrot.phar, path: build}
+      - run: php build/lockrot.phar --version
+      - run: php build/lockrot.phar -d tests/fixtures/skeletons/laravel --format=json --target-php=8.4 --offline > /dev/null
+  release:
+    needs: [phar, smoke-php74]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # release assets
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: {name: lockrot.phar, path: build}
       # The TypeScript contract of report-2 ships as release assets only: types/ is export-ignored, so
       # the PHAR and the Composer dist do not carry it.
-      - if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v3
+      - uses: softprops/action-gh-release@v3
         with:
           # A moved d.ts file fails the release instead of a release without types.
           fail_on_unmatched_files: true
@@ -121,21 +176,7 @@ jobs:
       # The release is published at this point, so a missing SITE_DISPATCH_TOKEN (a fine-grained token
       # with Contents: write on somework/lockrot.dev only) must not turn it red. The site also
       # rebuilds on a weekly schedule.
-      - if: startsWith(github.ref, 'refs/tags/')
-        name: Ask lockrot.dev to rebuild
+      - name: Ask lockrot.dev to rebuild
         continue-on-error: true
         env: {GH_TOKEN: '${{ secrets.SITE_DISPATCH_TOKEN }}'}
         run: gh api repos/somework/lockrot.dev/dispatches -f event_type=lockrot-release
-  # The phar job builds on PHP 8.4, and the archive must run on the floor of the plugin. This job runs
-  # it once on PHP 7.4.
-  smoke-php74:
-    needs: phar
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: shivammathur/setup-php@v2
-        with: {php-version: '7.4'}
-      - uses: actions/download-artifact@v8
-        with: {name: lockrot.phar, path: build}
-      - run: php build/lockrot.phar --version
-      - run: php build/lockrot.phar -d tests/fixtures/skeletons/laravel --format=json --target-php=8.4 --offline > /dev/null

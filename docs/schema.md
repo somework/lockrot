@@ -181,8 +181,9 @@ names what to read for each report-1 field that report-2 removes or redefines.
 | `.libyears_unmeasured == "metadata_unavailable"` | `.libyears_unmeasured == "unavailable" or .libyears_unmeasured == "not_found"` |
 | `.libyears_unmeasured == "no_stable_release_date"` | `shared_commit`, `undated`, `no_stable_release` or `undated_releases`, the ids that `age` uses for the same cause |
 | S9's `.severity == null` | `.severity == "unrated"`. `moderate` reads `medium`, and `.severity_published` keeps Composer's word |
-| S4's `.data.activity` | S4's `.data.event`, or the finding's `.activity.event` |
-| explain-1's `.activity`, `.target_php`, `.project_php`, `.thresholds` | explain-2's `.finding.activity`, `.run.target_php`, `.run.project_php`, `.run.thresholds` |
+| S4's `.data` (`last_push`, `repo`, `host`, `years`) | the same keys, plus `forge` and `event` (`push` or `commit`) |
+| explain-1's `.activity`, `.target_php`, `.project_php`, `.thresholds` | explain-2's `.finding.activity`, `.run.target_php`, `.run.project_php`, `.run.thresholds`. `.finding.activity` is an object on every finding: read its `status` where explain-1's `.activity` was null |
+| explain-1's `.activity.pushed_at`, `.activity.repository`, `.activity.from_cache` | `.finding.age.push.at`, `.finding.activity.host` and `.finding.activity.repo`, `.finding.activity.cached_at != null` |
 | the html page's `details.<package>.activity` | the finding's `activity`. `repository_link` stays in `details` |
 | a baseline entry's `.verdict` | the first key of the entry's `flags`, in flag order, or the report's `.baseline.recorded.lead` |
 | every flag id a finding mentions: `[.. \| .flag_ids? \| arrays]` | `[.score.terms[]?.flag]` for the counted flags, and `.allowlist.flag_ids` for the accepted ones (null: every maintenance flag) |
@@ -387,12 +388,14 @@ comes in through others, `commands` (argv lists) and `text`. `also` holds the ot
 `kind` is an open set: show `text` for a kind you do not know.
 
 Each argument of `commands` and of `security.update_now_command` matches
-`^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only `--no-update`, the Composer
-option that lockrot writes in a `require` step, starts with `-`. The first argument is `composer`,
-and the second is `update`, `require` or `why-not`. An argument comes from the lock or a
-repository, so lockrot leaves out a step that breaks this rule. The move keeps its `constraint`,
-`text` and other steps. `text` shows a command only as the POSIX rendering of a step in `commands`.
-Render each argv with one of these renderings:
+`^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only a Composer option starts
+with `-`: `--no-update` in a `require` step, and `--with-dependencies` or `--with-all-dependencies`
+in an `update` or `require` step. An option comes after the package arguments. The first argument
+is `composer`, and the second is `update`, `require` or `why-not`.
+
+An argument comes from the lock or a repository, so lockrot leaves out a step that breaks this
+rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the
+POSIX rendering of a step in `commands`. Render each argv with one of these renderings:
 
 | Shell | Rendering | Example |
 |---|---|---|
@@ -474,8 +477,14 @@ validates with any object as its `data`.
 
 ### Dates
 
-Dates are RFC 3339 strings (`format: date-time`). S5's `ga_date` and a baseline entry's
-`first_seen` and `known_since` are plain `YYYY-MM-DD`. Every years field holds one decimal at most.
+Dates are RFC 3339 strings (`format: date-time`). These dates are plain `YYYY-MM-DD`:
+
+- S5's `ga_date`
+- a baseline entry's `first_seen` and `known_since`
+- the `baseline.since` of a flag and of an S9 row
+- `allowlist.expires` and `unchecked_accepted[].accepted_by.expires`
+
+Every years field holds one decimal at most.
 
 ### The explanation
 

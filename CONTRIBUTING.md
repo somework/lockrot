@@ -155,6 +155,8 @@ To change a generated schema:
     python3 tools/schema/build_other_schemas.py
     python3 tools/schema/make_negatives.py
     python3 tools/schema/make_negatives_other.py explain-2
+    python3 tools/schema/make_negatives_other.py baseline-2
+    python3 tools/schema/make_negatives_other.py config-2
     python3 tools/schema/build_sarif_properties_schema.py
     python3 tools/schema/make_negatives_sarif.py
     ```
@@ -297,8 +299,9 @@ of it as `resources/report/report.html` and `manifest.json`, so the PHAR builds 
 tools/report/update-renderer vX.Y.Z
 ```
 
-- The script needs `gh`. It verifies the build provenance of the release, the page against the
-  sha256 in its manifest, and that the manifest names the requested version.
+- The script needs `gh`. It verifies that the renderer's `release.yml` attested the files for that
+  tag, the page against the sha256 in its manifest, and that the manifest names the requested
+  version.
   `tests/Unit/Output/RendererManifestTest.php` rechecks the page against the manifest on every run.
 - `--from-dir DIR` vendors a local build for development. It is not attested. Never release with it.
 - `vX.Y.Z-rc.N` vendors a pre-release. A lockrot release vendors a plain `vX.Y.Z`
@@ -354,11 +357,38 @@ tools/corpus/corpus check   --out head --explain-out head
       in `SchemaEvolutionTest`. `SchemaEvolutionTest` fails unless the releases that `CHANGELOG.md`
       lists, the keys of `RELEASED_SCHEMAS` and the directories under `schemas/` match exactly.
 
+    - Pin the sha256 of each formatter golden in `ChangedGoldensTest::RELEASED`, and empty its
+      `CHANGED`.
+
+    - Vendor a renderer release ([The HTML report page](#the-html-report-page)). When the contract
+      bundle changes, run `tools/report/record` first, so that the renderer release pins the new
+      `bundle_sha256`. Then release lockrot-report `vX.Y.Z` and run
+      `tools/report/update-renderer vX.Y.Z`.
+
 2. Build the PHAR and check that `php build/lockrot.phar --version` prints the new version.
-3. Merge the release pull request into `main` with CI green.
-4. Tag the merge commit `vX.Y.Z` and push the tag. `.github/workflows/phar.yml` builds, signs and
-   attests the PHAR, publishes the GitHub release and asks lockrot.dev to rebuild.
-5. When the published release changes what lockrot writes (a schema differs from the previous
+3. Before the merge, check what the tag needs outside this repository:
+
+    - Main's ruleset requires each job of the release pull request's `ci.yml` run, by its job
+      name. A ruleset requires a check by its name, so a red job outside the list does not stop
+      the merge.
+    - When the release changes the flag set, a schema number or the score model, the lockrot.dev
+      change that reads it is merged. The lockrot.dev build stops on a set that it does not know.
+    - A lockrot-action release that `@v1` jobs need on the tag day is published.
+
+4. Merge the release pull request into `main` with CI green.
+5. When a schema file changes, `.github/workflows/schemas.yml` asks lockrot.dev to publish it.
+   Approve the `schemas` environment of the lockrot.dev run, then check that each new schema URL
+   answers (`curl -fsI https://lockrot.dev/schema/<document>-<number>.json`).
+6. When the `ci.yml` push run of the merge commit on `main` passes, tag the commit `vX.Y.Z` and
+   push the tag. `.github/workflows/phar.yml` refuses these tags:
+
+    - a tag that is not on `main`, or whose `ci.yml` push run on `main` did not pass
+    - a tag whose vendored renderer is not an attested release
+    - a tag whose archive prints another version
+
+    It builds, signs and attests the PHAR, runs it on PHP 7.4, then publishes the GitHub release
+    and asks lockrot.dev to rebuild.
+7. When the published release changes what lockrot writes (a schema differs from the previous
    release's), record it and pin the hashes ([Recording a release](#recording-a-release)).
 
 ## Related
