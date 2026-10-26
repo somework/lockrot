@@ -79,13 +79,14 @@ final class TerminalText
     }
 
     /**
-     * {@see self::neutraliseLines()} for a log that a CI runner reads. The runner runs `::` at a line
-     * start and `##[` anywhere in a line as a command:
+     * {@see self::neutraliseLines()} for a log that a CI runner reads. The runner runs `::` after
+     * leading whitespace and `##[` anywhere in a line as a command. neutralise() escapes every
+     * whitespace character but the Unicode spaces:
      * https://github.com/actions/runner/blob/main/src/Runner.Worker/ActionCommandManager.cs
      */
     public static function neutraliseLogLines(string $text): string
     {
-        return (string) preg_replace('/^( *):(?=:)/m', '$1\x3A', str_replace('##[', '##\x5B', self::neutraliseLines($text)));
+        return (string) preg_replace('/^(\p{Zs}*):(?=:)/mu', '$1\x3A', str_replace('##[', '##\x5B', self::neutraliseLines($text)));
     }
 
     public static function warning(string $line, bool $decorated): string
