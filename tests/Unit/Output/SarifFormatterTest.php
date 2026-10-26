@@ -17,6 +17,7 @@ use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\SarifFormatter;
+use Lockrot\Output\SarifRecords;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\BaselineEntries;
@@ -787,5 +788,13 @@ final class SarifFormatterTest extends TestCase
 
         self::assertSame('8.0', JsonPath::stringAt($byId['lockrot/advisory/PKSA-4wjj-gy1p-ft3r'], ['properties', 'security-severity']));
         self::assertSame(['maintainability'], JsonPath::arrayAt($byId['lockrot/left-behind'], ['properties', 'tags']));
+    }
+
+    /** GitHub reads `security-severity` as a score from 0.0 to 10.0, and SPEC §5.2 omits it for an unrated advisory. */
+    public function testAnUnratedAdvisoryRuleCarriesNoSecuritySeverity(): void
+    {
+        $rule = SarifRecords::rule('lockrot/advisory/PKSA-unrated', null);
+
+        self::assertSame(['tags' => ['security', 'dependency']], $rule['properties']);
     }
 }

@@ -24,7 +24,7 @@ use Lockrot\Verdict\ScoreModel;
  *
  * @phpstan-type Bag array<string, scalar|object|list<string>|null>
  * @phpstan-type Result array{ruleId: string, level: string, rank?: float, message: array{text: string}, partialFingerprints: array<string, string>, suppressions?: list<array{kind: string, status: string, justification: string}>, properties: Bag}
- * @phpstan-type Rule array{id: string, name: string, shortDescription: array{text: string}, fullDescription: array{text: string}, defaultConfiguration: array{level: string}, helpUri: string, properties: array{tags: list<string>, security-severity?: ?string}}
+ * @phpstan-type Rule array{id: string, name: string, shortDescription: array{text: string}, fullDescription: array{text: string}, defaultConfiguration: array{level: string}, helpUri: string, properties: array{tags: list<string>, security-severity?: string}}
  */
 final class SarifRecords
 {
@@ -132,6 +132,10 @@ final class SarifRecords
         $name = substr($ruleId, \strlen('lockrot/'));
         if (strpos($name, 'advisory/') === 0) {
             $bucket = Severity::fromComposer($severity);
+            $properties = ['tags' => ['security', 'dependency']];
+            if ($bucket->sarifSecuritySeverity() !== null) {
+                $properties['security-severity'] = $bucket->sarifSecuritySeverity();
+            }
 
             return [
                 'id' => $ruleId,
@@ -140,7 +144,7 @@ final class SarifRecords
                 'fullDescription' => ['text' => 'A counted security advisory affects the installed version: '.$bucket->bucket().' severity.'],
                 'defaultConfiguration' => ['level' => FormatContext::LEVEL_WARNING],
                 'helpUri' => self::HELP_URI.'#security-advisories',
-                'properties' => ['tags' => ['security', 'dependency'], 'security-severity' => $bucket->sarifSecuritySeverity()],
+                'properties' => $properties,
             ];
         }
         [$short, $full] = self::RULES[$name];
