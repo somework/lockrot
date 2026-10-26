@@ -13,6 +13,7 @@
         "Composer\\DependencyResolver\\LockTransaction",
         "Composer\\DependencyResolver\\Operation\\InstallOperation",
         "Composer\\DependencyResolver\\Operation\\OperationInterface",
+        "Composer\\DependencyResolver\\Operation\\UninstallOperation",
         "Composer\\DependencyResolver\\Operation\\UpdateOperation",
         "Composer\\DependencyResolver\\Pool",
         "Composer\\DependencyResolver\\PoolOptimizer",

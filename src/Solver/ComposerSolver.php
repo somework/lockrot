@@ -191,7 +191,7 @@ final class ComposerSolver
         $installs = self::installs($answer);
         $from = self::updatedFrom($answer);
         foreach ($unrequired as $name) {
-            // A temporary constraint installs nothing: a name that no package requires after the solve leaves the lock.
+            // Composer before 2.4 has no temporary constraint, so the inline name became a root requirement: drop what that requirement alone keeps.
             if (!$this->requiredAfter($answer, $name)) {
                 unset($installs[$name], $from[$name]);
             }

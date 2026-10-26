@@ -736,6 +736,24 @@ final class SolverCheckerTest extends TestCase
     }
 
     /**
+     * acme/lib is a lock entry that nothing requires. Composer before 2.4 joins the inline
+     * constraint to the root requirement, which alone keeps acme/lib installed. Composer 2.4 and
+     * later drop it.
+     */
+    public function testAnUpdateOfALockEntryThatNothingRequiresInstallsNoRelease(): void
+    {
+        $checker = self::checker(
+            ['acme/holder' => '^1.0'],
+            [['name' => 'acme/holder', 'version' => '1.1.0'], ['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/holder' => [['version' => '1.1.0']], 'acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0']]]
+        );
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^2.0.0', '2.0.0', null, '2.0.0'));
+
+        self::assertNull($outcome->installs(), (string) $outcome->installs());
+    }
+
+    /**
      * The joint solve installs the move only through another reference of the locked holder's tag,
      * which changes no holder: the step would be the request that the first check refused.
      */
