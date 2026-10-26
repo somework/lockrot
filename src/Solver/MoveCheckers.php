@@ -8,6 +8,7 @@ use Composer\Config;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
@@ -31,8 +32,9 @@ final class MoveCheckers
      * @param RootPackageInterface      $root         the project's root package, as Composer loads composer.json
      * @param list<RepositoryInterface> $repositories the project's Composer repositories, in lookup order
      * @param string                    $targetPhp    the target PHP's minor
+     * @param string                    $advisoryScope one of {@see AdvisoryCoverage::SCOPES}
      */
-    public static function forProject(RootPackageInterface $root, LockFile $lock, ProjectConfig $project, Config $config, array $repositories, string $targetPhp, bool $offline, Deadline $deadline): MoveChecker
+    public static function forProject(RootPackageInterface $root, LockFile $lock, ProjectConfig $project, Config $config, array $repositories, string $targetPhp, bool $offline, Deadline $deadline, string $advisoryScope = AdvisoryCoverage::SCOPE_ALL): MoveChecker
     {
         $overrides = [];
         $configured = $config->get('platform');
@@ -57,7 +59,9 @@ final class MoveCheckers
         $blocking = AdvisoryBlocking::fromConfig($config);
         $lookup = new RepositoryAdvisoryLoader($repositories, $offline, $deadline);
 
-        return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): ?array => $lookup->records($names, $complete)), $configured);
+        $keptOut = $advisoryScope === AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES ? $notFromComposerRepository : [];
+
+        return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): ?array => $lookup->records($names, $complete), $keptOut), $configured);
     }
 
     /**

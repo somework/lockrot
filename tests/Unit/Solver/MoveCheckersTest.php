@@ -9,10 +9,14 @@ use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
+use Composer\Repository\AdvisoryProviderInterface;
+use Composer\Repository\ArrayRepository;
 use Composer\Repository\PlatformRepository;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveCheckers;
@@ -185,6 +189,60 @@ final class MoveCheckersTest extends TestCase
         $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
 
         self::assertSame([MoveCheck::RESOLVES, MoveCheck::WITH_ALL_DEPENDENCIES], [$check->result(), $check->form()]);
+    }
+
+    /**
+     * Ruling R2-24: under `advisory-lookup: composer-repositories`, the `-W` solve frees acme/vcs,
+     * which a VCS repository serves. The move check keeps its name out of the advisory lookup.
+     */
+    public function testTheMoveChecksAdvisoryLookupKeepsOutAVcsNameThatAMoveWithAllDependenciesFrees(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class) || !ComposerFeatures::blocksAdvisories()) {
+            self::markTestSkipped('Composer without advisory blocking');
+        }
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0', 'acme/zeta' => '^1.0 || ^2.0', 'acme/vcs' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/vcs' => '^1.0', 'acme/zeta' => '^1.0']] + $packagist,
+            ['name' => 'acme/zeta', 'version' => '1.0.0'] + $packagist,
+            ['name' => 'acme/vcs', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://git.example.org/acme/vcs.git', 'reference' => 'abc']],
+        ]]);
+        $loader = new ArrayLoader();
+        $repository = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/vcs' => '^1.0', 'acme/zeta' => '^1.0']]),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.1.0', 'require' => ['acme/vcs' => '^1.0', 'acme/zeta' => '^2.0']]),
+            $loader->load(['name' => 'acme/zeta', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/zeta', 'version' => '2.0.0']),
+        ]);
+        $feed = new class () extends ArrayRepository implements AdvisoryProviderInterface {
+            /** @var list<string> */
+            public array $asked = [];
+
+            public function getRepoName(): string
+            {
+                return 'feed';
+            }
+
+            public function hasSecurityAdvisories(): bool
+            {
+                return true;
+            }
+
+            public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array
+            {
+                $this->asked = array_merge($this->asked, array_map('strval', array_keys($packageConstraintMap)));
+
+                return ['namesFound' => [], 'advisories' => []];
+            }
+        };
+
+        $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$repository, $feed], '8.4', false, Deadline::never(), AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES)
+            ->withAdvisories([], ['acme/lib', 'acme/zeta']);
+        $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame([MoveCheck::RESOLVES, MoveCheck::WITH_ALL_DEPENDENCIES], [$check->result(), $check->form()]);
+        self::assertNotContains('acme/vcs', $feed->asked, 'asked: '.implode(', ', $feed->asked));
     }
 
     /** A locked VCS branch keeps its branch alias, which the root requirement matches. */

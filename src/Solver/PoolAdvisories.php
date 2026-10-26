@@ -26,25 +26,35 @@ final class PoolAdvisories
     private array $covered = [];
     /** @var array<string, true> the covered names whose records the lookup could not read */
     private array $unread = [];
+    /** @var array<string, true> */
+    private array $keptOut;
 
-    /** @param \Closure(list<string>, bool): (array<string, list<PartialSecurityAdvisory>>|null) $lookup every record of each name, complete ones only when the flag is true, null when it could not read them */
-    public function __construct(AdvisoryBlocking $blocking, \Closure $lookup)
+    /**
+     * @param \Closure(list<string>, bool): (array<string, list<PartialSecurityAdvisory>>|null) $lookup  every record of each name, complete ones only when the flag is true, null when it could not read them
+     * @param list<string>                                                                    $keptOut the names that no lookup sends, which stay unread: `advisory-lookup: composer-repositories` keeps the names that no Composer repository serves
+     */
+    public function __construct(AdvisoryBlocking $blocking, \Closure $lookup, array $keptOut = [])
     {
         $this->blocking = $blocking;
         $this->lookup = $lookup;
+        $this->keptOut = array_fill_keys($keptOut, true);
     }
 
     /**
-     * A copy that knows the run's lookup.
+     * A copy that knows the run's lookup. A name with records that $covered lacks missed a
+     * repository: its records are partial, so it counts as unread.
      *
      * @param array<string, list<PartialSecurityAdvisory>> $records every record of each name
-     * @param list<string>                                 $covered the names that the lookup read, with records or without
+     * @param list<string>                                 $covered the names that the lookup read from every repository, with records or without
      */
     public function withRecords(array $records, array $covered): self
     {
+        $read = array_fill_keys($covered, true);
+        $partial = array_diff_key(array_fill_keys(array_keys($records), true), $read);
         $clone = clone $this;
         $clone->records = $records + $this->records;
-        $clone->covered = array_fill_keys($covered, true) + array_fill_keys(array_keys($records), true) + $this->covered;
+        $clone->covered = $read + $partial + $this->covered;
+        $clone->unread = $partial + array_diff_key($this->unread, $read);
 
         return $clone;
     }
@@ -65,6 +75,10 @@ final class PoolAdvisories
             return [];
         }
         $missing = array_values(array_diff(array_unique($names), array_keys($this->covered)));
+        $keptOut = array_fill_keys(array_values(array_intersect($missing, array_keys($this->keptOut))), true);
+        $this->unread += $keptOut;
+        $this->covered += $keptOut;
+        $missing = array_values(array_diff($missing, array_keys($keptOut)));
         if ($missing !== []) {
             $found = ($this->lookup)($missing, false);
             if ($found !== null && $this->blocking->needsComplete($found)) {

@@ -199,7 +199,7 @@ final class ComposerSolver
     }
 
     /**
-     * @param list<string> $names
+     * @param array<string> $names
      *
      * @return array<string, string> the {@see VersionSource} failure of each name that has one
      */

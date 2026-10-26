@@ -231,7 +231,7 @@ final class LockrotCommand extends BaseCommand
             $targets = ReportTargets::resolve($specs, $cwd, $specs === [] ? [] : self::protectedFiles($cwd, $composerFile, $lockPath, $baselineFile, $project));
             $markdownMaxBytes = self::markdownMaxBytes($input);
             // No time budget, unlike the install-time summary (docs/install-time.md#time-budget).
-            $checks = static fn (): MoveChecks => MoveChecks::of($root === null ? new UncheckedMoves($hasComposerJson ? MoveCheck::COMPOSER_JSON_INVALID : MoveCheck::NO_COMPOSER_JSON) : MoveCheckers::forProject($root, $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), Deadline::never()));
+            $checks = static fn (): MoveChecks => MoveChecks::of($root === null ? new UncheckedMoves($hasComposerJson ? MoveCheck::COMPOSER_JSON_INVALID : MoveCheck::NO_COMPOSER_JSON) : MoveCheckers::forProject($root, $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), Deadline::never(), $lockrot->advisoryLookup()));
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never(), $checks, $lock->platform()['php'] ?? null);
             // Before the baseline is read: an explanation ignores it, so a missing or unreadable
             // baseline must not block it.
