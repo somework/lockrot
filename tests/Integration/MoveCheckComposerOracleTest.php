@@ -188,8 +188,12 @@ final class MoveCheckComposerOracleTest extends TestCase
             $inline = [];
             foreach (\array_slice($words, 1) as $name) {
                 // The combined update takes the candidates of update now: a lead update that resolves inline (SPEC §5.6).
-                $update = array_values(array_filter(array_keys($answers), static fn ($other): bool => strpos((string) $other, 'update '.$name.' ') === 0
-                    && (($answers[$other] ?? [])['result'] ?? null) === MoveCheck::RESOLVES && (($answers[$other] ?? [])['form'] ?? null) === MoveCheck::INLINE));
+                $update = array_values(array_filter(array_keys($answers), static function ($other) use ($answers, $name): bool {
+                    $answer = $answers[$other] ?? null;
+
+                    return strpos((string) $other, 'update '.$name.' ') === 0 && \is_array($answer)
+                        && ($answer['result'] ?? null) === MoveCheck::RESOLVES && ($answer['form'] ?? null) === MoveCheck::INLINE;
+                }));
                 self::assertCount(1, $update, $key.': one update request of '.$name.' that resolves inline');
                 $inline[$name] = explode(' ', (string) $update[0])[2];
             }

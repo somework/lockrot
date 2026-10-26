@@ -577,19 +577,19 @@ final class SolverCheckerTest extends TestCase
         }
         $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/new-dependency' => '^1.0']]], 'acme/new-dependency' => [['version' => '1.0.0']]]);
         $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, []);
-        $checker = static fn (?array $answer): MoveChecker => (new SolverChecker($solver, [], '8.4.99', true, Deadline::never(), new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): ?array => $answer)))->withAdvisories(['acme/lib' => []], ['acme/lib']);
+        $checker = static fn (bool $read): MoveChecker => (new SolverChecker($solver, [], '8.4.99', true, Deadline::never(), new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): ?array => $read ? [] : null)))->withAdvisories(['acme/lib' => []], ['acme/lib']);
 
-        $unread = $checker(null)->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check();
-        $read = $checker([])->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check();
-        $refused = $checker(null)->check(MoveQuery::update('acme/lib', '^2.0', '2.0.0'))->check();
+        $unread = $checker(false)->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check();
+        $read = $checker(true)->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check();
+        $refused = $checker(false)->check(MoveQuery::update('acme/lib', '^2.0', '2.0.0'))->check();
 
         self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::ADVISORY_LOOKUP_INCOMPLETE], [$unread->result(), $unread->reason()]);
         self::assertSame(MoveCheck::RESOLVES, $read->result(), 'a name that the lookup read and found no record for');
         self::assertSame(MoveCheck::REFUSED, $refused->result(), 'a refused solve stays refused');
-        self::assertSame(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE, $checker(null)->combined(['acme/lib' => '^1.1.0'])->check()->reason(), 'the update-now request');
-        self::assertSame(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE, $checker(null)->joint(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'), ['acme/lib'])->check()->reason(), 'the joint request');
-        self::assertSame(MoveCheck::RESOLVES, $checker([])->combined(['acme/lib' => '^1.1.0'])->check()->result());
-        self::assertSame(MoveCheck::RESOLVES, $checker([])->joint(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'), ['acme/lib'])->check()->result());
+        self::assertSame(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE, $checker(false)->combined(['acme/lib' => '^1.1.0'])->check()->reason(), 'the update-now request');
+        self::assertSame(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE, $checker(false)->joint(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'), ['acme/lib'])->check()->reason(), 'the joint request');
+        self::assertSame(MoveCheck::RESOLVES, $checker(true)->combined(['acme/lib' => '^1.1.0'])->check()->result());
+        self::assertSame(MoveCheck::RESOLVES, $checker(true)->joint(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'), ['acme/lib'])->check()->result());
     }
 
     /** Composer's `block-abandoned` removes an abandoned release from the pool of an update. */

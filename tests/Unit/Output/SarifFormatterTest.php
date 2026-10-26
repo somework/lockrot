@@ -820,6 +820,7 @@ final class SarifFormatterTest extends TestCase
             $named[$id] = [];
             $expected[$id] = [];
             foreach (JsonPath::arrayAt($flag, ['thresholds']) as $key) {
+                self::assertIsString($key);
                 $value = $values[$key] ?? null;
                 self::assertIsInt($value);
                 $expected[$id][] = true;
