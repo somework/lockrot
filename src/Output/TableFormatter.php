@@ -129,25 +129,26 @@ final class TableFormatter implements FormatterInterface
         return $lines;
     }
 
-    /** @return list<array{0: string, 1: bool}> the move text cut around each command that it names, and whether a part is one */
-    private static function commandParts(Move $move): array
+    /**
+     * The move text cut around the first command that it names, as [text, whether it is the command].
+     * The text of a move names one command at most.
+     *
+     * @return list<array{0: string, 1: bool}>
+     */
+    public static function commandParts(Move $move): array
     {
         $text = $move->text();
-        $parts = [];
-        $at = 0;
         foreach ($move->commands() as $argv) {
             $command = ShellCommand::posix($argv);
-            $found = $command === null ? false : strpos($text, $command, $at);
-            if ($command === null || $found === false) {
-                continue;
-            }
-            $parts[] = [trim(substr($text, $at, $found - $at)), false];
-            $parts[] = [$command, true];
-            $at = $found + \strlen($command);
-        }
-        $parts[] = [trim(substr($text, $at)), false];
+            if ($command !== null && ($at = strpos($text, $command)) !== false) {
+                $before = trim(substr($text, 0, $at));
+                $after = trim(substr($text, $at + \strlen($command)));
 
-        return array_values(array_filter($parts, static fn (array $part): bool => $part[0] !== ''));
+                return array_merge($before === '' ? [] : [[$before, false]], [[$command, true]], $after === '' ? [] : [[$after, false]]);
+            }
+        }
+
+        return [[$text, false]];
     }
 
     /**

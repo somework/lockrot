@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Solver;
 
+use Composer\Semver\Constraint\Constraint;
 use Lockrot\Security\Holder;
 use Lockrot\Solver\CheckOutcome;
 use Lockrot\Solver\MoveCheck;
@@ -139,5 +140,15 @@ final class CheckOutcomeTest extends TestCase
         $copy = $outcome->withoutAdmitting('1.1.0');
 
         self::assertSame([[$root, $package], [$package]], [$outcome->holds(), $copy->holds()]);
+    }
+
+    public function testTheCopyWithARangeLeavesTheOutcomeItComesFromWithoutOne(): void
+    {
+        $outcome = new CheckOutcome(MoveCheck::refused(), []);
+        $range = new Constraint('>=', '1.2.5.0');
+
+        $copy = $outcome->withRange($range);
+
+        self::assertSame([null, $range], [$outcome->range(), $copy->range()]);
     }
 }

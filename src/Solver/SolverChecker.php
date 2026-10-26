@@ -321,9 +321,9 @@ final class SolverChecker implements MoveChecker
         $parser = new VersionParser();
         $range = [$parser->parseConstraints($query->constraint())];
         $root = $this->solver->root();
-        foreach (array_merge(array_values($root->getRequires()), array_values($root->getDevRequires())) as $link) {
-            if ($link->getTarget() === $query->package()) {
-                $range[] = $link->getConstraint();
+        foreach ([$root->getRequires(), $root->getDevRequires()] as $links) {
+            if (isset($links[$query->package()])) {
+                $range[] = $links[$query->package()]->getConstraint();
             }
         }
 

@@ -475,7 +475,7 @@ final class ExplainFormatter
     /** UTF-8 characters, without ext-mbstring: every byte but a continuation byte starts one. */
     private static function characters(string $text): int
     {
-        return \strlen($text) - (int) preg_match_all('/[\x80-\xBF]/', $text);
+        return \strlen(preg_replace('/[\x80-\xBF]/', '', $text) ?? '');
     }
 
     /**

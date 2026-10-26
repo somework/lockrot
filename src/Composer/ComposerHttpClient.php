@@ -112,6 +112,16 @@ final class ComposerHttpClient implements HttpClientInterface
             }
         }
 
+        return self::withoutCredentials($headers);
+    }
+
+    /**
+     * @param list<string> $headers
+     *
+     * @return list<string>
+     */
+    private static function withoutCredentials(array $headers): array
+    {
         return array_values(array_filter($headers, static fn (string $header): bool => !self::isCredentialHeader($header)));
     }
 
@@ -141,8 +151,8 @@ final class ComposerHttpClient implements HttpClientInterface
         $timeout = $this->timeoutSeconds();
         foreach (array_unique($urls) as $url) {
             $sent = self::withoutRedundantAuthorization($this->io, $this->config, $url, $headers);
-            $options = ['http' => ['timeout' => $timeout, 'header' => $sent], 'retry-auth-failure' => false];
-            if (self::carriesCredentials($sent) && self::canRefuseRedirects()) {
+            $options = self::options($timeout, $sent);
+            if (self::refusesRedirects(Composer::getVersion(), HttpDownloader::isCurlEnabled())) {
                 $options['prevent_url_access_callable'] = static function (string $target) use ($url, &$redirects): bool {
                     if ($target === '' || self::origin($target) === self::origin($url)) {
                         return false;
@@ -158,8 +168,7 @@ final class ComposerHttpClient implements HttpClientInterface
         // Composer replays the request's own headers to a redirect's target, so the request goes
         // again to that target without lockrot's credentials.
         foreach ($redirects as $url => $target) {
-            $sent = array_values(array_filter($headers, static fn (string $header): bool => !self::isCredentialHeader($header)));
-            $this->add($url, $target, ['http' => ['timeout' => $timeout, 'header' => $sent], 'retry-auth-failure' => false], $results);
+            $this->add($url, $target, self::options($timeout, self::withoutCredentials($headers)), $results);
         }
         if ($redirects !== []) {
             $this->downloader->wait();
@@ -191,12 +200,22 @@ final class ComposerHttpClient implements HttpClientInterface
     }
 
     /**
+     * @param list<string> $headers
+     *
+     * @return array{http: array{timeout: int, header: list<string>}, retry-auth-failure: false}
+     */
+    private static function options(int $timeout, array $headers): array
+    {
+        return ['http' => ['timeout' => $timeout, 'header' => $headers], 'retry-auth-failure' => false];
+    }
+
+    /**
      * Composer 2.10 and later ask `prevent_url_access_callable` before each request of a redirect
      * chain, and only its curl downloader takes the option: RemoteFilesystem throws on it.
      */
-    private static function canRefuseRedirects(): bool
+    public static function refusesRedirects(string $composerVersion, bool $curl): bool
     {
-        return HttpDownloader::isCurlEnabled() && version_compare(Composer::getVersion(), '2.10.0-dev', '>=');
+        return $curl && version_compare($composerVersion, '2.10.0-dev', '>=');
     }
 
     private static function origin(string $url): string

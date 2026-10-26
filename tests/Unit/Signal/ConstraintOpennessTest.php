@@ -45,6 +45,7 @@ final class ConstraintOpennessTest extends TestCase
     {
         yield 'an open floor above 8.0.0' => ['^7.4 || >=8.0.1'];
         yield 'a gap at 8.0.0 and 8.0.1' => ['>=7.2 <8.0 || >=8.0.2'];
+        yield 'a gap from 8.1 to 9' => ['>=7.2 <8.1 || >=9.0'];
     }
 
     /** @dataProvider constraints */

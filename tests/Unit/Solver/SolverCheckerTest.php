@@ -11,6 +11,7 @@ use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\PlatformRepository;
 use Composer\Semver\VersionParser;
+use Composer\Util\Platform;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Security\Holder;
@@ -107,6 +108,38 @@ final class SolverCheckerTest extends TestCase
 
         self::assertSame([true, false], [$refused->refuses('1.2.5.0'), $refused->refuses('1.3.0.0')]);
         self::assertSame([], $refused->holding('1.3.0.0'));
+    }
+
+    public function testARefusedUpdateHoldsOnlyTheReleasesThatTheRootDevRequirementAlsoAdmits(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require-dev' => ['acme/lib' => '~1.2.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $locked = LockFile::fromArray(['packages' => [], 'packages-dev' => [['name' => 'acme/lib', 'version' => '1.2.3']]])->lockedRepository();
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.2.3'], ['version' => '1.2.5', 'require' => ['acme/gone' => '^1.0']], ['version' => '1.3.0']]]);
+        $checks = new MoveChecks(new SolverChecker(new ComposerSolver($root, $locked, new PlatformRepository([], ['php' => '8.4.99']), $source, []), [], '8.4.99', false, Deadline::never()), true);
+
+        self::assertSame(MoveCheck::REFUSED, $checks->check(MoveQuery::update('acme/lib', '^1.2.5', '1.2.5'))->check()->result());
+
+        self::assertSame([true, false], [$checks->refused('acme/lib')->refuses('1.2.5.0'), $checks->refused('acme/lib')->refuses('1.3.0.0')]);
+    }
+
+    public function testTheCheckerNamesTheVariableThatTurnedTheAdvisoryBlockingOff(): void
+    {
+        if (!\in_array('COMPOSER_NO_SECURITY_BLOCKING', ComposerFeatures::blockingVariables(ComposerFeatures::version()), true)) {
+            self::markTestSkipped('Composer 2.9.2 or later reads COMPOSER_NO_SECURITY_BLOCKING');
+        }
+        $solver = new ComposerSolver(self::root([]), LockFile::fromArray(['packages' => []])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource([]), []);
+        Platform::putEnv('COMPOSER_NO_SECURITY_BLOCKING', '1');
+        try {
+            $advisories = new PoolAdvisories(AdvisoryBlocking::fromConfig(new Config(false)), static fn (array $names, bool $complete): array => []);
+        } finally {
+            Platform::clearEnv('COMPOSER_NO_SECURITY_BLOCKING');
+        }
+
+        self::assertSame(
+            [['COMPOSER_NO_SECURITY_BLOCKING'], []],
+            [(new SolverChecker($solver, [], '8.4.99', false, Deadline::never(), $advisories))->blockingDisabledBy(), (new SolverChecker($solver, [], '8.4.99', false, Deadline::never()))->blockingDisabledBy()]
+        );
     }
 
     public function testARefusedRequireHoldsEveryReleaseOfItsConstraint(): void

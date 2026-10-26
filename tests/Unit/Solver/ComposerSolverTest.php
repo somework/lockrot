@@ -425,8 +425,8 @@ final class ComposerSolverTest extends TestCase
     }
 
     /**
-     * `composer require` rewrites composer.json and loads it again, so the stability flag, the root
-     * alias and the reference of the old constraint do not reach its solve. The only tag needs php 9.
+     * `composer require` rewrites composer.json and loads it again, so the stability flag and the
+     * root alias of the old constraint do not reach its solve. The only tag needs php 9.
      *
      * @dataProvider pinnedRoots
      *
@@ -448,6 +448,28 @@ final class ComposerSolverTest extends TestCase
     {
         yield 'a dev branch' => ['dev-main', ['acme/lib' => 20], []];
         yield 'a dev branch with a root alias' => ['dev-main as 1.5.0', ['acme/lib' => 20], [['package' => 'acme/lib', 'version' => 'dev-main', 'alias' => '1.5.0', 'alias_normalized' => '1.5.0.0']]];
+    }
+
+    /**
+     * At minimum-stability dev no flag holds the branch, so the root alias alone gives the
+     * consumer the acme/lib ^1.5.0 that it requires. The only tag needs php 9.
+     */
+    public function testARequireOfAnAliasedBranchSolvesWithoutTheAlias(): void
+    {
+        $dev = ['version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.com/lib.git', 'reference' => 'abc123']];
+        $consumer = ['version' => '1.0.0', 'require' => ['acme/lib' => '^1.5.0']];
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => 'dev-main as 1.5.0', 'acme/consumer' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $root->setMinimumStability('dev');
+        $root->setAliases([['package' => 'acme/lib', 'version' => 'dev-main', 'alias' => '1.5.0', 'alias_normalized' => '1.5.0.0']]);
+        $locked = LockFile::fromArray([
+            'packages' => [['name' => 'acme/lib'] + $dev, ['name' => 'acme/consumer'] + $consumer],
+            'aliases' => [['package' => 'acme/lib', 'version' => 'dev-main', 'alias' => '1.5.0', 'alias_normalized' => '1.5.0.0']],
+        ])->lockedRepository();
+        $solver = new ComposerSolver($root, $locked, new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [$dev, ['version' => '1.5.0', 'require' => ['php' => '>=9.0']]], 'acme/consumer' => [$consumer]]), []);
+
+        self::assertTrue($solver->solve(SolveRequest::baseline())->resolves(), 'the lock installs with its alias');
+        self::assertFalse($solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => 'dev-main']))->resolves(), 'the branch satisfies the consumer only through the old alias');
     }
 
     public function testARequireDropsTheBetaFlagOfTheOldConstraintAndTakesTheFlagOfTheNewOne(): void
