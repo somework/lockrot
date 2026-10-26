@@ -1546,7 +1546,7 @@
                     ]
                 },
                 "held_by": {
-                    "description": "The links that exclude the move; `upgrade` ⇒ not empty where lockrot read the links.",
+                    "description": "The links that exclude the move; `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move (`moves_with` not empty).",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/heldBy"
@@ -13960,7 +13960,7 @@
                     ]
                 },
                 "held_by": {
-                    "description": "The links that exclude the move; `upgrade` ⇒ not empty where lockrot read the links.",
+                    "description": "The links that exclude the move; `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move (`moves_with` not empty).",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/heldBy"
@@ -17913,7 +17913,7 @@
                     ]
                 },
                 "held_by": {
-                    "description": "The links that exclude the fixing release; `upgrade` ⇒ not empty where lockrot read the links.",
+                    "description": "The links that exclude the fixing release; `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move to this release.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/heldBy"

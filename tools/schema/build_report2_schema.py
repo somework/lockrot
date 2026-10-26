@@ -496,7 +496,7 @@ def move_props(with_also):
         'crosses_major': nul("Whether the move crosses a major; for a branch-alias snapshot (`5.4.x-dev`) the snapshot's own line is the installed branch, so on a `tag` "
                              "move from `pinned` false says the tag is the newest on the snapshot's own line; null when the move names no branch, or the installed version "
                              "has none (a `dev-main` snapshot).", {'type': 'boolean'}),
-        'held_by': arr("The links that exclude the move (§5.3); `upgrade` ⇒ not empty where lockrot read the links.", ref('heldBy')),
+        'held_by': arr("The links that exclude the move (§5.3); `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move (`moves_with` not empty).", ref('heldBy')),
         'clears': arr("What the move clears, each with its basis (§5.6). `clears`, `unverified` and `leaves` are disjoint and together hold every counted fact (I14b).", ref('clearedFact')),
         'unverified': arr('Facts the move could not be checked against (§5.6): counted facts it may not clear, and a flag it may raise that lockrot could not date.', ref('unverifiedFact')),
         'adds': arr("Facts the move would raise that would count: neither fired now (counted or accepted) nor accepted by the finding's allowlist entry; disjoint from "
@@ -930,7 +930,7 @@ defs['s9fix'] = obj("The advisory's fix (§5.3 \"Per advisory\"): `fix` is alway
                               'Null is no answer, never admitted: `php` is null or cannot be read, or the kind names no fixing release.'), {'type': 'boolean'}),
     'admits_project_php': nul(("A branch row's `admits_project_php` asked of `php`: whether the fixing release's php admits `run.project_php_lowest`. The Fixed by note reads it. "
                                'Null is no answer, never admitted: `php` is null or cannot be read, the project names no lowest PHP, or the kind names no fixing release.'), {'type': 'boolean'}),
-    'held_by': arr('The links that exclude the fixing release (§5.3); `upgrade` ⇒ not empty where lockrot read the links.', ref('heldBy')),
+    'held_by': arr('The links that exclude the fixing release (§5.3); `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move to this release.', ref('heldBy')),
     'reason': nul(("Set for `unknown` (`releases_unknown`, `affected_range_unknown`, `not_from_composer_repository`) and `none` (`no_release_outside_range`), else null. An open set "
                    "(round 3). The corpus model's `branch_table_missing` (‡, no details block) is a model-only value lockrot never writes, so it is not listed."),
                   {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['releases_unknown', 'affected_range_unknown', 'not_from_composer_repository', 'no_release_outside_range']}),

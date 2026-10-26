@@ -271886,6 +271886,17 @@
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v4.4.47 released 2022-10-03 (4.0 years ago), the newest on 4.x; newest release v8.1.7 2026-09-03 (0.1 years ago); last push 2026-09-26 (less than three weeks ago)"
    },
+   "unattributed": [
+    {
+     "package": "symfony/var-dumper",
+     "verdict": "medium",
+     "lead": "left-behind",
+     "flag_ids": [
+      "left-behind"
+     ],
+     "fan_in": 34
+    }
+   ],
    "inputs": {
     "root": {
      "name": "wallabag/wallabag",
