@@ -74,9 +74,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   tell now reach each Composer repository that publishes advisories. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
   ([What lockrot contacts](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
-- **All formats:** the move check loads the metadata of each package that a solve needs and the
-  run did not read. On Composer 2.9 and later, it also asks for the advisories of those names, by
-  name only. `composer-repositories` keeps out the locked packages from outside a Composer repository.
+- **All formats:** the move check loads the metadata of packages that a solve needs and the run did
+  not read. With Composer 2.9 or later and advisory blocking on, it asks for their advisories by name.
+  This affects a project that limits its network access or the names it sends. Action: pass
+  `--offline`, or set `extra.lockrot.advisory-lookup` to `composer-repositories`.
   ([What lockrot contacts](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **All formats:** `next_step.commands`, `security.update_now_command`, the `update now:` line and
   the command in the `do:` line hold only arguments from one set that every shell quotes safely. A

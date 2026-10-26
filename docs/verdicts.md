@@ -474,8 +474,9 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
 - lockrot asks each configured Composer repository that publishes advisories. A repository without
   a feed is listed with the outcome `no_feed`.
 
-- On Composer 2.9 and later, [the move check](#the-move-check) asks for the advisories of each
-  name that a solve loads and that the run did not ask, such as a new dependency of a move.
+- On Composer 2.9 and later, while advisory blocking is on, [the move check](#the-move-check)
+  asks for the advisories of each name that a solve loads and that no earlier lookup covered,
+  such as a new dependency of a move.
   `run.advisory_lookup` describes the run's own lookup only.
 
 - For a package installed from vcs or a path, the advisory is published for the package of that
