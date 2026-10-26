@@ -226,6 +226,23 @@ final class MarkdownFormatterTest extends TestCase
         self::assertSame(0, preg_match('/@(?!&#8203;)|www\\.|(?<!\\\\):\/\//i', $out), 'no live mention, www link or scheme link');
     }
 
+    /**
+     * An `@` after a letter or a digit starts no mention, and with no dotted domain after it no
+     * email link (https://github.github.com/gfm/#extended-email-autolink). A constraint keeps its
+     * stability flag as written, so a reader can copy it.
+     */
+    public function testAStabilityFlagInAConstraintStaysAsWritten(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            (new FindingBuilder())->withPackage('acme/kept')->withSignals([new Signal(Signal::LEVEL_WARN, 'x', SignalDataStub::of(Signal::S2, []))])->withAllowlistReason('requires ~0.4@dev, (@octocat), a@b.example and ^1.0@beta.1')->withDataDate($at)->build(),
+        ], Notes::texts([]), $at, 1, 0);
+
+        $out = self::formatter()->format($report, true);
+
+        self::assertStringContainsString('requires \\~0.4@dev, (@&#8203;octocat), a@&#8203;b.example and ^1.0@&#8203;beta.1', $out);
+    }
+
     public function testEveryKindOfLineBreakInACellFoldsIntoOneSpace(): void
     {
         $at = new \DateTimeImmutable(self::AT);

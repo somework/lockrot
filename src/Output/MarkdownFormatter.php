@@ -219,8 +219,9 @@ final class MarkdownFormatter implements FormatterInterface
             $value = str_replace($character, '\\'.$character, $value);
         }
         // GitHub notifies the user or team of an `@name` and links a bare URL or email address, and
-        // the lock of a fork's pull request is its author's text.
-        $value = str_replace(['@', '://'], ['@&#8203;', '\\://'], $value);
+        // the lock of a fork's pull request is its author's text. An `@` after a letter or a digit
+        // with no dotted domain after it is neither, such as the stability flag of `~0.4@dev`.
+        $value = (string) preg_replace('/(?<![A-Za-z0-9])@|@(?=[A-Za-z0-9_\\\\-]+\\.[A-Za-z0-9])/', '@&#8203;', str_replace('://', '\\://', $value));
 
         return (string) preg_replace('/(www)\./i', '$1\\\\.', $value);
     }
