@@ -531,7 +531,9 @@ every `conflict`.
 
 - A release fixes an advisory when it and every later release on its branch lie outside the
   advisory's range. S9's `fix.version` is the first such release in the order that the Limits
-  paragraph gives, and `fix.newest` is the branch's newest release.
+  paragraph gives, and `fix.newest` is the branch's newest release. On the installed branch,
+  `fix.newest` and `installed_branch_fixes.newest` are the newest release that the lock's links
+  allow and the target PHP runs: what `composer update` installs there.
 
 - `fix.admits_target_php` and `fix.admits_project_php` are the floor answers of a branch row,
   asked of `fix.php` ([The PHP test](#the-php-test-in-explain)). Null is no answer, never admitted.
@@ -693,7 +695,8 @@ holds. JSON writes the answer as the move's `check`.
 - **A joint request.** When Composer refuses a move, lockrot asks once more: the move and an update
   of each package that a package hold names. The joint request resolves only when it installs the
   package inside the move's constraint and changes the release of a holder. Then `held_by[]` is
-  empty, and `moves_with[]` names each holder whose release the joint request changes. The joint
+  empty on the move, on its branch row and on the S9 `fix` at its release, and `moves_with[]`
+  names each holder whose release the joint request changes. The joint
   request moves the packages that require the package. So the `transitive` reason adds no words,
   and the `unreached` words end at "lockrot found no path from your requirements to it". The step
   names those holders:

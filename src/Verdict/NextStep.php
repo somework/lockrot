@@ -29,11 +29,11 @@ final class NextStep
         $security = $score->deciding() === null ? null : self::securityDraft($context);
         $maintenance = $finding->lead() === null ? null : MaintenanceMove::draft($context, $finding->lead());
         $fixKind = $security === null ? null : $security->fixKind();
-        [$rows, $rowChecks] = self::rowsIfApplied($context);
+        [$rows, $rowChecks, $rowsJoint] = self::rowsIfApplied($context);
         $partial = self::partial($context);
         [$main, $other] = self::lead($security, $maintenance, $context, $fixKind);
         if ($main === null) {
-            return new Moves(null, null, $fixKind, $partial, $rows, $rowChecks);
+            return new Moves(null, null, $fixKind, $partial, $rows, $rowChecks, $rowsJoint);
         }
         $lead = null;
         $mainRow = $main->row();
@@ -74,7 +74,7 @@ final class NextStep
         }
         $published = $moveIn === Moves::IN_NEXT_STEP ? $lead : ($moveIn === Moves::IN_ALSO ? $also[0] : null);
 
-        return new Moves($lead, $moveIn, $published === null ? $fixKind : $published->fixKind(), $partial, $rows, $rowChecks);
+        return new Moves($lead, $moveIn, $published === null ? $fixKind : $published->fixKind(), $partial, $rows, $rowChecks, $rowsJoint);
     }
 
     /**
@@ -129,15 +129,16 @@ final class NextStep
     }
 
     /**
-     * Each row's score after a move to its candidate, judged as the move to it is, and Composer's
-     * check of that move.
+     * Each row's score after a move to its candidate, judged as the move to it is, Composer's
+     * check of that move, and the rows whose move the joint request resolves.
      *
-     * @return array{0: array<string, IfApplied>, 1: array<string, \Lockrot\Solver\MoveCheck>}
+     * @return array{0: array<string, IfApplied>, 1: array<string, \Lockrot\Solver\MoveCheck>, 2: array<string, string>}
      */
     private static function rowsIfApplied(MoveContext $context): array
     {
         $out = [];
         $checks = [];
+        $joint = [];
         $fixes = $context->fixes();
         foreach ($fixes === null ? [] : $fixes->branches() as $branch) {
             $candidate = $branch->candidate();
@@ -154,9 +155,12 @@ final class NextStep
             if ($move->check() !== null) {
                 $checks[$branch->branch()] = $move->check();
             }
+            if ($move->movesWith() !== []) {
+                $joint[$branch->branch()] = $candidate->release()->pretty();
+            }
         }
 
-        return [$out, $checks];
+        return [$out, $checks, $joint];
     }
 
     /** `security.partial`, judged as an `update` move to that release. */

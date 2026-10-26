@@ -215,11 +215,21 @@ final class Finding
         return $this->details === null ? null : $this->details->moves()->nextStep();
     }
 
-    /** @throws \LogicException for a finding built without its details */
+    /**
+     * A copy with its moves. An S9 row at a release that the joint request moves to names no holder.
+     *
+     * @throws \LogicException for a finding built without its details
+     */
     public function withMoves(Moves $moves): self
     {
         $clone = clone $this;
         $clone->details = $this->details()->withMoves($moves);
+        $joint = $moves->jointReleases();
+        $clone->signals = $joint === [] ? $this->signals : array_map(static function (Signal $signal) use ($joint): Signal {
+            $data = $signal->data();
+
+            return $data instanceof AdvisoryData ? new Signal($signal->level(), $signal->summary(), $data->withJointMoves($joint)) : $signal;
+        }, $this->signals);
 
         return $clone;
     }

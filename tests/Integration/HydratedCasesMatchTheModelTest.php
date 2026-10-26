@@ -90,7 +90,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'run.graded_verdicts',
         ],
         'security' => [
-            'details.metadata.branches[].{branch,installed}', 'details.metadata.branches[].fixes.{fix_kind,fixed,lowest,of}',
+            'details.metadata.branches[].{branch,installed}', 'details.metadata.branches[].fixes.{fix_kind,fixed,lowest,newest,of}',
             'details.metadata.branches[].fixes.held_by[].{package,source}',
             'details.metadata.branches[].fixes.if_applied.{assumes,at_most,total,verdict}', 'next_step.held_by[].{package,source}',
             'next_step.to_branch', 'origin.kind', 'package', 'score.parts.security.of',
@@ -98,7 +98,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'security.ignored[].{by,cve,id,reason,severity}', 'security.partial.clears[].{id,kind}',
             'security.partial.if_applied.{assumes,at_most,total,verdict}', 'security.partial.{unverified,version}',
             'signals[].data.advisories[].{affected_versions,cve,deciding,id,severity}',
-            'signals[].data.advisories[].fix.{kind,on_installed_branch,to_branch,version}', 'signals[].id', 'version',
+            'signals[].data.advisories[].fix.{kind,newest,on_installed_branch,to_branch,version}', 'signals[].id', 'version',
             'run.score_model.severities[].{counts_as,id}',
         ],
         'branches_lead' => [
@@ -210,7 +210,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version', 'next_step.commands', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'flags[].id', 'score.terms[].flag', 'signals[].data.advisories[].id'], self::TIE],
             ],
             'security' => [
-                [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::TIE],
+                [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.newest', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::TIE],
             ],
             'branches_lead' => [
                 [['signals[].id', 'signals[].data.newest_branch', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::TIE],
@@ -256,7 +256,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['signals[].data.advisories[].id'], self::BITBUCKET],
             ],
             'security' => [
-                [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::BITBUCKET],
+                [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.newest', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::BITBUCKET],
             ],
             'branches_lead' => [
                 [['signals[].id', 'signals[].data.newest_branch', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::BITBUCKET],

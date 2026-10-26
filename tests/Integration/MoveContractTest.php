@@ -279,7 +279,8 @@ final class MoveContractTest extends TestCase
     }
 
     /**
-     * SPEC §5.3 and I19 on every branch row: `fixes.newest` is the row's newest tag, `if_applied`
+     * SPEC §5.3 and I19 on every branch row: `fixes.newest` is the row's newest tag, on the
+     * installed row a release that the lock's links allow up to it (case mc-link-newest‡), `if_applied`
      * is null exactly on a row that fixes nothing or is `blocked`, and such a row has no holder.
      * The security move agrees with its row on the release, the class, `held_by` and the score after
      * it. A merged move, or a maintenance move that clears the advisories, agrees only when its
@@ -307,7 +308,11 @@ final class MoveContractTest extends TestCase
             if (!\is_array($fixes)) {
                 continue;
             }
-            self::assertSame($row['highest'], $fixes['newest'], $branch.': fixes.newest is the row\'s newest tag');
+            if ($row['installed'] === true) {
+                self::assertTrue(version_compare(JsonPath::stringAt($fixes, ['newest']), JsonPath::stringAt($row, ['highest']), '<='), $branch.': fixes.newest of the installed row is at most the row\'s newest tag');
+            } else {
+                self::assertSame($row['highest'], $fixes['newest'], $branch.': fixes.newest is the row\'s newest tag');
+            }
             self::assertSame($fixes['fixed'] === 0 || $fixes['fix_kind'] === 'blocked', $fixes['if_applied'] === null, $branch.': if_applied is null exactly on a row that fixes nothing or is blocked');
             if ($fixes['fixed'] === 0) {
                 self::assertSame([], $fixes['held_by'], $branch.': a row that fixes nothing has no holder');

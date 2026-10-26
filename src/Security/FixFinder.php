@@ -85,11 +85,15 @@ final class FixFinder
             $byBranch[$candidate->branchKey()][] = $candidate;
         }
 
+        $onInstalled = $installedBranch === null ? [] : ($byBranch[$installedBranch] ?? []);
+        $allowed = $this->newestAllowed($package->name(), $onInstalled);
+        if ($allowed !== null && $installedBranch !== null && isset($newest[$installedBranch])) {
+            $newest[$installedBranch] = $allowed;
+        }
         $fixes = [];
         foreach ($ranges as $id => $range) {
             $fixes[$id] = $range === null ? Fix::unknown(Fix::AFFECTED_RANGE_UNKNOWN) : $this->fixOf($range, $byBranch, $own, $newest, $installedBranch);
         }
-        $onInstalled = $installedBranch === null ? [] : ($byBranch[$installedBranch] ?? []);
         $rows = self::branches($newest, $byBranch, $installedBranch, $ranged, $own, \count($advisories));
         $move = self::move($rows, \count($advisories));
 
@@ -99,7 +103,7 @@ final class FixFinder
             $this->gets($onInstalled, $ranged, \count($advisories)),
             $move,
             self::partial($onInstalled, $ranged, \count($advisories)),
-            $this->newestAllowed($package->name(), $onInstalled)
+            $allowed
         );
     }
 
@@ -171,7 +175,7 @@ final class FixFinder
      *
      * @param array<string, list<Candidate>> $byBranch the lowest branch first, ascending per branch
      * @param list<ConstraintInterface>      $own      the ranges of the advisories the facts do not count
-     * @param array<string, string>          $newest   the newest release by branch key
+     * @param array<string, string>          $newest   the newest release by branch key, on the installed branch the newest that the lock's links allow
      */
     private function fixOf(ConstraintInterface $range, array $byBranch, array $own, array $newest, ?string $installedBranch): Fix
     {

@@ -444,6 +444,12 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString('; held by symfony/mailer v6.4.40, its own release and acme/ml-widget; after it', self::plain(self::caseExplanation('mc-package-hold‡')));
     }
 
+    /** SPEC §5.6, ruling R1: the joint request with acme/gz-client resolves the move to the 8.x row, so nothing holds it. */
+    public function testABranchRowThatTheJointRequestResolvesNamesNoHolder(): void
+    {
+        self::assertStringContainsString(" 1 of 1 · upgrade (lowest fix); after it: 0, ok; Composer's solver resolves it\n", self::plain(self::caseExplanation('mc-joint‡')));
+    }
+
     /** Each cell of a branch row starts under its header, counted in characters: a `—` or a long branch name shifts nothing. */
     public function testEveryBranchRowLinesUpWithItsHeader(): void
     {
