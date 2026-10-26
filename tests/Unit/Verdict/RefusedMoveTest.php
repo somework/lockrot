@@ -19,7 +19,7 @@ final class RefusedMoveTest extends TestCase
 {
     private const MOVE = 'update typo3/html-sanitizer ^2.3.2 ';
 
-    public function testARefusalThatNamesNoHoldBlocksTheReleaseAndIsNoReachableFix(): void
+    public function testARefusalThatNamesNoHoldBlocksTheReleaseAndLeavesGetsAtTheNewest(): void
     {
         $document = self::document(['result' => 'refused', 'form' => null, 'reason' => null, 'holds' => []]);
         $finding = self::finding($document);
@@ -28,7 +28,7 @@ final class RefusedMoveTest extends TestCase
         self::assertSame('refused', JsonPath::stringAt($finding, ['next_step', 'check', 'result']));
         self::assertSame([], FindingRelations::violations($document));
         self::assertSame('blocked', JsonPath::stringAt($finding, ['security', 'fix_kind']), 'the verdict counts no reachable fix');
-        self::assertNull(JsonPath::arrayAt($finding, ['security'])['gets'], 'composer update installs no release that Composer refuses');
+        self::assertSame('v2.3.2', JsonPath::stringAt($finding, ['security', 'gets', 'version']), 'a refusal leaves gets at the newest release (SPEC §5.6 ruling R2-1)');
     }
 
     public function testTheTextOfAMoveThatComposerRefusesWithNoHoldNamesTheRefusal(): void

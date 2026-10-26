@@ -51,8 +51,12 @@ final class HolderTest extends TestCase
         yield 'two tags, the lower first' => [['v7.13.0', 'v7.14.0'], 'v7.13.0'];
         yield 'two dev versions' => [['7.x-dev', 'dev-main'], '7.x-dev'];
         yield 'a branch, then a tag' => [['dev-main', 'v7.14.0'], 'v7.14.0'];
-        // Only a dev version gives way: any other pair of stabilities keeps the first.
-        yield 'a beta, then a tag' => [['v7.14.0-beta1', 'v7.14.0'], 'v7.14.0-beta1'];
+        // The stabilities rank as Composer's prefer-stable ranks them: stable, RC, beta, alpha, dev.
+        yield 'a beta, then a tag' => [['v7.14.0-beta1', 'v7.14.0'], 'v7.14.0'];
+        yield 'an RC, then a beta' => [['v7.14.0-beta1', 'v7.14.0-RC1'], 'v7.14.0-RC1'];
+        yield 'an alpha, then a beta' => [['v7.14.0-beta1', 'v7.14.0-alpha1'], 'v7.14.0-beta1'];
+        yield 'a dev version, then an alpha' => [['7.x-dev', 'v7.14.0-alpha1'], 'v7.14.0-alpha1'];
+        yield 'two betas keep the first' => [['v7.14.0-beta2', 'v7.14.0-beta1'], 'v7.14.0-beta2'];
     }
 
     /**
@@ -61,7 +65,7 @@ final class HolderTest extends TestCase
      * @param list<string> $versions the hold's versions, in rule order
      */
     #[DataProvider('versionsOfOneHold')]
-    public function testOfTwoHoldsThatDifferOnlyInTheVersionATagWinsOverADevVersionAndTheLowerTagOverAHigherOne(array $versions, string $kept): void
+    public function testOfTwoHoldsThatDifferOnlyInTheVersionTheMoreStableWinsAndTheLowerTagOverAHigherOne(array $versions, string $kept): void
     {
         $holds = Holder::distinct(array_map(static fn (string $version): Holder => new Holder(Holder::PACKAGE, 'scheb/2fa-email', $version, Holder::REQUIRE, 'self.version', 'scheb/2fa-bundle'), $versions));
 
