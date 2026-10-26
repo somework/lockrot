@@ -18,6 +18,7 @@ use Lockrot\Clock;
 use Lockrot\Composer\LockrotCommand;
 use Lockrot\Composer\ServiceFactory;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
@@ -342,6 +343,19 @@ final class LockrotCommandTest extends TestCase
         foreach (LockrotConfig::FORMATS as $format) {
             self::assertStringContainsString($format, $description, $format.' is accepted but not listed in --help');
         }
+    }
+
+    /** `--help` names every value that `--fail-on` accepts, and that it takes a list. */
+    public function testTheFailOnHelpTextNamesEveryValueAndTheList(): void
+    {
+        $description = $this->command()->getDefinition()->getOption('fail-on')->getDescription();
+
+        foreach (FailOn::allowed() as $value) {
+            self::assertMatchesRegularExpression('/(?<![a-z-])'.preg_quote($value, '/').'(?![a-z-])/', $description, $value.' is accepted but not listed in --help');
+        }
+        self::assertStringContainsString('comma-separated', $description);
+        self::assertStringNotContainsString('verdict', $description, 'a 0.14 verdict is a grade or a word, not a flag');
+        self::assertStringNotContainsString('priority', $description, 'a 0.14 threshold is a grade, not a priority');
     }
 
     public function testTableOutputAndExitCodeOnWallabag(): void
