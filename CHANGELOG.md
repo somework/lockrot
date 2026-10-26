@@ -267,8 +267,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **sarif:** a message writes each literal `{` as `{{` and each `}` as `}}`, as SARIF 2.1.0
   requires, so a viewer that fills placeholders shows an advisory title such as `{% use %}` as written.
 - **All formats:** the anonymous cap note counts one package in the singular ("1 candidate package").
-- **All formats:** a `require.php` with a post-release lower bound, such as `>=7.4.0-p1`, gives
-  the project's lowest PHP as the next patch, `7.4.1`. It read `7.4.0`, which the bound excludes.
+- **All formats:** `run.project_php_lowest` of a post-release `require.php` bound, such as
+  `>=7.4.0-p1`, is the next patch, `7.4.1`. It read `7.4.0`, which the bound excludes.
   ([The PHP test in explain](docs/verdicts.md#the-php-test-in-explain))
 - **All formats:** lockrot no longer proposes an `update` move that Composer refuses. On Composer
   2.9 and later, the plain `composer update <package>` of such a move installed a dev snapshot, and

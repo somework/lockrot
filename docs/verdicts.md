@@ -777,9 +777,11 @@ Limits of the check:
 - Composer blocks only the advisories that it reads. When the advisory lookup did not read a
   package that a resolving solve installs, the move is not checked (`check.reason`
   `advisory_lookup_incomplete`). An `--offline` run, a spent install-time budget and a failed
-  repository cause it. With `advisory-lookup: composer-repositories`, a package that no Composer
-  repository serves causes it too, because the check does not send that name. A refused solve stays refused. A refused move also stays refused when its
+  repository cause it. A refused solve stays refused. A refused move also stays refused when its
   joint request is not checked, because Composer refuses the move alone.
+- With `advisory-lookup: composer-repositories`, the check does not send the name of a package that
+  no Composer repository serves. It keeps such a package at its locked version. Composer can still
+  block that version in an update with `--with-all-dependencies`, so such a move can fail in Composer.
 - On Composer 2.10 and later, an update also removes the versions that a filter list names. Such a
   list is the `malware` list under `config.policy`, which blocks by default, or a custom list there.
   The check does not read these lists. So a move that resolves in lockrot can fail in Composer, or

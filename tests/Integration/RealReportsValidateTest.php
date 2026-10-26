@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Json\Schemas;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -69,6 +70,10 @@ final class RealReportsValidateTest extends TestCase
         $json = $this->lockrot('sites/wallabag-2.6.14', ['--target-php=7.4', '--explain=symfony/google-mailer', '--format=json']);
 
         $this->assertValid(Schemas::EXPLAIN, $json, 'symfony/google-mailer at 7.4', true);
+        $document = json_decode($json, true);
+        self::assertIsArray($document);
+        $step = JsonPath::arrayAt($document, ['finding', 'next_step']);
+        self::assertSame([[], null], [$step['clears'], $step['if_applied']], 'the move installs a release that clears nothing: '.json_encode($step['check']));
     }
 
     /** @param list<string> $arguments */
