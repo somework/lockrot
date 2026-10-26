@@ -152,9 +152,10 @@ final class CheckOutcome
     }
 
     /**
-     * A copy without the requirements on the moved package that admit $version, of the root or of a
-     * package: Composer's steps on the way to the hold that refuses the move. When no other hold is
-     * left, the copy keeps them: Composer then names only those requirements.
+     * A copy without the links on the moved package that admit $version, of the root or of a
+     * package: a requirement that matches it, or a conflict that does not. They are Composer's steps
+     * on the way to the hold that refuses the move. When no other hold is left, the copy keeps them:
+     * Composer then names only those links.
      */
     public function withoutAdmitting(string $version): self
     {
@@ -215,12 +216,13 @@ final class CheckOutcome
 
     private static function admits(Holder $hold, string $version): bool
     {
-        if ($hold->target() !== null || !\in_array($hold->link(), [Holder::REQUIRE, Holder::REQUIRE_DEV], true)) {
+        $conflict = $hold->link() === Holder::CONFLICT;
+        if ($hold->target() !== null || !($conflict || \in_array($hold->link(), [Holder::REQUIRE, Holder::REQUIRE_DEV], true))) {
             return false;
         }
         $parser = new VersionParser();
         try {
-            return $parser->parseConstraints($hold->constraint())->matches(new Constraint('==', $parser->normalize($version)));
+            return $conflict !== $parser->parseConstraints($hold->constraint())->matches(new Constraint('==', $parser->normalize($version)));
         } catch (\UnexpectedValueException $e) {
             return false;
         }

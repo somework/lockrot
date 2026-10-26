@@ -57,6 +57,27 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([$kernel], $outcome->holds());
     }
 
+    /** SPEC §5.6: a `conflict` link admits the release when its constraint does not match it. */
+    public function testAConflictOnTheMovedPackageThatDoesNotMatchItsReleaseIsNoHold(): void
+    {
+        $conflict = new Holder(Holder::PACKAGE, 'acme/plugin', '1.0.0', Holder::CONFLICT, '>=6.0');
+        $kernel = new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^4.4.51', 'symfony/http-kernel');
+
+        $outcome = (new CheckOutcome(MoveCheck::refused(), [$conflict, $kernel]))->withoutAdmitting('v5.4.52');
+
+        self::assertSame([$kernel], $outcome->holds());
+    }
+
+    public function testAConflictOnTheMovedPackageThatMatchesItsReleaseStays(): void
+    {
+        $conflict = new Holder(Holder::PACKAGE, 'acme/plugin', '1.0.0', Holder::CONFLICT, '>=5.4');
+        $kernel = new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^4.4.51', 'symfony/http-kernel');
+
+        $outcome = (new CheckOutcome(MoveCheck::refused(), [$conflict, $kernel]))->withoutAdmitting('v5.4.52');
+
+        self::assertSame([$conflict, $kernel], $outcome->holds());
+    }
+
     public function testAPackageRequirementOnTheMovedPackageThatExcludesItsReleaseStays(): void
     {
         $bundle = new Holder(Holder::PACKAGE, 'symfony/monolog-bundle', 'v3.8.0', Holder::REQUIRE_DEV, '~4.4');
