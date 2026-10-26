@@ -99,7 +99,7 @@ final class MoveBuilder
             $heldBy = Holder::distinct(array_merge($heldBy, $outcome->holds()));
         }
         $movesWith = $joint ? $outcome->movesWith() : [];
-        $because = self::because($kind, $crosses, $heldBy, $movesWith !== [], $subject);
+        $because = self::because($kind, $crosses, $heldBy, $subject);
         $ifApplied = null;
         if (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
             $resolves = $check !== null && $check->isResolved();
@@ -343,10 +343,10 @@ final class MoveBuilder
      *
      * @return list<string>
      */
-    private static function because(string $kind, ?bool $crosses, array $heldBy, bool $joint, MoveSubject $subject): array
+    private static function because(string $kind, ?bool $crosses, array $heldBy, MoveSubject $subject): array
     {
         $held = array_filter($heldBy, static fn (Holder $holder): bool => $holder->source() === Holder::PACKAGE) !== [];
-        $acts = \in_array($kind, self::ACTIONS, true) && !$subject->isDirect() && !$held && !$joint;
+        $acts = \in_array($kind, self::ACTIONS, true) && !$subject->isDirect() && !$held;
         $because = [];
         if ($held) {
             $because[] = Move::HOLDERS;

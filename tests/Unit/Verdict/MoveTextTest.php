@@ -133,6 +133,37 @@ final class MoveTextTest extends TestCase
         self::assertStringEndsWith("; Composer's solver checked it against the lock, with an update of h/x (to v5.30.0) and h/y (to 4.10.0)", MoveText::render($move));
     }
 
+    /** @return iterable<string, array{string}> the kinds of move that a joint request resolves */
+    public static function jointKinds(): iterable
+    {
+        yield 'update' => [Move::UPDATE];
+        yield 'require' => [Move::REQUIRE];
+    }
+
+    /**
+     * The joint request moves what requires the package: the transitive reason asks nothing more.
+     *
+     * @dataProvider jointKinds
+     */
+    #[DataProvider('jointKinds')]
+    public function testATransitiveMoveThatTheJointRequestResolvesAddsNoTransitiveWords(string $kind): void
+    {
+        $text = MoveText::render(self::jointMove($kind, [Move::TRANSITIVE], ['c/d']));
+
+        self::assertSame([false, false], [strpos($text, 'must allow it') !== false, strpos($text, 'comes in through') !== false], $text);
+    }
+
+    /**
+     * @dataProvider jointKinds
+     */
+    #[DataProvider('jointKinds')]
+    public function testAnUnreachedMoveThatTheJointRequestResolvesSaysOnlyThatNoPathWasFound(string $kind): void
+    {
+        $text = MoveText::render(self::jointMove($kind, [Move::UNREACHED], []));
+
+        self::assertSame([true, false, false], [strpos($text, '; lockrot found no path from your requirements to it; ') !== false, strpos($text, 'must allow it') !== false, strpos($text, 'composer why') !== false], $text);
+    }
+
     public function testATagMoveThatInstallsBelowTheTagNamesTheReleaseAfterTheTagDate(): void
     {
         $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null);
@@ -278,5 +309,19 @@ final class MoveTextTest extends TestCase
         $commands = $kind === Move::BLOCKED ? [] : [['composer', 'update', 'acme/lib']];
 
         return new Move($kind, FlagSet::VULNERABLE, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, $php, true, [], [], [], [], [], null, $because, $commands, $subject);
+    }
+
+    /**
+     * acme/lib, which c/d requires when $dependents names it, resolved by a joint request that moves h/x.
+     *
+     * @param list<string> $because
+     * @param list<string> $dependents
+     */
+    private static function jointMove(string $kind, array $because, array $dependents): Move
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', false, $dependents, '8.4', null);
+        $move = new Move($kind, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, null, false, [], [], [], [], [], null, $because, [['composer', 'update', 'acme/lib:^2.0', 'h/x']], $subject);
+
+        return $move->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0'))->withMovesWith([['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.1.0']]);
     }
 }

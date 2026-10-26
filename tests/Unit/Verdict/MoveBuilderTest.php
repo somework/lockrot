@@ -354,15 +354,15 @@ final class MoveBuilderTest extends TestCase
         );
     }
 
-    /** The joint solve moves what requires the package, so the transitive clause has nothing left to ask. */
-    public function testATransitiveMoveThatTheJointRequestResolvesHasNoTransitiveReason(): void
+    /** `transitive` stays a fact of the move: the through note explains the joint request. */
+    public function testATransitiveMoveThatTheJointRequestResolvesKeepsItsTransitiveReason(): void
     {
         [$row, $context] = self::checked(self::refusedThenJoint('update a/b ^2.0 '), false);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
 
-        self::assertSame([[['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.1.0']], []], [$move->movesWith(), array_values(array_intersect([Move::TRANSITIVE, Move::UNREACHED], $move->composerMovesBecause()))]);
+        self::assertSame([[['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.1.0']], [Move::CROSSES_MAJOR, Move::TRANSITIVE]], [$move->movesWith(), $move->composerMovesBecause()]);
     }
 
     /** @return array<string, array<string, mixed>> the refusal of $key by the holder h/x 1.0.0, and the joint request that moves h/x to 2.1.0 */

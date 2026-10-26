@@ -50,7 +50,8 @@ final class MoveText
             $text .= '; held by '.implode(' and ', $holders);
         }
         foreach ($move->composerMovesBecause() as $reason) {
-            $text .= '; '.self::because($reason, $move, $subject);
+            $words = self::because($reason, $move, $subject);
+            $text .= $words === '' ? '' : '; '.$words;
         }
         $through = self::throughWords($move->through());
         if ($through !== '' && \in_array(Move::TRANSITIVE, $move->composerMovesBecause(), true)) {
@@ -419,9 +420,11 @@ final class MoveText
         return $verb.($target === null ? '' : ($name === null ? $target : $name($target)).' ').$constraint.($holder->link() === Holder::REQUIRE_DEV ? ' in require-dev' : '');
     }
 
+    /** The joint request moves what requires the package, so a move that it resolves asks nothing of them. */
     private static function because(string $reason, Move $move, MoveSubject $subject): string
     {
         $resolved = \in_array($move->kind(), [Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true);
+        $joint = $move->movesWith() !== [];
         switch ($reason) {
             case Move::HOLDERS:
                 return 'the packages that hold it may need to move too';
@@ -431,8 +434,16 @@ final class MoveText
 
                 return (strpos((string) $move->toBranch(), '0.') === 0 ? 'a new 0.x line (Composer treats 0.x minors as breaking)' : 'a new major').' brings its own requirements'.($solved ? '' : ', which lockrot does not solve');
             case Move::TRANSITIVE:
+                if ($joint) {
+                    return '';
+                }
+
                 return $resolved ? 'what requires it must allow it' : 'it comes in through '.self::dependents(self::withRequirer($subject)).': '.self::throughActions($subject->dependents(), $move->through());
             default:
+                if ($joint) {
+                    return 'lockrot found no path from your requirements to it';
+                }
+
                 return $resolved ? 'lockrot found no path from your requirements to it, so what requires it must allow it' : 'lockrot found no path from your requirements to it: `composer why` names what requires it';
         }
     }
