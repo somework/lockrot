@@ -32,6 +32,7 @@ use Lockrot\Verdict\MoveContext;
 use Lockrot\Verdict\MoveDraft;
 use Lockrot\Verdict\MoveFact;
 use Lockrot\Verdict\MoveSubject;
+use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
 final class MoveBuilderTest extends TestCase
@@ -392,7 +393,7 @@ final class MoveBuilderTest extends TestCase
         $facts = self::facts($php);
         $floor = new PhpFloor('8.4', $projectPhp);
         $row = BranchRow::all($facts, $floor, Clock::fixed(self::NOW))[0];
-        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->withVerdict(Verdict::LEFT_BEHIND)->build();
         $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
         $project = ProjectConfig::fromArray(['require' => $require]);
         $context = (new MoveContext($finding, (new MoveSubject('a/b', '1.0.0', $direct, $direct ? [] : ['c/d'], '8.4', null))->withNamedIn($namedIn), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, $project)), $floor, new \DateTimeImmutable(self::NOW), 2, null, $ranges, [], true))
