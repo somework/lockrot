@@ -378,6 +378,8 @@ final class ComposerHttpClientTest extends TestCase
         [$client, $downloader] = self::clientWith(['https://api.github.com/repos/vendor/name' => [200, '{}']]);
 
         $client->fetchAll(['https://api.github.com/repos/vendor/name'], self::HEADERS);
+        // The redirect guard is a closure, which ComposerHttpClientRedirectTest covers.
+        unset($downloader->requests[0]['options']['prevent_url_access_callable']);
 
         self::assertSame([[
             'url' => 'https://api.github.com/repos/vendor/name',
