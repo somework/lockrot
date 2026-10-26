@@ -23064,6 +23064,7 @@
       "type": "object",
       "required": [
         "packages",
+        "lock_platform",
         "command",
         "check",
         "reason",
@@ -23072,7 +23073,7 @@
       ],
       "properties": {
         "packages": {
-          "description": "The package links that exclude `target.php`, on the set that `target.inside` reads: each package `require` that fails there and each package `conflict` that matches there, on `php` and `php-64bit`. Production first, then packages-dev, each by name, then by `link` and `target`. A packages-dev entry is listed when the run did not analyse packages-dev. At least one, except at the root ceiling.",
+          "description": "The package links that exclude `target.php`, on the set that `target.inside` reads: each package `require` that fails there and each package `conflict` that matches there, on `php` and `php-64bit`. Production first, then packages-dev, each by name, then by `link` and `target`. A packages-dev entry is listed when the run did not analyse packages-dev. At least one, except at the root ceiling and beside a `lock_platform` entry.",
           "type": "array",
           "items": {
             "description": "A package link that excludes the target.",
@@ -23125,8 +23126,38 @@
           },
           "uniqueItems": true
         },
+        "lock_platform": {
+          "description": "The root `require` links on `php` and `php-64bit` that fail at `target.php` and that only the lock's `platform` or `platform-dev` holds: composer.json has no link of that name. Any update of the lock rewrites them from composer.json, so such a link is no hold and not the root ceiling. `[]` when there is none, and on a lock-only run.",
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/phpWindowReq"
+              },
+              {
+                "properties": {
+                  "name": {
+                    "description": "Null: a root link.",
+                    "type": "null"
+                  },
+                  "version": {
+                    "description": "Null: a root link.",
+                    "type": "null"
+                  },
+                  "link": {
+                    "description": "A root `require` link.",
+                    "enum": [
+                      "require"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "uniqueItems": true
+        },
         "command": {
-          "description": "The argv of the update that Composer's solver resolves: `composer update <packages>` with each listed package once, and `--with-dependencies` or `--with-all-dependencies` when that form resolved. Set exactly when `check` is `resolves`. It obeys the command argument rule of `next_step.commands[]`, and a page renders it as it renders `commands[]`.",
+          "description": "The argv of the update that Composer's solver resolves: `composer update <packages>` with each listed package once, and `--with-dependencies` or `--with-all-dependencies` when that form resolved. With no package listed, `composer update --lock`. Set exactly when `check` is `resolves`. It obeys the command argument rule of `next_step.commands[]`, and a page renders it as it renders `commands[]`.",
           "oneOf": [
             {
               "description": "One command.",
@@ -23186,7 +23217,7 @@
       },
       "anyOf": [
         {
-          "description": "`resolves`: a command, no reason, no hold, a package.",
+          "description": "`resolves`: a command, no reason, no hold, a package or a `lock_platform` link.",
           "properties": {
             "check": {
               "enum": [
@@ -23201,14 +23232,31 @@
             },
             "held_by": {
               "maxItems": 0
-            },
-            "packages": {
-              "minItems": 1
             }
-          }
+          },
+          "allOf": [
+            {
+              "anyOf": [
+                {
+                  "properties": {
+                    "packages": {
+                      "minItems": 1
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "lock_platform": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
-          "description": "`refused` by the solve: no command, no reason, a package.",
+          "description": "`refused` by the solve: no command, no reason, a package or a `lock_platform` link.",
           "properties": {
             "check": {
               "enum": [
@@ -23220,11 +23268,28 @@
             },
             "reason": {
               "type": "null"
-            },
-            "packages": {
-              "minItems": 1
             }
-          }
+          },
+          "allOf": [
+            {
+              "anyOf": [
+                {
+                  "properties": {
+                    "packages": {
+                      "minItems": 1
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "lock_platform": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "description": "`refused` at the root ceiling: no command, no reason, only root holds on php.",
@@ -23268,7 +23333,7 @@
           }
         },
         {
-          "description": "`not_checked`: no command, no hold, a package.",
+          "description": "`not_checked`: no command, no hold, a package or a `lock_platform` link.",
           "properties": {
             "check": {
               "enum": [
@@ -23280,11 +23345,28 @@
             },
             "held_by": {
               "maxItems": 0
-            },
-            "packages": {
-              "minItems": 1
             }
-          }
+          },
+          "allOf": [
+            {
+              "anyOf": [
+                {
+                  "properties": {
+                    "packages": {
+                      "minItems": 1
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "lock_platform": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
         }
       ]
     },
