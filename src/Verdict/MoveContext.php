@@ -207,16 +207,12 @@ final class MoveContext
         return $release !== null;
     }
 
-    /**
-     * What `composer update` installs on the row: the release `security.gets` names on the installed
-     * branch, which the lock's links allow, else the row's newest.
-     */
+    /** The `newest` of an update move: {@see PackageFixes::newestOnInstalledBranch()} on the installed row, else the row's newest. */
     public function updateTarget(BranchRow $row): string
     {
-        $gets = $this->fixes === null ? null : $this->fixes->gets();
-        $version = $gets === null || !$row->installed() ? null : $gets->version();
+        $newest = $this->fixes === null || !$row->installed() ? null : $this->fixes->newestOnInstalledBranch();
 
-        return $version ?? $row->highest();
+        return $newest ?? $row->highest();
     }
 
     /** The row's date, or S8's date for the same branch when the row has none. */

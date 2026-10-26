@@ -98,7 +98,8 @@ final class FixFinder
             $rows,
             $this->gets($onInstalled, $ranged, \count($advisories)),
             $move,
-            self::partial($onInstalled, $ranged, \count($advisories))
+            self::partial($onInstalled, $ranged, \count($advisories)),
+            $this->newestAllowed($package->name(), $onInstalled)
         );
     }
 
@@ -323,6 +324,20 @@ final class FixFinder
         $clears = self::cleared($release, $ranged);
 
         return new Gets($release->release()->pretty(), $check, $clears, \count($clears) === $of);
+    }
+
+    /** @param list<Candidate> $onInstalled ascending */
+    private function newestAllowed(string $package, array $onInstalled): ?string
+    {
+        $newest = null;
+        foreach ($onInstalled as $candidate) {
+            $release = $candidate->release();
+            if ($this->links->excluding($package, $release->normalized()) === [] && $this->floor->admitsTarget($release->php()) !== false) {
+                $newest = $release->pretty();
+            }
+        }
+
+        return $newest;
     }
 
     /**

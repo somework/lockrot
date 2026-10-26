@@ -22,13 +22,16 @@ final class PackageFixes
     private ?Gets $gets;
     private ?Candidate $move;
     private ?Partial $partial;
+    private ?string $newestOnInstalledBranch;
 
     /**
-     * @param array<string, Fix>  $fixes    by advisory id, in the order the advisories came
-     * @param list<BranchFixes>   $branches highest branch first
+     * @param array<string, Fix>  $fixes                   by advisory id, in the order the advisories came
+     * @param list<BranchFixes>   $branches                highest branch first
+     * @param ?string             $newestOnInstalledBranch see {@see newestOnInstalledBranch()}
      */
-    public function __construct(array $fixes, array $branches, ?Gets $gets, ?Candidate $move, ?Partial $partial)
+    public function __construct(array $fixes, array $branches, ?Gets $gets, ?Candidate $move, ?Partial $partial, ?string $newestOnInstalledBranch = null)
     {
+        $this->newestOnInstalledBranch = $newestOnInstalledBranch;
         $this->fixes = $fixes;
         $this->branches = $branches;
         $this->gets = $gets;
@@ -49,7 +52,8 @@ final class PackageFixes
             array_map(static fn (BranchFixes $row): BranchFixes => $row->withFindings($findings), $this->branches),
             $this->gets,
             $this->move === null ? null : $this->move->withFindings($findings),
-            $this->partial === null ? null : $this->partial->withFindings($findings)
+            $this->partial === null ? null : $this->partial->withFindings($findings),
+            $this->newestOnInstalledBranch
         );
     }
 
@@ -95,6 +99,16 @@ final class PackageFixes
     public function gets(): ?Gets
     {
         return $this->gets;
+    }
+
+    /**
+     * The highest release on the installed branch that the lock's links allow and the target runs:
+     * what `composer update` installs there. A refusal of the move check does not lower it (ruling
+     * 5a), and a solve that installs a lower release names it in `check.installs` (ruling R2).
+     */
+    public function newestOnInstalledBranch(): ?string
+    {
+        return $this->newestOnInstalledBranch;
     }
 
     /**
