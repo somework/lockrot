@@ -28,6 +28,24 @@ final class RecordedMoveCheckerTest extends TestCase
         self::assertSame(self::PROBLEM, $outcome->problem());
     }
 
+    /** SPEC §5.6 (ruling Q2), case `mc-lookup-incomplete‡`: the world's answer is Composer's, and lockrot reads it as SolverChecker does. */
+    public function testAResolvingSolveThatInstallsANameOutsideTheLookupIsNotCheckedWhileComposerBlocksAdvisories(): void
+    {
+        $answer = ['result' => 'resolves', 'form' => MoveCheck::INLINE, 'installs' => ['acme/b' => '2.0.0', 'acme/new' => '1.0.0'], 'holds' => [], 'problem' => null];
+        $checks = ['update acme/b ^2.0 ' => $answer, 'combined acme/b' => $answer, 'joint update acme/b ^2.0 with acme/h' => $answer];
+        $blocking = (new RecordedMoveChecker($checks, ['blocks_advisories' => true], true))->withAdvisories([], ['acme/b', 'acme/h']);
+        $open = (new RecordedMoveChecker($checks, ['blocks_advisories' => false], true))->withAdvisories([], ['acme/b', 'acme/h']);
+        $query = MoveQuery::update('acme/b', '^2.0', '2.0.0');
+
+        $read = static fn (MoveCheck $check): array => [$check->result(), $check->reason()];
+
+        self::assertSame(
+            array_fill(0, 3, [MoveCheck::NOT_CHECKED, MoveCheck::ADVISORY_LOOKUP_INCOMPLETE]),
+            [$read($blocking->check($query)->check()), $read($blocking->combined(['acme/b' => '^2.0'])->check()), $read($blocking->joint($query, ['acme/h'])->check())],
+        );
+        self::assertSame([MoveCheck::RESOLVES, null], $read($open->check($query)->check()), 'a Composer that blocks no advisory leaves the solve resolved');
+    }
+
     public function testARefusedBaselineReturnsTheRecordedProblemText(): void
     {
         $checker = new RecordedMoveChecker(['baseline' => ['result' => 'refused', 'form' => null, 'holds' => [], 'problem' => self::PROBLEM]], [], true);
