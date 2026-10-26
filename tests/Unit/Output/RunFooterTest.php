@@ -142,6 +142,23 @@ final class RunFooterTest extends TestCase
         self::assertSame('advisories: 0 packages asked, 1 not asked · packagist.org answered (3 on record for 2 packages) · 2 other repositories publish no advisories', RunFooter::advisories(self::report([self::notAsked('a/one')], $coverage)));
     }
 
+    public function testTheMovesLineNamesEachVariableThatTurnedTheBlockingOff(): void
+    {
+        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $report = self::report([])->withMoveChecks(new MoveCheckRun('2.10.3', false, ['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
+
+        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by COMPOSER_NO_BLOCKING and COMPOSER_NO_SECURITY_BLOCKING; ext-* requirements not checked', RunFooter::moveCheck($report));
+        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by `COMPOSER_NO_BLOCKING` and `COMPOSER_NO_SECURITY_BLOCKING`; ext-* requirements not checked', RunFooter::moveCheck($report, static fn (string $name): string => '`'.$name.'`'));
+    }
+
+    public function testTheMovesLineOfARunThatBlocksNoAdvisoryAddsNoWords(): void
+    {
+        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $report = self::report([])->withMoveChecks(new MoveCheckRun('2.8.12', false, [], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
+
+        self::assertSame('moves: checked with the solver of Composer 2.8.12 against the lock; ext-* requirements not checked', RunFooter::moveCheck($report));
+    }
+
     public function testTheMovesLineOfARunWithNoCheckSaysWhyInWords(): void
     {
         $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);

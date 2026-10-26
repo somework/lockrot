@@ -6,8 +6,10 @@ namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Allowlist\AcceptedCheck;
 use Lockrot\Allowlist\UncheckedAcceptanceEntry;
+use Lockrot\Analyzer\MoveCheckRun;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
+use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
@@ -18,6 +20,8 @@ use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
+use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
@@ -27,6 +31,7 @@ use Lockrot\Tests\Support\TextGolden;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\FindingDetails;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Verdict\ShellCommand;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -330,6 +335,14 @@ final class TableFormatterTest extends TestCase
     }
 
     /** A critical, a medium and a low finding, and two score-0 ones that only `--all` shows. */
+    public function testTheMovesLineNamesTheVariableThatTurnedTheBlockingOff(): void
+    {
+        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $report = self::report()->withMoveChecks(new MoveCheckRun('2.9.5', false, ['COMPOSER_NO_SECURITY_BLOCKING'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
+
+        self::assertStringContainsString('against the lock, with advisory blocking turned off by COMPOSER_NO_SECURITY_BLOCKING; ext-* requirements not checked', self::formatter(400)->format($report));
+    }
+
     private static function report(): Report
     {
         $at = new \DateTimeImmutable(self::AT);

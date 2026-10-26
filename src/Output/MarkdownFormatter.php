@@ -169,7 +169,7 @@ final class MarkdownFormatter implements FormatterInterface
         };
         $baseline = $report->baseline();
         $lines = [];
-        foreach ([RunFooter::flags($report), RunFooter::depth($report, $name), RunFooter::security($report, false), $report->libyears()->line(), RunFooter::exposure($report, $name), RunFooter::advisories($report), RunFooter::moveCheck($report), RunFooter::phpWindow($report, $name), $baseline === null ? null : $baseline->summaryLine()] as $line) {
+        foreach ([RunFooter::flags($report), RunFooter::depth($report, $name), RunFooter::security($report, false), $report->libyears()->line(), RunFooter::exposure($report, $name), RunFooter::advisories($report), RunFooter::moveCheck($report, $name), RunFooter::phpWindow($report, $name), $baseline === null ? null : $baseline->summaryLine()] as $line) {
             if ($line !== null) {
                 $lines[] = strtr(self::text($line), $spans);
             }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Analyzer\MoveCheckRun;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
@@ -14,12 +16,15 @@ use Lockrot\Output\Formatters;
 use Lockrot\Output\MarkdownFormatter;
 use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\Signal;
+use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Support\TextGolden;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -271,6 +276,14 @@ final class MarkdownFormatterTest extends TestCase
     {
         $this->expectException(ConfigException::class);
         Formatters::for('xml', FormatContext::create(null, LockrotConfig::FAIL_ON_NONE));
+    }
+
+    public function testTheMovesLineNamesTheVariableThatTurnedTheBlockingOff(): void
+    {
+        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $report = self::report()->withMoveChecks(new MoveCheckRun('2.9.5', false, ['COMPOSER_NO_SECURITY_BLOCKING'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
+
+        self::assertStringContainsString('against the lock, with advisory blocking turned off by `COMPOSER_NO_SECURITY_BLOCKING`; ext-\\* requirements not checked', self::formatter()->format($report));
     }
 
     private static function report(): Report

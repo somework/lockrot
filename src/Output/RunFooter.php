@@ -208,7 +208,8 @@ final class RunFooter
      * The `moves:` line of `run.move_check`: which Composer checked the moves, once per run with
      * the extensions it does not check. Null when the run checked no move.
      */
-    public static function moveCheck(Report $report): ?string
+    /** @param ?callable(string): string $name marks a variable name as the format marks code */
+    public static function moveCheck(Report $report, ?callable $name = null): ?string
     {
         $run = $report->moveCheck();
         if ($run === null) {
@@ -217,7 +218,9 @@ final class RunFooter
         $data = $run->jsonSerialize();
         switch ($data['baseline']) {
             case MoveCheck::RESOLVES:
-                return 'moves: checked with the solver of Composer '.$data['composer'].' against the lock; ext-* requirements not checked';
+                $off = $data['blocking_disabled_by'] === [] ? '' : ', with advisory blocking turned off by '.implode(' and ', $name === null ? $data['blocking_disabled_by'] : array_map($name, $data['blocking_disabled_by']));
+
+                return 'moves: checked with the solver of Composer '.$data['composer'].' against the lock'.$off.'; ext-* requirements not checked';
             case MoveCheck::REFUSED:
                 return "moves: not checked, because Composer's solver refuses the lock itself (see the moves_not_checked note)";
             default:
