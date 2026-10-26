@@ -71,22 +71,25 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'next_step.if_applied.{assumes,at_most,total,verdict}', 'next_step.latest.{is_installed,relation,version}',
             'next_step.php_check.{project_allows,raise_size,raise_to,requires,target_runs}', 'next_step.replacement.{package,url}',
             'next_step.replacement.finding.{flag_ids,verdict}', 'next_step.through[].{newest_requires,package}',
-            'next_step.through[].newest_stable.version',
+            'next_step.through[].{local,newest_is_installed}', 'next_step.through[].newest_stable.version',
+            'next_step.moves_with[].{installed_version,package,version}',
             'next_step.also[].{clears_all,commands,composer_moves_because,constraint,crosses_major,kind,newest,reason,source,to_branch,version}',
             'next_step.also[].adds[].{basis,id}', 'next_step.also[].clears[].{id,kind}', 'next_step.also[].leaves[].{id,kind}',
             'next_step.also[].unverified[].{id,kind}', 'next_step.also[].if_applied.{assumes,at_most,total,verdict}',
             'next_step.also[].latest.{is_installed,relation,version}',
             'next_step.also[].php_check.{project_allows,raise_size,raise_to,requires,target_runs}', 'next_step.also[].replacement.{package,url}',
             'next_step.also[].replacement.finding.{flag_ids,verdict}', 'next_step.also[].through[].{newest_requires,package}',
-            'next_step.also[].through[].newest_stable.version', 'next_step.check.{form,reason,result}', 'next_step.also[].check.{form,reason,result}',
+            'next_step.also[].through[].{local,newest_is_installed}', 'next_step.also[].through[].newest_stable.version',
+            'next_step.also[].moves_with[].{installed_version,package,version}', 'next_step.check.{form,installs,reason,result}',
+            'next_step.also[].check.{form,installs,reason,result}',
             'depth_unmeasured', 'direct', 'direct_dependents', 'flags[].id',
             'installed_php.{requires,target_runs}', 'metadata.status', 'origin.kind', 'package', 'replacement', 'score.terms[].flag',
             'signals[].data.advisories[].id', 'version', 'run.{include_dev,project_php_lowest,target_php}',
         ],
         'held_by' => [
-            'next_step.held_by[].{constraint,package,source,version}', 'next_step.held_by[].holder.{flag_ids,verdict}',
+            'next_step.held_by[].{constraint,package,source,version}', 'next_step.held_by[].holder.{direct,flag_ids,verdict}',
             'next_step.held_by[].holder.next_step.{constraint,kind,to_branch}', 'next_step.also[].held_by[].{constraint,package,source,version}',
-            'next_step.also[].held_by[].holder.{flag_ids,verdict}', 'next_step.also[].held_by[].holder.next_step.{constraint,kind,to_branch}',
+            'next_step.also[].held_by[].holder.{direct,flag_ids,verdict}', 'next_step.also[].held_by[].holder.next_step.{constraint,kind,to_branch}',
             'run.graded_verdicts',
         ],
         'security' => [
@@ -356,13 +359,20 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].through[].newest_requires' => self::ALSO_THROUGH,
         'next_step.also[].through[].package' => self::ALSO_THROUGH,
         'next_step.also[].through[].newest_stable.version' => self::ALSO_THROUGH,
+        'next_step.also[].through[].local' => self::ALSO_THROUGH,
+        'next_step.also[].through[].newest_is_installed' => self::ALSO_THROUGH,
         'next_step.also[].held_by[].holder.flag_ids' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.verdict' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.constraint' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.kind' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.to_branch' => self::ALSO_HELD,
+        'next_step.also[].held_by[].holder.direct' => self::ALSO_HELD,
         'next_step.also[].check.form' => self::ALSO_CHECK,
         'next_step.also[].check.reason' => self::ALSO_CHECK,
+        'next_step.also[].check.installs' => self::ALSO_CHECK,
+        'next_step.also[].moves_with[].installed_version' => self::ALSO_CHECK,
+        'next_step.also[].moves_with[].package' => self::ALSO_CHECK,
+        'next_step.also[].moves_with[].version' => self::ALSO_CHECK,
     ];
 
     private const ONLY_PSR_LOG = 'Only psr-log accepts a flag on a halved finding, and it carries no branch rows, so the projector gives it no inputs.';
@@ -377,7 +387,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 
     private const ALSO_HELD = 'No also[] move of a case with inputs is held by a package that has a finding of its own.';
 
-    private const ALSO_CHECK = 'Each also[] move of a case with inputs that Composer\'s solver checks is refused, so no case gives it a form or a reason.';
+    private const ALSO_CHECK = 'Each also[] move of a case with inputs that Composer\'s solver checks is refused, so no case gives it a form, a reason, an install or a joint move.';
 
     private const ACCEPT_UNCHECKED = 'The cases that accept an unchecked check need an accept-unchecked entry of the project, which the hydrator does not take (`unhydrated()`).';
 
