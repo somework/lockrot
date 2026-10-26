@@ -267,7 +267,7 @@ mark.
 - **SARIF `rank`** is the band of the record's own fact: `100.0` for critical, `75.0` high, `50.0`
   medium, `25.0` low. An advisory result ranks by its severity: `95.0`, `80.0`, `55.0` (medium and
   unrated) and `20.0`. An advisory rule carries the `security-severity` that code scanning reads:
-  `9.5`, `8.0`, `5.5` and `2.0`, and `null` for an unrated advisory.
+  `9.5`, `8.0`, `5.5` and `2.0`. An unrated advisory's rule has no `security-severity`.
 - **The run-level record.** When advisories were not checked, `github`, `sarif` and `gitlab` add
   one record for the run: `lockrot/advisories-unchecked`. It is `error` (`major`) only when
   `unchecked` is a failing value and a finding fails it on an advisory gap. Otherwise it is
