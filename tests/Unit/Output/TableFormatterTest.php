@@ -27,6 +27,7 @@ use Lockrot\Tests\Support\TextGolden;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\FindingDetails;
+use Lockrot\Verdict\ShellCommand;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -208,6 +209,33 @@ final class TableFormatterTest extends TestCase
         }
 
         self::assertSame([], $wide);
+    }
+
+    /**
+     * A command that the move text names prints whole on a line of its own, after `do: ` or
+     * alone, at any width, so a copy of that line runs it and nothing else.
+     */
+    public function testEachCommandOfAMovePrintsWholeOnItsOwnLine(): void
+    {
+        $report = CaseHydrator::everyCase();
+        $commands = [];
+        foreach ($report->graded() as $finding) {
+            $move = $finding->nextStep();
+            foreach ($move === null ? [] : $move->commands() as $argv) {
+                $command = ShellCommand::posix($argv);
+                if ($command !== null && strpos($move->text(), $command) !== false) {
+                    $commands[$command] = true;
+                }
+            }
+        }
+        self::assertNotSame([], $commands);
+
+        foreach ([40, 100, 400] as $width) {
+            $lines = array_map(static fn (string $line): string => (string) preg_replace('/^\s*(do: )?/', '', $line), self::lines(self::formatter($width)->format($report)));
+            foreach (array_keys($commands) as $command) {
+                self::assertContains($command, $lines, 'width '.$width);
+            }
+        }
     }
 
     public function testAKnownFlagReadsBaselineAndTheScoreLineCarriesTheSuffix(): void

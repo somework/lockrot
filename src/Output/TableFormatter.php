@@ -7,6 +7,8 @@ namespace Lockrot\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Config\Gate;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\Move;
+use Lockrot\Verdict\ShellCommand;
 
 /**
  * The `table` format, a list grouped by grade. A row is prose, not a cell in a box,
@@ -90,9 +92,9 @@ final class TableFormatter implements FormatterInterface
         if ($gateLine !== null) {
             $lines[] = self::LINE.self::escape($gateLine);
         }
-        $move = FindingBlock::move($finding);
+        $move = $finding->isGraded() ? $finding->nextStep() : null;
         if ($move !== null) {
-            $lines = array_merge($lines, $this->wrapped(self::LINE.'do: ', $move, self::DO_HANG));
+            $lines = array_merge($lines, $this->moveLines($move));
         }
         foreach (FindingBlock::evidence($finding) as $flag => $summary) {
             $lines = array_merge($lines, $this->wrapped(self::LINE.str_pad($flag, self::FLAG_WIDTH).' ', $summary, str_repeat(' ', \strlen(self::LINE) + self::FLAG_WIDTH + 1)));
@@ -108,6 +110,44 @@ final class TableFormatter implements FormatterInterface
         }
 
         return $lines;
+    }
+
+    /**
+     * The `do:` line: the move text wrapped, and each command that it names whole on a line of its
+     * own, because a command that a wrap splits runs as two when it is copied.
+     *
+     * @return list<string>
+     */
+    private function moveLines(Move $move): array
+    {
+        $lines = [];
+        foreach (self::commandParts($move) as [$part, $isCommand]) {
+            $prefix = $lines === [] ? self::LINE.'do: ' : self::DO_HANG;
+            $lines = array_merge($lines, $isCommand ? [self::escape($prefix.$part)] : $this->wrapped($prefix, $part, self::DO_HANG));
+        }
+
+        return $lines;
+    }
+
+    /** @return list<array{0: string, 1: bool}> the move text cut around each command that it names, and whether a part is one */
+    private static function commandParts(Move $move): array
+    {
+        $text = $move->text();
+        $parts = [];
+        $at = 0;
+        foreach ($move->commands() as $argv) {
+            $command = ShellCommand::posix($argv);
+            $found = $command === null ? false : strpos($text, $command, $at);
+            if ($command === null || $found === false) {
+                continue;
+            }
+            $parts[] = [trim(substr($text, $at, $found - $at)), false];
+            $parts[] = [$command, true];
+            $at = $found + \strlen($command);
+        }
+        $parts[] = [trim(substr($text, $at)), false];
+
+        return array_values(array_filter($parts, static fn (array $part): bool => $part[0] !== ''));
     }
 
     /**
