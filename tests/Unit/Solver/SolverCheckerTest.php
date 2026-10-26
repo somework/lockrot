@@ -89,6 +89,40 @@ final class SolverCheckerTest extends TestCase
         self::assertSame([['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'require', 'target' => 'acme/gone', 'constraint' => '^1.0']], self::rows($outcome->holds()));
     }
 
+    /**
+     * The update solve takes the root requirement with its inline constraint, so a refused
+     * `update acme/lib:^1.2.5` under `~1.2.0` says nothing about 1.3.0, which only a require reaches.
+     */
+    public function testARefusedUpdateHoldsOnlyTheReleasesThatTheRootRequirementAlsoAdmits(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '~1.2.0'],
+            [['name' => 'acme/lib', 'version' => '1.2.3']],
+            ['acme/lib' => [['version' => '1.2.3'], ['version' => '1.2.5', 'require' => ['acme/gone' => '^1.0']], ['version' => '1.3.0']]]
+        );
+        $checks = new MoveChecks($checker, true);
+
+        self::assertSame(MoveCheck::REFUSED, $checks->check(MoveQuery::update('acme/lib', '^1.2.5', '1.2.5'))->check()->result());
+        $refused = $checks->refused('acme/lib');
+
+        self::assertSame([true, false], [$refused->refuses('1.2.5.0'), $refused->refuses('1.3.0.0')]);
+        self::assertSame([], $refused->holding('1.3.0.0'));
+    }
+
+    public function testARefusedRequireHoldsEveryReleaseOfItsConstraint(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '~1.2.0'],
+            [['name' => 'acme/lib', 'version' => '1.2.3']],
+            ['acme/lib' => [['version' => '1.2.3'], ['version' => '1.3.0', 'require' => ['acme/gone' => '^1.0']], ['version' => '1.4.0', 'require' => ['acme/gone' => '^1.0']]]]
+        );
+        $checks = new MoveChecks($checker, true);
+
+        self::assertSame(MoveCheck::REFUSED, $checks->check(MoveQuery::require('acme/lib', '^1.3.0', '1.3.0'))->check()->result());
+
+        self::assertSame([true, true], [$checks->refused('acme/lib')->refuses('1.3.0.0'), $checks->refused('acme/lib')->refuses('1.4.0.0')]);
+    }
+
     /** The pool serves no release of the move: the root requirement is the one hold that Composer names, so it stays. */
     public function testARootRequirementThatAdmitsTheReleaseStaysWhenItIsTheOnlyHold(): void
     {

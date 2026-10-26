@@ -102,7 +102,7 @@ final class MoveChecks
         $refused = RefusedMoves::none();
         foreach ($this->asked as [$query, $outcome]) {
             if ($query->package() === $package && $outcome->check()->result() === MoveCheck::REFUSED) {
-                $refused = $refused->with($query->constraint(), $outcome->holds());
+                $refused = $refused->with($query->constraint(), $outcome->holds(), $outcome->range());
             }
         }
 

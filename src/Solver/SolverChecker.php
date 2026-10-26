@@ -7,6 +7,7 @@ namespace Lockrot\Solver;
 use Composer\Package\BasePackage;
 use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
+use Composer\Semver\Constraint\MultiConstraint;
 use Composer\Semver\VersionParser;
 use Lockrot\Deadline;
 use Lockrot\Security\Holder;
@@ -312,7 +313,21 @@ final class SolverChecker implements MoveChecker
         $scanned = $target === null ? [] : $this->scan->of($target, (new VersionParser())->normalize($this->platformPhp));
 
         // A move publishes its holds, never Composer's problem text, which is costly to render.
-        return new CheckOutcome(MoveCheck::refused(), Holder::distinct(array_merge($last->holds(), $scanned)));
+        $outcome = new CheckOutcome(MoveCheck::refused(), Holder::distinct(array_merge($last->holds(), $scanned)));
+        if ($query->isRequire()) {
+            return $outcome;
+        }
+        // An update keeps the root requirements on the package beside its inline constraint.
+        $parser = new VersionParser();
+        $range = [$parser->parseConstraints($query->constraint())];
+        $root = $this->solver->root();
+        foreach (array_merge(array_values($root->getRequires()), array_values($root->getDevRequires())) as $link) {
+            if ($link->getTarget() === $query->package()) {
+                $range[] = $link->getConstraint();
+            }
+        }
+
+        return \count($range) === 1 ? $outcome : $outcome->withRange(MultiConstraint::create($range, true));
     }
 
     /** Whether Composer failed on the solve: the first failure of the run is kept for its run note. */

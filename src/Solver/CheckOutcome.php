@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Solver;
 
 use Composer\Semver\Constraint\Constraint;
+use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\VersionParser;
 use Lockrot\Security\Holder;
 
@@ -27,6 +28,7 @@ final class CheckOutcome
     /** @var list<array{package: string, installed_version: ?string, version: string}> */
     private array $movesWith = [];
     private bool $joint = false;
+    private ?ConstraintInterface $range = null;
 
     /** @param list<Holder> $holds */
     public function __construct(MoveCheck $check, array $holds = [], ?string $problem = null)
@@ -192,6 +194,20 @@ final class CheckOutcome
         }
     }
 
+    /** A copy whose refusal holds the releases of $range alone: the versions that the solve could choose. */
+    public function withRange(ConstraintInterface $range): self
+    {
+        $clone = clone $this;
+        $clone->range = $range;
+
+        return $clone;
+    }
+
+    /** The versions that a refused solve could choose, null when they are the move's constraint. */
+    public function range(): ?ConstraintInterface
+    {
+        return $this->range;
+    }
 
     private static function admits(Holder $hold, string $version): bool
     {
