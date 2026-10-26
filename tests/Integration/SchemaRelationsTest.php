@@ -44,7 +44,7 @@ final class SchemaRelationsTest extends TestCase
      */
     private const WAITING = [
         'Under score model 1 each `next_step.also[].if_applied.verdict` is the band of its total, a score-0 word at 0.' => 'reads next_step.also[]',
-        "Each `also[]` move of a transitive or unreached package's `require` or `tag` kind writes no command." => 'reads next_step.also[]',
+        "Each `also[]` move of the `require` or `tag` kind of a transitive or unreached package that composer.json does not list writes no `composer require` command." => 'reads next_step.also[]',
     ];
 
     /** @var list<string> the pointers of the WAITING relations, found by their description */

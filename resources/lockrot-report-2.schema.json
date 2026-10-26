@@ -17507,7 +17507,7 @@
           ]
         },
         {
-          "description": "A transitive or unreached package's `require` or `tag` move writes no `composer require` command (the package itself is never required at the root); its only commands are `composer why-not` checks.",
+          "description": "A `require` or `tag` move of a transitive or unreached package that composer.json does not list writes no `composer require` command: the root does not require the package (ruling R13).",
           "anyOf": [
             {
               "properties": {
@@ -17515,6 +17515,13 @@
                   "enum": [
                     true
                   ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "named_in": {
+                  "minItems": 1
                 }
               }
             },
@@ -17563,7 +17570,7 @@
           ]
         },
         {
-          "description": "Each `also[]` move of a transitive or unreached package's `require` or `tag` kind writes no command.",
+          "description": "Each `also[]` move of the `require` or `tag` kind of a transitive or unreached package that composer.json does not list writes no `composer require` command.",
           "anyOf": [
             {
               "properties": {
@@ -17571,6 +17578,13 @@
                   "enum": [
                     true
                   ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "named_in": {
+                  "minItems": 1
                 }
               }
             },
@@ -17596,7 +17610,22 @@
                           {
                             "properties": {
                               "commands": {
-                                "maxItems": 0
+                                "items": {
+                                  "not": {
+                                    "items": [
+                                      {
+                                        "enum": [
+                                          "composer"
+                                        ]
+                                      },
+                                      {
+                                        "enum": [
+                                          "require"
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                }
                               }
                             }
                           }

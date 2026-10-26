@@ -203,12 +203,13 @@ final class MoveContractTest extends TestCase
                 foreach ($argv as $argument) {
                     self::assertIsString($argument);
                 }
-                if ($finding['reach'] !== 'direct') {
+                if ($finding['reach'] !== 'direct' && $finding['named_in'] === []) {
                     $target = $argv[2] ?? '';
                     self::assertIsString($target);
-                    self::assertFalse($argv[1] === 'require' && strpos($target, JsonPath::stringAt($finding, ['package']).':') === 0, 'no root requirement of a package the project does not require');
+                    self::assertFalse($argv[1] === 'require' && strpos($target, JsonPath::stringAt($finding, ['package']).':') === 0, 'no root requirement of a package that composer.json does not list');
                 }
             }
+            self::assertWhyNot($finding, $move);
             self::assertSame($i === 0, \array_key_exists('through', $move), 'through[] on the lead move only');
             if ($i === 0) {
                 self::assertThrough($finding, $move);
@@ -483,8 +484,7 @@ final class MoveContractTest extends TestCase
     }
 
     /**
-     * one entry per direct dependent of a transitive package, `[]` otherwise, and a `why-not`
-     * command for each dependent whose newest release no longer requires the package.
+     * one entry per direct dependent of a transitive package, `[]` otherwise.
      *
      * @param array<mixed, mixed> $finding
      * @param array<mixed, mixed> $move
@@ -498,7 +498,6 @@ final class MoveContractTest extends TestCase
             return;
         }
         self::assertSame($finding['direct_dependents'], array_column($through, 'package'), 'direct_dependents order');
-        $whyNot = [];
         foreach ($through as $entry) {
             self::assertIsArray($entry);
             self::assertSame($entry['newest_requires'] === null, $entry['newest_requires_unmeasured'] !== null);
@@ -507,11 +506,28 @@ final class MoveContractTest extends TestCase
                 self::assertNotNull($entry['newest_stable']);
             }
             self::assertSame($entry['installed_requires'] === false, $entry['newest_requires_unmeasured'] === 'through_other_package');
-            if ($entry['newest_requires'] === false) {
-                $whyNot[] = ['composer', 'why-not', $entry['package'], JsonPath::stringAt($entry, ['newest_stable', 'version'])];
-            }
         }
-        self::assertSame($whyNot, array_values(array_filter(JsonPath::arrayAt($move, ['commands']), static fn ($argv): bool => \is_array($argv) && ($argv[1] ?? null) === 'why-not')));
+    }
+
+    /**
+     * SPEC 5.6: an update, require, raise-php or tag move whose check does not resolve, a null
+     * check included, ends with one `composer why-not` of its package and version, read from the lock.
+     *
+     * @param array<mixed, mixed> $finding
+     * @param array<mixed, mixed> $move
+     */
+    private static function assertWhyNot(array $finding, array $move): void
+    {
+        $check = $move['check'];
+        $asks = \in_array($move['kind'], ['update', 'require', 'raise-php', 'tag'], true) && \is_string($move['version'])
+            && (!\is_array($check) || $check['result'] !== 'resolves');
+        $commands = JsonPath::arrayAt($move, ['commands']);
+        $whyNot = array_values(array_filter($commands, static fn ($argv): bool => \is_array($argv) && ($argv[1] ?? null) === 'why-not'));
+        $expected = $asks ? [['composer', 'why-not', $finding['package'], $move['version'], '--locked']] : [];
+        self::assertSame($expected, $whyNot, ''.$move['kind'].' why-not');
+        if ($asks) {
+            self::assertSame($expected[0], end($commands), 'why-not is the last step');
+        }
     }
 
     /**

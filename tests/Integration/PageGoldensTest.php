@@ -224,7 +224,8 @@ final class PageGoldensTest extends TestCase
 
     /**
      * SPEC-0.14.md §7.9.21 "The move": the sheet's move cards of a page case hold the check line of
-     * each move. The page cases show a resolved, a refused and two unchecked moves.
+     * each move that runs a Composer request. The page cases show a resolved, a refused and two
+     * unchecked moves.
      */
     public function testTheSheetMoveCardsHoldTheCheckLineOfEachMove(): void
     {
@@ -243,6 +244,12 @@ final class PageGoldensTest extends TestCase
                 $lead = JsonPath::arrayAt($findings[$package], ['next_step']);
                 foreach (array_values(array_merge([$lead], JsonPath::arrayAt($lead, ['also']))) as $i => $move) {
                     $move = JsonPath::decoded($move);
+                    if ($move['check'] === null) {
+                        if (JsonPath::decoded($cards)[$i]['after'] !== null) {
+                            $differ[$id.' '.$package.' card '.$i] = ['expected' => 'no check line on a move that runs no Composer request'];
+                        }
+                        continue;
+                    }
                     $result = JsonPath::stringAt($move, ['check', 'result']);
                     $expected = [
                         'resolves' => 'checked with Composer',
@@ -456,7 +463,8 @@ final class PageGoldensTest extends TestCase
     }
 
     /**
-     * SPEC-0.14.md §7.9.21, the link words.
+     * SPEC-0.14.md §7.9.21, the link words, with the words of a `self.version` constraint (ruling R9)
+     * and of a `require-dev` link (ruling REQ-DEV).
      *
      * @param array<mixed, mixed> $hold
      */
@@ -472,7 +480,9 @@ final class PageGoldensTest extends TestCase
             return 'no release of '.$constraint.' can install';
         }
 
-        return ($link === 'conflict' ? 'conflicts with ' : 'requires ').($target === null ? '' : $target.' ').$constraint;
+        $words = $constraint === 'self.version' ? 'self.version ('.self::textAt($hold, ['version']).')' : $constraint;
+
+        return ($link === 'conflict' ? 'conflicts with ' : 'requires ').($target === null ? '' : $target.' ').$words.($link === 'require-dev' ? ' in require-dev' : '');
     }
 
     /**
