@@ -177,7 +177,8 @@ final class FixtureRepositoryServer
      */
     public function withAdvisoryApi(array $advisoriesByName, array $availablePatterns = []): void
     {
-        $root = ['metadata-url' => '/p2/%package%.json', 'security-advisories' => ['api-url' => '/api/security-advisories/']];
+        // Absolute, because Composer 2.6 requests a relative api-url as a local file path.
+        $root = ['metadata-url' => '/p2/%package%.json', 'security-advisories' => ['api-url' => $this->url().'/api/security-advisories/']];
         if ($availablePatterns !== []) {
             $root['available-package-patterns'] = $availablePatterns;
         }
