@@ -73,7 +73,7 @@ final class CheckOutcome
     public function joinedWith(self $joint, string $package, string $constraint, array $holders): self
     {
         $check = $joint->check();
-        if ($check->isRefused() || $check->reason() === MoveCheck::ADVISORY_LOOKUP_INCOMPLETE) {
+        if ($check->isRefused()) {
             return $joint;
         }
         $installs = $joint->changes()[$package] ?? null;
