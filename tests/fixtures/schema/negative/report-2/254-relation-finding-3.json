@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "run.graded_verdicts"
+  "error": "findings[0].security.installed_branch_fixes"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {
@@ -55,6 +55,7 @@
    "ok"
   ],
   "graded_verdicts": [
+   "critical",
    "high",
    "medium",
    "low"
@@ -783,16 +784,16 @@
    "counted": 0,
    "lead-first": 0,
    "corroborating-share": 0,
-   "advisory-points": 0,
+   "advisory-points": 1,
    "no-reachable-fix-multiplier": 0,
-   "security-max": 0,
+   "security-max": 1,
    "divide-reach": 0,
    "security-exempt-from-reach": 0,
    "sum": 0,
    "divide-dev": 0,
    "floor-once": 0,
-   "band-floors": 0,
-   "zero-verdicts": 1,
+   "band-floors": 1,
+   "zero-verdicts": 0,
    "sort": null,
    "gate-bounded-new": 0,
    "baseline-cover": 0
@@ -811,7 +812,7 @@
      "reason": null,
      "message": null,
      "packages_with_records": 1,
-     "records": 1
+     "records": 5
     }
    ]
   },
@@ -835,6 +836,14 @@
        "link": "require",
        "target": "php",
        "constraint": "^7.2.5",
+       "dev": false
+      },
+      {
+       "name": "symfony/yaml",
+       "version": "v5.4.23",
+       "link": "require",
+       "target": "php",
+       "constraint": ">=7.2.5",
        "dev": false
       }
      ]
@@ -871,6 +880,14 @@
        "target": "php",
        "constraint": "^7.2.5",
        "dev": false
+      },
+      {
+       "name": "symfony/yaml",
+       "version": "v5.4.23",
+       "link": "require",
+       "target": "php",
+       "constraint": ">=7.2.5",
+       "dev": false
       }
      ]
     },
@@ -895,6 +912,7 @@
    },
    "target_fix": {
     "packages": [],
+    "lock_platform": [],
     "command": null,
     "check": "refused",
     "reason": null,
@@ -913,10 +931,10 @@
    }
   }
  },
- "activity_cache_oldest_at": null,
- "activity_cache_age_hours": null,
+ "activity_cache_oldest_at": "2026-10-01T16:05:49+00:00",
+ "activity_cache_age_hours": 1.6,
  "packages_checked": 1,
- "packages_flagged": 0,
+ "packages_flagged": 1,
  "packages_multi_flag": 0,
  "include_dev": false,
  "not_from_composer_repository": 0,
@@ -926,10 +944,10 @@
   "critical": 0,
   "high": 0,
   "medium": 0,
-  "low": 0,
+  "low": 1,
   "unknown": 0,
   "finished": 0,
-  "ok": 1
+  "ok": 0
  },
  "abandoned": {
   "total": 0,
@@ -940,8 +958,8 @@
   "critical": 0,
   "high": 0,
   "medium": 0,
-  "low": 0,
-  "none": 1
+  "low": 1,
+  "none": 0
  },
  "flags": {
   "abandoned": {
@@ -1043,14 +1061,14 @@
    }
   },
   "vulnerable": {
-   "carrying": 0,
+   "carrying": 1,
    "leading": null,
    "accepted": null,
    "by_verdict": {
     "critical": 0,
     "high": 0,
     "medium": 0,
-    "low": 0
+    "low": 1
    }
   }
  },
@@ -1060,28 +1078,33 @@
  },
  "unattributed": [],
  "rot_depth": {
-  "flagged": 0,
-  "measured": 0,
+  "flagged": 1,
+  "measured": 1,
   "unmeasured": {
    "unreached": 0,
    "no_composer_json": 0
   },
   "by_reach": {
-   "direct": 0,
+   "direct": 1,
    "transitive": 0,
    "unreached": 0
   },
   "not_in_composer_json": 0,
   "require_dev_not_walked": 0,
-  "production": 0,
+  "production": 1,
   "development": 0,
-  "by_depth": [],
-  "max_depth": null,
+  "by_depth": [
+   {
+    "depth": 0,
+    "flagged": 1
+   }
+  ],
+  "max_depth": 0,
   "deepest": []
  },
  "libyears": {
-  "total": 2.98,
-  "direct_requirements": 2.98,
+  "total": 3.43,
+  "direct_requirements": 3.43,
   "measured": 1,
   "at_least_count": 0,
   "unmeasured": {
@@ -1095,22 +1118,14 @@
    "undated_releases": 0
   },
   "furthest_behind": {
-   "package": "composer/ca-bundle",
-   "version": "1.3.7",
-   "libyears": 2.98,
+   "package": "symfony/yaml",
+   "version": "v5.4.23",
+   "libyears": 3.43,
    "at_least": false
   },
   "packages": 1
  },
- "baseline": {
-  "path": "lockrot-baseline.json",
-  "known": 0,
-  "new": 0,
-  "worsened": 0,
-  "stale": [
-   "acme/removed-package"
-  ]
- },
+ "baseline": null,
  "gate": {
   "fails": false,
   "tripped_by": [],
@@ -1139,13 +1154,13 @@
  "security": {
   "check": "complete",
   "packages": {
-   "vulnerable": 0,
+   "vulnerable": 1,
    "unchecked": 0,
    "ignored": 1,
-   "clear": 1
+   "clear": 0
   },
   "advisories": {
-   "counted": 0,
+   "counted": 3,
    "ignored": 1
   },
   "severities": {
@@ -1153,18 +1168,24 @@
    "high": 0,
    "medium": 0,
    "unrated": 0,
-   "low": 0
+   "low": 3
   },
   "fixes": {
-   "update": 0,
+   "update": 1,
    "upgrade": 0,
    "raise-php": 0,
    "unknown": 0,
    "blocked": 0,
    "none": 0
   },
-  "update_now": [],
-  "update_now_command": null,
+  "update_now": [
+   "symfony/yaml"
+  ],
+  "update_now_command": [
+   "composer",
+   "update",
+   "symfony/yaml"
+  ],
   "fix_unknown": 0
  },
  "data_date": "2026-10-01T17:41:33+00:00",
@@ -1172,42 +1193,198 @@
  "note_details": [],
  "findings": [
   {
-   "package": "composer/ca-bundle",
-   "version": "1.3.7",
-   "branch": "1.x",
+   "package": "symfony/yaml",
+   "version": "v5.4.23",
+   "branch": "5.x",
    "installed_php": {
-    "requires": null,
-    "target_runs": null,
-    "project_allows": null
+    "requires": ">=7.2.5",
+    "target_runs": true,
+    "project_allows": true
    },
-   "verdict": "ok",
-   "priority": "none",
+   "verdict": "low",
+   "priority": "low",
    "lead": null,
    "rank": 1,
-   "flags": [],
+   "flags": [
+    {
+     "id": "vulnerable",
+     "role": "security",
+     "baseline": null,
+     "signal_ids": [
+      "S9"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "advisories",
+      "value": 3,
+      "source": null
+     },
+     "summary": "3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings"
+    }
+   ],
    "score": {
     "model": 1,
-    "total": 0,
-    "exact": 0,
+    "total": 2,
+    "exact": 2,
+    "rounded_down": false,
+    "band": {
+     "floor": 1,
+     "next": "medium",
+     "to_next": 6
+    },
+    "decided_by": "security",
+    "parts": {
+     "maintenance": {
+      "status": "none",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      }
+     },
+     "security": {
+      "status": "counted",
+      "contribution": 2,
+      "alone": {
+       "total": 2,
+       "verdict": "low"
+      },
+      "of": 3,
+      "tied": [
+       "PKSA-ft77-7h5f-p3r6",
+       "PKSA-v5yj-8nmz-sk2q"
+      ]
+     }
+    },
+    "terms": [
+     {
+      "part": "security",
+      "flag": "vulnerable",
+      "role": "security",
+      "advisory": "PKSA-b14r-zh1d-vdrc",
+      "severity": "low",
+      "fix_kind": "update",
+      "weight": 2,
+      "multiplier": 1,
+      "points": 2,
+      "contribution": 2
+     }
+    ],
+    "modifiers": [],
     "accepted": [],
-    "text": "0"
+    "without": [
+     {
+      "remove": {
+       "kind": "advisory",
+       "id": "PKSA-b14r-zh1d-vdrc"
+      },
+      "revealed": [],
+      "total": 2,
+      "verdict": "low",
+      "lead": null,
+      "deciding_advisory": "PKSA-ft77-7h5f-p3r6",
+      "at_least": false
+     }
+    ],
+    "text": "2 = vulnerable 2 [low advisory]"
    },
-   "next_step": null,
+   "next_step": {
+    "kind": "update",
+    "source": "vulnerable",
+    "merged": [],
+    "fix_kind": "update",
+    "reason": null,
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": "5.x",
+    "version": "v5.4.52",
+    "newest": "v5.4.53",
+    "constraint": null,
+    "latest": null,
+    "php_check": {
+     "requires": ">=7.2.5",
+     "project_allows": true,
+     "target_runs": true,
+     "raise_to": null,
+     "raise_size": null
+    },
+    "crosses_major": false,
+    "held_by": [],
+    "clears": [
+     {
+      "kind": "advisory",
+      "id": "PKSA-b14r-zh1d-vdrc",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-ft77-7h5f-p3r6",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-v5yj-8nmz-sk2q",
+      "basis": "outside_range"
+     }
+    ],
+    "unverified": [],
+    "adds": [],
+    "leaves": [],
+    "clears_all": true,
+    "if_applied": {
+     "total": 0,
+     "verdict": "ok",
+     "lead": null,
+     "deciding_advisory": null,
+     "at_most": false,
+     "assumes": [
+      "clears_hold"
+     ]
+    },
+    "check": null,
+    "moves_with": [],
+    "composer_moves_because": [],
+    "commands": [
+     [
+      "composer",
+      "update",
+      "symfony/yaml"
+     ],
+     [
+      "composer",
+      "why-not",
+      "symfony/yaml",
+      "v5.4.52",
+      "--locked"
+     ]
+    ],
+    "through": [],
+    "also": [],
+    "text": "composer update symfony/yaml (gets v5.4.53) — clears 3 advisories"
+   },
    "security": {
-    "status": "clear",
+    "status": "vulnerable",
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
-    "records": 1,
+    "records": 5,
     "feeds": [
      {
       "composer_repository": "composer repo (https://repo.packagist.org)",
       "registry": "packagist.org",
       "answer": "answered",
-      "records": 1,
+      "records": 5,
       "reason": null
      }
     ],
+    "worst": "low",
+    "counts": {
+     "critical": 0,
+     "high": 0,
+     "medium": 0,
+     "unrated": 0,
+     "low": 3
+    },
     "ignored": [
      {
       "id": "PKSA-ign0-0000-0000",
@@ -1219,7 +1396,39 @@
       "reason": "not reachable in our use (‡)"
      }
     ],
-    "ignored_count": 1
+    "ignored_count": 1,
+    "fix_kind": "update",
+    "installed_branch_fixes": null,
+    "move_in": "next_step",
+    "gets": {
+     "version": "v5.4.53",
+     "php_check": {
+      "requires": ">=7.2.5",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "clears": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-b14r-zh1d-vdrc",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-ft77-7h5f-p3r6",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-v5yj-8nmz-sk2q",
+       "basis": "outside_range"
+      }
+     ],
+     "clears_all": true
+    },
+    "partial": null
    },
    "checks_missing": [],
    "checks_skipped": [],
@@ -1235,11 +1444,11 @@
     "reason": null,
     "forge": "github",
     "host": "github.com",
-    "repo": "composer/ca-bundle",
+    "repo": "symfony/yaml",
     "event": "push",
     "archived": false,
-    "fetched_at": "2026-10-01T17:41:33+00:00",
-    "cached_at": null
+    "fetched_at": "2026-10-01T16:05:49+00:00",
+    "cached_at": "2026-10-01T16:05:49+00:00"
    },
    "allowlist": null,
    "abandoned_ignored": null,
@@ -1247,7 +1456,7 @@
    "origin": {
     "kind": "packagist",
     "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/composer/ca-bundle",
+    "package_url": "https://packagist.org/packages/symfony/yaml",
     "local": false
    },
    "replacement": null,
@@ -1259,7 +1468,7 @@
    "dev": false,
    "reach": "direct",
    "chain": [
-    "composer/ca-bundle"
+    "symfony/yaml"
    ],
    "depth": 0,
    "depth_unmeasured": null,
@@ -1267,41 +1476,128 @@
     "require"
    ],
    "direct_dependents": [
-    "composer/ca-bundle",
-    "joomla/http",
-    "joomla/oauth1",
-    "joomla/oauth2"
+    "symfony/yaml"
    ],
-   "signals": [],
-   "evidence": "",
+   "signals": [
+    {
+     "id": "S9",
+     "level": "warn",
+     "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
+     "data": {
+      "advisories": [
+       {
+        "id": "PKSA-b14r-zh1d-vdrc",
+        "cve": "CVE-2026-45133",
+        "title": "YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+        "link": "https://symfony.com/cve-2026-45133",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+        "counted": true,
+        "points": 2,
+        "deciding": true,
+        "fix": {
+         "kind": "update",
+         "to_branch": "5.x",
+         "version": "v5.4.52",
+         "newest": "v5.4.53",
+         "on_installed_branch": true,
+         "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": true,
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-ft77-7h5f-p3r6",
+        "cve": "CVE-2026-45305",
+        "title": "YAML Parser ReDoS via Catastrophic Backtracking in Parser::cleanup() Regex",
+        "link": "https://symfony.com/cve-2026-45305",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+        "counted": true,
+        "points": 2,
+        "deciding": false,
+        "fix": {
+         "kind": "update",
+         "to_branch": "5.x",
+         "version": "v5.4.52",
+         "newest": "v5.4.53",
+         "on_installed_branch": true,
+         "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": true,
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-v5yj-8nmz-sk2q",
+        "cve": "CVE-2026-45304",
+        "title": "YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion (\"Billion Laughs\")",
+        "link": "https://symfony.com/cve-2026-45304",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+        "counted": true,
+        "points": 2,
+        "deciding": false,
+        "fix": {
+         "kind": "update",
+         "to_branch": "5.x",
+         "version": "v5.4.52",
+         "newest": "v5.4.53",
+         "on_installed_branch": true,
+         "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": true,
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       }
+      ],
+      "releases_read": true,
+      "complete": true
+     }
+    }
+   ],
+   "evidence": "vulnerable: 3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:41:33+00:00",
-   "libyears": 2.98,
+   "libyears": 3.43,
    "age": {
     "installed": {
-     "at": "2023-08-30T09:31:38+00:00",
-     "years": 3.1,
+     "at": "2023-04-23T19:33:36+00:00",
+     "years": 3.4,
      "dated_by": null
     },
     "installed_unmeasured": null,
     "release": {
-     "version": "1.4.15",
-     "at": "2026-08-21T14:57:32+00:00",
-     "years": 0.1,
+     "version": "v8.1.8",
+     "at": "2026-09-26T06:33:49+00:00",
+     "years": 0,
      "level": null,
      "dated_by": null
     },
     "release_unmeasured": null,
     "branch_release": {
-     "version": "1.5.14",
-     "at": "2026-08-21T14:57:29+00:00",
-     "years": 0.1,
+     "version": "v5.4.53",
+     "at": "2026-05-20T17:13:41+00:00",
+     "years": 0.4,
      "level": null,
      "dated_by": null
     },
     "branch_release_unmeasured": null,
     "push": {
-     "at": "2026-10-01T16:47:29Z",
+     "at": "2026-10-01T12:53:29+00:00",
      "years": 0,
      "level": null
     },

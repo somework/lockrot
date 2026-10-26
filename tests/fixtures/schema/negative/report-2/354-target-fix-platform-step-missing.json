@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "run.php_window.target_fix.platform_step"
+  "error": "run.php_window.target_fix"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {
@@ -912,6 +912,7 @@
    },
    "target_fix": {
     "packages": [],
+    "lock_platform": [],
     "command": null,
     "check": "refused",
     "reason": null,
@@ -925,8 +926,7 @@
       "constraint": "^7.2.5",
       "holder": null
      }
-    ],
-    "platform_step": "yes"
+    ]
    }
   }
  },

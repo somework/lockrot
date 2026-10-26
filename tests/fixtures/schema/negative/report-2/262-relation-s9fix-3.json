@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[0]"
+  "error": "findings[0].signals[2].data.advisories[0].fix.admits_target_php"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {
@@ -919,6 +919,7 @@
       "dev": false
      }
     ],
+    "lock_platform": [],
     "command": null,
     "check": "not_checked",
     "reason": null,
@@ -1453,16 +1454,7 @@
     "gets": null,
     "partial": null
    },
-   "checks_missing": [
-    {
-     "check": "release_metadata",
-     "reason": "not_from_composer_repository",
-     "blocks": [
-      "S2",
-      "S8"
-     ]
-    }
-   ],
+   "checks_missing": [],
    "checks_skipped": [
     {
      "check": "repository_activity",
@@ -1504,10 +1496,10 @@
    "abandoned_ignored": null,
    "from_composer_repository": false,
    "origin": {
-    "kind": "artifact",
+    "kind": "path",
     "registry": null,
     "package_url": null,
-    "local": false
+    "local": true
    },
    "replacement": null,
    "replacement_url": null,
@@ -3096,7 +3088,7 @@
          "newest": null,
          "on_installed_branch": null,
          "php": null,
-         "admits_target_php": null,
+         "admits_target_php": true,
          "admits_project_php": null,
          "held_by": [],
          "reason": "not_from_composer_repository"

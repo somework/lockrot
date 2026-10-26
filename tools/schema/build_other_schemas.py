@@ -550,6 +550,8 @@ def add_relations(D):
         relate(m, '`if_applied.at_most` is true exactly when `unverified` is not empty (I14).',
                [P(if_applied=NULL), P(if_applied=P(at_most=E(True)), unverified=MIN1), P(if_applied=P(at_most=E(False)), unverified=EMPTY)])
         relate(m, '`crosses_major` is null when the move names no branch.', [P(to_branch=NULL, crosses_major=NULL), P(to_branch=STR)])
+        relate(m, '`moves_with` is empty unless `check.result` is `resolves`, and a move with entries has an empty `held_by`.',
+               [P(moves_with=EMPTY), P(check=P(result=E('resolves')), held_by=EMPTY)])
         # `merged` holding vulnerable makes it a security move too
         relate(m, 'A security move carries its fix kind: `source` or `merged` holds `vulnerable`.',
                [P(source=E('vulnerable'), fix_kind=STR), P(merged=CONTAINS(E('vulnerable')), fix_kind=STR), P(source=NOT('vulnerable'), merged=NONE(E('vulnerable')))])

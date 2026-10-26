@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "run.php_window.target_fix"
+  "error": "findings[0].signals[0].data.advisories[0].fix.on_installed_branch"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {
@@ -912,6 +912,7 @@
    },
    "target_fix": {
     "packages": [],
+    "lock_platform": [],
     "command": null,
     "check": "refused",
     "reason": null,
@@ -925,7 +926,8 @@
       "constraint": "^7.2.5",
       "holder": null
      }
-    ]
+    ],
+    "platform_step": false
    }
   }
  },
@@ -1154,12 +1156,12 @@
   "packages": {
    "vulnerable": 1,
    "unchecked": 0,
-   "ignored": 0,
+   "ignored": 1,
    "clear": 0
   },
   "advisories": {
    "counted": 3,
-   "ignored": 0
+   "ignored": 1
   },
   "severities": {
    "critical": 0,
@@ -1383,8 +1385,18 @@
      "unrated": 0,
      "low": 3
     },
-    "ignored": [],
-    "ignored_count": 0,
+    "ignored": [
+     {
+      "id": "PKSA-ign0-0000-0000",
+      "cve": "CVE-2026-00001",
+      "title": "an advisory the project ignores",
+      "severity": "medium",
+      "by": "audit.ignore",
+      "matched": "id",
+      "reason": "not reachable in our use (‡)"
+     }
+    ],
+    "ignored_count": 1,
     "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 3,
@@ -1507,7 +1519,7 @@
          "to_branch": "5.x",
          "version": "v5.4.52",
          "newest": "v5.4.53",
-         "on_installed_branch": true,
+         "on_installed_branch": null,
          "php": ">=7.2.5",
          "admits_target_php": true,
          "admits_project_php": true,

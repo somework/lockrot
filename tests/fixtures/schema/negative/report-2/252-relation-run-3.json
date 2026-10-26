@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "run.move_check"
+  "error": "run.graded_verdicts"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {
@@ -10,12 +10,12 @@
  },
  "generated_at": "2026-10-01T17:41:20+00:00",
  "run": {
-  "project": "typo3/cms",
-  "root_package": "typo3/cms",
+  "project": "joomla/joomla-cms",
+  "root_package": "joomla/joomla-cms",
   "target_php": "8.4",
   "target_php_source": "option",
-  "project_php": "^8.1",
-  "project_php_lowest": "8.1.0",
+  "project_php": "^7.2.5",
+  "project_php_lowest": "7.2.5",
   "lock_file": "composer.lock",
   "fail_on": "high",
   "fail_on_source": "option",
@@ -55,7 +55,6 @@
    "ok"
   ],
   "graded_verdicts": [
-   "critical",
    "high",
    "medium",
    "low"
@@ -784,16 +783,16 @@
    "counted": 0,
    "lead-first": 0,
    "corroborating-share": 0,
-   "advisory-points": 1,
+   "advisory-points": 0,
    "no-reachable-fix-multiplier": 0,
-   "security-max": 1,
+   "security-max": 0,
    "divide-reach": 0,
    "security-exempt-from-reach": 0,
    "sum": 0,
    "divide-dev": 0,
    "floor-once": 0,
-   "band-floors": 1,
-   "zero-verdicts": 0,
+   "band-floors": 0,
+   "zero-verdicts": 1,
    "sort": null,
    "gate-bounded-new": 0,
    "baseline-cover": 0
@@ -812,81 +811,113 @@
      "reason": null,
      "message": null,
      "packages_with_records": 1,
-     "records": 6
+     "records": 1
     }
    ]
   },
-  "move_check": {
-   "composer": "2.10.3",
-   "blocks_advisories": false,
-   "ignores_extensions": true,
-   "baseline": "not_checked",
-   "reason": null
-  },
+  "move_check": null,
   "php_window": {
    "platform_override": null,
    "host_requires": [],
    "with_dev": {
     "minors": [
-     "8.1",
-     "8.2",
-     "8.3",
-     "8.4",
-     "8.5"
+     "7.2",
+     "7.3",
+     "7.4"
     ],
     "gaps": false,
     "lower_edge": {
-     "php": "8.1.0",
+     "php": "7.2.5",
      "set_by": [
       {
        "name": null,
        "version": null,
        "link": "require",
        "target": "php",
-       "constraint": "^8.1",
+       "constraint": "^7.2.5",
        "dev": false
       }
      ]
     },
-    "upper_edge": null,
+    "upper_edge": {
+     "excludes": "8.0",
+     "set_by": [
+      {
+       "name": null,
+       "version": null,
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5",
+       "dev": false
+      }
+     ]
+    },
     "closest": null
    },
    "without_dev": {
     "minors": [
-     "8.1",
-     "8.2",
-     "8.3",
-     "8.4",
-     "8.5"
+     "7.2",
+     "7.3",
+     "7.4"
     ],
     "gaps": false,
     "lower_edge": {
-     "php": "8.1.0",
+     "php": "7.2.5",
      "set_by": [
       {
        "name": null,
        "version": null,
        "link": "require",
        "target": "php",
-       "constraint": "^8.1",
+       "constraint": "^7.2.5",
        "dev": false
       }
      ]
     },
-    "upper_edge": null,
+    "upper_edge": {
+     "excludes": "8.0",
+     "set_by": [
+      {
+       "name": null,
+       "version": null,
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5",
+       "dev": false
+      }
+     ]
+    },
     "closest": null
    },
    "target": {
     "php": "8.4.99",
-    "inside": true
+    "inside": false
    },
-   "target_fix": null
+   "target_fix": {
+    "packages": [],
+    "lock_platform": [],
+    "command": null,
+    "check": "refused",
+    "reason": null,
+    "held_by": [
+     {
+      "source": "root",
+      "package": null,
+      "version": null,
+      "link": "require",
+      "target": "php",
+      "constraint": "^7.2.5",
+      "holder": null
+     }
+    ],
+    "platform_step": false
+   }
   }
  },
- "activity_cache_oldest_at": "2026-10-01T16:06:22+00:00",
- "activity_cache_age_hours": 1.6,
+ "activity_cache_oldest_at": null,
+ "activity_cache_age_hours": null,
  "packages_checked": 1,
- "packages_flagged": 1,
+ "packages_flagged": 0,
  "packages_multi_flag": 0,
  "include_dev": false,
  "not_from_composer_repository": 0,
@@ -895,11 +926,11 @@
  "counts": {
   "critical": 0,
   "high": 0,
-  "medium": 1,
+  "medium": 0,
   "low": 0,
   "unknown": 0,
   "finished": 0,
-  "ok": 0
+  "ok": 1
  },
  "abandoned": {
   "total": 0,
@@ -909,9 +940,9 @@
  "priorities": {
   "critical": 0,
   "high": 0,
-  "medium": 1,
+  "medium": 0,
   "low": 0,
-  "none": 0
+  "none": 1
  },
  "flags": {
   "abandoned": {
@@ -1013,13 +1044,13 @@
    }
   },
   "vulnerable": {
-   "carrying": 1,
+   "carrying": 0,
    "leading": null,
    "accepted": null,
    "by_verdict": {
     "critical": 0,
     "high": 0,
-    "medium": 1,
+    "medium": 0,
     "low": 0
    }
   }
@@ -1030,33 +1061,28 @@
  },
  "unattributed": [],
  "rot_depth": {
-  "flagged": 1,
-  "measured": 1,
+  "flagged": 0,
+  "measured": 0,
   "unmeasured": {
    "unreached": 0,
    "no_composer_json": 0
   },
   "by_reach": {
-   "direct": 1,
+   "direct": 0,
    "transitive": 0,
    "unreached": 0
   },
   "not_in_composer_json": 0,
   "require_dev_not_walked": 0,
-  "production": 1,
+  "production": 0,
   "development": 0,
-  "by_depth": [
-   {
-    "depth": 0,
-    "flagged": 1
-   }
-  ],
-  "max_depth": 0,
+  "by_depth": [],
+  "max_depth": null,
   "deepest": []
  },
  "libyears": {
-  "total": 1.91,
-  "direct_requirements": 1.91,
+  "total": 2.98,
+  "direct_requirements": 2.98,
   "measured": 1,
   "at_least_count": 0,
   "unmeasured": {
@@ -1070,14 +1096,22 @@
    "undated_releases": 0
   },
   "furthest_behind": {
-   "package": "typo3/html-sanitizer",
-   "version": "v2.2.0",
-   "libyears": 1.91,
+   "package": "composer/ca-bundle",
+   "version": "1.3.7",
+   "libyears": 2.98,
    "at_least": false
   },
   "packages": 1
  },
- "baseline": null,
+ "baseline": {
+  "path": "lockrot-baseline.json",
+  "known": 0,
+  "new": 0,
+  "worsened": 0,
+  "stale": [
+   "acme/removed-package"
+  ]
+ },
  "gate": {
   "fails": false,
   "tripped_by": [],
@@ -1106,24 +1140,24 @@
  "security": {
   "check": "complete",
   "packages": {
-   "vulnerable": 1,
+   "vulnerable": 0,
    "unchecked": 0,
-   "ignored": 0,
-   "clear": 0
+   "ignored": 1,
+   "clear": 1
   },
   "advisories": {
-   "counted": 2,
-   "ignored": 0
+   "counted": 0,
+   "ignored": 1
   },
   "severities": {
    "critical": 0,
    "high": 0,
-   "medium": 1,
+   "medium": 0,
    "unrated": 0,
-   "low": 1
+   "low": 0
   },
   "fixes": {
-   "update": 1,
+   "update": 0,
    "upgrade": 0,
    "raise-php": 0,
    "unknown": 0,
@@ -1134,245 +1168,59 @@
   "update_now_command": null,
   "fix_unknown": 0
  },
- "data_date": "2026-10-01T17:41:59+00:00",
+ "data_date": "2026-10-01T17:41:33+00:00",
  "notes": [],
  "note_details": [],
  "findings": [
   {
-   "package": "typo3/html-sanitizer",
-   "version": "v2.2.0",
-   "branch": "2.x",
+   "package": "composer/ca-bundle",
+   "version": "1.3.7",
+   "branch": "1.x",
    "installed_php": {
-    "requires": "^7.2 || ^8.0",
-    "target_runs": true,
-    "project_allows": true
+    "requires": null,
+    "target_runs": null,
+    "project_allows": null
    },
-   "verdict": "medium",
-   "priority": "medium",
+   "verdict": "ok",
+   "priority": "none",
    "lead": null,
    "rank": 1,
-   "flags": [
-    {
-     "id": "vulnerable",
-     "role": "security",
-     "baseline": null,
-     "signal_ids": [
-      "S9"
-     ],
-     "degree": null,
-     "headline": {
-      "unit": "advisories",
-      "value": 2,
-      "source": null
-     },
-     "summary": "2 advisories: 1 medium, 1 low — all fixed on 2.x; worst: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting"
-    }
-   ],
+   "flags": [],
    "score": {
     "model": 1,
-    "total": 8,
-    "exact": 8,
-    "rounded_down": false,
-    "band": {
-     "floor": 8,
-     "next": "high",
-     "to_next": 8
-    },
-    "decided_by": "security",
-    "parts": {
-     "maintenance": {
-      "status": "none",
-      "contribution": 0,
-      "alone": {
-       "total": 0,
-       "verdict": null
-      }
-     },
-     "security": {
-      "status": "counted",
-      "contribution": 8,
-      "alone": {
-       "total": 8,
-       "verdict": "medium"
-      },
-      "of": 2,
-      "tied": []
-     }
-    },
-    "terms": [
-     {
-      "part": "security",
-      "flag": "vulnerable",
-      "role": "security",
-      "advisory": "PKSA-7jn3-yc49-35c6",
-      "severity": "medium",
-      "fix_kind": "update",
-      "weight": 8,
-      "multiplier": 1,
-      "points": 8,
-      "contribution": 8
-     }
-    ],
-    "modifiers": [],
+    "total": 0,
+    "exact": 0,
     "accepted": [],
-    "without": [
-     {
-      "remove": {
-       "kind": "advisory",
-       "id": "PKSA-7jn3-yc49-35c6"
-      },
-      "revealed": [],
-      "total": 2,
-      "verdict": "low",
-      "lead": null,
-      "deciding_advisory": "PKSA-5mxx-9w1m-fqfb",
-      "at_least": false
-     }
-    ],
-    "text": "8 = vulnerable 8 [medium advisory]"
+    "text": "0"
    },
-   "next_step": {
-    "kind": "update",
-    "source": "vulnerable",
-    "merged": [],
-    "fix_kind": "update",
-    "reason": null,
-    "replacement": null,
-    "quiet_years": null,
-    "to_branch": "2.x",
-    "version": "v2.3.2",
-    "newest": "v2.3.2",
-    "constraint": null,
-    "latest": null,
-    "php_check": {
-     "requires": "^7.2 || ^8.0",
-     "project_allows": true,
-     "target_runs": true,
-     "raise_to": null,
-     "raise_size": null
-    },
-    "crosses_major": false,
-    "held_by": [],
-    "clears": [
-     {
-      "kind": "advisory",
-      "id": "PKSA-7jn3-yc49-35c6",
-      "basis": "outside_range"
-     },
-     {
-      "kind": "advisory",
-      "id": "PKSA-5mxx-9w1m-fqfb",
-      "basis": "outside_range"
-     }
-    ],
-    "unverified": [],
-    "adds": [],
-    "leaves": [],
-    "clears_all": true,
-    "if_applied": {
-     "total": 0,
-     "verdict": "ok",
-     "lead": null,
-     "deciding_advisory": null,
-     "at_most": false,
-     "assumes": [
-      "clears_hold"
-     ]
-    },
-    "check": {
-     "result": "resolves",
-     "form": "with-dependencies",
-     "reason": null,
-     "installs": null
-    },
-    "moves_with": [],
-    "composer_moves_because": [],
-    "commands": [
-     [
-      "composer",
-      "update",
-      "typo3/html-sanitizer:^2.3.2",
-      "--with-dependencies"
-     ]
-    ],
-    "through": [],
-    "also": [],
-    "text": "composer update 'typo3/html-sanitizer:^2.3.2' --with-dependencies (gets v2.3.2) — clears 2 advisories; Composer's solver checked it against the lock"
-   },
+   "next_step": null,
    "security": {
-    "status": "vulnerable",
+    "status": "clear",
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
-    "records": 6,
+    "records": 1,
     "feeds": [
      {
       "composer_repository": "composer repo (https://repo.packagist.org)",
       "registry": "packagist.org",
       "answer": "answered",
-      "records": 6,
+      "records": 1,
       "reason": null
      }
     ],
-    "worst": "medium",
-    "counts": {
-     "critical": 0,
-     "high": 0,
-     "medium": 1,
-     "unrated": 0,
-     "low": 1
-    },
-    "ignored": [],
-    "ignored_count": 0,
-    "fix_kind": "update",
-    "installed_branch_fixes": {
-     "fixed": 2,
-     "unknown": 0,
-     "of": 2,
-     "fix_kind": "update",
-     "lowest": "v2.3.2",
-     "newest": "v2.3.2",
-     "held_by": [],
-     "if_applied": {
-      "total": 0,
-      "verdict": "ok",
-      "at_most": false,
-      "assumes": [
-       "clears_hold"
-      ]
-     },
-     "check": {
-      "result": "resolves",
-      "form": "with-dependencies",
-      "reason": null,
-      "installs": null
+    "ignored": [
+     {
+      "id": "PKSA-ign0-0000-0000",
+      "cve": "CVE-2026-00001",
+      "title": "an advisory the project ignores",
+      "severity": "medium",
+      "by": "audit.ignore",
+      "matched": "id",
+      "reason": "not reachable in our use (‡)"
      }
-    },
-    "move_in": "next_step",
-    "gets": {
-     "version": "v2.3.2",
-     "php_check": {
-      "requires": "^7.2 || ^8.0",
-      "project_allows": true,
-      "target_runs": true,
-      "raise_to": null,
-      "raise_size": null
-     },
-     "clears": [
-      {
-       "kind": "advisory",
-       "id": "PKSA-7jn3-yc49-35c6",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-5mxx-9w1m-fqfb",
-       "basis": "outside_range"
-      }
-     ],
-     "clears_all": true
-    },
-    "partial": null
+    ],
+    "ignored_count": 1
    },
    "checks_missing": [],
    "checks_skipped": [],
@@ -1388,11 +1236,11 @@
     "reason": null,
     "forge": "github",
     "host": "github.com",
-    "repo": "TYPO3/html-sanitizer",
+    "repo": "composer/ca-bundle",
     "event": "push",
     "archived": false,
-    "fetched_at": "2026-10-01T16:06:22+00:00",
-    "cached_at": "2026-10-01T16:06:22+00:00"
+    "fetched_at": "2026-10-01T17:41:33+00:00",
+    "cached_at": null
    },
    "allowlist": null,
    "abandoned_ignored": null,
@@ -1400,7 +1248,7 @@
    "origin": {
     "kind": "packagist",
     "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/typo3/html-sanitizer",
+    "package_url": "https://packagist.org/packages/composer/ca-bundle",
     "local": false
    },
    "replacement": null,
@@ -1412,7 +1260,7 @@
    "dev": false,
    "reach": "direct",
    "chain": [
-    "typo3/html-sanitizer"
+    "composer/ca-bundle"
    ],
    "depth": 0,
    "depth_unmeasured": null,
@@ -1420,103 +1268,42 @@
     "require"
    ],
    "direct_dependents": [
-    "typo3/html-sanitizer"
+    "composer/ca-bundle",
+    "joomla/http",
+    "joomla/oauth1",
+    "joomla/oauth2"
    ],
-   "signals": [
-    {
-     "id": "S9",
-     "level": "warn",
-     "summary": "2 security advisories affect v2.2.0 (CVE-2026-47345, CVE-2026-47344); fixed in v2.3.2",
-     "data": {
-      "advisories": [
-       {
-        "id": "PKSA-7jn3-yc49-35c6",
-        "cve": "CVE-2026-47345",
-        "title": "TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
-        "link": "https://typo3.org/security/advisory/typo3-core-sa-2026-006",
-        "reported_at": "2026-06-08T20:00:00+00:00",
-        "severity": "medium",
-        "severity_published": "medium",
-        "affected_versions": "<2.3.2",
-        "counted": true,
-        "points": 8,
-        "deciding": true,
-        "fix": {
-         "kind": "update",
-         "to_branch": "2.x",
-         "version": "v2.3.2",
-         "newest": "v2.3.2",
-         "on_installed_branch": true,
-         "php": "^7.2 || ^8.0",
-         "admits_target_php": true,
-         "admits_project_php": true,
-         "held_by": [],
-         "reason": null
-        },
-        "baseline": null
-       },
-       {
-        "id": "PKSA-5mxx-9w1m-fqfb",
-        "cve": "CVE-2026-47344",
-        "title": "TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
-        "link": "https://typo3.org/security/advisory/typo3-core-sa-2026-006",
-        "reported_at": "2026-06-08T20:00:00+00:00",
-        "severity": "low",
-        "severity_published": "low",
-        "affected_versions": "<2.3.2",
-        "counted": true,
-        "points": 2,
-        "deciding": false,
-        "fix": {
-         "kind": "update",
-         "to_branch": "2.x",
-         "version": "v2.3.2",
-         "newest": "v2.3.2",
-         "on_installed_branch": true,
-         "php": "^7.2 || ^8.0",
-         "admits_target_php": true,
-         "admits_project_php": true,
-         "held_by": [],
-         "reason": null
-        },
-        "baseline": null
-       }
-      ],
-      "releases_read": true,
-      "complete": true
-     }
-    }
-   ],
-   "evidence": "vulnerable: 2 advisories: 1 medium, 1 low — all fixed on 2.x; worst: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
+   "signals": [],
+   "evidence": "",
    "allowlist_reason": null,
-   "data_date": "2026-10-01T17:41:59+00:00",
-   "libyears": 1.91,
+   "data_date": "2026-10-01T17:41:33+00:00",
+   "libyears": 2.98,
    "age": {
     "installed": {
-     "at": "2024-07-12T15:52:25+00:00",
-     "years": 2.2,
+     "at": "2023-08-30T09:31:38+00:00",
+     "years": 3.1,
      "dated_by": null
     },
     "installed_unmeasured": null,
     "release": {
-     "version": "v2.3.2",
-     "at": "2026-06-08T15:19:36+00:00",
-     "years": 0.3,
+     "version": "1.4.15",
+     "at": "2026-08-21T14:57:32+00:00",
+     "years": 0.1,
      "level": null,
      "dated_by": null
     },
     "release_unmeasured": null,
     "branch_release": {
-     "version": "v2.3.2",
-     "at": "2026-06-08T15:19:36+00:00",
-     "years": 0.3,
+     "version": "1.5.14",
+     "at": "2026-08-21T14:57:29+00:00",
+     "years": 0.1,
      "level": null,
      "dated_by": null
     },
     "branch_release_unmeasured": null,
     "push": {
-     "at": "2026-06-08T15:24:23+00:00",
-     "years": 0.3,
+     "at": "2026-10-01T16:47:29Z",
+     "years": 0,
      "level": null
     },
     "push_unmeasured": null

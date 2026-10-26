@@ -211,7 +211,7 @@ defs['factBaseline'] = nul("A fact's state against the baseline entry (§6.4 \"P
 
 # holders and php checks
 MOVE_CHECK_REASONS = ['baseline_refused', 'unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'no_composer_json',
-                      'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error']
+                      'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete']
 # The reasons that leave the baseline itself unchecked: the budget, a run that cannot solve at all, or a solve that Composer failed on.
 BASELINE_CHECK_REASONS = ['install_time_budget', 'no_composer_json', 'composer_json_invalid', 'solver_error']
 defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the move's `composer update` or `composer require` installs from the lock. "

@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "run.move_check"
+  "error": "run.php_window.target_fix.platform_step"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {
@@ -10,12 +10,12 @@
  },
  "generated_at": "2026-10-01T17:41:20+00:00",
  "run": {
-  "project": "typo3/cms",
-  "root_package": "typo3/cms",
+  "project": "joomla/joomla-cms",
+  "root_package": "joomla/joomla-cms",
   "target_php": "8.4",
   "target_php_source": "option",
-  "project_php": "^8.1",
-  "project_php_lowest": "8.1.0",
+  "project_php": "^7.2.5",
+  "project_php_lowest": "7.2.5",
   "lock_file": "composer.lock",
   "fail_on": "high",
   "fail_on_source": "option",
@@ -812,78 +812,126 @@
      "reason": null,
      "message": null,
      "packages_with_records": 1,
-     "records": 6
+     "records": 5
     }
    ]
   },
-  "move_check": {
-   "composer": "2.10.3",
-   "blocks_advisories": false,
-   "ignores_extensions": true,
-   "baseline": "resolves",
-   "reason": "solver_error"
-  },
+  "move_check": null,
   "php_window": {
    "platform_override": null,
    "host_requires": [],
    "with_dev": {
     "minors": [
-     "8.1",
-     "8.2",
-     "8.3",
-     "8.4",
-     "8.5"
+     "7.2",
+     "7.3",
+     "7.4"
     ],
     "gaps": false,
     "lower_edge": {
-     "php": "8.1.0",
+     "php": "7.2.5",
      "set_by": [
       {
        "name": null,
        "version": null,
        "link": "require",
        "target": "php",
-       "constraint": "^8.1",
+       "constraint": "^7.2.5",
+       "dev": false
+      },
+      {
+       "name": "symfony/yaml",
+       "version": "v5.4.23",
+       "link": "require",
+       "target": "php",
+       "constraint": ">=7.2.5",
        "dev": false
       }
      ]
     },
-    "upper_edge": null,
+    "upper_edge": {
+     "excludes": "8.0",
+     "set_by": [
+      {
+       "name": null,
+       "version": null,
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5",
+       "dev": false
+      }
+     ]
+    },
     "closest": null
    },
    "without_dev": {
     "minors": [
-     "8.1",
-     "8.2",
-     "8.3",
-     "8.4",
-     "8.5"
+     "7.2",
+     "7.3",
+     "7.4"
     ],
     "gaps": false,
     "lower_edge": {
-     "php": "8.1.0",
+     "php": "7.2.5",
      "set_by": [
       {
        "name": null,
        "version": null,
        "link": "require",
        "target": "php",
-       "constraint": "^8.1",
+       "constraint": "^7.2.5",
+       "dev": false
+      },
+      {
+       "name": "symfony/yaml",
+       "version": "v5.4.23",
+       "link": "require",
+       "target": "php",
+       "constraint": ">=7.2.5",
        "dev": false
       }
      ]
     },
-    "upper_edge": null,
+    "upper_edge": {
+     "excludes": "8.0",
+     "set_by": [
+      {
+       "name": null,
+       "version": null,
+       "link": "require",
+       "target": "php",
+       "constraint": "^7.2.5",
+       "dev": false
+      }
+     ]
+    },
     "closest": null
    },
    "target": {
     "php": "8.4.99",
-    "inside": true
+    "inside": false
    },
-   "target_fix": null
+   "target_fix": {
+    "packages": [],
+    "lock_platform": [],
+    "command": null,
+    "check": "refused",
+    "reason": null,
+    "held_by": [
+     {
+      "source": "root",
+      "package": null,
+      "version": null,
+      "link": "require",
+      "target": "php",
+      "constraint": "^7.2.5",
+      "holder": null
+     }
+    ],
+    "platform_step": "yes"
+   }
   }
  },
- "activity_cache_oldest_at": "2026-10-01T16:06:22+00:00",
+ "activity_cache_oldest_at": "2026-10-01T16:05:49+00:00",
  "activity_cache_age_hours": 1.6,
  "packages_checked": 1,
  "packages_flagged": 1,
@@ -895,8 +943,8 @@
  "counts": {
   "critical": 0,
   "high": 0,
-  "medium": 1,
-  "low": 0,
+  "medium": 0,
+  "low": 1,
   "unknown": 0,
   "finished": 0,
   "ok": 0
@@ -909,8 +957,8 @@
  "priorities": {
   "critical": 0,
   "high": 0,
-  "medium": 1,
-  "low": 0,
+  "medium": 0,
+  "low": 1,
   "none": 0
  },
  "flags": {
@@ -1019,8 +1067,8 @@
    "by_verdict": {
     "critical": 0,
     "high": 0,
-    "medium": 1,
-    "low": 0
+    "medium": 0,
+    "low": 1
    }
   }
  },
@@ -1055,8 +1103,8 @@
   "deepest": []
  },
  "libyears": {
-  "total": 1.91,
-  "direct_requirements": 1.91,
+  "total": 3.43,
+  "direct_requirements": 3.43,
   "measured": 1,
   "at_least_count": 0,
   "unmeasured": {
@@ -1070,9 +1118,9 @@
    "undated_releases": 0
   },
   "furthest_behind": {
-   "package": "typo3/html-sanitizer",
-   "version": "v2.2.0",
-   "libyears": 1.91,
+   "package": "symfony/yaml",
+   "version": "v5.4.23",
+   "libyears": 3.43,
    "at_least": false
   },
   "packages": 1
@@ -1112,15 +1160,15 @@
    "clear": 0
   },
   "advisories": {
-   "counted": 2,
+   "counted": 3,
    "ignored": 0
   },
   "severities": {
    "critical": 0,
    "high": 0,
-   "medium": 1,
+   "medium": 0,
    "unrated": 0,
-   "low": 1
+   "low": 3
   },
   "fixes": {
    "update": 1,
@@ -1130,25 +1178,31 @@
    "blocked": 0,
    "none": 0
   },
-  "update_now": [],
-  "update_now_command": null,
+  "update_now": [
+   "symfony/yaml"
+  ],
+  "update_now_command": [
+   "composer",
+   "update",
+   "symfony/yaml"
+  ],
   "fix_unknown": 0
  },
- "data_date": "2026-10-01T17:41:59+00:00",
+ "data_date": "2026-10-01T17:41:33+00:00",
  "notes": [],
  "note_details": [],
  "findings": [
   {
-   "package": "typo3/html-sanitizer",
-   "version": "v2.2.0",
-   "branch": "2.x",
+   "package": "symfony/yaml",
+   "version": "v5.4.23",
+   "branch": "5.x",
    "installed_php": {
-    "requires": "^7.2 || ^8.0",
+    "requires": ">=7.2.5",
     "target_runs": true,
     "project_allows": true
    },
-   "verdict": "medium",
-   "priority": "medium",
+   "verdict": "low",
+   "priority": "low",
    "lead": null,
    "rank": 1,
    "flags": [
@@ -1162,21 +1216,21 @@
      "degree": null,
      "headline": {
       "unit": "advisories",
-      "value": 2,
+      "value": 3,
       "source": null
      },
-     "summary": "2 advisories: 1 medium, 1 low — all fixed on 2.x; worst: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting"
+     "summary": "3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings"
     }
    ],
    "score": {
     "model": 1,
-    "total": 8,
-    "exact": 8,
+    "total": 2,
+    "exact": 2,
     "rounded_down": false,
     "band": {
-     "floor": 8,
-     "next": "high",
-     "to_next": 8
+     "floor": 1,
+     "next": "medium",
+     "to_next": 6
     },
     "decided_by": "security",
     "parts": {
@@ -1190,13 +1244,16 @@
      },
      "security": {
       "status": "counted",
-      "contribution": 8,
+      "contribution": 2,
       "alone": {
-       "total": 8,
-       "verdict": "medium"
+       "total": 2,
+       "verdict": "low"
       },
-      "of": 2,
-      "tied": []
+      "of": 3,
+      "tied": [
+       "PKSA-ft77-7h5f-p3r6",
+       "PKSA-v5yj-8nmz-sk2q"
+      ]
      }
     },
     "terms": [
@@ -1204,13 +1261,13 @@
       "part": "security",
       "flag": "vulnerable",
       "role": "security",
-      "advisory": "PKSA-7jn3-yc49-35c6",
-      "severity": "medium",
+      "advisory": "PKSA-b14r-zh1d-vdrc",
+      "severity": "low",
       "fix_kind": "update",
-      "weight": 8,
+      "weight": 2,
       "multiplier": 1,
-      "points": 8,
-      "contribution": 8
+      "points": 2,
+      "contribution": 2
      }
     ],
     "modifiers": [],
@@ -1219,17 +1276,17 @@
      {
       "remove": {
        "kind": "advisory",
-       "id": "PKSA-7jn3-yc49-35c6"
+       "id": "PKSA-b14r-zh1d-vdrc"
       },
       "revealed": [],
       "total": 2,
       "verdict": "low",
       "lead": null,
-      "deciding_advisory": "PKSA-5mxx-9w1m-fqfb",
+      "deciding_advisory": "PKSA-ft77-7h5f-p3r6",
       "at_least": false
      }
     ],
-    "text": "8 = vulnerable 8 [medium advisory]"
+    "text": "2 = vulnerable 2 [low advisory]"
    },
    "next_step": {
     "kind": "update",
@@ -1239,13 +1296,13 @@
     "reason": null,
     "replacement": null,
     "quiet_years": null,
-    "to_branch": "2.x",
-    "version": "v2.3.2",
-    "newest": "v2.3.2",
+    "to_branch": "5.x",
+    "version": "v5.4.52",
+    "newest": "v5.4.53",
     "constraint": null,
     "latest": null,
     "php_check": {
-     "requires": "^7.2 || ^8.0",
+     "requires": ">=7.2.5",
      "project_allows": true,
      "target_runs": true,
      "raise_to": null,
@@ -1256,12 +1313,17 @@
     "clears": [
      {
       "kind": "advisory",
-      "id": "PKSA-7jn3-yc49-35c6",
+      "id": "PKSA-b14r-zh1d-vdrc",
       "basis": "outside_range"
      },
      {
       "kind": "advisory",
-      "id": "PKSA-5mxx-9w1m-fqfb",
+      "id": "PKSA-ft77-7h5f-p3r6",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-v5yj-8nmz-sk2q",
       "basis": "outside_range"
      }
     ],
@@ -1279,59 +1341,60 @@
       "clears_hold"
      ]
     },
-    "check": {
-     "result": "resolves",
-     "form": "with-dependencies",
-     "reason": null,
-     "installs": null
-    },
+    "check": null,
     "moves_with": [],
     "composer_moves_because": [],
     "commands": [
      [
       "composer",
       "update",
-      "typo3/html-sanitizer:^2.3.2",
-      "--with-dependencies"
+      "symfony/yaml"
+     ],
+     [
+      "composer",
+      "why-not",
+      "symfony/yaml",
+      "v5.4.52",
+      "--locked"
      ]
     ],
     "through": [],
     "also": [],
-    "text": "composer update 'typo3/html-sanitizer:^2.3.2' --with-dependencies (gets v2.3.2) — clears 2 advisories; Composer's solver checked it against the lock"
+    "text": "composer update symfony/yaml (gets v5.4.53) — clears 3 advisories"
    },
    "security": {
     "status": "vulnerable",
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
-    "records": 6,
+    "records": 5,
     "feeds": [
      {
       "composer_repository": "composer repo (https://repo.packagist.org)",
       "registry": "packagist.org",
       "answer": "answered",
-      "records": 6,
+      "records": 5,
       "reason": null
      }
     ],
-    "worst": "medium",
+    "worst": "low",
     "counts": {
      "critical": 0,
      "high": 0,
-     "medium": 1,
+     "medium": 0,
      "unrated": 0,
-     "low": 1
+     "low": 3
     },
     "ignored": [],
     "ignored_count": 0,
     "fix_kind": "update",
     "installed_branch_fixes": {
-     "fixed": 2,
+     "fixed": 3,
      "unknown": 0,
-     "of": 2,
+     "of": 3,
      "fix_kind": "update",
-     "lowest": "v2.3.2",
-     "newest": "v2.3.2",
+     "lowest": "v5.4.52",
+     "newest": "v5.4.53",
      "held_by": [],
      "if_applied": {
       "total": 0,
@@ -1341,18 +1404,13 @@
        "clears_hold"
       ]
      },
-     "check": {
-      "result": "resolves",
-      "form": "with-dependencies",
-      "reason": null,
-      "installs": null
-     }
+     "check": null
     },
     "move_in": "next_step",
     "gets": {
-     "version": "v2.3.2",
+     "version": "v5.4.53",
      "php_check": {
-      "requires": "^7.2 || ^8.0",
+      "requires": ">=7.2.5",
       "project_allows": true,
       "target_runs": true,
       "raise_to": null,
@@ -1361,12 +1419,17 @@
      "clears": [
       {
        "kind": "advisory",
-       "id": "PKSA-7jn3-yc49-35c6",
+       "id": "PKSA-b14r-zh1d-vdrc",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-5mxx-9w1m-fqfb",
+       "id": "PKSA-ft77-7h5f-p3r6",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-v5yj-8nmz-sk2q",
        "basis": "outside_range"
       }
      ],
@@ -1388,11 +1451,11 @@
     "reason": null,
     "forge": "github",
     "host": "github.com",
-    "repo": "TYPO3/html-sanitizer",
+    "repo": "symfony/yaml",
     "event": "push",
     "archived": false,
-    "fetched_at": "2026-10-01T16:06:22+00:00",
-    "cached_at": "2026-10-01T16:06:22+00:00"
+    "fetched_at": "2026-10-01T16:05:49+00:00",
+    "cached_at": "2026-10-01T16:05:49+00:00"
    },
    "allowlist": null,
    "abandoned_ignored": null,
@@ -1400,7 +1463,7 @@
    "origin": {
     "kind": "packagist",
     "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/typo3/html-sanitizer",
+    "package_url": "https://packagist.org/packages/symfony/yaml",
     "local": false
    },
    "replacement": null,
@@ -1412,7 +1475,7 @@
    "dev": false,
    "reach": "direct",
    "chain": [
-    "typo3/html-sanitizer"
+    "symfony/yaml"
    ],
    "depth": 0,
    "depth_unmeasured": null,
@@ -1420,34 +1483,34 @@
     "require"
    ],
    "direct_dependents": [
-    "typo3/html-sanitizer"
+    "symfony/yaml"
    ],
    "signals": [
     {
      "id": "S9",
      "level": "warn",
-     "summary": "2 security advisories affect v2.2.0 (CVE-2026-47345, CVE-2026-47344); fixed in v2.3.2",
+     "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
      "data": {
       "advisories": [
        {
-        "id": "PKSA-7jn3-yc49-35c6",
-        "cve": "CVE-2026-47345",
-        "title": "TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
-        "link": "https://typo3.org/security/advisory/typo3-core-sa-2026-006",
-        "reported_at": "2026-06-08T20:00:00+00:00",
-        "severity": "medium",
-        "severity_published": "medium",
-        "affected_versions": "<2.3.2",
+        "id": "PKSA-b14r-zh1d-vdrc",
+        "cve": "CVE-2026-45133",
+        "title": "YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+        "link": "https://symfony.com/cve-2026-45133",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
         "counted": true,
-        "points": 8,
+        "points": 2,
         "deciding": true,
         "fix": {
          "kind": "update",
-         "to_branch": "2.x",
-         "version": "v2.3.2",
-         "newest": "v2.3.2",
+         "to_branch": "5.x",
+         "version": "v5.4.52",
+         "newest": "v5.4.53",
          "on_installed_branch": true,
-         "php": "^7.2 || ^8.0",
+         "php": ">=7.2.5",
          "admits_target_php": true,
          "admits_project_php": true,
          "held_by": [],
@@ -1456,24 +1519,50 @@
         "baseline": null
        },
        {
-        "id": "PKSA-5mxx-9w1m-fqfb",
-        "cve": "CVE-2026-47344",
-        "title": "TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
-        "link": "https://typo3.org/security/advisory/typo3-core-sa-2026-006",
-        "reported_at": "2026-06-08T20:00:00+00:00",
+        "id": "PKSA-ft77-7h5f-p3r6",
+        "cve": "CVE-2026-45305",
+        "title": "YAML Parser ReDoS via Catastrophic Backtracking in Parser::cleanup() Regex",
+        "link": "https://symfony.com/cve-2026-45305",
+        "reported_at": "2026-05-20T08:00:00+00:00",
         "severity": "low",
         "severity_published": "low",
-        "affected_versions": "<2.3.2",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
         "counted": true,
         "points": 2,
         "deciding": false,
         "fix": {
          "kind": "update",
-         "to_branch": "2.x",
-         "version": "v2.3.2",
-         "newest": "v2.3.2",
+         "to_branch": "5.x",
+         "version": "v5.4.52",
+         "newest": "v5.4.53",
          "on_installed_branch": true,
-         "php": "^7.2 || ^8.0",
+         "php": ">=7.2.5",
+         "admits_target_php": true,
+         "admits_project_php": true,
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-v5yj-8nmz-sk2q",
+        "cve": "CVE-2026-45304",
+        "title": "YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion (\"Billion Laughs\")",
+        "link": "https://symfony.com/cve-2026-45304",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+        "counted": true,
+        "points": 2,
+        "deciding": false,
+        "fix": {
+         "kind": "update",
+         "to_branch": "5.x",
+         "version": "v5.4.52",
+         "newest": "v5.4.53",
+         "on_installed_branch": true,
+         "php": ">=7.2.5",
          "admits_target_php": true,
          "admits_project_php": true,
          "held_by": [],
@@ -1487,36 +1576,36 @@
      }
     }
    ],
-   "evidence": "vulnerable: 2 advisories: 1 medium, 1 low — all fixed on 2.x; worst: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
+   "evidence": "vulnerable: 3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
    "allowlist_reason": null,
-   "data_date": "2026-10-01T17:41:59+00:00",
-   "libyears": 1.91,
+   "data_date": "2026-10-01T17:41:33+00:00",
+   "libyears": 3.43,
    "age": {
     "installed": {
-     "at": "2024-07-12T15:52:25+00:00",
-     "years": 2.2,
+     "at": "2023-04-23T19:33:36+00:00",
+     "years": 3.4,
      "dated_by": null
     },
     "installed_unmeasured": null,
     "release": {
-     "version": "v2.3.2",
-     "at": "2026-06-08T15:19:36+00:00",
-     "years": 0.3,
+     "version": "v8.1.8",
+     "at": "2026-09-26T06:33:49+00:00",
+     "years": 0,
      "level": null,
      "dated_by": null
     },
     "release_unmeasured": null,
     "branch_release": {
-     "version": "v2.3.2",
-     "at": "2026-06-08T15:19:36+00:00",
-     "years": 0.3,
+     "version": "v5.4.53",
+     "at": "2026-05-20T17:13:41+00:00",
+     "years": 0.4,
      "level": null,
      "dated_by": null
     },
     "branch_release_unmeasured": null,
     "push": {
-     "at": "2026-06-08T15:24:23+00:00",
-     "years": 0.3,
+     "at": "2026-10-01T12:53:29+00:00",
+     "years": 0,
      "level": null
     },
     "push_unmeasured": null

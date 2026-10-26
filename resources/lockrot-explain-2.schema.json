@@ -2264,6 +2264,34 @@
                     ]
                 },
                 {
+                    "description": "`moves_with` is empty unless `check.result` is `resolves`, and a move with entries has an empty `held_by`.",
+                    "anyOf": [
+                        {
+                            "properties": {
+                                "moves_with": {
+                                    "maxItems": 0
+                                }
+                            }
+                        },
+                        {
+                            "properties": {
+                                "check": {
+                                    "properties": {
+                                        "result": {
+                                            "enum": [
+                                                "resolves"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "held_by": {
+                                    "maxItems": 0
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
                     "description": "A security move carries its fix kind: `source` or `merged` holds `vulnerable`.",
                     "anyOf": [
                         {
@@ -14664,6 +14692,34 @@
                     ]
                 },
                 {
+                    "description": "`moves_with` is empty unless `check.result` is `resolves`, and a move with entries has an empty `held_by`.",
+                    "anyOf": [
+                        {
+                            "properties": {
+                                "moves_with": {
+                                    "maxItems": 0
+                                }
+                            }
+                        },
+                        {
+                            "properties": {
+                                "check": {
+                                    "properties": {
+                                        "result": {
+                                            "enum": [
+                                                "resolves"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "held_by": {
+                                    "maxItems": 0
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
                     "description": "A security move carries its fix kind: `source` or `merged` holds `vulnerable`.",
                     "anyOf": [
                         {
@@ -15049,7 +15105,8 @@
                                         "composer_json_invalid",
                                         "no_release_read",
                                         "pass_cap",
-                                        "solver_error"
+                                        "solver_error",
+                                        "advisory_lookup_incomplete"
                                     ]
                                 },
                                 {
@@ -16158,7 +16215,8 @@
                         "composer_json_invalid",
                         "no_release_read",
                         "pass_cap",
-                        "solver_error"
+                        "solver_error",
+                        "advisory_lookup_incomplete"
                     ]
                 },
                 "packages": {
