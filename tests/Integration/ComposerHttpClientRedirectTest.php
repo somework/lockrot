@@ -6,8 +6,8 @@ namespace Lockrot\Tests\Integration;
 
 use Composer\Composer;
 use Composer\Factory;
-use Composer\Util\Filesystem;
 use Composer\IO\NullIO;
+use Composer\Util\Filesystem;
 use Composer\Util\HttpDownloader;
 use Lockrot\Clock;
 use Lockrot\Composer\ComposerHttpClient;

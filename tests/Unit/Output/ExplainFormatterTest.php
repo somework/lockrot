@@ -219,6 +219,21 @@ final class ExplainFormatterTest extends TestCase
         self::assertSame($plain, str_replace(["\033[1m", "\033[22m", "\033[31m", "\033[39m"], '', $decorated), 'nothing but lockrot\'s styles');
     }
 
+    /** A terminal obeys a control character from the lock, so each prints as an escape. */
+    public function testControlCharactersFromOutsidePrintAsEscapes(): void
+    {
+        $evil = "evil\x1b]52;c;cHduZWQ=\x07\x1b[2J\u{9B}31m\ntail";
+        $finding = (new FindingBuilder())->withPackage('vendor/'.$evil)->withVersion($evil)->withVerdict(Verdict::ABANDONED)->withChain(['vendor/'.$evil])->build();
+        $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.0.0'])), new Thresholds(), '8.4', self::report(['run: '.$evil]));
+
+        $plain = ConsoleMarkup::render((new ExplainFormatter())->text($explanation), false);
+
+        $shown = 'evil\x1B]52;c;cHduZWQ=\x07\x1B[2J\u{009B}31m\ntail';
+        self::assertSame(0, preg_match('/[\x00-\x09\x0B-\x1F\x7F]|\xC2[\x80-\x9F]/', $plain), 'no control character but the line feed');
+        self::assertStringStartsWith('vendor/'.$shown.' '.$shown.' — ', $plain);
+        self::assertStringEndsWith("\nnote: run: ".$shown."\n", $plain);
+    }
+
     /**
      * An advisory's CVE and title come from the feed: they print as written in the score and flags
      * blocks.

@@ -100,6 +100,21 @@ final class GithubFormatterTest extends TestCase
         self::assertStringNotContainsString('a/r4', $out);
     }
 
+    /** The Actions log renders ANSI sequences, so a control character from the lock prints as an escape. */
+    public function testControlCharactersFromOutsidePrintAsEscapes(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $evil = "evil\x1b]52;c;cHduZWQ=\x07\x1b[2J\u{9B}31m\ntail";
+        $report = new Report([
+            (new FindingBuilder())->withPackage('vendor/'.$evil)->withVerdict(Verdict::ABANDONED)->withChain(['vendor/'.$evil])->withDataDate($at)->build(),
+        ], Notes::texts(['note '.$evil]), $at, 1, 0);
+
+        $out = $this->formatter('none', null)->format($report);
+
+        self::assertSame(0, preg_match('/[\x00-\x09\x0B-\x1F\x7F]|\xC2[\x80-\x9F]/', $out), 'no control character but the line feed');
+        self::assertStringContainsString('vendor/evil\x1B]52;c;cHduZWQ=\x07\x1B[2J\u{009B}31m%0Atail', $out);
+    }
+
     private function formatter(string $failOn, ?string $lockPath): GithubFormatter
     {
         return new GithubFormatter(FormatContext::create($lockPath, $failOn));

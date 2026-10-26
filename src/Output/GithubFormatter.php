@@ -161,11 +161,17 @@ final class GithubFormatter implements FormatterInterface
 
     private static function escapeData(string $value): string
     {
-        return str_replace(['%', "\r", "\n"], ['%25', '%0D', '%0A'], $value);
+        return str_replace(['%', "\r", "\n"], ['%25', '%0D', '%0A'], self::neutralised($value));
     }
 
     private static function escapeProperty(string $value): string
     {
-        return str_replace(['%', "\r", "\n", ':', ','], ['%25', '%0D', '%0A', '%3A', '%2C'], $value);
+        return str_replace(['%', "\r", "\n", ':', ','], ['%25', '%0D', '%0A', '%3A', '%2C'], self::neutralised($value));
+    }
+
+    /** The Actions log renders ANSI sequences. Line breaks stay, for the `%0A` of a workflow command. */
+    private static function neutralised(string $value): string
+    {
+        return implode("\n", array_map([TerminalText::class, 'neutralise'], explode("\n", $value)));
     }
 }

@@ -465,6 +465,6 @@ final class ExplainFormatter
 
     private static function escape(string $text): string
     {
-        return ConsoleMarkup::escape($text);
+        return ConsoleMarkup::escape(TerminalText::neutralise($text));
     }
 }

@@ -264,6 +264,23 @@ final class TableFormatterTest extends TestCase
         self::assertSame($plain, str_replace(["\033[31m", "\033[39m", "\033[1m", "\033[22m"], '', $decorated), 'nothing but lockrot\'s styles');
     }
 
+    /** A terminal obeys a control character from the lock (OSC 52 writes the clipboard), so each prints as an escape, on its own line. */
+    public function testControlCharactersFromOutsidePrintAsEscapes(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $evil = "evil\x1b]52;c;cHduZWQ=\x07\x1b[2J\u{9B}31m\ntail";
+        $report = new Report([
+            (new FindingBuilder())->withPackage('vendor/'.$evil)->withVersion($evil)->withVerdict(Verdict::ABANDONED)->withChain(['vendor/'.$evil])->withDataDate($at)->build(),
+        ], Notes::texts(['note '.$evil]), $at, 1, 0);
+
+        $plain = ConsoleMarkup::render(self::formatter(400)->format($report), false);
+
+        $shown = 'evil\x1B]52;c;cHduZWQ=\x07\x1B[2J\u{009B}31m\ntail';
+        self::assertSame(0, preg_match('/[\x00-\x09\x0B-\x1F\x7F]|\xC2[\x80-\x9F]/', $plain), 'no control character but the line feed');
+        self::assertStringContainsString('vendor/'.$shown.' '.$shown, $plain);
+        self::assertStringContainsString("\nnote: note ".$shown."\n", $plain);
+    }
+
     /** @return iterable<string, array{string}> */
     public static function textsThatLookLikeMarkup(): iterable
     {

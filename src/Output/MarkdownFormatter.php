@@ -162,7 +162,8 @@ final class MarkdownFormatter implements FormatterInterface
         $spans = [];
         $name = static function (string $package) use (&$spans): string {
             $placeholder = \sprintf("\x00%d\x00", \count($spans));
-            $spans[$placeholder] = self::code($package);
+            // The key is the placeholder as self::text() writes it, because the spans go in after it.
+            $spans[self::text($placeholder)] = self::code($package);
 
             return $placeholder;
         };
@@ -206,7 +207,7 @@ final class MarkdownFormatter implements FormatterInterface
     /** Plain text for a table cell or a bullet: one line, nothing that renders as markup. */
     private static function text(string $value): string
     {
-        $value = str_replace(["\r\n", "\r", "\n"], ' ', $value);
+        $value = TerminalText::neutralise(str_replace(["\r\n", "\r", "\n"], ' ', $value));
         foreach (self::ESCAPED as $character) {
             $value = str_replace($character, '\\'.$character, $value);
         }
@@ -221,7 +222,7 @@ final class MarkdownFormatter implements FormatterInterface
      */
     private static function code(string $value): string
     {
-        $value = str_replace(["\r\n", "\r", "\n"], ' ', $value);
+        $value = TerminalText::neutralise(str_replace(["\r\n", "\r", "\n"], ' ', $value));
         $value = str_replace('|', '\\|', $value);
         $longest = 0;
         preg_match_all('/`+/', $value, $runs);

@@ -169,6 +169,21 @@ final class MarkdownFormatterTest extends TestCase
         self::assertSame(0, preg_match('/(?<!\\\\)<(img|script|b>)/', $out), 'every < from package metadata is escaped');
     }
 
+    /** A job summary or a terminal that shows the comment can obey a control character, so each prints as an escape. */
+    public function testControlCharactersFromOutsidePrintAsEscapes(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $evil = "evil\x1b]52;c;cHduZWQ=\x07\x1b[2J\u{9B}31m";
+        $report = new Report([
+            (new FindingBuilder())->withPackage('vendor/'.$evil)->withVerdict(Verdict::ABANDONED)->withChain(['vendor/'.$evil])->withDataDate($at)->build(),
+        ], Notes::texts(['note '.$evil]), $at, 1, 0);
+
+        $out = self::formatter()->format($report);
+
+        self::assertSame(0, preg_match('/[\x00-\x09\x0B-\x1F\x7F]|\xC2[\x80-\x9F]/', $out), 'no control character but the line feed');
+        self::assertStringContainsString('- note: note evil\\\\x1B\\]52;c;cHduZWQ=\\\\x07\\\\x1B\\[2J\\\\u{009B}31m', $out);
+    }
+
     public function testEveryKindOfLineBreakInACellFoldsIntoOneSpace(): void
     {
         $at = new \DateTimeImmutable(self::AT);
