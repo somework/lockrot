@@ -470,6 +470,7 @@ final class ComposerSolverTest extends TestCase
 
         self::assertTrue($solver->solve(SolveRequest::baseline())->resolves(), 'the lock installs with its alias');
         self::assertFalse($solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => 'dev-main']))->resolves(), 'the branch satisfies the consumer only through the old alias');
+        self::assertTrue($solver->solve(SolveRequest::require('acme/consumer', ['acme/consumer' => '^1.0'])->withTransitive(SolveRequest::WITH_ALL_DEPENDENCIES))->resolves(), 'a require of another name keeps the alias of the branch that it unlocks');
     }
 
     public function testARequireDropsTheBetaFlagOfTheOldConstraintAndTakesTheFlagOfTheNewOne(): void
