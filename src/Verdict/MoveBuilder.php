@@ -166,9 +166,7 @@ final class MoveBuilder
         if (!$subject->isListed()) {
             return MoveQuery::update($subject->package(), $constraint, $version, $php, $newest);
         }
-        $query = MoveQuery::require($subject->package(), $constraint, $version, $php, $newest);
-
-        return $subject->isListedInRequireDevOnly() ? $query->inRequireDev() : $query;
+        return MoveQuery::require($subject->package(), $constraint, $version, $php, $newest)->withRequireDev($subject->isListedInRequireDevOnly());
     }
 
     /** @return list<string> the counted maintenance flags in flag order */

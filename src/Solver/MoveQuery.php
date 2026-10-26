@@ -46,11 +46,11 @@ final class MoveQuery
         return new self($package, $constraint, $version, true, $php, $newest);
     }
 
-    /** A copy for a package that only `require-dev` lists: `composer require --dev`. */
-    public function inRequireDev(): self
+    /** A copy that writes the requirement into `require-dev` when $requireDev is set: `composer require --dev`. */
+    public function withRequireDev(bool $requireDev): self
     {
         $clone = clone $this;
-        $clone->dev = $this->isRequire;
+        $clone->dev = $requireDev && $this->isRequire;
 
         return $clone;
     }
@@ -88,7 +88,7 @@ final class MoveQuery
     /** One key per Composer request: two moves with one request share one check. */
     public function key(): string
     {
-        return implode(' ', [$this->isRequire ? ($this->dev ? 'require --dev' : 'require') : 'update', $this->package, $this->constraint, $this->php]);
+        return implode(' ', [$this->isRequire ? 'require' : 'update', $this->package, $this->constraint, $this->php]);
     }
 
     public function request(): SolveRequest

@@ -59,11 +59,13 @@ final class UpdateNowTest extends TestCase
     {
         $case = CaseHydrator::case('move-check‡');
         $inputs = JsonPath::arrayAt($case, ['inputs']);
-        $inputs['checks'] = ['*' => [
-            'result' => 'refused', 'form' => null, 'reason' => null,
-            'holds' => [['source' => 'package', 'package' => 'h/x', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^2.0']],
-            'joint' => ['names' => [self::PACKAGE, 'h/x'], 'result' => 'resolves', 'form' => 'inline', 'installs' => [self::PACKAGE => 'v2.3.2', 'h/x' => '2.0.0'], 'holds' => []],
-        ]];
+        $inputs['checks'] = [
+            '*' => [
+                'result' => 'refused', 'form' => null, 'reason' => null,
+                'holds' => [['source' => 'package', 'package' => 'h/x', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^2.0']],
+            ],
+            'joint *' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => [self::PACKAGE => 'v2.3.2', 'h/x' => '2.0.0'], 'holds' => []],
+        ];
         $case['inputs'] = $inputs;
 
         $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());

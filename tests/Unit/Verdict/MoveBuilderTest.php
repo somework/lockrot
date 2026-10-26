@@ -290,7 +290,7 @@ final class MoveBuilderTest extends TestCase
     /** monica's firebase/php-jwt: Composer refuses the move alone, and one request of the package and its holder h/x resolves it. */
     public function testARootRequirementThatAJointRequestResolvesWritesItThenUpdatesThePackageWithItsHolders(): void
     {
-        [$row, $context] = self::checked(['require a/b ^2.0 ' => self::refusedThenJoint()], true, true, null, ['a/b' => '^1.0']);
+        [$row, $context] = self::checked(self::refusedThenJoint('require a/b ^2.0 '), true, true, null, ['a/b' => '^1.0']);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
@@ -305,7 +305,7 @@ final class MoveBuilderTest extends TestCase
 
     public function testAnUpdateThatAJointRequestResolvesNamesItsHoldersInTheSameStep(): void
     {
-        [$row, $context] = self::checked(['update a/b ^2.0.0 ' => self::refusedThenJoint()], false);
+        [$row, $context] = self::checked(self::refusedThenJoint('update a/b ^2.0.0 '), false);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::LEFT_BEHIND)->to($row, $lower, null), [], null, $context);
@@ -315,7 +315,7 @@ final class MoveBuilderTest extends TestCase
 
     public function testAPackageThatOnlyRequireDevListsGetsTheRequireCommandOfThatSection(): void
     {
-        [$row, $context] = self::checked(['require --dev a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, true, null, [], null, [], ['require-dev']);
+        [$row, $context] = self::checked(['require a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, true, null, [], null, [], ['require-dev']);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
@@ -326,13 +326,15 @@ final class MoveBuilderTest extends TestCase
         self::assertSame([MoveCheck::RESOLVES, [['composer', 'require', 'a/b:^2.0', '--dev']]], [$check->result(), $move->commands()]);
     }
 
-    /** @return array<string, mixed> a refusal by the holder h/x 1.0.0, and the joint request that moves h/x to 2.1.0 */
-    private static function refusedThenJoint(): array
+    /** @return array<string, array<string, mixed>> the refusal of $key by the holder h/x 1.0.0, and the joint request that moves h/x to 2.1.0 */
+    private static function refusedThenJoint(string $key): array
     {
         return [
-            'result' => 'refused', 'form' => null, 'reason' => null,
-            'holds' => [['source' => 'package', 'package' => 'h/x', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^1.0', 'holder' => null]],
-            'joint' => ['names' => ['a/b', 'h/x'], 'result' => 'resolves', 'form' => 'inline', 'installs' => ['a/b' => '2.0.0', 'h/x' => '2.1.0'], 'holds' => []],
+            $key => [
+                'result' => 'refused', 'form' => null, 'reason' => null,
+                'holds' => [['source' => 'package', 'package' => 'h/x', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^1.0', 'holder' => null]],
+            ],
+            'joint '.rtrim($key).' with h/x' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => ['a/b' => '2.0.0', 'h/x' => '2.1.0'], 'holds' => []],
         ];
     }
 

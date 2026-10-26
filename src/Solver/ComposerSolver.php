@@ -387,12 +387,12 @@ final class ComposerSolver
         return trim((string) preg_replace('/, (?:actual: [^)]*|same as actual)\)/', ')', $text));
     }
 
-    /** @return array<string, string> name => the pretty version that the solve installs, for each name it installs or moves */
+    /** @return array<string, string> name => the pretty version that the solve installs, for each name it installs or moves to another version */
     private static function installs(LockTransaction $transaction): array
     {
         $installs = [];
         foreach ($transaction->getOperations() as $operation) {
-            if ($operation instanceof UpdateOperation) {
+            if ($operation instanceof UpdateOperation && self::movesVersion($operation)) {
                 $installs[$operation->getTargetPackage()->getName()] = $operation->getTargetPackage()->getPrettyVersion();
             } elseif ($operation instanceof InstallOperation) {
                 $installs[$operation->getPackage()->getName()] = $operation->getPackage()->getPrettyVersion();
@@ -403,12 +403,18 @@ final class ComposerSolver
         return $installs;
     }
 
+    /** Another reference of the same tag is no move. A branch moves with its reference. */
+    private static function movesVersion(UpdateOperation $operation): bool
+    {
+        return $operation->getTargetPackage()->isDev() || $operation->getTargetPackage()->getVersion() !== $operation->getInitialPackage()->getVersion();
+    }
+
     /** @return array<string, string> name => the locked pretty version, for each name that the solve updates */
     private static function updatedFrom(LockTransaction $transaction): array
     {
         $from = [];
         foreach ($transaction->getOperations() as $operation) {
-            if ($operation instanceof UpdateOperation) {
+            if ($operation instanceof UpdateOperation && self::movesVersion($operation)) {
                 $from[$operation->getInitialPackage()->getName()] = $operation->getInitialPackage()->getPrettyVersion();
             }
         }
