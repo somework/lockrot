@@ -53,10 +53,8 @@ final class GithubFormatter implements FormatterInterface
         $name = static fn (string $package): string => $package;
         $updateNow = RunFooter::updateNow($report);
         foreach ([RunFooter::flags($report), RunFooter::depth($report, $name), RunFooter::security($report, false), $updateNow === null ? null : 'update now: '.RunFooter::platformStep($report).$updateNow, RunFooter::phpWindow($report, $name), RunGateText::render($gate, $this->context->runOf($report))] as $line) {
-            // A plain log line, not an annotation. A package name comes unvalidated from the lock, so
-            // fold line breaks into spaces: a `::` after one runs as a workflow command.
             if ($line !== null) {
-                $lines[] = str_replace(["\r\n", "\r", "\n"], ' ', $line);
+                $lines[] = self::plainLine($line);
             }
         }
 
@@ -159,6 +157,16 @@ final class GithubFormatter implements FormatterInterface
     }
 
 
+    /**
+     * A plain log line, not an annotation, holds text from the lock. A `::` after a line break runs
+     * as a workflow command, and the runner reads a legacy `##[` command anywhere in a line:
+     * https://github.com/actions/runner/blob/main/src/Runner.Worker/ActionCommandManager.cs
+     */
+    private static function plainLine(string $line): string
+    {
+        return str_replace('##[', '##\x5B', TerminalText::neutralise(str_replace(["\r\n", "\r", "\n"], ' ', $line)));
+    }
+
     private static function escapeData(string $value): string
     {
         return str_replace(['%', "\r", "\n"], ['%25', '%0D', '%0A'], self::neutralised($value));
@@ -172,6 +180,6 @@ final class GithubFormatter implements FormatterInterface
     /** The Actions log renders ANSI sequences. Line breaks stay, for the `%0A` of a workflow command. */
     private static function neutralised(string $value): string
     {
-        return implode("\n", array_map([TerminalText::class, 'neutralise'], explode("\n", $value)));
+        return TerminalText::neutraliseLines($value);
     }
 }

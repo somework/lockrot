@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **high** | `symfony/debug` | v3.4.47 | abandoned · old-promise | `18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 unreached`<br>**Do:** replace with symfony/error-handler (named by its registry); lockrot found no path from your requirements to it: \`composer why\` names what requires it<br>*abandoned:* marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on GitHub; last release 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago)<br>*old-promise:* released 2020-10-24 for PHP 5 (php "^5.5.9\|\>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested |  |
+| **high** | `symfony/debug` | v3.4.47 | abandoned · old-promise | `18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 unreached`<br>**Do:** replace with symfony/error-handler (named by its registry); lockrot found no path from your requirements to it: \`composer why\` names what requires it<br>*abandoned:* marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on GitHub; last release 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago)<br>*old-promise:* released 2020-10-24 for PHP 5 (php "^5.5.9\|\>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested | unreached |
 
 flags: abandoned 1 · old-promise 1 · 1 package carries more than one
 depth: composer.json not read, so depth is not measured for 1 flagged package

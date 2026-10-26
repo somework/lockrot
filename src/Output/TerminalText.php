@@ -21,15 +21,23 @@ final class TerminalText
 
     /**
      * One unit of text at the offset reached so far (`\G`). Each byte belongs to one alternative.
-     * `unsafe` is a well-formed character that is still unsafe to print: a C1 control, a Unicode
-     * Bidi_Control character, a line or paragraph separator or the byte order mark. `character` is
-     * any other UTF-8 character that RFC 3629 allows. `invalid` is one byte that starts none.
+     * `unsafe` is a well-formed character that is still unsafe to print: a C1 control, a line or
+     * paragraph separator, or a Default_Ignorable_Code_Point, which includes the Bidi_Control, the
+     * zero-width and the tag characters and the byte order mark:
+     * https://www.unicode.org/Public/UCD/latest/ucd/DerivedCoreProperties.txt
+     * `character` is any other UTF-8 character that RFC 3629 allows. `invalid` is one byte that starts none.
      */
     private const UNIT = '/\G(?:
         (?<backslash>\\\\)
         |(?<control>[\x00-\x1F\x7F])
         |(?<printable>[\x20-\x5B\x5D-\x7E]+)
-        |(?<unsafe>\xC2[\x80-\x9F]|\xD8\x9C|\xE2\x80[\x8E\x8F\xA8-\xAE]|\xE2\x81[\xA6-\xA9]|\xEF\xBB\xBF)
+        |(?<unsafe>
+            \xC2[\x80-\x9F\xAD]|\xCD\x8F|\xD8\x9C
+            |\xE1\x85[\x9F\xA0]|\xE1\x9E[\xB4\xB5]|\xE1\xA0[\x8B-\x8F]
+            |\xE2\x80[\x8B-\x8F\xA8-\xAE]|\xE2\x81[\xA0-\xAF]|\xE3\x85\xA4
+            |\xEF\xB8[\x80-\x8F]|\xEF\xBB\xBF|\xEF\xBE\xA0|\xEF\xBF[\xB0-\xB8]
+            |\xF0\x9B\xB2[\xA0-\xA3]|\xF0\x9D\x85[\xB3-\xBA]|\xF3\xA0[\x80-\xBF]{2}
+        )
         |(?<character>
             [\xC2-\xDF][\x80-\xBF]
             |\xE0[\xA0-\xBF][\x80-\xBF]
@@ -44,8 +52,8 @@ final class TerminalText
 
     private const NAMED = ["\n" => '\\n', "\r" => '\\r', "\t" => '\\t'];
 
-    /** The UTF-8 lead-byte marker by length. Every `unsafe` character has two or three bytes. */
-    private const LEAD_MARKER = [2 => 0xC0, 3 => 0xE0];
+    /** The UTF-8 lead-byte marker by the length of an `unsafe` character. */
+    private const LEAD_MARKER = [2 => 0xC0, 3 => 0xE0, 4 => 0xF0];
 
     /**
      * Writes each character that could break the line, recolour or reorder the terminal, or print
@@ -62,6 +70,12 @@ final class TerminalText
     public static function neutralise(string $text): string
     {
         return self::render($text, false, \PHP_INT_MAX);
+    }
+
+    /** {@see self::neutralise()} for each line, with the line feeds between the lines kept. */
+    public static function neutraliseLines(string $text): string
+    {
+        return implode("\n", array_map([self::class, 'neutralise'], explode("\n", $text)));
     }
 
     public static function warning(string $line, bool $decorated): string

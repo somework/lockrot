@@ -146,7 +146,7 @@ final class MarkdownFormatter implements FormatterInterface
 
         return '| '.$verdict.' | '.self::code($finding->package()).' | '.self::text($finding->version())
             .' | '.implode(' · ', FindingBlock::headerFlags($finding, $standing)).' | '.implode('<br>', $why)
-            .' | '.self::text($finding->isDirect() ? 'direct' : FindingBlock::dependents($finding)).' |';
+            .' | '.self::text($finding->reach() === 'unreached' ? 'unreached' : ($finding->isDirect() ? 'direct' : FindingBlock::dependents($finding))).' |';
     }
 
     /** The age line and the abandoned-marking line set their label in italics. */

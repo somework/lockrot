@@ -18,7 +18,8 @@ use Composer\Config;
  */
 final class RepoLocator
 {
-    private const SEGMENT = '[A-Za-z0-9_.-]+';
+    /** Never `.` or `..`: the API path joins the segments unencoded, and a dot segment moves up a level. */
+    private const SEGMENT = '(?!\.\.?(?:/|$))[A-Za-z0-9_.-]+';
 
     /** @var list<string> */
     private array $gitlabDomains;

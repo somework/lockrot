@@ -338,7 +338,7 @@
                     "level": "error",
                     "rank": 95.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46633 (critical advisory): PHP code injection via `{% use %}` template name."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46633 (critical advisory): PHP code injection via `{{% use %}}` template name."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -698,7 +698,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46638 (medium advisory): `{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411)."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46638 (medium advisory): `{{% sandbox %}}{{% include %}}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411)."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",

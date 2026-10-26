@@ -156,6 +156,14 @@ final class MarkdownFormatterTest extends TestCase
         self::assertMatchesRegularExpression('/\| `a\/leaf` .* \| a\/r1, a\/r2, a\/r3 and 2 more \|$/m', self::formatter()->format($report));
     }
 
+    public function testTheViaCellOfAnUnreachedFindingSaysUnreached(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([(new FindingBuilder())->withPackage('a/orphan')->withVerdict(Verdict::STALE)->withChain([])->withDataDate($at)->build()], [], $at, 1, 0);
+
+        self::assertMatchesRegularExpression('/\| `a\/orphan` .* \| unreached \|$/m', self::formatter()->format($report));
+    }
+
     public function testShowAllAddsTheScoreZeroRows(): void
     {
         $at = new \DateTimeImmutable(self::AT);

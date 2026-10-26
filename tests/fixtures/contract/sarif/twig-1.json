@@ -477,7 +477,7 @@
                     "level": "error",
                     "rank": 95.0,
                     "message": {
-                        "text": "twig/twig v1.43.1 is affected by CVE-2026-46633 (critical advisory): PHP code injection via `{% use %}` template name. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38) and symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v1.43.1 is affected by CVE-2026-46633 (critical advisory): PHP code injection via `{{% use %}}` template name. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38) and symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -1083,7 +1083,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "twig/twig v1.43.1 is affected by CVE-2026-46638 (medium advisory): `{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411). Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38) and symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v1.43.1 is affected by CVE-2026-46638 (medium advisory): `{{% sandbox %}}{{% include %}}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411). Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38) and symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",

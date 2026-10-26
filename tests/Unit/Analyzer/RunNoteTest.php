@@ -173,10 +173,17 @@ final class RunNoteTest extends TestCase
             false,
             ['forge_id' => 'github', 'checked' => 11, 'skipped_no_token' => 80, 'skipped_budget' => 9],
         ];
+        yield 'the GitHub cap counts one of each in the singular' => [
+            static fn (): RunNote => RunNote::repositoryActivityAnonymousCap(RepoRef::GITHUB, 1, 1, 0),
+            'repository_activity_anonymous_cap',
+            'GitHub token not set: repository activity checked for 1 candidate package, 1 package skipped (set GITHUB_TOKEN to check all)',
+            false,
+            ['forge_id' => 'github', 'checked' => 1, 'skipped_no_token' => 1, 'skipped_budget' => 0],
+        ];
         yield 'the Bitbucket cap' => [
             static fn (): RunNote => RunNote::repositoryActivityAnonymousCap(RepoRef::BITBUCKET, 1, 0, 0),
             'repository_activity_anonymous_cap',
-            'Bitbucket credentials not set: repository activity checked for 1 candidate packages, 0 packages skipped (add bitbucket.org credentials to auth.json to check all)',
+            'Bitbucket credentials not set: repository activity checked for 1 candidate package, 0 packages skipped (add bitbucket.org credentials to auth.json to check all)',
             false,
             ['forge_id' => 'bitbucket', 'checked' => 1, 'skipped_no_token' => 0, 'skipped_budget' => 0],
         ];

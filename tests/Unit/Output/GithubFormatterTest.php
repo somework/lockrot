@@ -290,6 +290,24 @@ final class GithubFormatterTest extends TestCase
         self::assertStringNotContainsString('::acme/offline', $this->formatter('high', null)->format(self::uncheckedReport()));
     }
 
+    /**
+     * A plain line is no workflow command, so nothing turns its control characters into escapes. The
+     * runner reads a legacy `##[` command anywhere in a line:
+     * https://github.com/actions/runner/blob/main/src/Runner.Worker/ActionCommandManager.cs
+     */
+    public function testAPlainLinePrintsControlCharactersAsEscapesAndNoLegacyCommand(): void
+    {
+        $name = "x/a\x1b]0;PWNED\x07\x1b[31m##[stop-commands]tok\u{200B}#\u{202E}##[group]x";
+        $finding = (new FindingBuilder())->withPackage($name)->withVerdict(Verdict::STALE)->withChain(['root/r', $name])->build();
+        $out = $this->formatter('high', null)->format(new Report([$finding], [], new \DateTimeImmutable(self::AT), 1, 0));
+        $depth = preg_grep('/^depth: /', explode("\n", $out));
+
+        self::assertCount(1, $depth);
+        self::assertSame(0, preg_match('/[\x00-\x09\x0B-\x1F\x7F]|\xC2[\x80-\x9F]|\xE2\x80[\x8B\xAE]/', $out), 'no control or invisible character but the line feed');
+        self::assertStringNotContainsString('##[', implode("\n", $depth));
+        self::assertStringContainsString('x/a\x1B]0;PWNED\x07\x1B[31m##\x5Bstop-commands]tok\u{200B}#\u{202E}##\x5Bgroup]x', implode("\n", $depth));
+    }
+
     public function testThePlainLinesFoldEveryKindOfLineBreakInAPackageName(): void
     {
         $name = "x/a\rb\nc\r\nd";

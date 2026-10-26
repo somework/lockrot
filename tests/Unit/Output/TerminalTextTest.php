@@ -34,7 +34,10 @@ final class TerminalTextTest extends TestCase
         yield 'every other bidi control' => ["\u{061C}\u{200E}\u{200F}\u{202A}\u{202B}\u{202C}\u{202D}\u{2066}\u{2067}\u{2068}\u{2069}", '\\u{061C}\\u{200E}\\u{200F}\\u{202A}\\u{202B}\\u{202C}\\u{202D}\\u{2066}\\u{2067}\\u{2068}\\u{2069}'];
         yield 'a byte order mark' => ["\u{FEFF}key", '\\u{FEFF}key'];
         yield 'printable UTF-8 is left alone' => ['ключ-é-€-😀', 'ключ-é-€-😀'];
-        yield 'the characters next to the escaped ranges are left alone' => ["\u{A0}\u{2027}\u{202F}\u{2065}\u{206A}\u{FEFE}", "\u{A0}\u{2027}\u{202F}\u{2065}\u{206A}\u{FEFE}"];
+        yield 'a soft hyphen and the zero-width characters' => ["a\u{AD}b\u{200B}c\u{200C}d\u{200D}e\u{2060}f\u{2064}", 'a\\u{00AD}b\\u{200B}c\\u{200C}d\\u{200D}e\\u{2060}f\\u{2064}'];
+        yield 'the other characters that print as nothing' => ["\u{34F}\u{115F}\u{17B4}\u{180E}\u{206F}\u{3164}\u{FE0F}\u{FFA0}\u{FFF0}", '\\u{034F}\\u{115F}\\u{17B4}\\u{180E}\\u{206F}\\u{3164}\\u{FE0F}\\u{FFA0}\\u{FFF0}'];
+        yield 'four-byte characters that print as nothing' => ["v\u{1BCA0}\u{1D173}\u{E0041}\u{E0FFF}", 'v\\u{1BCA0}\\u{1D173}\\u{E0041}\\u{E0FFF}'];
+        yield 'the characters next to the escaped ranges are left alone' => ["\u{A0}\u{AC}\u{AE}\u{2027}\u{202F}\u{205F}\u{2070}\u{FEFE}\u{1D172}\u{E1000}", "\u{A0}\u{AC}\u{AE}\u{2027}\u{202F}\u{205F}\u{2070}\u{FEFE}\u{1D172}\u{E1000}"];
         yield 'an invalid byte in hex' => ["a\xFFb", 'a\\xFFb'];
         yield 'a truncated sequence byte by byte' => ["a\xE2\x80", 'a\\xE2\\x80'];
         yield 'an overlong encoding byte by byte' => ["\xC0\xAF", '\\xC0\\xAF'];
