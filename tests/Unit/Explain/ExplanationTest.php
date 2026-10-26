@@ -503,7 +503,7 @@ final class ExplanationTest extends TestCase
 
         $branches = JsonPath::arrayAt((new Explanation($finding, F::facts(F::package(['version' => '1.4.0']), $metadata), new Thresholds(), '8.4', $this->report()))->toArray(), ['metadata', 'branches']);
 
-        self::assertSame(['3.x' => null, '2.x' => FindingDetails::branchFixes($two, null), '1.x' => FindingDetails::branchFixes($one, null)], array_column($branches, 'fixes', 'branch'));
+        self::assertSame(['3.x' => null, '2.x' => FindingDetails::branchFixes($two, null, null, false), '1.x' => FindingDetails::branchFixes($one, null, null, false)], array_column($branches, 'fixes', 'branch'));
     }
 
     /** next_step.text reads the lock's platform PHP and whether the window admits the target, so explain-2 carries both beside the move (SPEC §5.6, §5.9). */

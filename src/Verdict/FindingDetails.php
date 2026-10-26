@@ -433,7 +433,7 @@ final class FindingDetails
      *
      * @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: ?IfApplied, check: ?MoveCheck}
      */
-    public static function branchFixes(BranchFixes $row, ?IfApplied $ifApplied, ?MoveCheck $check = null, bool $joint = false): array
+    public static function branchFixes(BranchFixes $row, ?IfApplied $ifApplied, ?MoveCheck $check, bool $joint): array
     {
         $candidate = $row->candidate();
 

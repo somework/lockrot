@@ -28,6 +28,7 @@ use Lockrot\Tests\Unit\Signal\FactsBuilder;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\Moves;
 use Lockrot\Verdict\Score;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -840,6 +841,26 @@ final class FindingTest extends TestCase
         $gaps = [['check' => 'a', 'reason' => 'no_token', 'blocks' => ['S9']], ['check' => 'b', 'reason' => 'no_token', 'blocks' => ['S9', 'S4']]];
         yield 'beside an S10 whose gaps share a block' => [[$s6, new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $gaps, 'blocks' => ['S9', 'S4']]))], ['S4', 'S9']];
         yield 'with no S10' => [[$s6], ['S9']];
+    }
+
+    /** SPEC §5.6, ruling R1: the S9 row at a release that the joint request moves to names no holder, and another signal stays as it was. */
+    public function testMovesWithAJointReleaseClearTheHoldersOfTheS9RowAtThatRelease(): void
+    {
+        $s6 = new Signal(Signal::LEVEL_INFO, 'pinned', SignalDataStub::of('S6', []));
+        $row = SignalDataStub::row(['id' => 'PKSA-1', 'severity' => 'high', 'fix' => ['kind' => 'upgrade', 'version' => '2.0.0', 'held_by' => [['package' => 'h/x', 'version' => '1.0.0', 'constraint' => '^1.0']]]]);
+        $signals = [$s6, new Signal(Signal::LEVEL_HIGH, 'advisory', new AdvisoryData([$row], true, true))];
+        $finding = (new FindingBuilder())->withPackage('a/vulnerable')->withSignals($signals)->withChain(['a/vulnerable'])->build();
+        $holders = static function (Finding $finding): int {
+            $data = $finding->signalData(AdvisoryData::class);
+            self::assertInstanceOf(AdvisoryData::class, $data);
+
+            return \count($data->rows()[0]->fix()->heldBy());
+        };
+
+        $joint = $finding->withMoves(new Moves(null, null, null, null, [], [], ['2.x' => '2.0.0']));
+
+        self::assertSame([0, 1], [$holders($joint), $holders($finding->withMoves(new Moves(null, null, null, null, [], [], [])))]);
+        self::assertSame($s6, $joint->signals()[0]);
     }
 
     /** report-2: each S9 row carries its state against the baseline entry that the standing compared. */
