@@ -524,7 +524,9 @@ The shape of the table:
 
 lockrot renders every value from the project or from package metadata as plain text, and
 backslash-escapes Markdown and HTML punctuation. A `composer.lock` under someone else's control
-cannot put an image, a tag or link markup into the comment. A bare URL still autolinks.
+cannot put an image, a tag or link markup into the comment. It cannot mention a user or a team,
+or make a bare URL or an email address into a link. A control character prints as an escape,
+such as `\x1B`.
 
 ## `--format=html` {#-formathtml}
 

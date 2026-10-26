@@ -211,8 +211,11 @@ final class MarkdownFormatter implements FormatterInterface
         foreach (self::ESCAPED as $character) {
             $value = str_replace($character, '\\'.$character, $value);
         }
+        // GitHub notifies the user or team of an `@name` and links a bare URL or email address, and
+        // the lock of a fork's pull request is its author's text.
+        $value = str_replace(['@', '://'], ['@&#8203;', '\\://'], $value);
 
-        return $value;
+        return (string) preg_replace('/(www)\./i', '$1\\\\.', $value);
     }
 
     /**

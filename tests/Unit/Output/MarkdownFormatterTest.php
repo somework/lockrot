@@ -164,7 +164,7 @@ final class MarkdownFormatterTest extends TestCase
         $out = self::formatter()->format($report, true);
 
         self::assertStringContainsString('| `` acme/ev`il `` | 1.0.0 \<b\>x\</b\> |', $out);
-        self::assertStringContainsString('\<img src=x onerror=alert(1)\> \[fine\](https://example.com) \*ok\* \&lt;b\&gt; \#1 a\|b', $out);
+        self::assertStringContainsString('\<img src=x onerror=alert(1)\> \[fine\](https\://example.com) \*ok\* \&lt;b\&gt; \#1 a\|b', $out);
         self::assertStringContainsString('- note: GitHub unreachable: \<script\>alert(1)\</script\> \[x\](y)', $out);
         self::assertSame(0, preg_match('/(?<!\\\\)<(img|script|b>)/', $out), 'every < from package metadata is escaped');
     }
@@ -182,6 +182,25 @@ final class MarkdownFormatterTest extends TestCase
 
         self::assertSame(0, preg_match('/[\x00-\x09\x0B-\x1F\x7F]|\xC2[\x80-\x9F]/', $out), 'no control character but the line feed');
         self::assertStringContainsString('- note: note evil\\\\x1B\\]52;c;cHduZWQ=\\\\x07\\\\x1B\\[2J\\\\u{009B}31m', $out);
+    }
+
+    /**
+     * In a fork's pull request the lock is the author's: a mention notifies a user or a team, and a
+     * bare URL renders as a link inside lockrot's comment. A zero-width space after `@` breaks a
+     * mention and an email link, and an escaped `:` or `.` breaks a URL link.
+     */
+    public function testLockTextCannotMentionOrLink(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            (new FindingBuilder())->withPackage('acme/kept')->withSignals([new Signal(Signal::LEVEL_WARN, 'x', SignalDataStub::of(Signal::S2, []))])->withAllowlistReason('@github/security-team see www.evil.example/login or https://evil.example/x and mail me@evil.example')->withDataDate($at)->build(),
+        ], Notes::texts(['ask @octocat at http://evil.example']), $at, 1, 0);
+
+        $out = self::formatter()->format($report, true);
+
+        self::assertStringContainsString('@&#8203;github/security-team see www\\.evil.example/login or https\\://evil.example/x and mail me@&#8203;evil.example', $out);
+        self::assertStringContainsString('- note: ask @&#8203;octocat at http\\://evil.example', $out);
+        self::assertSame(0, preg_match('/@(?!&#8203;)|www\\.|(?<!\\\\):\/\//i', $out), 'no live mention, www link or scheme link');
     }
 
     public function testEveryKindOfLineBreakInACellFoldsIntoOneSpace(): void

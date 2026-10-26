@@ -79,6 +79,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   step with a version, branch or name from the lock or a repository outside it is left out, so a
   hostile lock cannot inject into a pasted command. This affects a reader who copies these commands. Action: if a step is missing,
   check that lock entry before you write the command by hand. ([The move](docs/schema.md#the-move))
+- **CLI:** a repository host's redirect to another host no longer receives lockrot's
+  `Authorization` or `PRIVATE-TOKEN` header, on Composer 2.10 or later with curl. lockrot asks the
+  redirect target again without it. ([Which credentials](docs/internals.md#which-credentials))
+- **table, github, markdown:** a control character from the lock or a repository prints as an
+  escape (`\x1B`), also in `--explain`, as in the install-time summary. A lock cannot clear your
+  screen, write your clipboard or plant a link in your terminal.
+  ([What lockrot does](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
+- **markdown:** text from the lock cannot mention a user or a team, or link a bare URL or an email
+  address, in a pull request comment or a job summary. ([`--format=markdown`](docs/ci.md#-formatmarkdown))
 
 ### Added
 
