@@ -474,6 +474,10 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
 - lockrot asks each configured Composer repository that publishes advisories. A repository without
   a feed is listed with the outcome `no_feed`.
 
+- On Composer 2.9 and later, [the move check](#the-move-check) asks for the advisories of each
+  name that a solve loads and that the run did not ask, such as a new dependency of a move.
+  `run.advisory_lookup` describes the run's own lookup only.
+
 - For a package installed from vcs or a path, the advisory is published for the package of that
   name. Check that the version you hold is the one the advisory names.
 
@@ -659,8 +663,11 @@ in its POSIX form, for a POSIX shell. For cmd.exe or PowerShell, render `command
 lockrot asks Composer's own solver about every move that runs a Composer request: the lead move,
 each move in `next_step.also[]`, and the move to each branch row's candidate. It builds the request
 of `composer update <package>:<constraint> --dry-run`, or of `composer require` for a package that
-composer.json requires, and solves it offline, on the lock and the versions that Composer's cache
-holds. JSON writes the answer as the move's `check`.
+composer.json requires, and solves it against the lock. The solver loads the versions of each
+package that the solve needs from the project's Composer repositories. A file that the run
+already fetched comes from Composer's cache, so only a package that the run did not read costs a
+request. With `--offline`, only Composer's cache answers. JSON writes the answer as the move's
+`check`.
 
 | `check.result` | What it says | The steps in `commands[]` |
 |---|---|---|
@@ -769,7 +776,8 @@ Limits of the check:
 - Composer blocks only the advisories that it reads. When the advisory lookup did not read a
   package that a resolving solve installs, the move is not checked (`check.reason`
   `advisory_lookup_incomplete`). An `--offline` run, a spent install-time budget and a failed
-  repository cause it. A refused solve stays refused. A refused move also stays refused when its
+  repository cause it. With `advisory-lookup: composer-repositories`, a package that no Composer
+  repository serves causes it too, because the check does not send that name. A refused solve stays refused. A refused move also stays refused when its
   joint request is not checked, because Composer refuses the move alone.
 - On Composer 2.10 and later, an update also removes the versions that a filter list names. Such a
   list is the `malware` list under `config.policy`, which blocks by default, or a custom list there.
@@ -789,6 +797,9 @@ Limits of the check:
 - A run whose composer.json Composer cannot load checks no move (`check.reason`
   `composer_json_invalid`). Composer refuses such a file, for example for a requirement name that
   is no package name. Composer 2.2 stops the run with its own error instead.
+- The check does not read whether the lock has a `packages-dev` key. A lock without that key can
+  get a move that resolves and its command, but Composer refuses an update with require-dev on
+  such a lock.
 
 ### The PHP window {#the-php-window}
 
@@ -816,8 +827,10 @@ How lockrot reads the window:
 - In the set with require-dev, a `require-dev` link replaces the `require` link of the same name.
   `platform-dev` replaces `platform` in the same way. So require-dev can widen the window as well as
   narrow it.
-- `php-zts`, `php-debug` and `php-ipv6` are host features, not versions. `host_requires` lists the
-  ones that a requirement names, and the window ignores them.
+- `php-zts`, `php-debug` and `php-ipv6` are host features. `host_requires` lists the ones that a
+  requirement names, and the window ignores them. Composer gives each of them the version of `php`
+  on a host that has the feature. So a version constraint on such a name can exclude a minor that
+  `minors` lists, and no edge names that link.
 - A known minor is a PHP minor whose GA date is on or before the run's date. A known minor is in
   `minors` when every requirement admits its newest patch (`8.4.99`) and no conflict matches it.
 - lockrot reads the target's minor at the PHP that [the move check](#the-move-check) solves at
