@@ -122,6 +122,15 @@ final class TerminalTextTest extends TestCase
         );
     }
 
+    /** Rendered output can hold an escape sequence or an invalid byte, which the break keeps. */
+    public function testTheBreakKeepsEveryOtherByteOfALineThatIsNotValidUtf8(): void
+    {
+        self::assertSame(
+            "\xFF\033[31m##\\x5B\n\u{2000}\u{202F}\\x3A:error::x\n\u{2010}::y\n\u{3001}::z",
+            TerminalText::breakLogCommands("\xFF\033[31m##[\n\u{2000}\u{202F}::error::x\n\u{2010}::y\n\u{3001}::z"),
+        );
+    }
+
     public function testAWarningIsPlainWhenTheOutputIsNotDecorated(): void
     {
         self::assertSame('lockrot: <b>x</b>', TerminalText::warning('lockrot: <b>x</b>', false));

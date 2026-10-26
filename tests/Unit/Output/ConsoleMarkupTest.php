@@ -44,6 +44,18 @@ final class ConsoleMarkupTest extends TestCase
         yield 'nothing' => [''];
     }
 
+    /**
+     * A CI runner reads `::` at a line start, after any Unicode space, and `##[` anywhere in a line
+     * as a workflow command, so text from the lock that renders as either is broken.
+     */
+    public function testRenderedTextStartsNoWorkflowCommandAndHoldsNoLegacyCommand(): void
+    {
+        $markup = ConsoleMarkup::escape("dev-##[group]x\n::error::a\n  ::warning::b\n\u{A0}\u{3000}::notice::c\nFoo::bar()");
+
+        self::assertSame("dev-##\\x5Bgroup]x\n\\x3A:error::a\n  \\x3A:warning::b\n\u{A0}\u{3000}\\x3A:notice::c\nFoo::bar()", ConsoleMarkup::render($markup, false));
+        self::assertSame("\033[31mdev-##\\x5Bgroup]\033[39m", ConsoleMarkup::render('<fg=red>'.ConsoleMarkup::escape('dev-##[group]').'</fg=red>', true));
+    }
+
     public function testATrailingBackslashDoesNotSwallowTheClosingTag(): void
     {
         $markup = '<fg=red>'.ConsoleMarkup::escape('a\\').'</fg=red>'.ConsoleMarkup::escape('<b');

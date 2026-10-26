@@ -39,7 +39,8 @@ final class ConsoleMarkup
     }
 
     /**
-     * Undoes each escape, drops each tag and, when $decorated, colours the text a style encloses.
+     * Undoes each escape, drops each tag and, when $decorated, colours the text a style encloses. It
+ * breaks the workflow commands that a CI runner reads in the result ({@see TerminalText::breakLogCommands()}).
      * Styles nest, and the innermost one colours. Do not use a regular expression here: a long run
      * of `<b` exhausts PCRE's JIT and lets a style run past its closing tag.
      *
@@ -78,7 +79,7 @@ final class ConsoleMarkup
             $at += $run;
         }
 
-        return $rendered.self::styled($text, $open, $decorated);
+        return TerminalText::breakLogCommands($rendered.self::styled($text, $open, $decorated));
     }
 
     /**

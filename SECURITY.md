@@ -152,8 +152,9 @@ repositories publish, and finds no vulnerability of its own.
   your terminal.
 
 - **Workflow commands.** A GitHub Actions runner reads a line that starts with `::`, and a `##[`
-  anywhere in a line, as a command. The plain lines of the `github` format and the error lines on
-  stderr break both forms, so text from the lock cannot start a command.
+  anywhere in a line, as a command. The plain lines of the `github` format, the `table` format, the
+  text of `--explain`, the install-time summary and the error lines on stderr break both forms. So
+  text from the lock cannot start a command.
 
 ## Key custody and rotation
 

@@ -344,6 +344,21 @@ final class TableFormatterTest extends TestCase
         self::assertStringContainsString("\nnote: note ".$shown."\n", $plain);
     }
 
+    /** A CI runner reads `##[` anywhere in a line and `::` at a line start as a workflow command. */
+    public function testTextFromTheLockPrintsNoWorkflowCommandOnAnyLine(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            (new FindingBuilder())->withPackage('vendor/pkg')->withVersion('dev-##[group]x')->withVerdict(Verdict::ABANDONED)->withDataDate($at)->build(),
+        ], Notes::texts([trim(str_repeat('::error::a ', 30))]), $at, 1, 0);
+
+        $plain = ConsoleMarkup::render(self::formatter(50)->format($report), false);
+
+        self::assertStringNotContainsString('##[', $plain);
+        self::assertSame([], preg_grep('/^\p{Zs}*::/u', explode("\n", $plain)), $plain);
+        self::assertGreaterThan(1, preg_match_all('/^\p{Zs}*\\\\x3A:error::a/mu', $plain), 'the wrapped note starts a line with the broken command: '.$plain);
+    }
+
     /** @return iterable<string, array{string}> */
     public static function textsThatLookLikeMarkup(): iterable
     {
