@@ -139,7 +139,7 @@ final class Holder implements \JsonSerializable
      * Each entry once, in `held_by[]`'s order. Of two entries that differ only in the version, the
      * holder's locked release wins (W6). Else a stable version wins over a dev version, which
      * Composer installs only without the tag (T4). Between two stable versions the lower wins:
-     * Composer's problem text names one rule's versions lowest first. Of two dev versions the first stays.
+     * Composer's problem text names one rule's versions lowest first. Any other pair keeps the first.
      *
      * @param list<self> $holders
      *

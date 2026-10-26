@@ -348,12 +348,12 @@ final class RunFooter
      * carries a refusal and an unchecked fix.
      *
      * @param Fix                      $fix
-     * @param non-empty-list<Req>      $links `lock_platform`
+     * @param non-empty-list<Req>      $links `lock_platform`, one link per target
      * @param callable(string): string $name
      */
     private static function lockPlatformWords(array $fix, array $links, string $target, callable $name): string
     {
-        $records = 'the lock records '.self::names(array_values(array_unique(array_map(static fn (array $req): string => self::setter($req, $name).' '.$req['constraint'], $links)))).', which composer.json does not have';
+        $records = 'the lock records '.self::names(array_map(static fn (array $req): string => self::setter($req, $name).' '.$req['constraint'], $links)).', which composer.json does not have';
         if ($fix['check'] === MoveCheck::RESOLVES) {
             $step = $fix['platform_step'] && $fix['packages'] === [] ? 'set config.platform.php to your PHP '.$target.' release, then ' : '';
 

@@ -44,9 +44,9 @@ final class NextStep
             $check = $mergedLead->check();
             if ($check === null || !$check->isRefused()) {
                 [$main, $lead, $other] = [$mergedDraft, $mergedLead, null];
-            } elseif ($security !== null && $maintenance !== null) {
+            } elseif ($main === $maintenance) {
                 // SPEC §5.6, rule 4 of the choice of move: a merge holds only while Composer's solver does not refuse it.
-                [$main, $other] = [$security, $maintenance];
+                [$main, $other] = [$other, $main];
             }
         }
         $lead ??= MoveBuilder::build($main, [], $fixKind, $context);
