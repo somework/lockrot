@@ -55,7 +55,7 @@ trait AssertsNoteDetails
 
                     break;
                 case RunNote::REPOSITORY_ACTIVITY_ANONYMOUS_CAP:
-                    $counts = self::noteCounts('/checked for (\d+) candidate packages, (\d+) packages skipped/', $text, $where);
+                    $counts = self::noteCounts('/checked for (\d+) candidate packages?, (\d+) packages? skipped/', $text, $where);
                     $skipped = JsonPath::intAt($data, ['skipped_no_token']) + JsonPath::intAt($data, ['skipped_budget']);
                     Assert::assertSame([(string) JsonPath::intAt($data, ['checked']), (string) $skipped], [$counts[1], $counts[2] ?? null], $where);
 
