@@ -160,7 +160,9 @@ finding. Do one of these:
 - Undo the change. Run `composer remove <package>`, or restore `composer.json` and `composer.lock`
   from version control.
 - For a graded finding, accept it into the [baseline](baseline.md), then run `composer install`.
-- Allowlist the package ([the allowlist](configuration.md#the-allowlist)), then run
+- For a maintenance flag, allowlist the package ([the allowlist](configuration.md#the-allowlist)),
+  then run `composer install`. An allowlist entry never accepts an advisory. Accept an advisory in
+  Composer's audit settings ([accepting advisories](verdicts.md#accepting-advisories)), then run
   `composer install`.
 
 A baseline covers only graded findings. On an `ok` or `unknown` finding, a `fail-on: unchecked`

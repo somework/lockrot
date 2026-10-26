@@ -75,7 +75,7 @@
             "minimum": 1
         },
         "findings": {
-            "description": "One entry per graded finding, keyed by package name and sorted by it, so a regenerated file diffs cleanly. An ok, finished or unknown package gets no entry, and reads `new` when it is graded later.",
+            "description": "One entry per graded finding, keyed by package name and sorted by it, so a regenerated file diffs cleanly. A score-0 finding gets none, except the entry that an incomplete lookup carries forward. A package with no entry reads `new` when it is graded later.",
             "type": "object",
             "patternProperties": {
                 "^[^\\/]+\\/[^\\/]+$": {
@@ -121,7 +121,7 @@
             ]
         },
         "entry": {
-            "description": "What the baseline knows about one package: its counted facts, each with the date it became known. A maintenance flag is covered when the entry lists it or a flag above it in flag order, so only the first flag of the entry decides coverage.",
+            "description": "What the baseline knows about one package: its counted facts, each with the date it became known. A maintenance flag is covered when the entry lists it or a flag above it in flag order, so only the first flag of the entry decides coverage. An incomplete advisory lookup carries an entry forward whole, also for a package that scores 0 in that run.",
             "type": "object",
             "required": [
                 "version",
@@ -273,7 +273,7 @@
                     ]
                 },
                 {
-                    "description": "...or at least one counted advisory: the writer gives an entry only to a graded finding, which has a counted fact.",
+                    "description": "...or at least one counted advisory. A graded finding has a counted fact, and a carried entry keeps the facts it recorded.",
                     "required": [
                         "advisories"
                     ]

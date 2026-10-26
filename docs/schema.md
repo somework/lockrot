@@ -115,7 +115,7 @@ grows in minor releases. These are the ones that a reader meets most:
 - the configuration's `format`, and format names wherever lockrot writes one.
 
 Repository hosts are an open set in a run note's `forge_id` and in report-2's `forge` of S3, S4 and
-`activity`. Composer registries are an open set only in a finding's `origin.registry`. S3 and S4's
+`activity`. Composer registries are an open set in each `registry` field. S3 and S4's
 `host` and a finding's `activity.host` are plain strings.
 
 How the schemas write an open set:
@@ -389,16 +389,17 @@ package that comes in through others, `commands` (argv lists) and `text`. `also`
 part's move. A holder's `held_by[].holder.direct` says whether the run requires the holder directly.
 `kind` is an open set: show `text` for a kind you do not know.
 
-Each argument of `commands` and of `security.update_now_command` matches
-`^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only the Composer options that
-lockrot writes start with `-`:
+Each argument of `commands`, of `security.update_now_command` and of
+`run.php_window.target_fix.command` matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than
+spaces. Only the Composer options that lockrot writes start with `-`:
 
 - `--no-update` and `--dev` in a `require` step
 - `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step
 - `--locked` in a `why-not` step
+- `--lock` as the one argument of an `update` step: `composer update --lock`
 
-An option comes after the package arguments. The first argument is `composer`, and the second is
-`update`, `require` or `why-not`.
+Every other option comes after the package arguments. The first argument is `composer`, and the
+second is `update`, `require` or `why-not`.
 
 An argument comes from the lock or a repository, so lockrot leaves out a step that breaks this
 rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the
@@ -661,14 +662,28 @@ curl -fsSL -o ci/lockrot-report.schema.json https://lockrot.dev/schema/report-2.
 check-jsonschema --schemafile ci/lockrot-report.schema.json lockrot.json
 ```
 
-[Ajv](https://ajv.js.org/) needs three things for these files:
+[Ajv](https://ajv.js.org/) 8 needs three things for these files:
 
 - `ajv-draft-04`, for the dialect.
 
 - `ajv-formats`, for `date-time`.
 
-- `x-known-values` declared, since strict mode refuses a keyword that it does not know. Use
-  `ajv.addKeyword({keyword: "x-known-values", schemaType: "array"})`, or `strict: false`.
+- `strict: false`. Strict mode refuses the `x-` keywords of the schemas, and its type and tuple
+  checks refuse schemas that JSON Schema allows.
+
+```js
+const fs = require("fs");
+const Ajv = require("ajv-draft-04");
+const addFormats = require("ajv-formats");
+
+const ajv = new Ajv({strict: false});
+addFormats(ajv);
+const validate = ajv.compile(JSON.parse(fs.readFileSync("ci/lockrot-report.schema.json", "utf8")));
+if (!validate(JSON.parse(fs.readFileSync("lockrot.json", "utf8")))) {
+  console.error(validate.errors);
+  process.exit(1);
+}
+```
 
 ## Related
 

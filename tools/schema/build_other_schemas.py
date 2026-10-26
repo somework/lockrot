@@ -723,7 +723,8 @@ def baseline_schema():
                                    'because a stored years value changes on every regeneration of an unchanged lock.'),
     })
     entry = obj('What the baseline knows about one package: its counted facts, each with the date it became known. A maintenance flag is covered when the '
-                'entry lists it or a flag above it in flag order, so only the first flag of the entry decides coverage.', {
+                'entry lists it or a flag above it in flag order, so only the first flag of the entry decides coverage. An incomplete advisory lookup carries an entry '
+                'forward whole, also for a package that scores 0 in that run.', {
         'version': string('The version that was locked when the entry was last written.', minLength=1),
         'first_seen': ref('date', 'The date the package first got an entry. A regeneration keeps it.'),
         'flags': {'description': 'The counted maintenance flags, id to `{known_since}`. The key is present exactly when the entry has one: the writer never writes an empty '
@@ -735,7 +736,7 @@ def baseline_schema():
     }, required=['version', 'first_seen'])
     entry['anyOf'] = [
         {'description': 'An entry stores at least one counted maintenance flag...', 'required': ['flags']},
-        {'description': '...or at least one counted advisory: the writer gives an entry only to a graded finding, which has a counted fact.', 'required': ['advisories']},
+        {'description': '...or at least one counted advisory. A graded finding has a counted fact, and a carried entry keeps the facts it recorded.', 'required': ['advisories']},
     ]
     return {
         '$schema': DRAFT,
@@ -762,8 +763,9 @@ def baseline_schema():
             'score_model_id': integer('`run.score_model.id` of the run that wrote it. Grades under two score models are not comparable.', 1),
             'fix_model': integer('`run.fix_model` of the run that wrote it. A reader compares fixes only under an equal fix model, else the note '
                                  '`baseline_fix_model_differs` says so.', 1),
-            'findings': {'description': 'One entry per graded finding, keyed by package name and sorted by it, so a regenerated file diffs cleanly. An '
-                                        'ok, finished or unknown package gets no entry, and reads `new` when it is graded later.',
+            'findings': {'description': 'One entry per graded finding, keyed by package name and sorted by it, so a regenerated file diffs cleanly. A '
+                                        'score-0 finding gets none, except the entry that an incomplete lookup carries forward. A package with no '
+                                        'entry reads `new` when it is graded later.',
                          'type': 'object', 'patternProperties': {'^[^\\/]+\\/[^\\/]+$': ref('entry')}, 'additionalProperties': False},
         },
         'definitions': {
