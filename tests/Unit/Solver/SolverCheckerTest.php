@@ -396,6 +396,22 @@ final class SolverCheckerTest extends TestCase
     }
 
     /**
+     * Offline, a virtual name such as psr/log-implementation reads as not loaded, because no
+     * repository lists it. A solve that installs the newest release proves the move all the same.
+     */
+    public function testASolveThatInstallsTheNewestReleaseResolvesWithANameTheSourceCouldNotLoad(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/impl' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['psr/log-implementation' => '^1.0']], ['name' => 'acme/impl', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['psr/log-implementation' => '^1.0']], ['version' => '1.1.0', 'require' => ['psr/log-implementation' => '^1.0']]], 'acme/impl' => [['version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]]],
+            ['psr/log-implementation' => VersionSource::OFFLINE]
+        );
+
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '1.1.0'], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.1.0'))->check()->jsonSerialize());
+    }
+
+    /**
      * D6: the moved package's own versions did not load, so the solve has no target to refuse.
      *
      * @dataProvider unloadedNames
