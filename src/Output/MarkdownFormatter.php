@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Config\Gate;
 use Lockrot\Score\Standing;
 use Lockrot\Verdict\Finding;
@@ -83,11 +84,17 @@ final class MarkdownFormatter implements FormatterInterface
     private function heading(Report $report): string
     {
         $flagged = \count($report->graded());
-        if ($flagged === 0) {
-            return \sprintf('### lockrot: nothing flagged in %d %s', $report->packagesChecked(), $report->packagesChecked() === 1 ? 'package' : 'packages');
+        $noun = $report->packagesChecked() === 1 ? 'package' : 'packages';
+        if ($flagged > 0) {
+            return \sprintf('### lockrot: %d of %d %s flagged — %s', $flagged, $report->packagesChecked(), $noun, RunFooter::gradeCounts($report));
+        }
+        foreach ($report->runNotes() as $note) {
+            if ($note->code() === RunNote::ADVISORIES_NOT_CHECKED && ($note->data()['reason'] ?? null) === RunNote::ADVISORIES_OFFLINE) {
+                return \sprintf('### lockrot: nothing flagged in %d %s — security advisories not checked (offline)', $report->packagesChecked(), $noun);
+            }
         }
 
-        return \sprintf('### lockrot: %d of %d packages flagged — %s', $flagged, $report->packagesChecked(), RunFooter::gradeCounts($report));
+        return \sprintf('### lockrot: nothing flagged in %d %s', $report->packagesChecked(), $noun);
     }
 
     /**

@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\MoveCheckRun;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
@@ -112,6 +113,23 @@ final class MarkdownFormatterTest extends TestCase
         self::assertStringStartsWith("### lockrot: nothing flagged in 1 package\n\n**gate: off** · ", $out);
         self::assertStringNotContainsString('| Verdict |', $out);
         self::assertStringEndsWith("<sub>1 package checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>\n", $out);
+    }
+
+    public function testAOnePackageRunCountsItsPackageInTheSingular(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([(new FindingBuilder())->withPackage('a/gone')->withDataDate($at)->withSignals([new Signal(Signal::LEVEL_HIGH, 'x', SignalDataStub::of(Signal::S1, []))])->build()], [], $at, 1, 0);
+
+        self::assertStringStartsWith('### lockrot: 1 of 1 package flagged — ', self::formatter()->format($report));
+    }
+
+    public function testACleanOfflineRunSaysInItsHeadingThatTheAdvisoriesWereNotChecked(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $fine = [(new FindingBuilder())->withPackage('a/fine')->withDataDate($at)->build()];
+
+        self::assertStringStartsWith("### lockrot: nothing flagged in 1 package — security advisories not checked (offline)\n", self::formatter()->format(new Report($fine, [RunNote::advisoriesNotChecked(RunNote::ADVISORIES_OFFLINE, 0)], $at, 1, 0)));
+        self::assertStringStartsWith("### lockrot: nothing flagged in 1 package\n", self::formatter()->format(new Report($fine, [RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, 0)], $at, 1, 0)));
     }
 
     public function testTheVerdictIsBoldWhereTheFindingFailsTheGateAndTheBaselineDoesNotKnowIt(): void
