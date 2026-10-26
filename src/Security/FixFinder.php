@@ -100,7 +100,7 @@ final class FixFinder
         return new PackageFixes(
             $fixes,
             $rows,
-            $this->gets($onInstalled, $ranged, \count($advisories)),
+            $this->gets($package->name(), $onInstalled, $ranged, \count($advisories)),
             $move,
             self::partial($onInstalled, $ranged, \count($advisories)),
             $allowed
@@ -298,20 +298,21 @@ final class FixFinder
     /**
      * `composer update <package>` installs the highest release on the installed branch that the
      * lock's links allow and the target runs, whatever `require.php` says. With none that the target
-     * runs, the highest one that the links allow says why.
+     * runs, the highest one that the links allow says why. A refusal of the move check does not lower
+     * it: only the release that a solve installs does ({@see \Lockrot\Verdict\FindingDetails}, SPEC §5.6 ruling R2).
      *
      * @param list<Candidate>                    $onInstalled ascending
      * @param array<string, ConstraintInterface> $ranged
      */
-    private function gets(array $onInstalled, array $ranged, int $of): ?Gets
+    private function gets(string $package, array $onInstalled, array $ranged, int $of): ?Gets
     {
         $release = null;
         $blocked = null;
         foreach ($onInstalled as $candidate) {
-            if ($candidate->heldBy() !== [] || $this->refused->refuses($candidate->release()->normalized())) {
+            if ($this->links->excluding($package, $candidate->release()->normalized()) !== []) {
                 continue;
             }
-            if ($candidate->kind() === Fix::BLOCKED) {
+            if ($this->floor->admitsTarget($candidate->release()->php()) === false) {
                 $blocked = $candidate;
             } else {
                 $release = $candidate;
