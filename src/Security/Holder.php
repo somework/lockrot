@@ -40,6 +40,7 @@ final class Holder implements \JsonSerializable
     private string $constraint;
     private ?string $target;
     private ?GradedPackage $finding = null;
+    private bool $locked = false;
 
     /**
      * @param self::ROOT|self::PACKAGE                                                       $source
@@ -95,6 +96,20 @@ final class Holder implements \JsonSerializable
         return $this->finding;
     }
 
+    /** A copy that names the holder's locked release: the release that holds the move now (W6). */
+    public function asLocked(): self
+    {
+        $clone = clone $this;
+        $clone->locked = true;
+
+        return $clone;
+    }
+
+    public function isLocked(): bool
+    {
+        return $this->locked;
+    }
+
     private function withFinding(?GradedPackage $finding): self
     {
         $clone = clone $this;
@@ -121,10 +136,10 @@ final class Holder implements \JsonSerializable
     }
 
     /**
-     * Each entry once, in `held_by[]`'s order. Of two entries that differ only in the version, a
-     * stable version wins over a dev version, which Composer installs only without the tag (T4).
-     * Between two stable versions the lower wins: Composer's problem text names one rule's versions
-     * lowest first. Between two dev versions the first stays.
+     * Each entry once, in `held_by[]`'s order. Of two entries that differ only in the version, the
+     * holder's locked release wins (W6). Else a stable version wins over a dev version, which
+     * Composer installs only without the tag (T4). Between two stable versions the lower wins:
+     * Composer's problem text names one rule's versions lowest first. Of two dev versions the first stays.
      *
      * @param list<self> $holders
      *
@@ -146,6 +161,9 @@ final class Holder implements \JsonSerializable
 
     private static function wins(self $holder, self $kept): bool
     {
+        if ($holder->locked !== $kept->locked) {
+            return $holder->locked;
+        }
         $stability = $holder->stability();
         if ($stability !== $kept->stability()) {
             return $kept->stability() === 'dev' && $stability === 'stable';

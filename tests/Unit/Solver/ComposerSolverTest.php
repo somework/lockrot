@@ -188,6 +188,29 @@ final class ComposerSolverTest extends TestCase
         self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'acme/kernel', 'constraint' => '^4.4'], $holds);
     }
 
+    /** W6: of two holds that differ only in the version, the hold names the holder's locked release, the one that holds the move now. */
+    public function testARefusalMarksTheHoldOfAPackageAtItsLockedRelease(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0', 'acme/h' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/h', 'version' => '1.4.1', 'require' => ['acme/lib' => '^1.0']]],
+            [
+                'acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0']],
+                'acme/h' => [['version' => '1.3.4', 'require' => ['acme/lib' => '^1.0']], ['version' => '1.4.1', 'require' => ['acme/lib' => '^1.0']]],
+            ]
+        );
+
+        $holds = $solver->solve(SolveRequest::update(['acme/lib' => '^2.0'])->withTransitive(SolveRequest::WITH_ALL_DEPENDENCIES))->holds();
+        $marked = [];
+        foreach ($holds as $hold) {
+            if ($hold->package() === 'acme/h') {
+                $marked[(string) $hold->version()] = $hold->isLocked();
+            }
+        }
+
+        self::assertSame(['1.4.1' => true], $marked);
+    }
+
     /** A root requirement holds a move only through a requirement that it leaves no candidate. */
     public function testARefusalNamesNoRootRequirementOfARequirementThatKeepsACandidate(): void
     {

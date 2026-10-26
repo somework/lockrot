@@ -175,7 +175,11 @@ final class ComposerSolver
         [$set, $composerRequest, $pool, $fixedRoot] = $this->pool($root, $requires, $temporary, $request);
         [$pool, $answer] = $this->answer($policy, $composerRequest, $pool, $fixedRoot);
         if ($answer instanceof SolverProblemsException) {
-            $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $requested);
+            $locked = [];
+            foreach ($this->locked->getPackages() as $package) {
+                $locked[$package->getName()] = $package->getVersion();
+            }
+            $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $requested, $locked);
             $unloaded = [];
             foreach ($holds->wanted() as $name) {
                 $failure = $this->source->failure($name);

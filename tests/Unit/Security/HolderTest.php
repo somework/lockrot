@@ -65,6 +65,17 @@ final class HolderTest extends TestCase
         self::assertSame([$kept], array_map(static fn (Holder $hold): ?string => $hold->version(), $holds));
     }
 
+    /** W6, snipe-it's pragmarx/google2fa-laravel: the locked release holds the move now and keeps the holder's grade. */
+    public function testOfTwoHoldsThatDifferOnlyInTheVersionTheLockedOneWinsOverALowerTag(): void
+    {
+        $hold = static fn (string $version): Holder => new Holder(Holder::PACKAGE, 'pragmarx/google2fa-laravel', $version, Holder::REQUIRE, '^1.0', 'pragmarx/google2fa-qrcode');
+
+        $lockedFirst = Holder::distinct([$hold('v1.4.1')->asLocked(), $hold('v1.3.4')]);
+        $lockedLast = Holder::distinct([$hold('v1.3.4'), $hold('v1.4.1')->asLocked()]);
+
+        self::assertSame([['v1.4.1', true], ['v1.4.1', true]], [[$lockedFirst[0]->version(), $lockedFirst[0]->isLocked()], [$lockedLast[0]->version(), $lockedLast[0]->isLocked()]]);
+    }
+
     public function testTheLinkOrdersBeforeTheTargetAndEveryFieldKeepsAnEntryApart(): void
     {
         $holds = Holder::distinct([
