@@ -39,6 +39,17 @@ final class ComposerSolverTest extends TestCase
         self::assertSame(['acme/lib' => '1.2.0', 'acme/zeta' => '1.0.0'], $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->installs());
     }
 
+    public function testAnUpdateNamesTheLockedReleaseOfEachNameThatItMoves(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => 'v1.0.0']],
+            ['acme/lib' => [['version' => 'v1.0.0'], ['version' => '1.2.0', 'require' => ['acme/zeta' => '^1.0']]], 'acme/zeta' => [['version' => '1.0.0']]]
+        );
+
+        self::assertSame(['acme/lib' => 'v1.0.0'], $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->updatedFrom());
+    }
+
     public function testARequireOfARequireDevPackageSolvesWithTheNewConstraint(): void
     {
         $solver = self::solver(['require-dev' => ['acme/dev' => '^1.0']], [], ['acme/dev' => [['version' => '1.0.0'], ['version' => '2.0.0']]], [['name' => 'acme/dev', 'version' => '1.0.0']]);

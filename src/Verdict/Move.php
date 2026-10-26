@@ -16,7 +16,7 @@ use Lockrot\Solver\MoveCheck;
  *
  * @internal
  *
- * @phpstan-type Shape array{kind: string, source: string, merged: list<string>, fix_kind: ?string, reason: ?string, replacement: ?Replacement, quiet_years: ?float, to_branch: ?string, version: ?string, newest: ?string, constraint: ?string, latest: ?Latest, php_check: ?PhpCheck, crosses_major: ?bool, held_by: list<Holder>, clears: list<MoveFact>, unverified: list<MoveFact>, adds: list<MoveFact>, leaves: list<MoveFact>, clears_all: bool, if_applied: ?IfApplied, check: ?MoveCheck, moves_with: list<array{package: string, installed_version: string, version: string}>, composer_moves_because: list<string>, commands: list<list<string>>, through?: list<ThroughEntry>, also?: list<self>, text: string}
+ * @phpstan-type Shape array{kind: string, source: string, merged: list<string>, fix_kind: ?string, reason: ?string, replacement: ?Replacement, quiet_years: ?float, to_branch: ?string, version: ?string, newest: ?string, constraint: ?string, latest: ?Latest, php_check: ?PhpCheck, crosses_major: ?bool, held_by: list<Holder>, clears: list<MoveFact>, unverified: list<MoveFact>, adds: list<MoveFact>, leaves: list<MoveFact>, clears_all: bool, if_applied: ?IfApplied, check: ?MoveCheck, moves_with: list<array{package: string, installed_version: ?string, version: string}>, composer_moves_because: list<string>, commands: list<list<string>>, through?: list<ThroughEntry>, also?: list<self>, text: string}
  */
 final class Move implements \JsonSerializable
 {
@@ -58,7 +58,7 @@ final class Move implements \JsonSerializable
     private ?bool $crossesMajor;
     /** @var list<Holder> */
     private array $heldBy;
-    /** @var list<array{package: string, installed_version: string, version: string}> */
+    /** @var list<array{package: string, installed_version: ?string, version: string}> */
     private array $movesWith = [];
     /** @var list<MoveFact> */
     private array $clears;
@@ -158,7 +158,7 @@ final class Move implements \JsonSerializable
     /**
      * A copy with the holders that a resolving joint request moves beside the package.
      *
-     * @param list<array{package: string, installed_version: string, version: string}> $movesWith
+     * @param list<array{package: string, installed_version: ?string, version: string}> $movesWith
      */
     public function withMovesWith(array $movesWith): self
     {
@@ -168,7 +168,7 @@ final class Move implements \JsonSerializable
         return $clone;
     }
 
-    /** @return list<array{package: string, installed_version: string, version: string}> */
+    /** @return list<array{package: string, installed_version: ?string, version: string}> */
     public function movesWith(): array
     {
         return $this->movesWith;

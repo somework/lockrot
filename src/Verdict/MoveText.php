@@ -59,7 +59,7 @@ final class MoveText
 
         $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->refusedTargetInside());
 
-        return $step.$text.self::checked($move->check());
+        return $step.$text.self::checked($move->check()).self::movesWith($move);
     }
 
     /**
@@ -94,6 +94,17 @@ final class MoveText
             default:
                 return '; not checked with Composer\'s solver ('.MoveCheck::reasonWords((string) $check->reason()).'), so it holds only if Composer resolves it';
         }
+    }
+
+    /** ", with an update of h/x (to 2.1.0)", one entry per holder that the joint request moves (ruling R1). */
+    private static function movesWith(Move $move): string
+    {
+        $parts = [];
+        foreach ($move->movesWith() as $moved) {
+            $parts[] = $moved['package'].' (to '.$moved['version'].')';
+        }
+
+        return $parts === [] ? '' : ', with an update of '.self::join($parts);
     }
 
     /** @param list<string> $names */
@@ -183,7 +194,7 @@ final class MoveText
         $ownLine = $move->toBranch() !== null && $move->crossesMajor() === false && self::isBranchAlias($subject->version());
         $word = $ownLine ? 'the newest on its own line' : 'the newest';
         if ($subject->isListed()) {
-            $text = self::raise($move).'require a tag — '.$word.' is '.$version;
+            $text = self::raise($move).'require a tag'.self::inRequireDev($subject).' — '.$word.' is '.$version;
         } else {
             $via = self::dependents($subject->dependents());
             $text = self::raise($move).'move it to a tag — '.$word.' is '.$version.($via === '' ? '' : ', through '.$via);
@@ -200,13 +211,19 @@ final class MoveText
     {
         $raise = self::raise($move);
         if ($subject->isListed()) {
-            $text = $raise.'require '.$subject->package().' '.$move->constraint().($subject->isListedInRequireDevOnly() ? ' in require-dev' : '');
+            $text = $raise.'require '.$subject->package().' '.$move->constraint().self::inRequireDev($subject);
         } else {
             $via = self::dependents($subject->dependents());
             $text = $raise.'move '.$subject->package().' to '.$move->constraint().($via === '' ? '' : ' through '.$via);
         }
 
         return $text.self::below($move, $move->newest()).self::clears($move).self::adds($move).self::phpClause($move, $subject, true);
+    }
+
+    /** " in require-dev" for a package that only require-dev lists, when the run does not require it directly (ruling R13). */
+    private static function inRequireDev(MoveSubject $subject): string
+    {
+        return $subject->isListedInRequireDevOnly() && !$subject->isDirect() ? ' in require-dev' : '';
     }
 
     /** " (gets 5.3.8, below the newest 5.3.9)" when the resolving form installs a release below `$newest`, else an empty string. */

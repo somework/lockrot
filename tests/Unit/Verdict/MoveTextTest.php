@@ -122,12 +122,23 @@ final class MoveTextTest extends TestCase
         self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. ', MoveText::render($move->withCheck(MoveCheck::refused())));
     }
 
+    /** monica's firebase/php-jwt: the joint request resolves the move with an update of its two holders. */
+    public function testAMoveThatTheJointRequestResolvesNamesEachHolderAndItsRelease(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null);
+        $move = (new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], [['composer', 'update', 'acme/lib:^2.0.0', 'h/x', 'h/y']], $subject))
+            ->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0'))
+            ->withMovesWith([['package' => 'h/x', 'installed_version' => 'v5.23.0', 'version' => 'v5.30.0'], ['package' => 'h/y', 'installed_version' => 'v4.8.1', 'version' => '4.10.0']]);
+
+        self::assertStringEndsWith("; Composer's solver checked it against the lock, with an update of h/x (to v5.30.0) and h/y (to 4.10.0)", MoveText::render($move));
+    }
+
     public function testATagMoveThatInstallsBelowTheTagNamesTheReleaseAfterTheTagDate(): void
     {
         $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null);
-        $move = new Move(Move::TAG, FlagSet::PINNED, [], null, null, null, null, null, '2.0.0', '2.0.0', null, new Latest('2.0.0', '2026-01-01T00:00:00+00:00', false, null, null), null, false, [], [], [], [], [], null, [], [['composer', 'require', 'acme/lib:2.0.0']], $subject);
+        $move = new Move(Move::TAG, FlagSet::PINNED, [], null, null, null, null, null, '2.0.0', '2.1.0', null, new Latest('2.1.0', '2026-01-01T00:00:00+00:00', false, null, null), null, false, [], [], [], [], [], null, [], [['composer', 'require', 'acme/lib:^2.0.0']], $subject);
 
-        self::assertStringStartsWith('require a tag — the newest is 2.0.0 (2026-01-01) (gets 1.9.0, below the newest 2.0.0)', MoveText::render($move->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '1.9.0'))));
+        self::assertStringStartsWith('require a tag — the newest is 2.1.0 (2026-01-01) (gets 2.0.5, below the newest 2.1.0)', MoveText::render($move->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '2.0.5'))));
     }
 
     public function testARequireMoveNamesTheReleaseBelowTheNewestBeforeWhatItClears(): void
@@ -171,6 +182,24 @@ final class MoveTextTest extends TestCase
             ->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '5.3.8'));
 
         self::assertStringStartsWith("composer update 'web-auth/webauthn-lib:^5.3.5' (gets 5.3.8, below the newest 5.3.9)", MoveText::render($move));
+    }
+
+    /** A run with `--dev` requires a require-dev package directly, so its move needs no section words. */
+    public function testARequireMoveOfARequireDevPackageThatTheRunRequiresDirectlyNamesNoSection(): void
+    {
+        $subject = (new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null))->withNamedIn(['require-dev']);
+        $move = (new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, null, true, [], [], [], [], [], null, [], [['composer', 'require', 'acme/lib:^2.0', '--dev']], $subject))
+            ->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0'));
+
+        self::assertStringStartsWith('require acme/lib ^2.0;', MoveText::render($move));
+    }
+
+    public function testATagMoveOfARequireDevPackageNamesTheSection(): void
+    {
+        $subject = (new MoveSubject('acme/lib', '1.2.0', false, [], '8.4', null))->withNamedIn(['require-dev']);
+        $move = new Move(Move::TAG, FlagSet::PINNED, [], null, null, null, null, null, '2.0.0', '2.0.0', null, new Latest('2.0.0', null, false, null, null), null, false, [], [], [], [], [], null, [], [['composer', 'require', 'acme/lib:^2.0.0', '--dev']], $subject);
+
+        self::assertStringStartsWith('require a tag in require-dev — the newest is 2.0.0', MoveText::render($move));
     }
 
     /** A package that only require-dev lists reads as a root requirement of that section, also in a run without `--dev`. */

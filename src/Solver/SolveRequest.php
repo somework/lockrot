@@ -109,7 +109,7 @@ final class SolveRequest
     }
 
     /**
-     * A copy that may also update the holders of a refused move, with no constraint of their own.
+     * A copy that also updates the holders of a refused move, with no constraint of their own.
      * A link to a holder keeps its target in a hold.
      *
      * @param list<string> $holders

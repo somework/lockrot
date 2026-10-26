@@ -79,7 +79,7 @@ final class MoveChecks
         return $this->asked[$key][1];
     }
 
-    /** A refused move gets one more request, which may also update the packages that hold it. */
+    /** A refused move gets one more request, which also updates the packages that hold it. */
     private function joined(MoveQuery $query, CheckOutcome $outcome): CheckOutcome
     {
         $holders = $outcome->check()->isRefused() ? $outcome->holders($query->package()) : [];

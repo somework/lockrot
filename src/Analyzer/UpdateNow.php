@@ -119,7 +119,7 @@ final class UpdateNow
         foreach ($findings as $finding) {
             $package = $finding->package();
             if (isset($inline[$package])) {
-                $argv[] = $checks->writesInline($finding->isDirect()) ? $package.':'.$inline[$package] : $package;
+                $argv[] = $checks->writesInline($finding->isDirect() || $finding->namedIn() !== []) ? $package.':'.$inline[$package] : $package;
             }
         }
 

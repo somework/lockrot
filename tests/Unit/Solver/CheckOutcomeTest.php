@@ -82,6 +82,42 @@ final class CheckOutcomeTest extends TestCase
         );
     }
 
+    /** The joint solve moves h/dev from one dev-main commit to another: the step must update it, although its version reads the same. */
+    public function testAHolderThatTheJointSolveMovesIsListedAlthoughItsVersionReadsTheSame(): void
+    {
+        $hold = new Holder(Holder::PACKAGE, 'h/dev', 'dev-main', Holder::REQUIRE, '^1.0');
+        $outcome = new CheckOutcome(MoveCheck::refused(), [$hold]);
+        $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['acme/lib' => '2.0.0', 'h/dev' => 'dev-main'], ['acme/lib' => '1.0.0', 'h/dev' => 'dev-main']);
+
+        $joined = $outcome->joinedWith($joint, 'acme/lib', '^2.0', ['h/dev']);
+
+        self::assertSame([['package' => 'h/dev', 'installed_version' => 'dev-main', 'version' => 'dev-main']], $joined->movesWith());
+    }
+
+    /** A `-W` refusal names a release of the holder that the lock does not hold: the installed version comes from the lock. */
+    public function testTheInstalledVersionOfAMovedHolderIsItsLockedRelease(): void
+    {
+        $hold = new Holder(Holder::PACKAGE, 'h/x', '1.2.0', Holder::REQUIRE, '^1.0');
+        $outcome = new CheckOutcome(MoveCheck::refused(), [$hold]);
+        $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['acme/lib' => '2.0.0', 'h/x' => '2.1.0'], ['acme/lib' => '1.0.0', 'h/x' => '1.0.0']);
+
+        $joined = $outcome->joinedWith($joint, 'acme/lib', '^2.0', ['h/x']);
+
+        self::assertSame([['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.1.0']], $joined->movesWith());
+    }
+
+    /** A recorded joint answer names no locked releases: the hold's version stands in. */
+    public function testWithoutTheLockedReleaseTheHoldGivesTheInstalledVersion(): void
+    {
+        $hold = new Holder(Holder::PACKAGE, 'h/x', '1.0.0', Holder::REQUIRE, '^1.0');
+        $outcome = new CheckOutcome(MoveCheck::refused(), [$hold]);
+        $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['acme/lib' => '2.0.0', 'h/x' => '2.1.0']);
+
+        $joined = $outcome->joinedWith($joint, 'acme/lib', '^2.0', ['h/x']);
+
+        self::assertSame([['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.1.0']], $joined->movesWith());
+    }
+
     public function testTheCopyLeavesTheOutcomeItComesFromAsItWas(): void
     {
         $root = new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.0');

@@ -1776,7 +1776,7 @@
               "uniqueItems": true
             },
             "direct": {
-              "description": "The holder's own `direct`: whether the project's composer.json requires the holder.",
+              "description": "The holder's own `direct`: whether the run requires the holder directly.",
               "type": "boolean"
             },
             "replacement": {
@@ -4555,8 +4555,11 @@
                 "$ref": "#/definitions/packageName"
               },
               "installed_version": {
-                "description": "Its locked version.",
-                "type": "string",
+                "description": "Its locked version, or null when lockrot reads no locked version.",
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "minLength": 1
               },
               "version": {
@@ -5782,8 +5785,11 @@
                 "$ref": "#/definitions/packageName"
               },
               "installed_version": {
-                "description": "Its locked version.",
-                "type": "string",
+                "description": "Its locked version, or null when lockrot reads no locked version.",
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "minLength": 1
               },
               "version": {

@@ -1945,7 +1945,7 @@ score     18 = (left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high 
   dev          packages-dev: the score ÷ 2
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/monolog-bridge ^5.4.52 in require-dev — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 in require-dev); a new major brings its own requirements, which lockrot does not solve
+do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6 in require-dev); a new major brings its own requirements, which lockrot does not solve
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
@@ -1986,7 +1986,7 @@ score     16 = vulnerable 32 [critical advisory] ÷ 2 dev     high from 16
   dev          packages-dev: the score ÷ 2
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=8.1, then require twig/twig ^3.27.0 in require-dev — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
           clears PKSA-h8hf-ytnd-5t9q, PKSA-8zx5-v2nz-58pb, PKSA-dpx1-78wg-1kqs, PKSA-gw7n-z4yx-7xjt, PKSA-1tmc-rt7x-12w6, PKSA-3mcc-k66d-pydb, PKSA-fbvq-z33h-r2np, PKSA-xx6c-6d96-db2w, PKSA-kvv6-36cr-fkzb, PKSA-yd6k-t2gh-1m43, PKSA-2wrf-1xmk-1pky, PKSA-g9zw-qxh8-pq8w, PKSA-n14z-jjjg-g8vd, PKSA-sjvz-tbbr-vwth, PKSA-yhcn-xrg3-68b1
 
 flags

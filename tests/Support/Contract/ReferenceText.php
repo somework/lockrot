@@ -95,7 +95,7 @@ final class ReferenceText
             $text .= '; '.$through;
         }
 
-        return self::platformStep($move, $in).$text.self::checked(Fields::nullableObject($move, 'check'));
+        return self::platformStep($move, $in).$text.self::checked(Fields::nullableObject($move, 'check')).self::movesWith($move);
     }
 
     /**
@@ -433,7 +433,7 @@ final class ReferenceText
                 $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';
                 $constraint = Fields::string($move, 'constraint');
                 $text = self::listed($in)
-                    ? $raise.'require '.$package.' '.$constraint.(self::listedInRequireDevOnly($in) ? ' in require-dev' : '')
+                    ? $raise.'require '.$package.' '.$constraint.(self::inRequireDevWords($in) ? ' in require-dev' : '')
                     : $raise.'move '.$package.' to '.$constraint.(self::dependents($in) === '' ? '' : ' through '.self::dependents($in));
                 $text .= self::below($move, Fields::nullableString($move, 'newest')).self::clears($move).self::adds($move);
                 if ($check !== null && \is_string($check['requires'] ?? null)) {
@@ -481,7 +481,7 @@ final class ReferenceText
         $word = ($move['to_branch'] ?? null) !== null && ($move['crosses_major'] ?? null) === false ? 'the newest on its own line' : 'the newest';
         $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';
         if (self::listed($in)) {
-            $text = $raise.'require a tag — '.$word.' is '.Fields::string($latest, 'version');
+            $text = $raise.'require a tag'.(self::inRequireDevWords($in) ? ' in require-dev' : '').' — '.$word.' is '.Fields::string($latest, 'version');
         } else {
             $through = self::dependents($in);
             $text = $raise.'move it to a tag — '.$word.' is '.Fields::string($latest, 'version').($through === '' ? '' : ', through '.$through);
@@ -678,11 +678,11 @@ final class ReferenceText
     }
 
     /** @param array<mixed, mixed> $in */
-    private static function listedInRequireDevOnly(array $in): bool
+    private static function inRequireDevWords(array $in): bool
     {
         $sections = Fields::strings($in, 'named_in');
 
-        return !\in_array('require', $sections, true) && \in_array('require-dev', $sections, true);
+        return !Fields::bool($in, 'direct') && !\in_array('require', $sections, true) && \in_array('require-dev', $sections, true);
     }
 
     /**
@@ -732,6 +732,21 @@ final class ReferenceText
     private static function dependents(array $in): string
     {
         return self::list(Fields::strings($in, 'direct_dependents'));
+    }
+
+    /**
+     * SPEC 5.6, "Text": ", with an update of {package} (to {version})" per `moves_with[]` entry, joined as a list.
+     *
+     * @param array<mixed, mixed> $move
+     */
+    private static function movesWith(array $move): string
+    {
+        $items = [];
+        foreach (Fields::objects($move, 'moves_with') as $moved) {
+            $items[] = Fields::string($moved, 'package').' (to '.Fields::string($moved, 'version').')';
+        }
+
+        return $items === [] ? '' : ', with an update of '.self::joined($items);
     }
 
     /** @param list<string> $names */

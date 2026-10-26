@@ -22,7 +22,9 @@ final class CheckOutcome
     private ?string $problem;
     /** @var array<string, string> */
     private array $changes = [];
-    /** @var list<array{package: string, installed_version: string, version: string}> */
+    /** @var array<string, string> */
+    private array $updatedFrom = [];
+    /** @var list<array{package: string, installed_version: ?string, version: string}> */
     private array $movesWith = [];
     private bool $joint = false;
 
@@ -35,14 +37,17 @@ final class CheckOutcome
     }
 
     /**
-     * A copy that knows every release that the solve installs or moves to, by name.
+     * A copy that knows every release that the solve installs or moves to, by name, and the
+     * locked release of each name that it updates.
      *
      * @param array<string, string> $changes
+     * @param array<string, string> $updatedFrom
      */
-    public function withChanges(array $changes): self
+    public function withChanges(array $changes, array $updatedFrom = []): self
     {
         $clone = clone $this;
         $clone->changes = $changes;
+        $clone->updatedFrom = $updatedFrom;
 
         return $clone;
     }
@@ -73,10 +78,9 @@ final class CheckOutcome
         }
         $movesWith = [];
         foreach ($holders as $holder) {
-            $installed = $this->holderVersion($holder);
             $version = $joint->changes()[$holder] ?? null;
-            if ($installed !== null && $version !== null && !self::sameVersion($installed, $version)) {
-                $movesWith[] = ['package' => $holder, 'installed_version' => $installed, 'version' => $version];
+            if ($version !== null) {
+                $movesWith[] = ['package' => $holder, 'installed_version' => $joint->updatedFrom[$holder] ?? $this->holderVersion($holder), 'version' => $version];
             }
         }
         $resolved = new self(MoveCheck::resolves(MoveCheck::INLINE, $installs));
@@ -92,7 +96,7 @@ final class CheckOutcome
         return $this->joint;
     }
 
-    /** @return list<array{package: string, installed_version: string, version: string}> the holders that the joint solve moves, in holder order */
+    /** @return list<array{package: string, installed_version: ?string, version: string}> the holders that the joint solve moves, in holder order */
     public function movesWith(): array
     {
         return $this->movesWith;
@@ -184,15 +188,6 @@ final class CheckOutcome
         }
     }
 
-    private static function sameVersion(string $a, string $b): bool
-    {
-        $parser = new VersionParser();
-        try {
-            return $parser->normalize($a) === $parser->normalize($b);
-        } catch (\UnexpectedValueException $e) {
-            return $a === $b;
-        }
-    }
 
     private static function admits(Holder $hold, string $version): bool
     {

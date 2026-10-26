@@ -248,7 +248,7 @@ defs['holder'] = nul(("The holder's own finding in this report, for display only
         'verdict': ref('verdict'),
         'lead': nul("The holder's `lead`.", ref('maintenanceFlag')),
         'flag_ids': arr("The holder's counted flag ids, in flag order (every list of bare flag ids is `flag_ids`, §8.2 \"One name, one type\").", ref('flag'), uniqueItems=True),
-        'direct': d("The holder's own `direct`: whether the project's composer.json requires the holder.", {'type': 'boolean'}),
+        'direct': d("The holder's own `direct`: whether the run requires the holder directly.", {'type': 'boolean'}),
         'replacement': nul("The holder's `replacement` (a Composer package name), so an abandoned holder reads \"held by abandoned symfony/x (replacement: …)\".", ref('packageName')),
         'next_step': nul("The holder's own move; null when the holder's finding has no move (score 0).", HOLDER_MOVE),
     }))
@@ -509,7 +509,7 @@ def move_props(with_also):
                            "Each entry names a holder whose release the joint request changes. Not empty only when `check` resolves and `held_by` is empty."),
                           obj('A holder that moves with the package.', {
                               'package': d('The holder.', ref('packageName')),
-                              'installed_version': d('Its locked version.', {'type': 'string', 'minLength': 1}),
+                              'installed_version': nul('Its locked version, or null when lockrot reads no locked version.', {'type': 'string', 'minLength': 1}),
                               'version': d('The version that the joint request installs.', {'type': 'string', 'minLength': 1}),
                           })),
         'composer_moves_because': arr(("Why the move needs more than the project's own command, one clause each: `holders` (`held_by` names a package), `crosses_major` (a "

@@ -6,10 +6,12 @@ namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\UpdateNow;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingRelations;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\RecordedMoveChecker;
+use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\MoveChecks;
 use PHPUnit\Framework\TestCase;
 
@@ -129,6 +131,19 @@ final class UpdateNowTest extends TestCase
         $updateNow = UpdateNow::of($findings, new MoveChecks(new RecordedMoveChecker([], []), false));
 
         self::assertSame(['composer', 'update', self::COMMONMARK, self::LARAVEL.':^12.69.0'], $updateNow->command());
+    }
+
+    /** A package that only require-dev lists is a root requirement, also in a run without `--dev`: its constraint stays inline (ruling R13). */
+    public function testOnAComposerWithoutInlineConstraintsOnAnyPackageARequireDevPackageKeepsItsConstraint(): void
+    {
+        $findings = array_map(
+            static fn (Finding $finding): Finding => $finding->package() === self::COMMONMARK ? $finding->withComposerJson(true, [ProjectConfig::REQUIRE_DEV]) : $finding,
+            self::reportOf('commonmark', [])->sorted()
+        );
+
+        $updateNow = UpdateNow::of($findings, new MoveChecks(new RecordedMoveChecker([], []), false));
+
+        self::assertSame(['composer', 'update', self::COMMONMARK.':^2.10.3', self::LARAVEL.':^12.69.0'], $updateNow->command());
     }
 
     /**

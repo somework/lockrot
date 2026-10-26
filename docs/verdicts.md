@@ -632,7 +632,7 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
     - "replace" for a package whose locked release is its newest (`through[].newest_is_installed`);
     - "replace or update" for each other package.
 
-    When the newest release of such a package no longer requires it, the line says so.
+    When the newest release of such a package does not require it, the line says so.
 
 - **A new major.** A move to a higher branch says that a new major brings its own requirements.
 
@@ -693,7 +693,8 @@ holds. JSON writes the answer as the move's `check`.
   of each package that a package hold names. The joint request resolves only when it installs the
   package inside the move's constraint. Then `held_by[]` is empty, and `moves_with[]` names each
   holder whose release the joint request changes. The step names those holders:
-  `composer update 'firebase/php-jwt:^7.0.0' laravel/socialite`. A package that composer.json
+  `composer update 'firebase/php-jwt:^7.0.0' laravel/socialite`. The line ends with ", with an
+  update of laravel/socialite (to v5.30.0)". A package that composer.json
   requires gets `composer require <package>:<constraint> --no-update` first, then
   `composer update <package>` and the holders. When the joint request is refused, `held_by[]`
   names its holds.

@@ -185,7 +185,7 @@ final class ComposerSolver
             return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $unloaded);
         }
 
-        return Solution::resolved(self::installs($answer));
+        return Solution::resolved(self::installs($answer), self::updatedFrom($answer));
     }
 
     /**
@@ -401,5 +401,19 @@ final class ComposerSolver
         ksort($installs);
 
         return $installs;
+    }
+
+    /** @return array<string, string> name => the locked pretty version, for each name that the solve updates */
+    private static function updatedFrom(LockTransaction $transaction): array
+    {
+        $from = [];
+        foreach ($transaction->getOperations() as $operation) {
+            if ($operation instanceof UpdateOperation) {
+                $from[$operation->getInitialPackage()->getName()] = $operation->getInitialPackage()->getPrettyVersion();
+            }
+        }
+        ksort($from);
+
+        return $from;
     }
 }

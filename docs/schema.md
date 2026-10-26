@@ -386,7 +386,7 @@ command, `clears`, `unverified` and `leaves` (the facts it settles, cannot check
 touch), `held_by`, `php_check`, `if_applied` (the score after it), `check` (Composer's answer and
 the release it installs), `moves_with` (the holders that a joint request moves), `through` for a
 package that comes in through others, `commands` (argv lists) and `text`. `also` holds the other
-part's move. A holder's `held_by[].holder.direct` says whether composer.json requires the holder.
+part's move. A holder's `held_by[].holder.direct` says whether the run requires the holder directly.
 `kind` is an open set: show `text` for a kind you do not know.
 
 Each argument of `commands` and of `security.update_now_command` matches

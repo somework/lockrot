@@ -101,7 +101,7 @@ final class MoveQuery
     }
 
     /**
-     * The same request that may also update the holders of its refusal: one request, inline form.
+     * The same request that also updates the holders of its refusal: one request, inline form.
      *
      * @param list<string> $holders
      */
