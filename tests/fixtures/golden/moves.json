@@ -3542,7 +3542,7 @@
                     "newest_stable": null,
                     "newest_requires": null,
                     "newest_requires_unmeasured": "not_from_composer_repository",
-                    "local": false,
+                    "local": true,
                     "newest_is_installed": null
                 }
             ],
@@ -4801,7 +4801,7 @@
                     "newest_stable": null,
                     "newest_requires": null,
                     "newest_requires_unmeasured": "not_from_composer_repository",
-                    "local": false,
+                    "local": true,
                     "newest_is_installed": null
                 }
             ],
@@ -9959,7 +9959,8 @@
             "check": null,
             "moves_with": [],
             "composer_moves_because": [
-                "crosses_major"
+                "crosses_major",
+                "transitive"
             ],
             "commands": [
                 [
@@ -10421,7 +10422,7 @@
                 }
             ],
             "also": [],
-            "text": "require symfony/var-dumper ^5.4 in require-dev \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require symfony/var-dumper ^5.4 in require-dev \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.8) still requires it"
         }
     },
     "rounded-dev\u2021": {
@@ -10890,7 +10891,7 @@
                     "newest_stable": null,
                     "newest_requires": null,
                     "newest_requires_unmeasured": "not_from_composer_repository",
-                    "local": false,
+                    "local": true,
                     "newest_is_installed": null
                 }
             ],
@@ -10977,7 +10978,7 @@
                     "newest_stable": null,
                     "newest_requires": null,
                     "newest_requires_unmeasured": "not_from_composer_repository",
-                    "local": false,
+                    "local": true,
                     "newest_is_installed": null
                 }
             ],
@@ -11069,7 +11070,7 @@
                     "newest_stable": null,
                     "newest_requires": null,
                     "newest_requires_unmeasured": "not_from_composer_repository",
-                    "local": false,
+                    "local": true,
                     "newest_is_installed": null
                 }
             ],
@@ -11224,12 +11225,12 @@
                     "newest_stable": null,
                     "newest_requires": null,
                     "newest_requires_unmeasured": "not_from_composer_repository",
-                    "local": false,
+                    "local": true,
                     "newest_is_installed": null
                 }
             ],
             "also": [],
-            "text": "test it on PHP 8.4 \u2014 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): replace or update mautic/core-lib"
+            "text": "test it on PHP 8.4 \u2014 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): change your own package mautic/core-lib"
         }
     },
     "tie\u2021": {

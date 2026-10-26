@@ -534,8 +534,8 @@ medium (13)
       9 = (old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive (baseline: new package)
       do: test it on PHP 8.4 — 2.0.1 is its newest
           release; it comes in through mautic/core-lib
-          (jbroadway/urlify requires it): replace or update
-          mautic/core-lib
+          (jbroadway/urlify requires it): change your own
+          package mautic/core-lib
       old-promise  released 2018-11-23 for PHP 7 (php
                    ">=7.0.0"), before PHP 8 existed (8.0 GA
                    2020-11-26); admits 8.4 untested
@@ -619,7 +619,9 @@ medium (13)
           clears left-behind; 5.x needs php >=7.2.5, which
           require.php allows; the target php 8.4 runs it; a
           new major brings its own requirements, which
-          lockrot does not solve
+          lockrot does not solve; what requires it must
+          allow it; the newest release of
+          symfony/error-handler (v8.1.8) still requires it
       left-behind  branch 4.x last released 2022-10-03 (4.0
                    years ago); 8.x released v8.1.7
                    (2026-09-03), needs php >=8.4.1 above the
