@@ -93,7 +93,7 @@ final class MoveCheckComposerOracleTest extends TestCase
                 self::assertIsArray($answer);
                 $outcome = self::ask($checker, (string) $key, $answers, JsonPath::arrayAt($world, ['repo']));
                 $withProblem = $key === 'baseline' || strpos((string) $key, 'combined ') === 0;
-                [$installs, $actualInstalls] = self::installs((string) $key, $answer, $outcome);
+                [$installs, $actualInstalls] = self::installs((string) $key, $answer, $outcome, JsonPath::arrayAt($world, ['lock']));
                 // lockrot reads no hold of a refused baseline: every move is then not checked.
                 $expected[$key] = self::answerOf(JsonPath::stringAt($answer, ['result']), \is_string($answer['form'] ?? null) ? $answer['form'] : null, null, $key === 'baseline' ? [] : JsonPath::arrayAt($answer, ['holds']), $answer['problem'], $withProblem) + ['installs' => $installs];
                 $actual[$key] = self::answerOf($outcome->check()->result(), $outcome->check()->form(), $outcome->check()->reason(), array_map(static fn (Holder $hold): array => $hold->jsonSerialize(), $outcome->holds()), $outcome->problem(), $withProblem) + ['installs' => $actualInstalls];
@@ -147,19 +147,22 @@ final class MoveCheckComposerOracleTest extends TestCase
 
     /**
      * The installs of a resolved answer, recorded and lockrot's: every changed name of a joint
-     * request, the moved package's release of a move, null for the baseline and a combined update.
+     * request ({@see ComposerOracle::changes()}), the moved package's release of a move, null for
+     * the baseline and a combined update.
      *
      * @param array<mixed, mixed> $answer
+     * @param array<mixed, mixed> $lock   the world's lock
      *
      * @return array{mixed, mixed}
      */
-    private static function installs(string $key, array $answer, CheckOutcome $outcome): array
+    private static function installs(string $key, array $answer, CheckOutcome $outcome, array $lock): array
     {
         $recorded = \is_array($answer['installs'] ?? null) && $answer['result'] === 'resolves' ? $answer['installs'] : null;
         if ($recorded === null || $key === 'baseline' || strpos($key, 'combined ') === 0) {
             return [null, null];
         }
         if (strpos($key, 'joint ') === 0) {
+            $recorded = ComposerOracle::changes($recorded, $lock);
             $changes = $outcome->changes();
             ksort($recorded);
             ksort($changes);
