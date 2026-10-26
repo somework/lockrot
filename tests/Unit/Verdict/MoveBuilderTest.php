@@ -326,6 +326,17 @@ final class MoveBuilderTest extends TestCase
         self::assertSame([MoveCheck::RESOLVES, [['composer', 'require', 'a/b:^2.0', '--dev']]], [$check->result(), $move->commands()]);
     }
 
+    /** SPEC 5.6: `transitive` reads `direct`, so a require-dev name in a run without --dev keeps it (case require-dev-name). */
+    public function testARequireDevNameThatTheRunDoesNotReachDirectlyMovesBecauseItIsTransitive(): void
+    {
+        [$row, $context] = self::checked(['require a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, true, null, [], null, [], ['require-dev']);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertContains(Move::TRANSITIVE, $move->composerMovesBecause());
+    }
+
     /** @return array<string, array<string, mixed>> the refusal of $key by the holder h/x 1.0.0, and the joint request that moves h/x to 2.1.0 */
     private static function refusedThenJoint(string $key): array
     {

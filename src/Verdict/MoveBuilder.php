@@ -346,7 +346,7 @@ final class MoveBuilder
     private static function because(string $kind, ?bool $crosses, array $heldBy, MoveSubject $subject): array
     {
         $held = array_filter($heldBy, static fn (Holder $holder): bool => $holder->source() === Holder::PACKAGE) !== [];
-        $acts = \in_array($kind, self::ACTIONS, true) && !$subject->isListed() && !$held;
+        $acts = \in_array($kind, self::ACTIONS, true) && !$subject->isDirect() && !$held;
         $because = [];
         if ($held) {
             $because[] = Move::HOLDERS;
