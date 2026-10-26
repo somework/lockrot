@@ -7,6 +7,7 @@ namespace Lockrot\Solver;
 use Composer\DependencyResolver\DefaultPolicy;
 use Composer\DependencyResolver\LockTransaction;
 use Composer\DependencyResolver\Operation\InstallOperation;
+use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\DependencyResolver\Pool;
 use Composer\DependencyResolver\PoolOptimizer;
@@ -159,8 +160,10 @@ final class ComposerSolver
         foreach ($request->inline() as $name => $constraint) {
             $temporary[$name] = $parser->parseConstraints($constraint);
         }
+        $unrequired = [];
         if (!ComposerFeatures::hasTemporaryConstraints()) {
             // Composer 2.2 and 2.3 have no temporary constraints: the inline constraint joins the root requirement.
+            $unrequired = array_keys(array_diff_key($temporary, $requires));
             foreach ($temporary as $name => $constraint) {
                 $requires[$name] = isset($requires[$name]) ? MultiConstraint::create([$requires[$name], $constraint], true) : $constraint;
             }
@@ -185,7 +188,40 @@ final class ComposerSolver
             return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $unloaded);
         }
 
-        return Solution::resolved(self::installs($answer), self::updatedFrom($answer));
+        $installs = self::installs($answer);
+        $from = self::updatedFrom($answer);
+        foreach ($unrequired as $name) {
+            // A temporary constraint installs nothing: a name that no package requires after the solve leaves the lock.
+            if (!$this->requiredAfter($answer, $name)) {
+                unset($installs[$name], $from[$name]);
+            }
+        }
+
+        return Solution::resolved($installs, $from);
+    }
+
+    private function requiredAfter(LockTransaction $transaction, string $name): bool
+    {
+        $packages = [];
+        foreach ($this->locked->getPackages() as $package) {
+            $packages[$package->getName()] = $package;
+        }
+        foreach ($transaction->getOperations() as $operation) {
+            if ($operation instanceof UpdateOperation) {
+                $packages[$operation->getTargetPackage()->getName()] = $operation->getTargetPackage();
+            } elseif ($operation instanceof InstallOperation) {
+                $packages[$operation->getPackage()->getName()] = $operation->getPackage();
+            } elseif ($operation instanceof UninstallOperation) {
+                unset($packages[$operation->getPackage()->getName()]);
+            }
+        }
+        foreach ($packages as $package) {
+            if (isset($package->getRequires()[$name])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
