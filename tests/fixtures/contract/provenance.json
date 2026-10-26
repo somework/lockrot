@@ -76,7 +76,7 @@
             "commands_cmd": 117,
             "commands_posix": 117,
             "gate_line": 135,
-            "next_step_text": 98,
+            "next_step_text": 99,
             "run_gate_line": 136,
             "score_text": 134
         },
@@ -86,7 +86,7 @@
             "commands_cmd": 19,
             "commands_posix": 19,
             "gate_line": 1,
-            "next_step_text": 38,
+            "next_step_text": 37,
             "score_text": 2
         }
     },

@@ -2,7 +2,8 @@
   symfony/routing v6.4.28  direct  ·  capped · vulnerable
       24 = capped 8 + vulnerable 16 [high advisory]
       do: composer update 'symfony/routing:^6.4.40'
-          (gets v6.4.40) — clears the advisory; capped stays; Composer's solver checked it against the lock
+          (gets v6.4.40, below the newest v6.4.41) — clears the advisory; capped stays; Composer's solver checked it
+          against the lock
       capped       requires php \>=8.1 \<8.5: it stops at 8.4, so the newest PHP, 8.5, is excluded
       vulnerable   1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding
                    Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986

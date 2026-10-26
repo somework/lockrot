@@ -65,7 +65,7 @@
                     "level": "error",
                     "rank": 50.0,
                     "message": {
-                        "text": "symfony/routing v6.4.28 \u2014 finding high, 24 = capped 8 + vulnerable 16 [high advisory] \u2014 capped: requires php >=8.1 <8.5: it stops at 8.4, so the newest PHP, 8.5, is excluded. Do: composer update 'symfony/routing:^6.4.40' (gets v6.4.40) \u2014 clears the advisory; capped stays; Composer's solver checked it against the lock."
+                        "text": "symfony/routing v6.4.28 \u2014 finding high, 24 = capped 8 + vulnerable 16 [high advisory] \u2014 capped: requires php >=8.1 <8.5: it stops at 8.4, so the newest PHP, 8.5, is excluded. Do: composer update 'symfony/routing:^6.4.40' (gets v6.4.40, below the newest v6.4.41) \u2014 clears the advisory; capped stays; Composer's solver checked it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/routing"
@@ -161,7 +161,7 @@
                     "level": "error",
                     "rank": 80.0,
                     "message": {
-                        "text": "symfony/routing v6.4.28 is affected by CVE-2026-48784 (high advisory): UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization. Do: composer update 'symfony/routing:^6.4.40' (gets v6.4.40) \u2014 clears the advisory; capped stays; Composer's solver checked it against the lock."
+                        "text": "symfony/routing v6.4.28 is affected by CVE-2026-48784 (high advisory): UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization. Do: composer update 'symfony/routing:^6.4.40' (gets v6.4.40, below the newest v6.4.41) \u2014 clears the advisory; capped stays; Composer's solver checked it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/routing",
