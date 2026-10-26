@@ -37,6 +37,9 @@ final class ExplainFormatter
     private const INDENT = '  ';
     /** The label column of a block: `age`, `score`, `do`. */
     private const LABEL = 10;
+    /** The narrowest width of each branch table column before `fixes`: branch, highest tag, released, php. */
+    private const BRANCH_COLUMNS = [8, 13, 12, 10];
+
     /** The label column of a line in the flags block. */
     private const FLAG = 13;
 
@@ -389,12 +392,22 @@ final class ExplainFormatter
             $fixes[$branch->branch()] = $branch;
         }
         $moveBranch = self::securityMoveBranch($finding);
-        $lines = ['repository metadata', self::escape(\sprintf('     %-8s %-13s %-12s %-10s %s', 'branch', 'highest tag', 'released', 'php', 'fixes'))];
+        $moves = $finding->details()->moves();
+        $cells = [];
         foreach (\array_slice($rows, 0, Explanation::BRANCH_ROWS) as $row) {
             $released = $row['highest_released'] === null ? ($row['highest_commit_date'] === null ? 'undated' : 'commit '.$row['highest_commit_date']->format('Y-m-d')) : $row['highest_released']->format('Y-m-d');
-            $moves = $finding->details()->moves();
-            $cell = isset($fixes[$row['branch']]) ? self::fixesCell($fixes[$row['branch']], $moves->rowIfApplied($row['branch']), $moves->rowCheck($row['branch']), $row['branch'] === $moveBranch, $finding->package()) : '';
-            $lines[] = self::escape(rtrim(\sprintf('   %s %-8s %-13s %-12s %-10s %s', $row['installed'] ? '*' : ' ', $row['branch'], $row['highest'], $released, $row['php'] ?? '—', $cell)));
+            $fix = isset($fixes[$row['branch']]) ? self::fixesCell($fixes[$row['branch']], $moves->rowIfApplied($row['branch']), $moves->rowCheck($row['branch']), $row['branch'] === $moveBranch, $finding->package()) : '';
+            $cells[] = [$row['installed'] ? '*' : ' ', [$row['branch'], $row['highest'], $released, $row['php'] ?? '—'], $fix];
+        }
+        $widths = self::BRANCH_COLUMNS;
+        foreach ($cells as [, $columns]) {
+            foreach ($columns as $i => $column) {
+                $widths[$i] = max($widths[$i], self::characters($column));
+            }
+        }
+        $lines = ['repository metadata', self::escape(self::branchRow(' ', ['branch', 'highest tag', 'released', 'php'], 'fixes', $widths))];
+        foreach ($cells as [$mark, $columns, $fix]) {
+            $lines[] = self::escape(self::branchRow($mark, $columns, $fix, $widths));
         }
         if (\count($rows) > Explanation::BRANCH_ROWS) {
             $lines[] = \sprintf('     … and %d more', \count($rows) - Explanation::BRANCH_ROWS);
@@ -443,6 +456,26 @@ final class ExplainFormatter
         }
 
         return $cell;
+    }
+
+    /**
+     * @param list<string> $columns
+     * @param list<int>    $widths  in characters, which `sprintf()` padding would count as bytes
+     */
+    private static function branchRow(string $mark, array $columns, string $fix, array $widths): string
+    {
+        $row = '   '.$mark;
+        foreach ($columns as $i => $column) {
+            $row .= ' '.$column.str_repeat(' ', $widths[$i] - self::characters($column));
+        }
+
+        return rtrim($row.' '.$fix);
+    }
+
+    /** UTF-8 characters, without ext-mbstring: every byte but a continuation byte starts one. */
+    private static function characters(string $text): int
+    {
+        return \strlen($text) - (int) preg_match_all('/[\x80-\xBF]/', $text);
     }
 
     /**
