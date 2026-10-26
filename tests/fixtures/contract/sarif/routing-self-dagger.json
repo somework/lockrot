@@ -272,7 +272,7 @@
                                     "target": null,
                                     "constraint": "self.version",
                                     "holder": {
-                                        "verdict": "ok",
+                                        "verdict": "unknown",
                                         "lead": null,
                                         "flag_ids": [],
                                         "direct": false,
@@ -388,7 +388,7 @@
                                     "target": null,
                                     "constraint": "self.version",
                                     "holder": {
-                                        "verdict": "ok",
+                                        "verdict": "unknown",
                                         "lead": null,
                                         "flag_ids": [],
                                         "direct": false,

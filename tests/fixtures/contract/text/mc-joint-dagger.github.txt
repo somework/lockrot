@@ -1,4 +1,5 @@
-::error file=composer.lock,line=18,title=lockrot%3A high — vulnerable (high advisory)::guzzlehttp/guzzle 7.10.0: 16 = vulnerable 16 [high advisory]. Do: require guzzlehttp/guzzle ^8.0.1 — clears the advisory; 8.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock, with an update of acme/gz-client (to 1.1.0). vulnerable: 1 advisory: 1 high — none fixed on 7.x; advisory: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks.
+::error file=composer.lock,line=19,title=lockrot%3A high — vulnerable (high advisory)::guzzlehttp/guzzle 7.10.0: 16 = vulnerable 16 [high advisory]. Do: require guzzlehttp/guzzle ^8.0.1 — clears the advisory; 8.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock, with an update of acme/gz-client (to 1.1.0). vulnerable: 1 advisory: 1 high — none fixed on 7.x; advisory: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks.
+::notice file=composer.lock,line=4,title=lockrot%3A ok::acme/gz-client 1.0.0: 0.
 flags: vulnerable 1
 depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 1 advisory: 1 high

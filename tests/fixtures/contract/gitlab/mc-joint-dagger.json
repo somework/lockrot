@@ -11,7 +11,23 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 18
+                "begin": 19
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "acme/gz-client 1.0.0 \u2014 finding ok (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "f2c55946480104d64c850a242164fa837d54cc453c2ee0c28572cc959c179579",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
             }
         }
     }

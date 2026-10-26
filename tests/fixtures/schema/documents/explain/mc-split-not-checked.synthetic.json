@@ -354,7 +354,7 @@
         "version": "v6.4.40",
         "newest": "v6.4.41",
         "on_installed_branch": true,
-        "php": ">=8.1",
+        "php": ">=8.1 <8.5",
         "admits_target_php": true,
         "admits_project_php": true,
         "held_by": [],
@@ -1282,7 +1282,7 @@
   "advisory_lookup": {
    "scope": "all",
    "scope_source": "default",
-   "packages_asked": 1,
+   "packages_asked": 3,
    "packages_not_asked": 0,
    "other_repositories": 0,
    "repositories": [

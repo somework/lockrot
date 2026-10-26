@@ -139,7 +139,14 @@
      "link": "require",
      "target": null,
      "constraint": "5.3.*",
-     "holder": null
+     "holder": {
+      "verdict": "ok",
+      "lead": null,
+      "flag_ids": [],
+      "replacement": null,
+      "direct": true,
+      "next_step": null
+     }
     }
    ],
    "clears": [
@@ -278,7 +285,14 @@
       "link": "require",
       "target": null,
       "constraint": "5.3.*",
-      "holder": null
+      "holder": {
+       "verdict": "ok",
+       "lead": null,
+       "flag_ids": [],
+       "replacement": null,
+       "direct": true,
+       "next_step": null
+      }
      }
     ],
     "if_applied": {
@@ -413,7 +427,14 @@
           "link": "require",
           "target": null,
           "constraint": "5.3.*",
-          "holder": null
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
          }
         ],
         "reason": null
@@ -449,7 +470,14 @@
           "link": "require",
           "target": null,
           "constraint": "5.3.*",
-          "holder": null
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
          }
         ],
         "reason": null
@@ -485,7 +513,14 @@
           "link": "require",
           "target": null,
           "constraint": "5.3.*",
-          "holder": null
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
          }
         ],
         "reason": null
@@ -600,7 +635,14 @@
        "link": "require",
        "target": null,
        "constraint": "5.3.*",
-       "holder": null
+       "holder": {
+        "verdict": "ok",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "direct": true,
+        "next_step": null
+       }
       }
      ],
      "if_applied": {
@@ -655,7 +697,14 @@
        "link": "require",
        "target": null,
        "constraint": "5.3.*",
-       "holder": null
+       "holder": {
+        "verdict": "ok",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "direct": true,
+        "next_step": null
+       }
       }
      ],
      "if_applied": {
@@ -710,7 +759,14 @@
        "link": "require",
        "target": null,
        "constraint": "5.3.*",
-       "holder": null
+       "holder": {
+        "verdict": "ok",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "direct": true,
+        "next_step": null
+       }
       }
      ],
      "if_applied": {
@@ -765,7 +821,14 @@
        "link": "require",
        "target": null,
        "constraint": "5.3.*",
-       "holder": null
+       "holder": {
+        "verdict": "ok",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "direct": true,
+        "next_step": null
+       }
       }
      ],
      "if_applied": {

@@ -14,5 +14,21 @@
                 "begin": 19
             }
         }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "acme/h 1.0.0 \u2014 finding ok (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "c3a34861a15ea0335e7cb15278d755e424827fc2b8a21f74fef759fd62d57674",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
     }
 ]

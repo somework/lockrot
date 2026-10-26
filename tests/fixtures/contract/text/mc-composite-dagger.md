@@ -1,4 +1,4 @@
-### lockrot: 6 of 6 packages flagged — high 6
+### lockrot: 6 of 10 packages flagged — high 6
 
 **gate: fails** · --fail-on=high · 6 findings fail it · target php 8.4 (--target-php)
 
@@ -10,15 +10,19 @@
 | **high** | `symfony/routing` | v6.4.28 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** composer update 'symfony/routing:^6.4.41' --with-dependencies (gets v6.4.41) — clears the advisory; Composer's solver checked it against the lock<br>*vulnerable:* 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained \`../\` or \`./\` → Generated URL Collapses Off-Route Under RFC 3986 Normalization<br>*age:* installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-14 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago) | direct |
 | **high** | `symfony/yaml` | v6.4.26 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** raise require.php to \>=8.2, then require symfony/yaml ^6.4.40 — clears the advisory; 6.x needs php \>=8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; Composer's solver checked it against the lock<br>*vulnerable:* 1 advisory: 1 high — all fixed on 6.x (php floor raise); advisory: CVE-2026-45304 YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion ("Billion Laughs")<br>*age:* installed v6.4.26 released 2025-09-26 (1.0 years ago); 6.x last released v6.4.40 2026-07-15 (0.2 years ago), its newest release; last push 2026-10-01 (less than three weeks ago) | direct |
 | **high** | `typo3/html-sanitizer` | v2.2.0 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) — clears the advisory; Composer's solver checked it against the lock<br>*vulnerable:* 1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting<br>*age:* installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.2 2026-07-17 (0.2 years ago), its newest release; last push 2026-07-17 (0.2 years ago) | direct |
+| ok | `acme/gz-promises` | 1.0.0 | ok | `0` | direct |
+| ok | `acme/hf-mime` | 1.0.0 | ok | `0` | direct |
+| ok | `acme/ml-widget` | 1.0.0 | ok | `0` | direct |
+| ok | `acme/rt-kernel` | 1.0.0 | ok | `0` | direct |
 
 flags: vulnerable 6
 depth: every flagged package is named in composer.json · direct 6
 security: 6 vulnerable packages · 6 advisories: 6 high
-libyears: 5.8 behind across all 6 packages · 5.8 from direct requirements · furthest behind typo3/html-sanitizer v2.2.0 at 2.0
-advisories: 6 packages asked · packagist.org answered (45 on record for 6 packages)
+libyears: 5.8 behind across all 10 packages · 5.8 from direct requirements · furthest behind typo3/html-sanitizer v2.2.0 at 2.0
+advisories: 10 packages asked · packagist.org answered (45 on record for 6 packages)
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-\* requirements not checked
 php: the lock installs on PHP 8.1 to 8.5
 
 **Update now:** `composer update 'typo3/html-sanitizer:^2.3.2'`
 
-<sub>6 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>10 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

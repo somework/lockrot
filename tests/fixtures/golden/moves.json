@@ -7658,7 +7658,7 @@
             "kind": "require",
             "source": "vulnerable",
             "merged": [],
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "reason": null,
             "replacement": null,
             "quiet_years": null,
@@ -7731,7 +7731,7 @@
             "also": [],
             "text": "require guzzlehttp/guzzle ^8.0.1 \u2014 clears the advisory; 8.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock, with an update of acme/gz-client (to 1.1.0)"
         },
-        "fix_kind": "update",
+        "fix_kind": "upgrade",
         "installed_branch_fixes": {
             "fixed": 0,
             "unknown": 0,
@@ -7742,6 +7742,96 @@
             "held_by": [],
             "if_applied": null,
             "check": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "mc-link-newest\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "v2.3.2",
+            "newest": "v2.3.2",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "^7.2 || ^8.0",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-7jn3-yc49-35c6",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "inline",
+                "reason": null,
+                "installs": "v2.3.2"
+            },
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "typo3/html-sanitizer:^2.3.2"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) \u2014 clears the advisory; Composer's solver checked it against the lock"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "update",
+            "lowest": "v2.3.2",
+            "newest": "v2.3.2",
+            "held_by": [],
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "inline",
+                "reason": null,
+                "installs": "v2.3.2"
+            }
         },
         "move_in": "next_step",
         "partial": null
@@ -11896,7 +11986,7 @@
                     "target": null,
                     "constraint": "self.version",
                     "holder": {
-                        "verdict": "ok",
+                        "verdict": "unknown",
                         "lead": null,
                         "flag_ids": [],
                         "direct": false,

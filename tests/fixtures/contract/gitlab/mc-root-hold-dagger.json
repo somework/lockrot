@@ -14,5 +14,21 @@
                 "begin": 18
             }
         }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "acme/gz-promises 1.0.0 \u2014 finding ok (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "4570b2962d08a51e771a7f5a05fb1b3b1195a2ca4c1cb03de06ad894bf8dd6d6",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
     }
 ]

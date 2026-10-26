@@ -627,9 +627,9 @@
                         ]
                     },
                     "check": {
-                        "result": "not_checked",
+                        "result": "refused",
                         "form": null,
-                        "reason": "unloaded_name",
+                        "reason": null,
                         "installs": null
                     }
                 }
@@ -689,9 +689,9 @@
                         ]
                     },
                     "check": {
-                        "result": "not_checked",
+                        "result": "refused",
                         "form": null,
-                        "reason": "unloaded_name",
+                        "reason": null,
                         "installs": null
                     }
                 }
@@ -751,9 +751,9 @@
                         ]
                     },
                     "check": {
-                        "result": "not_checked",
+                        "result": "refused",
                         "form": null,
-                        "reason": "unloaded_name",
+                        "reason": null,
                         "installs": null
                     }
                 }

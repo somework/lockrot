@@ -14,5 +14,21 @@
                 "begin": 18
             }
         }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "acme/san-tokens 1.0.0 \u2014 finding ok (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "b2f83928dcf914b06c6411e80b5abaff655915dca076e1aa48c24c63bdf0b5f9",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
     }
 ]

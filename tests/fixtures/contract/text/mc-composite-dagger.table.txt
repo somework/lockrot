@@ -52,15 +52,25 @@
       age: installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.2 2026-07-17 (0.2 years
            ago), its newest release; last push 2026-07-17 (0.2 years ago)
 
-6 packages checked · 6 flagged: high 6
+<options=bold>not flagged (4)</options=bold>
+  acme/gz-promises 1.0.0  direct  ·  ok
+      0
+  acme/hf-mime 1.0.0  direct  ·  ok
+      0
+  acme/ml-widget 1.0.0  direct  ·  ok
+      0
+  acme/rt-kernel 1.0.0  direct  ·  ok
+      0
+
+10 packages checked · 6 flagged: high 6
 flags: vulnerable 6
 depth: every flagged package is named in composer.json · direct 6
 security: 6 vulnerable packages · 6 advisories: 6 high · packages-dev not checked (pass --dev)
 fix, by package: composer update 4 · upgrade 1 · php floor raise 1
 update now: composer update 'typo3/html-sanitizer:^2.3.2'
-libyears: 5.8 behind across all 6 packages · 5.8 from direct requirements ·
+libyears: 5.8 behind across all 10 packages · 5.8 from direct requirements ·
 furthest behind typo3/html-sanitizer v2.2.0 at 2.0
-advisories: 6 packages asked · packagist.org answered (45 on record for 6 packages)
+advisories: 10 packages asked · packagist.org answered (45 on record for 6 packages)
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
 php: the lock installs on PHP 8.1 to 8.5
 <fg=red>gate: fails · --fail-on=high · 6 findings fail it · target php 8.4 (--target-php)</fg=red>

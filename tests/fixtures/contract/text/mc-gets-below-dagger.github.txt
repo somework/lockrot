@@ -1,4 +1,5 @@
 ::error file=composer.lock,line=18,title=lockrot%3A high — vulnerable (high advisory)::symfony/routing v6.4.28: 16 = vulnerable 16 [high advisory]. Do: composer update 'symfony/routing:^6.4.40' (gets v6.4.40, below the newest v6.4.41) — clears the advisory; Composer's solver checked it against the lock. vulnerable: 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization.
+::notice file=composer.lock,line=4,title=lockrot%3A ok::acme/rt-kernel 1.0.0: 0.
 flags: vulnerable 1
 depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 1 advisory: 1 high

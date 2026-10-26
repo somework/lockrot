@@ -1221,7 +1221,7 @@
   "advisory_lookup": {
    "scope": "all",
    "scope_source": "default",
-   "packages_asked": 1,
+   "packages_asked": 2,
    "packages_not_asked": 0,
    "other_repositories": 0,
    "repositories": [
@@ -1231,8 +1231,8 @@
      "outcome": "answered",
      "reason": null,
      "message": null,
-     "packages_with_records": 1,
-     "records": 6
+     "packages_with_records": 2,
+     "records": 21
     }
    ]
   },

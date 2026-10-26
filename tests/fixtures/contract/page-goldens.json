@@ -20553,7 +20553,7 @@
       "sheet_holders": {
         "bacon/bacon-qr-code": [
           {
-            "count": 3,
+            "count": 4,
             "shown": [
               {
                 "name": "your composer.json",
@@ -20572,6 +20572,12 @@
                 "grade": "high",
                 "meta": "requires pragmarx/google2fa-qrcode ^1.0 · itself left-behind · old-promise",
                 "step": "its own step: require ^2.3 on 2.x"
+              },
+              {
+                "name": "pragmarx/google2fa-qrcode v1.0.2",
+                "grade": null,
+                "meta": "requires pragmarx/google2fa ~4.0",
+                "step": null
               }
             ],
             "fold": null
@@ -20602,22 +20608,22 @@
     },
     "mc-composite‡": {
       "document": "cases/mc-composite-dagger.json",
-      "title": "lockrot: 6 of 6 packages flagged",
-      "description": "lockrot flagged 6 of 6 packages in composer.lock: 6 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "title": "lockrot: 6 of 10 packages flagged",
+      "description": "lockrot flagged 6 of 10 packages in composer.lock: 6 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
       "copy_summary": [
         "lockrot report for typo3/cms · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
-        "6 of 6 packages flagged (100%): 6 graded high. Flags: vulnerable 6.",
+        "6 of 10 packages flagged (60%): 6 graded high. Flags: vulnerable 6.",
         "All 6 in production · all 6 required directly · 6 security advisories on 6 packages (severity: 6 high) · fix by package: 4 composer update, 1 upgrade, 1 php floor raise · 5.8 libyears behind."
       ],
-      "grade_line": "Project grade: high · 6 high findings · 6 of 6 packages high or worse",
-      "figure_line": "6 of 6 packages flagged · 0 ok · 0 finished",
+      "grade_line": "Project grade: high · 6 high findings · 6 of 10 packages high or worse",
+      "figure_line": "6 of 10 packages flagged · 4 ok · 0 finished",
       "load_line": "96 points on 6 flagged packages · 96 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
-      "waffle_caption": "6 of 6 packages flagged · 0 ok · 0 finished",
+      "waffle_caption": "6 of 10 packages flagged · 4 ok · 0 finished",
       "lead_scope": "all 6 in production · all 6 required directly",
       "grade_chips": [
         "high 6"
@@ -20628,6 +20634,12 @@
           "word": "high",
           "mark": "fill",
           "count": 6
+        },
+        {
+          "verdict": "ok",
+          "word": "ok",
+          "mark": "soft",
+          "count": 4
         }
       ],
       "ready": {
@@ -20774,7 +20786,7 @@
       "libyears": {
         "figure": "5.78",
         "bound": "",
-        "sub": "over 6 packages · 5.78 from direct requirements",
+        "sub": "over 10 packages · 5.78 from direct requirements",
         "unmeasured": null,
         "top": [
           [
@@ -22272,22 +22284,22 @@
     },
     "mc-joint‡": {
       "document": "cases/mc-joint-dagger.json",
-      "title": "lockrot: 1 of 1 package flagged",
-      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "title": "lockrot: 1 of 2 packages flagged",
+      "description": "lockrot flagged 1 of 2 packages in composer.lock: 1 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
       "copy_summary": [
         "lockrot report for typo3/cms · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
-        "1 of 1 package flagged (100%): 1 graded high. Flags: vulnerable 1.",
+        "1 of 2 packages flagged (50%): 1 graded high. Flags: vulnerable 1.",
         "In production · required directly · 1 security advisory on 1 package (severity: 1 high) · fix by package: 1 upgrade · 0.9 libyears behind."
       ],
-      "grade_line": "Project grade: high · 1 high finding · 1 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
+      "grade_line": "Project grade: high · 1 high finding · 1 of 2 packages high or worse",
+      "figure_line": "1 of 2 packages flagged · 1 ok · 0 finished",
       "load_line": "16 points on 1 flagged package · 16 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
+      "waffle_caption": "1 of 2 packages flagged · 1 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
         "high 1"
@@ -22297,6 +22309,12 @@
           "verdict": "high",
           "word": "high",
           "mark": "fill",
+          "count": 1
+        },
+        {
+          "verdict": "ok",
+          "word": "ok",
+          "mark": "soft",
           "count": 1
         }
       ],
@@ -22367,7 +22385,7 @@
       "libyears": {
         "figure": "0.86",
         "bound": "",
-        "sub": "over 1 package · 0.86 from direct requirements",
+        "sub": "over 2 packages · 0.86 from direct requirements",
         "unmeasured": null,
         "top": [
           [
@@ -22486,22 +22504,22 @@
     },
     "mc-gets-below‡": {
       "document": "cases/mc-gets-below-dagger.json",
-      "title": "lockrot: 1 of 1 package flagged",
-      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "title": "lockrot: 1 of 2 packages flagged",
+      "description": "lockrot flagged 1 of 2 packages in composer.lock: 1 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
       "copy_summary": [
         "lockrot report for typo3/cms · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
-        "1 of 1 package flagged (100%): 1 graded high. Flags: vulnerable 1.",
+        "1 of 2 packages flagged (50%): 1 graded high. Flags: vulnerable 1.",
         "In production · required directly · 1 security advisory on 1 package (severity: 1 high) · fix by package: 1 composer update · 0.7 libyears behind."
       ],
-      "grade_line": "Project grade: high · 1 high finding · 1 of 1 package high or worse",
-      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
+      "grade_line": "Project grade: high · 1 high finding · 1 of 2 packages high or worse",
+      "figure_line": "1 of 2 packages flagged · 1 ok · 0 finished",
       "load_line": "16 points on 1 flagged package · 16 (100 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
-      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
+      "waffle_caption": "1 of 2 packages flagged · 1 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
         "high 1"
@@ -22511,6 +22529,12 @@
           "verdict": "high",
           "word": "high",
           "mark": "fill",
+          "count": 1
+        },
+        {
+          "verdict": "ok",
+          "word": "ok",
+          "mark": "soft",
           "count": 1
         }
       ],
@@ -22581,7 +22605,7 @@
       "libyears": {
         "figure": "0.67",
         "bound": "",
-        "sub": "over 1 package · 0.67 from direct requirements",
+        "sub": "over 2 packages · 0.67 from direct requirements",
         "unmeasured": null,
         "top": [
           [
@@ -22690,6 +22714,207 @@
       },
       "sheet_provenance": {},
       "sheet_holders": {},
+      "sheet_ladder": {}
+    },
+    "mc-split‡": {
+      "document": "cases/mc-split-dagger.json",
+      "title": "lockrot: 1 of 2 packages flagged",
+      "description": "lockrot flagged 1 of 2 packages in composer.lock: 1 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for typo3/cms · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
+        "1 of 2 packages flagged (50%): 1 graded high. Flags: capped 1, vulnerable 1.",
+        "In production · required directly · 1 security advisory on 1 package (severity: 1 high) · fix by package: 1 composer update · 0.7 libyears behind."
+      ],
+      "grade_line": "Project grade: high · 1 high finding · 1 of 2 packages high or worse",
+      "figure_line": "1 of 2 packages flagged · 1 ok · 0 finished",
+      "load_line": "24 points on 1 flagged package · 24 (100 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 1,
+      "state_lines": [
+        "PHP: this lock installs on PHP 8.1 to 8.4 · 1 package stops below the newest PHP, 8.5. The PHP window"
+      ],
+      "waffle_caption": "1 of 2 packages flagged · 1 ok · 0 finished",
+      "lead_scope": "1 in production · 1 required directly",
+      "grade_chips": [
+        "high 1"
+      ],
+      "waffle": [
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 1
+        },
+        {
+          "verdict": "ok",
+          "word": "ok",
+          "mark": "soft",
+          "count": 1
+        }
+      ],
+      "ready": {
+        "note": "for findings that fail the gate, in lockrot's rank order",
+        "moves": [
+          {
+            "package": "symfony/routing",
+            "link": "#view=findings&pkg=symfony%2Frouting",
+            "grade": "high",
+            "major": null,
+            "command": "composer update 'symfony/routing:^6.4.40'",
+            "clears": "the advisory",
+            "after": {
+              "result": "8, medium",
+              "conditions": [
+                "checked with Composer"
+              ]
+            },
+            "also_holds": null,
+            "moves_with": null
+          }
+        ],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": null,
+        "way_out_link": null,
+        "way_out_link_rows": null,
+        "none": null
+      },
+      "security": {
+        "figure": "1",
+        "unit": "advisory on 1 package",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "high",
+            "package": "symfony/routing",
+            "link": "#view=findings&pkg=symfony%2Frouting",
+            "reach": "",
+            "total": 24,
+            "terms": "capped 8 · vulnerable 16",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "1 carries more than one flag · score model 1",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": null,
+      "depth": {
+        "rows": [
+          "direct 1"
+        ],
+        "sentence": "The flagged package is named by a line of composer.json."
+      },
+      "libyears": {
+        "figure": "0.67",
+        "bound": "",
+        "sub": "over 2 packages · 0.67 from direct requirements",
+        "unmeasured": null,
+        "top": [
+          [
+            "symfony/routing v6.4.28",
+            "0.7",
+            "v6.4.41 (2026-07-04)"
+          ]
+        ],
+        "none": null
+      },
+      "radius_lead": [
+        "The flagged package is named by a line of composer.json."
+      ],
+      "advisories_lead": {
+        "figure": "1",
+        "unit": "advisory on 1 package",
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "findings_groups": [
+        {
+          "grade": "high",
+          "count": "1 package",
+          "gate": "all fail the gate",
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "symfony/routing",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": "held by its own release",
+          "command": "composer update 'symfony/routing:^6.4.40'",
+          "raise_words": null,
+          "after": "after it: 8, medium",
+          "major": null,
+          "blocked": null,
+          "ready": true,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 1,
+      "gate_partition": {
+        "ready": 1,
+        "held": 0,
+        "wayout": 0
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S9 advisories",
+        "S11 PHP cap"
+      ],
+      "advisory_groups": [
+        {
+          "package": "symfony/routing",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ],
+      "run_notes": [],
+      "php_line": "php: the lock installs on PHP 8.1 to 8.4; symfony/routing excludes 8.5",
+      "php_rows": [
+        "PHP window, with require-dev: 8.1 to 8.4 · lowest 8.1.0, set by require.php ^8.1, acme/rt-kernel >=8.1 and symfony/routing >=8.1 <8.5 · 8.5 excluded by symfony/routing >=8.1 <8.5",
+        "PHP window, without require-dev: 8.1 to 8.4 · lowest 8.1.0, set by require.php ^8.1, acme/rt-kernel >=8.1 and symfony/routing >=8.1 <8.5 · 8.5 excluded by symfony/routing >=8.1 <8.5"
+      ],
+      "platform_step": null,
+      "sheet_moves": {},
+      "sheet_provenance": {},
+      "sheet_holders": {
+        "symfony/routing": [
+          null,
+          {
+            "count": 2,
+            "shown": [
+              {
+                "name": "your composer.json",
+                "grade": null,
+                "meta": "requires acme/rt-kernel ^1.0",
+                "step": null
+              },
+              {
+                "name": "symfony/routing v6.4.41, its own release",
+                "grade": null,
+                "meta": "requires acme/rt-kernel ^2.0",
+                "step": null
+              }
+            ],
+            "fold": null
+          }
+        ]
+      },
       "sheet_ladder": {}
     },
     "empty-lock": {

@@ -9,14 +9,18 @@
       age: installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.2 2026-07-03 (0.2 years
            ago), its newest release; last push 2026-07-03 (0.2 years ago)
 
+<options=bold>not flagged (1)</options=bold>
+  acme/san-tokens 1.0.0  direct  ·  ok
+      0
+
 2 packages checked · 1 flagged: high 1
 flags: vulnerable 1
 depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 1 advisory: 1 high · packages-dev not checked (pass --dev)
 fix, by package: composer update 1
-libyears: 2.0 behind across the one package · 2.0 from direct requirements ·
+libyears: 2.0 behind across all 2 packages · 2.0 from direct requirements ·
 furthest behind typo3/html-sanitizer v2.2.0 at 2.0
-advisories: 1 package asked · packagist.org answered (6 on record for 1 package)
+advisories: 2 packages asked · packagist.org answered (6 on record for 1 package)
 moves: not checked, because Composer's solver refuses the lock itself (see the moves_not_checked note)
 php: the lock installs on PHP 8.1 to 8.5
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>

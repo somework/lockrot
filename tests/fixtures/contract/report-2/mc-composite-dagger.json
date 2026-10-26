@@ -779,7 +779,7 @@
         "advisory_lookup": {
             "scope": "all",
             "scope_source": "default",
-            "packages_asked": 6,
+            "packages_asked": 10,
             "packages_not_asked": 0,
             "other_repositories": 0,
             "repositories": [
@@ -1002,7 +1002,7 @@
             "divide-dev": 0,
             "floor-once": 0,
             "band-floors": 6,
-            "zero-verdicts": 0,
+            "zero-verdicts": 4,
             "sort": null,
             "gate-bounded-new": 0,
             "baseline-cover": 0
@@ -1010,7 +1010,7 @@
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 6,
+    "packages_checked": 10,
     "packages_flagged": 6,
     "packages_multi_flag": 0,
     "include_dev": false,
@@ -1024,7 +1024,7 @@
         "low": 0,
         "unknown": 0,
         "finished": 0,
-        "ok": 0
+        "ok": 4
     },
     "abandoned": {
         "total": 0,
@@ -1036,7 +1036,7 @@
         "high": 6,
         "medium": 0,
         "low": 0,
-        "none": 0
+        "none": 4
     },
     "flags": {
         "abandoned": {
@@ -1182,7 +1182,7 @@
     "libyears": {
         "total": 5.78,
         "direct_requirements": 5.78,
-        "measured": 6,
+        "measured": 10,
         "at_least_count": 0,
         "unmeasured": {
             "not_from_composer_repository": 0,
@@ -1200,7 +1200,7 @@
             "libyears": 2.01,
             "at_least": false
         },
-        "packages": 6
+        "packages": 10
     },
     "baseline": null,
     "gate": {
@@ -1243,7 +1243,7 @@
             "vulnerable": 6,
             "unchecked": 0,
             "ignored": 0,
-            "clear": 0
+            "clear": 4
         },
         "advisories": {
             "counted": 6,
@@ -3473,6 +3473,534 @@
                         ]
                     }
                 ],
+                "basis": null
+            }
+        },
+        {
+            "package": "acme/gz-promises",
+            "version": "1.0.0",
+            "branch": "1.x",
+            "installed_php": {
+                "requires": ">=8.1",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "ok",
+            "priority": "none",
+            "lead": null,
+            "rank": 7,
+            "flags": [],
+            "score": {
+                "model": 1,
+                "total": 0,
+                "exact": 0,
+                "accepted": [],
+                "text": "0"
+            },
+            "next_step": null,
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "acme/gz-promises",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/acme/gz-promises",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "acme/gz-promises"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "acme/gz-promises"
+            ],
+            "signals": [],
+            "evidence": "",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0,
+            "age": {
+                "installed": {
+                    "at": "2026-07-01T10:00:00+00:00",
+                    "years": 0.3,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "1.0.0",
+                    "at": "2026-07-01T10:00:00+00:00",
+                    "years": 0.3,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "1.0.0",
+                    "at": "2026-07-01T10:00:00+00:00",
+                    "years": 0.3,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-07-01T10:00:00+00:00",
+                    "years": 0.3,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
+            "package": "acme/hf-mime",
+            "version": "1.0.0",
+            "branch": "1.x",
+            "installed_php": {
+                "requires": ">=8.1",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "ok",
+            "priority": "none",
+            "lead": null,
+            "rank": 8,
+            "flags": [],
+            "score": {
+                "model": 1,
+                "total": 0,
+                "exact": 0,
+                "accepted": [],
+                "text": "0"
+            },
+            "next_step": null,
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "acme/hf-mime",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/acme/hf-mime",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "acme/hf-mime"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "acme/hf-mime"
+            ],
+            "signals": [],
+            "evidence": "",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0,
+            "age": {
+                "installed": {
+                    "at": "2026-07-03T10:00:00+00:00",
+                    "years": 0.2,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "1.0.0",
+                    "at": "2026-07-03T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "1.0.0",
+                    "at": "2026-07-03T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-07-03T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
+            "package": "acme/ml-widget",
+            "version": "1.0.0",
+            "branch": "1.x",
+            "installed_php": {
+                "requires": ">=8.1",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "ok",
+            "priority": "none",
+            "lead": null,
+            "rank": 9,
+            "flags": [],
+            "score": {
+                "model": 1,
+                "total": 0,
+                "exact": 0,
+                "accepted": [],
+                "text": "0"
+            },
+            "next_step": null,
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "acme/ml-widget",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/acme/ml-widget",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "acme/ml-widget"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "acme/ml-widget"
+            ],
+            "signals": [],
+            "evidence": "",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0,
+            "age": {
+                "installed": {
+                    "at": "2026-07-07T10:00:00+00:00",
+                    "years": 0.2,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "1.0.0",
+                    "at": "2026-07-07T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "1.0.0",
+                    "at": "2026-07-07T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-07-07T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
+            "package": "acme/rt-kernel",
+            "version": "1.0.0",
+            "branch": "1.x",
+            "installed_php": {
+                "requires": ">=8.1",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "ok",
+            "priority": "none",
+            "lead": null,
+            "rank": 10,
+            "flags": [],
+            "score": {
+                "model": 1,
+                "total": 0,
+                "exact": 0,
+                "accepted": [],
+                "text": "0"
+            },
+            "next_step": null,
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "acme/rt-kernel",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/acme/rt-kernel",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "acme/rt-kernel"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "acme/rt-kernel"
+            ],
+            "signals": [],
+            "evidence": "",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0,
+            "age": {
+                "installed": {
+                    "at": "2026-07-08T10:00:00+00:00",
+                    "years": 0.2,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "1.0.0",
+                    "at": "2026-07-08T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "1.0.0",
+                    "at": "2026-07-08T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-07-08T10:00:00+00:00",
+                    "years": 0.2,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
                 "basis": null
             }
         }

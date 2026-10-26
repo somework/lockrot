@@ -110284,13 +110284,6 @@
        "dev": false,
        "origin": "packagist"
       },
-      "releases": [
-       {
-        "version": "v4.4.41",
-        "time": null,
-        "php": null
-       }
-      ],
       "advisories": [],
       "records": 0,
       "ignored": [],
@@ -255002,7 +254995,14 @@
        "link": "require",
        "target": null,
        "constraint": "5.3.*",
-       "holder": null
+       "holder": {
+        "verdict": "ok",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "direct": true,
+        "next_step": null
+       }
       }
      ],
      "clears": [
@@ -255141,7 +255141,14 @@
         "link": "require",
         "target": null,
         "constraint": "5.3.*",
-        "holder": null
+        "holder": {
+         "verdict": "ok",
+         "lead": null,
+         "flag_ids": [],
+         "replacement": null,
+         "direct": true,
+         "next_step": null
+        }
        }
       ],
       "if_applied": {
@@ -255276,7 +255283,14 @@
             "link": "require",
             "target": null,
             "constraint": "5.3.*",
-            "holder": null
+            "holder": {
+             "verdict": "ok",
+             "lead": null,
+             "flag_ids": [],
+             "replacement": null,
+             "direct": true,
+             "next_step": null
+            }
            }
           ],
           "reason": null
@@ -255312,7 +255326,14 @@
             "link": "require",
             "target": null,
             "constraint": "5.3.*",
-            "holder": null
+            "holder": {
+             "verdict": "ok",
+             "lead": null,
+             "flag_ids": [],
+             "replacement": null,
+             "direct": true,
+             "next_step": null
+            }
            }
           ],
           "reason": null
@@ -255348,7 +255369,14 @@
             "link": "require",
             "target": null,
             "constraint": "5.3.*",
-            "holder": null
+            "holder": {
+             "verdict": "ok",
+             "lead": null,
+             "flag_ids": [],
+             "replacement": null,
+             "direct": true,
+             "next_step": null
+            }
            }
           ],
           "reason": null
@@ -255443,7 +255471,14 @@
           "link": "require",
           "target": null,
           "constraint": "5.3.*",
-          "holder": null
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
          }
         ],
         "if_applied": {
@@ -255498,7 +255533,14 @@
           "link": "require",
           "target": null,
           "constraint": "5.3.*",
-          "holder": null
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
          }
         ],
         "if_applied": {
@@ -255553,7 +255595,14 @@
           "link": "require",
           "target": null,
           "constraint": "5.3.*",
-          "holder": null
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
          }
         ],
         "if_applied": {
@@ -255608,7 +255657,14 @@
           "link": "require",
           "target": null,
           "constraint": "5.3.*",
-          "holder": null
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
          }
         ],
         "if_applied": {
@@ -256387,6 +256443,54 @@
       ]
      },
      "update symfony/yaml ^6.4.40 ": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null,
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "require",
+        "target": null,
+        "constraint": "5.3.*"
+       }
+      ]
+     },
+     "update symfony/yaml ^8.0.12 >=8.4.1": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null,
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "require",
+        "target": null,
+        "constraint": "5.3.*"
+       }
+      ]
+     },
+     "update symfony/yaml ^7.4.12 >=8.2": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null,
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "require",
+        "target": null,
+        "constraint": "5.3.*"
+       }
+      ]
+     },
+     "update symfony/yaml ^6.4.40 >=8.1": {
       "result": "refused",
       "form": null,
       "reason": null,
@@ -288258,6 +288362,7 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.2 2026-07-02 (0.3 years ago), its newest release; last push 2026-07-02 (0.3 years ago)"
    },
+   "parents": [],
    "solver_world": {
     "world_id": "inline",
     "world": {
@@ -289313,7 +289418,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -289321,7 +289426,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -289992,6 +290097,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-03 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)"
    },
+   "parents": [
+    {
+     "package": "acme/rt-kernel",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/rt-kernel",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/rt-kernel",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/rt-kernel"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/rt-kernel"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "with-deps",
     "world": {
@@ -291093,7 +291332,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -291101,7 +291340,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -291772,6 +292011,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v6.4.29 released 2025-11-08 (0.9 years ago); 6.x last released v6.4.41 2026-07-03 (0.2 years ago), its newest release; last push 2026-10-01 (less than three weeks ago)"
    },
+   "parents": [
+    {
+     "package": "acme/hf-mime",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/hf-mime",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/hf-mime",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/hf-mime"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/hf-mime"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "with-all",
     "world": {
@@ -292875,7 +293248,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -292883,7 +293256,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -293670,6 +294043,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 7.10.0 released 2025-08-23 (1.1 years ago); 7.x last released 7.15.2 2026-07-03 (0.2 years ago); newest release 8.0.1 2026-07-04 (0.2 years ago); last push 2026-09-06 (0.1 years ago)"
    },
+   "parents": [
+    {
+     "package": "acme/gz-promises",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/gz-promises",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/gz-promises",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/gz-promises"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/gz-promises"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "root-hold",
     "world": {
@@ -294956,7 +295463,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -294964,7 +295471,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -295792,6 +296299,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 7.10.0 released 2025-08-23 (1.1 years ago); 7.x last released 7.15.2 2026-07-03 (0.2 years ago); newest release 8.0.1 2026-07-04 (0.2 years ago); last push 2026-09-06 (0.1 years ago)"
    },
+   "parents": [
+    {
+     "package": "acme/gz-promises",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/gz-promises",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/gz-promises",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/gz-promises"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/gz-promises"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "replan-major",
     "world": {
@@ -297078,7 +297719,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -297086,7 +297727,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -297889,6 +298530,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v6.4.27 released 2025-10-24 (0.9 years ago); 6.x last released v6.4.40 2026-07-04 (0.2 years ago), its newest release; last push 2026-09-15 (less than three weeks ago)"
    },
+   "parents": [
+    {
+     "package": "acme/ml-widget",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/ml-widget",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/ml-widget",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/ml-widget"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/ml-widget"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-03T10:00:00+00:00",
+       "years": 0.2,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-03T10:00:00+00:00",
+       "years": 0.2,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-03T10:00:00+00:00",
+       "years": 0.2,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-03T10:00:00+00:00",
+       "years": 0.2,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "package-hold",
     "world": {
@@ -299420,7 +300195,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -299428,7 +300203,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -300239,6 +301014,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v6.4.27 released 2025-10-24 (0.9 years ago); 6.x last released v6.4.40 2026-07-04 (0.2 years ago), its newest release; last push 2026-09-15 (less than three weeks ago)"
    },
+   "parents": [
+    {
+     "package": "acme/ml-widget",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/ml-widget",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/ml-widget",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/ml-widget"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/ml-widget"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-03T10:00:00+00:00",
+       "years": 0.2,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-03T10:00:00+00:00",
+       "years": 0.2,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-03T10:00:00+00:00",
+       "years": 0.2,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-03T10:00:00+00:00",
+       "years": 0.2,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "package-hold",
     "world": {
@@ -301771,7 +302680,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -301779,7 +302688,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -302136,6 +303045,7 @@
      "require"
     ],
     "direct_dependents": [
+     "acme/gz-client",
      "guzzlehttp/guzzle"
     ],
     "signals": [
@@ -302322,7 +303232,7 @@
     "qualifiers": {
      "reach": [
       "Production: not in packages-dev",
-      "Required directly"
+      "Required directly, and also through acme/gz-client"
      ],
      "origin": null,
      "not_judged": null,
@@ -302498,6 +303408,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 7.10.0 released 2025-08-23 (1.1 years ago); 7.x last released 7.15.2 2026-07-03 (0.2 years ago); newest release 8.0.1 2026-07-04 (0.2 years ago); last push 2026-09-06 (0.1 years ago)"
    },
+   "parents": [
+    {
+     "package": "acme/gz-client",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/gz-client",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/gz-client",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/gz-client"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/gz-client"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "joint",
     "world": {
@@ -302626,7 +303670,8 @@
      "name": "typo3/cms",
      "require": {
       "php": "^8.1",
-      "guzzlehttp/guzzle": "*"
+      "guzzlehttp/guzzle": "*",
+      "acme/gz-client": "*"
      }
     },
     "lock": [
@@ -302637,6 +303682,15 @@
       "php": "^7.2.5 || ^8.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "acme/gz-client",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "guzzlehttp/guzzle": "^7.10"
+      }
      }
     ],
     "releases": [
@@ -303690,7 +304744,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -303698,7 +304752,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -304063,6 +305117,7 @@
      "require"
     ],
     "direct_dependents": [
+     "acme/h",
      "guzzlehttp/guzzle"
     ],
     "signals": [
@@ -304284,7 +305339,7 @@
     "qualifiers": {
      "reach": [
       "Production: not in packages-dev",
-      "Required directly"
+      "Required directly, and also through acme/h"
      ],
      "origin": null,
      "not_judged": null,
@@ -304472,6 +305527,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 7.10.0 released 2025-08-23 (1.1 years ago); 7.x last released 7.15.2 2026-07-02 (0.3 years ago); newest release 8.0.1 2026-07-03 (0.2 years ago); last push 2026-09-06 (0.1 years ago)"
    },
+   "parents": [
+    {
+     "package": "acme/h",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/h",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/h",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/h"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/h"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "joint-retag",
     "world": {
@@ -304602,7 +305791,8 @@
      "name": "typo3/cms",
      "require": {
       "php": "^8.1",
-      "guzzlehttp/guzzle": "*"
+      "guzzlehttp/guzzle": "*",
+      "acme/h": "*"
      }
     },
     "lock": [
@@ -305677,7 +306867,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -305685,7 +306875,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -306356,6 +307546,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-04 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)"
    },
+   "parents": [
+    {
+     "package": "acme/rt-kernel",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/rt-kernel",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/rt-kernel",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/rt-kernel"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/rt-kernel"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "gets-next",
     "world": {
@@ -307478,7 +308802,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -307486,7 +308810,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -308156,6 +309480,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-04 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)"
    },
+   "parents": [
+    {
+     "package": "acme/rt-kernel",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/rt-kernel",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/rt-kernel",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/rt-kernel"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/rt-kernel"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "gets-below",
     "world": {
@@ -308500,6 +309958,1950 @@
       "form": "inline",
       "installs": {
        "symfony/routing": "v6.4.40"
+      },
+      "holds": [],
+      "problem": null,
+      "reason": null
+     }
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": false,
+     "blocking_disabled_by": [],
+     "ignores_extensions": true,
+     "baseline": "resolves",
+     "reason": null,
+     "php": "8.4.99"
+    }
+   }
+  },
+  {
+   "id": "mc-link-newest‡",
+   "label": "a locked package conflicts with the branch's newest tag: the update's newest is the highest release that the lock's links allow (§5.3)",
+   "project": "typo3-v12",
+   "run": {
+    "project": "typo3/cms",
+    "root_package": "typo3/cms",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "project_php": "^8.1",
+    "project_php_lowest": "8.1.0",
+    "lock_file": "composer.lock",
+    "fail_on": "high",
+    "fail_on_source": "option",
+    "gates": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "threshold": "high"
+     }
+    ],
+    "strict_network": false,
+    "mode": "check",
+    "include_dev": false,
+    "thresholds": {
+     "release-warn-years": 3,
+     "release-high-years": 5,
+     "push-warn-years": 3,
+     "push-high-years": 5
+    },
+    "flag_ids": [
+     "abandoned",
+     "silent",
+     "pinned",
+     "left-behind",
+     "old-promise",
+     "stale",
+     "capped",
+     "vulnerable"
+    ],
+    "verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     "unknown",
+     "finished",
+     "ok"
+    ],
+    "graded_verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "signal_ids": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7",
+     "S8",
+     "S9",
+     "S10",
+     "S11"
+    ],
+    "fix_model": 1,
+    "text_grammar": 1,
+    "score_model": {
+     "id": 1,
+     "score_text_grammar": 1,
+     "flag_order": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "capped",
+      "vulnerable"
+     ],
+     "parts": [
+      {
+       "id": "maintenance",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "capped"
+       ],
+       "combine": "lead_plus_share"
+      },
+      {
+       "id": "security",
+       "flag_ids": [
+        "vulnerable"
+       ],
+       "combine": "max"
+      }
+     ],
+     "flags": [
+      {
+       "id": "abandoned",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "abandoned",
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S1",
+        "S3"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "silent",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "silent",
+        "pinned",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-high-years",
+        "push-high-years"
+       ],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "pinned",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 22,
+       "max_maintenance_flags": [
+        "pinned",
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S6"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "left-behind",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 20,
+       "max_maintenance_flags": [
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S8"
+       ],
+       "thresholds": [
+        "release-warn-years"
+       ],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "old-promise",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 18,
+       "max_maintenance_flags": [
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S5"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "stale",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 10,
+       "max_maintenance_flags": [
+        "stale",
+        "capped"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-warn-years",
+        "push-warn-years"
+       ],
+       "basis": {
+        "v013_base": "medium",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "capped",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 8,
+       "max_maintenance_flags": [
+        "capped"
+       ],
+       "raised_by": [
+        "S11"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "vulnerable",
+       "part": "security",
+       "points": null,
+       "band": null,
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": null,
+       "max_maintenance_flags": null,
+       "raised_by": [
+        "S9"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "severities"
+       },
+       "points_from": "severities"
+      }
+     ],
+     "severities": [
+      {
+       "id": "critical",
+       "points": 32,
+       "band": "critical",
+       "points_no_reachable_fix": 64,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 4,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "high",
+       "points": 16,
+       "band": "high",
+       "points_no_reachable_fix": 32,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 3,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "medium",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "unrated",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": "medium",
+       "basis": {
+        "points": "counts_as"
+       }
+      },
+      {
+       "id": "low",
+       "points": 2,
+       "band": "low",
+       "points_no_reachable_fix": 4,
+       "band_no_reachable_fix": "low",
+       "gate_rank": 1,
+       "counts_as": null,
+       "basis": {
+        "points": "share",
+        "of": "medium",
+        "share": {
+         "num": 1,
+         "den": 4
+        }
+       }
+      }
+     ],
+     "fix_kinds": [
+      {
+       "id": "update",
+       "ease": 1,
+       "doubles": false
+      },
+      {
+       "id": "upgrade",
+       "ease": 2,
+       "doubles": false
+      },
+      {
+       "id": "raise-php",
+       "ease": 3,
+       "doubles": false
+      },
+      {
+       "id": "unknown",
+       "ease": 4,
+       "doubles": false
+      },
+      {
+       "id": "blocked",
+       "ease": 5,
+       "doubles": true
+      },
+      {
+       "id": "none",
+       "ease": 6,
+       "doubles": true
+      }
+     ],
+     "bands": [
+      {
+       "verdict": "critical",
+       "floor": 32
+      },
+      {
+       "verdict": "high",
+       "floor": 16
+      },
+      {
+       "verdict": "medium",
+       "floor": 8
+      },
+      {
+       "verdict": "low",
+       "floor": 1
+      }
+     ],
+     "zero_verdicts": [
+      {
+       "verdict": "finished",
+       "when": "allowlisted"
+      },
+      {
+       "verdict": "unknown",
+       "when": "no_metadata"
+      },
+      {
+       "verdict": "ok",
+       "when": "otherwise"
+      }
+     ],
+     "exact_unit": 0.5,
+     "rounding": "floor_once",
+     "max_total": 104,
+     "bar_max": 64,
+     "bar_overflow": "clip",
+     "exclusive_groups": [
+      {
+       "id": "liveness",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "stale"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "branch",
+       "flag_ids": [
+        "pinned",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_age",
+       "flag_ids": [
+        "silent",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_push",
+       "flag_ids": [
+        "left-behind",
+        "stale"
+       ],
+       "holds_unless": {
+        "threshold": "push-warn-years",
+        "below": "release-warn-years"
+       }
+      },
+      {
+       "id": "php_bound",
+       "flag_ids": [
+        "old-promise",
+        "capped"
+       ],
+       "holds_unless": null
+      }
+     ],
+     "sort": [
+      {
+       "key": "verdict",
+       "path": "verdict",
+       "dir": "order",
+       "order": [
+        [
+         "critical"
+        ],
+        [
+         "high"
+        ],
+        [
+         "medium"
+        ],
+        [
+         "low"
+        ],
+        [
+         "unknown"
+        ],
+        [
+         "finished",
+         "ok"
+        ]
+       ],
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "security",
+       "path": "score.parts.security.contribution",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "score",
+       "path": "score.exact",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "direct",
+       "path": "direct",
+       "dir": "true_first",
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "package",
+       "path": "package",
+       "dir": "asc",
+       "collation": "bytes",
+       "default": null
+      }
+     ],
+     "rules": [
+      {
+       "id": "counted",
+       "stage": 1,
+       "kind": "select",
+       "applies_to": "flags",
+       "accept_group": "liveness",
+       "accept_covers": "listed_and_below",
+       "why": "accepted-facts-shown-not-counted",
+       "doc": "score-counted",
+       "illustration": null
+      },
+      {
+       "id": "lead-first",
+       "stage": 2,
+       "kind": "select",
+       "applies_to": "maintenance",
+       "order": "flag_order",
+       "share": {
+        "num": 1,
+        "den": 1
+       },
+       "why": "strongest-fact-in-full",
+       "doc": "score-lead-first",
+       "illustration": null
+      },
+      {
+       "id": "corroborating-share",
+       "stage": 3,
+       "kind": "share",
+       "applies_to": "maintenance",
+       "share": {
+        "num": 1,
+        "den": 4
+       },
+       "why": "correlated-evidence",
+       "doc": "score-corroborating-share",
+       "illustration": {
+        "lead": "left-behind",
+        "flag": "old-promise",
+        "weight": 16,
+        "points": 4
+       }
+      },
+      {
+       "id": "advisory-points",
+       "stage": 4,
+       "kind": "lookup",
+       "applies_to": "security",
+       "table": "severities",
+       "why": "severity-points",
+       "doc": "score-advisory-points",
+       "illustration": null
+      },
+      {
+       "id": "no-reachable-fix-multiplier",
+       "stage": 5,
+       "kind": "multiply",
+       "applies_to": "advisory",
+       "factor": 2,
+       "when_fix": [
+        "none",
+        "blocked"
+       ],
+       "why": "one-band-up",
+       "doc": "score-no-reachable-fix-multiplier",
+       "illustration": {
+        "severity": "high",
+        "before": 16,
+        "after": 32,
+        "band_before": "high",
+        "band_after": "critical"
+       }
+      },
+      {
+       "id": "security-max",
+       "stage": 6,
+       "kind": "max",
+       "applies_to": "security",
+       "tie_break": [
+        {
+         "key": "points",
+         "dir": "desc",
+         "collation": null
+        },
+        {
+         "key": "severity",
+         "dir": "order",
+         "collation": null
+        },
+        {
+         "key": "id",
+         "dir": "asc",
+         "collation": "bytes"
+        }
+       ],
+       "why": "one-number-per-part",
+       "doc": "score-security-max",
+       "illustration": null
+      },
+      {
+       "id": "divide-reach",
+       "stage": 7,
+       "kind": "divide",
+       "applies_to": "maintenance",
+       "by": 2,
+       "when": [
+        "transitive",
+        "unreached"
+       ],
+       "why": "reach-halves-maintenance",
+       "doc": "score-divide-reach",
+       "illustration": {
+        "flag": "abandoned",
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "security-exempt-from-reach",
+       "stage": 8,
+       "kind": "exempt",
+       "applies_to": "security",
+       "of": "divide-reach",
+       "why": "exploitability-independent-of-reach",
+       "doc": "score-security-exempt-from-reach",
+       "illustration": {
+        "severity": "critical",
+        "reach": "transitive",
+        "total": 32
+       }
+      },
+      {
+       "id": "sum",
+       "stage": 9,
+       "kind": "combine",
+       "applies_to": "total",
+       "op": "sum",
+       "ratio_from": "medium",
+       "why": "parts-add",
+       "doc": "score-sum",
+       "illustration": {
+        "maintenance": 16,
+        "security": 16,
+        "total": 32,
+        "band": "critical",
+        "low_maintenance": 4,
+        "low_security": 4,
+        "low_total": 8,
+        "low_band": "medium"
+       }
+      },
+      {
+       "id": "divide-dev",
+       "stage": 10,
+       "kind": "divide",
+       "applies_to": "total",
+       "by": 2,
+       "when": [
+        "dev"
+       ],
+       "why": "dev-halves-total",
+       "doc": "score-divide-dev",
+       "illustration": {
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "floor-once",
+       "stage": 11,
+       "kind": "floor",
+       "applies_to": "total",
+       "why": "integer-band-edges",
+       "doc": "score-floor-once",
+       "illustration": {
+        "exact": 4.5,
+        "total": 4
+       }
+      },
+      {
+       "id": "band-floors",
+       "stage": 12,
+       "kind": "band",
+       "applies_to": "total",
+       "ratio": 2,
+       "ratio_from": "medium",
+       "why": "two-floor-parts-make-next",
+       "doc": "score-band-floors",
+       "illustration": null
+      },
+      {
+       "id": "zero-verdicts",
+       "stage": 13,
+       "kind": "zero",
+       "applies_to": "total",
+       "table": "zero_verdicts",
+       "why": "score-zero-says-why",
+       "doc": "score-zero-verdicts",
+       "illustration": null
+      },
+      {
+       "id": "sort",
+       "stage": 14,
+       "kind": "order",
+       "applies_to": "findings",
+       "why": "advisory-findings-first",
+       "doc": "score-sort",
+       "illustration": null
+      },
+      {
+       "id": "gate-bounded-new",
+       "stage": 15,
+       "kind": "gate",
+       "applies_to": "gate",
+       "cap_multiplier": 2,
+       "why": "new-fact-sets-level",
+       "doc": "score-gate-bounded-new",
+       "illustration": {
+        "score": 36,
+        "new": 16,
+        "gate": 32
+       }
+      },
+      {
+       "id": "baseline-cover",
+       "stage": 16,
+       "kind": "cover",
+       "applies_to": "gate",
+       "order": "flag_order",
+       "covers": "listed_and_below",
+       "why": "recorded-lead-covers-below",
+       "doc": "score-baseline-cover",
+       "illustration": null
+      }
+     ],
+     "docs": "https://lockrot.dev/verdicts/model-1/"
+    },
+    "score_rules_used": {
+     "counted": 0,
+     "lead-first": 0,
+     "corroborating-share": 0,
+     "advisory-points": 1,
+     "no-reachable-fix-multiplier": 0,
+     "security-max": 0,
+     "divide-reach": 0,
+     "security-exempt-from-reach": 0,
+     "sum": 0,
+     "divide-dev": 0,
+     "floor-once": 0,
+     "band-floors": 1,
+     "zero-verdicts": 1,
+     "sort": null,
+     "gate-bounded-new": 0,
+     "baseline-cover": 0
+    },
+    "advisory_lookup": {
+     "scope": "all",
+     "scope_source": "default",
+     "packages_asked": 2,
+     "packages_not_asked": 0,
+     "other_repositories": 0,
+     "repositories": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "outcome": "answered",
+       "reason": null,
+       "message": null,
+       "packages_with_records": 1,
+       "records": 6
+      }
+     ]
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": false,
+     "blocking_disabled_by": [],
+     "ignores_extensions": true,
+     "baseline": "resolves",
+     "reason": null
+    },
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "acme/san-cap",
+         "version": "1.0.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "acme/san-cap",
+         "version": "1.0.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     },
+     "target_fix": null
+    }
+   },
+   "synthetic_inputs": [
+    "the world of r3/cases.json `solver_world`: branch rows, advisory, lock and composer.json designed; every check is the Composer 2.10.3 answer of design/move-check-oracle (‡)"
+   ],
+   "finding": {
+    "package": "typo3/html-sanitizer",
+    "version": "v2.2.0",
+    "branch": "2.x",
+    "installed_php": {
+     "requires": "^7.2 || ^8.0",
+     "target_runs": true,
+     "project_allows": true
+    },
+    "verdict": "high",
+    "priority": "high",
+    "lead": null,
+    "rank": 8,
+    "flags": [
+     {
+      "id": "vulnerable",
+      "role": "security",
+      "baseline": null,
+      "signal_ids": [
+       "S9"
+      ],
+      "degree": null,
+      "headline": {
+       "unit": "advisories",
+       "value": 1,
+       "source": null
+      },
+      "summary": "1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting"
+     }
+    ],
+    "score": {
+     "model": 1,
+     "total": 16,
+     "exact": 16,
+     "rounded_down": false,
+     "band": {
+      "floor": 16,
+      "next": "critical",
+      "to_next": 16
+     },
+     "decided_by": "security",
+     "parts": {
+      "maintenance": {
+       "status": "none",
+       "contribution": 0,
+       "alone": {
+        "total": 0,
+        "verdict": null
+       }
+      },
+      "security": {
+       "status": "counted",
+       "contribution": 16,
+       "alone": {
+        "total": 16,
+        "verdict": "high"
+       },
+       "of": 1,
+       "tied": []
+      }
+     },
+     "terms": [
+      {
+       "part": "security",
+       "flag": "vulnerable",
+       "role": "security",
+       "advisory": "PKSA-7jn3-yc49-35c6",
+       "severity": "high",
+       "fix_kind": "update",
+       "weight": 16,
+       "multiplier": 1,
+       "points": 16,
+       "contribution": 16
+      }
+     ],
+     "modifiers": [],
+     "accepted": [],
+     "without": [],
+     "text": "16 = vulnerable 16 [high advisory]"
+    },
+    "next_step": {
+     "kind": "update",
+     "source": "vulnerable",
+     "merged": [],
+     "fix_kind": "update",
+     "reason": null,
+     "replacement": null,
+     "quiet_years": null,
+     "to_branch": "2.x",
+     "version": "v2.3.2",
+     "newest": "v2.3.2",
+     "constraint": null,
+     "latest": null,
+     "php_check": {
+      "requires": "^7.2 || ^8.0",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "crosses_major": false,
+     "held_by": [],
+     "clears": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-7jn3-yc49-35c6",
+       "basis": "outside_range"
+      }
+     ],
+     "unverified": [],
+     "adds": [],
+     "leaves": [],
+     "clears_all": true,
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "lead": null,
+      "deciding_advisory": null,
+      "at_most": false,
+      "assumes": [
+       "clears_hold"
+      ]
+     },
+     "check": {
+      "result": "resolves",
+      "form": "inline",
+      "reason": null,
+      "installs": "v2.3.2"
+     },
+     "moves_with": [],
+     "composer_moves_because": [],
+     "commands": [
+      [
+       "composer",
+       "update",
+       "typo3/html-sanitizer:^2.3.2"
+      ]
+     ],
+     "through": [],
+     "also": [],
+     "text": "composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) — clears the advisory; Composer's solver checked it against the lock"
+    },
+    "security": {
+     "status": "vulnerable",
+     "check": "complete",
+     "complete": true,
+     "unchecked_reason": null,
+     "records": 6,
+     "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "answer": "answered",
+       "records": 6,
+       "reason": null
+      }
+     ],
+     "worst": "high",
+     "counts": {
+      "critical": 0,
+      "high": 1,
+      "medium": 0,
+      "unrated": 0,
+      "low": 0
+     },
+     "ignored": [],
+     "ignored_count": 0,
+     "fix_kind": "update",
+     "installed_branch_fixes": {
+      "fixed": 1,
+      "unknown": 0,
+      "of": 1,
+      "fix_kind": "update",
+      "lowest": "v2.3.2",
+      "newest": "v2.3.2",
+      "held_by": [],
+      "if_applied": {
+       "total": 0,
+       "verdict": "ok",
+       "at_most": false,
+       "assumes": [
+        "clears_hold"
+       ]
+      },
+      "check": {
+       "result": "resolves",
+       "form": "inline",
+       "reason": null,
+       "installs": "v2.3.2"
+      }
+     },
+     "move_in": "next_step",
+     "gets": {
+      "version": "v2.3.2",
+      "php_check": {
+       "requires": "^7.2 || ^8.0",
+       "project_allows": true,
+       "target_runs": true,
+       "raise_to": null,
+       "raise_size": null
+      },
+      "clears": [
+       {
+        "kind": "advisory",
+        "id": "PKSA-7jn3-yc49-35c6",
+        "basis": "outside_range"
+       }
+      ],
+      "clears_all": true
+     },
+     "partial": null
+    },
+    "checks_missing": [],
+    "checks_skipped": [],
+    "unchecked_accepted": [],
+    "maintenance_judged": true,
+    "metadata": {
+     "status": "read",
+     "reason": null,
+     "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "TYPO3/html-sanitizer",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:06:22+00:00",
+     "cached_at": "2026-10-01T16:06:22+00:00"
+    },
+    "allowlist": null,
+    "abandoned_ignored": null,
+    "from_composer_repository": true,
+    "origin": {
+     "kind": "packagist",
+     "registry": "packagist.org",
+     "package_url": "https://packagist.org/packages/typo3/html-sanitizer",
+     "local": false
+    },
+    "replacement": null,
+    "replacement_url": null,
+    "note": null,
+    "libyears_unmeasured": null,
+    "libyears_at_least": false,
+    "direct": true,
+    "dev": false,
+    "reach": "direct",
+    "chain": [
+     "typo3/html-sanitizer"
+    ],
+    "depth": 0,
+    "depth_unmeasured": null,
+    "named_in": [
+     "require"
+    ],
+    "direct_dependents": [
+     "typo3/html-sanitizer"
+    ],
+    "signals": [
+     {
+      "id": "S9",
+      "level": "high",
+      "summary": "1 security advisory affects v2.2.0 (CVE-2026-47345); fixed in v2.3.2",
+      "data": {
+       "advisories": [
+        {
+         "id": "PKSA-7jn3-yc49-35c6",
+         "cve": "CVE-2026-47345",
+         "title": "TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
+         "link": "https://typo3.org/security/advisory/typo3-core-sa-2026-006",
+         "reported_at": "2026-06-08T20:00:00+00:00",
+         "severity": "high",
+         "severity_published": "high",
+         "affected_versions": "<2.3.2",
+         "counted": true,
+         "points": 16,
+         "deciding": true,
+         "fix": {
+          "kind": "update",
+          "to_branch": "2.x",
+          "version": "v2.3.2",
+          "newest": "v2.3.2",
+          "on_installed_branch": true,
+          "php": "^7.2 || ^8.0",
+          "admits_target_php": true,
+          "admits_project_php": true,
+          "held_by": [],
+          "reason": null
+         },
+         "baseline": null
+        }
+       ],
+       "releases_read": true,
+       "complete": true
+      }
+     }
+    ],
+    "evidence": "vulnerable: 1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
+    "allowlist_reason": null,
+    "data_date": "2026-10-01T17:41:59+00:00",
+    "libyears": 1.97,
+    "age": {
+     "installed": {
+      "at": "2024-07-12T15:52:25+00:00",
+      "years": 2.2,
+      "dated_by": null
+     },
+     "installed_unmeasured": null,
+     "release": {
+      "version": "v2.3.5",
+      "at": "2026-07-03T10:00:00+00:00",
+      "years": 0.2,
+      "level": null,
+      "dated_by": null
+     },
+     "release_unmeasured": null,
+     "branch_release": {
+      "version": "v2.3.5",
+      "at": "2026-07-03T10:00:00+00:00",
+      "years": 0.2,
+      "level": null,
+      "dated_by": null
+     },
+     "branch_release_unmeasured": null,
+     "push": {
+      "at": "2026-07-03T10:00:00+00:00",
+      "years": 0.2,
+      "level": null
+     },
+     "push_unmeasured": null
+    },
+    "baseline": null,
+    "gate": {
+     "reaches_fail_on": true,
+     "fails": true,
+     "exempt_by": null,
+     "by": [
+      {
+       "value": "high",
+       "kind": "grade",
+       "facts": [
+        {
+         "kind": "advisory",
+         "id": "PKSA-7jn3-yc49-35c6"
+        }
+       ]
+      }
+     ],
+     "basis": null
+    }
+   },
+   "details": {
+    "metadata": {
+     "installed_branch": "2.x",
+     "branches": [
+      {
+       "branch": "2.x",
+       "installed": true,
+       "highest": "v2.3.5",
+       "highest_released": "2026-07-03T10:00:00+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v2.3.5",
+       "newest_dated_released": "2026-07-03T10:00:00+00:00",
+       "dated_by": null,
+       "php": "^7.2 || ^8.0",
+       "highest_php": "^7.2 || ^8.0",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 0.2,
+       "fixes": {
+        "fixed": 1,
+        "unknown": 0,
+        "of": 1,
+        "fix_kind": "update",
+        "lowest": "v2.3.2",
+        "newest": "v2.3.2",
+        "held_by": [],
+        "if_applied": {
+         "total": 0,
+         "verdict": "ok",
+         "at_most": false,
+         "assumes": [
+          "clears_hold"
+         ]
+        },
+        "check": {
+         "result": "resolves",
+         "form": "inline",
+         "reason": null,
+         "installs": "v2.3.2"
+        }
+       }
+      }
+     ]
+    }
+   },
+   "golden": {
+    "score_text": "16 = vulnerable 16 [high advisory]",
+    "next_step_text": "composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) — clears the advisory; Composer's solver checked it against the lock",
+    "verdict_line": "High: a high-severity advisory affects your version (CVE-2026-47345: TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting).",
+    "readings": [],
+    "qualifiers": {
+     "reach": [
+      "Production: not in packages-dev",
+      "Required directly"
+     ],
+     "origin": null,
+     "not_judged": null,
+     "unchecked": [],
+     "not_run": [],
+     "php": null,
+     "php_edge": [],
+     "accepted": [],
+     "gate": [
+      "fails the run: grade high or above",
+      "Tripped by CVE-2026-47345"
+     ]
+    },
+    "moves": [
+     {
+      "heading": "The move",
+      "action": "Update to v2.3.2 on 2.x",
+      "platform_step": null,
+      "command_note": null,
+      "moves_with": null,
+      "commands": [
+       "composer update 'typo3/html-sanitizer:^2.3.2'"
+      ],
+      "commands_label": "Command",
+      "clears": "the advisory",
+      "stays": null,
+      "not_checked": null,
+      "adds": [],
+      "php": {
+       "head": "2.x needs php ^7.2 || ^8.0",
+       "lines": [
+        {
+         "answer": "yes",
+         "text": "your require.php allows it"
+        },
+        {
+         "answer": "yes",
+         "text": "your target, 8.4, runs it"
+        }
+       ]
+      },
+      "after": {
+       "result": "0, ok",
+       "conditions": [
+        "checked with Composer"
+       ]
+      },
+      "composer": []
+     }
+    ],
+    "held_by": [
+     null
+    ],
+    "security": {
+     "summary": [
+      "1 high advisory",
+      "6 on record for this name",
+      "fix: composer update",
+      "lookup complete"
+     ],
+     "counts": [],
+     "meanwhile": null,
+     "caption": [
+      "By severity. Each affects your version, v2.2.0."
+     ],
+     "groups": [],
+     "rows": [
+      {
+       "name": "CVE-2026-47345",
+       "source": "PKSA-7jn3-yc49-35c6",
+       "deciding": true,
+       "severity": "high",
+       "fix": "fix v2.3.2 on 2.x, your branch (composer update)",
+       "affects": "affects <2.3.2",
+       "ranges": null,
+       "same_as": null
+      }
+     ],
+     "ignored": [],
+     "ladder": [
+      {
+       "branch": "2.x",
+       "marks": [
+        "your branch",
+        "the move"
+       ],
+       "lines": [
+        "2.x your branch the move clears 1 of 1 from v2.3.2",
+        "composer update",
+        "after it: 0, ok"
+       ]
+      }
+     ]
+    },
+    "branches_lead": [
+     "Your branch, 2.x, had its last release, v2.3.5, 0.2 years ago.",
+     "It has no higher branch."
+    ],
+    "branch_rows": [],
+    "age_rows": [
+     {
+      "label": "installed",
+      "value": "v2.2.0 · 2024-07-12 · 2.2 years ago"
+     },
+     {
+      "label": "2.x last",
+      "value": "v2.3.5 · 2026-07-03 · 0.2 years ago · its most recent release"
+     },
+     {
+      "label": "last push",
+      "value": "2026-07-03 · 0.2 years ago"
+     }
+    ],
+    "security_row": [
+     "1 high advisory",
+     "6 on record for this name",
+     "fix: composer update",
+     "lookup complete",
+     "2.x your branch the move clears 1 of 1 from v2.3.2",
+     "composer update",
+     "after it: 0, ok"
+    ],
+    "why": [
+     "16 · high from 16 · 16 points short of critical",
+     "vulnerable 16: high advisory CVE-2026-47345; its own fix (composer update on 2.x) is reachable, so no × 2",
+     "the advisory alone makes it high"
+    ],
+    "gate_line": null,
+    "checks": "1 fired (S9) · 10 quiet · every check ran",
+    "baseline_suffix": null,
+    "commands_posix": [
+     "composer update 'typo3/html-sanitizer:^2.3.2'"
+    ],
+    "commands_cmd": [
+     "composer update \"typo3/html-sanitizer:^2.3.2\""
+    ],
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.5 2026-07-03 (0.2 years ago), its newest release; last push 2026-07-03 (0.2 years ago)"
+   },
+   "parents": [
+    {
+     "package": "acme/san-cap",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/san-cap",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/san-cap",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/san-cap"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/san-cap"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
+   "solver_world": {
+    "world_id": "link-newest",
+    "world": {
+     "platform_php": "8.4.99",
+     "root": {
+      "name": "typo3/cms",
+      "require": {
+       "php": "^8.1",
+       "typo3/html-sanitizer": "^2.2",
+       "acme/san-cap": "^1.0"
+      }
+     },
+     "lock": {
+      "packages": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1"
+        },
+        "conflict": {
+         "typo3/html-sanitizer": "~2.3.5"
+        },
+        "name": "acme/san-cap",
+        "time": "2026-07-01T10:00:00+00:00"
+       },
+       {
+        "version": "v2.2.0",
+        "require": {
+         "php": "^7.2 || ^8.0"
+        },
+        "name": "typo3/html-sanitizer",
+        "time": "2024-07-12T15:52:25+00:00"
+       }
+      ],
+      "packages-dev": []
+     },
+     "repo": {
+      "acme/san-cap": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1"
+        },
+        "conflict": {
+         "typo3/html-sanitizer": "~2.3.5"
+        },
+        "time": "2026-07-01T10:00:00+00:00"
+       }
+      ],
+      "typo3/html-sanitizer": [
+       {
+        "version": "v2.2.0",
+        "require": {
+         "php": "^7.2 || ^8.0"
+        },
+        "time": "2024-07-12T15:52:25+00:00"
+       },
+       {
+        "version": "v2.3.5",
+        "require": {
+         "php": "^7.2 || ^8.0"
+        },
+        "time": "2026-07-03T10:00:00+00:00"
+       },
+       {
+        "version": "v2.3.2",
+        "require": {
+         "php": "^7.2 || ^8.0"
+        },
+        "time": "2026-07-02T10:00:00+00:00"
+       }
+      ]
+     }
+    },
+    "check_passes": null,
+    "update_now": null,
+    "answers": {
+     "baseline": {
+      "result": "resolves",
+      "form": "inline",
+      "installs": {},
+      "holds": [],
+      "problem": null
+     },
+     "combined typo3/html-sanitizer": {
+      "result": "resolves",
+      "form": "inline",
+      "installs": {
+       "typo3/html-sanitizer": "v2.3.2"
+      },
+      "holds": [],
+      "problem": null
+     },
+     "update typo3/html-sanitizer ^2.3.2 ": {
+      "result": "resolves",
+      "form": "inline",
+      "installs": {
+       "typo3/html-sanitizer": "v2.3.2"
+      },
+      "holds": [],
+      "problem": null
+     }
+    }
+   },
+   "inputs": {
+    "root": {
+     "name": "typo3/cms",
+     "require": {
+      "php": "^8.1",
+      "typo3/html-sanitizer": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "typo3/html-sanitizer",
+      "version": "v2.2.0",
+      "time": "2024-07-12T15:52:25+00:00",
+      "php": "^7.2 || ^8.0",
+      "dev": false,
+      "origin": "packagist"
+     },
+     {
+      "name": "acme/san-cap",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "conflict": {
+       "typo3/html-sanitizer": "~2.3.5"
+      }
+     }
+    ],
+    "releases": [
+     {
+      "version": "v2.2.0",
+      "time": "2024-07-12T15:52:25+00:00",
+      "php": "^7.2 || ^8.0"
+     },
+     {
+      "version": "v2.3.2",
+      "time": "2026-07-02T10:00:00+00:00",
+      "php": "^7.2 || ^8.0"
+     },
+     {
+      "version": "v2.3.5",
+      "time": "2026-07-03T10:00:00+00:00",
+      "php": "^7.2 || ^8.0"
+     }
+    ],
+    "advisories": [
+     {
+      "id": "PKSA-7jn3-yc49-35c6",
+      "cve": "CVE-2026-47345",
+      "title": "TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
+      "link": "https://typo3.org/security/advisory/typo3-core-sa-2026-006",
+      "reported_at": "2026-06-08T20:00:00+00:00",
+      "severity": "high",
+      "affected_versions": "<2.3.2"
+     }
+    ],
+    "records": 6,
+    "ignored": [],
+    "abandoned": null,
+    "activity": {
+     "forge": "github",
+     "host": "github.com",
+     "repo": "TYPO3/html-sanitizer",
+     "status": "read",
+     "reason": null,
+     "pushed_at": "2026-07-03T10:00:00+00:00",
+     "archived": false
+    },
+    "dependents": {},
+    "run": {
+     "target_php": "8.4",
+     "project_php": "^8.1",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    },
+    "packages": {
+     "acme/san-cap": {
+      "lock": {
+       "name": "acme/san-cap",
+       "version": "1.0.0",
+       "time": "2026-07-01T10:00:00+00:00",
+       "php": ">=8.1",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "1.0.0",
+        "time": "2026-07-01T10:00:00+00:00",
+        "php": ">=8.1"
+       }
+      ],
+      "advisories": [],
+      "records": 0,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "acme/san-cap",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-07-01T10:00:00+00:00",
+       "archived": false
+      },
+      "chain": [
+       "acme/san-cap"
+      ],
+      "below": null
+     }
+    },
+    "solver_world": {
+     "world_id": "link-newest",
+     "world": {
+      "platform_php": "8.4.99",
+      "root": {
+       "name": "typo3/cms",
+       "require": {
+        "php": "^8.1",
+        "typo3/html-sanitizer": "^2.2",
+        "acme/san-cap": "^1.0"
+       }
+      },
+      "lock": {
+       "packages": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1"
+         },
+         "conflict": {
+          "typo3/html-sanitizer": "~2.3.5"
+         },
+         "name": "acme/san-cap",
+         "time": "2026-07-01T10:00:00+00:00"
+        },
+        {
+         "version": "v2.2.0",
+         "require": {
+          "php": "^7.2 || ^8.0"
+         },
+         "name": "typo3/html-sanitizer",
+         "time": "2024-07-12T15:52:25+00:00"
+        }
+       ],
+       "packages-dev": []
+      },
+      "repo": {
+       "acme/san-cap": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1"
+         },
+         "conflict": {
+          "typo3/html-sanitizer": "~2.3.5"
+         },
+         "time": "2026-07-01T10:00:00+00:00"
+        }
+       ],
+       "typo3/html-sanitizer": [
+        {
+         "version": "v2.2.0",
+         "require": {
+          "php": "^7.2 || ^8.0"
+         },
+         "time": "2024-07-12T15:52:25+00:00"
+        },
+        {
+         "version": "v2.3.5",
+         "require": {
+          "php": "^7.2 || ^8.0"
+         },
+         "time": "2026-07-03T10:00:00+00:00"
+        },
+        {
+         "version": "v2.3.2",
+         "require": {
+          "php": "^7.2 || ^8.0"
+         },
+         "time": "2026-07-02T10:00:00+00:00"
+        }
+       ]
+      }
+     },
+     "check_passes": null,
+     "update_now": null,
+     "answers": {
+      "baseline": {
+       "result": "resolves",
+       "form": "inline",
+       "installs": {},
+       "holds": [],
+       "problem": null
+      },
+      "combined typo3/html-sanitizer": {
+       "result": "resolves",
+       "form": "inline",
+       "installs": {
+        "typo3/html-sanitizer": "v2.3.2"
+       },
+       "holds": [],
+       "problem": null
+      },
+      "update typo3/html-sanitizer ^2.3.2 ": {
+       "result": "resolves",
+       "form": "inline",
+       "installs": {
+        "typo3/html-sanitizer": "v2.3.2"
+       },
+       "holds": [],
+       "problem": null
+      }
+     }
+    },
+    "checks": {
+     "baseline": {
+      "result": "resolves",
+      "form": "inline",
+      "installs": {},
+      "holds": [],
+      "problem": null,
+      "reason": null
+     },
+     "combined typo3/html-sanitizer": {
+      "result": "resolves",
+      "form": "inline",
+      "installs": {
+       "typo3/html-sanitizer": "v2.3.2"
+      },
+      "holds": [],
+      "problem": null,
+      "reason": null
+     },
+     "update typo3/html-sanitizer ^2.3.2 ": {
+      "result": "resolves",
+      "form": "inline",
+      "installs": {
+       "typo3/html-sanitizer": "v2.3.2"
       },
       "holds": [],
       "problem": null,
@@ -309976,6 +313378,7 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v6.4.26 released 2025-09-26 (1.0 years ago); 6.x last released v6.4.40 2026-07-01 (0.3 years ago), its newest release; last push 2026-10-01 (less than three weeks ago)"
    },
+   "parents": [],
    "solver_world": {
     "world_id": "raise-php",
     "world": {
@@ -310984,7 +314387,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -310992,7 +314395,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -311002,8 +314405,8 @@
        "outcome": "answered",
        "reason": null,
        "message": null,
-       "packages_with_records": 1,
-       "records": 6
+       "packages_with_records": 2,
+       "records": 21
       }
      ]
     },
@@ -311671,6 +315074,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 2.8.0 released 2025-08-23 (1.1 years ago); 2.x last released 2.12.3 2026-07-02 (0.3 years ago), its newest release; last push 2026-08-24 (0.1 years ago)"
    },
+   "parents": [
+    {
+     "package": "guzzlehttp/guzzle",
+     "version": "7.10.0",
+     "branch": "7.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 15,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 15,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "guzzlehttp/guzzle",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/guzzlehttp/guzzle",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "guzzlehttp/guzzle"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "guzzlehttp/guzzle"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "7.10.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "7.10.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "dev-update",
     "world": {
@@ -311792,7 +315329,7 @@
       "dev": false,
       "origin": "packagist",
       "require": {
-       "guzzlehttp/psr7": "*"
+       "guzzlehttp/psr7": "^1.9.1 || ^2.4.5"
       }
      }
     ],
@@ -312809,7 +316346,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -312817,7 +316354,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -313491,6 +317028,140 @@
       "reason": "baseline_refused",
       "php": "8.4.99",
       "problem": "  Problem 1\n    - typo3/html-sanitizer is locked to version v2.2.0 and an update of this package was not requested.\n    - typo3/html-sanitizer v2.2.0 requires acme/san-tokens ^2.0 -> found acme/san-tokens[2.0.0] but the package is fixed to 1.0.0 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command."
+     }
+    }
+   ],
+   "parents": [
+    {
+     "package": "acme/san-tokens",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/san-tokens",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/san-tokens",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/san-tokens"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/san-tokens"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
      }
     }
    ],
@@ -319804,7 +323475,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -319812,7 +323483,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -320381,7 +324052,7 @@
           "version": "v6.4.40",
           "newest": "v6.4.41",
           "on_installed_branch": true,
-          "php": ">=8.1",
+          "php": ">=8.1 <8.5",
           "admits_target_php": true,
           "admits_project_php": true,
           "held_by": [],
@@ -320735,6 +324406,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-04 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)"
    },
+   "parents": [
+    {
+     "package": "acme/rt-kernel",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/rt-kernel",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/rt-kernel",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/rt-kernel"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/rt-kernel"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "split",
     "world": {
@@ -322049,7 +325854,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -322057,7 +325862,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -322937,6 +326742,140 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-04 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)"
    },
+   "parents": [
+    {
+     "package": "acme/rt-kernel",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/rt-kernel",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/rt-kernel",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/rt-kernel"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/rt-kernel"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "split-both",
     "world": {
@@ -324359,7 +328298,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 2,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -324367,7 +328306,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 3,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -324871,7 +328810,7 @@
           "version": "v6.4.40",
           "newest": "v6.4.41",
           "on_installed_branch": true,
-          "php": ">=8.1",
+          "php": ">=8.1 <8.5",
           "admits_target_php": true,
           "admits_project_php": true,
           "held_by": [],
@@ -325180,6 +329119,272 @@
       "reason": "baseline_refused",
       "php": "8.4.99",
       "problem": "  Problem 1\n    - acme/rt-glue is locked to version 1.0.0 and an update of this package was not requested.\n    - acme/rt-glue 1.0.0 requires acme/rt-tokens ^2.0 -> found acme/rt-tokens[1.0.0] but it does not match the constraint."
+     }
+    }
+   ],
+   "parents": [
+    {
+     "package": "acme/rt-glue",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/rt-glue",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/rt-glue",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/rt-glue"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/rt-glue"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    },
+    {
+     "package": "acme/rt-kernel",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/rt-kernel",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/rt-kernel",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/rt-kernel"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/rt-kernel"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-02T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-02T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-02T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-02T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
      }
     }
    ],
@@ -326416,7 +330621,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 1,
-     "zero-verdicts": 0,
+     "zero-verdicts": 1,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -326424,7 +330629,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 1,
+     "packages_asked": 2,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -326999,7 +331204,7 @@
           "version": "v6.4.40",
           "newest": "v6.4.41",
           "on_installed_branch": true,
-          "php": ">=8.2",
+          "php": ">=8.2 <8.5",
           "admits_target_php": true,
           "admits_project_php": false,
           "held_by": [],
@@ -327340,6 +331545,140 @@
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-04 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)"
    },
+   "parents": [
+    {
+     "package": "acme/rt-kernel",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/rt-kernel",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/rt-kernel",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/rt-kernel"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/rt-kernel"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
    "solver_world": {
     "world_id": "split-maint",
     "world": {
@@ -329188,6 +333527,7 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.2 2026-07-02 (0.3 years ago), its newest release; last push 2026-07-02 (0.3 years ago)"
    },
+   "parents": [],
    "solver_world": {
     "world_id": "lookup",
     "world": {
@@ -330867,6 +335207,7 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.2 2026-07-02 (0.3 years ago), its newest release; last push 2026-07-02 (0.3 years ago)"
    },
+   "parents": [],
    "solver_world": {
     "world_id": "lookup",
     "world": {
@@ -332580,6 +336921,7 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.2 2026-07-02 (0.3 years ago), its newest release; last push 2026-07-02 (0.3 years ago)"
    },
+   "parents": [],
    "solver_world": {
     "world_id": "lookup",
     "world": {
@@ -333645,7 +337987,7 @@
      "divide-dev": 0,
      "floor-once": 0,
      "band-floors": 6,
-     "zero-verdicts": 0,
+     "zero-verdicts": 4,
      "sort": null,
      "gate-bounded-new": 0,
      "baseline-cover": 0
@@ -333653,7 +337995,7 @@
     "advisory_lookup": {
      "scope": "all",
      "scope_source": "default",
-     "packages_asked": 6,
+     "packages_asked": 10,
      "packages_not_asked": 0,
      "other_repositories": 0,
      "repositories": [
@@ -336352,6 +340694,534 @@
         ]
        }
       ],
+      "basis": null
+     }
+    },
+    {
+     "package": "acme/gz-promises",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/gz-promises",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/gz-promises",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/gz-promises"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/gz-promises"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    },
+    {
+     "package": "acme/hf-mime",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/hf-mime",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/hf-mime",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/hf-mime"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/hf-mime"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-03T10:00:00+00:00",
+       "years": 0.2,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-03T10:00:00+00:00",
+       "years": 0.2,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-03T10:00:00+00:00",
+       "years": 0.2,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-03T10:00:00+00:00",
+       "years": 0.2,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    },
+    {
+     "package": "acme/ml-widget",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/ml-widget",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/ml-widget",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/ml-widget"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/ml-widget"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-07T10:00:00+00:00",
+       "years": 0.2,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-07T10:00:00+00:00",
+       "years": 0.2,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-07T10:00:00+00:00",
+       "years": 0.2,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-07T10:00:00+00:00",
+       "years": 0.2,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    },
+    {
+     "package": "acme/rt-kernel",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/rt-kernel",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/rt-kernel",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/rt-kernel"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/rt-kernel"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-08T10:00:00+00:00",
+       "years": 0.2,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-08T10:00:00+00:00",
+       "years": 0.2,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-08T10:00:00+00:00",
+       "years": 0.2,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-08T10:00:00+00:00",
+       "years": 0.2,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
       "basis": null
      }
     }

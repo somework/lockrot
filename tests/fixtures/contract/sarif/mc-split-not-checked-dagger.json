@@ -48,6 +48,25 @@
                                 ],
                                 "security-severity": "8.0"
                             }
+                        },
+                        {
+                            "id": "lockrot/ok",
+                            "name": "ok",
+                            "shortDescription": {
+                                "text": "ok: Nothing counts"
+                            },
+                            "fullDescription": {
+                                "text": "No flag counts and no counted advisory affects the installed version."
+                            },
+                            "defaultConfiguration": {
+                                "level": "note"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
                         }
                     ]
                 }
@@ -271,6 +290,162 @@
                             }
                         }
                     ]
+                },
+                {
+                    "ruleId": "lockrot/ok",
+                    "ruleIndex": 2,
+                    "level": "note",
+                    "message": {
+                        "text": "acme/rt-glue 1.0.0 \u2014 finding ok, 0"
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "acme/rt-glue"
+                    },
+                    "properties": {
+                        "package": "acme/rt-glue",
+                        "version": "1.0.0",
+                        "verdict": "ok",
+                        "priority": "none",
+                        "lead": null,
+                        "score_total": 0,
+                        "score_text": "0",
+                        "score_model_id": 1,
+                        "flag_ids": [],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "acme/rt-glue"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "acme/rt-glue"
+                        ],
+                        "signal_ids": [],
+                        "age": {
+                            "installed": {
+                                "at": "2026-07-01T10:00:00+00:00",
+                                "years": 0.3,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "1.0.0",
+                                "at": "2026-07-01T10:00:00+00:00",
+                                "years": 0.3,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "1.0.0",
+                                "at": "2026-07-01T10:00:00+00:00",
+                                "years": 0.3,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-07-01T10:00:00+00:00",
+                                "years": 0.3,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/ok",
+                    "ruleIndex": 2,
+                    "level": "note",
+                    "message": {
+                        "text": "acme/rt-kernel 1.0.0 \u2014 finding ok, 0"
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "acme/rt-kernel"
+                    },
+                    "properties": {
+                        "package": "acme/rt-kernel",
+                        "version": "1.0.0",
+                        "verdict": "ok",
+                        "priority": "none",
+                        "lead": null,
+                        "score_total": 0,
+                        "score_text": "0",
+                        "score_model_id": 1,
+                        "flag_ids": [],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "acme/rt-kernel"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "acme/rt-kernel"
+                        ],
+                        "signal_ids": [],
+                        "age": {
+                            "installed": {
+                                "at": "2026-07-02T10:00:00+00:00",
+                                "years": 0.3,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "1.0.0",
+                                "at": "2026-07-02T10:00:00+00:00",
+                                "years": 0.3,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "1.0.0",
+                                "at": "2026-07-02T10:00:00+00:00",
+                                "years": 0.3,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-07-02T10:00:00+00:00",
+                                "years": 0.3,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 18
+                                }
+                            }
+                        }
+                    ]
                 }
             ],
             "invocations": [
@@ -339,7 +514,7 @@
                 "advisory_lookup": {
                     "scope": "all",
                     "scope_source": "default",
-                    "packages_asked": 1,
+                    "packages_asked": 3,
                     "packages_not_asked": 0,
                     "other_repositories": 0,
                     "repositories": [
