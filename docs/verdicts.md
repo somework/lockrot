@@ -238,7 +238,8 @@ both of these floors:
 
 - the target PHP ([`target-php`](configuration.md#extralockrot-keys) or its option and environment
   override, else `config.platform.php`, else the running PHP), at its minor's newest patch
-  (`8.4.99`), where the move check solves: a branch that does not admit it will not install.
+  (`8.4.99`): a branch that does not admit it will not install. The move check solves there
+  too, unless `config.platform.php` is in that minor ([limits of the check](#the-move-check)).
 
 When that is not the newest branch, the evidence says which floor blocks the newest branch, then
 names the branch within reach. Abridged from the [example run](example-run.md):

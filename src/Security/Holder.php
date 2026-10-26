@@ -96,7 +96,7 @@ final class Holder implements \JsonSerializable
         return $this->finding;
     }
 
-    /** A copy that names the holder's locked release: the release that holds the move now (W6). */
+    /** A copy that names the holder's locked release: the release that holds the move in the lock. */
     public function asLocked(): self
     {
         $clone = clone $this;
@@ -137,7 +137,7 @@ final class Holder implements \JsonSerializable
 
     /**
      * Each entry once, in `held_by[]`'s order. Of two entries that differ only in the version, the
-     * holder's locked release wins (W6). Else a stable version wins over a dev version, which
+     * holder's locked release wins. Else a stable version wins over a dev version, which
      * Composer installs only without the tag (T4). Between two stable versions the lower wins:
      * Composer's problem text names one rule's versions lowest first. Any other pair keeps the first.
      *

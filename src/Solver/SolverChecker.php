@@ -289,7 +289,7 @@ final class SolverChecker implements MoveChecker
         }
     }
 
-    /** Composer blocks only the advisories that it reads, so a solve that installs a name whose records the lookup could not read proves nothing (SPEC §5.6, ruling Q2). */
+    /** Composer blocks only the advisories that it reads, so a solve that installs a name whose records the lookup could not read proves nothing. */
     private function installsUnread(Solution $solution): bool
     {
         return $this->advisories !== null && $this->advisories->unread(array_keys($solution->installs())) !== [];

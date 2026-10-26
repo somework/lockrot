@@ -166,7 +166,7 @@ final class SarifRecords
         ];
     }
 
-    /** SPEC §7.5: `run.score_model` names the thresholds of a flag, and `run.thresholds` holds their values. */
+    /** `run.score_model` names the thresholds of a flag, and `run.thresholds` holds their values. */
     private static function fullText(string $full, string $flag, Thresholds $thresholds): string
     {
         $values = $thresholds->toArray();

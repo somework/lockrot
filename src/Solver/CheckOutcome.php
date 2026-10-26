@@ -61,7 +61,7 @@ final class CheckOutcome
     }
 
     /**
-     * The move after its joint request ({@see \Lockrot\Verdict\MoveChecks}, SPEC §5.6). The joint
+     * The move after its joint request ({@see \Lockrot\Verdict\MoveChecks}). The joint
      * solve resolves the move when it installs the moved package inside the move's constraint and
      * changes a holder's release. The move then has no hold and lists each changed holder. A new
      * install of the same tag is no change, but a branch version can move to another commit.

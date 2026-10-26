@@ -103,8 +103,8 @@ final class PackageFixes
 
     /**
      * The highest release on the installed branch that the lock's links allow and the target runs:
-     * what `composer update` installs there. A refusal of the move check does not lower it (ruling
-     * 5a), and a solve that installs a lower release names it in `check.installs` (ruling R2).
+     * what `composer update` installs there. A refusal of the move check does not lower it, and a
+     * solve that installs a lower release names it in `check.installs`.
      */
     public function newestOnInstalledBranch(): ?string
     {

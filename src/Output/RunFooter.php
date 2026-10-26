@@ -343,7 +343,7 @@ final class RunFooter
     }
 
     /**
-     * The `lock_platform` clause (§7.0, ruling Q3): the root links that only the lock records, and
+     * The `lock_platform` clause: the root links that only the lock records, and
      * the update that rewrites them. Beside a listed package or at the root ceiling, the fix clause
      * carries a refusal and an unchecked fix.
      *

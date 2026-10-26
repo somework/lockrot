@@ -194,8 +194,9 @@ final class PhpWindow implements \JsonSerializable
     }
 
     /**
-     * The root links that only the lock's `platform` or `platform-dev` holds. Composer writes them
-     * from composer.json on every update, so composer.json no longer has them. On a lock-only run
+     * The root links that only the lock's `platform` or `platform-dev` holds. Composer writes the
+     * lock's platform from composer.json on each update, so composer.json dropped these links after
+     * the last update. On a lock-only run
      * the lock's platform is the only record of the root, and none is listed.
      *
      * @return list<Req>

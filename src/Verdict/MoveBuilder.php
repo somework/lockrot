@@ -62,7 +62,7 @@ final class MoveBuilder
         if ($check === null && $checks !== null && $kind === Move::BLOCKED && $lower !== null && $checks->refused($subject->package())->refuses($lower->release()->normalized())) {
             $check = MoveCheck::refused();
         }
-        // Ruling R2: a solve that installs a release below the row's newest clears what that release clears.
+        // A solve that installs a release below the row's newest clears what that release clears.
         $installs = $row === null || $check === null || !$draft->isRowMove() ? null : $check->installsBelow($row->highest());
         $below = $installs === null ? null : $context->release($installs);
         $judged = $below === null || $row === null ? $row : (BranchRow::ofRelease($below, $row->installed(), $context->floor()) ?? $row);

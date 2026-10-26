@@ -30,7 +30,8 @@ final class PhpFloor
 
     /**
      * The patch at which lockrot tests a PHP minor: its newest one. The move check solves at the
-     * same point, so the target tests and the solve admit the same PHP (docs/verdicts.md#the-php-window).
+     * same point unless `config.platform.php` is in that minor ({@see \Lockrot\Solver\MoveCheckers::platformPhp()},
+     * docs/verdicts.md#the-move-check).
      */
     public const NEWEST_PATCH = '99';
 

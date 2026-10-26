@@ -131,7 +131,7 @@ final class TableFormatter implements FormatterInterface
 
     /**
      * The move text cut around the first command that it names, as [text, whether it is the command].
-     * The text of a move names one command at most.
+     * A second command stays in the text part.
      *
      * @return list<array{0: string, 1: bool}>
      */

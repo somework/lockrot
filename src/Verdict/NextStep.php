@@ -45,7 +45,7 @@ final class NextStep
             if ($check === null || !$check->isRefused()) {
                 [$main, $lead, $other] = [$mergedDraft, $mergedLead, null];
             } elseif ($main === $maintenance) {
-                // SPEC §5.6, rule 4 of the choice of move: a merge holds only while Composer's solver does not refuse it.
+                // A merge holds only while Composer's solver does not refuse it.
                 [$main, $other] = [$other, $main];
             }
         }

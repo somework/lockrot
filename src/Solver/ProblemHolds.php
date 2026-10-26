@@ -50,7 +50,7 @@ final class ProblemHolds
     /**
      * @param array<string, string> $moved     the names on the allow list: a link to one of them has no target
      * @param array<string, string> $requested the root requirements that the request writes: a refusal of one names the request, not a hold
-     * @param array<string, string> $locked    name => the normalized version of each locked package: a hold at that release is marked locked (W6)
+     * @param array<string, string> $locked    name => the normalized version of each locked package: a hold at that release is marked locked
      */
     public static function of(SolverProblemsException $e, Pool $pool, RootPackageInterface $root, array $moved, array $requested = [], array $locked = []): self
     {
