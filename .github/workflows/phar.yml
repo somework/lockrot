@@ -38,17 +38,22 @@ jobs:
         run: |
           conclusion="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml --branch main --event push --commit "$GITHUB_SHA" --json conclusion --jq '.[0].conclusion // "none"')"
           [ "$conclusion" = success ] || { echo "::error::the ci.yml push run of $GITHUB_SHA on main is $conclusion"; exit 1; }
-      # tools/report/README.md: a release vendors a renderer release, never a pre-release or a local
-      # build. The attestation must come from the renderer's release workflow, for the tag that the
-      # manifest names.
+      # The release pull request into main ran the same check (ci.yml, job quality).
       - name: The vendored renderer is an attested release
         if: startsWith(github.ref, 'refs/tags/')
         env: {GH_TOKEN: '${{ github.token }}'}
+        run: tools/report/check-vendored
+      # Every report, explanation, baseline and config names its schema by URL in `$schema`, so the
+      # release waits until lockrot.dev serves the schemas that this tag carries.
+      - name: lockrot.dev serves the schemas of the tag
+        if: startsWith(github.ref, 'refs/tags/')
+        # A named bash shell runs with pipefail, so a curl failure fails the pipe into jq.
+        shell: bash
         run: |
-          version=$(jq -r .version resources/report/manifest.json)
-          [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::resources/report/ holds lockrot-report $version, not a release"; exit 1; }
-          for file in report.html manifest.json; do
-            gh attestation verify "resources/report/$file" --repo somework/lockrot-report --signer-workflow somework/lockrot-report/.github/workflows/release.yml --source-ref "refs/tags/v$version"
+          for doc in report explain baseline config; do
+            url="https://lockrot.dev/schema/$doc-2.json"
+            served="$(curl -fsSL --retry 3 "$url" | jq -S .)" || { echo "::error::$url does not answer"; exit 1; }
+            [ "$served" = "$(jq -S . "resources/lockrot-$doc-2.schema.json")" ] || { echo "::error::$url differs from resources/lockrot-$doc-2.schema.json"; exit 1; }
           done
       # Composer is part of the reproducible-build recipe: it writes vendor/composer/*.php from its own
       # source. A rebuilder uses the version that this file pins at the tag.

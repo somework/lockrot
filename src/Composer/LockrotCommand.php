@@ -426,7 +426,7 @@ final class LockrotCommand extends BaseCommand
                 'lockrot: the advisory lookup did not complete, so the baseline keeps the recorded advisories of %d %s: %s',
                 \count($carried),
                 \count($carried) === 1 ? 'package' : 'packages',
-                TerminalText::neutralise(implode(', ', $carried))
+                implode(', ', $carried)
             ));
         }
         $this->writeError($output, \sprintf(
@@ -583,26 +583,26 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * Written past Symfony's tag formatter: $message quotes text that is not console markup, such
-     * as a path, an exception message or a stack trace ({@see TerminalText}).
+     * Written past Symfony's tag formatter and neutralised: $message quotes text from outside lockrot
+     * that is not console markup, such as a path, an exception message or a stack trace ({@see TerminalText}).
      */
     private function writeError(OutputInterface $output, string $message): void
     {
-        self::errorOutput($output)->writeln($message, OutputInterface::OUTPUT_RAW);
+        self::errorOutput($output)->writeln(TerminalText::neutraliseLogLines($message), OutputInterface::OUTPUT_RAW);
     }
 
     /** Raw for the reason of writeError(). */
     private function writeWarning(OutputInterface $output, string $line): void
     {
         $target = self::errorOutput($output);
-        $target->writeln(TerminalText::warning($line, $target->isDecorated()), OutputInterface::OUTPUT_RAW);
+        $target->writeln(TerminalText::warning(TerminalText::neutraliseLogLines($line), $target->isDecorated()), OutputInterface::OUTPUT_RAW);
     }
 
     /** Raw for the reason of writeError(). */
     private function writeFailure(OutputInterface $output, string $text): void
     {
         $target = self::errorOutput($output);
-        $target->writeln(TerminalText::error($text, $target->isDecorated()), OutputInterface::OUTPUT_RAW);
+        $target->writeln(TerminalText::error(TerminalText::neutraliseLogLines($text), $target->isDecorated()), OutputInterface::OUTPUT_RAW);
     }
 
     private static function errorOutput(OutputInterface $output): OutputInterface

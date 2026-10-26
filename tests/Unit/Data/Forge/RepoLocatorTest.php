@@ -42,6 +42,12 @@ final class RepoLocatorTest extends TestCase
         yield 'github www' => ['https://www.github.com/o/r.git', [RepoRef::GITHUB, 'github.com', 'o/r']];
         yield 'github web page' => ['https://github.com/o/r/tree/main', null];
         yield 'github one segment' => ['https://github.com/o', null];
+        yield 'github dot-dot segment' => ['https://github.com/../user.git', null];
+        yield 'github dot segment' => ['git@github.com:o/..git', null];
+        yield 'github scp dot-dot owner' => ['git@github.com:../user.git', null];
+        yield 'bitbucket dot-dot segment' => ['https://bitbucket.org/../user.git', null];
+        yield 'gitlab dot-dot subgroup' => ['https://gitlab.com/group/../project.git', null];
+        yield 'github segment that starts with dots' => ['https://github.com/o/..r.git', [RepoRef::GITHUB, 'github.com', 'o/..r']];
         yield 'github host only' => ['https://github.com', null];
         yield 'path repository url' => ['file:///srv/mirrors/repo.git', null];
         yield 'gitlab.com' => ['https://gitlab.com/owner/repo.git', [RepoRef::GITLAB, 'gitlab.com', 'owner/repo']];

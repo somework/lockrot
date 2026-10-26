@@ -32,8 +32,9 @@ jobs:
       # check by its job name, so a renamed row drops out of the ruleset.
       # The move check solves with the classes of composer/composer, which change at 2.4, 2.6 and
       # 2.9 (src/Solver). The 2.2 and latest rows cover the ends, and the 2.6 row the middle.
-      # The ignore-list readers (src/Data/Advisory, src/Data/Abandoned) read Composer 2.9's
-      # AuditConfig by property name, and only the 2.9 row has that class.
+      # The ignore-list readers (src/Data/Advisory, src/Data/Abandoned) and the blocking settings
+      # (src/Solver/AdvisoryBlocking.php) read Composer 2.9's AuditConfig by property name, and only
+      # the 2.9 row has that class. The 2.6 row runs the readers' Auditor leg of Composer 2.4 to 2.8.
       # The covers-nothing tests pin their target PHP, so they run on the two covers_nothing rows,
       # at both ends of PHP and of composer/composer. Each row runs the runtime-php group.
       matrix: >-
@@ -87,12 +88,16 @@ jobs:
           if [ "${{ matrix.composer }}" = "2.6" ]; then
             groups_config phpunit-ci.xml "<exclude>$slow<group>covers-nothing</group></exclude>"
             vendor/bin/phpunit -c phpunit-ci.xml tests/Unit/Solver tests/Unit/Verdict tests/Unit/Analyzer
+            # The Auditor parameter leg of the ignore-list reader (Composer 2.4 to 2.8) runs only here,
+            # so a skip or an empty run fails the row.
+            vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AuditParityTest.php
           elif [ "${{ matrix.composer }}" = "2.9" ]; then
-            # The Composer 2.9 legs of the parity tests must run here, so a skip or an empty run fails
-            # the row.
+            # The Composer 2.9 legs of the parity tests and of the blocking settings must run here, so
+            # a skip or an empty run fails the row. The filter leaves out the Composer 2.10 test of the blocking.
             groups_config phpunit-ci.xml "<exclude>$slow</exclude>"
             vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AuditParityTest.php
             vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AbandonedIgnoreParityTest.php
+            vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter '/^(?!.*testOnComposer210)/' tests/Unit/Solver/AdvisoryBlockingTest.php
             vendor/bin/phpunit -c phpunit-ci.xml tests/Unit/Data
           else
             # Processes side by side shorten the row. Each writes its own log, and the step checks every exit code.
@@ -155,6 +160,13 @@ jobs:
       - run: vendor/bin/phpstan analyse --memory-limit=1G
       - run: vendor/bin/phpstan analyse -c phpstan.tests.neon.dist --memory-limit=1G
       - run: python3 -m unittest discover -s tools/schema/tests -t tools/schema/tests
+      # A pull request into main is a release pull request. Its tag is public at once, and Packagist
+      # reads it before phar.yml runs, so the renderer check of phar.yml runs here first. VersionTest
+      # and ChangedGoldensTest hold the version and the golden pins to the CHANGELOG.
+      - name: The release pull request vendors an attested renderer release
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: tools/report/check-vendored
       # tools/schema writes the -2 schemas and their negative fixtures (tools/schema/README.md). An edit
       # of a generated file, or a builder change committed without its output, fails here.
       - name: The generated schemas and negatives match tools/schema
@@ -376,6 +388,7 @@ jobs:
       - run: node union_parity.js
       - run: node dts_check.js
       - run: node ajv_all.js
+      - run: node ajv_recipe.js
   e2e:
     runs-on: ubuntu-latest
     steps:

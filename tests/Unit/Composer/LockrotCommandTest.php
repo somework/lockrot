@@ -1197,6 +1197,53 @@ final class LockrotCommandTest extends TestCase
         self::assertStringEndsWith("\n  - unknown key extra.lockrot.<<fg=red>> ignored\n", $stderr);
     }
 
+    /** A config error, its verbose details and a failure quote text from outside lockrot, so each prints its control characters as escapes. */
+    public function testAConfigErrorAndItsDetailsPrintControlCharactersAsEscapes(): void
+    {
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['include-dev' => 'yes', "k\x1b]0;PWNED\x07\u{200B}" => 1]);
+        $command = $this->command($this->loader());
+        $command->setIO(new BufferIO('', OutputInterface::VERBOSITY_VERBOSE));
+
+        [$code, , $stderr] = $this->runCommandWithSplitStreams($command, []);
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame(0, preg_match('/[\x00-\x09\x0B-\x1F\x7F]|\xE2\x80\x8B/', $stderr), $stderr);
+        self::assertStringContainsString('k\x1B]0;PWNED\x07\u{200B}', $stderr);
+    }
+
+    public function testAFailureAndItsVerboseTracePrintControlCharactersAsEscapes(): void
+    {
+        $this->fixtureCopy(self::LARAVEL_LOCK);
+        $command = $this->buildCommand(static function (): Analyzer {
+            throw new \RuntimeException("boom \x1b[31mred\nnext");
+        });
+        $command->setIO(new BufferIO('', OutputInterface::VERBOSITY_VERBOSE));
+
+        [$code, , $stderr] = $this->runCommandWithSplitStreams($command, ['--target-php' => '8.4']);
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame(0, preg_match('/[\x00-\x09\x0B-\x1F\x7F]/', $stderr), $stderr);
+        self::assertStringContainsString("lockrot failed: boom \\x1B[31mred\nnext", $stderr);
+        self::assertStringContainsString('#0 ', $stderr);
+    }
+
+    /** On an Actions runner stderr goes to the job log, and the runner reads commands from it. */
+    public function testAFailureAndItsVerboseTraceStartNoWorkflowCommand(): void
+    {
+        $this->fixtureCopy(self::LARAVEL_LOCK);
+        $command = $this->buildCommand(static function (): Analyzer {
+            throw new \RuntimeException("boom\n::error::pwned ##[group]x");
+        });
+        $command->setIO(new BufferIO('', OutputInterface::VERBOSITY_VERBOSE));
+
+        [$code, , $stderr] = $this->runCommandWithSplitStreams($command, ['--target-php' => '8.4']);
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame(0, preg_match('/^\s*::/m', $stderr), $stderr);
+        self::assertStringNotContainsString('##[', $stderr);
+        self::assertStringContainsString("lockrot failed: boom\n\\x3A:error::pwned ##\\x5Bgroup]x", $stderr);
+    }
+
     /**
      * Decorated, the warning is coloured by lockrot itself, whole and on stderr alone. The key is
      * thousands of `<b`, a text that exhausts PCRE's JIT in Symfony's tag formatter. Through that

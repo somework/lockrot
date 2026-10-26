@@ -12,7 +12,7 @@ use Lockrot\Json\SchemaPayload;
 use Lockrot\Json\Schemas;
 
 /**
- * Validates `extra.lockrot` against resources/lockrot-config-1.schema.json, with the
+ * Validates `extra.lockrot` against resources/lockrot-config-2.schema.json, with the
  * justinrainbow/json-schema validator that Composer bundles.
  *
  * The published schema leaves `format` open, so an editor with an older copy does not flag a format

@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **high** | `fgrosse/phpasn1` | v2.5.0 | abandoned | `16 = abandoned 32 ÷ 2 unreached`<br>**Do:** find a replacement (none named); lockrot found no path from your requirements to it: \`composer why\` names what requires it<br>*abandoned:* marked abandoned by its registry; its repository is archived on GitHub; last release 2022-12-19 (3.8 years ago); last push 2023-04-23 (3.4 years ago) |  |
+| **high** | `fgrosse/phpasn1` | v2.5.0 | abandoned | `16 = abandoned 32 ÷ 2 unreached`<br>**Do:** find a replacement (none named); lockrot found no path from your requirements to it: \`composer why\` names what requires it<br>*abandoned:* marked abandoned by its registry; its repository is archived on GitHub; last release 2022-12-19 (3.8 years ago); last push 2023-04-23 (3.4 years ago) | unreached |
 
 flags: abandoned 1
 depth: 1 of 1 flagged package is named by no line of composer.json · unreached 1

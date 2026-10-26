@@ -158,6 +158,26 @@ final class SarifFormatterTest extends TestCase
         self::assertStringContainsString('. Do: require symfony/debug ^4.4.0 — clears the advisory;', $texts['lockrot/advisory/PKSA-eith-0000-0001'] ?? '');
     }
 
+    /** SARIF 2.1.0 §3.11.5: a message writes each literal `{` as `{{` and each `}` as `}}`. */
+    public function testEveryMessageTextDoublesItsLiteralBraces(): void
+    {
+        $report = CaseHydrator::composite();
+        $run = $this->singleRun($this->formatter('high', null)->format(new Report($report->findings(), Notes::texts(['note {0} }{']), $report->generatedAt(), 1, 0)));
+        $texts = [];
+        foreach ([['results'], ['invocations', 0, 'toolExecutionNotifications']] as $path) {
+            foreach (JsonPath::arrayAt($run, $path) as $record) {
+                self::assertIsArray($record);
+                $texts[] = JsonPath::stringAt($record, ['message', 'text']);
+            }
+        }
+
+        self::assertContains('note {{0}} }}{{', $texts);
+        self::assertNotEmpty(preg_grep('/PHP code injection via `\{\{% use %\}\}` template name/', $texts));
+        foreach ($texts as $text) {
+            self::assertSame(0, preg_match('/[{}]/', str_replace(['{{', '}}'], '', $text)), $text);
+        }
+    }
+
     public function testFlaggedReportIsValidSarif(): void
     {
         $this->assertValidSarif($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report()));

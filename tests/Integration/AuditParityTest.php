@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Integration;
 
 use Composer\Advisory\AuditConfig;
 use Composer\Advisory\Auditor;
+use Composer\Composer;
 use Composer\Config;
 use Composer\IO\BufferIO;
 use Composer\Package\AliasPackage;
@@ -191,8 +192,15 @@ final class AuditParityTest extends TestCase
 
                 return \is_int($status) ? $status : -1;
             });
+            $lockrot = self::lockrotResult($config);
+            if (version_compare(Composer::getVersion(), '2.7.0', '<')) {
+                // Composer before 2.7 audits one version per name and misses the branch alias version.
+                // lockrot audits both, as Composer 2.7 does: https://github.com/composer/composer/commit/0c99bfc8fd
+                self::assertSame(['PKSA-b1'], $lockrot['counted']['acme/branch'] ?? null, $label);
+                unset($lockrot['counted']['acme/branch']);
+            }
 
-            self::assertSame($composer, self::lockrotResult($config), $label);
+            self::assertSame($composer, $lockrot, $label);
         }
     }
 

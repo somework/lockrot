@@ -110,8 +110,8 @@ final class RunNote
 
     /** GitLab's anonymous limit needs no cap, so it has no sentence. */
     private const ANONYMOUS_CAP_TEXT = [
-        RepoRef::GITHUB => 'GitHub token not set: repository activity checked for %d candidate packages, %d packages skipped (set GITHUB_TOKEN to check all)',
-        RepoRef::BITBUCKET => 'Bitbucket credentials not set: repository activity checked for %d candidate packages, %d packages skipped (add bitbucket.org credentials to auth.json to check all)',
+        RepoRef::GITHUB => 'GitHub token not set: repository activity checked for %d candidate %s, %d %s skipped (set GITHUB_TOKEN to check all)',
+        RepoRef::BITBUCKET => 'Bitbucket credentials not set: repository activity checked for %d candidate %s, %d %s skipped (add bitbucket.org credentials to auth.json to check all)',
     ];
 
     private string $code;
@@ -263,10 +263,11 @@ final class RunNote
         if (!isset(self::ANONYMOUS_CAP_TEXT[$forge])) {
             throw new \InvalidArgumentException(\sprintf('%s has no anonymous cap.', $forge));
         }
+        $skipped = $skippedNoToken + $skippedBudget;
 
         return self::of(
             self::REPOSITORY_ACTIVITY_ANONYMOUS_CAP,
-            \sprintf(self::ANONYMOUS_CAP_TEXT[$forge], $checked, $skippedNoToken + $skippedBudget),
+            \sprintf(self::ANONYMOUS_CAP_TEXT[$forge], $checked, $checked === 1 ? 'package' : 'packages', $skipped, $skipped === 1 ? 'package' : 'packages'),
             false,
             ['forge_id' => $forge, 'checked' => $checked, 'skipped_no_token' => $skippedNoToken, 'skipped_budget' => $skippedBudget]
         );

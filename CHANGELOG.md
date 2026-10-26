@@ -83,11 +83,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Authorization` or `PRIVATE-TOKEN` header, on Composer 2.10 or later with curl. lockrot asks the
   redirect target again without it. ([Which credentials](docs/internals.md#which-credentials))
 - **table, github, markdown:** a control character from the lock or a repository prints as an
-  escape (`\x1B`), also in `--explain`, as in the install-time summary. A lock cannot clear your
-  screen, write your clipboard or plant a link in your terminal.
+  escape (`\x1B`), also in `--explain`, in the error lines on stderr, as in the install-time
+  summary. So does a character that prints as nothing, such as a zero-width space (`\u{200B}`). A
+  lock cannot clear your screen, write your clipboard, plant a link in your terminal or hide text.
+  A github format run line and an error line on stderr cannot start a `::` workflow command or
+  hold a `##[` command.
   ([What lockrot does](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **markdown:** text from the lock cannot mention a user or a team, or link a bare URL or an email
   address, in a pull request comment or a job summary. ([`--format=markdown`](docs/ci.md#-formatmarkdown))
+- **All formats:** a repository URL with a `.` or `..` path segment names no repository, so a lock
+  cannot send the token to another API path of the repository host.
 
 ### Added
 
@@ -196,8 +201,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** **Distribution:** `docs/compatibility.md` no longer promises which lockrot-action
   major line follows lockrot 1.x. `@v1` runs 0.14 from lockrot-action v1.2.0 on, and with `version:
   latest` from this tag on. The Docker image's `latest` tag moves with v1.2.0. Action: to stay on
-  0.13, set the action's `version: 0.13.0`, or use the image tag `0.13.0`.
-  ([Compatibility](docs/compatibility.md#distribution))
+  0.13, set the action's `version: 0.13.0`, or use the image tag `0.13.0`. Before v1.2.0, the
+  action writes its job summary from an `--offline` run, which shows no advisory on 0.14: upgrade
+  the action before you set `version: latest`.
+  ([Upgrading to 0.14](docs/changes/0.14.md#how-014-reaches-you))
 - **Breaking:** **Config:** an `ignore[].flags`, `accept-unchecked` or `advisory-lookup` value that
   0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2.
   Action: give the key a valid value, or drop it.
@@ -229,6 +236,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   advisory, and that each next step's score after the move assumes none on its versions.
   ([Run notes](docs/notes.md#advisories_not_checked))
 
+### Deprecated
+
+- **json:** report-2's `priority` on a finding and the root `priorities`. Action: read `verdict`,
+  and the grades in `counts`. report-3 drops them. ([Deprecation](docs/compatibility.md#deprecation))
+
 ### Removed
 
 - **Breaking:** **Baseline:** 0.14 reads baseline-2 only, and a baseline-1 file exits 2. Action:
@@ -247,6 +259,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **sarif:** a message writes each literal `{` as `{{` and each `}` as `}}`, as SARIF 2.1.0
+  requires, so a viewer that fills placeholders shows an advisory title such as `{% use %}` as written.
+- **All formats:** the anonymous cap note counts one package in the singular ("1 candidate package").
 - **All formats:** lockrot no longer proposes an `update` move that Composer refuses. On Composer
   2.9 and later, the plain `composer update <package>` of such a move installed a dev snapshot, and
   `update now:` held it beside the moves that resolve. ([The move check](docs/verdicts.md#the-move-check))

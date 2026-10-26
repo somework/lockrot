@@ -338,7 +338,7 @@
                     "level": "error",
                     "rank": 95.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46633 (critical advisory): PHP code injection via `{% use %}` template name. Do: require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46633 (critical advisory): PHP code injection via `{{% use %}}` template name. Do: require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -873,7 +873,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46638 (medium advisory): `{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411). Do: require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46638 (medium advisory): `{{% sandbox %}}{{% include %}}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411). Do: require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",

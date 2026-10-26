@@ -43,16 +43,6 @@ final class CappedData implements SignalData
         return Signal::S11;
     }
 
-    public function newestPhp(): string
-    {
-        return $this->newestPhp;
-    }
-
-    public function newestPhpSource(): string
-    {
-        return $this->newestPhpSource;
-    }
-
     public function requires(): string
     {
         return $this->requires;
@@ -61,11 +51,6 @@ final class CappedData implements SignalData
     public function stopsAt(): string
     {
         return $this->stopsAt;
-    }
-
-    public function excludesTarget(): bool
-    {
-        return $this->excludesTarget;
     }
 
     /** @return ?array{version: string, branch: string, blocking: ?string} */

@@ -45,6 +45,7 @@ final class ChangedGoldensTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';
     private const GOLDEN = self::FIXTURES.'golden/formats/';
+    private const CHANGELOG = __DIR__.'/../../CHANGELOG.md';
     private const DIRS = ['apps/wallabag_wallabag', 'apps/nextcloud_3rdparty', 'skeletons/laravel', 'apps/matomo-org_matomo'];
     private const FORMATS = ['github' => 'txt', 'gitlab' => 'json', 'sarif' => 'sarif', 'markdown' => 'md', 'table' => 'txt'];
     private const NOW = '2026-09-14T00:00:00+00:00';
@@ -60,6 +61,12 @@ final class ChangedGoldensTest extends TestCase
      * @var array<string, string>
      */
     private const RELEASED = [];
+
+    /** The release whose goldens RELEASED pins, empty while no release shipped them. */
+    private const RELEASED_AT = '';
+
+    /** The first release that ships these goldens. */
+    private const FIRST_RELEASE = '0.14.0';
 
     /** Each golden whose bytes differ from RELEASED, with its reason. */
     private const CHANGED = [
@@ -143,6 +150,43 @@ final class ChangedGoldensTest extends TestCase
         sort($moved);
         sort($listed);
         self::assertSame($moved, $listed, 'a golden whose bytes differ from RELEASED needs a row in CHANGED, and a row in CHANGED needs such a golden');
+    }
+
+    /**
+     * The release pull request dates the release in CHANGELOG.md, so it must pin RELEASED and name
+     * the release in RELEASED_AT in the same change (CONTRIBUTING, "Cutting a release").
+     */
+    public function testTheGoldensArePinnedAsTheNewestReleaseShippedThem(): void
+    {
+        preg_match('/^## \[(\d+\.\d+\.\d+)\] - /m', (string) file_get_contents(self::CHANGELOG), $newest);
+        $version = $newest[1] ?? '';
+        self::assertNotSame('', $version, 'CHANGELOG.md names a release');
+        $shipped = version_compare($version, self::FIRST_RELEASE, '>=');
+
+        self::assertSame($shipped ? $version : '', self::releasedAt(), 'pin RELEASED and set RELEASED_AT to '.$version);
+        $pinned = array_keys(self::released());
+        sort($pinned);
+        self::assertSame($shipped ? self::goldenNames() : [], $pinned, 'RELEASED pins every golden exactly when RELEASED_AT names a release');
+        self::assertSame([], $shipped ? array_keys(self::CHANGED) : [], 'the release pull request empties CHANGED');
+    }
+
+    /** @return list<string> sorted */
+    private static function goldenNames(): array
+    {
+        $names = [];
+        foreach (self::DIRS as $dir) {
+            foreach (self::FORMATS as $format => $extension) {
+                $names[] = basename($dir).'.'.$format.'.'.$extension;
+            }
+        }
+        sort($names);
+
+        return $names;
+    }
+
+    private static function releasedAt(): string
+    {
+        return self::RELEASED_AT;
     }
 
     /** @return array<string, string> RELEASED, typed for PHPStan, which reads an empty constant as array{} */

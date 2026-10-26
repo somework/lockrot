@@ -49,11 +49,12 @@ target php 8.4 (--target-php)
   absolute. Under `COMPOSER=app/alt.json` that is next to `alt.json`, in `app/`
   ([environment overrides](configuration.md#environment-overrides)).
 - Records every graded finding of the run: its counted maintenance flags and its counted
-  advisories, each with the date it became known. A score-0 finding gets no entry, and an accepted
-  flag is never recorded.
-- Replaces the file: a package this run does not grade loses its entry. A package that stays keeps
-  its `first_seen`, and each fact keeps its `known_since`. Each advisory is written with its
-  current severity and fix kind, so a regenerated file accepts a rating or a fix that changed.
+  advisories, each with the date it became known. A score-0 finding gets no entry, except the entry
+  that an incomplete lookup carries forward. An accepted flag is never recorded.
+- Replaces the file: a package this run does not grade loses its entry, unless an incomplete lookup
+  carries the entry forward. A package that stays keeps its `first_seen`, and each fact keeps its
+  `known_since`. Each advisory is written with its current severity and fix kind, so a regenerated
+  file accepts a rating or a fix that changed.
 - Over a baseline-1 file, writes a new baseline-2 file from this run. It reads nothing from the old
   file, so every date starts again on the day of the run.
 - Never leaves a truncated baseline, even when interrupted.
@@ -241,8 +242,10 @@ git rm lockrot-baseline.0.13.json
 git commit -m "chore: regenerate the lockrot baseline as baseline-2"
 ```
 
-Use the path that `extra.lockrot.baseline` names when it names one. The same commands work with the
-PHAR (`php lockrot.phar`). The new file starts every `first_seen` and `known_since` again on the day
+If `extra.lockrot.baseline` names the file, move the file at that path. A run without the file that
+the key names exits `2` with `lockrot: <path> not found`, so remove the key for the review run. Put
+the key back before `--generate-baseline`, which writes the path that the key names. The same
+commands work with the PHAR (`php lockrot.phar`). The new file starts every `first_seen` and `known_since` again on the day
 of the run. [Upgrading to 0.14](changes/0.14.md) has the steps for the action and the plugin.
 
 ## Install time

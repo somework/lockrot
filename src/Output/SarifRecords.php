@@ -180,6 +180,17 @@ final class SarifRecords
     }
 
     /**
+     * SARIF 2.1.0 §3.11.5 writes a literal `{` as `{{` and `}` as `}}`, so no consumer reads a placeholder:
+     * https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html
+     *
+     * @return array{text: string}
+     */
+    public static function message(string $text): array
+    {
+        return ['text' => strtr($text, ['{' => '{{', '}' => '}}'])];
+    }
+
+    /**
      * @param array<string, string> $fingerprints
      * @param Bag                   $bag
      *
@@ -192,7 +203,7 @@ final class SarifRecords
         if ($rank !== null) {
             $result['rank'] = $rank;
         }
-        $result['message'] = ['text' => $text];
+        $result['message'] = self::message($text);
         $result['partialFingerprints'] = $fingerprints;
         if ($level === FormatContext::LEVEL_NOTE && $state !== null && \in_array($state->state(), [FactState::KNOWN, FactState::COVERED], true)) {
             $result['suppressions'] = [['kind' => 'external', 'status' => 'accepted', 'justification' => 'covered by '.$this->baselinePath.' (known since '.$state->since().')']];
