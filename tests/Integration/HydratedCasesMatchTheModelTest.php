@@ -339,7 +339,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     private const MOVE_VERSION = 'The model leaves `version` null on a move whose constraint comes from S8. lockrot names the lowest release that the constraint admits, and the why-not step of a move that does not resolve names it. The move card prints `newest` and reads `version` only when `newest` is null.';
 
     // HARDEN-SRC removes every MODEL_R7_PENDING entry when it projects the MODEL-R7 shas.
-    private const MODEL_R7_PENDING = 'The model value is wrong for the case, and MODEL-R7 corrects it. lockrot follows SPEC-0.14.md.';
+    private const MODEL_R7_PENDING = 'MODEL-R7 corrects the model value or the inputs of the case. lockrot follows SPEC-0.14.md for the inputs that the case gives.';
 
     private const PHP_STAR = 'The case sets the project\'s require.php to `*` (‡). The model keeps the holder\'s own step of case A, and lockrot judges the holder under the case\'s require.php, which admits its newest line.';
 

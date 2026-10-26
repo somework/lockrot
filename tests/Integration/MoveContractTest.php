@@ -21,7 +21,7 @@ final class MoveContractTest extends TestCase
     private const VERSION = 'the model leaves `version` null on a move whose constraint comes from S8 : lockrot names the lowest admitted release, and the why-not step of a move that does not resolve names it';
     private const DATED = 'the model dates a branch by its newest release only : a lower release leaves old-promise unverified, where lockrot dates it';
     // HARDEN-SRC removes every MODEL_R7_PENDING entry when it projects the MODEL-R7 shas.
-    private const MODEL_R7_PENDING = 'the model value is wrong for the case and MODEL-R7 corrects it : lockrot follows SPEC-0.14.md';
+    private const MODEL_R7_PENDING = 'MODEL-R7 corrects the model value or the inputs of the case : lockrot follows SPEC-0.14.md for the inputs that the case gives';
     private const TIE = 'the model removes S5 from the case to make the tie : the installed release is older than PHP 8.0, so lockrot raises S5 and the move differs';
 
     /**

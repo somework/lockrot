@@ -403,10 +403,16 @@ final class ComposerSolver
         return $installs;
     }
 
-    /** Another reference of the same tag is no move. A branch moves with its reference. */
+    /** Another reference of the same tag is no move. A branch moves with its commit, not with its metadata. */
     private static function movesVersion(UpdateOperation $operation): bool
     {
-        return $operation->getTargetPackage()->isDev() || $operation->getTargetPackage()->getVersion() !== $operation->getInitialPackage()->getVersion();
+        $target = $operation->getTargetPackage();
+        $initial = $operation->getInitialPackage();
+        if (!$target->isDev()) {
+            return $target->getVersion() !== $initial->getVersion();
+        }
+
+        return $target->getVersion() !== $initial->getVersion() || ($target->getSourceReference() ?? $target->getDistReference()) !== ($initial->getSourceReference() ?? $initial->getDistReference());
     }
 
     /** @return array<string, string> name => the locked pretty version, for each name that the solve updates */

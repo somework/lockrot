@@ -268,8 +268,10 @@ final class PageGoldensTest extends TestCase
                 foreach (array_values(array_merge([$lead], JsonPath::arrayAt($lead, ['also']))) as $i => $move) {
                     $move = JsonPath::decoded($move);
                     if ($move['check'] === null) {
-                        if (JsonPath::arrayAt(JsonPath::decoded($cards), [$i])['after'] !== null) {
-                            $differ[$id.' '.$package.' card '.$i] = ['expected' => 'no check line on a move that runs no Composer request'];
+                        $after = JsonPath::arrayAt(JsonPath::decoded($cards), [$i])['after'];
+                        $checkLines = array_values(array_filter(\is_array($after) ? JsonPath::arrayAt($after, ['conditions']) : [], static fn ($condition): bool => \is_string($condition) && (\in_array($condition, ['checked with Composer', 'Composer refuses the move'], true) || strpos($condition, 'if Composer resolves it') === 0)));
+                        if ($checkLines !== []) {
+                            $differ[$id.' '.$package.' card '.$i] = ['expected' => 'no check line on a move that runs no Composer request', 'conditions' => $checkLines];
                         }
                         continue;
                     }

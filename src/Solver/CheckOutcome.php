@@ -60,8 +60,9 @@ final class CheckOutcome
 
     /**
      * The move after its joint request ({@see \Lockrot\Verdict\MoveChecks}): the joint solve
-     * resolves the move only when it installs the moved package inside the move's constraint. Then
-     * the move resolves with no hold, and it lists each holder whose release the solve changes.
+     * resolves the move only when it installs the moved package inside the move's constraint and
+     * changes the release of a holder. Then the move resolves with no hold, and it lists each holder
+     * whose release the solve changes.
      * A joint refusal gives its own holds. Any other answer leaves this refusal.
      *
      * @param list<string> $holders
@@ -82,6 +83,9 @@ final class CheckOutcome
             if ($version !== null) {
                 $movesWith[] = ['package' => $holder, 'installed_version' => $joint->updatedFrom[$holder] ?? $this->holderVersion($holder), 'version' => $version];
             }
+        }
+        if ($movesWith === []) {
+            return $this;
         }
         $resolved = new self(MoveCheck::resolves(MoveCheck::INLINE, $installs));
         $resolved->movesWith = $movesWith;

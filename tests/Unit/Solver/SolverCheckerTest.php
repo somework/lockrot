@@ -736,6 +736,31 @@ final class SolverCheckerTest extends TestCase
     }
 
     /**
+     * The joint solve installs the move only through another reference of the locked holder's tag,
+     * which changes no holder: the step would be the request that the first check refused.
+     */
+    public function testAJointSolveThatChangesNoHolderLeavesTheFirstRefusal(): void
+    {
+        $checker = self::checker(
+            ['acme/h' => '^1.0'],
+            [
+                ['name' => 'acme/lib', 'version' => '1.0.0'],
+                ['name' => 'acme/h', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0'], 'dist' => ['type' => 'zip', 'url' => 'https://example.org/a.zip', 'reference' => 'aaaa']],
+            ],
+            [
+                'acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0']],
+                'acme/h' => [['version' => '1.0.0', 'require' => ['acme/lib' => '^1.0 || ^2.0'], 'dist' => ['type' => 'zip', 'url' => 'https://example.org/b.zip', 'reference' => 'bbbb']]],
+            ]
+        );
+
+        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^2.0', '2.0.0', null, '2.0.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertContains(['source' => 'package', 'package' => 'acme/h', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^1.0'], self::rows($outcome->holds()));
+        self::assertSame([], $outcome->movesWith());
+    }
+
+    /**
      * The joint request is refused too: the holds come from that refusal, and the root holds on a
      * package that a package hold names drop beside it.
      */

@@ -96,7 +96,7 @@ final class MoveText
         }
     }
 
-    /** ", with an update of h/x (to 2.1.0)", one entry per holder that the joint request moves (ruling R1). */
+    /** ", with an update of h/x (to 2.1.0)", one entry per holder that the joint request moves. */
     private static function movesWith(Move $move): string
     {
         $parts = [];
@@ -220,7 +220,7 @@ final class MoveText
         return $text.self::below($move, $move->newest()).self::clears($move).self::adds($move).self::phpClause($move, $subject, true);
     }
 
-    /** " in require-dev" for a package that only require-dev lists, when the run does not require it directly (ruling R13). */
+    /** " in require-dev" for a package that only require-dev lists, when the run does not require it directly. */
     private static function inRequireDev(MoveSubject $subject): string
     {
         return $subject->isListedInRequireDevOnly() && !$subject->isDirect() ? ' in require-dev' : '';

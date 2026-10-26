@@ -337,6 +337,34 @@ final class MoveBuilderTest extends TestCase
         self::assertContains(Move::TRANSITIVE, $move->composerMovesBecause());
     }
 
+    public function testAJointSolveThatChangesNoHolderKeepsTheMoveRefusedWithOnlyTheWhyNotStep(): void
+    {
+        $checks = self::refusedThenJoint('update a/b ^2.0.0 ');
+        $checks['joint update a/b ^2.0.0 with h/x']['installs'] = ['a/b' => '2.0.0'];
+        [$row, $context] = self::checked($checks, false);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::LEFT_BEHIND)->to($row, $lower, null), [], null, $context);
+        $check = $move->check();
+
+        self::assertNotNull($check);
+        self::assertSame(
+            [MoveCheck::REFUSED, ['h/x'], [], [['composer', 'why-not', 'a/b', '2.0.0', '--locked']]],
+            [$check->result(), array_map(static fn (Holder $holder): ?string => $holder->package(), $move->heldBy()), $move->movesWith(), $move->commands()]
+        );
+    }
+
+    /** The joint solve moves what requires the package, so the transitive clause has nothing left to ask. */
+    public function testATransitiveMoveThatTheJointRequestResolvesHasNoTransitiveReason(): void
+    {
+        [$row, $context] = self::checked(self::refusedThenJoint('update a/b ^2.0 '), false);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertSame([[['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.1.0']], []], [$move->movesWith(), array_values(array_intersect([Move::TRANSITIVE, Move::UNREACHED], $move->composerMovesBecause()))]);
+    }
+
     /** @return array<string, array<string, mixed>> the refusal of $key by the holder h/x 1.0.0, and the joint request that moves h/x to 2.1.0 */
     private static function refusedThenJoint(string $key): array
     {
