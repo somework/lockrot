@@ -131,6 +131,8 @@ entry in the commit that changes the line.
 ## src/Security
 
 - `src/Security/FixFinder.php` CastString `$newest[(string) $key] = $branch['highest']['pretty'];` — PHP stores a decimal string key such as `"1"` as an int, so the cast changes no key. The cast is for the type.
+- `src/Security/Holder.php` LogicalAnd `if ($stability !== null && $kept->stability() !== null && $stability !== $kept->stability()) {` — the stability is null only without a version, and only root entries have none. Two entries of one key are then both root entries, both null, so each `||` gives false as the `&&` does.
+- `src/Security/Holder.php` LessThan `return BasePackage::$stabilities[$stability] < BasePackage::$stabilities[$kept->stability()];` — the branch runs only for two different stabilities, and `BasePackage::$stabilities` gives each stability its own rank, so the ranks are never equal.
 - `src/Security/LinkIndex.php` TrueValue `$locked[$package->name()] = true;` — a set. Only `isset()` reads it.
 
 ## src/SelfUpdate

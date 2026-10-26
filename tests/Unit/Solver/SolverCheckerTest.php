@@ -358,6 +358,27 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(MoveCheck::REFUSED, $checker->baseline()->check()->result());
     }
 
+    /** A source can read a platform name as not loaded, offline for one. No repository serves a platform name. */
+    public function testABaselineThatTheRootsPhpRequirementRefusesIsRefusedOffline(): void
+    {
+        $checker = self::checker(['acme/lib' => '^1.0', 'php' => '<7.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], [], ['php' => VersionSource::OFFLINE]);
+
+        self::assertSame(MoveCheck::REFUSED, $checker->baseline()->check()->result());
+    }
+
+    /** Of two names that did not load, the reason of the run state wins: offline before a failed repository. */
+    public function testASolveWithTwoNamesThatDidNotLoadReadsTheOfflineReason(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0'], ['version' => '1.2.0', 'require' => ['acme/first' => '^1.0', 'acme/second' => '^1.0']]]],
+            ['acme/first' => VersionSource::FAILED, 'acme/second' => VersionSource::OFFLINE]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::OFFLINE, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
+    }
+
     /**
      * D6: a refusal that needs a name the source could not load says nothing about the project.
      *

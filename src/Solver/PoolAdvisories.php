@@ -75,7 +75,7 @@ final class PoolAdvisories
             return [];
         }
         $missing = array_values(array_diff(array_unique($names), array_keys($this->covered)));
-        $keptOut = array_fill_keys(array_values(array_intersect($missing, array_keys($this->keptOut))), true);
+        $keptOut = array_fill_keys(array_intersect($missing, array_keys($this->keptOut)), true);
         $this->unread += $keptOut;
         $this->covered += $keptOut;
         $missing = array_values(array_diff($missing, array_keys($keptOut)));

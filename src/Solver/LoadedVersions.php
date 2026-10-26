@@ -77,6 +77,6 @@ final class LoadedVersions extends ArrayRepository
     /** @return list<string> the names that the pool builder asked for */
     public function asked(): array
     {
-        return array_map('strval', array_keys($this->byName));
+        return array_keys($this->byName);
     }
 }

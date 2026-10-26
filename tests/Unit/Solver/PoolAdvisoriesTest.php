@@ -87,6 +87,15 @@ final class PoolAdvisoriesTest extends TestCase
         self::assertSame(['acme/vcs'], $advisories->unread(['acme/vcs', 'acme/new']));
     }
 
+    public function testAKeptOutNameThatTheRunsLookupReadStaysRead(): void
+    {
+        $advisories = (new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): array => [], ['acme/vcs']))->withRecords([], ['acme/vcs']);
+
+        $advisories->ranges(['acme/other']);
+
+        self::assertSame([], $advisories->unread(['acme/vcs']));
+    }
+
     public function testTheNamesOfTwoLookupsThatCouldNotReadThemBothStayUnread(): void
     {
         $advisories = new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): ?array => null);
