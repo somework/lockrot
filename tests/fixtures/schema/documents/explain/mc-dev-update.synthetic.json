@@ -158,13 +158,13 @@
      "installed_version": "7.10.0",
      "installed_requires": true,
      "newest_stable": {
-      "version": "8.2.0",
-      "released": "2026-09-06T13:55:09+00:00"
+      "version": "7.10.0",
+      "released": "2026-07-01T10:00:00+00:00"
      },
      "newest_requires": true,
      "newest_requires_unmeasured": null,
      "local": false,
-     "newest_is_installed": false
+     "newest_is_installed": true
     }
    ],
    "also": [],

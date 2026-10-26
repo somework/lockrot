@@ -1,14 +1,14 @@
 {
  "source": "security-axis/r3/docs",
  "model_run_date": "2026-10-26",
- "suite": "the model suite reports every step passed (57 steps), and spec_blocks_check gives 0 mismatches",
+ "suite": "the model suite reports every step passed",
  "documents": {
   "corpus": 49,
   "variants": 3,
-  "cases": 177,
+  "cases": 178,
   "coverage/baselined": 49,
   "coverage/variants": 69,
-  "explain": 172,
+  "explain": 173,
   "explain/coverage": 91,
   "baseline/cases": 6,
   "baseline/corpus": 49,

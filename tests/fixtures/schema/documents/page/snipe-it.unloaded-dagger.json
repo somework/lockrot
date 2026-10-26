@@ -4238,6 +4238,13 @@
       "composer",
       "require",
       "pragmarx/google2fa-laravel:^2.3"
+     ],
+     [
+      "composer",
+      "why-not",
+      "pragmarx/google2fa-laravel",
+      "v2.3.0",
+      "--locked"
      ]
     ],
     "through": [],
@@ -6000,7 +6007,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "bacon/bacon-qr-code",
+      "v3.1.0",
+      "--locked"
+     ]
+    ],
     "through": [],
     "also": [],
     "text": "require bacon/bacon-qr-code ^3.1 — clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.0) and composer.json (requires pragmarx/google2fa-laravel ^1.3) and pragmarx/google2fa-laravel v1.4.1 (requires pragmarx/google2fa-qrcode ^1.0; itself left-behind) and pragmarx/google2fa-qrcode v1.0.3 (requires ~1.0|~2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
@@ -6635,7 +6650,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "intervention/image",
+      "3.11.0",
+      "--locked"
+     ]
+    ],
     "through": [],
     "also": [],
     "text": "require intervention/image ^3.11 — clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.5) and intervention/image 3.11.10, the release this move installs (requires intervention/gif ^4.2); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
@@ -8561,7 +8584,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "pragmarx/google2fa-qrcode",
+      "v4.0.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "pragmarx/google2fa-laravel",

@@ -1382,14 +1382,7 @@
      [
       "composer",
       "update",
-      "symfony/monolog-bridge"
-     ],
-     [
-      "composer",
-      "why-not",
-      "symfony/monolog-bridge",
-      "v2.8.52",
-      "--locked"
+      "symfony/monolog-bridge:^2.8.52"
      ]
     ],
     "through": [],

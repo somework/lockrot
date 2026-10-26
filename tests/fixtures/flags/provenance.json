@@ -1,12 +1,12 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "94ff5610cf0eca4c0f55231f30b6a9beb302efb4fde644d09e811f3a54763327",
+  "cases.json": "c49b260813d4502b9da09ce252b0c662ce9f76b58d6d8b7ecd4fc6509e4454b2",
   "model_run_date": "2026-10-26"
  },
- "suite": "the model suite reports every step passed (57 steps), and spec_blocks_check gives 0 mismatches",
+ "suite": "the model suite reports every step passed",
  "page_goldens": {
-  "sha256": "664f4810bdab3a51dcda90b8f54501027b3a1e970bde311bef57913d0378130c",
+  "sha256": "978cb3cccda022dc413560b75dd18ba81b1a4d1dc57a1a388b66349e676e8d9e",
   "rendered": "the model's goldens"
  },
  "dropped": [],

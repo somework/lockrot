@@ -15444,9 +15444,10 @@
             "command_note": null,
             "moves_with": null,
             "commands": [
-              "composer require 'pragmarx/google2fa-laravel:^2.3'"
+              "composer require 'pragmarx/google2fa-laravel:^2.3'",
+              "composer why-not pragmarx/google2fa-laravel v2.3.0 --locked"
             ],
-            "commands_label": "Command",
+            "commands_label": "Commands, in order",
             "clears": "both",
             "stays": null,
             "not_checked": null,
@@ -18537,7 +18538,7 @@
           "fails_gate": false,
           "reach": "via symfony/error-handler and 33 more",
           "held": "held by your composer.json",
-          "command": null,
+          "command": "composer require 'symfony/var-dumper:^5.4' --dev",
           "raise_words": null,
           "after": "after it: 0, ok · not checked: Composer refuses the lock itself",
           "major": "a new major",
@@ -18789,7 +18790,8 @@
             "moves_with": null,
             "commands": [
               "composer require 'php:>=8.1' --no-update",
-              "composer require 'twig/twig:^3.27.0'"
+              "composer require 'twig/twig:^3.27.0'",
+              "composer why-not twig/twig v3.27.0 --locked"
             ],
             "commands_label": "Commands, in order",
             "clears": "all 15 advisories",
@@ -19446,7 +19448,7 @@
             "link": "#view=findings&pkg=symfony%2Fmonolog-bridge",
             "grade": "critical",
             "major": null,
-            "command": "composer update symfony/monolog-bridge",
+            "command": "composer update 'symfony/monolog-bridge:^2.8.52'",
             "clears": "the advisory",
             "after": {
               "result": "20, high",
@@ -19539,7 +19541,7 @@
           "fails_gate": true,
           "reach": "direct",
           "held": "held by your composer.json",
-          "command": "composer update symfony/monolog-bridge",
+          "command": "composer update 'symfony/monolog-bridge:^2.8.52'",
           "raise_words": null,
           "after": "after it: 20, high",
           "major": null,
@@ -20499,10 +20501,12 @@
             "heading": "The move",
             "action": "Require ^3.1",
             "platform_step": null,
-            "command_note": null,
+            "command_note": "This shows which package holds the move.",
             "moves_with": null,
-            "commands": [],
-            "commands_label": null,
+            "commands": [
+              "composer why-not bacon/bacon-qr-code v3.1.0 --locked"
+            ],
+            "commands_label": "Check",
             "clears": "left-behind",
             "stays": null,
             "not_checked": null,

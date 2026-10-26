@@ -4,55 +4,72 @@
   "version": "0.14.0",
   "schema": 2
  },
- "package": "scheb/2fa-bundle",
- "version": "v5.13.2",
+ "package": "friendsofsymfony/oauth-server-bundle",
+ "version": "dev-master",
  "finding": {
-  "package": "scheb/2fa-bundle",
-  "version": "v5.13.2",
-  "branch": "5.x",
+  "package": "friendsofsymfony/oauth-server-bundle",
+  "version": "dev-master",
+  "branch": null,
   "installed_php": {
-   "requires": ">=7.2.5",
+   "requires": "^7.2 || ^8.0",
    "target_runs": true,
    "project_allows": true
   },
   "verdict": "high",
   "priority": "high",
-  "lead": "left-behind",
-  "rank": 48,
+  "lead": "pinned",
+  "rank": 24,
   "flags": [
    {
-    "id": "left-behind",
+    "id": "pinned",
     "role": "lead",
     "baseline": null,
     "signal_ids": [
-     "S8"
+     "S6"
     ],
     "degree": null,
     "headline": {
-     "unit": "years",
-     "value": 4.5,
-     "source": "branch"
+     "unit": "reason",
+     "value": "branch_snapshot",
+     "source": null
     },
-    "summary": "branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach"
+    "summary": "pinned to branch snapshot dev-master"
+   },
+   {
+    "id": "stale",
+    "role": "corroborating",
+    "baseline": null,
+    "signal_ids": [
+     "S2"
+    ],
+    "degree": {
+     "liveness_complete": true
+    },
+    "headline": {
+     "unit": "years",
+     "value": 7.7,
+     "source": "release"
+    },
+    "summary": "last release 2019-01-23 (7.7 years ago)"
    }
   ],
   "score": {
    "model": 1,
-   "total": 16,
-   "exact": 16,
+   "total": 18,
+   "exact": 18,
    "rounded_down": false,
    "band": {
     "floor": 16,
     "next": "critical",
-    "to_next": 16
+    "to_next": 14
    },
    "decided_by": "maintenance",
    "parts": {
     "maintenance": {
      "status": "counted",
-     "contribution": 16,
+     "contribution": 18,
      "alone": {
-      "total": 16,
+      "total": 18,
       "verdict": "high"
      }
     },
@@ -70,83 +87,103 @@
    "terms": [
     {
      "part": "maintenance",
-     "flag": "left-behind",
+     "flag": "pinned",
      "role": "lead",
      "weight": 16,
      "divisor": 1,
      "points": 16,
      "contribution": 16
+    },
+    {
+     "part": "maintenance",
+     "flag": "stale",
+     "role": "corroborating",
+     "weight": 8,
+     "divisor": 4,
+     "points": 2,
+     "contribution": 2
     }
    ],
    "modifiers": [],
    "accepted": [],
-   "without": [],
-   "text": "16 = left-behind 16"
+   "without": [
+    {
+     "remove": {
+      "kind": "flag",
+      "id": "pinned"
+     },
+     "revealed": [],
+     "total": 8,
+     "verdict": "medium",
+     "lead": "stale",
+     "deciding_advisory": null,
+     "at_least": false
+    },
+    {
+     "remove": {
+      "kind": "flag",
+      "id": "stale"
+     },
+     "revealed": [],
+     "total": 16,
+     "verdict": "high",
+     "lead": "pinned",
+     "deciding_advisory": null,
+     "at_least": false
+    }
+   ],
+   "text": "18 = pinned 16 + stale 2 [¼ of 8]"
   },
   "next_step": {
-   "kind": "raise-php",
-   "source": "left-behind",
+   "kind": "blocked",
+   "source": "pinned",
    "merged": [],
    "fix_kind": null,
    "reason": null,
    "replacement": null,
    "quiet_years": null,
-   "to_branch": "6.x",
+   "to_branch": "1.x",
    "version": null,
-   "newest": "v6.13.1",
-   "constraint": "^6.13",
-   "latest": null,
+   "newest": "1.6.2",
+   "constraint": null,
+   "latest": {
+    "version": "1.6.2",
+    "released": "2019-01-23T15:23:04+00:00",
+    "is_installed": false,
+    "relation": "older",
+    "snapshot_time": "2022-03-24T10:22:23+00:00"
+   },
    "php_check": {
-    "requires": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
-    "project_allows": false,
-    "target_runs": true,
-    "raise_to": ">=8.0",
-    "raise_size": "major"
+    "requires": "^5.5|^7.0",
+    "project_allows": true,
+    "target_runs": false,
+    "raise_to": null,
+    "raise_size": null
    },
-   "crosses_major": true,
+   "crosses_major": null,
    "held_by": [],
-   "clears": [
-    {
-     "kind": "flag",
-     "id": "left-behind",
-     "basis": "branch_releasing"
-    }
-   ],
+   "clears": [],
    "unverified": [],
-   "adds": [
+   "adds": [],
+   "leaves": [
     {
      "kind": "flag",
-     "id": "capped",
-     "basis": "stops_below_newest_php"
+     "id": "pinned"
+    },
+    {
+     "kind": "flag",
+     "id": "stale"
     }
    ],
-   "leaves": [],
-   "clears_all": true,
-   "if_applied": {
-    "total": 8,
-    "verdict": "medium",
-    "lead": "capped",
-    "deciding_advisory": null,
-    "at_most": false,
-    "assumes": [
-     "clears_hold",
-     "composer_resolves"
-    ]
-   },
-   "check": {
-    "result": "refused",
-    "form": null,
-    "reason": null,
-    "installs": null
-   },
+   "clears_all": false,
+   "if_applied": null,
+   "check": null,
    "moves_with": [],
-   "composer_moves_because": [
-    "crosses_major"
-   ],
+   "composer_moves_because": [],
    "commands": [],
    "through": [],
    "also": [],
-   "text": "raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements; Composer's solver refuses it against the lock"
+   "text": "no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it; replace it"
   },
   "security": {
    "status": "clear",
@@ -167,7 +204,15 @@
    "ignored_count": 0
   },
   "checks_missing": [],
-  "checks_skipped": [],
+  "checks_skipped": [
+   {
+    "check": "release_branch",
+    "reason": "branch_snapshot",
+    "blocks": [
+     "S8"
+    ]
+   }
+  ],
   "unchecked_accepted": [],
   "maintenance_judged": true,
   "metadata": {
@@ -180,7 +225,7 @@
    "reason": null,
    "forge": "github",
    "host": "github.com",
-   "repo": "scheb/2fa-bundle",
+   "repo": "FriendsOfSymfony/FOSOAuthServerBundle",
    "event": "push",
    "archived": false,
    "fetched_at": "2026-10-01T16:04:02+00:00",
@@ -192,19 +237,19 @@
   "origin": {
    "kind": "packagist",
    "registry": "packagist.org",
-   "package_url": "https://packagist.org/packages/scheb/2fa-bundle",
+   "package_url": "https://packagist.org/packages/friendsofsymfony/oauth-server-bundle",
    "local": false
   },
   "replacement": null,
   "replacement_url": null,
   "note": null,
-  "libyears_unmeasured": null,
+  "libyears_unmeasured": "branch_snapshot",
   "libyears_at_least": false,
   "direct": true,
   "dev": false,
   "reach": "direct",
   "chain": [
-   "scheb/2fa-bundle"
+   "friendsofsymfony/oauth-server-bundle"
   ],
   "depth": 0,
   "depth_unmeasured": null,
@@ -212,72 +257,78 @@
    "require"
   ],
   "direct_dependents": [
-   "scheb/2fa-backup-code",
-   "scheb/2fa-bundle",
-   "scheb/2fa-email",
-   "scheb/2fa-google-authenticator",
-   "scheb/2fa-qr-code",
-   "scheb/2fa-trusted-device"
+   "friendsofsymfony/oauth-server-bundle"
   ],
   "signals": [
    {
-    "id": "S8",
-    "level": "warn",
-    "summary": "branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
+    "id": "S2",
+    "level": "high",
+    "summary": "last release 2019-01-23 (7.7 years ago)",
     "data": {
-     "branch": "5.x",
-     "branch_last_release": "2022-04-16T10:18:34+00:00",
-     "branch_last_version": "v5.13.2",
-     "years": 4.5,
-     "newest_branch": "8.x",
-     "newest_version": "v8.6.1",
-     "newest_release": "2026-07-10T18:29:30+00:00",
-     "newest_php": "~8.4.0 || ~8.5.0",
-     "newest_within_reach": false,
-     "floor_php": ">=7.4",
-     "floor_source": "project",
-     "reachable_branch": null,
-     "reachable_version": null,
-     "reachable_release": null,
-     "suggested_constraint": null,
-     "dated_by": null,
-     "reachable_php": null,
-     "reachable_admits": null,
-     "newest_years": 0.2,
-     "reachable_years": null
+     "last_release": "2019-01-23T15:23:04+00:00",
+     "last_version": "1.6.2",
+     "years": 7.7,
+     "dated_by": null
+    }
+   },
+   {
+    "id": "S6",
+    "level": "warn",
+    "summary": "pinned to branch snapshot dev-master",
+    "data": {
+     "version": "dev-master",
+     "reason": "branch_snapshot",
+     "has_stable_release": true,
+     "last_stable_release": "2019-01-23T15:23:04+00:00",
+     "last_stable_version": "1.6.2",
+     "last_stable_dated_by": null,
+     "snapshot_time": "2022-03-24T10:22:23+00:00",
+     "tag_relation": "older"
+    }
+   },
+   {
+    "id": "S7",
+    "level": "info",
+    "summary": "pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)",
+    "data": {
+     "flagged": 1,
+     "packages": [
+      {
+       "package": "friendsofsymfony/oauth2-php",
+       "chain": [
+        "friendsofsymfony/oauth-server-bundle",
+        "friendsofsymfony/oauth2-php"
+       ],
+       "verdict": "low",
+       "lead": "stale",
+       "flag_ids": [
+        "stale"
+       ]
+      }
+     ]
     }
    }
   ],
-  "evidence": "left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
+  "evidence": "pinned: pinned to branch snapshot dev-master; stale: last release 2019-01-23 (7.7 years ago)",
   "allowlist_reason": null,
   "data_date": "2026-10-01T17:39:46+00:00",
-  "libyears": 4.23,
+  "libyears": null,
   "age": {
-   "installed": {
-    "at": "2022-04-16T10:18:34+00:00",
-    "years": 4.5,
-    "dated_by": null
-   },
-   "installed_unmeasured": null,
+   "installed": null,
+   "installed_unmeasured": "branch_snapshot",
    "release": {
-    "version": "v8.6.1",
-    "at": "2026-07-10T18:29:30+00:00",
-    "years": 0.2,
-    "level": null,
+    "version": "1.6.2",
+    "at": "2019-01-23T15:23:04+00:00",
+    "years": 7.7,
+    "level": "high",
     "dated_by": null
    },
    "release_unmeasured": null,
-   "branch_release": {
-    "version": "v5.13.2",
-    "at": "2022-04-16T10:18:34+00:00",
-    "years": 4.5,
-    "level": "warn",
-    "dated_by": null
-   },
-   "branch_release_unmeasured": null,
+   "branch_release": null,
+   "branch_release_unmeasured": "branch_snapshot",
    "push": {
-    "at": "2026-07-10T18:36:01+00:00",
-    "years": 0.2,
+    "at": "2024-01-12T10:27:37+00:00",
+    "years": 2.7,
     "level": null
    },
    "push_unmeasured": null
@@ -294,7 +345,7 @@
      "facts": [
       {
        "kind": "flag",
-       "id": "left-behind"
+       "id": "pinned"
       }
      ]
     }
@@ -303,115 +354,49 @@
   }
  },
  "lock": {
-  "php": ">=7.2.5",
-  "released": "2022-04-16T10:18:34+00:00",
-  "repository": "https://github.com/scheb/2fa-bundle.git",
+  "php": "^7.2 || ^8.0",
+  "released": "2022-03-24T10:22:23+00:00",
+  "repository": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle.git",
   "from_composer_repository": true,
   "dev": false,
-  "branch_snapshot": false,
+  "branch_snapshot": true,
   "type": "symfony-bundle"
  },
  "metadata": {
   "abandoned": false,
   "replacement": null,
-  "releases_listed": 76,
+  "releases_listed": 21,
   "has_stable_release": true,
-  "last_stable_release": "2026-07-10T18:29:30+00:00",
-  "last_stable_version": "v8.6.1",
+  "last_stable_release": "2019-01-23T15:23:04+00:00",
+  "last_stable_version": "1.6.2",
   "last_stable_dated_by": null,
-  "installed_release": "2022-04-16T10:18:34+00:00",
+  "installed_release": null,
   "installed_release_dated_by": null,
-  "repository": "https://github.com/scheb/2fa-bundle.git",
+  "repository": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle.git",
   "type": "symfony-bundle",
   "data_date": "2026-10-01T17:39:46+00:00",
-  "installed_branch": "5.x",
+  "installed_branch": null,
   "branches": [
    {
-    "branch": "8.x",
+    "branch": "1.x",
     "installed": false,
-    "highest": "v8.6.1",
-    "highest_released": "2026-07-10T18:29:30+00:00",
+    "highest": "1.6.2",
+    "highest_released": "2019-01-23T15:23:04+00:00",
     "highest_commit_date": null,
-    "newest_dated": "v8.6.1",
-    "newest_dated_released": "2026-07-10T18:29:30+00:00",
+    "newest_dated": "1.6.2",
+    "newest_dated_released": "2019-01-23T15:23:04+00:00",
     "dated_by": null,
-    "php": "~8.4.0 || ~8.5.0",
-    "highest_php": "~8.4.0 || ~8.5.0",
-    "admits_target_php": true,
-    "admits_project_php": false,
-    "php_blocked_by": "project",
-    "misses_target_php": null,
-    "misses_project_php": "needs_newer",
-    "highest_admits_target_php": true,
-    "highest_admits_project_php": false,
-    "highest_misses_project_php": "needs_newer",
-    "released_years": 0.2,
-    "fixes": null
-   },
-   {
-    "branch": "7.x",
-    "installed": false,
-    "highest": "v7.14.0",
-    "highest_released": "2026-06-12T18:31:07+00:00",
-    "highest_commit_date": null,
-    "newest_dated": "v7.14.0",
-    "newest_dated_released": "2026-06-12T18:31:07+00:00",
-    "dated_by": null,
-    "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
-    "highest_php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
-    "admits_target_php": true,
-    "admits_project_php": false,
-    "php_blocked_by": "project",
-    "misses_target_php": null,
-    "misses_project_php": "needs_newer",
-    "highest_admits_target_php": true,
-    "highest_admits_project_php": false,
-    "highest_misses_project_php": "needs_newer",
-    "released_years": 0.3,
-    "fixes": null
-   },
-   {
-    "branch": "6.x",
-    "installed": false,
-    "highest": "v6.13.1",
-    "highest_released": "2024-11-29T19:29:49+00:00",
-    "highest_commit_date": null,
-    "newest_dated": "v6.13.1",
-    "newest_dated_released": "2024-11-29T19:29:49+00:00",
-    "dated_by": null,
-    "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
-    "highest_php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
-    "admits_target_php": true,
-    "admits_project_php": false,
-    "php_blocked_by": "project",
-    "misses_target_php": null,
-    "misses_project_php": "needs_newer",
-    "highest_admits_target_php": true,
-    "highest_admits_project_php": false,
-    "highest_misses_project_php": "needs_newer",
-    "released_years": 1.8,
-    "fixes": null
-   },
-   {
-    "branch": "5.x",
-    "installed": true,
-    "highest": "v5.13.2",
-    "highest_released": "2022-04-16T10:18:34+00:00",
-    "highest_commit_date": null,
-    "newest_dated": "v5.13.2",
-    "newest_dated_released": "2022-04-16T10:18:34+00:00",
-    "dated_by": null,
-    "php": ">=7.2.5",
-    "highest_php": ">=7.2.5",
-    "admits_target_php": true,
+    "php": "^5.5|^7.0",
+    "highest_php": "^5.5|^7.0",
+    "admits_target_php": false,
     "admits_project_php": true,
-    "php_blocked_by": null,
-    "misses_target_php": null,
+    "php_blocked_by": "target",
+    "misses_target_php": "stops_before",
     "misses_project_php": null,
-    "highest_admits_target_php": true,
+    "highest_admits_target_php": false,
     "highest_admits_project_php": true,
     "highest_misses_project_php": null,
-    "released_years": 4.5,
+    "released_years": 7.7,
     "fixes": null
    }
   ]

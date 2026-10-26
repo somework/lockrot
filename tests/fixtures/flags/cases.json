@@ -253985,7 +253985,7 @@
   },
   {
    "id": "platform-step-why-not‡",
-   "label": "symfony/yaml under platform-overrides php 7.4.29 at target 8.4 and a refused update: the only command is the why-not step, and the platform step comes before it (§5.6)",
+   "label": "symfony/yaml under platform-overrides php 7.4.29 at target 8.4 and a move that Composer refuses for a locked package's requirement: the only command is the why-not step, and the platform step comes before it (§5.6)",
    "project": "wallabag",
    "run": {
     "project": "wallabag/wallabag",
@@ -254867,7 +254867,7 @@
     }
    },
    "synthetic_inputs": [
-    "platform-overrides php 7.4.29; Composer refuses each move (‡)"
+    "platform-overrides php 7.4.29; Composer refuses each move: incenteev/composer-parameter-handler requires symfony/yaml 5.3.* (‡)"
    ],
    "finding": {
     "package": "symfony/yaml",
@@ -254896,7 +254896,7 @@
        "value": 3,
        "source": null
       },
-      "summary": "3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings"
+      "summary": "3 advisories: 3 low — all fixed on 5.x (upgrade); worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings"
      }
     ],
     "score": {
@@ -254940,7 +254940,7 @@
        "role": "security",
        "advisory": "PKSA-b14r-zh1d-vdrc",
        "severity": "low",
-       "fix_kind": "update",
+       "fix_kind": "upgrade",
        "weight": 2,
        "multiplier": 1,
        "points": 2,
@@ -254974,17 +254974,17 @@
      "text": "2 = vulnerable 2 [low advisory]"
     },
     "next_step": {
-     "kind": "update",
+     "kind": "require",
      "source": "vulnerable",
      "merged": [],
-     "fix_kind": "update",
+     "fix_kind": "upgrade",
      "reason": null,
      "replacement": null,
      "quiet_years": null,
      "to_branch": "5.x",
      "version": "v5.4.52",
      "newest": "v5.4.53",
-     "constraint": null,
+     "constraint": "^5.4.52",
      "latest": null,
      "php_check": {
       "requires": ">=7.2.5",
@@ -254994,7 +254994,17 @@
       "raise_size": null
      },
      "crosses_major": false,
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "package",
+       "package": "incenteev/composer-parameter-handler",
+       "version": "v2.1.5",
+       "link": "require",
+       "target": null,
+       "constraint": "5.3.*",
+       "holder": null
+      }
+     ],
      "clears": [
       {
        "kind": "advisory",
@@ -255023,7 +255033,8 @@
       "deciding_advisory": null,
       "at_most": false,
       "assumes": [
-       "clears_hold"
+       "clears_hold",
+       "composer_resolves"
       ]
      },
      "check": {
@@ -255033,7 +255044,9 @@
       "installs": null
      },
      "moves_with": [],
-     "composer_moves_because": [],
+     "composer_moves_because": [
+      "holders"
+     ],
      "commands": [
       [
        "composer",
@@ -255085,7 +255098,7 @@
       }
      ],
      "also": [],
-     "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. update it with Composer (gets v5.4.53) — clears 3 advisories; Composer's solver refuses it against the lock"
+     "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle — clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
     },
     "security": {
      "status": "vulnerable",
@@ -255112,21 +255125,32 @@
      },
      "ignored": [],
      "ignored_count": 0,
-     "fix_kind": "update",
+     "fix_kind": "upgrade",
      "installed_branch_fixes": {
       "fixed": 3,
       "unknown": 0,
       "of": 3,
-      "fix_kind": "update",
+      "fix_kind": "upgrade",
       "lowest": "v5.4.52",
       "newest": "v5.4.53",
-      "held_by": [],
+      "held_by": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "require",
+        "target": null,
+        "constraint": "5.3.*",
+        "holder": null
+       }
+      ],
       "if_applied": {
        "total": 0,
        "verdict": "ok",
        "at_most": false,
        "assumes": [
-        "clears_hold"
+        "clears_hold",
+        "composer_resolves"
        ]
       },
       "check": {
@@ -255236,7 +255260,7 @@
          "points": 2,
          "deciding": true,
          "fix": {
-          "kind": "update",
+          "kind": "upgrade",
           "to_branch": "5.x",
           "version": "v5.4.52",
           "newest": "v5.4.53",
@@ -255244,7 +255268,17 @@
           "php": ">=7.2.5",
           "admits_target_php": true,
           "admits_project_php": true,
-          "held_by": [],
+          "held_by": [
+           {
+            "source": "package",
+            "package": "incenteev/composer-parameter-handler",
+            "version": "v2.1.5",
+            "link": "require",
+            "target": null,
+            "constraint": "5.3.*",
+            "holder": null
+           }
+          ],
           "reason": null
          },
          "baseline": null
@@ -255262,7 +255296,7 @@
          "points": 2,
          "deciding": false,
          "fix": {
-          "kind": "update",
+          "kind": "upgrade",
           "to_branch": "5.x",
           "version": "v5.4.52",
           "newest": "v5.4.53",
@@ -255270,7 +255304,17 @@
           "php": ">=7.2.5",
           "admits_target_php": true,
           "admits_project_php": true,
-          "held_by": [],
+          "held_by": [
+           {
+            "source": "package",
+            "package": "incenteev/composer-parameter-handler",
+            "version": "v2.1.5",
+            "link": "require",
+            "target": null,
+            "constraint": "5.3.*",
+            "holder": null
+           }
+          ],
           "reason": null
          },
          "baseline": null
@@ -255288,7 +255332,7 @@
          "points": 2,
          "deciding": false,
          "fix": {
-          "kind": "update",
+          "kind": "upgrade",
           "to_branch": "5.x",
           "version": "v5.4.52",
           "newest": "v5.4.53",
@@ -255296,7 +255340,17 @@
           "php": ">=7.2.5",
           "admits_target_php": true,
           "admits_project_php": true,
-          "held_by": [],
+          "held_by": [
+           {
+            "source": "package",
+            "package": "incenteev/composer-parameter-handler",
+            "version": "v2.1.5",
+            "link": "require",
+            "target": null,
+            "constraint": "5.3.*",
+            "holder": null
+           }
+          ],
           "reason": null
          },
          "baseline": null
@@ -255307,7 +255361,7 @@
       }
      }
     ],
-    "evidence": "vulnerable: 3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+    "evidence": "vulnerable: 3 advisories: 3 low — all fixed on 5.x (upgrade); worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
     "allowlist_reason": null,
     "data_date": "2026-10-01T17:39:46+00:00",
     "libyears": 4.66,
@@ -255381,7 +255435,17 @@
         "fix_kind": "raise-php",
         "lowest": "v8.0.12",
         "newest": "v8.1.8",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "package",
+          "package": "incenteev/composer-parameter-handler",
+          "version": "v2.1.5",
+          "link": "require",
+          "target": null,
+          "constraint": "5.3.*",
+          "holder": null
+         }
+        ],
         "if_applied": {
          "total": 0,
          "verdict": "ok",
@@ -255426,7 +255490,17 @@
         "fix_kind": "raise-php",
         "lowest": "v7.4.12",
         "newest": "v7.4.20",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "package",
+          "package": "incenteev/composer-parameter-handler",
+          "version": "v2.1.5",
+          "link": "require",
+          "target": null,
+          "constraint": "5.3.*",
+          "holder": null
+         }
+        ],
         "if_applied": {
          "total": 0,
          "verdict": "ok",
@@ -255471,7 +255545,17 @@
         "fix_kind": "raise-php",
         "lowest": "v6.4.40",
         "newest": "v6.4.47",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "package",
+          "package": "incenteev/composer-parameter-handler",
+          "version": "v2.1.5",
+          "link": "require",
+          "target": null,
+          "constraint": "5.3.*",
+          "holder": null
+         }
+        ],
         "if_applied": {
          "total": 0,
          "verdict": "ok",
@@ -255513,16 +255597,27 @@
         "fixed": 3,
         "unknown": 0,
         "of": 3,
-        "fix_kind": "update",
+        "fix_kind": "upgrade",
         "lowest": "v5.4.52",
         "newest": "v5.4.53",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "package",
+          "package": "incenteev/composer-parameter-handler",
+          "version": "v2.1.5",
+          "link": "require",
+          "target": null,
+          "constraint": "5.3.*",
+          "holder": null
+         }
+        ],
         "if_applied": {
          "total": 0,
          "verdict": "ok",
          "at_most": false,
          "assumes": [
-          "clears_hold"
+          "clears_hold",
+          "composer_resolves"
          ]
         },
         "check": {
@@ -255634,7 +255729,7 @@
    },
    "golden": {
     "score_text": "2 = vulnerable 2 [low advisory]",
-    "next_step_text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. update it with Composer (gets v5.4.53) — clears 3 advisories; Composer's solver refuses it against the lock",
+    "next_step_text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle — clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock",
     "verdict_line": "Low: 3 advisories affect your version. The worst is a low one (CVE-2026-45133: YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings).",
     "readings": [],
     "qualifiers": {
@@ -255659,9 +255754,9 @@
     "moves": [
      {
       "heading": "The move",
-      "action": "Update to v5.4.53 on 5.x",
+      "action": "Move it to ^5.4.52 through the 3 packages in Reach",
       "platform_step": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29.",
-      "command_note": null,
+      "command_note": "This shows which package holds the move.",
       "moves_with": null,
       "commands": [
        "composer why-not symfony/yaml v5.4.52 --locked"
@@ -255690,17 +255785,33 @@
         "Composer refuses the move"
        ]
       },
-      "composer": []
+      "composer": [
+       {
+        "text": "The packages that hold it may need to move too",
+        "items": []
+       }
+      ]
      }
     ],
     "held_by": [
-     null
+     {
+      "count": 1,
+      "shown": [
+       {
+        "name": "incenteev/composer-parameter-handler v2.1.5",
+        "grade": null,
+        "meta": "requires 5.3.*",
+        "step": null
+       }
+      ],
+      "fold": null
+     }
     ],
     "security": {
      "summary": [
       "3 advisories:",
       "5 on record for this name",
-      "fix: composer update",
+      "fix: upgrade",
       "lookup complete"
      ],
      "counts": [
@@ -255717,7 +255828,7 @@
        "source": "PKSA-b14r-zh1d-vdrc",
        "deciding": true,
        "severity": "low",
-       "fix": "fix v5.4.52 on 5.x, your branch (composer update)",
+       "fix": "fix v5.4.52 on 5.x, your branch (upgrade)",
        "affects": "affects 19 ranges",
        "ranges": [
         ">=2.0.0,<3.0.0|",
@@ -255747,7 +255858,7 @@
        "source": "PKSA-ft77-7h5f-p3r6",
        "deciding": false,
        "severity": "low",
-       "fix": "fix v5.4.52 on 5.x, your branch (composer update)",
+       "fix": "fix v5.4.52 on 5.x, your branch (upgrade)",
        "affects": "affects 19 ranges",
        "ranges": [
         ">=2.0.0,<3.0.0|",
@@ -255777,7 +255888,7 @@
        "source": "PKSA-v5yj-8nmz-sk2q",
        "deciding": false,
        "severity": "low",
-       "fix": "fix v5.4.52 on 5.x, your branch (composer update)",
+       "fix": "fix v5.4.52 on 5.x, your branch (upgrade)",
        "affects": "affects 19 ranges",
        "ranges": [
         ">=2.0.0,<3.0.0|",
@@ -255813,7 +255924,7 @@
        ],
        "lines": [
         "5.x your branch the move clears 3 of 3 from v5.4.52",
-        "composer update",
+        "upgrade · held by incenteev/composer-parameter-handler",
         "after it: 0, ok · Composer refuses the move"
        ]
       },
@@ -255822,7 +255933,7 @@
        "marks": [],
        "lines": [
         "6.x clears 3 of 3 from v6.4.40",
-        "php floor raise",
+        "php floor raise · held by incenteev/composer-parameter-handler",
         "after it: 0, ok · Composer refuses the move"
        ]
       },
@@ -255831,7 +255942,7 @@
        "marks": [],
        "lines": [
         "7.x clears 3 of 3 from v7.4.12",
-        "php floor raise",
+        "php floor raise · held by incenteev/composer-parameter-handler",
         "after it: 0, ok · Composer refuses the move"
        ]
       },
@@ -255840,7 +255951,7 @@
        "marks": [],
        "lines": [
         "8.x clears 3 of 3 from v8.0.12",
-        "php floor raise",
+        "php floor raise · held by incenteev/composer-parameter-handler",
         "after it: 0, ok · Composer refuses the move"
        ]
       }
@@ -255947,24 +256058,24 @@
     "security_row": [
      "3 advisories: low 3",
      "5 on record for this name",
-     "fix: composer update",
+     "fix: upgrade",
      "lookup complete",
      "5.x your branch the move clears 3 of 3 from v5.4.52",
-     "composer update",
+     "upgrade · held by incenteev/composer-parameter-handler",
      "after it: 0, ok · Composer refuses the move",
      "6.x clears 3 of 3 from v6.4.40",
-     "php floor raise",
+     "php floor raise · held by incenteev/composer-parameter-handler",
      "after it: 0, ok · Composer refuses the move",
      "7.x clears 3 of 3 from v7.4.12",
-     "php floor raise",
+     "php floor raise · held by incenteev/composer-parameter-handler",
      "after it: 0, ok · Composer refuses the move",
      "8.x clears 3 of 3 from v8.0.12",
-     "php floor raise",
+     "php floor raise · held by incenteev/composer-parameter-handler",
      "after it: 0, ok · Composer refuses the move"
     ],
     "why": [
      "2 · low from 1 · 6 points short of medium",
-     "vulnerable 2: low advisory CVE-2026-45133, the worst of 3 (tied with CVE-2026-45305, CVE-2026-45304); its own fix (composer update on 5.x) is reachable, so no × 2",
+     "vulnerable 2: low advisory CVE-2026-45133, the worst of 3 (tied with CVE-2026-45305, CVE-2026-45304); its own fix (upgrade on 5.x) is reachable, so no × 2",
      "transitive: no maintenance to halve; security is never halved for reach",
      "the advisories alone make it low",
      "without CVE-2026-45133: 2, low (tied: the others weigh the same)"
@@ -256006,7 +256117,7 @@
       "dev": false,
       "origin": "packagist",
       "require": {
-       "symfony/yaml": "*"
+       "symfony/yaml": "5.3.*"
       }
      },
      {
@@ -256185,34 +256296,111 @@
      "include_dev": false,
      "advisories_unchecked": null
     },
+    "packages": {
+     "incenteev/composer-parameter-handler": {
+      "lock": {
+       "name": "incenteev/composer-parameter-handler",
+       "version": "v2.1.5",
+       "time": "2022-05-25T10:57:22+00:00",
+       "php": ">=5.3.3",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v2.1.5",
+        "time": "2022-05-25T10:57:22+00:00",
+        "php": ">=5.3.3"
+       },
+       {
+        "version": "v2.3.0",
+        "time": "2025-11-26T14:10:46+00:00",
+        "php": null
+       }
+      ],
+      "advisories": [],
+      "records": 0,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "Incenteev/ParameterHandler",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2025-11-26T14:11:27Z",
+       "archived": false
+      },
+      "chain": [
+       "incenteev/composer-parameter-handler"
+      ],
+      "below": null
+     }
+    },
     "checks": {
      "update symfony/yaml ^5.4.52 ": {
       "result": "refused",
       "form": null,
       "reason": null,
       "installs": null,
-      "holds": []
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "require",
+        "target": null,
+        "constraint": "5.3.*"
+       }
+      ]
      },
      "update symfony/yaml ^8.0.12 ": {
       "result": "refused",
       "form": null,
       "reason": null,
       "installs": null,
-      "holds": []
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "require",
+        "target": null,
+        "constraint": "5.3.*"
+       }
+      ]
      },
      "update symfony/yaml ^7.4.12 ": {
       "result": "refused",
       "form": null,
       "reason": null,
       "installs": null,
-      "holds": []
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "require",
+        "target": null,
+        "constraint": "5.3.*"
+       }
+      ]
      },
      "update symfony/yaml ^6.4.40 ": {
       "result": "refused",
       "form": null,
       "reason": null,
       "installs": null,
-      "holds": []
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "require",
+        "target": null,
+        "constraint": "5.3.*"
+       }
+      ]
      }
     },
     "move_check": {
@@ -256233,7 +256421,7 @@
   },
   {
    "id": "platform-step-no-command‡",
-   "label": "2fa-bundle under platform-overrides php 7.4.29 at target 8.4 and a refused raise-php move that names no version: the move has no command, so it prints no platform step (§5.6)",
+   "label": "oauth-server-bundle under platform-overrides php 7.4.29 at target 8.4: its newest tag needs a php that the target does not run, so the move is blocked, has no command and prints no platform step (§5.6)",
    "project": "wallabag",
    "run": {
     "project": "wallabag/wallabag",
@@ -257009,7 +257197,7 @@
     "score_rules_used": {
      "counted": 0,
      "lead-first": 1,
-     "corroborating-share": 0,
+     "corroborating-share": 1,
      "advisory-points": 0,
      "no-reachable-fix-multiplier": 0,
      "security-max": 0,
@@ -257115,55 +257303,72 @@
     }
    },
    "synthetic_inputs": [
-    "platform-overrides php 7.4.29; Composer refuses each move (‡)"
+    "platform-overrides php 7.4.29 (‡)"
    ],
    "finding": {
-    "package": "scheb/2fa-bundle",
-    "version": "v5.13.2",
-    "branch": "5.x",
+    "package": "friendsofsymfony/oauth-server-bundle",
+    "version": "dev-master",
+    "branch": null,
     "installed_php": {
-     "requires": ">=7.2.5",
+     "requires": "^7.2 || ^8.0",
      "target_runs": true,
      "project_allows": true
     },
     "verdict": "high",
     "priority": "high",
-    "lead": "left-behind",
-    "rank": 48,
+    "lead": "pinned",
+    "rank": 24,
     "flags": [
      {
-      "id": "left-behind",
+      "id": "pinned",
       "role": "lead",
       "baseline": null,
       "signal_ids": [
-       "S8"
+       "S6"
       ],
       "degree": null,
       "headline": {
-       "unit": "years",
-       "value": 4.5,
-       "source": "branch"
+       "unit": "reason",
+       "value": "branch_snapshot",
+       "source": null
       },
-      "summary": "branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach"
+      "summary": "pinned to branch snapshot dev-master"
+     },
+     {
+      "id": "stale",
+      "role": "corroborating",
+      "baseline": null,
+      "signal_ids": [
+       "S2"
+      ],
+      "degree": {
+       "liveness_complete": true
+      },
+      "headline": {
+       "unit": "years",
+       "value": 7.7,
+       "source": "release"
+      },
+      "summary": "last release 2019-01-23 (7.7 years ago)"
      }
     ],
     "score": {
      "model": 1,
-     "total": 16,
-     "exact": 16,
+     "total": 18,
+     "exact": 18,
      "rounded_down": false,
      "band": {
       "floor": 16,
       "next": "critical",
-      "to_next": 16
+      "to_next": 14
      },
      "decided_by": "maintenance",
      "parts": {
       "maintenance": {
        "status": "counted",
-       "contribution": 16,
+       "contribution": 18,
        "alone": {
-        "total": 16,
+        "total": 18,
         "verdict": "high"
        }
       },
@@ -257181,83 +257386,103 @@
      "terms": [
       {
        "part": "maintenance",
-       "flag": "left-behind",
+       "flag": "pinned",
        "role": "lead",
        "weight": 16,
        "divisor": 1,
        "points": 16,
        "contribution": 16
+      },
+      {
+       "part": "maintenance",
+       "flag": "stale",
+       "role": "corroborating",
+       "weight": 8,
+       "divisor": 4,
+       "points": 2,
+       "contribution": 2
       }
      ],
      "modifiers": [],
      "accepted": [],
-     "without": [],
-     "text": "16 = left-behind 16"
+     "without": [
+      {
+       "remove": {
+        "kind": "flag",
+        "id": "pinned"
+       },
+       "revealed": [],
+       "total": 8,
+       "verdict": "medium",
+       "lead": "stale",
+       "deciding_advisory": null,
+       "at_least": false
+      },
+      {
+       "remove": {
+        "kind": "flag",
+        "id": "stale"
+       },
+       "revealed": [],
+       "total": 16,
+       "verdict": "high",
+       "lead": "pinned",
+       "deciding_advisory": null,
+       "at_least": false
+      }
+     ],
+     "text": "18 = pinned 16 + stale 2 [¼ of 8]"
     },
     "next_step": {
-     "kind": "raise-php",
-     "source": "left-behind",
+     "kind": "blocked",
+     "source": "pinned",
      "merged": [],
      "fix_kind": null,
      "reason": null,
      "replacement": null,
      "quiet_years": null,
-     "to_branch": "6.x",
+     "to_branch": "1.x",
      "version": null,
-     "newest": "v6.13.1",
-     "constraint": "^6.13",
-     "latest": null,
+     "newest": "1.6.2",
+     "constraint": null,
+     "latest": {
+      "version": "1.6.2",
+      "released": "2019-01-23T15:23:04+00:00",
+      "is_installed": false,
+      "relation": "older",
+      "snapshot_time": "2022-03-24T10:22:23+00:00"
+     },
      "php_check": {
-      "requires": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
-      "project_allows": false,
-      "target_runs": true,
-      "raise_to": ">=8.0",
-      "raise_size": "major"
+      "requires": "^5.5|^7.0",
+      "project_allows": true,
+      "target_runs": false,
+      "raise_to": null,
+      "raise_size": null
      },
-     "crosses_major": true,
+     "crosses_major": null,
      "held_by": [],
-     "clears": [
-      {
-       "kind": "flag",
-       "id": "left-behind",
-       "basis": "branch_releasing"
-      }
-     ],
+     "clears": [],
      "unverified": [],
-     "adds": [
+     "adds": [],
+     "leaves": [
       {
        "kind": "flag",
-       "id": "capped",
-       "basis": "stops_below_newest_php"
+       "id": "pinned"
+      },
+      {
+       "kind": "flag",
+       "id": "stale"
       }
      ],
-     "leaves": [],
-     "clears_all": true,
-     "if_applied": {
-      "total": 8,
-      "verdict": "medium",
-      "lead": "capped",
-      "deciding_advisory": null,
-      "at_most": false,
-      "assumes": [
-       "clears_hold",
-       "composer_resolves"
-      ]
-     },
-     "check": {
-      "result": "refused",
-      "form": null,
-      "reason": null,
-      "installs": null
-     },
+     "clears_all": false,
+     "if_applied": null,
+     "check": null,
      "moves_with": [],
-     "composer_moves_because": [
-      "crosses_major"
-     ],
+     "composer_moves_because": [],
      "commands": [],
      "through": [],
      "also": [],
-     "text": "raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements; Composer's solver refuses it against the lock"
+     "text": "no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it; replace it"
     },
     "security": {
      "status": "clear",
@@ -257278,7 +257503,15 @@
      "ignored_count": 0
     },
     "checks_missing": [],
-    "checks_skipped": [],
+    "checks_skipped": [
+     {
+      "check": "release_branch",
+      "reason": "branch_snapshot",
+      "blocks": [
+       "S8"
+      ]
+     }
+    ],
     "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
@@ -257291,7 +257524,7 @@
      "reason": null,
      "forge": "github",
      "host": "github.com",
-     "repo": "scheb/2fa-bundle",
+     "repo": "FriendsOfSymfony/FOSOAuthServerBundle",
      "event": "push",
      "archived": false,
      "fetched_at": "2026-10-01T16:04:02+00:00",
@@ -257303,19 +257536,19 @@
     "origin": {
      "kind": "packagist",
      "registry": "packagist.org",
-     "package_url": "https://packagist.org/packages/scheb/2fa-bundle",
+     "package_url": "https://packagist.org/packages/friendsofsymfony/oauth-server-bundle",
      "local": false
     },
     "replacement": null,
     "replacement_url": null,
     "note": null,
-    "libyears_unmeasured": null,
+    "libyears_unmeasured": "branch_snapshot",
     "libyears_at_least": false,
     "direct": true,
     "dev": false,
     "reach": "direct",
     "chain": [
-     "scheb/2fa-bundle"
+     "friendsofsymfony/oauth-server-bundle"
     ],
     "depth": 0,
     "depth_unmeasured": null,
@@ -257323,72 +257556,78 @@
      "require"
     ],
     "direct_dependents": [
-     "scheb/2fa-backup-code",
-     "scheb/2fa-bundle",
-     "scheb/2fa-email",
-     "scheb/2fa-google-authenticator",
-     "scheb/2fa-qr-code",
-     "scheb/2fa-trusted-device"
+     "friendsofsymfony/oauth-server-bundle"
     ],
     "signals": [
      {
-      "id": "S8",
-      "level": "warn",
-      "summary": "branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
+      "id": "S2",
+      "level": "high",
+      "summary": "last release 2019-01-23 (7.7 years ago)",
       "data": {
-       "branch": "5.x",
-       "branch_last_release": "2022-04-16T10:18:34+00:00",
-       "branch_last_version": "v5.13.2",
-       "years": 4.5,
-       "newest_branch": "8.x",
-       "newest_version": "v8.6.1",
-       "newest_release": "2026-07-10T18:29:30+00:00",
-       "newest_php": "~8.4.0 || ~8.5.0",
-       "newest_within_reach": false,
-       "floor_php": ">=7.4",
-       "floor_source": "project",
-       "reachable_branch": null,
-       "reachable_version": null,
-       "reachable_release": null,
-       "suggested_constraint": null,
-       "dated_by": null,
-       "reachable_php": null,
-       "reachable_admits": null,
-       "newest_years": 0.2,
-       "reachable_years": null
+       "last_release": "2019-01-23T15:23:04+00:00",
+       "last_version": "1.6.2",
+       "years": 7.7,
+       "dated_by": null
+      }
+     },
+     {
+      "id": "S6",
+      "level": "warn",
+      "summary": "pinned to branch snapshot dev-master",
+      "data": {
+       "version": "dev-master",
+       "reason": "branch_snapshot",
+       "has_stable_release": true,
+       "last_stable_release": "2019-01-23T15:23:04+00:00",
+       "last_stable_version": "1.6.2",
+       "last_stable_dated_by": null,
+       "snapshot_time": "2022-03-24T10:22:23+00:00",
+       "tag_relation": "older"
+      }
+     },
+     {
+      "id": "S7",
+      "level": "info",
+      "summary": "pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)",
+      "data": {
+       "flagged": 1,
+       "packages": [
+        {
+         "package": "friendsofsymfony/oauth2-php",
+         "chain": [
+          "friendsofsymfony/oauth-server-bundle",
+          "friendsofsymfony/oauth2-php"
+         ],
+         "verdict": "low",
+         "lead": "stale",
+         "flag_ids": [
+          "stale"
+         ]
+        }
+       ]
       }
      }
     ],
-    "evidence": "left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
+    "evidence": "pinned: pinned to branch snapshot dev-master; stale: last release 2019-01-23 (7.7 years ago)",
     "allowlist_reason": null,
     "data_date": "2026-10-01T17:39:46+00:00",
-    "libyears": 4.23,
+    "libyears": null,
     "age": {
-     "installed": {
-      "at": "2022-04-16T10:18:34+00:00",
-      "years": 4.5,
-      "dated_by": null
-     },
-     "installed_unmeasured": null,
+     "installed": null,
+     "installed_unmeasured": "branch_snapshot",
      "release": {
-      "version": "v8.6.1",
-      "at": "2026-07-10T18:29:30+00:00",
-      "years": 0.2,
-      "level": null,
+      "version": "1.6.2",
+      "at": "2019-01-23T15:23:04+00:00",
+      "years": 7.7,
+      "level": "high",
       "dated_by": null
      },
      "release_unmeasured": null,
-     "branch_release": {
-      "version": "v5.13.2",
-      "at": "2022-04-16T10:18:34+00:00",
-      "years": 4.5,
-      "level": "warn",
-      "dated_by": null
-     },
-     "branch_release_unmeasured": null,
+     "branch_release": null,
+     "branch_release_unmeasured": "branch_snapshot",
      "push": {
-      "at": "2026-07-10T18:36:01+00:00",
-      "years": 0.2,
+      "at": "2024-01-12T10:27:37+00:00",
+      "years": 2.7,
       "level": null
      },
      "push_unmeasured": null
@@ -257405,7 +257644,7 @@
        "facts": [
         {
          "kind": "flag",
-         "id": "left-behind"
+         "id": "pinned"
         }
        ]
       }
@@ -257415,113 +257654,47 @@
    },
    "details": {
     "metadata": {
-     "installed_branch": "5.x",
+     "installed_branch": null,
      "branches": [
       {
-       "branch": "8.x",
+       "branch": "1.x",
        "installed": false,
-       "highest": "v8.6.1",
-       "highest_released": "2026-07-10T18:29:30+00:00",
+       "highest": "1.6.2",
+       "highest_released": "2019-01-23T15:23:04+00:00",
        "highest_commit_date": null,
-       "newest_dated": "v8.6.1",
-       "newest_dated_released": "2026-07-10T18:29:30+00:00",
+       "newest_dated": "1.6.2",
+       "newest_dated_released": "2019-01-23T15:23:04+00:00",
        "dated_by": null,
-       "php": "~8.4.0 || ~8.5.0",
-       "highest_php": "~8.4.0 || ~8.5.0",
-       "admits_target_php": true,
-       "admits_project_php": false,
-       "php_blocked_by": "project",
-       "misses_target_php": null,
-       "misses_project_php": "needs_newer",
-       "highest_admits_target_php": true,
-       "highest_admits_project_php": false,
-       "highest_misses_project_php": "needs_newer",
-       "released_years": 0.2,
-       "fixes": null
-      },
-      {
-       "branch": "7.x",
-       "installed": false,
-       "highest": "v7.14.0",
-       "highest_released": "2026-06-12T18:31:07+00:00",
-       "highest_commit_date": null,
-       "newest_dated": "v7.14.0",
-       "newest_dated_released": "2026-06-12T18:31:07+00:00",
-       "dated_by": null,
-       "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
-       "highest_php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
-       "admits_target_php": true,
-       "admits_project_php": false,
-       "php_blocked_by": "project",
-       "misses_target_php": null,
-       "misses_project_php": "needs_newer",
-       "highest_admits_target_php": true,
-       "highest_admits_project_php": false,
-       "highest_misses_project_php": "needs_newer",
-       "released_years": 0.3,
-       "fixes": null
-      },
-      {
-       "branch": "6.x",
-       "installed": false,
-       "highest": "v6.13.1",
-       "highest_released": "2024-11-29T19:29:49+00:00",
-       "highest_commit_date": null,
-       "newest_dated": "v6.13.1",
-       "newest_dated_released": "2024-11-29T19:29:49+00:00",
-       "dated_by": null,
-       "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
-       "highest_php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
-       "admits_target_php": true,
-       "admits_project_php": false,
-       "php_blocked_by": "project",
-       "misses_target_php": null,
-       "misses_project_php": "needs_newer",
-       "highest_admits_target_php": true,
-       "highest_admits_project_php": false,
-       "highest_misses_project_php": "needs_newer",
-       "released_years": 1.8,
-       "fixes": null
-      },
-      {
-       "branch": "5.x",
-       "installed": true,
-       "highest": "v5.13.2",
-       "highest_released": "2022-04-16T10:18:34+00:00",
-       "highest_commit_date": null,
-       "newest_dated": "v5.13.2",
-       "newest_dated_released": "2022-04-16T10:18:34+00:00",
-       "dated_by": null,
-       "php": ">=7.2.5",
-       "highest_php": ">=7.2.5",
-       "admits_target_php": true,
+       "php": "^5.5|^7.0",
+       "highest_php": "^5.5|^7.0",
+       "admits_target_php": false,
        "admits_project_php": true,
-       "php_blocked_by": null,
-       "misses_target_php": null,
+       "php_blocked_by": "target",
+       "misses_target_php": "stops_before",
        "misses_project_php": null,
-       "highest_admits_target_php": true,
+       "highest_admits_target_php": false,
        "highest_admits_project_php": true,
        "highest_misses_project_php": null,
-       "released_years": 4.5,
+       "released_years": 7.7,
        "fixes": null
       }
      ]
     }
    },
    "golden": {
-    "score_text": "16 = left-behind 16",
-    "next_step_text": "raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements; Composer's solver refuses it against the lock",
-    "verdict_line": "High: its branch, 5.x, had its last release 4.5 years ago, behind 8.x.",
-    "readings": [],
+    "score_text": "18 = pinned 16 + stale 2 [¼ of 8]",
+    "next_step_text": "no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it; replace it",
+    "verdict_line": "High: it is pinned to the branch snapshot dev-master.",
+    "readings": [
+     {
+      "flag": "stale",
+      "text": "Nothing has been released for 7.7 years."
+     }
+    ],
     "qualifiers": {
      "reach": [
       "Production: not in packages-dev",
-      "Required directly, and also through:",
-      "scheb/2fa-backup-code",
-      "scheb/2fa-email",
-      "scheb/2fa-google-authenticator",
-      "scheb/2fa-qr-code",
-      "scheb/2fa-trusted-device"
+      "Required directly"
      ],
      "origin": null,
      "not_judged": null,
@@ -257532,50 +257705,37 @@
      "accepted": [],
      "gate": [
       "fails the run: grade high or above",
-      "Tripped by left-behind"
+      "Tripped by pinned"
      ]
     },
     "moves": [
      {
-      "heading": "The move",
-      "action": "Raise require.php to >=8.0, then require ^6.13",
+      "heading": "Next step",
+      "action": "Its newest tag, 1.6.2, needs php ^5.5|^7.0, which your target, 8.4, does not run: replace it",
       "platform_step": null,
       "command_note": null,
       "moves_with": null,
       "commands": [],
       "commands_label": null,
-      "clears": "left-behind",
+      "clears": null,
       "stays": null,
       "not_checked": null,
-      "adds": [
-       "capped: it stops below the newest PHP"
-      ],
+      "adds": [],
       "php": {
-       "head": "6.x needs php ~8.0.0 … ~8.4.0 (5 alternatives)",
+       "head": "1.x needs php ^5.5|^7.0",
        "lines": [
         {
-         "answer": "no",
-         "text": "your require.php still allows 7.4 (a major raise)"
+         "answer": "yes",
+         "text": "your require.php allows it"
         },
         {
-         "answer": "yes",
-         "text": "your target, 8.4, runs it"
+         "answer": "no",
+         "text": "your target, 8.4, does not run it"
         }
        ]
       },
-      "after": {
-       "result": "8, medium",
-       "conditions": [
-        "adds capped",
-        "Composer refuses the move"
-       ]
-      },
-      "composer": [
-       {
-        "text": "A new major brings its own requirements",
-        "items": []
-       }
-      ]
+      "after": null,
+      "composer": []
      }
     ],
     "held_by": [
@@ -257596,69 +257756,17 @@
      "ladder": []
     },
     "branches_lead": [
-     "Your branch, 5.x, had its last release, v5.13.2, 4.5 years ago.",
-     "The newest branch, 8.x, released v8.6.1 0.2 years ago."
+     "A branch snapshot, dev-master, is installed."
     ],
-    "branch_rows": [
-     {
-      "branch": "8.x",
-      "marks": [
-       "newest"
-      ],
-      "latest": "v8.6.1",
-      "age": "0.2y",
-      "php": "~8.4.0 || ~8.5.0",
-      "php_words": "above your require.php",
-      "bar": "v8.6.1, released 0.2 years ago",
-      "folded_in": null
-     },
-     {
-      "branch": "7.x",
-      "marks": [],
-      "latest": "v7.14.0",
-      "age": "0.3y",
-      "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
-      "php_words": "above your require.php",
-      "bar": "v7.14.0, released 0.3 years ago",
-      "folded_in": null
-     },
-     {
-      "branch": "6.x",
-      "marks": [
-       "the move"
-      ],
-      "latest": "v6.13.1",
-      "age": "1.8y",
-      "php": "~8.0.0 … ~8.4.0 (5 alternatives)",
-      "php_words": "above your require.php",
-      "bar": "v6.13.1, released 1.8 years ago",
-      "folded_in": null
-     },
-     {
-      "branch": "5.x",
-      "marks": [
-       "yours"
-      ],
-      "latest": "v5.13.2",
-      "age": "4.5y",
-      "php": ">=7.2.5",
-      "php_words": null,
-      "bar": "v5.13.2, released 4.5 years ago",
-      "folded_in": null
-     }
-    ],
+    "branch_rows": [],
     "age_rows": [
      {
-      "label": "installed",
-      "value": "v5.13.2 · 2022-04-16 · 4.5 years ago · the newest on 5.x"
-     },
-     {
       "label": "most recent",
-      "value": "v8.6.1 · 2026-07-10 · 0.2 years ago"
+      "value": "1.6.2 · 2019-01-23 · 7.7 years ago"
      },
      {
       "label": "last push",
-      "value": "2026-07-10 · 0.2 years ago"
+      "value": "2024-01-12 · 2.7 years ago"
      }
     ],
     "security_row": [
@@ -257667,112 +257775,49 @@
      "lookup complete"
     ],
     "why": [
-     "16 · high from 16 · 16 points short of critical",
-     "left-behind 16 leads: the strongest maintenance fact counts in full",
+     "18 · high from 16 · 14 points short of critical",
+     "pinned 16 leads: the strongest maintenance fact counts in full",
+     "stale 2: ¼ of 8, beside pinned (correlated evidence)",
      "direct requirement: maintenance not halved for reach",
-     "maintenance alone makes it high"
+     "maintenance alone makes it high",
+     "without pinned: 8, medium (stale would lead) · without stale: 16, high"
     ],
     "gate_line": null,
-    "checks": "1 fired (S8) · 10 quiet · every check ran",
+    "checks": "3 fired (S2, S6, S7) · 7 quiet · S8 not applicable (branch snapshot) · every other check ran",
     "baseline_suffix": null,
     "commands_posix": [],
     "commands_cmd": [],
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed v5.13.2 released 2022-04-16 (4.5 years ago), the newest on 5.x; newest release v8.6.1 2026-07-10 (0.2 years ago); last push 2026-07-10 (0.2 years ago)"
+    "age_line": "age: newest release 1.6.2 2019-01-23 (7.7 years ago); last push 2024-01-12 (2.7 years ago)"
    },
    "inputs": {
     "root": {
      "name": "wallabag/wallabag",
      "require": {
       "php": ">=7.4",
-      "scheb/2fa-bundle": "*",
-      "scheb/2fa-backup-code": "*",
-      "scheb/2fa-email": "*",
-      "scheb/2fa-google-authenticator": "*",
-      "scheb/2fa-qr-code": "*",
-      "scheb/2fa-trusted-device": "*"
+      "friendsofsymfony/oauth-server-bundle": "*"
      }
     },
     "lock": [
      {
-      "name": "scheb/2fa-bundle",
-      "version": "v5.13.2",
-      "time": "2022-04-16T10:18:34+00:00",
-      "php": ">=7.2.5",
+      "name": "friendsofsymfony/oauth-server-bundle",
+      "version": "dev-master",
+      "time": "2022-03-24T10:22:23+00:00",
+      "php": "^7.2 || ^8.0",
       "dev": false,
       "origin": "packagist"
-     },
-     {
-      "name": "scheb/2fa-backup-code",
-      "version": "1.0.0",
-      "dev": false,
-      "origin": "packagist",
-      "require": {
-       "scheb/2fa-bundle": "*"
-      }
-     },
-     {
-      "name": "scheb/2fa-email",
-      "version": "1.0.0",
-      "dev": false,
-      "origin": "packagist",
-      "require": {
-       "scheb/2fa-bundle": "*"
-      }
-     },
-     {
-      "name": "scheb/2fa-google-authenticator",
-      "version": "1.0.0",
-      "dev": false,
-      "origin": "packagist",
-      "require": {
-       "scheb/2fa-bundle": "*"
-      }
-     },
-     {
-      "name": "scheb/2fa-qr-code",
-      "version": "1.0.0",
-      "dev": false,
-      "origin": "packagist",
-      "require": {
-       "scheb/2fa-bundle": "*"
-      }
-     },
-     {
-      "name": "scheb/2fa-trusted-device",
-      "version": "1.0.0",
-      "dev": false,
-      "origin": "packagist",
-      "require": {
-       "scheb/2fa-bundle": "*"
-      }
      }
     ],
     "releases": [
      {
-      "version": "v5.13.2",
-      "time": "2022-04-16T10:18:34+00:00",
-      "php": ">=7.2.5"
+      "version": "1.6.2",
+      "time": "2019-01-23T15:23:04+00:00",
+      "php": "^5.5|^7.0"
      },
      {
-      "version": "v6.13.0",
-      "time": null,
-      "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0"
-     },
-     {
-      "version": "v6.13.1",
-      "time": "2024-11-29T19:29:49+00:00",
-      "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0"
-     },
-     {
-      "version": "v7.14.0",
-      "time": "2026-06-12T18:31:07+00:00",
-      "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0"
-     },
-     {
-      "version": "v8.6.1",
-      "time": "2026-07-10T18:29:30+00:00",
-      "php": "~8.4.0 || ~8.5.0"
+      "version": "dev-master",
+      "time": "2022-03-24T10:22:23+00:00",
+      "php": "^7.2 || ^8.0"
      }
     ],
     "advisories": [],
@@ -257782,10 +257827,10 @@
     "activity": {
      "forge": "github",
      "host": "github.com",
-     "repo": "scheb/2fa-bundle",
+     "repo": "FriendsOfSymfony/FOSOAuthServerBundle",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-07-10T18:36:01+00:00",
+     "pushed_at": "2024-01-12T10:27:37+00:00",
      "archived": false
     },
     "dependents": {},
@@ -257796,23 +257841,45 @@
      "include_dev": false,
      "advisories_unchecked": null
     },
-    "checks": {
-     "require scheb/2fa-bundle ^6.13 >=8.0": {
-      "result": "refused",
-      "form": null,
-      "reason": null,
-      "installs": null,
-      "holds": []
+    "packages": {
+     "friendsofsymfony/oauth2-php": {
+      "lock": {
+       "name": "friendsofsymfony/oauth2-php",
+       "version": "1.3.1",
+       "time": "2021-04-06T17:14:49+00:00",
+       "php": "^5.5.9 || ^7.0.8 || ^7.1.3 || ^7.2.5 || ^8.0.0",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "1.3.1",
+        "time": "2021-04-06T17:14:49+00:00",
+        "php": "^5.5.9 || ^7.0.8 || ^7.1.3 || ^7.2.5 || ^8.0.0"
+       }
+      ],
+      "advisories": [],
+      "records": 1,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "FriendsOfSymfony/oauth2-php",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2024-01-12T10:20:26+00:00",
+       "archived": false
+      },
+      "chain": [
+       "friendsofsymfony/oauth-server-bundle",
+       "friendsofsymfony/oauth2-php"
+      ],
+      "below": [
+       "friendsofsymfony/oauth-server-bundle",
+       "friendsofsymfony/oauth2-php"
+      ]
      }
-    },
-    "move_check": {
-     "composer": "2.10.3",
-     "blocks_advisories": true,
-     "blocking_disabled_by": [],
-     "ignores_extensions": true,
-     "baseline": "resolves",
-     "reason": null,
-     "php": "8.4.99"
     },
     "php_lock": {
      "platform-overrides": {
@@ -302836,6 +302903,1993 @@
    }
   },
   {
+   "id": "mc-joint-retag‡",
+   "label": "the joint solve installs the holder at its locked version on a new commit: it moves no package, so the require stays refused",
+   "project": "typo3-v12",
+   "run": {
+    "project": "typo3/cms",
+    "root_package": "typo3/cms",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "project_php": "^8.1",
+    "project_php_lowest": "8.1.0",
+    "lock_file": "composer.lock",
+    "fail_on": "high",
+    "fail_on_source": "option",
+    "gates": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "threshold": "high"
+     }
+    ],
+    "strict_network": false,
+    "mode": "check",
+    "include_dev": false,
+    "thresholds": {
+     "release-warn-years": 3,
+     "release-high-years": 5,
+     "push-warn-years": 3,
+     "push-high-years": 5
+    },
+    "flag_ids": [
+     "abandoned",
+     "silent",
+     "pinned",
+     "left-behind",
+     "old-promise",
+     "stale",
+     "capped",
+     "vulnerable"
+    ],
+    "verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     "unknown",
+     "finished",
+     "ok"
+    ],
+    "graded_verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "signal_ids": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7",
+     "S8",
+     "S9",
+     "S10",
+     "S11"
+    ],
+    "fix_model": 1,
+    "text_grammar": 1,
+    "score_model": {
+     "id": 1,
+     "score_text_grammar": 1,
+     "flag_order": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "capped",
+      "vulnerable"
+     ],
+     "parts": [
+      {
+       "id": "maintenance",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "capped"
+       ],
+       "combine": "lead_plus_share"
+      },
+      {
+       "id": "security",
+       "flag_ids": [
+        "vulnerable"
+       ],
+       "combine": "max"
+      }
+     ],
+     "flags": [
+      {
+       "id": "abandoned",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "abandoned",
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S1",
+        "S3"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "silent",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "silent",
+        "pinned",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-high-years",
+        "push-high-years"
+       ],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "pinned",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 22,
+       "max_maintenance_flags": [
+        "pinned",
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S6"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "left-behind",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 20,
+       "max_maintenance_flags": [
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S8"
+       ],
+       "thresholds": [
+        "release-warn-years"
+       ],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "old-promise",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 18,
+       "max_maintenance_flags": [
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S5"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "stale",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 10,
+       "max_maintenance_flags": [
+        "stale",
+        "capped"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-warn-years",
+        "push-warn-years"
+       ],
+       "basis": {
+        "v013_base": "medium",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "capped",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 8,
+       "max_maintenance_flags": [
+        "capped"
+       ],
+       "raised_by": [
+        "S11"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "vulnerable",
+       "part": "security",
+       "points": null,
+       "band": null,
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": null,
+       "max_maintenance_flags": null,
+       "raised_by": [
+        "S9"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "severities"
+       },
+       "points_from": "severities"
+      }
+     ],
+     "severities": [
+      {
+       "id": "critical",
+       "points": 32,
+       "band": "critical",
+       "points_no_reachable_fix": 64,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 4,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "high",
+       "points": 16,
+       "band": "high",
+       "points_no_reachable_fix": 32,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 3,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "medium",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "unrated",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": "medium",
+       "basis": {
+        "points": "counts_as"
+       }
+      },
+      {
+       "id": "low",
+       "points": 2,
+       "band": "low",
+       "points_no_reachable_fix": 4,
+       "band_no_reachable_fix": "low",
+       "gate_rank": 1,
+       "counts_as": null,
+       "basis": {
+        "points": "share",
+        "of": "medium",
+        "share": {
+         "num": 1,
+         "den": 4
+        }
+       }
+      }
+     ],
+     "fix_kinds": [
+      {
+       "id": "update",
+       "ease": 1,
+       "doubles": false
+      },
+      {
+       "id": "upgrade",
+       "ease": 2,
+       "doubles": false
+      },
+      {
+       "id": "raise-php",
+       "ease": 3,
+       "doubles": false
+      },
+      {
+       "id": "unknown",
+       "ease": 4,
+       "doubles": false
+      },
+      {
+       "id": "blocked",
+       "ease": 5,
+       "doubles": true
+      },
+      {
+       "id": "none",
+       "ease": 6,
+       "doubles": true
+      }
+     ],
+     "bands": [
+      {
+       "verdict": "critical",
+       "floor": 32
+      },
+      {
+       "verdict": "high",
+       "floor": 16
+      },
+      {
+       "verdict": "medium",
+       "floor": 8
+      },
+      {
+       "verdict": "low",
+       "floor": 1
+      }
+     ],
+     "zero_verdicts": [
+      {
+       "verdict": "finished",
+       "when": "allowlisted"
+      },
+      {
+       "verdict": "unknown",
+       "when": "no_metadata"
+      },
+      {
+       "verdict": "ok",
+       "when": "otherwise"
+      }
+     ],
+     "exact_unit": 0.5,
+     "rounding": "floor_once",
+     "max_total": 104,
+     "bar_max": 64,
+     "bar_overflow": "clip",
+     "exclusive_groups": [
+      {
+       "id": "liveness",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "stale"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "branch",
+       "flag_ids": [
+        "pinned",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_age",
+       "flag_ids": [
+        "silent",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_push",
+       "flag_ids": [
+        "left-behind",
+        "stale"
+       ],
+       "holds_unless": {
+        "threshold": "push-warn-years",
+        "below": "release-warn-years"
+       }
+      },
+      {
+       "id": "php_bound",
+       "flag_ids": [
+        "old-promise",
+        "capped"
+       ],
+       "holds_unless": null
+      }
+     ],
+     "sort": [
+      {
+       "key": "verdict",
+       "path": "verdict",
+       "dir": "order",
+       "order": [
+        [
+         "critical"
+        ],
+        [
+         "high"
+        ],
+        [
+         "medium"
+        ],
+        [
+         "low"
+        ],
+        [
+         "unknown"
+        ],
+        [
+         "finished",
+         "ok"
+        ]
+       ],
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "security",
+       "path": "score.parts.security.contribution",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "score",
+       "path": "score.exact",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "direct",
+       "path": "direct",
+       "dir": "true_first",
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "package",
+       "path": "package",
+       "dir": "asc",
+       "collation": "bytes",
+       "default": null
+      }
+     ],
+     "rules": [
+      {
+       "id": "counted",
+       "stage": 1,
+       "kind": "select",
+       "applies_to": "flags",
+       "accept_group": "liveness",
+       "accept_covers": "listed_and_below",
+       "why": "accepted-facts-shown-not-counted",
+       "doc": "score-counted",
+       "illustration": null
+      },
+      {
+       "id": "lead-first",
+       "stage": 2,
+       "kind": "select",
+       "applies_to": "maintenance",
+       "order": "flag_order",
+       "share": {
+        "num": 1,
+        "den": 1
+       },
+       "why": "strongest-fact-in-full",
+       "doc": "score-lead-first",
+       "illustration": null
+      },
+      {
+       "id": "corroborating-share",
+       "stage": 3,
+       "kind": "share",
+       "applies_to": "maintenance",
+       "share": {
+        "num": 1,
+        "den": 4
+       },
+       "why": "correlated-evidence",
+       "doc": "score-corroborating-share",
+       "illustration": {
+        "lead": "left-behind",
+        "flag": "old-promise",
+        "weight": 16,
+        "points": 4
+       }
+      },
+      {
+       "id": "advisory-points",
+       "stage": 4,
+       "kind": "lookup",
+       "applies_to": "security",
+       "table": "severities",
+       "why": "severity-points",
+       "doc": "score-advisory-points",
+       "illustration": null
+      },
+      {
+       "id": "no-reachable-fix-multiplier",
+       "stage": 5,
+       "kind": "multiply",
+       "applies_to": "advisory",
+       "factor": 2,
+       "when_fix": [
+        "none",
+        "blocked"
+       ],
+       "why": "one-band-up",
+       "doc": "score-no-reachable-fix-multiplier",
+       "illustration": {
+        "severity": "high",
+        "before": 16,
+        "after": 32,
+        "band_before": "high",
+        "band_after": "critical"
+       }
+      },
+      {
+       "id": "security-max",
+       "stage": 6,
+       "kind": "max",
+       "applies_to": "security",
+       "tie_break": [
+        {
+         "key": "points",
+         "dir": "desc",
+         "collation": null
+        },
+        {
+         "key": "severity",
+         "dir": "order",
+         "collation": null
+        },
+        {
+         "key": "id",
+         "dir": "asc",
+         "collation": "bytes"
+        }
+       ],
+       "why": "one-number-per-part",
+       "doc": "score-security-max",
+       "illustration": null
+      },
+      {
+       "id": "divide-reach",
+       "stage": 7,
+       "kind": "divide",
+       "applies_to": "maintenance",
+       "by": 2,
+       "when": [
+        "transitive",
+        "unreached"
+       ],
+       "why": "reach-halves-maintenance",
+       "doc": "score-divide-reach",
+       "illustration": {
+        "flag": "abandoned",
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "security-exempt-from-reach",
+       "stage": 8,
+       "kind": "exempt",
+       "applies_to": "security",
+       "of": "divide-reach",
+       "why": "exploitability-independent-of-reach",
+       "doc": "score-security-exempt-from-reach",
+       "illustration": {
+        "severity": "critical",
+        "reach": "transitive",
+        "total": 32
+       }
+      },
+      {
+       "id": "sum",
+       "stage": 9,
+       "kind": "combine",
+       "applies_to": "total",
+       "op": "sum",
+       "ratio_from": "medium",
+       "why": "parts-add",
+       "doc": "score-sum",
+       "illustration": {
+        "maintenance": 16,
+        "security": 16,
+        "total": 32,
+        "band": "critical",
+        "low_maintenance": 4,
+        "low_security": 4,
+        "low_total": 8,
+        "low_band": "medium"
+       }
+      },
+      {
+       "id": "divide-dev",
+       "stage": 10,
+       "kind": "divide",
+       "applies_to": "total",
+       "by": 2,
+       "when": [
+        "dev"
+       ],
+       "why": "dev-halves-total",
+       "doc": "score-divide-dev",
+       "illustration": {
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "floor-once",
+       "stage": 11,
+       "kind": "floor",
+       "applies_to": "total",
+       "why": "integer-band-edges",
+       "doc": "score-floor-once",
+       "illustration": {
+        "exact": 4.5,
+        "total": 4
+       }
+      },
+      {
+       "id": "band-floors",
+       "stage": 12,
+       "kind": "band",
+       "applies_to": "total",
+       "ratio": 2,
+       "ratio_from": "medium",
+       "why": "two-floor-parts-make-next",
+       "doc": "score-band-floors",
+       "illustration": null
+      },
+      {
+       "id": "zero-verdicts",
+       "stage": 13,
+       "kind": "zero",
+       "applies_to": "total",
+       "table": "zero_verdicts",
+       "why": "score-zero-says-why",
+       "doc": "score-zero-verdicts",
+       "illustration": null
+      },
+      {
+       "id": "sort",
+       "stage": 14,
+       "kind": "order",
+       "applies_to": "findings",
+       "why": "advisory-findings-first",
+       "doc": "score-sort",
+       "illustration": null
+      },
+      {
+       "id": "gate-bounded-new",
+       "stage": 15,
+       "kind": "gate",
+       "applies_to": "gate",
+       "cap_multiplier": 2,
+       "why": "new-fact-sets-level",
+       "doc": "score-gate-bounded-new",
+       "illustration": {
+        "score": 36,
+        "new": 16,
+        "gate": 32
+       }
+      },
+      {
+       "id": "baseline-cover",
+       "stage": 16,
+       "kind": "cover",
+       "applies_to": "gate",
+       "order": "flag_order",
+       "covers": "listed_and_below",
+       "why": "recorded-lead-covers-below",
+       "doc": "score-baseline-cover",
+       "illustration": null
+      }
+     ],
+     "docs": "https://lockrot.dev/verdicts/model-1/"
+    },
+    "score_rules_used": {
+     "counted": 0,
+     "lead-first": 0,
+     "corroborating-share": 0,
+     "advisory-points": 1,
+     "no-reachable-fix-multiplier": 0,
+     "security-max": 0,
+     "divide-reach": 0,
+     "security-exempt-from-reach": 0,
+     "sum": 0,
+     "divide-dev": 0,
+     "floor-once": 0,
+     "band-floors": 1,
+     "zero-verdicts": 0,
+     "sort": null,
+     "gate-bounded-new": 0,
+     "baseline-cover": 0
+    },
+    "advisory_lookup": {
+     "scope": "all",
+     "scope_source": "default",
+     "packages_asked": 1,
+     "packages_not_asked": 0,
+     "other_repositories": 0,
+     "repositories": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "outcome": "answered",
+       "reason": null,
+       "message": null,
+       "packages_with_records": 1,
+       "records": 15
+      }
+     ]
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": false,
+     "blocking_disabled_by": [],
+     "ignores_extensions": true,
+     "baseline": "resolves",
+     "reason": null
+    },
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "acme/h",
+         "version": "1.0.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "acme/h",
+         "version": "1.0.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     },
+     "target_fix": null
+    }
+   },
+   "synthetic_inputs": [
+    "the world of r3/cases.json `solver_world`: branch rows, advisory, lock and composer.json designed; every check is the Composer 2.10.3 answer of design/move-check-oracle (‡)"
+   ],
+   "finding": {
+    "package": "guzzlehttp/guzzle",
+    "version": "7.10.0",
+    "branch": "7.x",
+    "installed_php": {
+     "requires": "^7.2.5 || ^8.0",
+     "target_runs": true,
+     "project_allows": true
+    },
+    "verdict": "high",
+    "priority": "high",
+    "lead": null,
+    "rank": 2,
+    "flags": [
+     {
+      "id": "vulnerable",
+      "role": "security",
+      "baseline": null,
+      "signal_ids": [
+       "S9"
+      ],
+      "degree": null,
+      "headline": {
+       "unit": "advisories",
+       "value": 1,
+       "source": null
+      },
+      "summary": "1 advisory: 1 high — none fixed on 7.x; advisory: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks"
+     }
+    ],
+    "score": {
+     "model": 1,
+     "total": 16,
+     "exact": 16,
+     "rounded_down": false,
+     "band": {
+      "floor": 16,
+      "next": "critical",
+      "to_next": 16
+     },
+     "decided_by": "security",
+     "parts": {
+      "maintenance": {
+       "status": "none",
+       "contribution": 0,
+       "alone": {
+        "total": 0,
+        "verdict": null
+       }
+      },
+      "security": {
+       "status": "counted",
+       "contribution": 16,
+       "alone": {
+        "total": 16,
+        "verdict": "high"
+       },
+       "of": 1,
+       "tied": []
+      }
+     },
+     "terms": [
+      {
+       "part": "security",
+       "flag": "vulnerable",
+       "role": "security",
+       "advisory": "PKSA-gcrk-3vtt-1r14",
+       "severity": "high",
+       "fix_kind": "upgrade",
+       "weight": 16,
+       "multiplier": 1,
+       "points": 16,
+       "contribution": 16
+      }
+     ],
+     "modifiers": [],
+     "accepted": [],
+     "without": [],
+     "text": "16 = vulnerable 16 [high advisory]"
+    },
+    "next_step": {
+     "kind": "require",
+     "source": "vulnerable",
+     "merged": [],
+     "fix_kind": "upgrade",
+     "reason": null,
+     "replacement": null,
+     "quiet_years": null,
+     "to_branch": "8.x",
+     "version": "8.0.1",
+     "newest": "8.0.1",
+     "constraint": "^8.0.1",
+     "latest": null,
+     "php_check": {
+      "requires": "^8.1",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "crosses_major": true,
+     "held_by": [
+      {
+       "source": "package",
+       "package": "acme/h",
+       "version": "1.0.0",
+       "link": "require",
+       "target": null,
+       "constraint": "^7.10",
+       "holder": {
+        "verdict": "ok",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "direct": true,
+        "next_step": null
+       }
+      }
+     ],
+     "clears": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-gcrk-3vtt-1r14",
+       "basis": "outside_range"
+      }
+     ],
+     "unverified": [],
+     "adds": [],
+     "leaves": [],
+     "clears_all": true,
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "lead": null,
+      "deciding_advisory": null,
+      "at_most": false,
+      "assumes": [
+       "clears_hold",
+       "composer_resolves"
+      ]
+     },
+     "check": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null
+     },
+     "moves_with": [],
+     "composer_moves_because": [
+      "holders",
+      "crosses_major"
+     ],
+     "commands": [
+      [
+       "composer",
+       "why-not",
+       "guzzlehttp/guzzle",
+       "8.0.1",
+       "--locked"
+      ]
+     ],
+     "through": [],
+     "also": [],
+     "text": "require guzzlehttp/guzzle ^8.0.1 — clears the advisory; 8.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by acme/h 1.0.0 (requires ^7.10); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+    },
+    "security": {
+     "status": "vulnerable",
+     "check": "complete",
+     "complete": true,
+     "unchecked_reason": null,
+     "records": 15,
+     "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "answer": "answered",
+       "records": 15,
+       "reason": null
+      }
+     ],
+     "worst": "high",
+     "counts": {
+      "critical": 0,
+      "high": 1,
+      "medium": 0,
+      "unrated": 0,
+      "low": 0
+     },
+     "ignored": [],
+     "ignored_count": 0,
+     "fix_kind": "upgrade",
+     "installed_branch_fixes": {
+      "fixed": 0,
+      "unknown": 0,
+      "of": 1,
+      "fix_kind": null,
+      "lowest": null,
+      "newest": "7.15.2",
+      "held_by": [],
+      "if_applied": null,
+      "check": null
+     },
+     "move_in": "next_step",
+     "gets": {
+      "version": "7.15.2",
+      "php_check": {
+       "requires": "^7.2.5 || ^8.0",
+       "project_allows": true,
+       "target_runs": true,
+       "raise_to": null,
+       "raise_size": null
+      },
+      "clears": [],
+      "clears_all": false
+     },
+     "partial": null
+    },
+    "checks_missing": [],
+    "checks_skipped": [],
+    "unchecked_accepted": [],
+    "maintenance_judged": true,
+    "metadata": {
+     "status": "read",
+     "reason": null,
+     "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "guzzle/guzzle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:31+00:00",
+     "cached_at": "2026-10-01T16:05:31+00:00"
+    },
+    "allowlist": null,
+    "abandoned_ignored": null,
+    "from_composer_repository": true,
+    "origin": {
+     "kind": "packagist",
+     "registry": "packagist.org",
+     "package_url": "https://packagist.org/packages/guzzlehttp/guzzle",
+     "local": false
+    },
+    "replacement": null,
+    "replacement_url": null,
+    "note": null,
+    "libyears_unmeasured": null,
+    "libyears_at_least": false,
+    "direct": true,
+    "dev": false,
+    "reach": "direct",
+    "chain": [
+     "guzzlehttp/guzzle"
+    ],
+    "depth": 0,
+    "depth_unmeasured": null,
+    "named_in": [
+     "require"
+    ],
+    "direct_dependents": [
+     "guzzlehttp/guzzle"
+    ],
+    "signals": [
+     {
+      "id": "S9",
+      "level": "high",
+      "summary": "1 security advisory affects 7.10.0 (CVE-2026-69246); fixed in 8.0.1",
+      "data": {
+       "advisories": [
+        {
+         "id": "PKSA-gcrk-3vtt-1r14",
+         "cve": "CVE-2026-69246",
+         "title": "Guzzle: Noncanonical host can bypass host-based checks",
+         "link": "https://github.com/advisories/GHSA-v5mv-p594-2x33",
+         "reported_at": "2026-08-03T21:07:26+00:00",
+         "severity": "high",
+         "severity_published": "high",
+         "affected_versions": "<8.0.1",
+         "counted": true,
+         "points": 16,
+         "deciding": true,
+         "fix": {
+          "kind": "upgrade",
+          "to_branch": "8.x",
+          "version": "8.0.1",
+          "newest": "8.0.1",
+          "on_installed_branch": false,
+          "php": "^8.1",
+          "admits_target_php": true,
+          "admits_project_php": true,
+          "held_by": [
+           {
+            "source": "package",
+            "package": "acme/h",
+            "version": "1.0.0",
+            "link": "require",
+            "target": null,
+            "constraint": "^7.10",
+            "holder": {
+             "verdict": "ok",
+             "lead": null,
+             "flag_ids": [],
+             "replacement": null,
+             "direct": true,
+             "next_step": null
+            }
+           }
+          ],
+          "reason": null
+         },
+         "baseline": null
+        }
+       ],
+       "releases_read": true,
+       "complete": true
+      }
+     }
+    ],
+    "evidence": "vulnerable: 1 advisory: 1 high — none fixed on 7.x; advisory: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks",
+    "allowlist_reason": null,
+    "data_date": "2026-10-01T17:41:59+00:00",
+    "libyears": 0.86,
+    "age": {
+     "installed": {
+      "at": "2025-08-23T22:36:01+00:00",
+      "years": 1.1,
+      "dated_by": null
+     },
+     "installed_unmeasured": null,
+     "release": {
+      "version": "8.0.1",
+      "at": "2026-07-03T10:00:00+00:00",
+      "years": 0.2,
+      "level": null,
+      "dated_by": null
+     },
+     "release_unmeasured": null,
+     "branch_release": {
+      "version": "7.15.2",
+      "at": "2026-07-02T10:00:00+00:00",
+      "years": 0.3,
+      "level": null,
+      "dated_by": null
+     },
+     "branch_release_unmeasured": null,
+     "push": {
+      "at": "2026-09-06T13:55:34+00:00",
+      "years": 0.1,
+      "level": null
+     },
+     "push_unmeasured": null
+    },
+    "baseline": null,
+    "gate": {
+     "reaches_fail_on": true,
+     "fails": true,
+     "exempt_by": null,
+     "by": [
+      {
+       "value": "high",
+       "kind": "grade",
+       "facts": [
+        {
+         "kind": "advisory",
+         "id": "PKSA-gcrk-3vtt-1r14"
+        }
+       ]
+      }
+     ],
+     "basis": null
+    }
+   },
+   "details": {
+    "metadata": {
+     "installed_branch": "7.x",
+     "branches": [
+      {
+       "branch": "8.x",
+       "installed": false,
+       "highest": "8.0.1",
+       "highest_released": "2026-07-03T10:00:00+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "8.0.1",
+       "newest_dated_released": "2026-07-03T10:00:00+00:00",
+       "dated_by": null,
+       "php": "^8.1",
+       "highest_php": "^8.1",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 0.2,
+       "fixes": {
+        "fixed": 1,
+        "unknown": 0,
+        "of": 1,
+        "fix_kind": "upgrade",
+        "lowest": "8.0.1",
+        "newest": "8.0.1",
+        "held_by": [
+         {
+          "source": "package",
+          "package": "acme/h",
+          "version": "1.0.0",
+          "link": "require",
+          "target": null,
+          "constraint": "^7.10",
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
+         }
+        ],
+        "if_applied": {
+         "total": 0,
+         "verdict": "ok",
+         "at_most": false,
+         "assumes": [
+          "clears_hold",
+          "composer_resolves"
+         ]
+        },
+        "check": {
+         "result": "refused",
+         "form": null,
+         "reason": null,
+         "installs": null
+        }
+       }
+      },
+      {
+       "branch": "7.x",
+       "installed": true,
+       "highest": "7.15.2",
+       "highest_released": "2026-07-02T10:00:00+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "7.15.2",
+       "newest_dated_released": "2026-07-02T10:00:00+00:00",
+       "dated_by": null,
+       "php": "^7.2.5 || ^8.0",
+       "highest_php": "^7.2.5 || ^8.0",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 0.3,
+       "fixes": {
+        "fixed": 0,
+        "unknown": 0,
+        "of": 1,
+        "fix_kind": null,
+        "lowest": null,
+        "newest": "7.15.2",
+        "held_by": [],
+        "if_applied": null,
+        "check": null
+       }
+      }
+     ]
+    }
+   },
+   "golden": {
+    "score_text": "16 = vulnerable 16 [high advisory]",
+    "next_step_text": "require guzzlehttp/guzzle ^8.0.1 — clears the advisory; 8.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by acme/h 1.0.0 (requires ^7.10); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock",
+    "verdict_line": "High: a high-severity advisory affects your version (CVE-2026-69246: Guzzle: Noncanonical host can bypass host-based checks). It is not fixed on 7.x.",
+    "readings": [],
+    "qualifiers": {
+     "reach": [
+      "Production: not in packages-dev",
+      "Required directly"
+     ],
+     "origin": null,
+     "not_judged": null,
+     "unchecked": [],
+     "not_run": [],
+     "php": null,
+     "php_edge": [],
+     "accepted": [],
+     "gate": [
+      "fails the run: grade high or above",
+      "Tripped by CVE-2026-69246"
+     ]
+    },
+    "moves": [
+     {
+      "heading": "The move",
+      "action": "Require ^8.0.1",
+      "platform_step": null,
+      "command_note": "This shows which package holds the move.",
+      "moves_with": null,
+      "commands": [
+       "composer why-not guzzlehttp/guzzle 8.0.1 --locked"
+      ],
+      "commands_label": "Check",
+      "clears": "the advisory",
+      "stays": null,
+      "not_checked": null,
+      "adds": [],
+      "php": {
+       "head": "8.x needs php ^8.1",
+       "lines": [
+        {
+         "answer": "yes",
+         "text": "your require.php allows it"
+        },
+        {
+         "answer": "yes",
+         "text": "your target, 8.4, runs it"
+        }
+       ]
+      },
+      "after": {
+       "result": "0, ok",
+       "conditions": [
+        "Composer refuses the move"
+       ]
+      },
+      "composer": [
+       {
+        "text": "The packages that hold it may need to move too",
+        "items": []
+       },
+       {
+        "text": "A new major brings its own requirements",
+        "items": []
+       }
+      ]
+     }
+    ],
+    "held_by": [
+     {
+      "count": 1,
+      "shown": [
+       {
+        "name": "acme/h 1.0.0",
+        "grade": null,
+        "meta": "requires ^7.10",
+        "step": null
+       }
+      ],
+      "fold": null
+     }
+    ],
+    "security": {
+     "summary": [
+      "1 high advisory",
+      "15 on record for this name",
+      "fix: upgrade",
+      "lookup complete"
+     ],
+     "counts": [],
+     "meanwhile": null,
+     "caption": [
+      "By severity. Each affects your version, 7.10.0."
+     ],
+     "groups": [],
+     "rows": [
+      {
+       "name": "CVE-2026-69246",
+       "source": "PKSA-gcrk-3vtt-1r14",
+       "deciding": true,
+       "severity": "high",
+       "fix": "fix 8.0.1 on 8.x (upgrade)",
+       "affects": "affects <8.0.1",
+       "ranges": null,
+       "same_as": null
+      }
+     ],
+     "ignored": [],
+     "ladder": [
+      {
+       "branch": "8.x",
+       "marks": [
+        "the move"
+       ],
+       "lines": [
+        "8.x the move clears 1 of 1 from 8.0.1",
+        "upgrade · held by acme/h",
+        "after it: 0, ok · Composer refuses the move"
+       ]
+      }
+     ]
+    },
+    "branches_lead": [
+     "Your branch, 7.x, had its last release, 7.15.2, 0.3 years ago."
+    ],
+    "branch_rows": [
+     {
+      "branch": "8.x",
+      "marks": [
+       "the move",
+       "newest"
+      ],
+      "latest": "8.0.1",
+      "age": "0.2y",
+      "php": "^8.1",
+      "php_words": null,
+      "bar": "8.0.1, released 0.2 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "7.x",
+      "marks": [
+       "yours"
+      ],
+      "latest": "7.15.2",
+      "age": "0.3y",
+      "php": "^7.2.5 || ^8.0",
+      "php_words": null,
+      "bar": "7.15.2, released 0.3 years ago",
+      "folded_in": null
+     }
+    ],
+    "age_rows": [
+     {
+      "label": "installed",
+      "value": "7.10.0 · 2025-08-23 · 1.1 years ago"
+     },
+     {
+      "label": "7.x last",
+      "value": "7.15.2 · 2026-07-02 · 0.3 years ago"
+     },
+     {
+      "label": "most recent",
+      "value": "8.0.1 · 2026-07-03 · 0.2 years ago"
+     },
+     {
+      "label": "last push",
+      "value": "2026-09-06 · 0.1 years ago"
+     }
+    ],
+    "security_row": [
+     "1 high advisory",
+     "15 on record for this name",
+     "fix: upgrade",
+     "lookup complete",
+     "8.x the move clears 1 of 1 from 8.0.1",
+     "upgrade · held by acme/h",
+     "after it: 0, ok · Composer refuses the move"
+    ],
+    "why": [
+     "16 · high from 16 · 16 points short of critical",
+     "vulnerable 16: high advisory CVE-2026-69246; its own fix (upgrade on 8.x) is reachable, so no × 2",
+     "the advisory alone makes it high"
+    ],
+    "gate_line": null,
+    "checks": "1 fired (S9) · 10 quiet · every check ran",
+    "baseline_suffix": null,
+    "commands_posix": [
+     "composer why-not guzzlehttp/guzzle 8.0.1 --locked"
+    ],
+    "commands_cmd": [
+     "composer why-not guzzlehttp/guzzle 8.0.1 --locked"
+    ],
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 7.10.0 released 2025-08-23 (1.1 years ago); 7.x last released 7.15.2 2026-07-02 (0.3 years ago); newest release 8.0.1 2026-07-03 (0.2 years ago); last push 2026-09-06 (0.1 years ago)"
+   },
+   "solver_world": {
+    "world_id": "joint-retag",
+    "world": {
+     "platform_php": "8.4.99",
+     "root": {
+      "name": "typo3/cms",
+      "require": {
+       "php": "^8.1",
+       "guzzlehttp/guzzle": "^7.10 || ^8.0",
+       "acme/h": "^1.0"
+      }
+     },
+     "lock": {
+      "packages": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1",
+         "guzzlehttp/guzzle": "^7.10"
+        },
+        "dist": {
+         "type": "zip",
+         "url": "https://example.invalid/aaaa.zip",
+         "reference": "aaaa"
+        },
+        "name": "acme/h",
+        "time": "2026-07-01T10:00:00+00:00"
+       },
+       {
+        "version": "7.10.0",
+        "require": {
+         "php": "^7.2.5 || ^8.0"
+        },
+        "name": "guzzlehttp/guzzle",
+        "time": "2025-08-23T22:36:01+00:00"
+       }
+      ],
+      "packages-dev": []
+     },
+     "repo": {
+      "acme/h": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1",
+         "guzzlehttp/guzzle": "^7.10 || ^8.0"
+        },
+        "dist": {
+         "type": "zip",
+         "url": "https://example.invalid/bbbb.zip",
+         "reference": "bbbb"
+        },
+        "time": "2026-07-01T10:00:00+00:00"
+       }
+      ],
+      "guzzlehttp/guzzle": [
+       {
+        "version": "7.10.0",
+        "require": {
+         "php": "^7.2.5 || ^8.0"
+        },
+        "time": "2025-08-23T22:36:01+00:00"
+       },
+       {
+        "version": "7.15.2",
+        "require": {
+         "php": "^7.2.5 || ^8.0"
+        },
+        "time": "2026-07-02T10:00:00+00:00"
+       },
+       {
+        "version": "8.0.1",
+        "require": {
+         "php": "^8.1"
+        },
+        "time": "2026-07-03T10:00:00+00:00"
+       }
+      ]
+     }
+    },
+    "check_passes": null,
+    "update_now": null,
+    "answers": {
+     "baseline": {
+      "result": "resolves",
+      "form": "inline",
+      "installs": {},
+      "holds": [],
+      "problem": null
+     },
+     "joint require guzzlehttp/guzzle ^8.0.1 with acme/h": {
+      "result": "resolves",
+      "form": "inline",
+      "installs": {
+       "acme/h": "1.0.0",
+       "guzzlehttp/guzzle": "8.0.1"
+      },
+      "holds": [],
+      "problem": null
+     },
+     "require guzzlehttp/guzzle ^8.0.1 ": {
+      "result": "refused",
+      "form": null,
+      "holds": [
+       {
+        "constraint": "^1.0",
+        "link": "root-require",
+        "package": null,
+        "source": "root",
+        "target": "acme/h",
+        "version": null
+       },
+       {
+        "constraint": "^7.10",
+        "link": "require",
+        "package": "acme/h",
+        "source": "package",
+        "target": null,
+        "version": "1.0.0"
+       }
+      ],
+      "problem": "  Problem 1\n    - Root composer.json requires guzzlehttp/guzzle ^8.0.1, found guzzlehttp/guzzle[8.0.1] but these were not loaded, likely because it conflicts with another require.\n  Problem 2\n    - acme/h is locked to version 1.0.0 and an update of this package was not requested.\n    - acme/h 1.0.0 requires guzzlehttp/guzzle ^7.10 -> found guzzlehttp/guzzle[7.10.0, 7.15.2] but it conflicts with your root composer.json require (^8.0.1)."
+     }
+    }
+   },
+   "inputs": {
+    "root": {
+     "name": "typo3/cms",
+     "require": {
+      "php": "^8.1",
+      "guzzlehttp/guzzle": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "guzzlehttp/guzzle",
+      "version": "7.10.0",
+      "time": "2025-08-23T22:36:01+00:00",
+      "php": "^7.2.5 || ^8.0",
+      "dev": false,
+      "origin": "packagist"
+     },
+     {
+      "name": "acme/h",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "guzzlehttp/guzzle": "^7.10"
+      }
+     }
+    ],
+    "releases": [
+     {
+      "version": "7.10.0",
+      "time": "2025-08-23T22:36:01+00:00",
+      "php": "^7.2.5 || ^8.0"
+     },
+     {
+      "version": "7.15.2",
+      "time": "2026-07-02T10:00:00+00:00",
+      "php": "^7.2.5 || ^8.0"
+     },
+     {
+      "version": "8.0.1",
+      "time": "2026-07-03T10:00:00+00:00",
+      "php": "^8.1"
+     }
+    ],
+    "advisories": [
+     {
+      "id": "PKSA-gcrk-3vtt-1r14",
+      "cve": "CVE-2026-69246",
+      "title": "Guzzle: Noncanonical host can bypass host-based checks",
+      "link": "https://github.com/advisories/GHSA-v5mv-p594-2x33",
+      "reported_at": "2026-08-03T21:07:26+00:00",
+      "severity": "high",
+      "affected_versions": "<8.0.1"
+     }
+    ],
+    "records": 15,
+    "ignored": [],
+    "abandoned": null,
+    "activity": {
+     "forge": "github",
+     "host": "github.com",
+     "repo": "guzzle/guzzle",
+     "status": "read",
+     "reason": null,
+     "pushed_at": "2026-09-06T13:55:34+00:00",
+     "archived": false
+    },
+    "dependents": {},
+    "run": {
+     "target_php": "8.4",
+     "project_php": "^8.1",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    },
+    "packages": {
+     "acme/h": {
+      "lock": {
+       "name": "acme/h",
+       "version": "1.0.0",
+       "time": "2026-07-01T10:00:00+00:00",
+       "php": ">=8.1",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "1.0.0",
+        "time": "2026-07-01T10:00:00+00:00",
+        "php": ">=8.1"
+       }
+      ],
+      "advisories": [],
+      "records": 0,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "acme/h",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-07-01T10:00:00+00:00",
+       "archived": false
+      },
+      "chain": [
+       "acme/h"
+      ],
+      "below": null
+     }
+    },
+    "solver_world": {
+     "world_id": "joint-retag",
+     "world": {
+      "platform_php": "8.4.99",
+      "root": {
+       "name": "typo3/cms",
+       "require": {
+        "php": "^8.1",
+        "guzzlehttp/guzzle": "^7.10 || ^8.0",
+        "acme/h": "^1.0"
+       }
+      },
+      "lock": {
+       "packages": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1",
+          "guzzlehttp/guzzle": "^7.10"
+         },
+         "dist": {
+          "type": "zip",
+          "url": "https://example.invalid/aaaa.zip",
+          "reference": "aaaa"
+         },
+         "name": "acme/h",
+         "time": "2026-07-01T10:00:00+00:00"
+        },
+        {
+         "version": "7.10.0",
+         "require": {
+          "php": "^7.2.5 || ^8.0"
+         },
+         "name": "guzzlehttp/guzzle",
+         "time": "2025-08-23T22:36:01+00:00"
+        }
+       ],
+       "packages-dev": []
+      },
+      "repo": {
+       "acme/h": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1",
+          "guzzlehttp/guzzle": "^7.10 || ^8.0"
+         },
+         "dist": {
+          "type": "zip",
+          "url": "https://example.invalid/bbbb.zip",
+          "reference": "bbbb"
+         },
+         "time": "2026-07-01T10:00:00+00:00"
+        }
+       ],
+       "guzzlehttp/guzzle": [
+        {
+         "version": "7.10.0",
+         "require": {
+          "php": "^7.2.5 || ^8.0"
+         },
+         "time": "2025-08-23T22:36:01+00:00"
+        },
+        {
+         "version": "7.15.2",
+         "require": {
+          "php": "^7.2.5 || ^8.0"
+         },
+         "time": "2026-07-02T10:00:00+00:00"
+        },
+        {
+         "version": "8.0.1",
+         "require": {
+          "php": "^8.1"
+         },
+         "time": "2026-07-03T10:00:00+00:00"
+        }
+       ]
+      }
+     },
+     "check_passes": null,
+     "update_now": null,
+     "answers": {
+      "baseline": {
+       "result": "resolves",
+       "form": "inline",
+       "installs": {},
+       "holds": [],
+       "problem": null
+      },
+      "joint require guzzlehttp/guzzle ^8.0.1 with acme/h": {
+       "result": "resolves",
+       "form": "inline",
+       "installs": {
+        "acme/h": "1.0.0",
+        "guzzlehttp/guzzle": "8.0.1"
+       },
+       "holds": [],
+       "problem": null
+      },
+      "require guzzlehttp/guzzle ^8.0.1 ": {
+       "result": "refused",
+       "form": null,
+       "holds": [
+        {
+         "constraint": "^1.0",
+         "link": "root-require",
+         "package": null,
+         "source": "root",
+         "target": "acme/h",
+         "version": null
+        },
+        {
+         "constraint": "^7.10",
+         "link": "require",
+         "package": "acme/h",
+         "source": "package",
+         "target": null,
+         "version": "1.0.0"
+        }
+       ],
+       "problem": "  Problem 1\n    - Root composer.json requires guzzlehttp/guzzle ^8.0.1, found guzzlehttp/guzzle[8.0.1] but these were not loaded, likely because it conflicts with another require.\n  Problem 2\n    - acme/h is locked to version 1.0.0 and an update of this package was not requested.\n    - acme/h 1.0.0 requires guzzlehttp/guzzle ^7.10 -> found guzzlehttp/guzzle[7.10.0, 7.15.2] but it conflicts with your root composer.json require (^8.0.1)."
+      }
+     }
+    },
+    "checks": {
+     "baseline": {
+      "result": "resolves",
+      "form": "inline",
+      "installs": {},
+      "holds": [],
+      "problem": null,
+      "reason": null
+     },
+     "joint require guzzlehttp/guzzle ^8.0.1 with acme/h": {
+      "result": "resolves",
+      "form": "inline",
+      "installs": {
+       "acme/h": "1.0.0",
+       "guzzlehttp/guzzle": "8.0.1"
+      },
+      "holds": [],
+      "problem": null,
+      "reason": null
+     },
+     "require guzzlehttp/guzzle ^8.0.1 ": {
+      "result": "refused",
+      "form": null,
+      "holds": [
+       {
+        "constraint": "^1.0",
+        "link": "root-require",
+        "package": null,
+        "source": "root",
+        "target": "acme/h",
+        "version": null
+       },
+       {
+        "constraint": "^7.10",
+        "link": "require",
+        "package": "acme/h",
+        "source": "package",
+        "target": null,
+        "version": "1.0.0"
+       }
+      ],
+      "problem": "  Problem 1\n    - Root composer.json requires guzzlehttp/guzzle ^8.0.1, found guzzlehttp/guzzle[8.0.1] but these were not loaded, likely because it conflicts with another require.\n  Problem 2\n    - acme/h is locked to version 1.0.0 and an update of this package was not requested.\n    - acme/h 1.0.0 requires guzzlehttp/guzzle ^7.10 -> found guzzlehttp/guzzle[7.10.0, 7.15.2] but it conflicts with your root composer.json require (^8.0.1).",
+      "reason": null
+     }
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": false,
+     "blocking_disabled_by": [],
+     "ignores_extensions": true,
+     "baseline": "resolves",
+     "reason": null,
+     "php": "8.4.99"
+    }
+   }
+  },
+  {
    "id": "mc-gets-next-form‡",
    "label": "the inline update installs a release below newest, so --with-dependencies runs and installs newest (ruling R2)",
    "project": "typo3-v12",
@@ -308983,6 +311037,14 @@
          "target": "php",
          "constraint": "^8.1",
          "dev": false
+        },
+        {
+         "name": "guzzlehttp/guzzle",
+         "version": "7.10.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
         }
        ]
       },
@@ -309007,6 +311069,14 @@
          "link": "require",
          "target": "php",
          "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "guzzlehttp/guzzle",
+         "version": "7.10.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
          "dev": false
         }
        ]
@@ -309176,13 +311246,13 @@
        "installed_version": "7.10.0",
        "installed_requires": true,
        "newest_stable": {
-        "version": "8.2.0",
-        "released": "2026-09-06T13:55:09+00:00"
+        "version": "7.10.0",
+        "released": "2026-07-01T10:00:00+00:00"
        },
        "newest_requires": true,
        "newest_requires_unmeasured": null,
        "local": false,
-       "newest_is_installed": false
+       "newest_is_installed": true
       }
      ],
      "also": [],
@@ -309765,14 +311835,7 @@
      "guzzlehttp/guzzle": [
       {
        "version": "7.10.0",
-       "time": null,
-       "require": {
-        "guzzlehttp/psr7": "*"
-       }
-      },
-      {
-       "version": "8.2.0",
-       "time": "2026-09-06T13:55:09+00:00",
+       "time": "2026-07-01T10:00:00+00:00",
        "require": {
         "guzzlehttp/psr7": "*"
        }
@@ -309791,181 +311854,29 @@
       "lock": {
        "name": "guzzlehttp/guzzle",
        "version": "7.10.0",
-       "time": "2025-08-23T22:36:01+00:00",
-       "php": "^7.2.5 || ^8.0",
+       "time": "2026-07-01T10:00:00+00:00",
+       "php": ">=8.1",
        "dev": false,
        "origin": "packagist"
       },
       "releases": [
        {
-        "version": "4.2.4",
-        "time": "2016-07-15T17:44:18+00:00",
-        "php": ">=5.4.0"
-       },
-       {
-        "version": "5.3.4",
-        "time": "2019-10-30T09:32:00+00:00",
-        "php": ">=5.4.0"
-       },
-       {
-        "version": "6.5.8",
-        "time": "2022-06-20T22:16:07+00:00",
-        "php": ">=5.5"
-       },
-       {
         "version": "7.10.0",
-        "time": "2025-08-23T22:36:01+00:00",
-        "php": "^7.2.5 || ^8.0"
-       },
-       {
-        "version": "7.12.1",
-        "time": null,
-        "php": "^7.2.5 || ^8.0"
-       },
-       {
-        "version": "7.12.3",
-        "time": null,
-        "php": "^7.2.5 || ^8.0"
-       },
-       {
-        "version": "7.14.2",
-        "time": null,
-        "php": "^7.2.5 || ^8.0"
-       },
-       {
-        "version": "7.15.1",
-        "time": null,
-        "php": "^7.2.5 || ^8.0"
-       },
-       {
-        "version": "7.15.2",
-        "time": null,
-        "php": "^7.2.5 || ^8.0"
-       },
-       {
-        "version": "7.15.5",
-        "time": "2026-08-24T09:21:06+00:00",
-        "php": "^7.2.5 || ^8.0"
-       },
-       {
-        "version": "8.0.1",
-        "time": null,
-        "php": "^7.4 || ^8.0"
-       },
-       {
-        "version": "8.2.0",
-        "time": "2026-09-06T13:55:09+00:00",
-        "php": "^7.4 || ^8.0"
-       },
-       {
-        "version": "v1.0.4",
-        "time": "2011-12-31T21:30:12+00:00",
-        "php": ">=5.3.2"
-       },
-       {
-        "version": "v2.8.8",
-        "time": "2012-10-16T00:42:47+00:00",
-        "php": ">=5.3.2"
-       },
-       {
-        "version": "v3.8.1",
-        "time": "2014-01-28T22:29:15+00:00",
-        "php": ">=5.3.3"
+        "time": "2026-07-01T10:00:00+00:00",
+        "php": ">=8.1"
        }
       ],
-      "advisories": [
-       {
-        "id": "PKSA-gcrk-3vtt-1r14",
-        "cve": "CVE-2026-69246",
-        "title": "Guzzle: Noncanonical host can bypass host-based checks",
-        "link": "https://github.com/advisories/GHSA-v5mv-p594-2x33",
-        "reported_at": "2026-08-03T21:07:26+00:00",
-        "severity": "high",
-        "affected_versions": ">=8.0.0,<8.0.1|<7.15.2"
-       },
-       {
-        "id": "PKSA-93qv-9n9h-6k6p",
-        "cve": "CVE-2026-55767",
-        "title": "Dot-only cookie domains match all hosts",
-        "link": "https://github.com/guzzle/guzzle/security/advisories/GHSA-cwxw-98qj-8qjx",
-        "reported_at": "2026-06-18T14:12:49+00:00",
-        "severity": "medium",
-        "affected_versions": "<7.12.1"
-       },
-       {
-        "id": "PKSA-bbs6-q5q9-f3t4",
-        "cve": "CVE-2026-67353",
-        "title": "Guzzle: Unbounded response cookies risk denial of service",
-        "link": "https://github.com/advisories/GHSA-f283-ghqc-fg79",
-        "reported_at": "2026-07-20T23:27:02+00:00",
-        "severity": "medium",
-        "affected_versions": "<7.15.1"
-       },
-       {
-        "id": "PKSA-bcdd-5xc7-gwfb",
-        "cve": "CVE-2026-59883",
-        "title": "Guzzle: Cookie Disclosure and Injection via IP-Address Domains",
-        "link": "https://github.com/advisories/GHSA-g446-98w2-8p5w",
-        "reported_at": "2026-07-20T22:00:09+00:00",
-        "severity": "medium",
-        "affected_versions": "<7.12.3"
-       },
-       {
-        "id": "PKSA-cnw1-2ytm-cgr8",
-        "cve": "CVE-2026-69245",
-        "title": "Guzzle: Noncanonical cookie domain keeps subdomain scope",
-        "link": "https://github.com/advisories/GHSA-f7vp-7xgx-4w4r",
-        "reported_at": "2026-08-03T21:05:26+00:00",
-        "severity": "medium",
-        "affected_versions": ">=8.0.0,<8.0.1|<7.15.2"
-       },
-       {
-        "id": "PKSA-fy2t-3c5f-827y",
-        "cve": "CVE-2026-67354",
-        "title": "Guzzle: URI fragments disclosed in redirect Referer headers",
-        "link": "https://github.com/advisories/GHSA-h95v-h523-3mw8",
-        "reported_at": "2026-07-20T23:28:36+00:00",
-        "severity": "medium",
-        "affected_versions": "<7.15.1"
-       },
-       {
-        "id": "PKSA-k22t-f949-t9g6",
-        "cve": "CVE-2026-55568",
-        "title": "Silent HTTPS proxy downgrade to cleartext",
-        "link": "https://github.com/guzzle/guzzle/security/advisories/GHSA-wpwq-4j6v-78m3",
-        "reported_at": "2026-06-18T14:12:49+00:00",
-        "severity": "medium",
-        "affected_versions": "<7.12.1"
-       },
-       {
-        "id": "PKSA-pwsk-hy21-4gby",
-        "cve": "CVE-2026-67339",
-        "title": "Guzzle: Proxy-Authorization headers can be sent to origin servers",
-        "link": "https://github.com/advisories/GHSA-94pj-82f3-465w",
-        "reported_at": "2026-07-20T21:46:02+00:00",
-        "severity": "medium",
-        "affected_versions": "<7.14.2"
-       },
-       {
-        "id": "PKSA-qxvb-2bpp-dnk6",
-        "cve": "CVE-2026-67355",
-        "title": "Guzzle: Host-only cookie scope is not preserved",
-        "link": "https://github.com/advisories/GHSA-wm3w-8rrp-j577",
-        "reported_at": "2026-07-20T23:27:49+00:00",
-        "severity": "medium",
-        "affected_versions": "<7.15.1"
-       }
-      ],
+      "advisories": [],
       "records": 15,
       "ignored": [],
       "abandoned": null,
       "activity": {
        "forge": "github",
        "host": "github.com",
-       "repo": "guzzle/guzzle",
+       "repo": "guzzlehttp/guzzle",
        "status": "read",
        "reason": null,
-       "pushed_at": "2026-09-06T13:55:34+00:00",
+       "pushed_at": "2026-07-01T10:00:00+00:00",
        "archived": false
       },
       "chain": [

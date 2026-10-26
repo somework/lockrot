@@ -2261,7 +2261,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "drupal/core",
+      "10.6.19",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -15619,8 +15627,9 @@
      [
       "composer",
       "why-not",
-      "drupal/core-recommended",
-      "11.4.11"
+      "twig/twig",
+      "v3.27.0",
+      "--locked"
      ]
     ],
     "through": [
@@ -17939,8 +17948,9 @@
      [
       "composer",
       "why-not",
-      "drupal/core-recommended",
-      "11.4.11"
+      "guzzlehttp/guzzle",
+      "7.15.2",
+      "--locked"
      ]
     ],
     "through": [
@@ -19527,7 +19537,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/http-foundation",
+      "v5.4.54",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -20248,7 +20266,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/process",
+      "v5.4.51",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -20957,8 +20983,9 @@
      [
       "composer",
       "why-not",
-      "drupal/core-recommended",
-      "11.4.11"
+      "laminas/laminas-diactoros",
+      "2.26.0",
+      "--locked"
      ]
     ],
     "through": [
@@ -21719,6 +21746,13 @@
       "composer",
       "require",
       "drupal/core-recommended:^10.3.9"
+     ],
+     [
+      "composer",
+      "why-not",
+      "drupal/core-recommended",
+      "10.3.9",
+      "--locked"
      ]
     ],
     "through": [],
@@ -22789,7 +22823,15 @@
     "composer_moves_because": [
      "holders"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/mime",
+      "v5.4.52",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -23484,8 +23526,9 @@
      [
       "composer",
       "why-not",
-      "drupal/core-recommended",
-      "11.4.11"
+      "guzzlehttp/psr7",
+      "2.12.3",
+      "--locked"
      ]
     ],
     "through": [
@@ -24441,7 +24484,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "psy/psysh",
+      "v0.11.23",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -24985,7 +25036,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/routing",
+      "v5.4.53",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -25773,7 +25832,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/yaml",
+      "v5.4.54",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -27634,6 +27701,13 @@
       "composer",
       "require",
       "composer/installers:^2.3"
+     ],
+     [
+      "composer",
+      "why-not",
+      "composer/installers",
+      "v2.3.0",
+      "--locked"
      ]
     ],
     "through": [],
@@ -27945,6 +28019,13 @@
       "composer",
       "require",
       "drush/drush:^13.8"
+     ],
+     [
+      "composer",
+      "why-not",
+      "drush/drush",
+      "13.8.0",
+      "--locked"
      ]
     ],
     "through": [],
@@ -30106,6 +30187,13 @@
       "composer",
       "update",
       "drupal/paragraphs:^1.21.0"
+     ],
+     [
+      "composer",
+      "why-not",
+      "drupal/paragraphs",
+      "1.21.0",
+      "--locked"
      ]
     ],
     "through": [],
@@ -31035,7 +31123,15 @@
     "composer_moves_because": [
      "holders"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/http-kernel",
+      "v4.4.50",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -31625,7 +31721,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/validator",
+      "v5.4.43",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -32227,7 +32331,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "asm89/stack-cors",
+      "v2.4.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -32779,7 +32891,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "consolidation/config",
+      "3.2.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -33181,7 +33301,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "consolidation/filter-via-dot-access-data",
+      "2.0.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -33671,7 +33799,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "dflydev/dot-access-data",
+      "v3.0.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -34075,7 +34211,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "grasmash/expander",
+      "4.0.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -34482,8 +34626,9 @@
      [
       "composer",
       "why-not",
-      "drush/drush",
-      "13.8.0"
+      "grasmash/yaml-expander",
+      "4.0.0",
+      "--locked"
      ]
     ],
     "through": [
@@ -34833,7 +34978,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "chi-teck/drupal-code-generator",
+      "4.2.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -35168,7 +35321,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "consolidation/log",
+      "3.1.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -35504,7 +35665,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "consolidation/robo",
+      "5.1.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -35839,7 +36008,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "consolidation/self-update",
+      "3.1.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -36203,7 +36380,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "consolidation/site-alias",
+      "4.1.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -36538,7 +36723,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "consolidation/site-process",
+      "6.1.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -36924,7 +37117,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "doctrine/lexer",
+      "3.0.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -37296,7 +37497,15 @@
      "crosses_major",
      "transitive"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "drunomics/service-utils",
+      "11.0.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/lupus_ce_renderer",
@@ -37657,7 +37866,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "egulias/email-validator",
+      "4.0.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -38091,8 +38308,9 @@
      [
       "composer",
       "why-not",
-      "drupal/core-recommended",
-      "11.4.11"
+      "guzzlehttp/promises",
+      "3.1.0",
+      "--locked"
      ]
     ],
     "through": [
@@ -38537,7 +38755,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "league/container",
+      "5.2.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -38905,8 +39131,9 @@
      [
       "composer",
       "why-not",
-      "drupal/core-recommended",
-      "11.4.11"
+      "symfony-cmf/routing",
+      "3.0.0",
+      "--locked"
      ]
     ],
     "through": [
@@ -39583,7 +39810,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/console",
+      "v7.4.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -40027,7 +40262,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/dependency-injection",
+      "v7.4.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -40456,7 +40699,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/error-handler",
+      "v7.4.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -41014,7 +41265,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/event-dispatcher",
+      "v7.4.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -41457,7 +41716,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/event-dispatcher-contracts",
+      "v3.7.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -41928,7 +42195,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/filesystem",
+      "v7.4.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drush/drush",
@@ -42293,7 +42568,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/psr-http-message-bridge",
+      "v7.4.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -42723,7 +43006,15 @@
      "holders",
      "crosses_major"
     ],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "why-not",
+      "symfony/serializer",
+      "v7.4.0",
+      "--locked"
+     ]
+    ],
     "through": [
      {
       "package": "drupal/admin_toolbar",
@@ -43186,8 +43477,9 @@
      [
       "composer",
       "why-not",
-      "drupal/core-recommended",
-      "11.4.11"
+      "symfony/translation",
+      "v7.4.0",
+      "--locked"
      ]
     ],
     "through": [
@@ -43596,8 +43888,9 @@
      [
       "composer",
       "why-not",
-      "drupal/core-recommended",
-      "11.4.11"
+      "symfony/polyfill-intl-idn",
+      "v1.38.1",
+      "--locked"
      ]
     ],
     "through": [
@@ -44132,8 +44425,9 @@
      [
       "composer",
       "why-not",
-      "drupal/core-recommended",
-      "11.4.11"
+      "laminas/laminas-escaper",
+      "2.18.0",
+      "--locked"
      ]
     ],
     "through": [
@@ -44526,8 +44820,9 @@
      [
       "composer",
       "why-not",
-      "drupal/core-recommended",
-      "11.4.11"
+      "laminas/laminas-feed",
+      "2.26.3",
+      "--locked"
      ]
     ],
     "through": [
@@ -44920,8 +45215,9 @@
      [
       "composer",
       "why-not",
-      "drupal/core-recommended",
-      "11.4.11"
+      "laminas/laminas-stdlib",
+      "3.21.0",
+      "--locked"
      ]
     ],
     "through": [

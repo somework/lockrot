@@ -33,7 +33,7 @@
      "value": 3,
      "source": null
     },
-    "summary": "3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings"
+    "summary": "3 advisories: 3 low — all fixed on 5.x (upgrade); worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings"
    }
   ],
   "score": {
@@ -77,7 +77,7 @@
      "role": "security",
      "advisory": "PKSA-b14r-zh1d-vdrc",
      "severity": "low",
-     "fix_kind": "update",
+     "fix_kind": "upgrade",
      "weight": 2,
      "multiplier": 1,
      "points": 2,
@@ -111,17 +111,17 @@
    "text": "2 = vulnerable 2 [low advisory]"
   },
   "next_step": {
-   "kind": "update",
+   "kind": "require",
    "source": "vulnerable",
    "merged": [],
-   "fix_kind": "update",
+   "fix_kind": "upgrade",
    "reason": null,
    "replacement": null,
    "quiet_years": null,
    "to_branch": "5.x",
    "version": "v5.4.52",
    "newest": "v5.4.53",
-   "constraint": null,
+   "constraint": "^5.4.52",
    "latest": null,
    "php_check": {
     "requires": ">=7.2.5",
@@ -131,7 +131,17 @@
     "raise_size": null
    },
    "crosses_major": false,
-   "held_by": [],
+   "held_by": [
+    {
+     "source": "package",
+     "package": "incenteev/composer-parameter-handler",
+     "version": "v2.1.5",
+     "link": "require",
+     "target": null,
+     "constraint": "5.3.*",
+     "holder": null
+    }
+   ],
    "clears": [
     {
      "kind": "advisory",
@@ -160,7 +170,8 @@
     "deciding_advisory": null,
     "at_most": false,
     "assumes": [
-     "clears_hold"
+     "clears_hold",
+     "composer_resolves"
     ]
    },
    "check": {
@@ -170,7 +181,9 @@
     "installs": null
    },
    "moves_with": [],
-   "composer_moves_because": [],
+   "composer_moves_because": [
+    "holders"
+   ],
    "commands": [
     [
      "composer",
@@ -222,7 +235,7 @@
     }
    ],
    "also": [],
-   "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. update it with Composer (gets v5.4.53) — clears 3 advisories; Composer's solver refuses it against the lock"
+   "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle — clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
   },
   "security": {
    "status": "vulnerable",
@@ -249,21 +262,32 @@
    },
    "ignored": [],
    "ignored_count": 0,
-   "fix_kind": "update",
+   "fix_kind": "upgrade",
    "installed_branch_fixes": {
     "fixed": 3,
     "unknown": 0,
     "of": 3,
-    "fix_kind": "update",
+    "fix_kind": "upgrade",
     "lowest": "v5.4.52",
     "newest": "v5.4.53",
-    "held_by": [],
+    "held_by": [
+     {
+      "source": "package",
+      "package": "incenteev/composer-parameter-handler",
+      "version": "v2.1.5",
+      "link": "require",
+      "target": null,
+      "constraint": "5.3.*",
+      "holder": null
+     }
+    ],
     "if_applied": {
      "total": 0,
      "verdict": "ok",
      "at_most": false,
      "assumes": [
-      "clears_hold"
+      "clears_hold",
+      "composer_resolves"
      ]
     },
     "check": {
@@ -373,7 +397,7 @@
        "points": 2,
        "deciding": true,
        "fix": {
-        "kind": "update",
+        "kind": "upgrade",
         "to_branch": "5.x",
         "version": "v5.4.52",
         "newest": "v5.4.53",
@@ -381,7 +405,17 @@
         "php": ">=7.2.5",
         "admits_target_php": true,
         "admits_project_php": true,
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "package",
+          "package": "incenteev/composer-parameter-handler",
+          "version": "v2.1.5",
+          "link": "require",
+          "target": null,
+          "constraint": "5.3.*",
+          "holder": null
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -399,7 +433,7 @@
        "points": 2,
        "deciding": false,
        "fix": {
-        "kind": "update",
+        "kind": "upgrade",
         "to_branch": "5.x",
         "version": "v5.4.52",
         "newest": "v5.4.53",
@@ -407,7 +441,17 @@
         "php": ">=7.2.5",
         "admits_target_php": true,
         "admits_project_php": true,
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "package",
+          "package": "incenteev/composer-parameter-handler",
+          "version": "v2.1.5",
+          "link": "require",
+          "target": null,
+          "constraint": "5.3.*",
+          "holder": null
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -425,7 +469,7 @@
        "points": 2,
        "deciding": false,
        "fix": {
-        "kind": "update",
+        "kind": "upgrade",
         "to_branch": "5.x",
         "version": "v5.4.52",
         "newest": "v5.4.53",
@@ -433,7 +477,17 @@
         "php": ">=7.2.5",
         "admits_target_php": true,
         "admits_project_php": true,
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "package",
+          "package": "incenteev/composer-parameter-handler",
+          "version": "v2.1.5",
+          "link": "require",
+          "target": null,
+          "constraint": "5.3.*",
+          "holder": null
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -444,7 +498,7 @@
     }
    }
   ],
-  "evidence": "vulnerable: 3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+  "evidence": "vulnerable: 3 advisories: 3 low — all fixed on 5.x (upgrade); worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
   "allowlist_reason": null,
   "data_date": "2026-10-01T17:39:46+00:00",
   "libyears": 4.66,
@@ -538,7 +592,17 @@
      "fix_kind": "raise-php",
      "lowest": "v8.0.12",
      "newest": "v8.1.8",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "package",
+       "package": "incenteev/composer-parameter-handler",
+       "version": "v2.1.5",
+       "link": "require",
+       "target": null,
+       "constraint": "5.3.*",
+       "holder": null
+      }
+     ],
      "if_applied": {
       "total": 0,
       "verdict": "ok",
@@ -583,7 +647,17 @@
      "fix_kind": "raise-php",
      "lowest": "v7.4.12",
      "newest": "v7.4.20",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "package",
+       "package": "incenteev/composer-parameter-handler",
+       "version": "v2.1.5",
+       "link": "require",
+       "target": null,
+       "constraint": "5.3.*",
+       "holder": null
+      }
+     ],
      "if_applied": {
       "total": 0,
       "verdict": "ok",
@@ -628,7 +702,17 @@
      "fix_kind": "raise-php",
      "lowest": "v6.4.40",
      "newest": "v6.4.47",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "package",
+       "package": "incenteev/composer-parameter-handler",
+       "version": "v2.1.5",
+       "link": "require",
+       "target": null,
+       "constraint": "5.3.*",
+       "holder": null
+      }
+     ],
      "if_applied": {
       "total": 0,
       "verdict": "ok",
@@ -670,16 +754,27 @@
      "fixed": 3,
      "unknown": 0,
      "of": 3,
-     "fix_kind": "update",
+     "fix_kind": "upgrade",
      "lowest": "v5.4.52",
      "newest": "v5.4.53",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "package",
+       "package": "incenteev/composer-parameter-handler",
+       "version": "v2.1.5",
+       "link": "require",
+       "target": null,
+       "constraint": "5.3.*",
+       "holder": null
+      }
+     ],
      "if_applied": {
       "total": 0,
       "verdict": "ok",
       "at_most": false,
       "assumes": [
-       "clears_hold"
+       "clears_hold",
+       "composer_resolves"
       ]
      },
      "check": {
