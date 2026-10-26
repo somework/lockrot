@@ -30035,7 +30035,7 @@
       "name": "mautic/core-lib",
       "version": "4.3.x-dev",
       "dev": false,
-      "origin": "vcs",
+      "origin": "path",
       "require": {
        "lightsaml/sp-bundle": "*"
       }
@@ -32222,7 +32222,7 @@
       "name": "mautic/core-lib",
       "version": "4.3.x-dev",
       "dev": false,
-      "origin": "vcs",
+      "origin": "path",
       "require": {
        "barryvdh/elfinder-flysystem-driver": "*"
       }
@@ -63421,7 +63421,7 @@
       "name": "mautic/core-lib",
       "version": "4.3.x-dev",
       "dev": false,
-      "origin": "vcs",
+      "origin": "path",
       "require": {
        "symfony/routing": "~4.4.0"
       }
@@ -76454,7 +76454,7 @@
       "name": "mautic/core-lib",
       "version": "4.3.x-dev",
       "dev": false,
-      "origin": "vcs",
+      "origin": "path",
       "require": {
        "jbroadway/urlify": "*"
       }
@@ -110076,7 +110076,7 @@
       "name": "mautic/core-lib",
       "version": "4.3.x-dev",
       "dev": false,
-      "origin": "vcs",
+      "origin": "path",
       "require": {
        "symfony/routing": "~4.4.0"
       }
@@ -145642,7 +145642,7 @@
       "name": "mautic/core-lib",
       "version": "5.0.0-dev",
       "dev": false,
-      "origin": "vcs",
+      "origin": "path",
       "require": {
        "symfony/event-dispatcher": "*"
       }
@@ -147275,7 +147275,7 @@
       "name": "mautic/core-lib",
       "version": "5.0.0-dev",
       "dev": false,
-      "origin": "vcs",
+      "origin": "path",
       "require": {
        "symfony/event-dispatcher": "*"
       }
@@ -148906,7 +148906,7 @@
       "name": "mautic/core-lib",
       "version": "5.0.0-dev",
       "dev": false,
-      "origin": "vcs",
+      "origin": "path",
       "require": {
        "symfony/event-dispatcher": "*"
       }
@@ -235285,7 +235285,7 @@
       "name": "mautic/core-lib",
       "version": "4.3.x-dev",
       "dev": false,
-      "origin": "vcs",
+      "origin": "path",
       "require": {
        "phpoffice/phpspreadsheet": "*"
       }

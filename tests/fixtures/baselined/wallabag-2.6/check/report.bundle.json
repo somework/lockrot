@@ -47441,7 +47441,8 @@
                     },
                     "moves_with": [],
                     "composer_moves_because": [
-                        "crosses_major"
+                        "crosses_major",
+                        "transitive"
                     ],
                     "commands": [
                         [
@@ -47903,7 +47904,7 @@
                         }
                     ],
                     "also": [],
-                    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. require symfony/var-dumper ^5.4 in require-dev — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.47 in require-dev); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. require symfony/var-dumper ^5.4 in require-dev — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.47 in require-dev); a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.5) still requires it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
                 },
                 "security": {
                     "status": "clear",

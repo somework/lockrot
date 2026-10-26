@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| medium | `voku/stop-words` | 2.0.1 | old-promise · stale | `9 = (old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive`<br>**Do:** test it on PHP 8.4 — 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): replace or update mautic/core-lib<br>*old-promise:* released 2018-11-23 for PHP 7 (php "\>=7.0.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested<br>*stale:* last release 2018-11-23 (7.9 years ago) | mautic/core-lib |
+| medium | `voku/stop-words` | 2.0.1 | old-promise · stale | `9 = (old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive`<br>**Do:** test it on PHP 8.4 — 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): change your own package mautic/core-lib<br>*old-promise:* released 2018-11-23 for PHP 7 (php "\>=7.0.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested<br>*stale:* last release 2018-11-23 (7.9 years ago) | mautic/core-lib |
 
 flags: old-promise 1 · stale 1 · 1 package carries more than one
 depth: 1 of 1 flagged package is named by no line of composer.json · 2 hops 1 · deepest: `voku/stop-words`, 2 hops (`mautic/core-lib` › `jbroadway/urlify` › `voku/stop-words`)

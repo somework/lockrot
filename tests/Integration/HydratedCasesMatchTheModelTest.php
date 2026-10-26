@@ -150,22 +150,22 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         ],
         'psr7' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'unreached-move' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'many-dependents' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'pagerfanta' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'replace-graded' => [
@@ -175,7 +175,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         ],
         'B-also‡' => [
             'moves' => [
-                [['next_step.also[].version'], self::MOVE_VERSION],
+                [['next_step.also[].version', 'next_step.also[].commands'], self::MOVE_VERSION],
             ],
             'security' => [
                 [['details.metadata.branches[].fixes.if_applied.at_most', 'details.metadata.branches[].fixes.if_applied.total', 'details.metadata.branches[].fixes.if_applied.verdict'], self::IF_APPLIED],
@@ -207,7 +207,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['flags[].id', 'score.terms[].flag', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].id', 'signals[].id'], self::TIE],
             ],
             'moves' => [
-                [['next_step.version', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'flags[].id', 'score.terms[].flag', 'signals[].data.advisories[].id'], self::TIE],
+                [['next_step.version', 'next_step.commands', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'flags[].id', 'score.terms[].flag', 'signals[].data.advisories[].id'], self::TIE],
             ],
             'security' => [
                 [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::TIE],
@@ -224,22 +224,22 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         ],
         'B-offline‡' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'holder-vuln‡' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'partial-op‡' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'unreached-dev‡' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'C-bitbucket‡' => [
@@ -270,57 +270,76 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         ],
         'B-offline-high‡' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'require-dev-name‡' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'capped-require-php' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'adds-capped-raise-php' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'adds-capped-require‡' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'php-edge-lower‡' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'platform-step‡' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'platform-step-inside‡' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'php-edge-equal‡' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
         'php-edge-upper‡' => [
             'moves' => [
-                [['next_step.version'], self::MOVE_VERSION],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
+            ],
+        ],
+        'routing-self‡' => [
+            'held_by' => [
+                [['next_step.held_by[].constraint', 'next_step.held_by[].package', 'next_step.held_by[].version', 'next_step.held_by[].holder.flag_ids', 'next_step.held_by[].holder.verdict', 'next_step.held_by[].holder.next_step.constraint', 'next_step.held_by[].holder.next_step.kind', 'next_step.held_by[].holder.next_step.to_branch'], self::MODEL_R7_PENDING],
+            ],
+            'security' => [
+                [['details.metadata.branches[].fixes.held_by[].package', 'next_step.held_by[].package'], self::MODEL_R7_PENDING],
+            ],
+        ],
+        'mc-joint‡' => [
+            'security' => [
+                [['details.metadata.branches[].fixes.fix_kind', 'security.fix_kind', 'signals[].data.advisories[].fix.kind'], self::MODEL_R7_PENDING],
+            ],
+            'why' => [
+                [['score.terms[].fix_kind'], self::MODEL_R7_PENDING],
             ],
         ],
     ];
 
-    private const MOVE_VERSION = 'The model leaves `version` null on a move whose constraint comes from S8. lockrot names the lowest release that the constraint admits. The move card prints `newest` and reads `version` only when `newest` is null.';
+    private const MOVE_VERSION = 'The model leaves `version` null on a move whose constraint comes from S8. lockrot names the lowest release that the constraint admits, and the why-not step of a move that does not resolve names it. The move card prints `newest` and reads `version` only when `newest` is null.';
+
+    // HARDEN-SRC removes every MODEL_R7_PENDING entry when it projects the MODEL-R7 shas.
+    private const MODEL_R7_PENDING = 'The model value is wrong for the case, and MODEL-R7 corrects it. lockrot follows SPEC-0.14.md.';
 
     private const PHP_STAR = 'The case sets the project\'s require.php to `*` (‡). The model keeps the holder\'s own step of case A, and lockrot judges the holder under the case\'s require.php, which admits its newest line.';
 
@@ -426,6 +445,32 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         $kept = array_values(array_diff(self::paths(self::LINES[$line]), $listed));
 
         self::assertSame(Fields::only($model, $kept), Fields::only($lockrot, $kept), $id.' '.$line.': the recording differs from the model in the fields that the line reads');
+        $commands = array_values(array_intersect($listed, ['next_step.commands', 'next_step.also[].commands']));
+        self::assertSame(Fields::only($model, $commands), Fields::only(self::withoutWhyNot($lockrot), $commands), $id.' '.$line.': a listed commands differs in more than the trailing why-not step');
+    }
+
+    /**
+     * @param array<mixed, mixed> $document
+     *
+     * @return array<mixed, mixed> the document without the trailing `composer why-not` step of the package at each move's own `version`
+     */
+    private static function withoutWhyNot(array $document): array
+    {
+        $strip = static function (array $move) use ($document): array {
+            $commands = JsonPath::arrayAt($move, ['commands']);
+            if ($commands !== [] && end($commands) === ['composer', 'why-not', $document['package'], $move['version'], '--locked']) {
+                array_pop($commands);
+                $move['commands'] = $commands;
+            }
+
+            return $move;
+        };
+        if (\is_array($document['next_step'] ?? null)) {
+            $document['next_step'] = $strip($document['next_step']);
+            $document['next_step']['also'] = array_map($strip, JsonPath::arrayAt($document, ['next_step', 'also']));
+        }
+
+        return $document;
     }
 
     /** The notes of a train 7d case quote the move check (SPEC-0.14.md §6.2), so the page shows the model's notes. */

@@ -1,6 +1,6 @@
 {
     "score_text": "9 = (old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive",
-    "next_step_text": "test it on PHP 8.4 — 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): replace or update mautic/core-lib",
+    "next_step_text": "test it on PHP 8.4 — 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): change your own package mautic/core-lib",
     "gate_line": null,
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 2.0.1 released 2018-11-23 (7.9 years ago), its newest release; last push 2026-08-28 (0.1 years ago)",

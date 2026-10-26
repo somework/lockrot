@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/old-promise",
-        "description": "voku/stop-words 2.0.1 \u2014 finding medium (9 = (old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive) \u2014 old-promise: released 2018-11-23 for PHP 7 (php \">=7.0.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: test it on PHP 8.4 \u2014 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): replace or update mautic/core-lib. (via mautic/core-lib)",
+        "description": "voku/stop-words 2.0.1 \u2014 finding medium (9 = (old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive) \u2014 old-promise: released 2018-11-23 for PHP 7 (php \">=7.0.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: test it on PHP 8.4 \u2014 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): change your own package mautic/core-lib. (via mautic/core-lib)",
         "categories": [
             "Bug Risk"
         ],
@@ -11,14 +11,14 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 19
+                "begin": 23
             }
         }
     },
     {
         "type": "issue",
         "check_name": "lockrot/stale",
-        "description": "voku/stop-words 2.0.1 \u2014 finding medium (9 = (old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive) \u2014 stale: last release 2018-11-23 (7.9 years ago). Do: test it on PHP 8.4 \u2014 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): replace or update mautic/core-lib. (via mautic/core-lib)",
+        "description": "voku/stop-words 2.0.1 \u2014 finding medium (9 = (old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive) \u2014 stale: last release 2018-11-23 (7.9 years ago). Do: test it on PHP 8.4 \u2014 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): change your own package mautic/core-lib. (via mautic/core-lib)",
         "categories": [
             "Bug Risk"
         ],
@@ -27,7 +27,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 19
+                "begin": 23
             }
         }
     }

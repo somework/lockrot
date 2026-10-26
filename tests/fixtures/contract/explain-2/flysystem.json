@@ -265,7 +265,7 @@
                     "newest_stable": null,
                     "newest_requires": null,
                     "newest_requires_unmeasured": "not_from_composer_repository",
-                    "local": false,
+                    "local": true,
                     "newest_is_installed": null
                 }
             ],

@@ -1286,7 +1286,8 @@
                 "check": null,
                 "moves_with": [],
                 "composer_moves_because": [
-                    "crosses_major"
+                    "crosses_major",
+                    "transitive"
                 ],
                 "commands": [
                     [
@@ -1748,7 +1749,7 @@
                     }
                 ],
                 "also": [],
-                "text": "require symfony/var-dumper ^5.4 in require-dev \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/var-dumper ^5.4 in require-dev \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.8) still requires it"
             },
             "security": {
                 "status": "clear",

@@ -2,7 +2,7 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "5604cfed0bdd962a525cf2af68b88063f3a33fb4481a0e30eb2b36d74386cb9d",
+        "tests/fixtures/flags/cases.json": "9a9730437088e1a2a7ccd285f0cfe22fe8a7a05c9a769c305499fedd16f284d7",
         "tests/fixtures/flags/composite.json": "931aa288bfbfee92d7103d91a1d3c78a9d0d5625dd044f214ca72e1c9c73a6e7",
         "tests/fixtures/flags/provenance.json": "c294233f8e2cd4afd61d128f7836b0be6b7f4f1ef51c1ef1c4ea728fd34cd0ea"
     },
@@ -76,7 +76,7 @@
             "commands_cmd": 107,
             "commands_posix": 107,
             "gate_line": 125,
-            "next_step_text": 87,
+            "next_step_text": 92,
             "run_gate_line": 126,
             "score_text": 124
         },
@@ -86,7 +86,7 @@
             "commands_cmd": 19,
             "commands_posix": 19,
             "gate_line": 1,
-            "next_step_text": 39,
+            "next_step_text": 34,
             "score_text": 2
         }
     },

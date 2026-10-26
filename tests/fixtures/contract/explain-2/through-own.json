@@ -193,12 +193,12 @@
                     "newest_stable": null,
                     "newest_requires": null,
                     "newest_requires_unmeasured": "not_from_composer_repository",
-                    "local": false,
+                    "local": true,
                     "newest_is_installed": null
                 }
             ],
             "also": [],
-            "text": "test it on PHP 8.4 \u2014 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): replace or update mautic/core-lib"
+            "text": "test it on PHP 8.4 \u2014 2.0.1 is its newest release; it comes in through mautic/core-lib (jbroadway/urlify requires it): change your own package mautic/core-lib"
         },
         "security": {
             "status": "clear",
