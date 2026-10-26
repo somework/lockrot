@@ -66,6 +66,17 @@ final class Thresholds
         return $this->pushHighYears;
     }
 
+    /** @return array{release-warn-years: int, release-high-years: int, push-warn-years: int, push-high-years: int} by `extra.lockrot` key, as `run.thresholds` writes them */
+    public function toArray(): array
+    {
+        return [
+            'release-warn-years' => $this->releaseWarnYears,
+            'release-high-years' => $this->releaseHighYears,
+            'push-warn-years' => $this->pushWarnYears,
+            'push-high-years' => $this->pushHighYears,
+        ];
+    }
+
     public static function levelFor(float $years, int $warn, int $high): ?string
     {
         if ($years >= $high) {

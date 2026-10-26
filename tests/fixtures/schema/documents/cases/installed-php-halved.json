@@ -941,6 +941,7 @@
       "dev": false
      }
     ],
+    "lock_platform": [],
     "command": null,
     "check": "refused",
     "reason": null,

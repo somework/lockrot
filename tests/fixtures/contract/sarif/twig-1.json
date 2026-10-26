@@ -234,8 +234,7 @@
                                 "tags": [
                                     "security",
                                     "dependency"
-                                ],
-                                "security-severity": null
+                                ]
                             }
                         },
                         {
@@ -255,8 +254,7 @@
                                 "tags": [
                                     "security",
                                     "dependency"
-                                ],
-                                "security-severity": null
+                                ]
                             }
                         },
                         {

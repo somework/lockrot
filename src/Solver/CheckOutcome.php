@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Solver;
 
 use Composer\Semver\Constraint\Constraint;
+use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\VersionParser;
 use Lockrot\Security\Holder;
 
@@ -27,6 +28,7 @@ final class CheckOutcome
     /** @var list<array{package: string, installed_version: ?string, version: string}> */
     private array $movesWith = [];
     private bool $joint = false;
+    private ?ConstraintInterface $range = null;
 
     /** @param list<Holder> $holds */
     public function __construct(MoveCheck $check, array $holds = [], ?string $problem = null)
@@ -59,11 +61,11 @@ final class CheckOutcome
     }
 
     /**
-     * The move after its joint request ({@see \Lockrot\Verdict\MoveChecks}): the joint solve
-     * resolves the move only when it installs the moved package inside the move's constraint and
-     * changes the release of a holder. Then the move resolves with no hold, and it lists each holder
-     * whose release the solve changes.
-     * A joint refusal gives its own holds. Any other answer leaves this refusal.
+     * The move after its joint request ({@see \Lockrot\Verdict\MoveChecks}). The joint
+     * solve resolves the move when it installs the moved package inside the move's constraint and
+     * changes a holder's release. The move then has no hold and lists each changed holder. A new
+     * install of the same tag is no change, but a branch version can move to another commit.
+     * A joint refusal gives its own holds. Any other answer keeps this refusal.
      *
      * @param list<string> $holders
      */
@@ -80,8 +82,9 @@ final class CheckOutcome
         $movesWith = [];
         foreach ($holders as $holder) {
             $version = $joint->changes()[$holder] ?? null;
-            if ($version !== null) {
-                $movesWith[] = ['package' => $holder, 'installed_version' => $joint->updatedFrom[$holder] ?? $this->holderVersion($holder), 'version' => $version];
+            $from = $joint->updatedFrom[$holder] ?? $this->holderVersion($holder);
+            if ($version !== null && ($version !== $from || VersionParser::parseStability($version) === 'dev')) {
+                $movesWith[] = ['package' => $holder, 'installed_version' => $from, 'version' => $version];
             }
         }
         if ($movesWith === []) {
@@ -121,13 +124,16 @@ final class CheckOutcome
     }
 
     /**
-     * A copy without each root hold on a package that a package hold names as its `package`: that
-     * package's own requirement is the hold, and the root hold is the head of its chain.
+     * A copy without each root requirement on a package that a package hold names as its `package`:
+     * that package's own requirement is the hold, and the root requirement is the head of its chain.
+     * A conflict or a replace that composer.json declares stays a hold of its own.
      */
     public function withoutRootOnHolders(): self
     {
         $holders = $this->holders('');
-        $holds = array_values(array_filter($this->holds, static fn (Holder $hold): bool => $hold->source() !== Holder::ROOT || !\in_array($hold->target(), $holders, true)));
+        $holds = array_values(array_filter($this->holds, static fn (Holder $hold): bool => $hold->source() !== Holder::ROOT
+            || !\in_array($hold->link(), [Holder::REQUIRE, Holder::REQUIRE_DEV, Holder::ROOT_REQUIRE], true)
+            || !\in_array($hold->target(), $holders, true)));
         $clone = clone $this;
         $clone->holds = $holds;
 
@@ -192,6 +198,20 @@ final class CheckOutcome
         }
     }
 
+    /** A copy whose refusal holds the releases of $range alone: the versions that the solve could choose. */
+    public function withRange(ConstraintInterface $range): self
+    {
+        $clone = clone $this;
+        $clone->range = $range;
+
+        return $clone;
+    }
+
+    /** The versions that a refused solve could choose, null when they are the move's constraint. */
+    public function range(): ?ConstraintInterface
+    {
+        return $this->range;
+    }
 
     private static function admits(Holder $hold, string $version): bool
     {

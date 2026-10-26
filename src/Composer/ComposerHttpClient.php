@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Composer;
 
+use Composer\Composer;
 use Composer\Config;
 use Composer\Downloader\TransportException;
 use Composer\IO\IOInterface;
@@ -111,6 +112,16 @@ final class ComposerHttpClient implements HttpClientInterface
             }
         }
 
+        return self::withoutCredentials($headers);
+    }
+
+    /**
+     * @param list<string> $headers
+     *
+     * @return list<string>
+     */
+    private static function withoutCredentials(array $headers): array
+    {
         return array_values(array_filter($headers, static fn (string $header): bool => !self::isCredentialHeader($header)));
     }
 
@@ -135,24 +146,33 @@ final class ComposerHttpClient implements HttpClientInterface
     {
         /** @var array<string, HttpResult> $results */
         $results = [];
+        /** @var array<string, string> $redirects url => the URL on another origin that a redirect named */
+        $redirects = [];
         $timeout = $this->timeoutSeconds();
         foreach (array_unique($urls) as $url) {
-            $options = [
-                'http' => ['timeout' => $timeout, 'header' => self::withoutRedundantAuthorization($this->io, $this->config, $url, $headers)],
-                'retry-auth-failure' => false,
-            ];
-            $promise = $this->downloader->add($url, $options);
-            $promise->then(
-                function (Response $response) use ($url, &$results): void {
-                    $results[$url] = new HttpResult($url, $response->getStatusCode(), $response->getBody(), $this->clock->now());
-                },
-                function (\Throwable $e) use ($url, &$results): void {
-                    $status = $e instanceof TransportException ? (int) ($e->getStatusCode() ?? 0) : 0;
-                    $results[$url] = new HttpResult($url, $status, null, $this->clock->now(), RepositoryUrl::inText($e->getMessage()));
-                }
-            );
+            $sent = self::withoutRedundantAuthorization($this->io, $this->config, $url, $headers);
+            $options = self::options($timeout, $sent);
+            if (self::refusesRedirects(Composer::getVersion(), HttpDownloader::isCurlEnabled())) {
+                $options['prevent_url_access_callable'] = static function (string $target) use ($url, &$redirects): bool {
+                    if ($target === '' || self::origin($target) === self::origin($url)) {
+                        return false;
+                    }
+                    $redirects[$url] = $target;
+
+                    return true;
+                };
+            }
+            $this->add($url, $url, $options, $results);
         }
         $this->downloader->wait();
+        // Composer replays the request's own headers to a redirect's target, so the request goes
+        // again to that target without lockrot's credentials.
+        foreach ($redirects as $url => $target) {
+            $this->add($url, $target, self::options($timeout, self::withoutCredentials($headers)), $results);
+        }
+        if ($redirects !== []) {
+            $this->downloader->wait();
+        }
         foreach ($urls as $url) {
             if (!isset($results[$url])) {
                 $results[$url] = HttpResult::failure($url, 'no response', $this->clock->now());
@@ -160,5 +180,51 @@ final class ComposerHttpClient implements HttpClientInterface
         }
 
         return $results;
+    }
+
+    /**
+     * @param array{http: array{timeout: int, header: list<string>}, retry-auth-failure: false, prevent_url_access_callable?: \Closure(string): bool} $options
+     * @param array<string, HttpResult>                                                                                                        $results the answer for $url goes in here
+     */
+    private function add(string $url, string $target, array $options, array &$results): void
+    {
+        $this->downloader->add($target, $options)->then(
+            function (Response $response) use ($url, &$results): void {
+                $results[$url] = new HttpResult($url, $response->getStatusCode(), $response->getBody(), $this->clock->now());
+            },
+            function (\Throwable $e) use ($url, &$results): void {
+                $status = $e instanceof TransportException ? (int) ($e->getStatusCode() ?? 0) : 0;
+                $results[$url] = new HttpResult($url, $status, null, $this->clock->now(), RepositoryUrl::inText($e->getMessage()));
+            }
+        );
+    }
+
+    /**
+     * @param list<string> $headers
+     *
+     * @return array{http: array{timeout: int, header: list<string>}, retry-auth-failure: false}
+     */
+    private static function options(int $timeout, array $headers): array
+    {
+        return ['http' => ['timeout' => $timeout, 'header' => $headers], 'retry-auth-failure' => false];
+    }
+
+    /**
+     * Composer 2.10 and later ask `prevent_url_access_callable` before each request of a redirect
+     * chain, and only its curl downloader takes the option: RemoteFilesystem throws on it.
+     */
+    public static function refusesRedirects(string $composerVersion, bool $curl): bool
+    {
+        return $curl && version_compare($composerVersion, '2.10.0-dev', '>=');
+    }
+
+    private static function origin(string $url): string
+    {
+        $parts = parse_url($url);
+        if (!\is_array($parts)) {
+            return '';
+        }
+
+        return strtolower(($parts['scheme'] ?? '').'://'.($parts['host'] ?? '')).':'.(string) ($parts['port'] ?? '');
     }
 }

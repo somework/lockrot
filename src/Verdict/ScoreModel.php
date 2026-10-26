@@ -100,6 +100,12 @@ final class ScoreModel
 
     private const V013_BASE = [FlagSet::ABANDONED => 'critical', FlagSet::SILENT => 'critical', FlagSet::PINNED => 'high', FlagSet::LEFT_BEHIND => 'high', FlagSet::OLD_PROMISE => 'high', FlagSet::STALE => 'medium', FlagSet::CAPPED => null];
 
+    /** @return list<string> the `extra.lockrot` keys of the thresholds that raise a flag, as `run.score_model.flags[].thresholds` lists them */
+    public static function thresholdsOf(string $flag): array
+    {
+        return self::THRESHOLDS[$flag] ?? [];
+    }
+
     /** The band of a total, null at 0. */
     public static function band(int $total): ?string
     {
@@ -195,7 +201,7 @@ final class ScoreModel
                 'id' => $flag, 'part' => 'maintenance', 'points' => $points, 'band' => self::band($points),
                 'can_corroborate' => $canCorroborate, 'corroborating_points' => $canCorroborate ? intdiv($points, self::CORROBORATING_DIVISOR) : null,
                 'max_maintenance' => $max, 'max_maintenance_flags' => $maxFlags,
-                'raised_by' => self::RAISED_BY[$flag], 'thresholds' => self::THRESHOLDS[$flag] ?? [],
+                'raised_by' => self::RAISED_BY[$flag], 'thresholds' => self::thresholdsOf($flag),
                 'basis' => ['v013_base' => self::V013_BASE[$flag], 'points' => 'band_floor'], 'points_from' => null,
             ];
         }

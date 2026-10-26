@@ -16,7 +16,7 @@
                                 "text": "silent: No stable release and no repository push for a long time"
                             },
                             "fullDescription": {
-                                "text": "No stable release for release-high-years and no repository push for push-high-years."
+                                "text": "No release for 5 years (release-high-years) and no repository push for 5 years (push-high-years)."
                             },
                             "defaultConfiguration": {
                                 "level": "warning"

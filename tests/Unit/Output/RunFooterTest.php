@@ -142,10 +142,27 @@ final class RunFooterTest extends TestCase
         self::assertSame('advisories: 0 packages asked, 1 not asked · packagist.org answered (3 on record for 2 packages) · 2 other repositories publish no advisories', RunFooter::advisories(self::report([self::notAsked('a/one')], $coverage)));
     }
 
+    public function testTheMovesLineNamesEachVariableThatTurnedTheBlockingOff(): void
+    {
+        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $report = self::report([])->withMoveChecks(new MoveCheckRun('2.10.3', false, ['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
+
+        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by COMPOSER_NO_BLOCKING and COMPOSER_NO_SECURITY_BLOCKING; ext-* requirements not checked', RunFooter::moveCheck($report));
+        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by `COMPOSER_NO_BLOCKING` and `COMPOSER_NO_SECURITY_BLOCKING`; ext-* requirements not checked', RunFooter::moveCheck($report, static fn (string $name): string => '`'.$name.'`'));
+    }
+
+    public function testTheMovesLineOfARunThatBlocksNoAdvisoryAddsNoWords(): void
+    {
+        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $report = self::report([])->withMoveChecks(new MoveCheckRun('2.8.12', false, [], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
+
+        self::assertSame('moves: checked with the solver of Composer 2.8.12 against the lock; ext-* requirements not checked', RunFooter::moveCheck($report));
+    }
+
     public function testTheMovesLineOfARunWithNoCheckSaysWhyInWords(): void
     {
         $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
-        $report = self::report([])->withMoveChecks(new MoveCheckRun(null, false, MoveCheck::notChecked(MoveCheck::NO_COMPOSER_JSON)), UpdateNow::of([], $checks));
+        $report = self::report([])->withMoveChecks(new MoveCheckRun(null, false, [], MoveCheck::notChecked(MoveCheck::NO_COMPOSER_JSON)), UpdateNow::of([], $checks));
 
         self::assertSame('moves: not checked (the project has no composer.json)', RunFooter::moveCheck($report));
     }
@@ -272,6 +289,38 @@ final class RunFooterTest extends TestCase
         $line = self::phpLine($lock, ['config' => ['platform' => ['php' => '8.4.12']]], '8.5', false, new RecordedMoveChecker(['target_fix' => ['result' => 'resolves', 'form' => 'inline']], []));
 
         self::assertSame('php: the lock installs on PHP 5.3 to 8.4, so your target, 8.5, is excluded; set config.platform.php to your PHP 8.5 release, then Composer\'s solver resolves: composer update acme/a', $line);
+    }
+
+    /** Ruling Q3: a root link that only the lock records closes the line, with the update that rewrites it. */
+    public function testThePhpLineNamesTheLockPlatformLinkAndTheUpdateThatRewritesIt(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php' => '>=7.4'])], 'packages-dev' => [], 'platform' => ['php' => '>=7.4 <8.1']];
+        $holds = [['source' => 'package', 'package' => 'acme/c', 'version' => '2.0.0', 'link' => 'require', 'target' => 'acme/a', 'constraint' => '1.0.0']];
+        $head = 'php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; the lock records require.php >=7.4 <8.1, which composer.json does not have';
+
+        self::assertSame($head.': composer update --lock rewrites it', self::phpLine($lock, [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'resolves', 'form' => 'inline']], [])));
+        self::assertSame($head.': set config.platform.php to your PHP 8.4 release, then composer update --lock rewrites it', self::phpLine($lock, ['config' => ['platform' => ['php' => '8.3.5']]], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'resolves', 'form' => 'inline']], [])));
+        self::assertSame($head.", and Composer's solver at PHP 8.4 refuses the update that rewrites it: acme/c 2.0.0 requires acme/a 1.0.0", self::phpLine($lock, [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'refused', 'holds' => $holds]], [])));
+        self::assertSame($head.', and the update that rewrites it is not checked (the install-time budget ran out)', self::phpLine($lock, [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'not_checked', 'reason' => 'install_time_budget']], [])));
+    }
+
+    public function testBesideAListedPackageTheLockPlatformClauseFollowsTheFix(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php' => '<8.4'])], 'packages-dev' => [], 'platform' => ['php' => '<8.1', 'php-64bit' => '<8.2']];
+        $head = "php: the lock installs on PHP 5.3 to 8.0, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 ";
+        $records = '; the lock records require.php <8.1 and require.php-64bit <8.2, which composer.json does not have';
+
+        self::assertSame($head.'resolves: composer update acme/a'.$records.': composer update acme/a rewrites it', self::phpLine($lock, [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'resolves', 'form' => 'inline']], [])));
+        self::assertSame($head.'refuses the update of the package that excludes it'.$records, self::phpLine($lock, [], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'refused']], [])));
+    }
+
+    public function testAtTheRootCeilingTheLockPlatformClauseNamesOnlyTheRecord(): void
+    {
+        $lock = ['packages' => [], 'packages-dev' => [], 'platform' => ['php-64bit' => '<8.1']];
+
+        $line = self::phpLine($lock, ['require' => ['php' => '<8.2']], '8.4', false, new RecordedMoveChecker(['target_fix' => ['result' => 'resolves', 'form' => 'inline']], []));
+
+        self::assertSame('php: the lock installs on PHP 5.3 to 8.0; your target, 8.4, is excluded: require.php allows only <8.2; the lock records require.php-64bit <8.1, which composer.json does not have', $line);
     }
 
     public function testThePlatformStepAddsNoWordsToARefusedFix(): void

@@ -357,7 +357,8 @@
    "composer_json_invalid",
    "no_release_read",
    "pass_cap",
-   "solver_error"
+   "solver_error",
+   "advisory_lookup_incomplete"
   ],
   "open": true,
   "integer": false
@@ -2943,6 +2944,19 @@
   "integer": false
  },
  {
+  "name": "RunMoveCheckBlockingDisabledByItem",
+  "pointer": "#/definitions/run/properties/move_check/oneOf/0/properties/blocking_disabled_by/items",
+  "pointers": [
+   "#/definitions/run/properties/move_check/oneOf/0/properties/blocking_disabled_by/items"
+  ],
+  "values": [
+   "COMPOSER_NO_BLOCKING",
+   "COMPOSER_NO_SECURITY_BLOCKING"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
   "name": "RunMoveCheckIgnoresExtensions",
   "pointer": "#/definitions/run/properties/move_check/oneOf/0/properties/ignores_extensions",
   "pointers": [
@@ -3102,7 +3116,8 @@
    "composer_json_invalid",
    "no_release_read",
    "pass_cap",
-   "solver_error"
+   "solver_error",
+   "advisory_lookup_incomplete"
   ],
   "open": true,
   "integer": false
@@ -3112,10 +3127,7 @@
   "pointer": "#/definitions/phpWindowReq/properties/link",
   "pointers": [
    "#/definitions/phpWindowReq/properties/link",
-   "#/definitions/targetFix/anyOf/0/properties/packages/items/properties/link",
-   "#/definitions/targetFix/anyOf/1/properties/packages/items/properties/link",
-   "#/definitions/targetFix/properties/packages/items/properties/link",
-   "#/definitions/targetFix/anyOf/3/properties/packages/items/properties/link"
+   "#/definitions/targetFix/properties/packages/items/properties/link"
   ],
   "values": [
    "require",
@@ -3129,11 +3141,8 @@
   "pointer": "#/definitions/phpWindowReq/properties/target",
   "pointers": [
    "#/definitions/phpWindowReq/properties/target",
-   "#/definitions/targetFix/anyOf/0/properties/packages/items/properties/target",
-   "#/definitions/targetFix/anyOf/1/properties/packages/items/properties/target",
    "#/definitions/targetFix/properties/packages/items/properties/target",
-   "#/definitions/targetFix/anyOf/2/properties/held_by/items/properties/target",
-   "#/definitions/targetFix/anyOf/3/properties/packages/items/properties/target"
+   "#/definitions/targetFix/anyOf/2/properties/held_by/items/properties/target"
   ],
   "values": [
    "php",

@@ -17,6 +17,7 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\Holder;
 use Lockrot\Solver\CheckOutcome;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveChecker;
 use Lockrot\Solver\MoveCheckers;
 use Lockrot\Solver\MoveQuery;
@@ -92,7 +93,7 @@ final class MoveCheckComposerOracleTest extends TestCase
                 self::assertIsArray($answer);
                 $outcome = self::ask($checker, (string) $key, $answers, JsonPath::arrayAt($world, ['repo']));
                 $withProblem = $key === 'baseline' || strpos((string) $key, 'combined ') === 0;
-                [$installs, $actualInstalls] = self::installs((string) $key, $answer, $outcome);
+                [$installs, $actualInstalls] = self::installs((string) $key, $answer, $outcome, JsonPath::arrayAt($world, ['lock']));
                 // lockrot reads no hold of a refused baseline: every move is then not checked.
                 $expected[$key] = self::answerOf(JsonPath::stringAt($answer, ['result']), \is_string($answer['form'] ?? null) ? $answer['form'] : null, null, $key === 'baseline' ? [] : JsonPath::arrayAt($answer, ['holds']), $answer['problem'], $withProblem) + ['installs' => $installs];
                 $actual[$key] = self::answerOf($outcome->check()->result(), $outcome->check()->form(), $outcome->check()->reason(), array_map(static fn (Holder $hold): array => $hold->jsonSerialize(), $outcome->holds()), $outcome->problem(), $withProblem) + ['installs' => $actualInstalls];
@@ -146,19 +147,22 @@ final class MoveCheckComposerOracleTest extends TestCase
 
     /**
      * The installs of a resolved answer, recorded and lockrot's: every changed name of a joint
-     * request, the moved package's release of a move, null for the baseline and a combined update.
+     * request ({@see ComposerOracle::changes()}), the moved package's release of a move, null for
+     * the baseline and a combined update.
      *
      * @param array<mixed, mixed> $answer
+     * @param array<mixed, mixed> $lock   the world's lock
      *
      * @return array{mixed, mixed}
      */
-    private static function installs(string $key, array $answer, CheckOutcome $outcome): array
+    private static function installs(string $key, array $answer, CheckOutcome $outcome, array $lock): array
     {
         $recorded = \is_array($answer['installs'] ?? null) && $answer['result'] === 'resolves' ? $answer['installs'] : null;
         if ($recorded === null || $key === 'baseline' || strpos($key, 'combined ') === 0) {
             return [null, null];
         }
         if (strpos($key, 'joint ') === 0) {
+            $recorded = ComposerOracle::changes($recorded, $lock);
             $changes = $outcome->changes();
             ksort($recorded);
             ksort($changes);
@@ -186,8 +190,14 @@ final class MoveCheckComposerOracleTest extends TestCase
         if ($words[0] === 'combined') {
             $inline = [];
             foreach (\array_slice($words, 1) as $name) {
-                $update = array_values(array_filter(array_keys($answers), static fn ($other): bool => strpos((string) $other, 'update '.$name.' ') === 0));
-                self::assertCount(1, $update, $key.': one update request of '.$name);
+                // The combined update takes the candidates of update now: a lead update that resolves inline (SPEC §5.6).
+                $update = array_values(array_filter(array_keys($answers), static function ($other) use ($answers, $name): bool {
+                    $answer = $answers[$other] ?? null;
+
+                    return strpos((string) $other, 'update '.$name.' ') === 0 && \is_array($answer)
+                        && ($answer['result'] ?? null) === MoveCheck::RESOLVES && ($answer['form'] ?? null) === MoveCheck::INLINE;
+                }));
+                self::assertCount(1, $update, $key.': one update request of '.$name.' that resolves inline');
                 $inline[$name] = explode(' ', (string) $update[0])[2];
             }
 

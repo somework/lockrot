@@ -237,8 +237,9 @@ both of these floors:
   it admits: `>=8.2` is `8.2.0`, `>7.1` is `7.1.1`. `run.project_php_lowest` writes that version.
 
 - the target PHP ([`target-php`](configuration.md#extralockrot-keys) or its option and environment
-  override, else `config.platform.php`, else the running PHP), as a whole minor: a branch outside
-  it will not install.
+  override, else `config.platform.php`, else the running PHP), at its minor's newest patch
+  (`8.4.99`): a branch that does not admit it will not install. The move check solves there
+  too, unless `config.platform.php` is in that minor ([limits of the check](#the-move-check)).
 
 When that is not the newest branch, the evidence says which floor blocks the newest branch, then
 names the branch within reach. Abridged from the [example run](example-run.md):
@@ -314,16 +315,16 @@ Abridged from the [example run](example-run.md):
 
 S11 compares the installed release's `require.php` with R, the newest PHP minor that the project
 allows. R is the newest minor in `resources/php-ga-dates.json` with a GA on or before the run clock
-that the root php admits. The root php is composer.json's `require.php`, else the lock's
+whose newest patch (`8.5.99` for 8.5) the root php admits. The root php is composer.json's `require.php`, else the lock's
 `platform.php`. Without a root php, R is the newest of those minors.
 
 S11 fires when all of these hold:
 
 1. The installed `require.php` has an upper bound.
 
-2. It admits nothing at or above R's first release (`8.5.0` for R 8.5).
+2. It admits nothing at or above R's newest patch (`8.5.99` for R 8.5).
 
-3. It admits at least one known minor.
+3. It admits the newest patch of at least one known minor.
 
 A floor above R (`>=8.4.1` under a root that allows up to 8.3) and a disjunction with an open end
 are no cap. A constraint that skips R and admits a later minor (`~8.2.0 || ~8.4.0` against R 8.3)
@@ -530,7 +531,9 @@ every `conflict`.
 
 - A release fixes an advisory when it and every later release on its branch lie outside the
   advisory's range. S9's `fix.version` is the first such release in the order that the Limits
-  paragraph gives, and `fix.newest` is the branch's newest release.
+  paragraph gives, and `fix.newest` is the branch's newest release. On the installed branch,
+  `fix.newest` and `installed_branch_fixes.newest` are the newest release that the lock's links
+  allow and the target PHP runs: what `composer update` installs there.
 
 - `fix.admits_target_php` and `fix.admits_project_php` are the floor answers of a branch row,
   asked of `fix.php` ([The PHP test](#the-php-test-in-explain)). Null is no answer, never admitted.
@@ -692,7 +695,8 @@ holds. JSON writes the answer as the move's `check`.
 - **A joint request.** When Composer refuses a move, lockrot asks once more: the move and an update
   of each package that a package hold names. The joint request resolves only when it installs the
   package inside the move's constraint and changes the release of a holder. Then `held_by[]` is
-  empty, and `moves_with[]` names each holder whose release the joint request changes. The joint
+  empty on the move, on its branch row and on the S9 `fix` at its release, and `moves_with[]`
+  names each holder whose release the joint request changes. The joint
   request moves the packages that require the package. So the `transitive` reason adds no words,
   and the `unreached` words end at "lockrot found no path from your requirements to it". The step
   names those holders:
@@ -751,7 +755,15 @@ Limits of the check:
 - On Composer 2.9 and later, it removes the versions that an advisory affects, as Composer does in
   an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
   severities and the blocking of abandoned packages. It blocks every name that the update can move,
-  packages-dev and new dependencies included.
+  packages-dev and new dependencies included. `COMPOSER_NO_SECURITY_BLOCKING` on Composer 2.9.2 and
+  later, or `COMPOSER_NO_BLOCKING` on Composer 2.10 and later, set to a true value, turns this
+  blocking off, as in Composer. `run.move_check.blocking_disabled_by` and the `moves:` line then
+  name the variable.
+- Composer blocks only the advisories that it reads. When the advisory lookup did not read a
+  package that a resolving solve installs, the move is not checked (`check.reason`
+  `advisory_lookup_incomplete`). An `--offline` run, a spent install-time budget and a failed
+  repository cause it. A refused solve stays refused. A refused move also stays refused when its
+  joint request is not checked, because Composer refuses the move alone.
 - On Composer 2.10 and later, an update also removes the versions that a filter list names. Such a
   list is the `malware` list under `config.policy`, which blocks by default, or a custom list there.
   The check does not read these lists. So a move that resolves in lockrot can fail in Composer, or
@@ -837,6 +849,12 @@ it. It also gives the answer of Composer's solver:
 - A root link on `php` or `php-64bit` that excludes the target is the root ceiling. No update can
   admit the target, so `check` is `refused` with no solve. `held_by` names each such root link with
   its section: `require`, `require-dev` or `conflict`.
+- `lock_platform` lists the root `require` links that exclude the target and that only the lock's
+  `platform` or `platform-dev` holds. composer.json has no link of that name, and Composer writes
+  the lock's platform from composer.json on every update. So such a link is no root ceiling and no
+  hold. With no package listed, lockrot solves an update that names no package, and `command` is
+  `composer update --lock`. On a run with no composer.json, the lock's platform is the root, and
+  `lock_platform` is empty.
 - `platform_step` is true when `config.platform.php` lies outside the target minor. The solve then
   runs at the target. Before you run the command, set `config.platform.php` to your release of the
   target PHP. The lock's `platform-overrides` does not set it.
@@ -850,7 +868,9 @@ edge of the set that `target.inside` reads. No update of a package can lower tha
 The `php:` line of the table, markdown and github formats prints the window. When the minors of
 `with_dev` differ, the line prints `with_dev` and `without_dev`. The line adds the target when the
 window excludes it. With `target_fix`, the line ends with its answer. That is the command, the holds
-of the refusal, the root links of the root ceiling, or the reason that the run did not check it. A
+of the refusal, the root links of the root ceiling, or the reason that the run did not check it.
+Each `lock_platform` link adds "the lock records …, which composer.json does not have" last, with
+the update that rewrites it. A
 root hold on a package of `packages-dev` ends with " in require-dev". Without
 `target_fix`, the line adds the PHP of `platform_override` and the links that set one edge. That is
 the lowest edge when the target lies below it, else the edge after the last minor of the analysed

@@ -26,7 +26,7 @@ use Lockrot\Solver\MoveCheckers;
  * @phpstan-type Req array{name: ?string, version: ?string, link: string, target: string, constraint: string, dev: bool}
  * @phpstan-type Window array{minors: list<string>, gaps: bool, lower_edge: ?array{php: string, set_by: list<Req>}, upper_edge: ?array{excludes: string, set_by: list<Req>}, closest: ?array{minors: list<string>, set_by: list<Req>}}
  * @phpstan-type PhpLink array{0: Req, 1: ConstraintInterface}
- * @phpstan-type Fix array{packages: list<Req>, command: ?list<string>, check: string, reason: ?string, held_by: list<Holder>, platform_step: bool}
+ * @phpstan-type Fix array{packages: list<Req>, lock_platform: list<Req>, command: ?list<string>, check: string, reason: ?string, held_by: list<Holder>, platform_step: bool}
  * @phpstan-type Data array{platform_override: ?string, host_requires: list<string>, with_dev: ?Window, without_dev: Window, target: array{php: string, inside: bool}, target_fix: ?Fix}
  */
 final class PhpWindow implements \JsonSerializable
@@ -45,6 +45,8 @@ final class PhpWindow implements \JsonSerializable
     private array $knownMinors;
     /** @var list<Req> */
     private array $targetFailing;
+    /** @var list<Req> */
+    private array $lockPlatform;
     /** @var list<string> */
     private array $skippedNames;
     private ?string $projectPlatformPhp;
@@ -53,10 +55,12 @@ final class PhpWindow implements \JsonSerializable
      * @param Data         $data
      * @param list<string> $knownMinors
      * @param list<Req>    $targetFailing the links that fail at `target.php`, on the set that `target.inside` reads
+     * @param list<Req>    $lockPlatform  those of them that only the lock's platform holds
      * @param list<string> $skippedNames  {@see LockFile::skippedNames()}
      */
-    private function __construct(array $data, string $targetMinor, array $knownMinors, array $targetFailing, array $skippedNames, ?string $projectPlatformPhp)
+    private function __construct(array $data, string $targetMinor, array $knownMinors, array $targetFailing, array $lockPlatform, array $skippedNames, ?string $projectPlatformPhp)
     {
+        $this->lockPlatform = $lockPlatform;
         $this->data = $data;
         $this->targetMinor = $targetMinor;
         $this->knownMinors = $knownMinors;
@@ -118,6 +122,7 @@ final class PhpWindow implements \JsonSerializable
             $windows[$set] = $links === null ? null : self::setWindow($links, $knownMinors, $targetMinor, $targetPoint);
         }
         $targetFailing = self::failing($sets['with_dev'] ?? $sets['without_dev'], $targetPoint);
+        $lockOnly = self::lockOnlyLinks($lock, $project, $sets['with_dev'] !== null);
 
         return new self([
             'platform_override' => $lock->platformOverridePhp(),
@@ -126,7 +131,7 @@ final class PhpWindow implements \JsonSerializable
             'without_dev' => $windows['without_dev'],
             'target' => ['php' => $targetPoint, 'inside' => $targetFailing === []],
             'target_fix' => null,
-        ], $targetMinor, $knownMinors, $targetFailing, $lock->skippedNames(), $project->platformPhp());
+        ], $targetMinor, $knownMinors, $targetFailing, array_values(array_filter($targetFailing, static fn (array $req): bool => \in_array($req, $lockOnly, true))), $lock->skippedNames(), $project->platformPhp());
     }
 
     /**
@@ -143,7 +148,7 @@ final class PhpWindow implements \JsonSerializable
         $configured = ($checker === null ? null : $checker->configuredPhp()) ?? $this->projectPlatformPhp;
         $platformStep = $configured !== null && MoveCheckers::platformPhp($this->targetMinor, $configured) !== $configured;
         $copy = clone $this;
-        $copy->data['target_fix'] = TargetFix::of($this->targetFailing, $this->skippedNames, $platformStep, $checker);
+        $copy->data['target_fix'] = TargetFix::of($this->targetFailing, $this->lockPlatform, $this->skippedNames, $platformStep, $checker);
 
         return $copy;
     }
@@ -183,6 +188,33 @@ final class PhpWindow implements \JsonSerializable
         }
         foreach ($project->platformConstraints(ProjectConfig::CONFLICT) as $target => $constraint) {
             $links[] = [self::req(null, null, self::LINK_CONFLICT, $target, $constraint, false), null];
+        }
+
+        return $links;
+    }
+
+    /**
+     * The root links that only the lock's `platform` or `platform-dev` holds. Composer writes the
+     * lock's platform from composer.json on each update, so composer.json dropped these links after
+     * the last update. On a lock-only run
+     * the lock's platform is the only record of the root, and none is listed.
+     *
+     * @return list<Req>
+     */
+    private static function lockOnlyLinks(LockFile $lock, ProjectConfig $project, bool $dev): array
+    {
+        if (!$project->isRead()) {
+            return [];
+        }
+        $named = self::byName($project->platformConstraints(ProjectConfig::REQUIRE), false);
+        $lockNamed = self::byName($lock->platform(), false);
+        if ($dev) {
+            $named = array_merge($named, self::byName($project->platformConstraints(ProjectConfig::REQUIRE_DEV), true));
+            $lockNamed = array_merge($lockNamed, self::byName($lock->platformDev(), true));
+        }
+        $links = [];
+        foreach (array_diff_key($lockNamed, $named) as $target => [$constraint, $fromDev]) {
+            $links[] = self::req(null, null, self::LINK_REQUIRE, $target, $constraint, $fromDev);
         }
 
         return $links;

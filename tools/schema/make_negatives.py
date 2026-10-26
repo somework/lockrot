@@ -595,6 +595,11 @@ def _(d): d['findings'][0]['next_step']['commands'] = [['composer', 'require', '
 def _(d): d['findings'][0]['next_step']['if_applied']['at_most'] = True
 @case('relation-move-10', 'stale-only', 'findings[0].next_step.crosses_major')
 def _(d): d['findings'][0]['next_step']['crosses_major'] = True
+@case('relation-move-11-refused', 'mc-joint-dagger', 'findings[0].next_step.moves_with')
+def _(d): d['findings'][0]['next_step']['check'] = {'result': 'refused', 'form': None, 'reason': None, 'installs': None}
+@case('relation-move-11-held', 'mc-joint-dagger', 'findings[0].next_step.moves_with')
+def _(d): d['findings'][0]['next_step']['held_by'] = [{'source': 'package', 'package': 'acme/gz-client', 'version': '1.0.0', 'link': 'require',
+                                                       'target': None, 'constraint': '^7.0', 'holder': None}]
 @case('relation-branchfixes-if-applied-0-0', 'composite', 'findings[%d].security.installed_branch_fixes.if_applied.total' % POLY)
 def _(d): d['findings'][POLY]['security']['installed_branch_fixes']['if_applied']['total'] = 1
 @case('relation-branchfixes-0', 'A-blocked-dagger', 'findings[0].security.installed_branch_fixes.lowest')
@@ -831,6 +836,8 @@ def _(d): d['findings'][0]['unchecked_accepted'][0]['reason'] = 'rate_limit'  # 
 def _(d): d['run']['move_check']['reason'] = 'solver_error'
 @case('run-move-check-not-checked-without-a-reason', 'move-check-dagger', 'run.move_check')
 def _(d): d['run']['move_check']['baseline'] = 'not_checked'
+@case('run-move-check-blocking-on-while-disabled', 'mc-blocking-off-dagger', 'run.move_check')
+def _(d): d['run']['move_check']['blocks_advisories'] = True
 @case('run-php-window-missing', 'composite', 'run.php_window')
 def _(d): del d['run']['php_window']
 @case('run-php-window-link-provide', 'composite', 'run.php_window')
@@ -848,6 +855,13 @@ def _(d): del d['run']['php_window']['target_fix']['platform_step']
 def _(d): d['run']['php_window']['target_fix']['platform_step'] = 'yes'
 @case('target-fix-root-ceiling-platform-hold', 'E', 'run.php_window.target_fix')
 def _(d): d['run']['php_window']['target_fix']['held_by'][0]['link'] = 'platform'
+# lock_platform (Q3): every key is written, it holds root require links only, and a fix lists a package or such a link
+@case('target-fix-lock-platform-missing', 'E', 'run.php_window.target_fix')
+def _(d): del d['run']['php_window']['target_fix']['lock_platform']
+@case('target-fix-lock-platform-package-link', 'E', 'run.php_window.target_fix.lock_platform[0].name')
+def _(d): d['run']['php_window']['target_fix']['lock_platform'] = [{'name': 'acme/lib', 'version': '1.0.0', 'link': 'require', 'target': 'php', 'constraint': '<8.0', 'dev': False}]
+@case('target-fix-resolves-without-a-listed-link', 'E', 'run.php_window.target_fix')
+def _(d): d['run']['php_window']['target_fix'].update({'packages': [], 'lock_platform': [], 'command': ['composer', 'update', '--lock'], 'check': 'resolves', 'reason': None, 'held_by': []})
 # a run that checks no move names no reason for a fix that is not checked
 @case('target-fix-reason-without-move-check', 'routing', 'run')
 def _(d): d['run']['php_window']['target_fix']['reason'] = 'offline'

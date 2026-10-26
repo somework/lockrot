@@ -425,11 +425,15 @@ final class FindingDetails
      */
     public function rowFixes(BranchFixes $row): array
     {
-        return self::branchFixes($row, $this->moves()->rowIfApplied($row->branch()), $this->moves()->rowCheck($row->branch()));
+        return self::branchFixes($row, $this->moves()->rowIfApplied($row->branch()), $this->moves()->rowCheck($row->branch()), $this->moves()->rowIsJoint($row->branch()));
     }
 
-    /** @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: ?IfApplied, check: ?MoveCheck} */
-    public static function branchFixes(BranchFixes $row, ?IfApplied $ifApplied, ?MoveCheck $check = null): array
+    /**
+     * @param bool $joint whether the joint request resolves the row's move: then nothing holds it
+     *
+     * @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: ?IfApplied, check: ?MoveCheck}
+     */
+    public static function branchFixes(BranchFixes $row, ?IfApplied $ifApplied, ?MoveCheck $check, bool $joint): array
     {
         $candidate = $row->candidate();
 
@@ -440,7 +444,7 @@ final class FindingDetails
             'fix_kind' => $row->fixKind(),
             'lowest' => $row->lowest(),
             'newest' => $row->newest(),
-            'held_by' => $candidate === null ? [] : $candidate->heldBy(),
+            'held_by' => $candidate === null || $joint ? [] : $candidate->heldBy(),
             'if_applied' => $ifApplied,
             'check' => $check,
         ];

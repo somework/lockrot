@@ -55,7 +55,7 @@ final class LinkIndex
             foreach ([Holder::REQUIRE => $package->requireConstraints(), Holder::CONFLICT => $package->conflicts()] as $link => $constraints) {
                 foreach ($constraints as $target => $constraint) {
                     if ($target !== $package->name()) {
-                        $index->add($parser, (string) $target, new Holder(Holder::PACKAGE, $package->name(), $package->version(), $link, $constraint), $package->version());
+                        $index->add($parser, (string) $target, (new Holder(Holder::PACKAGE, $package->name(), $package->version(), $link, $constraint))->asLocked(), $package->version());
                     }
                 }
             }

@@ -50,11 +50,11 @@ final class SarifFormatter implements FormatterInterface
                 $result['locations'] = [['physicalLocation' => $this->physicalLocation($index->lineOf($finding->package()))]];
                 $results[] = $result;
             }
-            $rules = array_merge($rules, $records->rules());
+            $rules = array_merge($rules, $records->rules($run->thresholds()));
         }
         $gap = $this->context->advisoriesNotCheckedLevel($report);
         if ($gap !== null) {
-            $rules['lockrot/'.self::ADVISORIES_UNCHECKED] = SarifRecords::rule('lockrot/'.self::ADVISORIES_UNCHECKED, null);
+            $rules['lockrot/'.self::ADVISORIES_UNCHECKED] = SarifRecords::rule('lockrot/'.self::ADVISORIES_UNCHECKED, null, $run->thresholds());
             $results[] = [
                 'ruleId' => 'lockrot/'.self::ADVISORIES_UNCHECKED,
                 'level' => $gap,

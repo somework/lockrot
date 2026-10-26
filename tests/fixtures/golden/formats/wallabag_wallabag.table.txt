@@ -321,7 +321,8 @@
       stale        last release 2021-04-06 (5.4 years ago)
   lcobucci/clock 3.3.1  via lcobucci/jwt, scheb/2fa-trusted-device  ·  capped
       4 = capped 8 ÷ 2 transitive
-      do: composer update lcobucci/clock (gets 3.6.0) — clears capped
+      do: composer update lcobucci/clock
+          (gets 3.6.0) — clears capped
       capped       requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded
       age: installed 3.3.1 released 2024-09-24 (2.0 years ago); 3.x last released 3.6.0 2026-04-13 (0.4 years ago),
            its newest release; last push 2026-09-13 (less than three weeks ago)

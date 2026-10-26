@@ -74,7 +74,7 @@
                     "role": "security",
                     "advisory": "PKSA-gcrk-3vtt-1r14",
                     "severity": "high",
-                    "fix_kind": "update",
+                    "fix_kind": "upgrade",
                     "weight": 16,
                     "multiplier": 1,
                     "points": 16,
@@ -90,7 +90,7 @@
             "kind": "require",
             "source": "vulnerable",
             "merged": [],
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "reason": null,
             "replacement": null,
             "quiet_years": null,
@@ -188,7 +188,7 @@
             },
             "ignored": [],
             "ignored_count": 0,
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "installed_branch_fixes": {
                 "fixed": 0,
                 "unknown": 0,
@@ -261,6 +261,7 @@
             "require"
         ],
         "direct_dependents": [
+            "acme/gz-client",
             "guzzlehttp/guzzle"
         ],
         "signals": [
@@ -283,7 +284,7 @@
                             "points": 16,
                             "deciding": true,
                             "fix": {
-                                "kind": "update",
+                                "kind": "upgrade",
                                 "to_branch": "8.x",
                                 "version": "8.0.1",
                                 "newest": "8.0.1",
@@ -403,7 +404,7 @@
                     "fixed": 1,
                     "unknown": 0,
                     "of": 1,
-                    "fix_kind": "update",
+                    "fix_kind": "upgrade",
                     "lowest": "8.0.1",
                     "newest": "8.0.1",
                     "held_by": [],
@@ -1227,7 +1228,7 @@
         "advisory_lookup": {
             "scope": "all",
             "scope_source": "default",
-            "packages_asked": 1,
+            "packages_asked": 2,
             "packages_not_asked": 0,
             "other_repositories": 0,
             "repositories": [
@@ -1245,6 +1246,7 @@
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
+            "blocking_disabled_by": [],
             "ignores_extensions": true,
             "baseline": "resolves",
             "reason": null

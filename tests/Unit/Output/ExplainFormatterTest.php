@@ -82,8 +82,8 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString("\nscore     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory]     critical from 32\n  maintenance  left-behind 16 (lead) · old-promise 4 (¼ of 16)\n  security     vulnerable 16 (high advisory CVE-2026-45077)\n  reach        direct requirement: maintenance not halved for reach\n  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)\n", $text);
         self::assertStringContainsString("\n          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony\n", $text);
         self::assertStringContainsString("\n  feeds        packagist.org: 1 on record, 1 affects v2.6.13\n  accepted     none\n  not checked  nothing\n", $text);
-        self::assertStringContainsString("\n     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok, if Composer resolves it\n", $text);
-        self::assertStringContainsString("\n   * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1\n", $text);
+        self::assertStringContainsString("\n     5.x      v5.4.52       2026-05-07   >=7.2.5        1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok, if Composer resolves it\n", $text);
+        self::assertStringContainsString("\n   * 2.x      v2.8.52       2019-11-13   >=5.3.9        0 of 1\n", $text);
         self::assertStringContainsString("\n               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52\n", $text);
     }
 
@@ -217,6 +217,21 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringStartsWith("\033[1mvendor/".$text.' '.$text."\033[22m — ", $decorated, 'the package and its version print bold');
         self::assertStringEndsWith("\nnote: run: ".$text."\n", $plain);
         self::assertSame($plain, str_replace(["\033[1m", "\033[22m", "\033[31m", "\033[39m"], '', $decorated), 'nothing but lockrot\'s styles');
+    }
+
+    /** A terminal obeys a control character from the lock, so each prints as an escape. */
+    public function testControlCharactersFromOutsidePrintAsEscapes(): void
+    {
+        $evil = "evil\x1b]52;c;cHduZWQ=\x07\x1b[2J\u{9B}31m\ntail";
+        $finding = (new FindingBuilder())->withPackage('vendor/'.$evil)->withVersion($evil)->withVerdict(Verdict::ABANDONED)->withChain(['vendor/'.$evil])->build();
+        $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.0.0'])), new Thresholds(), '8.4', self::report(['run: '.$evil]));
+
+        $plain = ConsoleMarkup::render((new ExplainFormatter())->text($explanation), false);
+
+        $shown = 'evil\x1B]52;c;cHduZWQ=\x07\x1B[2J\u{009B}31m\ntail';
+        self::assertSame(0, preg_match('/[\x00-\x09\x0B-\x1F\x7F]|\xC2[\x80-\x9F]/', $plain), 'no control character but the line feed');
+        self::assertStringStartsWith('vendor/'.$shown.' '.$shown.' — ', $plain);
+        self::assertStringEndsWith("\nnote: run: ".$shown."\n", $plain);
     }
 
     /**
@@ -427,6 +442,41 @@ final class ExplainFormatterTest extends TestCase
     public function testABranchRowNamesAHoldOfThePackagesOwnReleaseAsItsOwnRelease(): void
     {
         self::assertStringContainsString('; held by symfony/mailer v6.4.40, its own release and acme/ml-widget; after it', self::plain(self::caseExplanation('mc-package-hold‡')));
+    }
+
+    /** SPEC §5.6, ruling R1: the joint request with acme/gz-client resolves the move to the 8.x row, so nothing holds it. */
+    public function testABranchRowThatTheJointRequestResolvesNamesNoHolder(): void
+    {
+        self::assertStringContainsString(" 1 of 1 · upgrade (lowest fix); after it: 0, ok; Composer's solver resolves it\n", self::plain(self::caseExplanation('mc-joint‡')));
+    }
+
+    /** Each cell of a branch row starts under its header, counted in characters: a `—` or a long branch name shifts nothing. */
+    public function testEveryBranchRowLinesUpWithItsHeader(): void
+    {
+        $misplaced = [];
+        $rows = 0;
+        foreach (array_keys(CaseHydrator::findings()) as $id) {
+            $lines = explode("\n", self::plain(self::caseExplanation((string) $id)));
+            foreach ($lines as $i => $header) {
+                if (preg_match('/^ {5}(branch +)(highest tag +)(released +)(php +)fixes$/', $header, $m) !== 1) {
+                    continue;
+                }
+                $starts = [5 + \strlen($m[1]), 5 + \strlen($m[1].$m[2]), 5 + \strlen($m[1].$m[2].$m[3]), 5 + \strlen($m[1].$m[2].$m[3].$m[4])];
+                for ($j = $i + 1; isset($lines[$j]) && preg_match('/^   [ *] (?!… and )\S/u', $lines[$j]) === 1; ++$j) {
+                    ++$rows;
+                    $characters = preg_split('//u', $lines[$j], -1, \PREG_SPLIT_NO_EMPTY) ?: [];
+                    foreach ($starts as $start) {
+                        if (isset($characters[$start]) && ($characters[$start - 1] !== ' ' || $characters[$start] === ' ')) {
+                            $misplaced[] = $id.': '.$lines[$j];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        self::assertGreaterThan(0, $rows);
+        self::assertSame([], $misplaced);
     }
 
     public function testEveryCaseExplainsAsItsGolden(): void

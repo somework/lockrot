@@ -27,14 +27,18 @@ final class Moves
     private array $rows;
     /** @var array<string, MoveCheck> */
     private array $rowChecks;
+    /** @var array<string, string> */
+    private array $rowsJoint;
 
     /**
      * @param ?string                  $fixKind   the fix kind of the move `move_in` names, else of the security move
      * @param array<string, IfApplied> $rows      by branch label, the rows whose candidate a move can reach
      * @param array<string, MoveCheck> $rowChecks by branch label, Composer's check of the move to each row's candidate
+     * @param array<string, string>    $rowsJoint by branch label, the row's candidate when the joint request resolves the move to it
      */
-    public function __construct(?Move $nextStep, ?string $moveIn, ?string $fixKind, ?SecurityPartial $partial, array $rows, array $rowChecks = [])
+    public function __construct(?Move $nextStep, ?string $moveIn, ?string $fixKind, ?SecurityPartial $partial, array $rows, array $rowChecks = [], array $rowsJoint = [])
     {
+        $this->rowsJoint = $rowsJoint;
         $this->nextStep = $nextStep;
         $this->moveIn = $moveIn;
         $this->fixKind = $fixKind;
@@ -88,6 +92,18 @@ final class Moves
     public function rowCheck(string $branch): ?MoveCheck
     {
         return $this->rowChecks[$branch] ?? null;
+    }
+
+    /** Whether the joint request resolves the move to the row's candidate: then nothing holds it (SPEC §5.6, ruling R1). */
+    public function rowIsJoint(string $branch): bool
+    {
+        return isset($this->rowsJoint[$branch]);
+    }
+
+    /** @return array<string, string> by branch label, each release that the joint request moves to */
+    public function jointReleases(): array
+    {
+        return $this->rowsJoint;
     }
 
     /** @param array<string, GradedPackage> $findings by package name */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Composer;
 
+use Composer\Composer;
 use Composer\Config;
 use Composer\Downloader\TransportException;
 use Composer\IO\BufferIO;
@@ -242,7 +243,7 @@ final class ComposerHttpClientTest extends TestCase
     }
 
     /**
-     * @param array<string, array{0: int, 1: string}|\Throwable> $script url => [status, body], or an exception to reject with. A URL the script does not mention is never answered at all
+     * @param array<string, array{0: int, 1: string}|\Throwable|string> $script url => [status, body], an exception to reject with, or the URL that a redirect names. A URL the script does not mention is never answered at all
      *
      * @return array{0: ComposerHttpClient, 1: ScriptedDownloader}
      */
@@ -378,6 +379,8 @@ final class ComposerHttpClientTest extends TestCase
         [$client, $downloader] = self::clientWith(['https://api.github.com/repos/vendor/name' => [200, '{}']]);
 
         $client->fetchAll(['https://api.github.com/repos/vendor/name'], self::HEADERS);
+        // The redirect guard is a closure, which ComposerHttpClientRedirectTest covers.
+        unset($downloader->requests[0]['options']['prevent_url_access_callable']);
 
         self::assertSame([[
             'url' => 'https://api.github.com/repos/vendor/name',
@@ -403,21 +406,104 @@ final class ComposerHttpClientTest extends TestCase
         self::assertIsArray($options['http']);
         self::assertSame(3, $options['http']['timeout'], '5s budget, 2.6s gone -> 2.4s left, rounded up');
     }
+    /**
+     * Composer replays a request's headers to the target of each redirect, so lockrot's token must
+     * not reach a target on another origin. That request goes out again without the token.
+     *
+     * @dataProvider redirectsToAnotherOrigin
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('redirectsToAnotherOrigin')]
+    public function testARedirectToAnotherOriginIsRequestedAgainWithoutTheToken(string $url, string $target): void
+    {
+        self::skipBelowComposer210();
+        [$client, $downloader] = self::clientWith([$url => $target, $target => [200, 'moved']]);
+
+        $results = $client->fetchAll([$url], self::HEADERS);
+
+        self::assertSame([$url => [200, 'moved', null]], self::summarize($results));
+        self::assertSame([], $downloader->followed, 'no request followed the redirect with the token');
+        self::assertSame([$url, $target], array_column($downloader->requests, 'url'));
+        unset($downloader->requests[0]['options']['prevent_url_access_callable']);
+        self::assertSame(['http' => ['timeout' => ComposerHttpClient::DEFAULT_TIMEOUT, 'header' => self::WITHOUT_AUTHORIZATION], 'retry-auth-failure' => false], $downloader->requests[1]['options']);
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function redirectsToAnotherOrigin(): iterable
+    {
+        yield 'another host' => ['https://api.github.com/repos/vendor/name', 'https://objects.example.com/name'];
+        yield 'another port' => ['https://a.example.com:8443/1', 'https://a.example.com:9443/1'];
+        yield 'a port in place of no port' => ['https://a.example.com/1', 'https://a.example.com:8443/1'];
+        yield 'a host that ends in the port digits' => ['https://a.example.com:8443/1', 'https://a.example.com8443/1'];
+        yield 'another scheme' => ['https://a.example.com/1', 'http://a.example.com/1'];
+    }
+
+    /** @dataProvider redirectsOnTheSameOrigin */
+    #[\PHPUnit\Framework\Attributes\DataProvider('redirectsOnTheSameOrigin')]
+    public function testARedirectOnTheSameOriginIsFollowedWithTheToken(string $url, string $target): void
+    {
+        self::skipBelowComposer210();
+        [$client, $downloader] = self::clientWith([$url => $target, $target => [200, 'moved']]);
+
+        $results = $client->fetchAll([$url], self::HEADERS);
+
+        self::assertSame([$url => [200, 'moved', null]], self::summarize($results));
+        self::assertSame([['url' => $target, 'header' => self::HEADERS]], $downloader->followed);
+        self::assertSame([$url], array_column($downloader->requests, 'url'));
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function redirectsOnTheSameOrigin(): iterable
+    {
+        yield 'another path' => ['https://a.example.com/1', 'https://a.example.com/2'];
+        yield 'the same port' => ['https://a.example.com:8443/1', 'https://a.example.com:8443/2'];
+        yield 'another letter case' => ['HTTPS://A.Example.com/1', 'https://a.example.com/2'];
+    }
+
+    /**
+     * @dataProvider composersThatRefuseRedirects
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('composersThatRefuseRedirects')]
+    public function testOnlyTheCurlDownloaderOfComposer210RefusesARedirect(string $version, bool $curl, bool $refuses): void
+    {
+        self::assertSame($refuses, ComposerHttpClient::refusesRedirects($version, $curl));
+    }
+
+    /** @return iterable<string, array{string, bool, bool}> */
+    public static function composersThatRefuseRedirects(): iterable
+    {
+        yield '2.10 with curl' => ['2.10.0', true, true];
+        yield 'a 2.10 snapshot with curl' => ['2.10.0-dev', true, true];
+        yield '2.10 without curl' => ['2.10.3', false, false];
+        yield '2.9 with curl' => ['2.9.5', true, false];
+    }
+
+    private static function skipBelowComposer210(): void
+    {
+        if (!ComposerHttpClient::refusesRedirects(Composer::getVersion(), true)) {
+            self::markTestSkipped('Composer 2.10 or later: an older Composer replays the headers (docs/internals.md#which-credentials)');
+        }
+    }
 }
 
-/** A downloader that answers each URL from a script, leaves an unscripted URL pending, and records every request and wait(). */
+/**
+ * A downloader that answers each URL from a script, leaves an unscripted URL pending, and records
+ * every request and wait(). A string answer is a redirect, which it follows with the request's
+ * headers, as Composer does, unless `prevent_url_access_callable` refuses the target.
+ */
 final class ScriptedDownloader extends HttpDownloader
 {
     /** @var list<array{url: string, options: array<string, mixed>}> the requests add() saw, in order */
     public array $requests = [];
+    /** @var list<array{url: string, header: mixed}> the redirect targets that a request reached, with the headers it replayed */
+    public array $followed = [];
     public int $waits = 0;
 
-    /** @var array<string, array{0: int, 1: string}|\Throwable> */
+    /** @var array<string, array{0: int, 1: string}|\Throwable|string> */
     private array $script;
-    /** @var list<array{0: non-empty-string, 1: Deferred<Response>}> */
+    /** @var list<array{0: non-empty-string, 1: Deferred<Response>, 2: array<string, mixed>}> */
     private array $pending = [];
 
-    /** @param array<string, array{0: int, 1: string}|\Throwable> $script */
+    /** @param array<string, array{0: int, 1: string}|\Throwable|string> $script */
     public function __construct(IOInterface $io, Config $config, array $script)
     {
         parent::__construct($io, $config);
@@ -437,10 +523,11 @@ final class ScriptedDownloader extends HttpDownloader
             // What the real downloader does, so a test cannot pass one by accident.
             throw new \InvalidArgumentException('$url must not be an empty string');
         }
-        $this->requests[] = ['url' => $url, 'options' => \is_array($options) ? $options : []];
+        $options = \is_array($options) ? $options : [];
+        $this->requests[] = ['url' => $url, 'options' => $options];
         /** @var Deferred<Response> $deferred */
         $deferred = new Deferred();
-        $this->pending[] = [$url, $deferred];
+        $this->pending[] = [$url, $deferred, $options];
 
         return $deferred->promise();
     }
@@ -456,8 +543,19 @@ final class ScriptedDownloader extends HttpDownloader
         ++$this->waits;
         $pending = $this->pending;
         $this->pending = [];
-        foreach ($pending as [$url, $deferred]) {
+        foreach ($pending as [$url, $deferred, $options]) {
             $answer = $this->script[$url] ?? null;
+            if (\is_string($answer)) {
+                $refuse = $options['prevent_url_access_callable'] ?? null;
+                if (\is_callable($refuse) && $refuse($answer) === true) {
+                    $deferred->reject(new TransportException('Access to "'.$answer.'" is blocked.'));
+
+                    continue;
+                }
+                $http = $options['http'] ?? [];
+                $this->followed[] = ['url' => $answer, 'header' => \is_array($http) ? ($http['header'] ?? null) : null];
+                $answer = $this->script[$answer] ?? null;
+            }
             if ($answer instanceof \Throwable) {
                 $deferred->reject($answer);
             } elseif (\is_array($answer)) {

@@ -1657,7 +1657,8 @@
                     "composer_json_invalid",
                     "no_release_read",
                     "pass_cap",
-                    "solver_error"
+                    "solver_error",
+                    "advisory_lookup_incomplete"
                   ]
                 },
                 {
@@ -4494,7 +4495,7 @@
           ]
         },
         "held_by": {
-          "description": "The links that exclude the move; `upgrade` ⇒ not empty where lockrot read the links.",
+          "description": "The links that exclude the move; `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move (`moves_with` not empty).",
           "type": "array",
           "items": {
             "$ref": "#/definitions/heldBy"
@@ -5226,6 +5227,34 @@
           ]
         },
         {
+          "description": "`moves_with` is empty unless `check.result` is `resolves`, and a move with entries has an empty `held_by`.",
+          "anyOf": [
+            {
+              "properties": {
+                "moves_with": {
+                  "maxItems": 0
+                }
+              }
+            },
+            {
+              "properties": {
+                "check": {
+                  "properties": {
+                    "result": {
+                      "enum": [
+                        "resolves"
+                      ]
+                    }
+                  }
+                },
+                "held_by": {
+                  "maxItems": 0
+                }
+              }
+            }
+          ]
+        },
+        {
           "description": "A security move carries its fix kind: `source` or `merged` holds `vulnerable`.",
           "anyOf": [
             {
@@ -5724,7 +5753,7 @@
           ]
         },
         "held_by": {
-          "description": "The links that exclude the move; `upgrade` ⇒ not empty where lockrot read the links.",
+          "description": "The links that exclude the move; `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move (`moves_with` not empty).",
           "type": "array",
           "items": {
             "$ref": "#/definitions/heldBy"
@@ -6436,6 +6465,34 @@
               "properties": {
                 "to_branch": {
                   "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`moves_with` is empty unless `check.result` is `resolves`, and a move with entries has an empty `held_by`.",
+          "anyOf": [
+            {
+              "properties": {
+                "moves_with": {
+                  "maxItems": 0
+                }
+              }
+            },
+            {
+              "properties": {
+                "check": {
+                  "properties": {
+                    "result": {
+                      "enum": [
+                        "resolves"
+                      ]
+                    }
+                  }
+                },
+                "held_by": {
+                  "maxItems": 0
                 }
               }
             }
@@ -11061,7 +11118,7 @@
           ]
         },
         "held_by": {
-          "description": "The links that exclude the fixing release; `upgrade` ⇒ not empty where lockrot read the links.",
+          "description": "The links that exclude the fixing release; `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move to this release.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/heldBy"
@@ -21555,6 +21612,7 @@
               "required": [
                 "composer",
                 "blocks_advisories",
+                "blocking_disabled_by",
                 "ignores_extensions",
                 "baseline",
                 "reason"
@@ -21571,6 +21629,18 @@
                 "blocks_advisories": {
                   "description": "Whether the solve removed the versions that an advisory affects, as Composer 2.9 and later do in an update.",
                   "type": "boolean"
+                },
+                "blocking_disabled_by": {
+                  "description": "The environment variables that turned off the blocking of the Composer that solved: each one that this Composer reads and that holds a true value, in this order. Composer 2.10 and later read both, and 2.9.2 to 2.9.x read `COMPOSER_NO_SECURITY_BLOCKING`. Closed.",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "COMPOSER_NO_BLOCKING",
+                      "COMPOSER_NO_SECURITY_BLOCKING"
+                    ]
+                  },
+                  "uniqueItems": true
                 },
                 "ignores_extensions": {
                   "description": "Always true: the solve ignores every `ext-*` requirement, as `--ignore-platform-req=ext-*` does, so the extensions of the machine that runs lockrot decide no move.",
@@ -21608,6 +21678,27 @@
                 }
               },
               "allOf": [
+                {
+                  "description": "A run whose blocking an environment variable turned off blocks no advisory.",
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "blocking_disabled_by": {
+                          "maxItems": 0
+                        }
+                      }
+                    },
+                    {
+                      "properties": {
+                        "blocks_advisories": {
+                          "enum": [
+                            false
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
                 {
                   "description": "`reason` is set exactly on a `baseline` of `not_checked`.",
                   "anyOf": [
@@ -22775,7 +22866,8 @@
             "composer_json_invalid",
             "no_release_read",
             "pass_cap",
-            "solver_error"
+            "solver_error",
+            "advisory_lookup_incomplete"
           ]
         },
         "packages": {
@@ -22972,6 +23064,7 @@
       "type": "object",
       "required": [
         "packages",
+        "lock_platform",
         "command",
         "check",
         "reason",
@@ -22980,7 +23073,7 @@
       ],
       "properties": {
         "packages": {
-          "description": "The package links that exclude `target.php`, on the set that `target.inside` reads: each package `require` that fails there and each package `conflict` that matches there, on `php` and `php-64bit`. Production first, then packages-dev, each by name, then by `link` and `target`. A packages-dev entry is listed when the run did not analyse packages-dev. At least one, except at the root ceiling.",
+          "description": "The package links that exclude `target.php`, on the set that `target.inside` reads: each package `require` that fails there and each package `conflict` that matches there, on `php` and `php-64bit`. Production first, then packages-dev, each by name, then by `link` and `target`. A packages-dev entry is listed when the run did not analyse packages-dev. At least one, except at the root ceiling and beside a `lock_platform` entry.",
           "type": "array",
           "items": {
             "description": "A package link that excludes the target.",
@@ -23033,8 +23126,38 @@
           },
           "uniqueItems": true
         },
+        "lock_platform": {
+          "description": "The root `require` links on `php` and `php-64bit` that fail at `target.php` and that only the lock's `platform` or `platform-dev` holds: composer.json has no link of that name. Any update of the lock rewrites them from composer.json, so such a link is no hold and not the root ceiling. `[]` when there is none, and on a lock-only run.",
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/phpWindowReq"
+              },
+              {
+                "properties": {
+                  "name": {
+                    "description": "Null: a root link.",
+                    "type": "null"
+                  },
+                  "version": {
+                    "description": "Null: a root link.",
+                    "type": "null"
+                  },
+                  "link": {
+                    "description": "A root `require` link.",
+                    "enum": [
+                      "require"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "uniqueItems": true
+        },
         "command": {
-          "description": "The argv of the update that Composer's solver resolves: `composer update <packages>` with each listed package once, and `--with-dependencies` or `--with-all-dependencies` when that form resolved. Set exactly when `check` is `resolves`. It obeys the command argument rule of `next_step.commands[]`, and a page renders it as it renders `commands[]`.",
+          "description": "The argv of the update that Composer's solver resolves: `composer update <packages>` with each listed package once, and `--with-dependencies` or `--with-all-dependencies` when that form resolved. With no package listed, `composer update --lock`. Set exactly when `check` is `resolves`. It obeys the command argument rule of `next_step.commands[]`, and a page renders it as it renders `commands[]`.",
           "oneOf": [
             {
               "description": "One command.",
@@ -23094,7 +23217,7 @@
       },
       "anyOf": [
         {
-          "description": "`resolves`: a command, no reason, no hold, a package.",
+          "description": "`resolves`: a command, no reason, no hold, a package or a `lock_platform` link.",
           "properties": {
             "check": {
               "enum": [
@@ -23109,14 +23232,31 @@
             },
             "held_by": {
               "maxItems": 0
-            },
-            "packages": {
-              "minItems": 1
             }
-          }
+          },
+          "allOf": [
+            {
+              "anyOf": [
+                {
+                  "properties": {
+                    "packages": {
+                      "minItems": 1
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "lock_platform": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
-          "description": "`refused` by the solve: no command, no reason, a package.",
+          "description": "`refused` by the solve: no command, no reason, a package or a `lock_platform` link.",
           "properties": {
             "check": {
               "enum": [
@@ -23128,11 +23268,28 @@
             },
             "reason": {
               "type": "null"
-            },
-            "packages": {
-              "minItems": 1
             }
-          }
+          },
+          "allOf": [
+            {
+              "anyOf": [
+                {
+                  "properties": {
+                    "packages": {
+                      "minItems": 1
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "lock_platform": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "description": "`refused` at the root ceiling: no command, no reason, only root holds on php.",
@@ -23176,7 +23333,7 @@
           }
         },
         {
-          "description": "`not_checked`: no command, no hold, a package.",
+          "description": "`not_checked`: no command, no hold, a package or a `lock_platform` link.",
           "properties": {
             "check": {
               "enum": [
@@ -23188,11 +23345,28 @@
             },
             "held_by": {
               "maxItems": 0
-            },
-            "packages": {
-              "minItems": 1
             }
-          }
+          },
+          "allOf": [
+            {
+              "anyOf": [
+                {
+                  "properties": {
+                    "packages": {
+                      "minItems": 1
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "lock_platform": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
         }
       ]
     },

@@ -22,6 +22,7 @@ use Composer\Package\BasePackage;
 use Composer\Package\CompleteAliasPackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Link;
+use Composer\Package\Loader\RootPackageLoader;
 use Composer\Package\RootPackageInterface;
 use Composer\Package\Version\VersionParser;
 use Composer\Repository\ArrayRepository;
@@ -174,7 +175,11 @@ final class ComposerSolver
         [$set, $composerRequest, $pool, $fixedRoot] = $this->pool($root, $requires, $temporary, $request);
         [$pool, $answer] = $this->answer($policy, $composerRequest, $pool, $fixedRoot);
         if ($answer instanceof SolverProblemsException) {
-            $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $requested);
+            $locked = [];
+            foreach ($this->locked->getPackages() as $package) {
+                $locked[$package->getName()] = $package->getVersion();
+            }
+            $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $requested, $locked);
             $unloaded = [];
             foreach ($holds->wanted() as $name) {
                 $failure = $this->source->failure($name);
@@ -356,6 +361,9 @@ final class ComposerSolver
     }
 
     /**
+     * `composer require` loads composer.json again after it writes the change, so a changed name
+     * takes the stability flag of its new constraint and loses its root alias.
+     *
      * @param array<string, string> $changes name => constraint, as `require name:constraint` without
      *                                       `--dev` writes it: in `require`, and out of `require-dev`
      * @param array<string, string> $dev     name => name, the changes that `require --dev` writes in `require-dev` instead
@@ -376,6 +384,16 @@ final class ComposerSolver
         }
         $root->setRequires($requires);
         $root->setDevRequires($devRequires);
+        if ($changes !== []) {
+            $root->setStabilityFlags(RootPackageLoader::extractStabilityFlags($changes, $root->getMinimumStability(), array_diff_key($root->getStabilityFlags(), $changes)));
+            $aliases = [];
+            foreach ($root->getAliases() as $alias) {
+                if (!isset($changes[$alias['package']])) {
+                    $aliases[] = $alias;
+                }
+            }
+            $root->setAliases($aliases);
+        }
 
         return $root;
     }

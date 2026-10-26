@@ -39,6 +39,31 @@ final class ComposerOracle
         return $versions[0];
     }
 
+    /**
+     * The installs that a recorded joint solve changes, as lockrot reads a solve: the CLI also lists
+     * a name that it installs again at its locked tag on another reference, which is no move. A
+     * branch moves with its commit, so a branch version stays.
+     *
+     * @param array<mixed, mixed> $installs name => the version that the CLI installs
+     * @param array<mixed, mixed> $lock     the world's lock, with `packages` and `packages-dev`
+     *
+     * @return array<mixed, mixed>
+     */
+    public static function changes(array $installs, array $lock): array
+    {
+        $locked = [];
+        foreach (['packages', 'packages-dev'] as $section) {
+            foreach (\is_array($lock[$section] ?? null) ? $lock[$section] : [] as $entry) {
+                if (\is_array($entry) && \is_string($entry['name'] ?? null) && \is_string($entry['version'] ?? null)) {
+                    $locked[$entry['name']] = $entry['version'];
+                }
+            }
+        }
+
+        return array_filter($installs, static fn ($version, $name): bool => !\is_string($version) || ($locked[$name] ?? null) !== $version
+            || strpos($version, 'dev-') === 0 || substr($version, -4) === '-dev', \ARRAY_FILTER_USE_BOTH);
+    }
+
     public static function guard(string $recorded, string $running, bool $required): void
     {
         if ($running === $recorded) {

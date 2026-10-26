@@ -211,7 +211,7 @@ defs['factBaseline'] = nul("A fact's state against the baseline entry (§6.4 \"P
 
 # holders and php checks
 MOVE_CHECK_REASONS = ['baseline_refused', 'unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'no_composer_json',
-                      'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error']
+                      'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete']
 # The reasons that leave the baseline itself unchecked: the budget, a run that cannot solve at all, or a solve that Composer failed on.
 BASELINE_CHECK_REASONS = ['install_time_budget', 'no_composer_json', 'composer_json_invalid', 'solver_error']
 defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the move's `composer update` or `composer require` installs from the lock. "
@@ -496,7 +496,7 @@ def move_props(with_also):
         'crosses_major': nul("Whether the move crosses a major; for a branch-alias snapshot (`5.4.x-dev`) the snapshot's own line is the installed branch, so on a `tag` "
                              "move from `pinned` false says the tag is the newest on the snapshot's own line; null when the move names no branch, or the installed version "
                              "has none (a `dev-main` snapshot).", {'type': 'boolean'}),
-        'held_by': arr("The links that exclude the move (§5.3); `upgrade` ⇒ not empty where lockrot read the links.", ref('heldBy')),
+        'held_by': arr("The links that exclude the move (§5.3); `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move (`moves_with` not empty).", ref('heldBy')),
         'clears': arr("What the move clears, each with its basis (§5.6). `clears`, `unverified` and `leaves` are disjoint and together hold every counted fact (I14b).", ref('clearedFact')),
         'unverified': arr('Facts the move could not be checked against (§5.6): counted facts it may not clear, and a flag it may raise that lockrot could not date.', ref('unverifiedFact')),
         'adds': arr("Facts the move would raise that would count: neither fired now (counted or accepted) nor accepted by the finding's allowlist entry; disjoint from "
@@ -930,7 +930,7 @@ defs['s9fix'] = obj("The advisory's fix (§5.3 \"Per advisory\"): `fix` is alway
                               'Null is no answer, never admitted: `php` is null or cannot be read, or the kind names no fixing release.'), {'type': 'boolean'}),
     'admits_project_php': nul(("A branch row's `admits_project_php` asked of `php`: whether the fixing release's php admits `run.project_php_lowest`. The Fixed by note reads it. "
                                'Null is no answer, never admitted: `php` is null or cannot be read, the project names no lowest PHP, or the kind names no fixing release.'), {'type': 'boolean'}),
-    'held_by': arr('The links that exclude the fixing release (§5.3); `upgrade` ⇒ not empty where lockrot read the links.', ref('heldBy')),
+    'held_by': arr('The links that exclude the fixing release (§5.3); `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move to this release.', ref('heldBy')),
     'reason': nul(("Set for `unknown` (`releases_unknown`, `affected_range_unknown`, `not_from_composer_repository`) and `none` (`no_release_outside_range`), else null. An open set "
                    "(round 3). The corpus model's `branch_table_missing` (‡, no details block) is a model-only value lockrot never writes, so it is not listed."),
                   {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['releases_unknown', 'affected_range_unknown', 'not_from_composer_repository', 'no_release_outside_range']}),
@@ -1403,13 +1403,18 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'move_check': nul("How Composer's solver checked the run's moves (§5.6); null when the run checked no move.", obj('The move check of the run.', {
         'composer': nul('The version of the Composer that solved; null when nothing solved.', {'type': 'string', 'minLength': 1}),
         'blocks_advisories': d('Whether the solve removed the versions that an advisory affects, as Composer 2.9 and later do in an update.', {'type': 'boolean'}),
+        'blocking_disabled_by': arr("The environment variables that turned off the blocking of the Composer that solved: each one that this Composer reads and that holds a true value, in this order. Composer 2.10 and later read both, and 2.9.2 to 2.9.x read `COMPOSER_NO_SECURITY_BLOCKING`. Closed.",
+                                    closed(['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING']), uniqueItems=True),
         'ignores_extensions': d("Always true: the solve ignores every `ext-*` requirement, as `--ignore-platform-req=ext-*` does, so the extensions of the machine that runs lockrot decide no move.",
                                 {'type': 'boolean', 'enum': [True]}),
         'baseline': closed(['resolves', 'refused', 'not_checked'], ("The partial update of a name outside the lock: `refused` means Composer refuses the lock "
                                                                    "itself, so no move is checked (the `moves_not_checked` note). Closed.")),
         'reason': nul("Why the baseline was not checked; null unless `baseline` is `not_checked`. An open set, with the values of `check.reason` that a whole run can have.",
                       {'type': 'string', 'pattern': SNAKE, 'x-known-values': BASELINE_CHECK_REASONS}),
-    }, allOf=[{'description': '`reason` is set exactly on a `baseline` of `not_checked`.',
+    }, allOf=[{'description': 'A run whose blocking an environment variable turned off blocks no advisory.',
+               'anyOf': [{'properties': {'blocking_disabled_by': {'maxItems': 0}}},
+                         {'properties': {'blocks_advisories': {'enum': [False]}}}]},
+              {'description': '`reason` is set exactly on a `baseline` of `not_checked`.',
                'anyOf': [{'properties': {'baseline': {'enum': ['resolves', 'refused']}, 'reason': {'type': 'null'}}},
                          {'properties': {'baseline': {'enum': ['not_checked']}, 'reason': {'type': 'string'}}}]}])),
     'php_window': nul('On which PHP minors the lock installs at each minor\'s newest patch, with require-dev and without (§5.9); null when a package or the root provides or replaces `php` or `php-64bit`, or a php link does not parse.',
@@ -1569,11 +1574,12 @@ defs['phpWindowSet'] = obj('The PHP minors on which one set of the lock installs
         'set_by': arr('The links that exclude those minors: the requirements that fail and the conflicts that match there.', ref('phpWindowReq'), minItems=1),
     })),
 })
+TARGET_FIX_LISTED = {'anyOf': [{'properties': {'packages': {'minItems': 1}}}, {'properties': {'lock_platform': {'minItems': 1}}}]}
 defs['targetFix'] = obj("`run.php_window.target_fix` (§5.9): one update that unlocks every package that excludes the target PHP.", {
     'packages': arr(("The package links that exclude `target.php`, on the set that `target.inside` reads: each package `require` "
                      "that fails there and each package `conflict` that matches there, on `php` and `php-64bit`. Production first, then packages-dev, "
                      "each by name, then by `link` and `target`. A packages-dev entry is listed when the run did not analyse packages-dev. At least "
-                     "one, except at the root ceiling."), obj('A package link that excludes the target.', {
+                     "one, except at the root ceiling and beside a `lock_platform` entry."), obj('A package link that excludes the target.', {
         'name': d('The package, as the lock names it. A name that is no Composer package name reaches no solve and no command.', {'type': 'string', 'minLength': 1}),
         'version': d('Its locked version.', {'type': 'string', 'minLength': 1}),
         'link': closed(['require', 'conflict'], 'The link. Closed.'),
@@ -1581,8 +1587,14 @@ defs['targetFix'] = obj("`run.php_window.target_fix` (§5.9): one update that un
         'constraint': d('The constraint as the lock writes it.', {'type': 'string', 'minLength': 1}),
         'dev': d('Whether it is a packages-dev entry.', {'type': 'boolean'}),
     }), uniqueItems=True),
+    'lock_platform': arr(("The root `require` links on `php` and `php-64bit` that fail at `target.php` and that only the lock's `platform` or "
+                          "`platform-dev` holds: composer.json has no link of that name. Any update of the lock rewrites them from composer.json, "
+                          "so such a link is no hold and not the root ceiling. `[]` when there is none, and on a lock-only run."),
+                         {'allOf': [ref('phpWindowReq'), {'properties': {'name': d('Null: a root link.', {'type': 'null'}), 'version': d('Null: a root link.', {'type': 'null'}),
+                                                                    'link': d('A root `require` link.', {'enum': ['require']})}}]},
+                         uniqueItems=True),
     'command': nul(("The argv of the update that Composer's solver resolves: `composer update <packages>` with each listed package once, and "
-                    "`--with-dependencies` or `--with-all-dependencies` when that form resolved. Set exactly when `check` is `resolves`. It obeys the "
+                    "`--with-dependencies` or `--with-all-dependencies` when that form resolved. With no package listed, `composer update --lock`. Set exactly when `check` is `resolves`. It obeys the "
                     "command argument rule of `next_step.commands[]`, and a page renders it as it renders `commands[]`."),
                    arr('One command.', {'type': 'string', 'minLength': 1}, minItems=3)),
     'check': closed(['resolves', 'refused', 'not_checked'], ("Composer's answer: `resolves`, `refused` (a refusal, or a root link that excludes the "
@@ -1598,16 +1610,16 @@ defs['targetFix'] = obj("`run.php_window.target_fix` (§5.9): one update that un
     'platform_step': d(("Whether the words of a `resolves` fix tell you to set `config.platform.php` to your release of the target PHP first. True "
                         "exactly when the solve's `config.platform.php` is set and lies outside the minor of `run.target_php`. Then `target.php` is "
                         "the `.99` point of `run.target_php`. The lock's `platform-overrides` does not set it."), {'type': 'boolean'}),
-}, anyOf=[{'description': '`resolves`: a command, no reason, no hold, a package.', 'properties': {'check': {'enum': ['resolves']}, 'command': {'type': 'array'}, 'reason': {'type': 'null'},
-                                                                                         'held_by': {'maxItems': 0}, 'packages': {'minItems': 1}}},
-          {'description': '`refused` by the solve: no command, no reason, a package.', 'properties': {'check': {'enum': ['refused']}, 'command': {'type': 'null'}, 'reason': {'type': 'null'},
-                                                                                                  'packages': {'minItems': 1}}},
+}, anyOf=[{'description': '`resolves`: a command, no reason, no hold, a package or a `lock_platform` link.', 'properties': {'check': {'enum': ['resolves']}, 'command': {'type': 'array'}, 'reason': {'type': 'null'},
+                                                                                         'held_by': {'maxItems': 0}}, 'allOf': [TARGET_FIX_LISTED]},
+          {'description': '`refused` by the solve: no command, no reason, a package or a `lock_platform` link.', 'properties': {'check': {'enum': ['refused']}, 'command': {'type': 'null'}, 'reason': {'type': 'null'}},
+           'allOf': [TARGET_FIX_LISTED]},
           {'description': '`refused` at the root ceiling: no command, no reason, only root holds on php.',
            'properties': {'check': {'enum': ['refused']}, 'command': {'type': 'null'}, 'reason': {'type': 'null'},
                           'held_by': {'minItems': 1, 'items': {'properties': {'source': {'enum': ['root']}, 'link': {'enum': ['require', 'require-dev', 'conflict']},
                                                                               'target': {'enum': ['php', 'php-64bit']}}}}}},
-          {'description': '`not_checked`: no command, no hold, a package.', 'properties': {'check': {'enum': ['not_checked']}, 'command': {'type': 'null'}, 'held_by': {'maxItems': 0},
-                                                                                      'packages': {'minItems': 1}}}])
+          {'description': '`not_checked`: no command, no hold, a package or a `lock_platform` link.', 'properties': {'check': {'enum': ['not_checked']}, 'command': {'type': 'null'}, 'held_by': {'maxItems': 0}},
+           'allOf': [TARGET_FIX_LISTED]}])
 defs['noteMoveCheckFailed'] = obj(("`move_check_failed`: Composer's solver failed on a request with an exception other than a refusal. That move's `check` "
                                    "reads `not_checked` with `reason` `solver_error`. The note names the run's first such failure."), {
     'class': d("The exception's class, as PHP names it. Foreign text, not contract.", {'type': 'string', 'minLength': 1}),

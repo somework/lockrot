@@ -12,6 +12,7 @@ use Lockrot\Score\Standing;
 use Lockrot\Security\Severity;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Signal;
+use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
 
@@ -24,18 +25,18 @@ use Lockrot\Verdict\ScoreModel;
  *
  * @phpstan-type Bag array<string, scalar|object|list<string>|null>
  * @phpstan-type Result array{ruleId: string, level: string, rank?: float, message: array{text: string}, partialFingerprints: array<string, string>, suppressions?: list<array{kind: string, status: string, justification: string}>, properties: Bag}
- * @phpstan-type Rule array{id: string, name: string, shortDescription: array{text: string}, fullDescription: array{text: string}, defaultConfiguration: array{level: string}, helpUri: string, properties: array{tags: list<string>, security-severity?: ?string}}
+ * @phpstan-type Rule array{id: string, name: string, shortDescription: array{text: string}, fullDescription: array{text: string}, defaultConfiguration: array{level: string}, helpUri: string, properties: array{tags: list<string>, security-severity?: string}}
  */
 final class SarifRecords
 {
-    /** The rule text of each rule id, as {short, full}. */
+    /** The rule text of each rule id, as {short, full}. A `{key}` in the full text is a threshold that `run.score_model` lists for the flag. */
     private const RULES = [
         'abandoned' => ['Package is marked abandoned, or its repository is archived', 'The package\'s registry or composer.lock marks it abandoned, or its repository is archived.'],
-        'silent' => ['No stable release and no repository push for a long time', 'No stable release for release-high-years and no repository push for push-high-years.'],
+        'silent' => ['No stable release and no repository push for a long time', 'No release for {release-high-years} and no repository push for {push-high-years}.'],
         'pinned' => ['Installed version is a branch snapshot, or the package has no stable release', 'The installed version is a branch snapshot (dev-* or #hash), or the package has no stable release at all.'],
-        'left-behind' => ['The installed release branch stopped while a newer branch kept releasing', 'No stable release on the installed branch for release-warn-years, while a higher branch has released since.'],
+        'left-behind' => ['The installed release branch stopped while a newer branch kept releasing', 'No stable release on the installed branch for {release-warn-years}, while a higher branch has released since.'],
         'old-promise' => ['Released before the target PHP\'s major with an open-ended php constraint', 'The installed version was released before the target PHP\'s GA date, and its php constraint admits that target untested.'],
-        'stale' => ['Old release or old push, below the silent thresholds', 'No stable release or no repository push for release-warn-years or push-warn-years.'],
+        'stale' => ['Old release or old push, below the silent thresholds', 'No release for {release-warn-years}, or no repository push for {push-warn-years}, short of silent.'],
         'capped' => ['The installed version\'s php constraint stops below the newest PHP the project allows', 'The installed version\'s php requirement has an upper bound below the newest PHP minor that the project allows.'],
         'ok' => ['Nothing counts', 'No flag counts and no counted advisory affects the installed version.'],
         'finished' => ['Accepted by an allowlist entry', 'An allowlist entry accepts the package as complete by design, not neglected.'],
@@ -49,7 +50,7 @@ final class SarifRecords
     private ?GateStanding $gate;
     private ?Standing $standing;
     private ?string $baselinePath;
-    /** @var array<string, Rule> by rule id, the rule of each record that results() wrote */
+    /** @var array<string, ?string> by rule id, the advisory severity of each record that results() wrote */
     private array $rules = [];
 
     public function __construct(Finding $finding, ?GateStanding $gate, ?BaselineComparison $baseline)
@@ -116,9 +117,14 @@ final class SarifRecords
     }
 
     /** @return array<string, Rule> by rule id, the rules of the records that the last results() call returned */
-    public function rules(): array
+    public function rules(Thresholds $thresholds): array
     {
-        return $this->rules;
+        $rules = [];
+        foreach ($this->rules as $ruleId => $severity) {
+            $rules[$ruleId] = self::rule($ruleId, $severity, $thresholds);
+        }
+
+        return $rules;
     }
 
     /**
@@ -127,11 +133,15 @@ final class SarifRecords
      *
      * @return Rule
      */
-    public static function rule(string $ruleId, ?string $severity): array
+    public static function rule(string $ruleId, ?string $severity, Thresholds $thresholds): array
     {
         $name = substr($ruleId, \strlen('lockrot/'));
         if (strpos($name, 'advisory/') === 0) {
             $bucket = Severity::fromComposer($severity);
+            $properties = ['tags' => ['security', 'dependency']];
+            if ($bucket->sarifSecuritySeverity() !== null) {
+                $properties['security-severity'] = $bucket->sarifSecuritySeverity();
+            }
 
             return [
                 'id' => $ruleId,
@@ -140,7 +150,7 @@ final class SarifRecords
                 'fullDescription' => ['text' => 'A counted security advisory affects the installed version: '.$bucket->bucket().' severity.'],
                 'defaultConfiguration' => ['level' => FormatContext::LEVEL_WARNING],
                 'helpUri' => self::HELP_URI.'#security-advisories',
-                'properties' => ['tags' => ['security', 'dependency'], 'security-severity' => $bucket->sarifSecuritySeverity()],
+                'properties' => $properties,
             ];
         }
         [$short, $full] = self::RULES[$name];
@@ -149,11 +159,24 @@ final class SarifRecords
             'id' => $ruleId,
             'name' => $name,
             'shortDescription' => ['text' => $name.': '.$short],
-            'fullDescription' => ['text' => $full],
+            'fullDescription' => ['text' => self::fullText($full, $name, $thresholds)],
             'defaultConfiguration' => ['level' => \in_array($name, ScoreModel::FLAG_ORDER, true) ? FormatContext::LEVEL_WARNING : FormatContext::LEVEL_NOTE],
             'helpUri' => self::HELP_URI,
             'properties' => ['tags' => ['maintainability']],
         ];
+    }
+
+    /** `run.score_model` names the thresholds of a flag, and `run.thresholds` holds their values. */
+    private static function fullText(string $full, string $flag, Thresholds $thresholds): string
+    {
+        $values = $thresholds->toArray();
+        $words = [];
+        foreach (ScoreModel::thresholdsOf($flag) as $key) {
+            $years = $values[$key];
+            $words['{'.$key.'}'] = $years.($years === 1 ? ' year' : ' years').' ('.$key.')';
+        }
+
+        return strtr($full, $words);
     }
 
     /**
@@ -164,7 +187,7 @@ final class SarifRecords
      */
     private function result(string $ruleId, string $level, ?float $rank, string $text, array $fingerprints, array $bag, ?FactState $state = null, ?string $severity = null): array
     {
-        $this->rules[$ruleId] = self::rule($ruleId, $severity);
+        $this->rules[$ruleId] = $severity;
         $result = ['ruleId' => $ruleId, 'level' => $level];
         if ($rank !== null) {
             $result['rank'] = $rank;

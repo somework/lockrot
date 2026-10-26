@@ -431,6 +431,33 @@ final class FixFinderTest extends TestCase
         self::assertSame([$version, $kind], [$move->release()->pretty(), $move->kind()]);
     }
 
+    /** Ruling 5a: a conflict of the lock holds 1.3.0, and the refusal of `^1.2` lowers `gets` only, not the newest release of the branch. */
+    public function testTheNewestOfTheInstalledBranchIsWhatTheLinksAllowWhateverTheSolverRefuses(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=7.4'], ['1.3.0', '>=7.4']], ['A' => '<1.1.0'], [['name' => 'c/c', 'version' => '1.0.0', 'conflict' => ['a/b' => '>=1.3.0']]]);
+        $refused = RefusedMoves::none()->with('^1.2', [new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '<1.2')]);
+        $finder = (new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::fromArray(['require' => ['a/b' => '^1.0']]))))->withRefused($refused);
+
+        $fixes = $finder->find($facts);
+        $gets = $fixes->gets();
+
+        self::assertNotNull($gets);
+        self::assertSame(['1.1.0', '1.2.0'], [$gets->version(), $fixes->newestOnInstalledBranch()]);
+    }
+
+    /** SPEC §5.3 (case mc-link-newest‡): the S9 fix and the installed row read the newest release that the lock's links allow. */
+    public function testTheFixAndTheInstalledRowNameTheNewestReleaseThatTheLinksAllow(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=7.4'], ['1.3.0', '>=7.4'], ['2.0.0', '>=7.4']], ['A' => '<1.1.0'], [['name' => 'c/c', 'version' => '1.0.0', 'conflict' => ['a/b' => '>=1.3.0 <2.0']]]);
+        $finder = new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::fromArray(['require' => ['a/b' => '^1.0']])));
+
+        $fixes = $finder->find($facts);
+        $installed = $fixes->installedBranch();
+
+        self::assertNotNull($installed);
+        self::assertSame(['1.2.0', '1.2.0', '2.0.0'], [$fixes->forAdvisory('A')->newest(), $installed->newest(), $fixes->branches()[0]->newest()]);
+    }
+
     public function testNoFloorAdmitsEveryRelease(): void
     {
         $fixes = $this->find(

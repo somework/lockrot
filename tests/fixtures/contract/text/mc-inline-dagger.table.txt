@@ -1,8 +1,8 @@
 <options=bold><fg=red>high (1)</fg=red></options=bold>
   typo3/html-sanitizer v2.2.0  direct  ·  vulnerable
       16 = vulnerable 16 [high advisory]
-      do: composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) — clears the advisory; Composer's solver checked
-          it against the lock
+      do: composer update 'typo3/html-sanitizer:^2.3.2'
+          (gets v2.3.2) — clears the advisory; Composer's solver checked it against the lock
       vulnerable   1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML
                    Sanitizer allows Cross-Site Scripting
       age: installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.2 2026-07-02 (0.3 years

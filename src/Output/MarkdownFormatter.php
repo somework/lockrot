@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Config\Gate;
 use Lockrot\Score\Standing;
 use Lockrot\Verdict\Finding;
@@ -83,11 +84,17 @@ final class MarkdownFormatter implements FormatterInterface
     private function heading(Report $report): string
     {
         $flagged = \count($report->graded());
-        if ($flagged === 0) {
-            return \sprintf('### lockrot: nothing flagged in %d %s', $report->packagesChecked(), $report->packagesChecked() === 1 ? 'package' : 'packages');
+        $noun = $report->packagesChecked() === 1 ? 'package' : 'packages';
+        if ($flagged > 0) {
+            return \sprintf('### lockrot: %d of %d %s flagged — %s', $flagged, $report->packagesChecked(), $noun, RunFooter::gradeCounts($report));
+        }
+        foreach ($report->runNotes() as $note) {
+            if ($note->code() === RunNote::ADVISORIES_NOT_CHECKED && ($note->data()['reason'] ?? null) === RunNote::ADVISORIES_OFFLINE) {
+                return \sprintf('### lockrot: nothing flagged in %d %s — security advisories not checked (offline)', $report->packagesChecked(), $noun);
+            }
         }
 
-        return \sprintf('### lockrot: %d of %d packages flagged — %s', $flagged, $report->packagesChecked(), RunFooter::gradeCounts($report));
+        return \sprintf('### lockrot: nothing flagged in %d %s', $report->packagesChecked(), $noun);
     }
 
     /**
@@ -162,13 +169,14 @@ final class MarkdownFormatter implements FormatterInterface
         $spans = [];
         $name = static function (string $package) use (&$spans): string {
             $placeholder = \sprintf("\x00%d\x00", \count($spans));
-            $spans[$placeholder] = self::code($package);
+            // The key is the placeholder as self::text() writes it, because the spans go in after it.
+            $spans[self::text($placeholder)] = self::code($package);
 
             return $placeholder;
         };
         $baseline = $report->baseline();
         $lines = [];
-        foreach ([RunFooter::flags($report), RunFooter::depth($report, $name), RunFooter::security($report, false), $report->libyears()->line(), RunFooter::exposure($report, $name), RunFooter::advisories($report), RunFooter::moveCheck($report), RunFooter::phpWindow($report, $name), $baseline === null ? null : $baseline->summaryLine()] as $line) {
+        foreach ([RunFooter::flags($report), RunFooter::depth($report, $name), RunFooter::security($report, false), $report->libyears()->line(), RunFooter::exposure($report, $name), RunFooter::advisories($report), RunFooter::moveCheck($report, $name), RunFooter::phpWindow($report, $name), $baseline === null ? null : $baseline->summaryLine()] as $line) {
             if ($line !== null) {
                 $lines[] = strtr(self::text($line), $spans);
             }
@@ -206,12 +214,16 @@ final class MarkdownFormatter implements FormatterInterface
     /** Plain text for a table cell or a bullet: one line, nothing that renders as markup. */
     private static function text(string $value): string
     {
-        $value = str_replace(["\r\n", "\r", "\n"], ' ', $value);
+        $value = TerminalText::neutralise(str_replace(["\r\n", "\r", "\n"], ' ', $value));
         foreach (self::ESCAPED as $character) {
             $value = str_replace($character, '\\'.$character, $value);
         }
+        // GitHub notifies the user or team of an `@name` and links a bare URL or email address, and
+        // the lock of a fork's pull request is its author's text. An `@` after a letter or a digit
+        // with no dotted domain after it is neither, such as the stability flag of `~0.4@dev`.
+        $value = (string) preg_replace('/(?<![A-Za-z0-9])@|@(?=[A-Za-z0-9_\\\\-]+\\.[A-Za-z0-9])/', '@&#8203;', str_replace('://', '\\://', $value));
 
-        return $value;
+        return (string) preg_replace('/(www)\./i', '$1\\\\.', $value);
     }
 
     /**
@@ -221,7 +233,7 @@ final class MarkdownFormatter implements FormatterInterface
      */
     private static function code(string $value): string
     {
-        $value = str_replace(["\r\n", "\r", "\n"], ' ', $value);
+        $value = TerminalText::neutralise(str_replace(["\r\n", "\r", "\n"], ' ', $value));
         $value = str_replace('|', '\\|', $value);
         $longest = 0;
         preg_match_all('/`+/', $value, $runs);

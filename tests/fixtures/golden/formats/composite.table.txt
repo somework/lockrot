@@ -56,7 +56,8 @@ high (2)
 low (3)
   symfony/yaml v5.4.23  direct  ·  vulnerable
       2 = vulnerable 2 [low advisory]
-      do: composer update symfony/yaml (gets v5.4.53) — clears 3 advisories
+      do: composer update symfony/yaml
+          (gets v5.4.53) — clears 3 advisories
       vulnerable   3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via
                    Unbounded Recursion in Nested Blocks, Sequences, and Mappings
       age: installed v5.4.23 released 2023-04-23 (3.4 years ago); 5.x last released v5.4.53 2026-05-20 (0.4 years
@@ -64,7 +65,8 @@ low (3)
            weeks ago)
   symfony/polyfill-intl-idn v1.37.0  via guzzlehttp/guzzle  ·  vulnerable
       2 = vulnerable 2 [low advisory]
-      do: composer update symfony/polyfill-intl-idn (gets v1.43.0) — clears the advisory
+      do: composer update symfony/polyfill-intl-idn
+          (gets v1.43.0) — clears the advisory
       vulnerable   1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts
                    xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence
       age: installed v1.37.0, release date not known (no date); 1.x last released v1.43.0 2026-09-23 (less than

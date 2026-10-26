@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Analyzer\MoveCheckRun;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
+use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
@@ -14,12 +17,15 @@ use Lockrot\Output\Formatters;
 use Lockrot\Output\MarkdownFormatter;
 use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\Signal;
+use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Support\TextGolden;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -109,6 +115,23 @@ final class MarkdownFormatterTest extends TestCase
         self::assertStringEndsWith("<sub>1 package checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>\n", $out);
     }
 
+    public function testAOnePackageRunCountsItsPackageInTheSingular(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([(new FindingBuilder())->withPackage('a/gone')->withDataDate($at)->withSignals([new Signal(Signal::LEVEL_HIGH, 'x', SignalDataStub::of(Signal::S1, []))])->build()], [], $at, 1, 0);
+
+        self::assertStringStartsWith('### lockrot: 1 of 1 package flagged — ', self::formatter()->format($report));
+    }
+
+    public function testACleanOfflineRunSaysInItsHeadingThatTheAdvisoriesWereNotChecked(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $fine = [(new FindingBuilder())->withPackage('a/fine')->withDataDate($at)->build()];
+
+        self::assertStringStartsWith("### lockrot: nothing flagged in 1 package — security advisories not checked (offline)\n", self::formatter()->format(new Report($fine, [RunNote::advisoriesNotChecked(RunNote::ADVISORIES_OFFLINE, 0)], $at, 1, 0)));
+        self::assertStringStartsWith("### lockrot: nothing flagged in 1 package\n", self::formatter()->format(new Report($fine, [RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, 0)], $at, 1, 0)));
+    }
+
     public function testTheVerdictIsBoldWhereTheFindingFailsTheGateAndTheBaselineDoesNotKnowIt(): void
     {
         $report = self::report();
@@ -164,9 +187,60 @@ final class MarkdownFormatterTest extends TestCase
         $out = self::formatter()->format($report, true);
 
         self::assertStringContainsString('| `` acme/ev`il `` | 1.0.0 \<b\>x\</b\> |', $out);
-        self::assertStringContainsString('\<img src=x onerror=alert(1)\> \[fine\](https://example.com) \*ok\* \&lt;b\&gt; \#1 a\|b', $out);
+        self::assertStringContainsString('\<img src=x onerror=alert(1)\> \[fine\](https\://example.com) \*ok\* \&lt;b\&gt; \#1 a\|b', $out);
         self::assertStringContainsString('- note: GitHub unreachable: \<script\>alert(1)\</script\> \[x\](y)', $out);
         self::assertSame(0, preg_match('/(?<!\\\\)<(img|script|b>)/', $out), 'every < from package metadata is escaped');
+    }
+
+    /** A job summary or a terminal that shows the comment can obey a control character, so each prints as an escape. */
+    public function testControlCharactersFromOutsidePrintAsEscapes(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $evil = "evil\x1b]52;c;cHduZWQ=\x07\x1b[2J\u{9B}31m";
+        $report = new Report([
+            (new FindingBuilder())->withPackage('vendor/'.$evil)->withVerdict(Verdict::ABANDONED)->withChain(['vendor/'.$evil])->withDataDate($at)->build(),
+        ], Notes::texts(['note '.$evil]), $at, 1, 0);
+
+        $out = self::formatter()->format($report);
+
+        self::assertSame(0, preg_match('/[\x00-\x09\x0B-\x1F\x7F]|\xC2[\x80-\x9F]/', $out), 'no control character but the line feed');
+        self::assertStringContainsString('- note: note evil\\\\x1B\\]52;c;cHduZWQ=\\\\x07\\\\x1B\\[2J\\\\u{009B}31m', $out);
+    }
+
+    /**
+     * In a fork's pull request the lock is the author's: a mention notifies a user or a team, and a
+     * bare URL renders as a link inside lockrot's comment. A zero-width space after `@` breaks a
+     * mention and an email link, and an escaped `:` or `.` breaks a URL link.
+     */
+    public function testLockTextCannotMentionOrLink(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            (new FindingBuilder())->withPackage('acme/kept')->withSignals([new Signal(Signal::LEVEL_WARN, 'x', SignalDataStub::of(Signal::S2, []))])->withAllowlistReason('@github/security-team see www.evil.example/login or https://evil.example/x and mail me@evil.example')->withDataDate($at)->build(),
+        ], Notes::texts(['ask @octocat at http://evil.example']), $at, 1, 0);
+
+        $out = self::formatter()->format($report, true);
+
+        self::assertStringContainsString('@&#8203;github/security-team see www\\.evil.example/login or https\\://evil.example/x and mail me@&#8203;evil.example', $out);
+        self::assertStringContainsString('- note: ask @&#8203;octocat at http\\://evil.example', $out);
+        self::assertSame(0, preg_match('/@(?!&#8203;)|www\\.|(?<!\\\\):\/\//i', $out), 'no live mention, www link or scheme link');
+    }
+
+    /**
+     * An `@` after a letter or a digit starts no mention, and with no dotted domain after it no
+     * email link (https://github.github.com/gfm/#extended-email-autolink). A constraint keeps its
+     * stability flag as written, so a reader can copy it.
+     */
+    public function testAStabilityFlagInAConstraintStaysAsWritten(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            (new FindingBuilder())->withPackage('acme/kept')->withSignals([new Signal(Signal::LEVEL_WARN, 'x', SignalDataStub::of(Signal::S2, []))])->withAllowlistReason('requires ~0.4@dev, (@octocat), a@b.example and ^1.0@beta.1')->withDataDate($at)->build(),
+        ], Notes::texts([]), $at, 1, 0);
+
+        $out = self::formatter()->format($report, true);
+
+        self::assertStringContainsString('requires \\~0.4@dev, (@&#8203;octocat), a@&#8203;b.example and ^1.0@&#8203;beta.1', $out);
     }
 
     public function testEveryKindOfLineBreakInACellFoldsIntoOneSpace(): void
@@ -237,6 +311,14 @@ final class MarkdownFormatterTest extends TestCase
     {
         $this->expectException(ConfigException::class);
         Formatters::for('xml', FormatContext::create(null, LockrotConfig::FAIL_ON_NONE));
+    }
+
+    public function testTheMovesLineNamesTheVariableThatTurnedTheBlockingOff(): void
+    {
+        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $report = self::report()->withMoveChecks(new MoveCheckRun('2.9.5', false, ['COMPOSER_NO_SECURITY_BLOCKING'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
+
+        self::assertStringContainsString('against the lock, with advisory blocking turned off by `COMPOSER_NO_SECURITY_BLOCKING`; ext-\\* requirements not checked', self::formatter()->format($report));
     }
 
     private static function report(): Report

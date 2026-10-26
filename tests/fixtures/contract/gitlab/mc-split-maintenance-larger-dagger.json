@@ -1,0 +1,50 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/capped",
+        "description": "symfony/routing v6.4.28 \u2014 finding medium (10 = capped 8 + vulnerable 2 [low advisory]) \u2014 capped: requires php >=8.1 <8.5: it stops at 8.4, so the newest PHP, 8.5, is excluded. Do: raise require.php to >=8.2, then require symfony/routing ^6.4.40 (gets v6.4.40, below the newest v6.4.41) \u2014 clears the advisory; 6.x needs php >=8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; capped stays; Composer's solver checked it against the lock.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "9b0af64135890b7f5981030124242626d2511b4873ee5c158edd300fa79e5c0b",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 18
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/routing v6.4.28 \u2014 finding medium (10 = capped 8 + vulnerable 2 [low advisory]) \u2014 vulnerable: 1 advisory: 1 low \u2014 all fixed on 6.x (php floor raise); advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization. Do: raise require.php to >=8.2, then require symfony/routing ^6.4.40 (gets v6.4.40, below the newest v6.4.41) \u2014 clears the advisory; 6.x needs php >=8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; capped stays; Composer's solver checked it against the lock.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "05a3d623ca7f4e66cfdaff6864d4119f0db78c9c1619f1dc190f77e75e6a3ff7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 18
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "acme/rt-kernel 1.0.0 \u2014 finding ok (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "24123e8db1f3bca5f90a3b6ef8a567d8a1a32ce002cabe9556d1297ec11bd984",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

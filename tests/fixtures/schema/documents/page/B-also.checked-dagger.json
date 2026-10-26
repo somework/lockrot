@@ -815,6 +815,7 @@
   "move_check": {
    "composer": "2.10.3",
    "blocks_advisories": true,
+   "blocking_disabled_by": [],
    "ignores_extensions": true,
    "baseline": "resolves",
    "reason": null
@@ -1381,14 +1382,7 @@
      [
       "composer",
       "update",
-      "symfony/monolog-bridge"
-     ],
-     [
-      "composer",
-      "why-not",
-      "symfony/monolog-bridge",
-      "v2.8.52",
-      "--locked"
+      "symfony/monolog-bridge:^2.8.52"
      ]
     ],
     "through": [],

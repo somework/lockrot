@@ -7,6 +7,8 @@ namespace Lockrot\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Config\Gate;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\Move;
+use Lockrot\Verdict\ShellCommand;
 
 /**
  * The `table` format, a list grouped by grade. A row is prose, not a cell in a box,
@@ -14,7 +16,8 @@ use Lockrot\Verdict\Finding;
  *
  * The result is {@see ConsoleMarkup}, which only {@see ConsoleMarkup::render()} reads, never
  * Symfony's tag formatter. Every string from the analysed project goes through
- * {@see ConsoleMarkup::escape()}, so a `<` or a backslash prints as written and is never a tag.
+ * {@see TerminalText::neutralise()} and {@see ConsoleMarkup::escape()}, so a control character
+ * prints as an escape, and a `<` or a backslash prints as written and is never a tag.
  *
  * @internal
  */
@@ -89,9 +92,9 @@ final class TableFormatter implements FormatterInterface
         if ($gateLine !== null) {
             $lines[] = self::LINE.self::escape($gateLine);
         }
-        $move = FindingBlock::move($finding);
+        $move = $finding->isGraded() ? $finding->nextStep() : null;
         if ($move !== null) {
-            $lines = array_merge($lines, $this->wrapped(self::LINE.'do: ', $move, self::DO_HANG));
+            $lines = array_merge($lines, $this->moveLines($move));
         }
         foreach (FindingBlock::evidence($finding) as $flag => $summary) {
             $lines = array_merge($lines, $this->wrapped(self::LINE.str_pad($flag, self::FLAG_WIDTH).' ', $summary, str_repeat(' ', \strlen(self::LINE) + self::FLAG_WIDTH + 1)));
@@ -110,6 +113,45 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
+     * The `do:` line: the move text wrapped, and each command that it names whole on a line of its
+     * own, because a command that a wrap splits runs as two when it is copied.
+     *
+     * @return list<string>
+     */
+    private function moveLines(Move $move): array
+    {
+        $lines = [];
+        foreach (self::commandParts($move) as [$part, $isCommand]) {
+            $prefix = $lines === [] ? self::LINE.'do: ' : self::DO_HANG;
+            $lines = array_merge($lines, $isCommand ? [self::escape($prefix.$part)] : $this->wrapped($prefix, $part, self::DO_HANG));
+        }
+
+        return $lines;
+    }
+
+    /**
+     * The move text cut around the first command that it names, as [text, whether it is the command].
+     * A second command stays in the text part.
+     *
+     * @return list<array{0: string, 1: bool}>
+     */
+    public static function commandParts(Move $move): array
+    {
+        $text = $move->text();
+        foreach ($move->commands() as $argv) {
+            $command = ShellCommand::posix($argv);
+            if ($command !== null && ($at = strpos($text, $command)) !== false) {
+                $before = trim(substr($text, 0, $at));
+                $after = trim(substr($text, $at + \strlen($command)));
+
+                return array_merge($before === '' ? [] : [[$before, false]], [[$command, true]], $after === '' ? [] : [[$after, false]]);
+            }
+        }
+
+        return [[$text, false]];
+    }
+
+    /**
      * $text wrapped to the terminal, its first line after $prefix and the rest after $continuation.
      * A first line after a prefix wider than the continuation gets the room that is left.
      *
@@ -119,7 +161,8 @@ final class TableFormatter implements FormatterInterface
     {
         $width = $this->context->terminalWidth();
         $out = [];
-        foreach (explode("\n", wordwrap($text, max(self::MIN_WRAP_WIDTH, $width - max(\strlen($prefix), \strlen($continuation))))) as $line) {
+        // Neutralised before the wrap, so a line break in a string from outside never starts a line.
+        foreach (explode("\n", wordwrap(TerminalText::neutralise($text), max(self::MIN_WRAP_WIDTH, $width - max(\strlen($prefix), \strlen($continuation))))) as $line) {
             $out[] = self::escape(($out === [] ? $prefix : $continuation).$line);
         }
 
@@ -184,11 +227,11 @@ final class TableFormatter implements FormatterInterface
      *
      * @return list<string>
      */
-    private static function wrap(string $text, int $wrap): array
+    private static function wrapNeutralised(string $text, int $wrap): array
     {
         $lines = [];
         foreach (explode("\n", wordwrap($text, $wrap, "\n")) as $line) {
-            $lines[] = self::escape($line);
+            $lines[] = ConsoleMarkup::escape($line);
         }
 
         return $lines;
@@ -207,7 +250,8 @@ final class TableFormatter implements FormatterInterface
             $glued[] = str_replace(' ', "\x1F", $command);
         }
         $lines = [];
-        foreach (self::wrap(str_replace(self::COMMANDS, $glued, $text), $wrap) as $line) {
+        // The glue goes in after the neutraliser, which would print it.
+        foreach (self::wrapNeutralised(str_replace(self::COMMANDS, $glued, TerminalText::neutralise($text)), $wrap) as $line) {
             $lines[] = str_replace("\x1F", ' ', $line);
         }
 
@@ -245,6 +289,6 @@ final class TableFormatter implements FormatterInterface
 
     private static function escape(string $text): string
     {
-        return ConsoleMarkup::escape($text);
+        return ConsoleMarkup::escape(TerminalText::neutralise($text));
     }
 }

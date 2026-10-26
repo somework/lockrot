@@ -913,6 +913,7 @@
       "dev": true
      }
     ],
+    "lock_platform": [],
     "command": null,
     "check": "not_checked",
     "reason": null,

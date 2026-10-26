@@ -35,10 +35,10 @@ interface MoveChecker
 
     /**
      * One update of the names at the solve's php, with no constraint, each hold with its target
-     * (`run.php_window.target_fix`). It takes the baseline's reason when the baseline was not
-     * checked, and ignores a refused baseline.
+     * (`run.php_window.target_fix`). With no name, it is `composer update --lock`. It takes the
+     * baseline's reason when the baseline was not checked, and ignores a refused baseline.
      *
-     * @param non-empty-list<string> $names
+     * @param list<string> $names
      */
     public function solveAt(array $names): CheckOutcome;
 
@@ -60,6 +60,9 @@ interface MoveChecker
 
     /** Whether the solve removes the versions that an advisory affects, as Composer 2.9 and later do. */
     public function blocksAdvisories(): bool;
+
+    /** @return list<string> the environment variables that turned Composer's blocking off (`run.move_check.blocking_disabled_by`) */
+    public function blockingDisabledBy(): array;
 
     /**
      * The same check with the advisories that the run's lookup found. When {@see blocksAdvisories()}

@@ -108,6 +108,36 @@ final class PhpFloorTest extends TestCase
         self::assertFalse((new PhpFloor('8.4'))->admitsTarget('>=7.1 <8.0'));
     }
 
+    /**
+     * The target is its minor's newest patch, X.Y.99, the PHP at which the solve and the window
+     * test the lock, so a cap inside the minor excludes the target.
+     *
+     * @dataProvider capsInsideTheTargetMinor
+     */
+    #[DataProvider('capsInsideTheTargetMinor')]
+    public function testACapInsideTheTargetMinorExcludesTheTarget(string $constraint): void
+    {
+        $floor = new PhpFloor('8.3');
+
+        self::assertFalse($floor->admitsTarget($constraint), $constraint);
+        self::assertSame(PhpFloor::STOPS_BEFORE, $floor->missesTarget($constraint), $constraint);
+        self::assertSame(PhpFloor::TARGET, $floor->blocking($constraint), $constraint);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function capsInsideTheTargetMinor(): iterable
+    {
+        yield 'a cap at the minor' => ['<=8.3'];
+        yield 'a range up to the minor' => ['>=8.1 <=8.3'];
+        yield 'the first patch alone' => ['8.3.0'];
+        yield 'a cap below a patch' => ['<8.3.5'];
+    }
+
+    public function testAFloorAboveTheNewestPatchOfTheTargetNeedsANewerPhp(): void
+    {
+        self::assertSame([true, false, PhpFloor::NEEDS_NEWER], [(new PhpFloor('8.3'))->admitsTarget('>=8.3.99'), (new PhpFloor('8.3'))->admitsTarget('>8.3.99'), (new PhpFloor('8.3'))->missesTarget('>8.3.99')]);
+    }
+
     public function testNoRequirementOrAnUnreadableOneGivesNoAnswer(): void
     {
         $floor = new PhpFloor('7.2', '>=7.2.5');

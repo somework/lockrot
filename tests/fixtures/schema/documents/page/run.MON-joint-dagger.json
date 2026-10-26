@@ -815,6 +815,7 @@
   "move_check": {
    "composer": "2.10.3",
    "blocks_advisories": true,
+   "blocking_disabled_by": [],
    "ignores_extensions": true,
    "baseline": "resolves",
    "reason": null
@@ -1431,7 +1432,7 @@
      "result": "resolves",
      "form": "inline",
      "reason": null,
-     "installs": null
+     "installs": "3.0.57"
     },
     "moves_with": [],
     "composer_moves_because": [],
@@ -1576,7 +1577,7 @@
       "result": "resolves",
       "form": "inline",
       "reason": null,
-      "installs": null
+      "installs": "3.0.57"
      }
     },
     "move_in": "next_step",
@@ -1995,7 +1996,7 @@
      "result": "resolves",
      "form": "inline",
      "reason": null,
-     "installs": null
+     "installs": "v4.9.0"
     },
     "moves_with": [],
     "composer_moves_because": [],
@@ -2689,7 +2690,7 @@
      }
     ],
     "also": [],
-    "text": "move firebase/php-jwt to ^7.0.0 through laravel/socialite, socialiteproviders/facebook, socialiteproviders/github and 5 more — clears the advisory; 7.x needs php ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; what requires it must allow it; the newest release of laravel/socialite (v5.31.0) still requires it; Composer's solver checked it against the lock, with an update of laravel/socialite (to v5.30.0) and socialiteproviders/manager (to 4.10.0)"
+    "text": "move firebase/php-jwt to ^7.0.0 through laravel/socialite, socialiteproviders/facebook, socialiteproviders/github and 5 more — clears the advisory; 7.x needs php ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; the newest release of laravel/socialite (v5.31.0) still requires it; Composer's solver checked it against the lock, with an update of laravel/socialite (to v5.30.0) and socialiteproviders/manager (to 4.10.0)"
    },
    "security": {
     "status": "vulnerable",
@@ -3302,7 +3303,7 @@
      "result": "resolves",
      "form": "inline",
      "reason": null,
-     "installs": null
+     "installs": "v1.3.6"
     },
     "moves_with": [],
     "composer_moves_because": [],

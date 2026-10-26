@@ -38,6 +38,7 @@
         "Composer\\Package\\CompletePackage",
         "Composer\\Package\\Link",
         "Composer\\Package\\Loader\\ArrayLoader",
+        "Composer\\Package\\Loader\\RootPackageLoader",
         "Composer\\Package\\Loader\\ValidatingArrayLoader",
         "Composer\\Package\\Package",
         "Composer\\Package\\PackageInterface",

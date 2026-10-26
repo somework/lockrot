@@ -20,8 +20,6 @@ final class MoveContractTest extends TestCase
 {
     private const VERSION = 'the model leaves `version` null on a move whose constraint comes from S8 : lockrot names the lowest admitted release, and the why-not step of a move that does not resolve names it';
     private const DATED = 'the model dates a branch by its newest release only : a lower release leaves old-promise unverified, where lockrot dates it';
-    // HARDEN-SRC removes every MODEL_R7_PENDING entry when it projects the MODEL-R7 shas.
-    private const MODEL_R7_PENDING = 'MODEL-R7 corrects the model value or the inputs of the case : lockrot follows SPEC-0.14.md for the inputs that the case gives';
     private const TIE = 'the model removes S5 from the case to make the tie : the installed release is older than PHP 8.0, so lockrot raises S5 and the move differs';
 
     /**
@@ -54,8 +52,6 @@ final class MoveContractTest extends TestCase
         'php-edge-upper‡' => [[['version', 'commands'], self::VERSION]],
         'platform-step‡' => [[['version', 'commands'], self::VERSION]],
         'platform-step-inside‡' => [[['version', 'commands'], self::VERSION]],
-        'routing-self‡' => [[['held_by', 'rows.held_by', 's9.held_by'], self::MODEL_R7_PENDING]],
-        'mc-joint‡' => [[['fix_kind', 'security.fix_kind', 'rows.fix_kind', 's9.kind'], self::MODEL_R7_PENDING]],
     ];
 
     private const NO_SCORE_AFTER = ['replace', 'find-alternative', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'];
@@ -283,7 +279,8 @@ final class MoveContractTest extends TestCase
     }
 
     /**
-     * SPEC §5.3 and I19 on every branch row: `fixes.newest` is the row's newest tag, `if_applied`
+     * SPEC §5.3 and I19 on every branch row: `fixes.newest` is the row's newest tag, on the
+     * installed row a release that the lock's links allow up to it (case mc-link-newest‡), `if_applied`
      * is null exactly on a row that fixes nothing or is `blocked`, and such a row has no holder.
      * The security move agrees with its row on the release, the class, `held_by` and the score after
      * it. A merged move, or a maintenance move that clears the advisories, agrees only when its
@@ -311,7 +308,11 @@ final class MoveContractTest extends TestCase
             if (!\is_array($fixes)) {
                 continue;
             }
-            self::assertSame($row['highest'], $fixes['newest'], $branch.': fixes.newest is the row\'s newest tag');
+            if ($row['installed'] === true) {
+                self::assertTrue(version_compare(JsonPath::stringAt($fixes, ['newest']), JsonPath::stringAt($row, ['highest']), '<='), $branch.': fixes.newest of the installed row is at most the row\'s newest tag');
+            } else {
+                self::assertSame($row['highest'], $fixes['newest'], $branch.': fixes.newest is the row\'s newest tag');
+            }
             self::assertSame($fixes['fixed'] === 0 || $fixes['fix_kind'] === 'blocked', $fixes['if_applied'] === null, $branch.': if_applied is null exactly on a row that fixes nothing or is blocked');
             if ($fixes['fixed'] === 0) {
                 self::assertSame([], $fixes['held_by'], $branch.': a row that fixes nothing has no holder');

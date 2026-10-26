@@ -57,6 +57,19 @@ final class AdvisoryData implements SignalData
         return $clone;
     }
 
+    /**
+     * A copy whose rows at a release that the joint request moves to name no holder.
+     *
+     * @param array<string, string> $releases by branch label, the release that the joint request moves to
+     */
+    public function withJointMoves(array $releases): self
+    {
+        $clone = clone $this;
+        $clone->rows = array_map(static fn (AdvisoryRow $row): AdvisoryRow => $row->withJointMoves($releases), $this->rows);
+
+        return $clone;
+    }
+
     /** @param array<string, GradedPackage> $findings by package name */
     public function withFindings(array $findings): self
     {

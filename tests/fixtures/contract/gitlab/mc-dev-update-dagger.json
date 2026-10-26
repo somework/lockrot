@@ -11,7 +11,23 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 12
+                "begin": 19
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "guzzlehttp/guzzle 7.10.0 \u2014 finding ok (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "066d2b58ab351db72b227dc05918884ed61e42d0b9ff65e7bc4b6024c0cc5086",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
             }
         }
     }

@@ -34,6 +34,32 @@ final class PoolAdvisoriesTest extends TestCase
         self::assertSame(['acme/new' => ['<2.0'], 'acme/covered' => ['<1.0']], self::pretty($ranges));
     }
 
+    public function testANameThatTheLookupCouldNotReadStaysUnreadAndIsNotAskedAgain(): void
+    {
+        $advisories = new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), function (array $names, bool $complete): ?array {
+            $this->asked[] = [$names, $complete];
+
+            return null;
+        });
+        $advisories = $advisories->withRecords([], ['acme/covered']);
+
+        self::assertSame([], $advisories->ranges(['acme/new', 'acme/covered']));
+        $advisories->ranges(['acme/new']);
+
+        self::assertSame(['acme/new'], $advisories->unread(['acme/covered', 'acme/new', 'acme/other']));
+        self::assertSame([[['acme/new'], false]], $this->asked);
+    }
+
+    public function testTheNamesOfTwoLookupsThatCouldNotReadThemBothStayUnread(): void
+    {
+        $advisories = new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): ?array => null);
+
+        $advisories->ranges(['acme/first']);
+        $advisories->ranges(['acme/second']);
+
+        self::assertSame(['acme/first', 'acme/second'], $advisories->unread(['acme/first', 'acme/second']));
+    }
+
     public function testACopyWithTheRunsRecordsLeavesTheOriginalWithoutThem(): void
     {
         $original = $this->advisories();

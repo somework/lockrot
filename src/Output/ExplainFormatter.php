@@ -37,6 +37,9 @@ final class ExplainFormatter
     private const INDENT = '  ';
     /** The label column of a block: `age`, `score`, `do`. */
     private const LABEL = 10;
+    /** The narrowest width of each branch table column before `fixes`: branch, highest tag, released, php. */
+    private const BRANCH_COLUMNS = [8, 13, 12, 10];
+
     /** The label column of a line in the flags block. */
     private const FLAG = 13;
 
@@ -389,12 +392,22 @@ final class ExplainFormatter
             $fixes[$branch->branch()] = $branch;
         }
         $moveBranch = self::securityMoveBranch($finding);
-        $lines = ['repository metadata', self::escape(\sprintf('     %-8s %-13s %-12s %-10s %s', 'branch', 'highest tag', 'released', 'php', 'fixes'))];
+        $moves = $finding->details()->moves();
+        $cells = [];
         foreach (\array_slice($rows, 0, Explanation::BRANCH_ROWS) as $row) {
             $released = $row['highest_released'] === null ? ($row['highest_commit_date'] === null ? 'undated' : 'commit '.$row['highest_commit_date']->format('Y-m-d')) : $row['highest_released']->format('Y-m-d');
-            $moves = $finding->details()->moves();
-            $cell = isset($fixes[$row['branch']]) ? self::fixesCell($fixes[$row['branch']], $moves->rowIfApplied($row['branch']), $moves->rowCheck($row['branch']), $row['branch'] === $moveBranch, $finding->package()) : '';
-            $lines[] = self::escape(rtrim(\sprintf('   %s %-8s %-13s %-12s %-10s %s', $row['installed'] ? '*' : ' ', $row['branch'], $row['highest'], $released, $row['php'] ?? '—', $cell)));
+            $fix = isset($fixes[$row['branch']]) ? self::fixesCell($fixes[$row['branch']], $moves->rowIfApplied($row['branch']), $moves->rowCheck($row['branch']), $row['branch'] === $moveBranch, $finding->package(), $moves->rowIsJoint($row['branch'])) : '';
+            $cells[] = [$row['installed'] ? '*' : ' ', [$row['branch'], $row['highest'], $released, $row['php'] ?? '—'], $fix];
+        }
+        $widths = self::BRANCH_COLUMNS;
+        foreach ($cells as [, $columns]) {
+            foreach ($columns as $i => $column) {
+                $widths[$i] = max($widths[$i], self::characters($column));
+            }
+        }
+        $lines = ['repository metadata', self::escape(self::branchRow(' ', ['branch', 'highest tag', 'released', 'php'], 'fixes', $widths))];
+        foreach ($cells as [$mark, $columns, $fix]) {
+            $lines[] = self::escape(self::branchRow($mark, $columns, $fix, $widths));
         }
         if (\count($rows) > Explanation::BRANCH_ROWS) {
             $lines[] = \sprintf('     … and %d more', \count($rows) - Explanation::BRANCH_ROWS);
@@ -419,8 +432,8 @@ final class ExplainFormatter
         return $move === null ? null : $move->toBranch();
     }
 
-    /** `{fixed} of {of}`, the fix word, `(lowest fix)` on the move's row, the holders and the score after it. */
-    private static function fixesCell(BranchFixes $row, ?IfApplied $after, ?MoveCheck $check, bool $moveRow, string $package): string
+    /** `{fixed} of {of}`, the fix word, `(lowest fix)` on the move's row, the holders unless the joint request resolves the move, and the score after it. */
+    private static function fixesCell(BranchFixes $row, ?IfApplied $after, ?MoveCheck $check, bool $moveRow, string $package, bool $joint): string
     {
         $cell = $row->fixed().' of '.$row->of();
         $candidate = $row->candidate();
@@ -429,7 +442,7 @@ final class ExplainFormatter
         }
         $cell .= ' · '.self::FIX_WORDS[$candidate->kind()].($moveRow ? ' (lowest fix)' : '');
         $holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json'
-            : ($holder->package() === $package ? $package.' '.$holder->version().', its own release' : (string) $holder->package()), MoveText::inTextOrder($candidate->heldBy(), $package));
+            : ($holder->package() === $package ? $package.' '.$holder->version().', its own release' : (string) $holder->package()), MoveText::inTextOrder($joint ? [] : $candidate->heldBy(), $package));
         if ($holders !== []) {
             $cell .= '; held by '.implode(' and ', array_unique($holders));
         }
@@ -443,6 +456,26 @@ final class ExplainFormatter
         }
 
         return $cell;
+    }
+
+    /**
+     * @param list<string> $columns
+     * @param list<int>    $widths  in characters, which `sprintf()` padding would count as bytes
+     */
+    private static function branchRow(string $mark, array $columns, string $fix, array $widths): string
+    {
+        $row = '   '.$mark;
+        foreach ($columns as $i => $column) {
+            $row .= ' '.$column.str_repeat(' ', $widths[$i] - self::characters($column));
+        }
+
+        return rtrim($row.' '.$fix);
+    }
+
+    /** UTF-8 characters, without ext-mbstring: every byte but a continuation byte starts one. */
+    private static function characters(string $text): int
+    {
+        return \strlen(preg_replace('/[\x80-\xBF]/', '', $text) ?? '');
     }
 
     /**
@@ -465,6 +498,6 @@ final class ExplainFormatter
 
     private static function escape(string $text): string
     {
-        return ConsoleMarkup::escape($text);
+        return ConsoleMarkup::escape(TerminalText::neutralise($text));
     }
 }

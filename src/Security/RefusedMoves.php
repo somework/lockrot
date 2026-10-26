@@ -17,7 +17,7 @@ use Composer\Semver\VersionParser;
  */
 final class RefusedMoves
 {
-    /** @var array<string, array{0: ConstraintInterface, 1: list<Holder>}> by constraint as written */
+    /** @var array<string, array{0: ConstraintInterface, 1: list<Holder>}> by the refused range */
     private array $refused = [];
 
     public static function none(): self
@@ -28,20 +28,22 @@ final class RefusedMoves
     /**
      * A copy with one more refusal. A constraint that does not parse holds nothing.
      *
-     * @param list<Holder> $holds
+     * @param list<Holder>         $holds
+     * @param ?ConstraintInterface $range the versions that the refused solve could choose, null for the constraint's
      */
-    public function with(string $constraint, array $holds): self
+    public function with(string $constraint, array $holds, ?ConstraintInterface $range = null): self
     {
-        if (isset($this->refused[$constraint])) {
-            return $this;
-        }
         try {
-            $parsed = (new VersionParser())->parseConstraints($constraint);
+            $parsed = $range ?? (new VersionParser())->parseConstraints($constraint);
         } catch (\UnexpectedValueException $e) {
             return $this;
         }
+        $key = (string) $parsed;
+        if (isset($this->refused[$key])) {
+            return $this;
+        }
         $clone = clone $this;
-        $clone->refused[$constraint] = [$parsed, $holds];
+        $clone->refused[$key] = [$parsed, $holds];
 
         return $clone;
     }

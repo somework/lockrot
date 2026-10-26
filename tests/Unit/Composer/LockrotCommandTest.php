@@ -42,6 +42,7 @@ use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Tests\Support\RecordingOutput;
 use Lockrot\Tests\Support\SplitStreamOutput;
 use Lockrot\Tests\Support\SplitStreamTester;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\MoveChecks;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -344,6 +345,19 @@ final class LockrotCommandTest extends TestCase
         }
     }
 
+    /** `--help` names every value that `--fail-on` accepts, and that it takes a list. */
+    public function testTheFailOnHelpTextNamesEveryValueAndTheList(): void
+    {
+        $description = $this->command()->getDefinition()->getOption('fail-on')->getDescription();
+
+        foreach (FailOn::allowed() as $value) {
+            self::assertMatchesRegularExpression('/(?<![a-z-])'.preg_quote($value, '/').'(?![a-z-])/', $description, $value.' is accepted but not listed in --help');
+        }
+        self::assertStringContainsString('comma-separated', $description);
+        self::assertStringNotContainsString('verdict', $description, 'a 0.14 verdict is a grade or a word, not a flag');
+        self::assertStringNotContainsString('priority', $description, 'a 0.14 threshold is a grade, not a priority');
+    }
+
     public function testTableOutputAndExitCodeOnWallabag(): void
     {
         chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
@@ -515,7 +529,7 @@ final class LockrotCommandTest extends TestCase
         self::assertStringStartsWith('doctrine/annotations ', $display, 'the name is trimmed and lower-cased, as Composer names packages');
         self::assertStringContainsString(' — high: abandoned', $display);
         self::assertStringContainsString("\n  abandoned    S1 high · marked abandoned by its registry", $display);
-        self::assertStringContainsString("\nrepository metadata\n     branch   highest tag   released     php        fixes\n", $display);
+        self::assertStringContainsString("\nrepository metadata\n     branch   highest tag   released     php          fixes\n", $display, "the php column is as wide as `^7.2 || ^8.0`");
         self::assertStringNotContainsString('packages checked', $display, 'the report itself is not printed');
     }
 

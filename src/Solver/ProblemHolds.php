@@ -9,6 +9,7 @@ use Composer\DependencyResolver\Rule;
 use Composer\DependencyResolver\SolverProblemsException;
 use Composer\Package\AliasPackage;
 use Composer\Package\Link;
+use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\PlatformRepository;
 use Composer\Semver\Constraint\ConstraintInterface;
@@ -43,14 +44,18 @@ final class ProblemHolds
     private array $requires = [];
     /** @var array<string, Link> */
     private array $devRequires = [];
+    /** @var array<string, string> name => the normalized version of each locked package */
+    private array $locked = [];
 
     /**
      * @param array<string, string> $moved     the names on the allow list: a link to one of them has no target
      * @param array<string, string> $requested the root requirements that the request writes: a refusal of one names the request, not a hold
+     * @param array<string, string> $locked    name => the normalized version of each locked package: a hold at that release is marked locked
      */
-    public static function of(SolverProblemsException $e, Pool $pool, RootPackageInterface $root, array $moved, array $requested = []): self
+    public static function of(SolverProblemsException $e, Pool $pool, RootPackageInterface $root, array $moved, array $requested = [], array $locked = []): self
     {
         $out = new self();
+        $out->locked = $locked;
         $out->requires = $root->getRequires();
         $out->devRequires = $root->getDevRequires();
         $rootRequires = array_merge($root->getDevRequires(), $root->getRequires());
@@ -136,7 +141,7 @@ final class ProblemHolds
         $other = \in_array($target, $moved, true) ? null : $target;
         $this->holds[] = $declarer === $rootName
             ? new Holder(Holder::ROOT, $rootName, null, $link, $data->getPrettyConstraint(), $other)
-            : new Holder(Holder::PACKAGE, $declarer, $source->getPrettyVersion(), $link, $data->getPrettyConstraint(), $other);
+            : $this->marked(new Holder(Holder::PACKAGE, $declarer, $source->getPrettyVersion(), $link, $data->getPrettyConstraint(), $other), $source);
         // One literal is a requirement with no candidate left: a conflict rule has two.
         if (\count($rule->getLiterals()) === 1 && !$platform) {
             $this->wanted[$target] = $target;
@@ -158,9 +163,14 @@ final class ProblemHolds
                 $target = \in_array($name, $moved, true) ? null : $name;
                 $this->holds[] = $package->getName() === $rootName
                     ? new Holder(Holder::ROOT, $rootName, null, Holder::REPLACE, $replace->getPrettyConstraint(), $target)
-                    : new Holder(Holder::PACKAGE, $package->getName(), $package->getPrettyVersion(), Holder::REPLACE, $replace->getPrettyConstraint(), $target);
+                    : $this->marked(new Holder(Holder::PACKAGE, $package->getName(), $package->getPrettyVersion(), Holder::REPLACE, $replace->getPrettyConstraint(), $target), $package);
             }
         }
+    }
+
+    private function marked(Holder $hold, PackageInterface $package): Holder
+    {
+        return ($this->locked[$package->getName()] ?? null) === $package->getVersion() ? $hold->asLocked() : $hold;
     }
 
     /**

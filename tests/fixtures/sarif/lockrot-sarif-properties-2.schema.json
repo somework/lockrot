@@ -1670,7 +1670,8 @@
                     "composer_json_invalid",
                     "no_release_read",
                     "pass_cap",
-                    "solver_error"
+                    "solver_error",
+                    "advisory_lookup_incomplete"
                   ]
                 },
                 {
@@ -3147,7 +3148,7 @@
           ]
         },
         "held_by": {
-          "description": "The links that exclude the fixing release; `upgrade` ⇒ not empty where lockrot read the links.",
+          "description": "The links that exclude the fixing release; `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move to this release.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/heldBy"

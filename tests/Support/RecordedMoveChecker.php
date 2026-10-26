@@ -24,6 +24,8 @@ final class RecordedMoveChecker implements MoveChecker
     /** @var array<mixed, mixed> */
     private array $run;
     private bool $strict;
+    /** @var list<string>|null the names that the run's advisory lookup asked, null before the run passes them */
+    private ?array $covered = null;
 
     /**
      * @param array<string, array<mixed, mixed>> $checks key => `{result, form, reason, installs, holds, problem}`, with
@@ -52,7 +54,7 @@ final class RecordedMoveChecker implements MoveChecker
         }
         $check = $this->recorded($query->key(), '*');
 
-        return $check === null ? new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME)) : self::outcome($check, $query->package());
+        return $check === null ? new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME)) : $this->unread($check) ?? self::outcome($check, $query->package());
     }
 
     /**
@@ -67,7 +69,7 @@ final class RecordedMoveChecker implements MoveChecker
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME));
         }
 
-        return self::outcome($joint, $query->package())->withChanges(self::installs($joint));
+        return $this->unread($joint) ?? self::outcome($joint, $query->package())->withChanges(self::installs($joint));
     }
 
     /** As {@see \Lockrot\Solver\SolverChecker}: Composer refuses the lock itself, so lockrot asks no move of it. */
@@ -123,7 +125,22 @@ final class RecordedMoveChecker implements MoveChecker
         }
         $check = $this->recorded('combined '.implode(' ', array_keys($inline)), 'combined');
 
-        return $check === null ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : self::outcome($check);
+        return $check === null ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : $this->unread($check) ?? self::outcome($check);
+    }
+
+    /**
+     * As {@see \Lockrot\Solver\SolverChecker}: while Composer blocks advisories, a solve that installs
+     * a name that the run's lookup did not ask is not checked. A hydrated run reads no other name.
+     *
+     * @param array<mixed, mixed> $check
+     */
+    private function unread(array $check): ?CheckOutcome
+    {
+        if ($this->covered === null || !$this->blocksAdvisories() || ($check['result'] ?? null) !== MoveCheck::RESOLVES) {
+            return null;
+        }
+
+        return array_diff(array_keys(self::installs($check)), $this->covered) === [] ? null : new CheckOutcome(MoveCheck::notChecked(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE));
     }
 
     public function solveAt(array $names): CheckOutcome
@@ -163,9 +180,19 @@ final class RecordedMoveChecker implements MoveChecker
         return ($this->run['blocks_advisories'] ?? false) === true;
     }
 
+    public function blockingDisabledBy(): array
+    {
+        $names = $this->run['blocking_disabled_by'] ?? [];
+
+        return \is_array($names) ? array_values(array_filter($names, 'is_string')) : [];
+    }
+
     public function withAdvisories(array $records, array $covered): MoveChecker
     {
-        return $this;
+        $clone = clone $this;
+        $clone->covered = $covered;
+
+        return $clone;
     }
 
     /** @param array<mixed, mixed> $check */

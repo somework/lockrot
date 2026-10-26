@@ -16,12 +16,16 @@ final class MoveCheckRun implements \JsonSerializable
 {
     private ?string $composer;
     private bool $blocksAdvisories;
+    /** @var list<string> */
+    private array $blockingDisabledBy;
     private MoveCheck $baseline;
 
-    public function __construct(?string $composer, bool $blocksAdvisories, MoveCheck $baseline)
+    /** @param list<string> $blockingDisabledBy */
+    public function __construct(?string $composer, bool $blocksAdvisories, array $blockingDisabledBy, MoveCheck $baseline)
     {
         $this->composer = $composer;
         $this->blocksAdvisories = $blocksAdvisories;
+        $this->blockingDisabledBy = $blockingDisabledBy;
         $this->baseline = $baseline;
     }
 
@@ -34,10 +38,10 @@ final class MoveCheckRun implements \JsonSerializable
      * `ignores_extensions` is always true: the solve ignores `ext-*` requirements, as
      * `--ignore-platform-req=ext-*` does, so the machine that runs lockrot decides no move.
      *
-     * @return array{composer: ?string, blocks_advisories: bool, ignores_extensions: true, baseline: string, reason: ?string}
+     * @return array{composer: ?string, blocks_advisories: bool, blocking_disabled_by: list<string>, ignores_extensions: true, baseline: string, reason: ?string}
      */
     public function jsonSerialize(): array
     {
-        return ['composer' => $this->composer, 'blocks_advisories' => $this->blocksAdvisories, 'ignores_extensions' => true, 'baseline' => $this->baseline->result(), 'reason' => $this->baseline->reason()];
+        return ['composer' => $this->composer, 'blocks_advisories' => $this->blocksAdvisories, 'blocking_disabled_by' => $this->blockingDisabledBy, 'ignores_extensions' => true, 'baseline' => $this->baseline->result(), 'reason' => $this->baseline->reason()];
     }
 }

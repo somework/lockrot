@@ -6,8 +6,10 @@ namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Allowlist\AcceptedCheck;
 use Lockrot\Allowlist\UncheckedAcceptanceEntry;
+use Lockrot\Analyzer\MoveCheckRun;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
+use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
@@ -18,6 +20,8 @@ use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
+use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
@@ -27,6 +31,11 @@ use Lockrot\Tests\Support\TextGolden;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\FindingDetails;
+use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\Move;
+use Lockrot\Verdict\MoveChecks;
+use Lockrot\Verdict\MoveSubject;
+use Lockrot\Verdict\ShellCommand;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -210,6 +219,60 @@ final class TableFormatterTest extends TestCase
         self::assertSame([], $wide);
     }
 
+    /**
+     * A command that the move text names prints whole on a line of its own, after `do: ` or
+     * alone, at any width, so a copy of that line runs it and nothing else.
+     */
+    public function testEachCommandOfAMovePrintsWholeOnItsOwnLine(): void
+    {
+        $report = CaseHydrator::everyCase();
+        $commands = [];
+        foreach ($report->graded() as $finding) {
+            $move = $finding->nextStep();
+            if ($move === null) {
+                continue;
+            }
+            foreach ($move->commands() as $argv) {
+                $command = ShellCommand::posix($argv);
+                if ($command !== null && strpos($move->text(), $command) !== false) {
+                    $commands[$command] = true;
+                }
+            }
+        }
+        self::assertNotSame([], $commands);
+
+        foreach ([40, 100, 400] as $width) {
+            $lines = array_map(static fn (string $line): string => (string) preg_replace('/^\s*(do: )?/', '', $line), self::lines(self::formatter($width)->format($report)));
+            foreach (array_keys($commands) as $command) {
+                self::assertContains($command, $lines, 'width '.$width);
+            }
+        }
+    }
+
+    /**
+     * @dataProvider movesAndTheirParts
+     *
+     * @param list<list<string>>              $commands
+     * @param list<array{0: string, 1: bool}> $parts
+     */
+    #[DataProvider('movesAndTheirParts')]
+    public function testTheMoveTextIsCutAroundTheCommandThatItNames(string $kind, string $source, ?string $override, array $commands, array $parts): void
+    {
+        $move = new Move($kind, $source, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], $commands, new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, $override));
+
+        self::assertSame($parts, TableFormatter::commandParts($move));
+    }
+
+    /** @return iterable<string, array{string, string, ?string, list<list<string>>, list<array{0: string, 1: bool}>}> */
+    public static function movesAndTheirParts(): iterable
+    {
+        $update = ['composer', 'update', 'acme/lib'];
+        yield 'the command first' => [Move::UPDATE, FlagSet::VULNERABLE, null, [$update], [['composer update acme/lib', true], ['(gets 2.0.0)', false]]];
+        yield 'a platform step before the command' => [Move::UPDATE, FlagSet::VULNERABLE, '7.4.29', [$update], [['First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29.', false], ['composer update acme/lib', true], ['(gets 2.0.0)', false]]];
+        yield 'a command that no shell takes, before the named one' => [Move::UPDATE, FlagSet::VULNERABLE, null, [['composer', 'update', 'acme/lib;x'], $update], [['composer update acme/lib', true], ['(gets 2.0.0)', false]]];
+        yield 'no command in the text' => [Move::FIND_ALTERNATIVE, FlagSet::ABANDONED, null, [], [['find a replacement (none named)', false]]];
+    }
+
     public function testAKnownFlagReadsBaselineAndTheScoreLineCarriesTheSuffix(): void
     {
         $report = self::report();
@@ -264,6 +327,23 @@ final class TableFormatterTest extends TestCase
         self::assertSame($plain, str_replace(["\033[31m", "\033[39m", "\033[1m", "\033[22m"], '', $decorated), 'nothing but lockrot\'s styles');
     }
 
+    /** A terminal obeys a control character from the lock (OSC 52 writes the clipboard), so each prints as an escape, on its own line. */
+    public function testControlCharactersFromOutsidePrintAsEscapes(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $evil = "evil\x1b]52;c;cHduZWQ=\x07\x1b[2J\u{9B}31m\ntail";
+        $report = new Report([
+            (new FindingBuilder())->withPackage('vendor/'.$evil)->withVersion($evil)->withVerdict(Verdict::ABANDONED)->withChain(['vendor/'.$evil])->withDataDate($at)->build(),
+        ], Notes::texts(['note '.$evil]), $at, 1, 0);
+
+        $plain = ConsoleMarkup::render(self::formatter(400)->format($report), false);
+
+        $shown = 'evil\x1B]52;c;cHduZWQ=\x07\x1B[2J\u{009B}31m\ntail';
+        self::assertSame(0, preg_match('/[\x00-\x09\x0B-\x1F\x7F]|\xC2[\x80-\x9F]/', $plain), 'no control character but the line feed');
+        self::assertStringContainsString('vendor/'.$shown.' '.$shown, $plain);
+        self::assertStringContainsString("\nnote: note ".$shown."\n", $plain);
+    }
+
     /** @return iterable<string, array{string}> */
     public static function textsThatLookLikeMarkup(): iterable
     {
@@ -282,6 +362,14 @@ final class TableFormatterTest extends TestCase
     }
 
     /** A critical, a medium and a low finding, and two score-0 ones that only `--all` shows. */
+    public function testTheMovesLineNamesTheVariableThatTurnedTheBlockingOff(): void
+    {
+        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $report = self::report()->withMoveChecks(new MoveCheckRun('2.9.5', false, ['COMPOSER_NO_SECURITY_BLOCKING'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
+
+        self::assertStringContainsString('against the lock, with advisory blocking turned off by COMPOSER_NO_SECURITY_BLOCKING; ext-* requirements not checked', self::formatter(400)->format($report));
+    }
+
     private static function report(): Report
     {
         $at = new \DateTimeImmutable(self::AT);

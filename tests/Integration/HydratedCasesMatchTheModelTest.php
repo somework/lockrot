@@ -90,7 +90,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'run.graded_verdicts',
         ],
         'security' => [
-            'details.metadata.branches[].{branch,installed}', 'details.metadata.branches[].fixes.{fix_kind,fixed,lowest,of}',
+            'details.metadata.branches[].{branch,installed}', 'details.metadata.branches[].fixes.{fix_kind,fixed,lowest,newest,of}',
             'details.metadata.branches[].fixes.held_by[].{package,source}',
             'details.metadata.branches[].fixes.if_applied.{assumes,at_most,total,verdict}', 'next_step.held_by[].{package,source}',
             'next_step.to_branch', 'origin.kind', 'package', 'score.parts.security.of',
@@ -98,7 +98,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'security.ignored[].{by,cve,id,reason,severity}', 'security.partial.clears[].{id,kind}',
             'security.partial.if_applied.{assumes,at_most,total,verdict}', 'security.partial.{unverified,version}',
             'signals[].data.advisories[].{affected_versions,cve,deciding,id,severity}',
-            'signals[].data.advisories[].fix.{kind,on_installed_branch,to_branch,version}', 'signals[].id', 'version',
+            'signals[].data.advisories[].fix.{kind,newest,on_installed_branch,to_branch,version}', 'signals[].id', 'version',
             'run.score_model.severities[].{counts_as,id}',
         ],
         'branches_lead' => [
@@ -210,7 +210,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version', 'next_step.commands', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'flags[].id', 'score.terms[].flag', 'signals[].data.advisories[].id'], self::TIE],
             ],
             'security' => [
-                [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::TIE],
+                [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.newest', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::TIE],
             ],
             'branches_lead' => [
                 [['signals[].id', 'signals[].data.newest_branch', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::TIE],
@@ -256,7 +256,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['signals[].data.advisories[].id'], self::BITBUCKET],
             ],
             'security' => [
-                [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::BITBUCKET],
+                [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.newest', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::BITBUCKET],
             ],
             'branches_lead' => [
                 [['signals[].id', 'signals[].data.newest_branch', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::BITBUCKET],
@@ -318,28 +318,9 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
-        'routing-self‡' => [
-            'held_by' => [
-                [['next_step.held_by[].constraint', 'next_step.held_by[].package', 'next_step.held_by[].version', 'next_step.held_by[].holder.flag_ids', 'next_step.held_by[].holder.verdict', 'next_step.held_by[].holder.next_step.constraint', 'next_step.held_by[].holder.next_step.kind', 'next_step.held_by[].holder.next_step.to_branch'], self::MODEL_R7_PENDING],
-            ],
-            'security' => [
-                [['details.metadata.branches[].fixes.held_by[].package', 'next_step.held_by[].package'], self::MODEL_R7_PENDING],
-            ],
-        ],
-        'mc-joint‡' => [
-            'security' => [
-                [['details.metadata.branches[].fixes.fix_kind', 'security.fix_kind', 'signals[].data.advisories[].fix.kind'], self::MODEL_R7_PENDING],
-            ],
-            'why' => [
-                [['score.terms[].fix_kind'], self::MODEL_R7_PENDING],
-            ],
-        ],
     ];
 
     private const MOVE_VERSION = 'The model leaves `version` null on a move whose constraint comes from S8. lockrot names the lowest release that the constraint admits, and the why-not step of a move that does not resolve names it. The move card prints `newest` and reads `version` only when `newest` is null.';
-
-    // HARDEN-SRC removes every MODEL_R7_PENDING entry when it projects the MODEL-R7 shas.
-    private const MODEL_R7_PENDING = 'MODEL-R7 corrects the model value or the inputs of the case. lockrot follows SPEC-0.14.md for the inputs that the case gives.';
 
     private const PHP_STAR = 'The case sets the project\'s require.php to `*` (‡). The model keeps the holder\'s own step of case A, and lockrot judges the holder under the case\'s require.php, which admits its newest line.';
 
@@ -368,8 +349,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].latest.is_installed' => self::ALSO_LATEST,
         'next_step.also[].latest.relation' => self::ALSO_LATEST,
         'next_step.also[].latest.version' => self::ALSO_LATEST,
-        'next_step.also[].php_check.raise_size' => self::ALSO_RAISE,
-        'next_step.also[].php_check.raise_to' => self::ALSO_RAISE,
         'next_step.also[].replacement.package' => self::ALSO_REPLACE,
         'next_step.also[].replacement.url' => self::ALSO_REPLACE,
         'next_step.also[].replacement.finding.flag_ids' => self::ALSO_REPLACE,
@@ -377,8 +356,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].through[].newest_requires' => self::ALSO_THROUGH,
         'next_step.also[].through[].package' => self::ALSO_THROUGH,
         'next_step.also[].through[].newest_stable.version' => self::ALSO_THROUGH,
-        'next_step.also[].held_by[].package' => self::ALSO_HELD,
-        'next_step.also[].held_by[].version' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.flag_ids' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.verdict' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.constraint' => self::ALSO_HELD,
@@ -386,7 +363,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].held_by[].holder.next_step.to_branch' => self::ALSO_HELD,
         'next_step.also[].check.form' => self::ALSO_CHECK,
         'next_step.also[].check.reason' => self::ALSO_CHECK,
-        'next_step.also[].check.result' => self::ALSO_CHECK,
     ];
 
     private const ONLY_PSR_LOG = 'Only psr-log accepts a flag on a halved finding, and it carries no branch rows, so the projector gives it no inputs.';
@@ -395,15 +371,13 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 
     private const ALSO_LATEST = 'No also[] move of a case with inputs is a tag, test or blocked move.';
 
-    private const ALSO_RAISE = 'No also[] move of a case with inputs raises require.php.';
-
     private const ALSO_REPLACE = 'No also[] move of a case with inputs is a replace move.';
 
     private const ALSO_THROUGH = 'An also[] move carries no through[] (I14f).';
 
-    private const ALSO_HELD = 'No also[] move of a case with inputs is held by a package.';
+    private const ALSO_HELD = 'No also[] move of a case with inputs is held by a package that has a finding of its own.';
 
-    private const ALSO_CHECK = 'No case that checks its moves (train 7d, `move-check‡`) has an also[] move.';
+    private const ALSO_CHECK = 'Each also[] move of a case with inputs that Composer\'s solver checks is refused, so no case gives it a form or a reason.';
 
     private const ACCEPT_UNCHECKED = 'The cases that accept an unchecked check need an accept-unchecked entry of the project, which the hydrator does not take (`unhydrated()`).';
 

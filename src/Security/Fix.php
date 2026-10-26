@@ -38,6 +38,7 @@ final class Fix implements \JsonSerializable
     private ?bool $admitsTargetPhp = null;
     private ?bool $admitsProjectPhp = null;
     private ?string $reason;
+    private bool $joint = false;
 
     /** @param self::UPDATE|self::UPGRADE|self::RAISE_PHP|self::BLOCKED|self::UNKNOWN|self::NONE $kind */
     private function __construct(string $kind, ?Candidate $candidate, ?string $newest, ?bool $onInstalledBranch, ?string $reason)
@@ -102,6 +103,15 @@ final class Fix implements \JsonSerializable
         return $clone;
     }
 
+    /** A copy at a release that the joint request moves to: nothing holds it (SPEC §5.6, ruling R1). */
+    public function resolvedJointly(): self
+    {
+        $clone = clone $this;
+        $clone->joint = true;
+
+        return $clone;
+    }
+
     /** @return self::UPDATE|self::UPGRADE|self::RAISE_PHP|self::BLOCKED|self::UNKNOWN|self::NONE */
     public function kind(): string
     {
@@ -155,7 +165,7 @@ final class Fix implements \JsonSerializable
     /** @return list<Holder> */
     public function heldBy(): array
     {
-        return $this->candidate === null ? [] : $this->candidate->heldBy();
+        return $this->candidate === null || $this->joint ? [] : $this->candidate->heldBy();
     }
 
     public function blockedBy(): ?string

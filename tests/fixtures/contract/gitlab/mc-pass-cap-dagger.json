@@ -14,5 +14,21 @@
                 "begin": 21
             }
         }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "acme/ml-widget 1.0.0 \u2014 finding ok (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "2fec30c67e8830aa4b50e88d3f9baf9a9748dfbe07849db995f543d4db992dbf",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
     }
 ]

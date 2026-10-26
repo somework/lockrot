@@ -79,9 +79,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   step with a version, branch or name from the lock or a repository outside it is left out, so a
   hostile lock cannot inject into a pasted command. This affects a reader who copies these commands. Action: if a step is missing,
   check that lock entry before you write the command by hand. ([The move](docs/schema.md#the-move))
+- **CLI:** a repository host's redirect to another host no longer receives lockrot's
+  `Authorization` or `PRIVATE-TOKEN` header, on Composer 2.10 or later with curl. lockrot asks the
+  redirect target again without it. ([Which credentials](docs/internals.md#which-credentials))
+- **table, github, markdown:** a control character from the lock or a repository prints as an
+  escape (`\x1B`), also in `--explain`, as in the install-time summary. A lock cannot clear your
+  screen, write your clipboard or plant a link in your terminal.
+  ([What lockrot does](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
+- **markdown:** text from the lock cannot mention a user or a team, or link a bare URL or an email
+  address, in a pull request comment or a job summary. ([`--format=markdown`](docs/ci.md#-formatmarkdown))
 
 ### Added
 
+- **JSON:** `run.move_check.blocking_disabled_by` lists each of `COMPOSER_NO_BLOCKING` and
+  `COMPOSER_NO_SECURITY_BLOCKING` that the solving Composer reads and that holds a true value.
+  The move check then blocks no advisory and no abandoned package, as Composer's update does.
+  ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** Composer's solver checks each move offline against the lock, and the move
   writes `check` with the release it `installs`. A refused move asks once more with its holders, and
   `moves_with[]` names the holders that move. A move still refused names its holds in `held_by[]`

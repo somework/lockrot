@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Solver;
 
+use Composer\Semver\Constraint\Constraint;
 use Lockrot\Security\Holder;
 use Lockrot\Solver\CheckOutcome;
 use Lockrot\Solver\MoveCheck;
@@ -43,6 +44,55 @@ final class CheckOutcomeTest extends TestCase
         $outcome = (new CheckOutcome(MoveCheck::refused(), [$coreLib, $other, $package]))->withoutRootOnHolders();
 
         self::assertSame([$other, $package], $outcome->holds());
+    }
+
+    /** @return iterable<string, array{Holder::REQUIRE|Holder::REQUIRE_DEV|Holder::ROOT_REQUIRE}> */
+    public static function rootRequirementLinks(): iterable
+    {
+        yield 'require' => [Holder::REQUIRE];
+        yield 'require-dev' => [Holder::REQUIRE_DEV];
+        yield 'root-require' => [Holder::ROOT_REQUIRE];
+    }
+
+    /**
+     * @dataProvider rootRequirementLinks
+     *
+     * @param Holder::REQUIRE|Holder::REQUIRE_DEV|Holder::ROOT_REQUIRE $link
+     */
+    #[DataProvider('rootRequirementLinks')]
+    public function testEachRootRequirementOnAPackageThatAPackageHoldNamesDrops(string $link): void
+    {
+        $root = new Holder(Holder::ROOT, null, null, $link, '^7.0', 'mautic/core-lib');
+        $package = new Holder(Holder::PACKAGE, 'mautic/core-lib', '7.0.1', Holder::REQUIRE, '~2.7.0', null);
+
+        $outcome = (new CheckOutcome(MoveCheck::refused(), [$root, $package]))->withoutRootOnHolders();
+
+        self::assertSame([$package], $outcome->holds());
+    }
+
+    /** @return iterable<string, array{Holder::CONFLICT|Holder::REPLACE}> */
+    public static function rootDeclarationLinks(): iterable
+    {
+        yield 'a conflict' => [Holder::CONFLICT];
+        yield 'a replace' => [Holder::REPLACE];
+    }
+
+    /**
+     * A conflict or a replace that composer.json declares is a hold of its own, not the head of the package hold's chain.
+     *
+     * @dataProvider rootDeclarationLinks
+     *
+     * @param Holder::CONFLICT|Holder::REPLACE $link
+     */
+    #[DataProvider('rootDeclarationLinks')]
+    public function testARootConflictOrReplaceOnAPackageThatAPackageHoldNamesStays(string $link): void
+    {
+        $root = new Holder(Holder::ROOT, null, null, $link, '>=7.1', 'mautic/core-lib');
+        $package = new Holder(Holder::PACKAGE, 'mautic/core-lib', '7.0.1', Holder::REQUIRE, '~2.7.0', null);
+
+        $outcome = (new CheckOutcome(MoveCheck::refused(), [$root, $package]))->withoutRootOnHolders();
+
+        self::assertSame([$root, $package], $outcome->holds());
     }
 
     public function testAJointSolveThatInstallsAReleaseOutsideTheConstraintKeepsTheFirstRefusal(): void
@@ -94,6 +144,21 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([['package' => 'h/dev', 'installed_version' => 'dev-main', 'version' => 'dev-main']], $joined->movesWith());
     }
 
+    /** SPEC §5.6, case `mc-joint-retag‡`: the tag 1.0.0 of h/x points at a new commit, and a new install of the same tag changes no holder. */
+    public function testAJointSolveThatInstallsAHolderAgainAtItsLockedTagKeepsTheFirstRefusal(): void
+    {
+        $hold = new Holder(Holder::PACKAGE, 'h/x', '1.0.0', Holder::REQUIRE, '^1.0');
+        $outcome = new CheckOutcome(MoveCheck::refused(), [$hold]);
+        $locked = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['acme/lib' => '2.0.0', 'h/x' => '1.0.0'], ['acme/lib' => '1.0.0', 'h/x' => '1.0.0']);
+        $recorded = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['acme/lib' => '2.0.0', 'h/x' => '1.0.0']);
+
+        $fromLock = $outcome->joinedWith($locked, 'acme/lib', '^2.0', ['h/x']);
+        $fromHold = $outcome->joinedWith($recorded, 'acme/lib', '^2.0', ['h/x']);
+
+        self::assertSame([MoveCheck::REFUSED, [$hold], []], [$fromLock->check()->result(), $fromLock->holds(), $fromLock->movesWith()]);
+        self::assertSame([MoveCheck::REFUSED, [$hold], []], [$fromHold->check()->result(), $fromHold->holds(), $fromHold->movesWith()]);
+    }
+
     /** A `-W` refusal names a release of the holder that the lock does not hold: the installed version comes from the lock. */
     public function testTheInstalledVersionOfAMovedHolderIsItsLockedRelease(): void
     {
@@ -104,6 +169,19 @@ final class CheckOutcomeTest extends TestCase
         $joined = $outcome->joinedWith($joint, 'acme/lib', '^2.0', ['h/x']);
 
         self::assertSame([['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.1.0']], $joined->movesWith());
+    }
+
+    /** SPEC §5.6: Composer refuses the move alone, so a joint answer other than resolves or refused keeps that refusal. */
+    public function testAJointRequestThatIsNotCheckedKeepsTheFirstRefusal(): void
+    {
+        $hold = new Holder(Holder::PACKAGE, 'h/x', '1.0.0', Holder::REQUIRE, '^1.0');
+        $outcome = new CheckOutcome(MoveCheck::refused(), [$hold]);
+
+        $incomplete = $outcome->joinedWith(new CheckOutcome(MoveCheck::notChecked(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE)), 'acme/lib', '^2.0', ['h/x']);
+        $budget = $outcome->joinedWith(new CheckOutcome(MoveCheck::notChecked(MoveCheck::INSTALL_TIME_BUDGET)), 'acme/lib', '^2.0', ['h/x']);
+
+        self::assertSame([MoveCheck::REFUSED, [$hold]], [$incomplete->check()->result(), $incomplete->holds()]);
+        self::assertSame([MoveCheck::REFUSED, [$hold]], [$budget->check()->result(), $budget->holds()]);
     }
 
     /** A recorded joint answer names no locked releases: the hold's version stands in. */
@@ -139,5 +217,15 @@ final class CheckOutcomeTest extends TestCase
         $copy = $outcome->withoutAdmitting('1.1.0');
 
         self::assertSame([[$root, $package], [$package]], [$outcome->holds(), $copy->holds()]);
+    }
+
+    public function testTheCopyWithARangeLeavesTheOutcomeItComesFromWithoutOne(): void
+    {
+        $outcome = new CheckOutcome(MoveCheck::refused(), []);
+        $range = new Constraint('>=', '1.2.5.0');
+
+        $copy = $outcome->withRange($range);
+
+        self::assertSame([null, $range], [$outcome->range(), $copy->range()]);
     }
 }

@@ -136,9 +136,10 @@ repositories publish, and finds no vulnerability of its own.
   signed release that this PHP cannot run, and that release refuses to start. If that happens,
   replace the archive by hand.
 
-- **Terminal output.** `self-update` replaces control characters in the tags, versions and URLs
-  that it prints from the release list. A release entry cannot send escape sequences to your
-  terminal.
+- **Terminal output.** The text formats (`table`, `--explain`, `github`, `markdown` and the
+  install-time summary) print a control character from the lock or a repository as an escape,
+  such as `\x1B`. `self-update` does the same for the tags, versions and URLs that it prints from
+  the release list. Neither can send escape sequences to your terminal.
 
 ## Key custody and rotation
 

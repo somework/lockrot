@@ -34,4 +34,19 @@ final class ComposerFeatures
     {
         return class_exists('Composer\\DependencyResolver\\SecurityAdvisoryPoolFilter');
     }
+
+    /**
+     * The environment variables that turn off the blocking of an update on this Composer version,
+     * in the order of `run.move_check.blocking_disabled_by`.
+     *
+     * @return list<'COMPOSER_NO_BLOCKING'|'COMPOSER_NO_SECURITY_BLOCKING'>
+     */
+    public static function blockingVariables(string $version): array
+    {
+        if (version_compare($version, '2.10.0-dev', '>=')) {
+            return ['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING'];
+        }
+
+        return version_compare($version, '2.9.2', '>=') ? ['COMPOSER_NO_SECURITY_BLOCKING'] : [];
+    }
 }

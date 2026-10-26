@@ -24,7 +24,7 @@
 <options=bold><fg=red>high (38)</fg=red></options=bold>
   spomky-labs/otphp v10.0.3  via scheb/2fa-google-authenticator  ·  left-behind · vulnerable
       24 = left-behind 16 ÷ 2 transitive + vulnerable 16 [high advisory] (baseline: new package)
-      do: move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator — clears left-behind and 2
+      do: move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator — clears left-behind and 2
           advisories; 11.x needs php \>=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json
           (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself
           left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev));
@@ -347,8 +347,8 @@
 <options=bold><fg=yellow>medium (10)</fg=yellow></options=bold>
   phpseclib/phpseclib 3.0.55  via php-amqplib/php-amqplib, php-amqplib/rabbitmq-bundle  ·  vulnerable
       8 = vulnerable 8 [medium advisory] (baseline: new package)
-      do: composer update 'phpseclib/phpseclib:^3.0.57' (gets 3.0.57) — clears the advisory; Composer's solver checked
-          it against the lock
+      do: composer update 'phpseclib/phpseclib:^3.0.57'
+          (gets 3.0.57) — clears the advisory; Composer's solver checked it against the lock
       vulnerable   1 advisory: 1 medium — all fixed on 3.x; advisory: CVE-2026-84308 phpseclib — non-constant-time
                    X25519 scalar multiplication permits full private-key recovery
       age: installed 3.0.55 released 2026-06-14 (0.3 years ago); 3.x last released 3.0.57 2026-08-26 (0.1 years
@@ -393,8 +393,8 @@
       8 = left-behind 16 ÷ 2 transitive (baseline: new package)
       do: move symfony/psr-http-message-bridge to ^7.4 through sentry/sentry-symfony — clears left-behind; 7.x needs
           php \>=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires
-          symfony/http-foundation ^5.4.48) and symfony/psr-http-message-bridge v7.4.8, its own release (requires
-          symfony/http-foundation ^6.4|^7.0|^8.0) and sentry/sentry-symfony 5.6.0 (requires ^1.2||^2.0||^6.4||^7.0) and
+          symfony/http-foundation ^5.4.48) and symfony/psr-http-message-bridge v7.4.0, its own release (requires
+          symfony/http-foundation ^6.4|^7.0|^8.0) and sentry/sentry-symfony 5.2.0 (requires ^1.2||^2.0||^6.4||^7.0) and
           sentry/sentry-symfony 5.12.0 (requires ^1.2||^2.0||^6.4||^7.0||^8.0) and sentry/sentry-symfony 5.13.0
           (requires sentry/sentry ^4.31.0); the packages that hold it may need to move too; a new major brings its own
           requirements; Composer's solver refuses it against the lock
@@ -467,7 +467,7 @@
       gate 0 = min(5, 2 × 0) (the new facts bound it); new: 0
       do: move sebastian/code-unit-reverse-lookup to ^4.0 through phpunit/phpunit — clears left-behind and
           old-promise; 4.x needs php \>=8.2, which require.php allows; the target php 8.4 runs it; held by
-          phpunit/php-code-coverage 9.2.32 (requires ^2.0.3) and phpunit/phpunit 9.6.35 (requires
+          phpunit/php-code-coverage 9.2.32 (requires ^2.0.3) and phpunit/phpunit 9.6.34 (requires
           phpunit/php-code-coverage ^9.2.32) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the
           packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses
           it against the lock
@@ -493,7 +493,7 @@
       do: move sebastian/object-reflector to ^4.0 through phpunit/phpunit — clears left-behind and old-promise; 4.x
           needs php \>=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator
           4.0.4 (requires ^2.0; itself left-behind) and sebastian/global-state 5.0.8 (requires ^2.0) and phpunit/phpunit
-          9.6.38 (requires sebastian/exporter ^4.0.9) and phpunit/phpunit 9.6.35 (requires sebastian/global-state
+          9.6.38 (requires sebastian/exporter ^4.0.9) and phpunit/phpunit 9.6.34 (requires sebastian/global-state
           ^5.0.8); the packages that hold it may need to move too; a new major brings its own requirements; Composer's
           solver refuses it against the lock
       left-behind  branch 2.x last released 2020-10-26 (6.0 years ago); 6.x released 6.1.0 (2026-08-13), needs php \>=8.4

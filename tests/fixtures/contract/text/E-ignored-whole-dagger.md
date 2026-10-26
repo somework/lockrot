@@ -1,4 +1,4 @@
-### lockrot: 1 of 1 packages flagged — low 1
+### lockrot: 1 of 1 package flagged — low 1
 
 **gate: passes** · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
 

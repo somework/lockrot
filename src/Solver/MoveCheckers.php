@@ -12,6 +12,7 @@ use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Signal\PhpFloor;
 
 /**
  * Builds the move check of one project (docs/verdicts.md#the-move-check).
@@ -22,10 +23,9 @@ final class MoveCheckers
 {
     /**
      * The patch that the solve runs `php` at when `config.platform.php` names none in the target
-     * minor: the newest one, so a requirement that admits a patch of the target admits it, as
-     * lockrot's target PHP does ({@see \Lockrot\Signal\PhpFloor}).
+     * minor: the point at which {@see PhpFloor} tests the target PHP.
      */
-    public const NEWEST_PATCH = '99';
+    public const NEWEST_PATCH = PhpFloor::NEWEST_PATCH;
 
     /**
      * @param RootPackageInterface      $root         the project's root package, as Composer loads composer.json
@@ -57,7 +57,7 @@ final class MoveCheckers
         $blocking = AdvisoryBlocking::fromConfig($config);
         $lookup = new RepositoryAdvisoryLoader($repositories, $offline, $deadline);
 
-        return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): array => $lookup->records($names, $complete)), $configured);
+        return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): ?array => $lookup->records($names, $complete)), $configured);
     }
 
     /**

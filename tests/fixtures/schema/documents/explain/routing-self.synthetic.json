@@ -181,6 +181,22 @@
    "held_by": [
     {
      "source": "package",
+     "package": "acme/routing-bridge",
+     "version": "v4.4.41",
+     "link": "require",
+     "target": null,
+     "constraint": "self.version",
+     "holder": {
+      "verdict": "unknown",
+      "lead": null,
+      "flag_ids": [],
+      "replacement": null,
+      "direct": false,
+      "next_step": null
+     }
+    },
+    {
+     "source": "package",
      "package": "mautic/core-lib",
      "version": "4.3.x-dev",
      "link": "require",
@@ -203,15 +219,6 @@
        "check": null
       }
      }
-    },
-    {
-     "source": "package",
-     "package": "acme/routing-bridge",
-     "version": "v4.4.41",
-     "link": "require",
-     "target": null,
-     "constraint": "self.version",
-     "holder": null
     }
    ],
    "clears": [
@@ -436,6 +443,22 @@
         "held_by": [
          {
           "source": "package",
+          "package": "acme/routing-bridge",
+          "version": "v4.4.41",
+          "link": "require",
+          "target": null,
+          "constraint": "self.version",
+          "holder": {
+           "verdict": "unknown",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": false,
+           "next_step": null
+          }
+         },
+         {
+          "source": "package",
           "package": "mautic/core-lib",
           "version": "4.3.x-dev",
           "link": "require",
@@ -458,15 +481,6 @@
             "check": null
            }
           }
-         },
-         {
-          "source": "package",
-          "package": "acme/routing-bridge",
-          "version": "v4.4.41",
-          "link": "require",
-          "target": null,
-          "constraint": "self.version",
-          "holder": null
          }
         ],
         "reason": null
@@ -497,6 +511,22 @@
         "held_by": [
          {
           "source": "package",
+          "package": "acme/routing-bridge",
+          "version": "v4.4.41",
+          "link": "require",
+          "target": null,
+          "constraint": "self.version",
+          "holder": {
+           "verdict": "unknown",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": false,
+           "next_step": null
+          }
+         },
+         {
+          "source": "package",
           "package": "mautic/core-lib",
           "version": "4.3.x-dev",
           "link": "require",
@@ -519,15 +549,6 @@
             "check": null
            }
           }
-         },
-         {
-          "source": "package",
-          "package": "acme/routing-bridge",
-          "version": "v4.4.41",
-          "link": "require",
-          "target": null,
-          "constraint": "self.version",
-          "holder": null
          }
         ],
         "reason": null
@@ -652,6 +673,22 @@
      "held_by": [
       {
        "source": "package",
+       "package": "acme/routing-bridge",
+       "version": "v4.4.41",
+       "link": "require",
+       "target": null,
+       "constraint": "self.version",
+       "holder": {
+        "verdict": "unknown",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "direct": false,
+        "next_step": null
+       }
+      },
+      {
+       "source": "package",
        "package": "friendsofsymfony/rest-bundle",
        "version": "3.3.0",
        "link": "require",
@@ -713,15 +750,6 @@
          "check": null
         }
        }
-      },
-      {
-       "source": "package",
-       "package": "acme/routing-bridge",
-       "version": "v4.4.41",
-       "link": "require",
-       "target": null,
-       "constraint": "self.version",
-       "holder": null
       }
      ],
      "if_applied": {
@@ -766,6 +794,22 @@
      "held_by": [
       {
        "source": "package",
+       "package": "acme/routing-bridge",
+       "version": "v4.4.41",
+       "link": "require",
+       "target": null,
+       "constraint": "self.version",
+       "holder": {
+        "verdict": "unknown",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "direct": false,
+        "next_step": null
+       }
+      },
+      {
+       "source": "package",
        "package": "friendsofsymfony/rest-bundle",
        "version": "3.3.0",
        "link": "require",
@@ -827,15 +871,6 @@
          "check": null
         }
        }
-      },
-      {
-       "source": "package",
-       "package": "acme/routing-bridge",
-       "version": "v4.4.41",
-       "link": "require",
-       "target": null,
-       "constraint": "self.version",
-       "holder": null
       }
      ],
      "if_applied": {
@@ -878,6 +913,22 @@
      "lowest": "v6.4.41",
      "newest": "v6.4.47",
      "held_by": [
+      {
+       "source": "package",
+       "package": "acme/routing-bridge",
+       "version": "v4.4.41",
+       "link": "require",
+       "target": null,
+       "constraint": "self.version",
+       "holder": {
+        "verdict": "unknown",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "direct": false,
+        "next_step": null
+       }
+      },
       {
        "source": "package",
        "package": "mautic/core-lib",
@@ -925,15 +976,6 @@
          "check": null
         }
        }
-      },
-      {
-       "source": "package",
-       "package": "acme/routing-bridge",
-       "version": "v4.4.41",
-       "link": "require",
-       "target": null,
-       "constraint": "self.version",
-       "holder": null
       }
      ],
      "if_applied": {
@@ -978,6 +1020,22 @@
      "held_by": [
       {
        "source": "package",
+       "package": "acme/routing-bridge",
+       "version": "v4.4.41",
+       "link": "require",
+       "target": null,
+       "constraint": "self.version",
+       "holder": {
+        "verdict": "unknown",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "direct": false,
+        "next_step": null
+       }
+      },
+      {
+       "source": "package",
        "package": "mautic/core-lib",
        "version": "4.3.x-dev",
        "link": "require",
@@ -1000,15 +1058,6 @@
          "check": null
         }
        }
-      },
-      {
-       "source": "package",
-       "package": "acme/routing-bridge",
-       "version": "v4.4.41",
-       "link": "require",
-       "target": null,
-       "constraint": "self.version",
-       "holder": null
       }
      ],
      "if_applied": {

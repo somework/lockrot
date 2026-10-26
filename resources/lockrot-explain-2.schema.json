@@ -1546,7 +1546,7 @@
                     ]
                 },
                 "held_by": {
-                    "description": "The links that exclude the move; `upgrade` ⇒ not empty where lockrot read the links.",
+                    "description": "The links that exclude the move; `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move (`moves_with` not empty).",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/heldBy"
@@ -2258,6 +2258,34 @@
                             "properties": {
                                 "to_branch": {
                                     "type": "string"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "description": "`moves_with` is empty unless `check.result` is `resolves`, and a move with entries has an empty `held_by`.",
+                    "anyOf": [
+                        {
+                            "properties": {
+                                "moves_with": {
+                                    "maxItems": 0
+                                }
+                            }
+                        },
+                        {
+                            "properties": {
+                                "check": {
+                                    "properties": {
+                                        "result": {
+                                            "enum": [
+                                                "resolves"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "held_by": {
+                                    "maxItems": 0
                                 }
                             }
                         }
@@ -3423,6 +3451,7 @@
                             "required": [
                                 "composer",
                                 "blocks_advisories",
+                                "blocking_disabled_by",
                                 "ignores_extensions",
                                 "baseline",
                                 "reason"
@@ -3439,6 +3468,18 @@
                                 "blocks_advisories": {
                                     "description": "Whether the solve removed the versions that an advisory affects, as Composer 2.9 and later do in an update.",
                                     "type": "boolean"
+                                },
+                                "blocking_disabled_by": {
+                                    "description": "The environment variables that turned off the blocking of the Composer that solved: each one that this Composer reads and that holds a true value, in this order. Composer 2.10 and later read both, and 2.9.2 to 2.9.x read `COMPOSER_NO_SECURITY_BLOCKING`. Closed.",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": [
+                                            "COMPOSER_NO_BLOCKING",
+                                            "COMPOSER_NO_SECURITY_BLOCKING"
+                                        ]
+                                    },
+                                    "uniqueItems": true
                                 },
                                 "ignores_extensions": {
                                     "description": "Always true: the solve ignores every `ext-*` requirement, as `--ignore-platform-req=ext-*` does, so the extensions of the machine that runs lockrot decide no move.",
@@ -3476,6 +3517,27 @@
                                 }
                             },
                             "allOf": [
+                                {
+                                    "description": "A run whose blocking an environment variable turned off blocks no advisory.",
+                                    "anyOf": [
+                                        {
+                                            "properties": {
+                                                "blocking_disabled_by": {
+                                                    "maxItems": 0
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "properties": {
+                                                "blocks_advisories": {
+                                                    "enum": [
+                                                        false
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
                                 {
                                     "description": "`reason` is set exactly on a `baseline` of `not_checked`.",
                                     "anyOf": [
@@ -13898,7 +13960,7 @@
                     ]
                 },
                 "held_by": {
-                    "description": "The links that exclude the move; `upgrade` ⇒ not empty where lockrot read the links.",
+                    "description": "The links that exclude the move; `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move (`moves_with` not empty).",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/heldBy"
@@ -14630,6 +14692,34 @@
                     ]
                 },
                 {
+                    "description": "`moves_with` is empty unless `check.result` is `resolves`, and a move with entries has an empty `held_by`.",
+                    "anyOf": [
+                        {
+                            "properties": {
+                                "moves_with": {
+                                    "maxItems": 0
+                                }
+                            }
+                        },
+                        {
+                            "properties": {
+                                "check": {
+                                    "properties": {
+                                        "result": {
+                                            "enum": [
+                                                "resolves"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "held_by": {
+                                    "maxItems": 0
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
                     "description": "A security move carries its fix kind: `source` or `merged` holds `vulnerable`.",
                     "anyOf": [
                         {
@@ -15015,7 +15105,8 @@
                                         "composer_json_invalid",
                                         "no_release_read",
                                         "pass_cap",
-                                        "solver_error"
+                                        "solver_error",
+                                        "advisory_lookup_incomplete"
                                     ]
                                 },
                                 {
@@ -16124,7 +16215,8 @@
                         "composer_json_invalid",
                         "no_release_read",
                         "pass_cap",
-                        "solver_error"
+                        "solver_error",
+                        "advisory_lookup_incomplete"
                     ]
                 },
                 "packages": {
@@ -17821,7 +17913,7 @@
                     ]
                 },
                 "held_by": {
-                    "description": "The links that exclude the fixing release; `upgrade` ⇒ not empty where lockrot read the links.",
+                    "description": "The links that exclude the fixing release; `upgrade` ⇒ not empty where lockrot read the links, except where the joint request resolves the move to this release.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/heldBy"

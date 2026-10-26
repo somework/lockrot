@@ -1,0 +1,23 @@
+{
+    "score_text": "10 = capped 8 + vulnerable 2 [low advisory]",
+    "next_step_text": "raise require.php to >=8.2, then require symfony/routing ^6.4.40 (gets v6.4.40, below the newest v6.4.41) — clears the advisory; 6.x needs php >=8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; capped stays; Composer's solver checked it against the lock",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-04 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)",
+    "explain_age": [
+        "installed  v6.4.28   2025-10-31   0.9 years ago",
+        "6.x        v6.4.41   2026-07-04   0.2 years ago                 below release-warn-years 3",
+        "newest     v6.4.41   2026-07-04   0.2 years ago                 below release-warn-years 3",
+        "last push            2026-09-29   less than three weeks ago     below push-warn-years 3",
+        "libyears 0.7 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer require 'php:>=8.2' --no-update",
+        "composer require 'symfony/routing:^6.4.40'"
+    ],
+    "commands_cmd": [
+        "composer require \"php:>=8.2\" --no-update",
+        "composer require \"symfony/routing:^6.4.40\""
+    ]
+}

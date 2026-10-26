@@ -372,7 +372,7 @@
           "--no-update"
         ]
       ],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "PrestaShop_PrestaShop",
@@ -453,7 +453,7 @@
           "mrclay/minify:^4.0"
         ]
       ],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "PrestaShop_PrestaShop",
@@ -1222,7 +1222,7 @@
           "bacon/bacon-qr-code:^3.1"
         ]
       ],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "grokability_snipe-it",
@@ -1324,7 +1324,7 @@
           "doctrine/instantiator:^2.1"
         ]
       ],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "grokability_snipe-it",
@@ -1582,7 +1582,7 @@
           "intervention/image:^3.11"
         ]
       ],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "grokability_snipe-it",
@@ -2196,7 +2196,7 @@
           "pragmarx/google2fa-laravel:^2.3"
         ]
       ],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "grokability_snipe-it",
@@ -4088,7 +4088,7 @@
         ]
       ],
       "model": [],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "mautic_mautic",
@@ -4158,7 +4158,7 @@
         ]
       ],
       "model": [],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "mautic_mautic",
@@ -4403,7 +4403,7 @@
         ]
       ],
       "model": [],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "mautic_mautic",
@@ -9795,7 +9795,7 @@
           "doctrine/event-manager:^2.1"
         ]
       ],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "wallabag_wallabag",
@@ -10798,7 +10798,7 @@
           "lcobucci/jwt:^5.6"
         ]
       ],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "wallabag_wallabag",
@@ -11071,7 +11071,7 @@
         ]
       ],
       "model": [],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "wallabag_wallabag",
@@ -11320,7 +11320,7 @@
         ]
       ],
       "model": [],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "wallabag_wallabag",
@@ -11355,7 +11355,7 @@
           "symfony/webpack-encore-bundle:^2.4"
         ]
       ],
-      "reason": "The model writes the why-not step only on an `update` move. SPEC §5.6 `commands[]` (ruling R5) also writes it on a `require`, `raise-php` or `tag` move whose check is null, and every check is null in this run."
+      "reason": "The model writes no why-not step, because it writes `next_step.version` null for the reason of the `next_step.version` entry of this package. lockrot ends the commands with the why-not step at its version."
     },
     {
       "app": "wallabag_wallabag",

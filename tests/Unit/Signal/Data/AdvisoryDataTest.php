@@ -74,6 +74,16 @@ final class AdvisoryDataTest extends TestCase
         self::assertSame('{"kind":"none","to_branch":null,"version":null,"newest":null,"on_installed_branch":null,"php":null,"admits_target_php":null,"admits_project_php":null,"held_by":[],"reason":"no_release_outside_range"}', JsonWriter::encode(Fix::none(), 0));
     }
 
+    /** SPEC §5.6, ruling R1: the S9 row at a release that the joint request moves to is not held (I19, case mc-joint‡). */
+    public function testARowAtAReleaseThatTheJointRequestResolvesNamesNoHolder(): void
+    {
+        $data = new AdvisoryData([self::row()], true, true);
+
+        $at = static fn (AdvisoryData $data): int => \count(JsonPath::arrayAt(JsonPath::decoded($data), ['advisories', 0, 'fix', 'held_by']));
+
+        self::assertSame([0, 2, 2], [$at($data->withJointMoves(['3.x' => 'v3.26.0'])), $at($data->withJointMoves(['3.x' => 'v3.27.0'])), $at($data->withJointMoves(['2.x' => 'v3.26.0']))]);
+    }
+
     private static function row(): AdvisoryRow
     {
         $holders = [new Holder(Holder::ROOT, 'acme/app', null, Holder::REQUIRE, '^2.0'), new Holder(Holder::PACKAGE, 'symfony/twig-bridge', 'v3.4.47', Holder::REQUIRE, '^1.41|^2.10')];

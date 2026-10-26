@@ -35,7 +35,7 @@
                                 "text": "stale: Old release or old push, below the silent thresholds"
                             },
                             "fullDescription": {
-                                "text": "No stable release or no repository push for release-warn-years or push-warn-years."
+                                "text": "No release for 3 years (release-warn-years), or no repository push for 3 years (push-warn-years), short of silent."
                             },
                             "defaultConfiguration": {
                                 "level": "warning"

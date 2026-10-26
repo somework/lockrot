@@ -261,6 +261,7 @@
    "require"
   ],
   "direct_dependents": [
+   "acme/gz-client",
    "guzzlehttp/guzzle"
   ],
   "signals": [
@@ -1227,7 +1228,7 @@
   "advisory_lookup": {
    "scope": "all",
    "scope_source": "default",
-   "packages_asked": 1,
+   "packages_asked": 2,
    "packages_not_asked": 0,
    "other_repositories": 0,
    "repositories": [
@@ -1245,6 +1246,7 @@
   "move_check": {
    "composer": "2.10.3",
    "blocks_advisories": false,
+   "blocking_disabled_by": [],
    "ignores_extensions": true,
    "baseline": "resolves",
    "reason": null

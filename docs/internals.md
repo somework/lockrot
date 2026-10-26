@@ -86,6 +86,10 @@ carries `User-Agent: lockrot`.
 - Exception: Composer's entry for the host can be a client certificate, or custom headers without a
   credential header. Then Composer adds no credential header, and lockrot sends its own.
 
+- When a host redirects to another host, lockrot asks that host again without its own header.
+  This needs Composer 2.10 or later with the curl extension. With an older Composer,
+  Composer sends lockrot's header to the redirect target too.
+
 - lockrot exchanges a `bitbucket-oauth` consumer for a bearer token, once per run, the first time
   it asks about a Bitbucket repository: a `client_credentials` request to
   `https://bitbucket.org/site/oauth2/access_token`. lockrot writes nothing to `auth.json`. When the

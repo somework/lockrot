@@ -37,8 +37,8 @@ final class BranchRowTest extends TestCase
         self::assertSame(['3.x', '2.x'], array_map(static fn (BranchRow $row): string => $row->branch(), $rows));
         [$three, $two] = $rows;
         self::assertSame('v3.1.0', $three->highest());
-        self::assertSame('8.2.0', $three->php());
-        self::assertTrue($three->admitsProjectPhp(), 'the floor point: >=8.2 admits a branch that needs 8.2.0');
+        self::assertSame('~8.2.0', $three->php());
+        self::assertTrue($three->admitsProjectPhp(), 'the floor point: >=8.2 admits a branch on ~8.2.0 at 8.2.0');
         self::assertTrue($three->admitsTargetPhp());
         self::assertNull($three->phpBlockedBy());
         self::assertNull($three->missesProjectPhp());
@@ -109,8 +109,8 @@ final class BranchRowTest extends TestCase
     {
         $versions = [
             self::release(['version' => 'v2.0.0', 'time' => '2023-01-01T00:00:00+00:00', 'require' => ['php' => '>=7.1']]),
-            self::release(['version' => 'v3.0.0', 'time' => '2025-01-01T00:00:00+00:00', 'require' => ['php' => '8.2.0']]),
-            self::release(['version' => 'v3.1.0', 'time' => '2025-09-14T00:00:00+00:00', 'require' => ['php' => '8.2.0']]),
+            self::release(['version' => 'v3.0.0', 'time' => '2025-01-01T00:00:00+00:00', 'require' => ['php' => '~8.2.0']]),
+            self::release(['version' => 'v3.1.0', 'time' => '2025-09-14T00:00:00+00:00', 'require' => ['php' => '~8.2.0']]),
         ];
 
         return new PackageFacts(self::locked('v2.0.0'), PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::NOW), '2.0.0.0'), null, $advisories);

@@ -39,9 +39,10 @@ final class MoveCheck implements \JsonSerializable
     public const NO_RELEASE_READ = 'no_release_read';
     public const PASS_CAP = 'pass_cap';
     public const SOLVER_ERROR = 'solver_error';
+    public const ADVISORY_LOOKUP_INCOMPLETE = 'advisory_lookup_incomplete';
 
     /** The reasons that lockrot writes, in the order that the schema lists them. */
-    public const REASONS = [self::BASELINE_REFUSED, self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NOT_FROM_COMPOSER_REPOSITORY, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::NO_RELEASE_READ, self::PASS_CAP, self::SOLVER_ERROR];
+    public const REASONS = [self::BASELINE_REFUSED, self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NOT_FROM_COMPOSER_REPOSITORY, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::NO_RELEASE_READ, self::PASS_CAP, self::SOLVER_ERROR, self::ADVISORY_LOOKUP_INCOMPLETE];
 
     /** The reasons that leave the baseline itself unchecked (`run.move_check.reason`), in the schema's order. */
     public const BASELINE_REASONS = [self::INSTALL_TIME_BUDGET, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::SOLVER_ERROR];
@@ -58,6 +59,7 @@ final class MoveCheck implements \JsonSerializable
         self::NO_RELEASE_READ => 'no release of the row was read',
         self::PASS_CAP => 'Composer refused each move before it',
         self::SOLVER_ERROR => "Composer's solver failed on it",
+        self::ADVISORY_LOOKUP_INCOMPLETE => 'the advisory lookup did not cover a package it installs',
     ];
 
     /** @var self::RESOLVES|self::REFUSED|self::NOT_CHECKED */

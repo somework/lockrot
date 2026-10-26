@@ -129,7 +129,8 @@ function runOnce(string $entry, string $app, string $out): array
         fwrite(STDERR, "expected-diff: $entry on $app exited ".$process->getExitCode()."\n".$process->getErrorOutput());
         exit(2);
     }
-    $mask = static fn (string $text): string => (string) preg_replace('{http://127\.0\.0\.1:\d+}', 'http://127.0.0.1', $text);
+    // Markdown escapes the colon of a bare URL (`http\://`).
+    $mask = static fn (string $text): string => (string) preg_replace('{http(\\\\?)://127\.0\.0\.1:\d+}', 'http$1://127.0.0.1', $text);
     $outputs = ['json' => $mask((string) file_get_contents($out.'/report.json')), 'table' => $mask($process->getOutput())];
     foreach (['markdown', 'github'] as $format) {
         $outputs[$format] = $mask((string) file_get_contents($out.'/'.TEXT[$format]));

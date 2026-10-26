@@ -58,6 +58,7 @@ final class TargetFixTest extends TestCase
 
         self::assertSame([
             'packages' => [['name' => 'acme/capped', 'version' => '1.0.0', 'link' => 'require', 'target' => 'php', 'constraint' => '>=7.4 <8.4', 'dev' => false]],
+            'lock_platform' => [],
             'command' => null,
             'check' => 'not_checked',
             'reason' => null,
@@ -102,6 +103,18 @@ final class TargetFixTest extends TestCase
         self::assertSame(['refused', null, null], [$fix['check'], $fix['command'], $fix['reason']]);
         self::assertSame([['root', 'root-require', 'acme/capped'], ['package', 'platform', 'php']], self::holds($fix), 'the listed package\'s platform hold restates packages; another package\'s stays');
         self::assertSame([null, 'acme/other'], array_map(static fn (Holder $hold): ?string => $hold->source() === Holder::ROOT ? null : $hold->package(), $fix['held_by']));
+    }
+
+    public function testARefusedFixDropsTheListedPackagesOwnPhp64bitHold(): void
+    {
+        $holds = [
+            ['source' => 'package', 'package' => 'acme/capped', 'version' => '1.0.0', 'link' => 'platform', 'target' => 'php-64bit', 'constraint' => '<8.3'],
+            ['source' => 'package', 'package' => 'acme/other', 'version' => '3.0.0', 'link' => 'platform', 'target' => 'php-64bit', 'constraint' => '<8.0'],
+        ];
+
+        $fix = self::fix(['packages' => [self::CAPPED], 'packages-dev' => []], [], self::recorded(['result' => 'refused', 'holds' => $holds]));
+
+        self::assertSame(['acme/other'], array_map(static fn (Holder $hold): ?string => $hold->package(), $fix['held_by']), 'the listed package\'s php-64bit hold restates packages; another package\'s stays');
     }
 
     public function testARefusedFixKeepsEveryHoldOfAListedPackageThatIsNotOnPhp(): void
@@ -249,6 +262,57 @@ final class TargetFixTest extends TestCase
         self::assertSame(['acme/installer'], array_column($fix['packages'], 'name'));
     }
 
+    /** Ruling Q3: Composer rewrites the lock's platform from composer.json on every update, so a link that only the lock records is no ceiling. */
+    public function testARootRequirementThatOnlyTheLockRecordsIsListedAndAnUpdateOfTheLockRewritesIt(): void
+    {
+        $lock = ['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['php' => '>=7.4']]], 'packages-dev' => [], 'platform' => ['php' => '>=7.4 <8.1'], 'platform-dev' => ['php' => '<8.2']];
+
+        $fix = self::fix($lock, ['require' => ['acme/lib' => '^1.0']], self::resolving());
+
+        self::assertSame([
+            ['name' => null, 'version' => null, 'link' => 'require', 'target' => 'php', 'constraint' => '<8.2', 'dev' => true],
+        ], $fix['lock_platform']);
+        self::assertSame([[], 'resolves', ['composer', 'update', '--lock'], []], [$fix['packages'], $fix['check'], $fix['command'], $fix['held_by']]);
+        self::assertSame('lock_platform', array_keys($fix)[1], 'lock_platform follows packages');
+    }
+
+    public function testAnUpdateThatNamesNoPackageSolvesWithComposer(): void
+    {
+        $lock = ['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['php' => '>=7.4']]], 'packages-dev' => [], 'platform' => ['php' => '<8.1']];
+
+        $fix = self::fix($lock, ['require' => ['acme/lib' => '^1.0']], self::solving($lock, [], new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0', 'require' => ['php' => '>=7.4']]]])));
+
+        self::assertSame(['resolves', ['composer', 'update', '--lock']], [$fix['check'], $fix['command']]);
+    }
+
+    public function testALockPlatformLinkBesideAListedPackageLeavesTheCommandToThePackage(): void
+    {
+        $lock = ['packages' => [self::CAPPED], 'packages-dev' => [], 'platform' => ['php' => '<8.1']];
+
+        $fix = self::fix($lock, ['require' => ['acme/capped' => '^1.0']], self::resolving());
+
+        self::assertSame([['require', 'php', '<8.1']], array_map(static fn (array $req): array => [$req['link'], $req['target'], $req['constraint']], $fix['lock_platform']));
+        self::assertSame(['acme/capped'], array_column($fix['packages'], 'name'));
+        self::assertSame(['composer', 'update', 'acme/capped'], $fix['command']);
+    }
+
+    /** On a lock-only run, every root link comes from the lock's platform, and it is the root ceiling. */
+    public function testALockOnlyRunReadsTheLocksPlatformAsTheRootCeiling(): void
+    {
+        $fix = self::fix(['packages' => [], 'packages-dev' => [], 'platform' => ['php' => '<8.1']], null, new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON));
+
+        self::assertSame([[], 'refused'], [$fix['lock_platform'], $fix['check']]);
+        self::assertSame([['root', 'require', 'php', '<8.1']], self::rootHolds($fix));
+    }
+
+    public function testALinkThatComposerJsonAlsoHasIsTheRootCeiling(): void
+    {
+        $fix = self::fix(['packages' => [], 'packages-dev' => [], 'platform' => ['php' => '<8.0']], ['require' => ['php' => '<8.1']], self::resolving());
+
+        self::assertSame([[], 'refused'], [$fix['lock_platform'], $fix['check']]);
+        self::assertSame([['root', 'require', 'php', '<8.1']], self::rootHolds($fix));
+    }
+
     /** F4: each root ceiling hold names its section, `require-dev` and `conflict` included. */
     public function testTheRootCeilingNamesARequireDevCapAndARootConflict(): void
     {
@@ -325,7 +389,7 @@ final class TargetFixTest extends TestCase
     /** @return Fix */
     private static function refused(Holder ...$holds): array
     {
-        return ['packages' => [], 'command' => null, 'check' => 'refused', 'reason' => null, 'held_by' => array_values($holds), 'platform_step' => false];
+        return ['packages' => [], 'lock_platform' => [], 'command' => null, 'check' => 'refused', 'reason' => null, 'held_by' => array_values($holds), 'platform_step' => false];
     }
 
     /** @param array<string, mixed> $check */

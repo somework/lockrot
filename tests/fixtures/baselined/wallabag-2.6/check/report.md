@@ -123,7 +123,7 @@ depth: 51 of 113 flagged packages are named by no line of composer.json · direc
 security: 20 vulnerable packages · 64 advisories: 1 critical, 17 high, 30 medium, 3 unrated, 13 low
 libyears: at least 388.8 behind across 204 of 210 packages · 220.4 from direct requirements · furthest behind willdurand/jsonp-callback-validator v1.1.0 at 8.0
 pulled in by: `kphoen/rulerz-bundle` 15 · `kphoen/rulerz` 14 · `wallabag/phpepub` 5 · `nelmio/api-doc-bundle` 3 · `pagerfanta/doctrine-orm-adapter` 3 · … and 31 more
-advisories: 210 packages asked · composer repo (http://127.0.0.1) answered (193 on record for 49 packages)
+advisories: 210 packages asked · composer repo (http\://127.0.0.1) answered (193 on record for 49 packages)
 moves: not checked, because Composer's solver refuses the lock itself (see the moves\_not\_checked note)
 php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of the 3 packages that exclude it: composer.json requires `php-http/guzzle5-adapter` ^2.0
 baseline: 48 known · 61 new · 6 worsened · 2 stale (lockrot-baseline.json)

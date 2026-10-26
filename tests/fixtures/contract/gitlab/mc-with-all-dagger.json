@@ -11,6 +11,22 @@
         "location": {
             "path": "composer.lock",
             "lines": {
+                "begin": 18
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "acme/hf-mime 1.0.0 \u2014 finding ok (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "01c48e0167c5b35c8a6e34ad8854bd79ad2710feee2b59cdb30a63af51287b21",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
                 "begin": 4
             }
         }
