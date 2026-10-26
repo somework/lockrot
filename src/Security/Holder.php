@@ -121,9 +121,10 @@ final class Holder implements \JsonSerializable
     }
 
     /**
-     * Each entry once, in `held_by[]`'s order. Two entries that differ only in the version keep the
-     * first: the solver can name a newer release of the moved package than the scan does. A stable
-     * version still wins over a dev version, which Composer installs only without the tag (T4).
+     * Each entry once, in `held_by[]`'s order. Of two entries that differ only in the version, a
+     * stable version wins over a dev version, which Composer installs only without the tag (T4).
+     * Between two stable versions the lower wins: Composer's problem text names one rule's versions
+     * lowest first. Between two dev versions the first stays.
      *
      * @param list<self> $holders
      *
@@ -134,13 +135,24 @@ final class Holder implements \JsonSerializable
         $kept = [];
         foreach ($holders as $holder) {
             $key = implode("\0", $holder->order());
-            if (!isset($kept[$key]) || ($kept[$key]->stability() === 'dev' && $holder->stability() === 'stable')) {
+            if (!isset($kept[$key]) || self::wins($holder, $kept[$key])) {
                 $kept[$key] = $holder;
             }
         }
         usort($kept, static fn (self $a, self $b): int => $a->order() <=> $b->order());
 
         return $kept;
+    }
+
+    private static function wins(self $holder, self $kept): bool
+    {
+        $stability = $holder->stability();
+        if ($stability !== $kept->stability()) {
+            return $kept->stability() === 'dev' && $stability === 'stable';
+        }
+        $parser = new VersionParser();
+
+        return $stability === 'stable' && version_compare($parser->normalize((string) $holder->version), $parser->normalize((string) $kept->version), '<');
     }
 
     private function stability(): ?string

@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 final class HolderTest extends TestCase
 {
     /** D3: holds are distinct, the root first, then by package, then by link, then by target. */
-    public function testDistinctHoldsKeepTheFirstOfEachAndSortTheRootFirst(): void
+    public function testDistinctHoldsKeepOneOfEachAndSortTheRootFirst(): void
     {
         $holds = Holder::distinct([
             new Holder(Holder::PACKAGE, 'symfony/yaml', 'v5.4.54', Holder::CONFLICT, '<5.3', 'symfony/console'),
@@ -34,7 +34,7 @@ final class HolderTest extends TestCase
             ],
             array_map(static fn (Holder $hold): array => [$hold->source(), $hold->link(), $hold->source() === Holder::ROOT ? null : $hold->package(), $hold->target()], $holds)
         );
-        self::assertSame('v5.4.54', $holds[4]->version(), 'the first of two that differ only in the version');
+        self::assertSame('v5.4.52', $holds[4]->version(), 'the lower of two tags that differ only in the version');
     }
 
     /**
@@ -46,7 +46,9 @@ final class HolderTest extends TestCase
     {
         yield 'a dev version, then a tag' => [['7.x-dev', 'v7.14.0'], 'v7.14.0'];
         yield 'a tag, then a dev version' => [['v7.14.0', '7.x-dev'], 'v7.14.0'];
-        yield 'two tags' => [['v7.14.0', 'v7.13.0'], 'v7.14.0'];
+        // Composer's problem text lists one rule's versions as a bracket, lowest first.
+        yield 'two tags, the higher first' => [['v7.14.0', 'v7.13.0'], 'v7.13.0'];
+        yield 'two tags, the lower first' => [['v7.13.0', 'v7.14.0'], 'v7.13.0'];
         yield 'two dev versions' => [['7.x-dev', 'dev-main'], '7.x-dev'];
     }
 
@@ -56,7 +58,7 @@ final class HolderTest extends TestCase
      * @param list<string> $versions the hold's versions, in rule order
      */
     #[DataProvider('versionsOfOneHold')]
-    public function testOfTwoHoldsThatDifferOnlyInTheVersionATagWinsOverADevVersionElseTheFirst(array $versions, string $kept): void
+    public function testOfTwoHoldsThatDifferOnlyInTheVersionATagWinsOverADevVersionAndTheLowerTagOverAHigherOne(array $versions, string $kept): void
     {
         $holds = Holder::distinct(array_map(static fn (string $version): Holder => new Holder(Holder::PACKAGE, 'scheb/2fa-email', $version, Holder::REQUIRE, 'self.version', 'scheb/2fa-bundle'), $versions));
 
