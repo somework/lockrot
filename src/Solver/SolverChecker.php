@@ -321,7 +321,7 @@ final class SolverChecker implements MoveChecker
         if ($this->failed($solution)) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::SOLVER_ERROR));
         }
-        $unloaded = $solution->resolves() ? null : $this->notLoaded($solution, ...$moved);
+        $unloaded = $this->notLoaded($solution, ...$moved);
 
         return $unloaded === null ? $solution : new CheckOutcome(MoveCheck::notChecked($unloaded));
     }
@@ -364,7 +364,7 @@ final class SolverChecker implements MoveChecker
         return $error !== null;
     }
 
-    /** The reason of a refusal that needs a name the source could not load, the moved names included, null for a real refusal. */
+    /** The reason of a solve that needs a name the source could not load, the moved names included, null when it proves something. */
     private function notLoaded(Solution $solution, string ...$moved): ?string
     {
         $failures = $solution->unloaded();

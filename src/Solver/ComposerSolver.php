@@ -172,7 +172,7 @@ final class ComposerSolver
             $temporary = [];
         }
         $policy = new DefaultPolicy($root->getPreferStable(), false);
-        [$set, $composerRequest, $pool, $fixedRoot] = $this->pool($root, $requires, $temporary, $request);
+        [$set, $composerRequest, $pool, $fixedRoot, $loaded] = $this->pool($root, $requires, $temporary, $request);
         [$pool, $answer] = $this->answer($policy, $composerRequest, $pool, $fixedRoot);
         if ($answer instanceof SolverProblemsException) {
             $locked = [];
@@ -180,17 +180,9 @@ final class ComposerSolver
                 $locked[$package->getName()] = $package->getVersion();
             }
             $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $requested, $locked);
-            $unloaded = [];
-            foreach ($holds->wanted() as $name) {
-                $failure = $this->source->failure($name);
-                if ($failure !== null) {
-                    $unloaded[$name] = $failure;
-                }
-            }
-
             $setsPhp = $this->setsPhp;
 
-            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $unloaded);
+            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $this->failures($holds->wanted()));
         }
 
         $installs = self::installs($answer);
@@ -202,7 +194,26 @@ final class ComposerSolver
             }
         }
 
-        return Solution::resolved($installs, $from);
+        // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
+        return Solution::resolved($installs, $from, $this->failures($loaded->asked()));
+    }
+
+    /**
+     * @param list<string> $names
+     *
+     * @return array<string, string> the {@see VersionSource} failure of each name that has one
+     */
+    private function failures(array $names): array
+    {
+        $failures = [];
+        foreach ($names as $name) {
+            $failure = $this->source->failure($name);
+            if ($failure !== null) {
+                $failures[$name] = $failure;
+            }
+        }
+
+        return $failures;
     }
 
     private function requiredAfter(LockTransaction $transaction, string $name): bool
@@ -261,7 +272,7 @@ final class ComposerSolver
      * @param array<string, ConstraintInterface> $requires  the root requirements: RepositorySet leaves out the platform ones
      * @param array<string, ConstraintInterface> $temporary
      *
-     * @return array{0: RepositorySet, 1: Request, 2: Pool, 3: BasePackage} the set, the request, the built pool and the root's copy in it
+     * @return array{0: RepositorySet, 1: Request, 2: Pool, 3: BasePackage, 4: LoadedVersions} the set, the request, the built pool, the root's copy in it and the remote versions
      */
     private function pool(RootPackageInterface $root, array $requires, array $temporary, SolveRequest $request): array
     {
@@ -282,7 +293,8 @@ final class ComposerSolver
         if ($this->lockedOnly !== null) {
             $set->addRepository($this->lockedOnly);
         }
-        $set->addRepository(new LoadedVersions($this->source));
+        $loaded = new LoadedVersions($this->source);
+        $set->addRepository($loaded);
         $set->addRepository($this->locked);
 
         $composerRequest = new Request($this->locked);
@@ -322,7 +334,7 @@ final class ComposerSolver
             $blocked[$name] = array_merge($blocked[$name] ?? [], $ranges);
         }
 
-        return [$set, $composerRequest, new Pool(array_filter($pool->getPackages(), self::keeps($blocked, $stayLocked, $blocking)), $pool->getUnacceptableFixedOrLockedPackages()), $fixedRoot];
+        return [$set, $composerRequest, new Pool(array_filter($pool->getPackages(), self::keeps($blocked, $stayLocked, $blocking)), $pool->getUnacceptableFixedOrLockedPackages()), $fixedRoot, $loaded];
     }
 
     /**

@@ -346,6 +346,25 @@ final class SolverCheckerTest extends TestCase
     }
 
     /**
+     * Ruling R2-3: 1.2.0 needs a name that did not load, so the solve resolves at 1.1.0 on a pool that
+     * lacks it. That solve proves nothing.
+     *
+     * @dataProvider unloadedNames
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('unloadedNames')]
+    public function testASolveThatResolvesWithoutANameTheSourceCouldNotLoadIsNotChecked(string $failure, string $reason): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0'], ['version' => '1.2.0', 'require' => ['acme/new-dependency' => '^1.0']]]],
+            ['acme/new-dependency' => $failure]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
+    }
+
+    /**
      * D6: the moved package's own versions did not load, so the solve has no target to refuse.
      *
      * @dataProvider unloadedNames
