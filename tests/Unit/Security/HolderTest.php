@@ -50,6 +50,9 @@ final class HolderTest extends TestCase
         yield 'two tags, the higher first' => [['v7.14.0', 'v7.13.0'], 'v7.13.0'];
         yield 'two tags, the lower first' => [['v7.13.0', 'v7.14.0'], 'v7.13.0'];
         yield 'two dev versions' => [['7.x-dev', 'dev-main'], '7.x-dev'];
+        yield 'a branch, then a tag' => [['dev-main', 'v7.14.0'], 'v7.14.0'];
+        // Only a dev version gives way: any other pair of stabilities keeps the first.
+        yield 'a beta, then a tag' => [['v7.14.0-beta1', 'v7.14.0'], 'v7.14.0-beta1'];
     }
 
     /**
@@ -63,6 +66,15 @@ final class HolderTest extends TestCase
         $holds = Holder::distinct(array_map(static fn (string $version): Holder => new Holder(Holder::PACKAGE, 'scheb/2fa-email', $version, Holder::REQUIRE, 'self.version', 'scheb/2fa-bundle'), $versions));
 
         self::assertSame([$kept], array_map(static fn (Holder $hold): ?string => $hold->version(), $holds));
+    }
+
+    public function testALockedCopyLeavesTheHoldItCopiesUnlocked(): void
+    {
+        $hold = new Holder(Holder::PACKAGE, 'pragmarx/google2fa-laravel', 'v1.4.1', Holder::REQUIRE, '^1.0', 'pragmarx/google2fa-qrcode');
+
+        $locked = $hold->asLocked();
+
+        self::assertSame([false, true], [$hold->isLocked(), $locked->isLocked()]);
     }
 
     /** W6, snipe-it's pragmarx/google2fa-laravel: the locked release holds the move now and keeps the holder's grade. */

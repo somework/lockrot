@@ -407,6 +407,22 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
     }
 
     /** On the Composer 2.2 LTS the whole check is one note. On 2.4 or newer that note never appears. */
+    /** A lookup that is not complete takes the partial records that Composer's metadata gives, and a complete one does not. */
+    public function testTheRecordsOfALookupArePartialOnlyWhenTheLookupIsNotComplete(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        [$completeSpy, $complete] = self::spy();
+        [$partialSpy, $partial] = self::spy();
+
+        (new RepositoryAdvisoryLoader([$completeSpy]))->records(['doctrine/cache'], true);
+        (new RepositoryAdvisoryLoader([$partialSpy]))->records(['doctrine/cache'], false);
+
+        self::assertSame(['hasSecurityAdvisories', 'getSecurityAdvisories'], $complete->getArrayCopy());
+        self::assertSame(['hasSecurityAdvisories', 'getSecurityAdvisories partial'], $partial->getArrayCopy());
+    }
+
     public function testTheComposerVersionNoteMatchesTheApi(): void
     {
         $loader = new RepositoryAdvisoryLoader($this->server()->repositories());
@@ -656,7 +672,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
             public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array
             {
-                $this->calls->append('getSecurityAdvisories');
+                $this->calls->append($allowPartialAdvisories ? 'getSecurityAdvisories partial' : 'getSecurityAdvisories');
 
                 return ['namesFound' => [], 'advisories' => []];
             }

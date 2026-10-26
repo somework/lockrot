@@ -388,6 +388,20 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => null], $outcome->check()->jsonSerialize());
     }
 
+    /** `composer update --lock` moves no package, so a newer release that admits the solve's php does not resolve it. */
+    public function testAnUnlockOfNoNameMovesNoPackage(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['php' => '<8.4']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['php' => '<8.4']], ['version' => '1.1.0', 'require' => ['php' => '>=8.1']]]]
+        );
+
+        $outcome = $checker->solveAt([]);
+
+        self::assertSame(['result' => 'refused', 'form' => null, 'reason' => null, 'installs' => null], $outcome->check()->jsonSerialize());
+    }
+
     /** monica at 8.5: the newer release needs a dependency that a root requirement keeps, so only `-W` moves it. */
     public function testAnUnlockWhoseNewerReleaseNeedsARootRequirementMovedResolvesOnlyWithAllDependencies(): void
     {
