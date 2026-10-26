@@ -118,6 +118,18 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.1.0']], $joined->movesWith());
     }
 
+    public function testTheInstalledVersionComesFromTheHoldOfThatHolderNotFromAnEarlierHold(): void
+    {
+        $other = new Holder(Holder::PACKAGE, 'h/a', '1.0.0', Holder::REQUIRE, '^1.0');
+        $hold = new Holder(Holder::PACKAGE, 'h/x', '1.2.0', Holder::REQUIRE, '^1.0');
+        $outcome = new CheckOutcome(MoveCheck::refused(), [$other, $hold]);
+        $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['acme/lib' => '2.0.0', 'h/x' => '2.1.0']);
+
+        $joined = $outcome->joinedWith($joint, 'acme/lib', '^2.0', ['h/a', 'h/x']);
+
+        self::assertSame([['package' => 'h/x', 'installed_version' => '1.2.0', 'version' => '2.1.0']], $joined->movesWith());
+    }
+
     public function testTheCopyLeavesTheOutcomeItComesFromAsItWas(): void
     {
         $root = new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^1.0');

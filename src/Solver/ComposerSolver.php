@@ -418,7 +418,6 @@ final class ComposerSolver
                 $from[$operation->getInitialPackage()->getName()] = $operation->getInitialPackage()->getPrettyVersion();
             }
         }
-        ksort($from);
 
         return $from;
     }
