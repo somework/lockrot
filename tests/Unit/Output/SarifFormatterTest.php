@@ -802,6 +802,35 @@ final class SarifFormatterTest extends TestCase
         self::assertSame('No release for 1 year (release-warn-years), or no repository push for 4 years (push-warn-years), short of silent.', $text('stale'));
     }
 
+    /** SPEC §7.5: the rule text of each flag comes from `run.score_model`, which names its thresholds, and `run.thresholds`, which holds their values. */
+    public function testTheRuleTextOfEachFlagNamesTheThresholdsThatTheScoreModelListsWithTheValuesOfTheRun(): void
+    {
+        $thresholds = new Thresholds(2, 6, 3, 7);
+        $run = JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::composite()->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, $thresholds))->toArray()), ['run']);
+        $values = JsonPath::arrayAt($run, ['thresholds']);
+        $named = [];
+        $expected = [];
+        foreach (JsonPath::arrayAt($run, ['score_model', 'flags']) as $flag) {
+            self::assertIsArray($flag);
+            if (JsonPath::stringAt($flag, ['part']) === 'security') {
+                continue;
+            }
+            $id = JsonPath::stringAt($flag, ['id']);
+            $text = SarifRecords::rule('lockrot/'.$id, null, $thresholds)['fullDescription']['text'];
+            $named[$id] = [];
+            $expected[$id] = [];
+            foreach (JsonPath::arrayAt($flag, ['thresholds']) as $key) {
+                $value = $values[$key] ?? null;
+                self::assertIsInt($value);
+                $expected[$id][] = true;
+                $named[$id][] = strpos($text, $value.' years ('.$key.')') !== false;
+            }
+            self::assertStringNotContainsString('{', $text, $id);
+        }
+
+        self::assertSame($expected, $named);
+    }
+
     public function testTheRulesOfASarifRunFollowTheThresholdsOfTheRun(): void
     {
         $settings = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, new Thresholds(2, 6, 2, 6));

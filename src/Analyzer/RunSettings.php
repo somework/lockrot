@@ -177,15 +177,8 @@ final class RunSettings
     /** @return array{thresholds: array<string, int>, flag_ids: list<string>, verdicts: list<string>, graded_verdicts: list<string>, signal_ids: list<string>, fix_model: int, text_grammar: int, score_model: array<string, mixed>} */
     private function toModelArray(): array
     {
-        $thresholds = $this->thresholds();
-
         return [
-            'thresholds' => [
-                'release-warn-years' => $thresholds->releaseWarnYears(),
-                'release-high-years' => $thresholds->releaseHighYears(),
-                'push-warn-years' => $thresholds->pushWarnYears(),
-                'push-high-years' => $thresholds->pushHighYears(),
-            ],
+            'thresholds' => $this->thresholds()->toArray(),
             'flag_ids' => ScoreModel::FLAG_ORDER,
             'verdicts' => array_merge(...ScoreModel::VERDICT_ORDER),
             'graded_verdicts' => ScoreModel::GRADES,

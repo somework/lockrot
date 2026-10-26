@@ -72,4 +72,9 @@ final class ThresholdsTest extends TestCase
         $this->expectExceptionMessage('extra.lockrot.release-warn-years must be an integer');
         Thresholds::fromArray(['release-warn-years' => '4']);
     }
+
+    public function testTheArrayHoldsEachThresholdUnderItsKey(): void
+    {
+        self::assertSame(['release-warn-years' => 2, 'release-high-years' => 6, 'push-warn-years' => 3, 'push-high-years' => 7], (new Thresholds(2, 6, 3, 7))->toArray());
+    }
 }

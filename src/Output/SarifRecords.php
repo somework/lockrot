@@ -29,7 +29,7 @@ use Lockrot\Verdict\ScoreModel;
  */
 final class SarifRecords
 {
-    /** The rule text of each rule id, as {short, full}. A `{key}` in the full text is that threshold of the run. */
+    /** The rule text of each rule id, as {short, full}. A `{key}` in the full text is a threshold that `run.score_model` lists for the flag. */
     private const RULES = [
         'abandoned' => ['Package is marked abandoned, or its repository is archived', 'The package\'s registry or composer.lock marks it abandoned, or its repository is archived.'],
         'silent' => ['No stable release and no repository push for a long time', 'No release for {release-high-years} and no repository push for {push-high-years}.'],
@@ -159,21 +159,24 @@ final class SarifRecords
             'id' => $ruleId,
             'name' => $name,
             'shortDescription' => ['text' => $name.': '.$short],
-            'fullDescription' => ['text' => strtr($full, [
-                '{release-warn-years}' => self::years($thresholds->releaseWarnYears(), 'release-warn-years'),
-                '{release-high-years}' => self::years($thresholds->releaseHighYears(), 'release-high-years'),
-                '{push-warn-years}' => self::years($thresholds->pushWarnYears(), 'push-warn-years'),
-                '{push-high-years}' => self::years($thresholds->pushHighYears(), 'push-high-years'),
-            ])],
+            'fullDescription' => ['text' => self::fullText($full, $name, $thresholds)],
             'defaultConfiguration' => ['level' => \in_array($name, ScoreModel::FLAG_ORDER, true) ? FormatContext::LEVEL_WARNING : FormatContext::LEVEL_NOTE],
             'helpUri' => self::HELP_URI,
             'properties' => ['tags' => ['maintainability']],
         ];
     }
 
-    private static function years(int $years, string $key): string
+    /** SPEC §7.5: `run.score_model` names the thresholds of a flag, and `run.thresholds` holds their values. */
+    private static function fullText(string $full, string $flag, Thresholds $thresholds): string
     {
-        return $years.($years === 1 ? ' year' : ' years').' ('.$key.')';
+        $values = $thresholds->toArray();
+        $words = [];
+        foreach (ScoreModel::thresholdsOf($flag) as $key) {
+            $years = $values[$key];
+            $words['{'.$key.'}'] = $years.($years === 1 ? ' year' : ' years').' ('.$key.')';
+        }
+
+        return strtr($full, $words);
     }
 
     /**
