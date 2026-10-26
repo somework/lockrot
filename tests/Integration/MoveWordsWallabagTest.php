@@ -93,12 +93,12 @@ final class MoveWordsWallabagTest extends TestCase
         self::assertSame([], array_values(array_filter($texts, static fn (string $text): bool => strpos($text, 'First set config.platform.php') !== false)));
     }
 
-    /** symfony/mailer v5.4.52 is the release that the move to ^5.4.52 installs, and its own links hold the move: they follow the root holds. */
+    /** symfony/mailer's own links hold the move to ^5.4.52 after the root holds. Each names the lowest stable release that its rule lists. */
     public function testAHoldOfTheFindingsOwnPackageNamesItsOwnRelease(): void
     {
         $text = JsonPath::stringAt(self::move('7.4', 'symfony/mailer'), ['text']);
 
-        self::assertStringContainsString('composer.json (requires symfony/mime ^4.4.47) and symfony/mailer v5.4.52, its own release (requires psr/event-dispatcher ^1) and symfony/mailer v5.4.52, its own release (requires symfony/mime ^5.2.6|^6.0) and ', $text);
+        self::assertStringContainsString('composer.json (requires symfony/mime ^4.4.47) and symfony/mailer v5.4.52, its own release (requires psr/event-dispatcher ^1) and symfony/mailer v5.4.0, its own release (requires symfony/mime ^5.2.6|^6.0) and ', $text);
         self::assertStringNotContainsString('symfony/mailer v5.4.52 (requires', $text);
     }
 

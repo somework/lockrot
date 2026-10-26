@@ -16,7 +16,7 @@
                                 "text": "silent: No stable release and no repository push for a long time"
                             },
                             "fullDescription": {
-                                "text": "No stable release for release-high-years and no repository push for push-high-years."
+                                "text": "No release for 5 years (release-high-years) and no repository push for 5 years (push-high-years)."
                             },
                             "defaultConfiguration": {
                                 "level": "warning"
@@ -92,7 +92,7 @@
                                 "text": "stale: Old release or old push, below the silent thresholds"
                             },
                             "fullDescription": {
-                                "text": "No stable release or no repository push for release-warn-years or push-warn-years."
+                                "text": "No release for 3 years (release-warn-years), or no repository push for 3 years (push-warn-years), short of silent."
                             },
                             "defaultConfiguration": {
                                 "level": "warning"
@@ -111,7 +111,7 @@
                                 "text": "left-behind: The installed release branch stopped while a newer branch kept releasing"
                             },
                             "fullDescription": {
-                                "text": "No stable release on the installed branch for release-warn-years, while a higher branch has released since."
+                                "text": "No stable release on the installed branch for 3 years (release-warn-years), while a higher branch has released since."
                             },
                             "defaultConfiguration": {
                                 "level": "warning"
