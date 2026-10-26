@@ -315,6 +315,8 @@ final class CoverageTest extends TestCase
                 self::NOT_REACHED.' (a security.partial on a held package). next_step.if_applied.assumes carries each value'],
             [self::D.'branchFixes/properties/if_applied/oneOf/0/properties/assumes/items', ['no_new_advisories'],
                 self::NOT_REACHED.' (a branch row that fixes something beside an incomplete lookup). next_step.if_applied.assumes carries the value'],
+            [self::D.'run/properties/move_check/oneOf/0/properties/reason/oneOf/0', ['unloaded_name', 'offline'], self::NOT_REACHED.' (a baseline refusal that needs a root requirement that did not load)'],
+            [self::D.'explainRun/properties/move_check/oneOf/0/properties/reason/oneOf/0', ['unloaded_name', 'offline'], 'as run.move_check.reason'],
             [self::D.'noteUpdateNowNotChecked/properties/reason', ['baseline_refused', 'unloaded_name', 'offline', 'not_from_composer_repository', 'no_composer_json', 'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete'],
                 "the note's reason is a value of check.reason, which the move-check documents carry each. A document carries install_time_budget"],
             [self::D.'noteAdvisoriesDisabledByPolicy/properties/policy_key', ['policy.advisories.audit', 'COMPOSER_POLICY'],
