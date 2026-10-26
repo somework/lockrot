@@ -237,8 +237,8 @@ both of these floors:
   it admits: `>=8.2` is `8.2.0`, `>7.1` is `7.1.1`. `run.project_php_lowest` writes that version.
 
 - the target PHP ([`target-php`](configuration.md#extralockrot-keys) or its option and environment
-  override, else `config.platform.php`, else the running PHP), as a whole minor: a branch outside
-  it will not install.
+  override, else `config.platform.php`, else the running PHP), at its minor's newest patch
+  (`8.4.99`), where the move check solves: a branch that does not admit it will not install.
 
 When that is not the newest branch, the evidence says which floor blocks the newest branch, then
 names the branch within reach. Abridged from the [example run](example-run.md):
@@ -314,16 +314,16 @@ Abridged from the [example run](example-run.md):
 
 S11 compares the installed release's `require.php` with R, the newest PHP minor that the project
 allows. R is the newest minor in `resources/php-ga-dates.json` with a GA on or before the run clock
-that the root php admits. The root php is composer.json's `require.php`, else the lock's
+whose newest patch (`8.5.99` for 8.5) the root php admits. The root php is composer.json's `require.php`, else the lock's
 `platform.php`. Without a root php, R is the newest of those minors.
 
 S11 fires when all of these hold:
 
 1. The installed `require.php` has an upper bound.
 
-2. It admits nothing at or above R's first release (`8.5.0` for R 8.5).
+2. It admits nothing at or above R's newest patch (`8.5.99` for R 8.5).
 
-3. It admits at least one known minor.
+3. It admits the newest patch of at least one known minor.
 
 A floor above R (`>=8.4.1` under a root that allows up to 8.3) and a disjunction with an open end
 are no cap. A constraint that skips R and admits a later minor (`~8.2.0 || ~8.4.0` against R 8.3)

@@ -65,8 +65,8 @@ final class PhpCap
     }
 
     /**
-     * S11's test: the requirement's upper bound is finite, it admits nothing at or above `R.0`, and
-     * it admits a known minor. Null for a release that states no php, which is no answer.
+     * S11's test: the requirement's upper bound is finite, it admits nothing at or above R's
+     * {@see PhpFloor::NEWEST_PATCH}, and it admits a known minor. Null for a release that states no php, which is no answer.
      */
     public function stopsBelow(?string $constraint): ?bool
     {
@@ -81,7 +81,7 @@ final class PhpCap
     public function stopsAt(string $constraint): ?string
     {
         $parsed = $this->parse($constraint);
-        if ($this->newest === null || $parsed === null || Intervals::haveIntersections($parsed, new Constraint('>=', $this->parser->normalize($this->newest)))) {
+        if ($this->newest === null || $parsed === null || Intervals::haveIntersections($parsed, new Constraint('>=', $this->point($this->newest)))) {
             return null;
         }
         $stops = null;
@@ -92,7 +92,7 @@ final class PhpCap
         return $stops;
     }
 
-    /** Whether the requirement meets some patch of R, as {@see PhpFloor::admitsTarget()} tests a minor. Null without an answer. */
+    /** Whether the requirement admits R, as {@see PhpFloor::admitsTarget()} tests a minor. Null without an answer. */
     public function admitsNewest(?string $constraint): ?bool
     {
         $parsed = $constraint === null ? null : $this->parse($constraint);
@@ -117,7 +117,12 @@ final class PhpCap
 
     private function admitsMinor(ConstraintInterface $constraint, string $minor): bool
     {
-        return Intervals::haveIntersections($constraint, $this->parser->parseConstraints('~'.$minor.'.0'));
+        return $constraint->matches(new Constraint('==', $this->point($minor)));
+    }
+
+    private function point(string $minor): string
+    {
+        return $this->parser->normalize($minor.'.'.PhpFloor::NEWEST_PATCH);
     }
 
     /** @phpstan-assert-if-true string $php */

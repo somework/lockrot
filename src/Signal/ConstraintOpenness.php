@@ -70,7 +70,7 @@ final class ConstraintOpenness
     {
         try {
             $parsed = $this->parser->parseConstraints($constraint);
-            $target = new Constraint('==', $this->parser->normalize(PhpReleaseDates::minorOf($targetPhp)));
+            $target = new Constraint('==', $this->parser->normalize(PhpReleaseDates::minorOf($targetPhp).'.'.PhpFloor::NEWEST_PATCH));
         } catch (\UnexpectedValueException $e) {
             return null;
         }

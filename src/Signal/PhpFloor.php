@@ -28,9 +28,15 @@ final class PhpFloor
     public const SKIPS = 'skips';
     public const UNSATISFIABLE = 'unsatisfiable';
 
+    /**
+     * The patch at which lockrot tests a PHP minor: its newest one. The move check solves at the
+     * same point, so the target tests and the solve admit the same PHP (docs/verdicts.md#the-php-window).
+     */
+    public const NEWEST_PATCH = '99';
+
     private VersionParser $parser;
-    /** The whole target minor, `>=8.4.0 <8.5.0`, or null with no target or a non-version. */
-    private ?ConstraintInterface $targetMinor;
+    /** The target minor's newest patch, as `== 8.4.99.0`, or null with no target or a non-version. */
+    private ?Constraint $targetPoint;
     private ?string $targetLabel;
     /** The lowest PHP the project promises to run on, as `== 7.2.5.0`, or null with no readable promise. */
     private ?Constraint $projectLowest;
@@ -45,7 +51,7 @@ final class PhpFloor
     public function __construct(?string $targetPhp, ?string $projectPhp = null)
     {
         $this->parser = new VersionParser();
-        [$this->targetMinor, $this->targetLabel] = $this->target($targetPhp);
+        [$this->targetPoint, $this->targetLabel] = $this->target($targetPhp);
         [$this->projectPoint, $this->projectPhp] = $this->project($projectPhp);
         $this->projectAny = $projectPhp !== null && trim($projectPhp) === '*';
         $this->projectLowest = $this->projectPoint === null ? null : new Constraint('==', $this->projectPoint.'.0');
@@ -63,8 +69,8 @@ final class PhpFloor
 
     /**
      * What holds a branch with this php requirement back. It is {@see self::PROJECT} when the
-     * project's lowest PHP is outside the requirement, else {@see self::TARGET} when no version of
-     * the target minor is, else null. A branch that requires no PHP, or whose requirement cannot
+     * project's lowest PHP is outside the requirement, else {@see self::TARGET} when the target
+     * minor's {@see self::NEWEST_PATCH} is, else null. A branch that requires no PHP, or whose requirement cannot
      * be parsed, is not held back.
      */
     public function blocking(?string $constraint): ?string
@@ -110,11 +116,11 @@ final class PhpFloor
     {
         $parsed = $this->parse($constraint);
 
-        if ($parsed === null || $this->targetMinor === null || Intervals::haveIntersections($parsed, $this->targetMinor)) {
+        if ($parsed === null || $this->targetPoint === null || $parsed->matches($this->targetPoint)) {
             return null;
         }
 
-        return self::side($parsed, $this->targetMinor);
+        return self::side($parsed, $this->targetPoint);
     }
 
     /** Null exactly where {@see self::admitsProject()} is not false. */
@@ -162,20 +168,18 @@ final class PhpFloor
 
     private function targetAdmits(?ConstraintInterface $constraint): ?bool
     {
-        if ($constraint === null || $this->targetMinor === null) {
+        if ($constraint === null || $this->targetPoint === null) {
             return null;
         }
 
-        return Intervals::haveIntersections($constraint, $this->targetMinor);
+        return $constraint->matches($this->targetPoint);
     }
 
     /**
      * Correct only for a $php that admits none of $floor: an admitting $php can read as `skips`.
-     * The floor is the target minor (`>=8.4.0.0-dev <8.5.0.0-dev`) or the project's point
-     * (`== 8.2.0.0`). Both include their lower bound, and only the target excludes its upper
-     * bound.
+     * The floor is a point: the target's (`== 8.4.99.0`) or the project's (`== 8.2.0.0`).
      */
-    private static function side(ConstraintInterface $php, ConstraintInterface $floor): string
+    private static function side(ConstraintInterface $php, Constraint $floor): string
     {
         $upper = $floor->getUpperBound();
         $below = Intervals::haveIntersections($php, new Constraint('<', $floor->getLowerBound()->getVersion()));
@@ -190,7 +194,7 @@ final class PhpFloor
         return $below ? self::STOPS_BEFORE : self::UNSATISFIABLE;
     }
 
-    /** @return array{0: ?ConstraintInterface, 1: ?string} */
+    /** @return array{0: ?Constraint, 1: ?string} */
     private function target(?string $targetPhp): array
     {
         if ($targetPhp === null) {
@@ -198,7 +202,7 @@ final class PhpFloor
         }
         $minor = PhpReleaseDates::minorOf($targetPhp);
         try {
-            return [$this->parser->parseConstraints('~'.$minor.'.0'), $minor];
+            return [new Constraint('==', $this->parser->normalize($minor.'.'.self::NEWEST_PATCH)), $minor];
         } catch (\UnexpectedValueException $e) {
             return [null, null];
         }

@@ -151,6 +151,22 @@ final class PhpCapTest extends TestCase
         self::assertNull(PhpCap::none()->admitsNewest('*'));
     }
 
+    /** R and the stop test read a minor at its newest patch, X.Y.99, as PhpFloor reads the target. */
+    public function testACapAtAPreReleaseOfTheNewestMinorStopsBelowIt(): void
+    {
+        $cap = new PhpCap(self::KNOWN, '^8.1');
+
+        self::assertSame('8.5', $cap->newest());
+        self::assertSame(['8.4', '8.4', '8.4'], [$cap->stopsAt('<8.5.0-alpha'), $cap->stopsAt('<8.5.0-RC1'), $cap->stopsAt('>=8.1 <8.5.0-beta')]);
+        self::assertSame('8.4', $cap->stopsAt('<8.5.3'), 'a cap inside the minor excludes its newest patch');
+    }
+
+    public function testARootThatAdmitsOnlyPreReleasesOfAMinorStopsRBelowIt(): void
+    {
+        self::assertSame('8.3', (new PhpCap(self::KNOWN, '>=8.1 <8.4.0-RC1'))->newest());
+        self::assertSame('8.3', (new PhpCap(self::KNOWN, '>=8.1 <=8.4.5'))->newest());
+    }
+
     public function testARequirementThatStartsAboveTheNewestMinorDoesNotAdmitIt(): void
     {
         self::assertFalse((new PhpCap(self::KNOWN))->admitsNewest('>=8.6'));
