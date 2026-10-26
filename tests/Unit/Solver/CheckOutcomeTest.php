@@ -46,6 +46,55 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([$other, $package], $outcome->holds());
     }
 
+    /** @return iterable<string, array{Holder::REQUIRE|Holder::REQUIRE_DEV|Holder::ROOT_REQUIRE}> */
+    public static function rootRequirementLinks(): iterable
+    {
+        yield 'require' => [Holder::REQUIRE];
+        yield 'require-dev' => [Holder::REQUIRE_DEV];
+        yield 'root-require' => [Holder::ROOT_REQUIRE];
+    }
+
+    /**
+     * @dataProvider rootRequirementLinks
+     *
+     * @param Holder::REQUIRE|Holder::REQUIRE_DEV|Holder::ROOT_REQUIRE $link
+     */
+    #[DataProvider('rootRequirementLinks')]
+    public function testEachRootRequirementOnAPackageThatAPackageHoldNamesDrops(string $link): void
+    {
+        $root = new Holder(Holder::ROOT, null, null, $link, '^7.0', 'mautic/core-lib');
+        $package = new Holder(Holder::PACKAGE, 'mautic/core-lib', '7.0.1', Holder::REQUIRE, '~2.7.0', null);
+
+        $outcome = (new CheckOutcome(MoveCheck::refused(), [$root, $package]))->withoutRootOnHolders();
+
+        self::assertSame([$package], $outcome->holds());
+    }
+
+    /** @return iterable<string, array{Holder::CONFLICT|Holder::REPLACE}> */
+    public static function rootDeclarationLinks(): iterable
+    {
+        yield 'a conflict' => [Holder::CONFLICT];
+        yield 'a replace' => [Holder::REPLACE];
+    }
+
+    /**
+     * A conflict or a replace that composer.json declares is a hold of its own, not the head of the package hold's chain.
+     *
+     * @dataProvider rootDeclarationLinks
+     *
+     * @param Holder::CONFLICT|Holder::REPLACE $link
+     */
+    #[DataProvider('rootDeclarationLinks')]
+    public function testARootConflictOrReplaceOnAPackageThatAPackageHoldNamesStays(string $link): void
+    {
+        $root = new Holder(Holder::ROOT, null, null, $link, '>=7.1', 'mautic/core-lib');
+        $package = new Holder(Holder::PACKAGE, 'mautic/core-lib', '7.0.1', Holder::REQUIRE, '~2.7.0', null);
+
+        $outcome = (new CheckOutcome(MoveCheck::refused(), [$root, $package]))->withoutRootOnHolders();
+
+        self::assertSame([$root, $package], $outcome->holds());
+    }
+
     public function testAJointSolveThatInstallsAReleaseOutsideTheConstraintKeepsTheFirstRefusal(): void
     {
         $first = new Holder(Holder::PACKAGE, 'acme/holder', '1.0.0', Holder::REQUIRE, '^1.0');

@@ -124,13 +124,16 @@ final class CheckOutcome
     }
 
     /**
-     * A copy without each root hold on a package that a package hold names as its `package`: that
-     * package's own requirement is the hold, and the root hold is the head of its chain.
+     * A copy without each root requirement on a package that a package hold names as its `package`:
+     * that package's own requirement is the hold, and the root requirement is the head of its chain.
+     * A conflict or a replace that composer.json declares stays a hold of its own.
      */
     public function withoutRootOnHolders(): self
     {
         $holders = $this->holders('');
-        $holds = array_values(array_filter($this->holds, static fn (Holder $hold): bool => $hold->source() !== Holder::ROOT || !\in_array($hold->target(), $holders, true)));
+        $holds = array_values(array_filter($this->holds, static fn (Holder $hold): bool => $hold->source() !== Holder::ROOT
+            || !\in_array($hold->link(), [Holder::REQUIRE, Holder::REQUIRE_DEV, Holder::ROOT_REQUIRE], true)
+            || !\in_array($hold->target(), $holders, true)));
         $clone = clone $this;
         $clone->holds = $holds;
 
