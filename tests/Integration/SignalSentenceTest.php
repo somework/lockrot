@@ -153,7 +153,8 @@ final class SignalSentenceTest extends TestCase
         $project = self::text($d, 'floor_source') === 'project';
         $floor = ($project ? "the project's php " : 'the target PHP ').self::text($d, 'floor_php');
         $side = $project ? (new PhpFloor(null, self::text($d, 'floor_php')))->missesProject(self::text($d, 'newest_php')) : (new PhpFloor(self::text($d, 'floor_php')))->missesTarget(self::text($d, 'newest_php'));
-        $words = ['stops_before' => ', which stops before '.$floor, 'skips' => ', which skips '.$floor, 'unsatisfiable' => ', which no PHP runs'][$side] ?? ' above '.$floor;
+        $sides = ['stops_before' => ', which stops before '.$floor, 'skips' => ', which skips '.$floor, 'unsatisfiable' => ', which no PHP runs'];
+        $words = $side !== null && isset($sides[$side]) ? $sides[$side] : ' above '.$floor;
         $sentence .= ', needs php '.self::text($d, 'newest_php').$words;
         if (($d['reachable_branch'] ?? null) === null) {
             return $sentence.'; no releasing branch within reach';

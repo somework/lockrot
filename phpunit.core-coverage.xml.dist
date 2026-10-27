@@ -39,9 +39,17 @@
             <file>src/Output/SarifFormatter.php</file>
             <file>src/Output/GitlabFormatter.php</file>
             <file>src/Output/MarkdownFormatter.php</file>
-            <file>src/Output/Via.php</file>
             <file>src/Output/TableFormatter.php</file>
             <file>src/Output/TerminalWidth.php</file>
+            <file>src/Output/AgeText.php</file>
+            <file>src/Output/CauseWords.php</file>
+            <file>src/Output/FailedValue.php</file>
+            <file>src/Output/FindingBlock.php</file>
+            <file>src/Output/MarkedFact.php</file>
+            <file>src/Output/RecordMarks.php</file>
+            <file>src/Output/RunFooter.php</file>
+            <file>src/Output/RunGateText.php</file>
+            <file>src/Output/SarifRecords.php</file>
             <directory>src/Baseline</directory>
             <!-- src/Composer/SelfUpdateCommand.php stays out, like LockrotCommand: only the e2e group
                  runs its Composer wiring. -->
