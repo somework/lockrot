@@ -217,21 +217,67 @@ final class PhpWindowTest extends TestCase
         self::assertFalse($window['target']['inside'], 'the set with require-dev decides');
     }
 
-    public function testTheTargetMinorIsReadAtConfigPlatformPhp(): void
+    /** SPEC 5.9: the target minor reads its lowest admitted patch, and `target.inside` reads config.platform.php. */
+    public function testTheTargetMinorIsInTheWindowWhenAPatchOtherThanConfigPlatformPhpAdmitsIt(): void
     {
         $window = self::window(['packages' => [self::package('acme/a', ['php' => '<8.5'], ['php' => '8.4.0'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.4.0']]]);
 
         self::assertSame(['php' => '8.4.0', 'inside' => false], $window['target']);
-        self::assertSame(['excludes' => '8.4', 'links' => ['conflict']], self::upper($window['without_dev']), 'the conflict matches 8.4.0, not 8.4.99');
+        self::assertSame('8.4', $window['without_dev']['minors'][\count($window['without_dev']['minors']) - 1]);
+        self::assertSame(['excludes' => '8.5', 'links' => ['require']], self::upper($window['without_dev']));
     }
 
-    public function testConfigPlatformPhpBelowAPatchFloorLeavesTheTargetMinorOut(): void
+    /** R3-6: config.platform.php 8.2.0 and a floor of 8.2.1. PHP 8.2.1 installs the lock, so 8.2 is in and is the lower edge. */
+    public function testAPatchFloorInsideTheTargetMinorIsTheLowerEdge(): void
     {
         $window = self::window(['packages' => [self::package('acme/a', ['php' => '>=8.2.1'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.2.0']]], '8.2');
 
-        self::assertSame(['8.3', '8.4', '8.5'], $window['without_dev']['minors']);
+        self::assertSame(['8.2', '8.3', '8.4', '8.5'], $window['without_dev']['minors']);
         self::assertSame(['php' => '8.2.0', 'inside' => false], $window['target']);
-        self::assertSame('>=8.2.1', $window['without_dev']['lower_edge']['set_by'][0]['constraint'] ?? null, 'read at the target point below the edge');
+        self::assertNotNull($window['without_dev']['lower_edge']);
+        self::assertSame('8.2.1', $window['without_dev']['lower_edge']['php']);
+        self::assertSame(['>=8.2.1'], array_column($window['without_dev']['lower_edge']['set_by'], 'constraint'), 'read at 8.2.0, the patch below the edge');
+    }
+
+    public function testAPatchFloorInsideTheTargetMinorKeepsTheTargetFix(): void
+    {
+        $window = PhpWindow::of(LockFile::fromArray(['packages' => [self::package('acme/a', ['php' => '>=8.3.2'])], 'packages-dev' => []]), ProjectConfig::fromArray(['config' => ['platform' => ['php' => '8.3.0']]]), '8.3', self::minors());
+        self::assertNotNull($window);
+
+        $fix = $window->withTargetFix(null)->toArray()['target_fix'];
+
+        self::assertNotNull($fix);
+        self::assertSame(['acme/a'], array_column($fix['packages'], 'name'));
+    }
+
+    /** R3-6: `~8.3.2` admits no X.Y.99 point but 8.3.2, so the window is 8.3 alone. */
+    public function testAPatchRangeInsideTheTargetMinorIsTheWholeWindow(): void
+    {
+        $set = self::window(['packages' => [self::package('acme/a', ['php' => '~8.3.2'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.3.0']]], '8.3')['without_dev'];
+
+        self::assertSame(['8.3'], $set['minors']);
+        self::assertNull($set['closest']);
+        self::assertNotNull($set['lower_edge']);
+        self::assertSame('8.3.2', $set['lower_edge']['php']);
+    }
+
+    /** A cap inside the target minor is no floor: the target point 8.4.99 fails, so 8.4 stays out although 8.4.0 installs the lock. */
+    public function testACapInsideTheTargetMinorLeavesItOut(): void
+    {
+        $set = self::window(['packages' => [self::package('acme/a', [], ['php' => '>=8.4.50'])], 'packages-dev' => []])['without_dev'];
+
+        self::assertNotContains('8.4', $set['minors']);
+        self::assertSame(['excludes' => '8.4', 'links' => ['conflict']], self::upper($set));
+    }
+
+    /** Below the target minor's floor, outside it: a target minor that no patch admits stays out, and `target_fix` stays null. */
+    public function testATargetMinorBelowTheLowestEdgeGetsNoTargetFix(): void
+    {
+        $window = PhpWindow::of(LockFile::fromArray(['packages' => [self::package('acme/a', ['php' => '>=8.4'])], 'packages-dev' => []]), ProjectConfig::fromArray(['config' => ['platform' => ['php' => '8.3.0']]]), '8.3', self::minors());
+        self::assertNotNull($window);
+
+        self::assertNull($window->withTargetFix(null)->toArray()['target_fix']);
+        self::assertTrue($window->targetBelowLowest());
     }
 
     public function testACapInsideAMinorLeavesThatMinorOut(): void
