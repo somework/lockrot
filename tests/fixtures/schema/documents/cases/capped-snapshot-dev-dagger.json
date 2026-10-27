@@ -779,7 +779,7 @@
   "score_rules_used": {
    "counted": 0,
    "lead-first": 1,
-   "corroborating-share": 0,
+   "corroborating-share": 1,
    "advisory-points": 0,
    "no-reachable-fix-multiplier": 0,
    "security-max": 0,
@@ -930,15 +930,15 @@
  "activity_cache_age_hours": null,
  "packages_checked": 1,
  "packages_flagged": 1,
- "packages_multi_flag": 0,
+ "packages_multi_flag": 1,
  "include_dev": false,
  "not_from_composer_repository": 0,
  "packages_unchecked_accepted": 0,
  "network_failures": false,
  "counts": {
   "critical": 0,
-  "high": 0,
-  "medium": 1,
+  "high": 1,
+  "medium": 0,
   "low": 0,
   "unknown": 0,
   "finished": 0,
@@ -951,8 +951,8 @@
  },
  "priorities": {
   "critical": 0,
-  "high": 0,
-  "medium": 1,
+  "high": 1,
+  "medium": 0,
   "low": 0,
   "none": 0
  },
@@ -986,15 +986,15 @@
    }
   },
   "pinned": {
-   "carrying": 0,
-   "leading": 0,
+   "carrying": 1,
+   "leading": 1,
    "accepted": {
     "all": 0,
     "in_graded": 0
    },
    "by_verdict": {
     "critical": 0,
-    "high": 0,
+    "high": 1,
     "medium": 0,
     "low": 0
    }
@@ -1043,15 +1043,15 @@
   },
   "capped": {
    "carrying": 1,
-   "leading": 1,
+   "leading": 0,
    "accepted": {
     "all": 0,
     "in_graded": 0
    },
    "by_verdict": {
     "critical": 0,
-    "high": 0,
-    "medium": 1,
+    "high": 1,
+    "medium": 0,
     "low": 0
    }
   },
@@ -1098,35 +1098,32 @@
   "deepest": []
  },
  "libyears": {
-  "total": 2.95,
-  "direct_requirements": 2.95,
-  "measured": 1,
+  "total": null,
+  "direct_requirements": null,
+  "measured": 0,
   "at_least_count": 0,
   "unmeasured": {
    "not_from_composer_repository": 0,
    "unavailable": 0,
    "not_found": 0,
-   "branch_snapshot": 0,
+   "branch_snapshot": 1,
    "shared_commit": 0,
    "undated": 0,
    "no_stable_release": 0,
    "undated_releases": 0
   },
-  "furthest_behind": {
-   "package": "laminas/laminas-code",
-   "version": "dev-main",
-   "libyears": 2.95,
-   "at_least": false
-  },
+  "furthest_behind": null,
   "packages": 1
  },
  "baseline": null,
  "gate": {
-  "fails": false,
-  "tripped_by": [],
+  "fails": true,
+  "tripped_by": [
+   "fail_on"
+  ],
   "fail_on_applied": true,
-  "reaching": 0,
-  "failing": 0,
+  "reaching": 1,
+  "failing": 1,
   "exempt": {
    "baseline": 0
   },
@@ -1134,17 +1131,19 @@
    "known": 0,
    "new": 0,
    "worsened": 0,
-   "none": 0
+   "none": 1
   },
-  "failing_packages": [],
+  "failing_packages": [
+   "laminas/laminas-code"
+  ],
   "failing_by": [
    {
     "value": "high",
-    "failing": 0
+    "failing": 1
    }
   ],
   "not_applied": [],
-  "text": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)"
+  "text": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)"
  },
  "security": {
   "check": "complete",
@@ -1190,14 +1189,29 @@
     "target_runs": false,
     "project_allows": true
    },
-   "verdict": "medium",
-   "priority": "medium",
-   "lead": "capped",
+   "verdict": "high",
+   "priority": "high",
+   "lead": "pinned",
    "rank": 1,
    "flags": [
     {
-     "id": "capped",
+     "id": "pinned",
      "role": "lead",
+     "baseline": null,
+     "signal_ids": [
+      "S6"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "reason",
+      "value": "branch_snapshot",
+      "source": null
+     },
+     "summary": "pinned to branch snapshot dev-main"
+    },
+    {
+     "id": "capped",
+     "role": "corroborating",
      "baseline": null,
      "signal_ids": [
       "S11"
@@ -1213,22 +1227,22 @@
    ],
    "score": {
     "model": 1,
-    "total": 8,
-    "exact": 8,
+    "total": 18,
+    "exact": 18,
     "rounded_down": false,
     "band": {
-     "floor": 8,
-     "next": "high",
-     "to_next": 8
+     "floor": 16,
+     "next": "critical",
+     "to_next": 14
     },
     "decided_by": "maintenance",
     "parts": {
      "maintenance": {
       "status": "counted",
-      "contribution": 8,
+      "contribution": 18,
       "alone": {
-       "total": 8,
-       "verdict": "medium"
+       "total": 18,
+       "verdict": "high"
       }
      },
      "security": {
@@ -1245,22 +1259,56 @@
     "terms": [
      {
       "part": "maintenance",
-      "flag": "capped",
+      "flag": "pinned",
       "role": "lead",
-      "weight": 8,
+      "weight": 16,
       "divisor": 1,
-      "points": 8,
-      "contribution": 8
+      "points": 16,
+      "contribution": 16
+     },
+     {
+      "part": "maintenance",
+      "flag": "capped",
+      "role": "corroborating",
+      "weight": 8,
+      "divisor": 4,
+      "points": 2,
+      "contribution": 2
      }
     ],
     "modifiers": [],
     "accepted": [],
-    "without": [],
-    "text": "8 = capped 8"
+    "without": [
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "pinned"
+      },
+      "revealed": [],
+      "total": 8,
+      "verdict": "medium",
+      "lead": "capped",
+      "deciding_advisory": null,
+      "at_least": false
+     },
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "capped"
+      },
+      "revealed": [],
+      "total": 16,
+      "verdict": "high",
+      "lead": "pinned",
+      "deciding_advisory": null,
+      "at_least": false
+     }
+    ],
+    "text": "18 = pinned 16 + capped 2 [¼ of 8]"
    },
    "next_step": {
-    "kind": "raise-php",
-    "source": "capped",
+    "kind": "tag",
+    "source": "pinned",
     "merged": [],
     "fix_kind": null,
     "reason": null,
@@ -1268,9 +1316,15 @@
     "quiet_years": null,
     "to_branch": "4.x",
     "version": "4.17.0",
-    "newest": "4.17.0",
-    "constraint": "^4.17.0",
-    "latest": null,
+    "newest": null,
+    "constraint": null,
+    "latest": {
+     "version": "4.17.0",
+     "released": "2025-11-01T09:38:14+00:00",
+     "is_installed": false,
+     "relation": "newer",
+     "snapshot_time": "2024-06-01T00:00:00+00:00"
+    },
     "php_check": {
      "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
      "project_allows": false,
@@ -1281,6 +1335,11 @@
     "crosses_major": null,
     "held_by": [],
     "clears": [
+     {
+      "kind": "flag",
+      "id": "pinned",
+      "basis": "tags_only"
+     },
      {
       "kind": "flag",
       "id": "capped",
@@ -1326,7 +1385,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 — clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
+    "text": "require a tag — the newest is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
    },
    "security": {
     "status": "clear",
@@ -1386,7 +1445,7 @@
    "replacement": null,
    "replacement_url": null,
    "note": null,
-   "libyears_unmeasured": null,
+   "libyears_unmeasured": "branch_snapshot",
    "libyears_at_least": false,
    "direct": true,
    "dev": false,
@@ -1407,6 +1466,21 @@
    ],
    "signals": [
     {
+     "id": "S6",
+     "level": "warn",
+     "summary": "pinned to branch snapshot dev-main",
+     "data": {
+      "version": "dev-main",
+      "reason": "branch_snapshot",
+      "has_stable_release": true,
+      "last_stable_release": "2025-11-01T09:38:14+00:00",
+      "last_stable_version": "4.17.0",
+      "last_stable_dated_by": null,
+      "snapshot_time": "2024-06-01T00:00:00+00:00",
+      "tag_relation": "newer"
+     }
+    },
+    {
      "id": "S11",
      "level": "warn",
      "summary": "php \">=7.4, <8.2\" stops at 8.1; the newest PHP, 8.5, is excluded",
@@ -1424,10 +1498,10 @@
      }
     }
    ],
-   "evidence": "capped: requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded",
+   "evidence": "pinned: pinned to branch snapshot dev-main; capped: requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:46+00:00",
-   "libyears": 2.95,
+   "libyears": null,
    "age": {
     "installed": null,
     "installed_unmeasured": "branch_snapshot",
@@ -1450,10 +1524,21 @@
    },
    "baseline": null,
    "gate": {
-    "reaches_fail_on": false,
-    "fails": false,
+    "reaches_fail_on": true,
+    "fails": true,
     "exempt_by": null,
-    "by": [],
+    "by": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "facts": [
+       {
+        "kind": "flag",
+        "id": "pinned"
+       }
+      ]
+     }
+    ],
     "basis": null
    }
   }

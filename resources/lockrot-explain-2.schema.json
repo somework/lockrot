@@ -1655,6 +1655,9 @@
                     "x-rendered-from": [
                         "next_step.also[]",
                         "package",
+                        "version",
+                        "signals[].id",
+                        "signals[].data.newest_php",
                         "direct",
                         "direct_dependents",
                         "chain",
@@ -14092,6 +14095,9 @@
                     "x-rendered-from": [
                         "next_step",
                         "package",
+                        "version",
+                        "signals[].id",
+                        "signals[].data.newest_php",
                         "direct",
                         "direct_dependents",
                         "chain",

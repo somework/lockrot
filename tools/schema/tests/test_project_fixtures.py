@@ -116,6 +116,14 @@ class ACaseWithoutBranchRowsHydratesFromItsRunReleases(unittest.TestCase):
 
         self.assertEqual(['4.17.0', '4.7.1'], [r['version'] for r in inputs['releases']])
 
+    def test_the_run_root_require_replaces_the_projected_constraint(self):
+        finding = dict(self.FINDING, direct=True, named_in=['require'])
+
+        inputs = project_fixtures.inputs_of({'finding': finding, 'run': self.RUN,
+                                             'run_inputs': {'_releases': self.RELEASES, '_root_require': {'laminas/laminas-code': '~4.7.0'}}})
+
+        self.assertEqual({'laminas/laminas-code': '~4.7.0'}, inputs['root']['require'])
+
     def test_a_case_without_branch_rows_and_without_run_releases_gets_none(self):
         self.assertIsNone(project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN}))
 

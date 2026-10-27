@@ -498,6 +498,8 @@ def inputs_of(case):
         dependents[name] = own
     # The links of lock entries that the model's ‡ run inputs give exactly, which the findings do not carry.
     lock_links(lock, (case.get('run_inputs') or {}).get('_lock_links') or {})
+    # The root constraints that the model's ‡ run inputs give exactly, where the projection writes `*`.
+    root_require.update((case.get('run_inputs') or {}).get('_root_require') or {})
     root = dict({'name': run['root_package'], 'require': dict({'php': run['project_php']} if run['project_php'] else {}, **dict(root_require, **root_links.pop('require', {})))}, **root_links)
     if root_dev:
         root['require-dev'] = dict(root_dev, **root.get('require-dev', {}))

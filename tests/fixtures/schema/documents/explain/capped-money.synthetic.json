@@ -236,7 +236,7 @@
   "evidence": "capped: requires php ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded",
   "allowlist_reason": null,
   "data_date": "2026-10-01T17:39:09+00:00",
-  "libyears": 2.21,
+  "libyears": 0.91,
   "age": {
    "installed": {
     "at": "2025-06-06T07:12:38+00:00",
