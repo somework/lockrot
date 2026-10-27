@@ -105,6 +105,7 @@ final class SchemaClaimsTest extends TestCase
         'scoreModel/properties/sort/items.collation' => 'PROSE: a direction word',
         'run.project_php' => 'PROSE: "never parse it"',
         'run.lock_file' => 'PROSE: "never its path"',
+        'run/properties/move_check/oneOf/0.blocking_disabled_by' => 'the environment and composer.json config are outside the document: AdvisoryBlockingTest',
         'run.fix_model' => 'baselines are outside the document',
         'run.score_rules_used' => 'counts over findings (a sum)',
         'noteAdvisoryIgnoreUnreadable.message' => 'PROSE',

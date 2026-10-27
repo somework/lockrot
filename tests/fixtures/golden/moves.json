@@ -3677,6 +3677,52 @@
             "text": "find a replacement (none named)"
         }
     },
+    "capped-accepted\u2021": {
+        "next_step": null
+    },
+    "capped-blocked\u2021": {
+        "next_step": {
+            "kind": "blocked",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": null,
+            "newest": "4.17.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": null,
+                "target_runs": false,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "capped"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no move runs on the target: 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 and the target php 7.4 does not run it"
+        }
+    },
     "capped-covered\u2021": {
         "next_step": {
             "kind": "no-move",
@@ -3730,6 +3776,294 @@
             ],
             "also": [],
             "text": "\u2014"
+        }
+    },
+    "capped-dev\u2021": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": "4.17.0",
+            "constraint": "^4.17.0",
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.2",
+                "raise_size": "major"
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.2",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "laminas/laminas-code:^4.17.0",
+                    "--dev"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
+        }
+    },
+    "capped-held-update\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": "4.17.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "laminas/laminas-code"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update laminas/laminas-code (gets 4.17.0) \u2014 clears capped"
+        }
+    },
+    "capped-htmlpurifier\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "v4.19.1",
+            "newest": "v4.19.1",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": null,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "ezyang/htmlpurifier"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "ezyang/htmlpurifier",
+                    "v4.19.1",
+                    "--locked"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "mautic/core-lib",
+                    "installed_version": "7.0.0-dev",
+                    "installed_requires": null,
+                    "newest_stable": null,
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "not_from_composer_repository",
+                    "local": true,
+                    "newest_is_installed": null
+                }
+            ],
+            "also": [],
+            "text": "composer update ezyang/htmlpurifier (gets v4.19.1) \u2014 clears capped"
+        }
+    },
+    "capped-known\u2021": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": "4.17.0",
+            "constraint": "^4.17.0",
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.2",
+                "raise_size": "major"
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.2",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "laminas/laminas-code:^4.17.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
         }
     },
     "capped-local\u2021": {
@@ -3792,6 +4126,650 @@
         "installed_branch_fixes": null,
         "move_in": "next_step",
         "partial": null
+    },
+    "capped-money\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "v4.9.0",
+            "newest": "v4.9.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "moneyphp/money"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "moneyphp/money",
+                    "v4.9.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update moneyphp/money (gets v4.9.0) \u2014 clears capped"
+        }
+    },
+    "capped-nette\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "v1.3.6",
+            "newest": "v1.3.6",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "8.1 - 8.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "nette/schema"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "nette/schema",
+                    "v1.3.6",
+                    "--locked"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "laravel/framework",
+                    "installed_version": "v9.52.16",
+                    "installed_requires": false,
+                    "newest_stable": {
+                        "version": "v13.34.0",
+                        "released": "2026-09-29T12:46:21+00:00"
+                    },
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": false
+                },
+                {
+                    "package": "pragmarx/google2fa-laravel",
+                    "installed_version": "v2.2.0",
+                    "installed_requires": false,
+                    "newest_stable": {
+                        "version": "v3.0.1",
+                        "released": "2026-03-17T20:54:53+00:00"
+                    },
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": false
+                }
+            ],
+            "also": [],
+            "text": "composer update nette/schema (gets v1.3.6) \u2014 clears capped"
+        }
+    },
+    "capped-new\u2021": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": "4.17.0",
+            "constraint": "^4.17.0",
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.2",
+                "raise_size": "major"
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.2",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "laminas/laminas-code:^4.17.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
+        }
+    },
+    "capped-no-php-newest\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.18.0",
+            "newest": "4.18.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": null,
+                "project_allows": null,
+                "target_runs": null,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [],
+            "unverified": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "reason": "no_release_data"
+                }
+            ],
+            "adds": [],
+            "leaves": [],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "laminas/laminas-code"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.18.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update laminas/laminas-code (gets 4.18.0); not checked: capped"
+        }
+    },
+    "capped-no-release\u2021": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": "no_release_admits",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "capped"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no move: no release above 4.7.1 admits PHP 8.5"
+        }
+    },
+    "capped-platform\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": "4.17.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": null,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "laminas/laminas-code"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update laminas/laminas-code (gets 4.17.0) \u2014 clears capped"
+        }
+    },
+    "capped-project-blocked\u2021": {
+        "next_step": {
+            "kind": "blocked",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": null,
+            "newest": "4.17.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": false,
+                "target_runs": false,
+                "raise_to": ">=8.2",
+                "raise_size": "major"
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "capped"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no move runs on the target: 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 and the target php 7.4 does not run it"
+        }
+    },
+    "capped-raise-php": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": "4.17.0",
+            "constraint": "^4.17.0",
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.2",
+                "raise_size": "major"
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.2",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "laminas/laminas-code:^4.17.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
+        }
+    },
+    "capped-recapped\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "5.0.0",
+            "newest": "5.0.0",
+            "constraint": "^5.0.0",
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "laminas/laminas-code:^5.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "5.0.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require laminas/laminas-code ^5.0.0 \u2014 clears capped; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+        }
+    },
+    "capped-require-higher\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "5.0.0",
+            "newest": "5.0.0",
+            "constraint": "^5.0.0",
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "laminas/laminas-code:^5.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "5.0.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require laminas/laminas-code ^5.0.0 \u2014 clears capped; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+        }
     },
     "capped-require-php": {
         "next_step": {
@@ -3873,6 +4851,321 @@
             "text": "raise require.php to >=7.3, then require pelago/emogrifier ^7.3 \u2014 clears left-behind and capped; 7.x needs php ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
         }
     },
+    "capped-require\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": "4.17.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "laminas/laminas-code"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update laminas/laminas-code (gets 4.17.0) \u2014 clears capped"
+        }
+    },
+    "capped-snapshot-alias\u2021": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "4.17.0",
+                "released": "2025-11-01T09:38:14+00:00",
+                "is_installed": false,
+                "relation": null,
+                "snapshot_time": null
+            },
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.2",
+                "raise_size": "major"
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                },
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.2",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "laminas/laminas-code:^4.17.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.2, then require a tag \u2014 the newest on its own line is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
+        }
+    },
+    "capped-snapshot-backport\u2021": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "4.17.0",
+                "released": "2025-11-01T09:38:14+00:00",
+                "is_installed": false,
+                "relation": "newer",
+                "snapshot_time": "2024-06-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.2",
+                "raise_size": "major"
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                },
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.2",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "laminas/laminas-code:^4.17.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.2, then require a tag \u2014 the newest is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
+        }
+    },
+    "capped-snapshot-dev\u2021": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "4.17.0",
+                "released": "2025-11-01T09:38:14+00:00",
+                "is_installed": false,
+                "relation": "newer",
+                "snapshot_time": "2024-06-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.2",
+                "raise_size": "major"
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                },
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.2",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "laminas/laminas-code:^4.17.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.2, then require a tag \u2014 the newest is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
+        }
+    },
     "capped-tag-unverified\u2021": {
         "next_step": {
             "kind": "tag",
@@ -3949,6 +5242,72 @@
             "through": [],
             "also": [],
             "text": "require a tag \u2014 the newest is 4.0.5 (2026-04-15); not checked: capped"
+        }
+    },
+    "capped-update\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": "4.17.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "laminas/laminas-code"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update laminas/laminas-code (gets 4.17.0) \u2014 clears capped"
         }
     },
     "commonmark": {
@@ -5067,71 +6426,6 @@
             "through": [],
             "also": [],
             "text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45) \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock"
-        }
-    },
-    "gets-below-clears-nothing\u2021": {
-        "next_step": {
-            "kind": "update",
-            "source": "old-promise",
-            "merged": [],
-            "fix_kind": null,
-            "reason": null,
-            "replacement": null,
-            "quiet_years": null,
-            "to_branch": "3.x",
-            "version": "v3.11.2",
-            "newest": "v3.11.2",
-            "constraint": null,
-            "latest": null,
-            "php_check": {
-                "requires": ">=8.1",
-                "project_allows": null,
-                "target_runs": true,
-                "raise_to": null,
-                "raise_size": null
-            },
-            "crosses_major": false,
-            "held_by": [],
-            "clears": [],
-            "unverified": [],
-            "adds": [],
-            "leaves": [
-                {
-                    "kind": "flag",
-                    "id": "old-promise"
-                }
-            ],
-            "clears_all": false,
-            "if_applied": null,
-            "check": {
-                "result": "resolves",
-                "form": "inline",
-                "reason": null,
-                "installs": "v3.6.0"
-            },
-            "moves_with": [],
-            "composer_moves_because": [],
-            "commands": [
-                [
-                    "composer",
-                    "update",
-                    "symfony/monolog-bundle:^3.11.2"
-                ]
-            ],
-            "through": [
-                {
-                    "package": "mautic/core-lib",
-                    "installed_version": "4.3.x-dev",
-                    "installed_requires": null,
-                    "newest_stable": null,
-                    "newest_requires": null,
-                    "newest_requires_unmeasured": "not_from_composer_repository",
-                    "local": true,
-                    "newest_is_installed": null
-                }
-            ],
-            "also": [],
-            "text": "composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); old-promise stays; Composer's solver checked it against the lock"
         }
     },
     "gitlab-anon\u2021": {
@@ -7592,6 +8886,97 @@
         "move_in": "next_step",
         "partial": null
     },
+    "mc-filter-only\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "v2.3.2",
+            "newest": "v2.3.2",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "^7.2 || ^8.0",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-7jn3-yc49-35c6",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "with-dependencies",
+                "reason": null,
+                "installs": "v2.3.2"
+            },
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "typo3/html-sanitizer:^2.3.2",
+                    "--with-dependencies"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update 'typo3/html-sanitizer:^2.3.2' --with-dependencies (gets v2.3.2) \u2014 clears the advisory; Composer's solver checked it against the lock"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "update",
+            "lowest": "v2.3.2",
+            "newest": "v2.3.2",
+            "held_by": [],
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "with-dependencies",
+                "reason": null,
+                "installs": "v2.3.2"
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "mc-gets-below\u2021": {
         "next_step": {
             "kind": "update",
@@ -7907,9 +9292,9 @@
                             "to_branch": "5.x",
                             "constraint": "^5.4.43",
                             "check": {
-                                "result": "not_checked",
+                                "result": "refused",
                                 "form": null,
-                                "reason": "unloaded_name",
+                                "reason": null,
                                 "installs": null
                             }
                         }
@@ -7976,6 +9361,107 @@
             "also": [],
             "text": "move symfony/translation to ^5.4 through friendsofsymfony/user-bundle \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/validator v4.4.48 (conflicts with >=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
         }
+    },
+    "mc-joint-down\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "8.x",
+            "version": "8.0.1",
+            "newest": "8.0.1",
+            "constraint": "^8.0.1",
+            "latest": null,
+            "php_check": {
+                "requires": "^8.1",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "package",
+                    "package": "acme/gz-down",
+                    "version": "2.0.0",
+                    "link": "require",
+                    "target": null,
+                    "constraint": "^7.10",
+                    "holder": {
+                        "verdict": "ok",
+                        "lead": null,
+                        "flag_ids": [],
+                        "direct": true,
+                        "replacement": null,
+                        "next_step": null
+                    }
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-gcrk-3vtt-1r14",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": {
+                "result": "refused",
+                "form": null,
+                "reason": null,
+                "installs": null
+            },
+            "moves_with": [],
+            "composer_moves_because": [
+                "holders",
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "why-not",
+                    "guzzlehttp/guzzle",
+                    "8.0.1",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require guzzlehttp/guzzle ^8.0.1 \u2014 clears the advisory; 8.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by acme/gz-down 2.0.0 (requires ^7.10); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "7.15.2",
+            "held_by": [],
+            "if_applied": null,
+            "check": null
+        },
+        "move_in": "next_step",
+        "partial": null
     },
     "mc-joint-retag\u2021": {
         "next_step": {
@@ -11328,6 +12814,95 @@
             "also": [],
             "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
         }
+    },
+    "policy-audit-ignore\u2021": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "raise-php",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "3.x",
+            "version": "3.0.5",
+            "newest": "3.0.7",
+            "constraint": "^3.0.5",
+            "latest": null,
+            "php_check": {
+                "requires": "^8.1.0",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-5x9t-bkbj-vmgp",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "joomla/filter:^3.0.5"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "joomla/filter",
+                    "3.0.5",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.1, then require joomla/filter ^3.0.5 \u2014 clears the advisory; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "raise-php",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "blocked",
+            "lowest": "2.0.6",
+            "newest": "2.0.6",
+            "held_by": [],
+            "if_applied": null,
+            "check": null
+        },
+        "move_in": "next_step",
+        "partial": null
     },
     "policy-off\u2021": {
         "next_step": {
