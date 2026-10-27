@@ -135,7 +135,6 @@ not warn, and lockrot writes it only when the lookup ran.
 |---|---|
 | `policy` | `false` |
 | `policy.advisories` | `false` |
-| `policy.advisories.audit` | `ignore` |
 | `COMPOSER_POLICY` | `false`: the variable is `0`, `false` or `off` |
 
 ### Advisories unavailable {#advisories_unavailable}
