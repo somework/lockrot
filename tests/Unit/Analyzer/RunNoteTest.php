@@ -145,12 +145,12 @@ final class RunNoteTest extends TestCase
             false,
             ['reason' => 'install_time_budget', 'composer_repositories_checked' => 2],
         ];
-        yield 'advisories off by the audit mode' => [
-            static fn (): RunNote => RunNote::advisoriesDisabledByPolicy('policy.advisories.audit', 'ignore'),
+        yield 'advisories off by the policy key' => [
+            static fn (): RunNote => RunNote::advisoriesDisabledByPolicy('policy.advisories', false),
             'advisories_disabled_by_policy',
-            "security advisories still checked: Composer's policy (policy.advisories.audit: ignore) stops Composer from warning about them",
+            "security advisories still checked: Composer's policy (policy.advisories: false) stops Composer from warning about them",
             false,
-            ['policy_key' => 'policy.advisories.audit', 'value' => 'ignore'],
+            ['policy_key' => 'policy.advisories', 'value' => false],
         ];
         yield 'advisories off by the environment' => [
             static fn (): RunNote => RunNote::advisoriesDisabledByPolicy('COMPOSER_POLICY', false),

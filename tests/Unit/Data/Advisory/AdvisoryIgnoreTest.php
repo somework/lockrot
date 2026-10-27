@@ -212,13 +212,13 @@ final class AdvisoryIgnoreTest extends TestCase
         self::assertNull($ignore->whyUnreadable());
     }
 
-    public function testThePolicyTurnsAdvisoriesOffThreeWays(): void
+    public function testThePolicyTurnsAdvisoriesOffByItsKeysAndNeverByTheAuditMode(): void
     {
         self::needsPolicyApi();
 
         self::assertSame(['policy_key' => 'policy', 'value' => false], self::read(['policy' => false])->disabledBy());
         self::assertSame(['policy_key' => 'policy.advisories', 'value' => false], self::read(['policy' => ['advisories' => false]])->disabledBy());
-        self::assertSame(['policy_key' => 'policy.advisories.audit', 'value' => 'ignore'], self::read(['policy' => ['advisories' => ['audit' => 'ignore']]])->disabledBy());
+        self::assertNull(self::read(['policy' => ['advisories' => ['audit' => 'ignore']]])->disabledBy(), 'Composer 2.10 reads no audit mode of the advisories list');
         self::assertNull(self::read(['policy' => ['advisories' => ['audit' => 'report']]])->disabledBy());
         $auditOff = self::read(['policy' => ['advisories' => ['audit' => 'ignore', 'ignore-id' => ['PKSA-1' => 'reviewed']]]]);
         self::assertSame(AdvisoryIgnoreMatch::ID, self::record($auditOff->match('vendor/pkg', $this->full('PKSA-1', null, null)))[0] ?? null, 'the lists still apply when the audit mode is ignore');

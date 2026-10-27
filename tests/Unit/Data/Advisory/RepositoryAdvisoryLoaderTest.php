@@ -710,7 +710,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
             self::markTestSkipped('Composer without the advisory API');
         }
         [$spy, $calls] = self::spy();
-        $ignore = AdvisoryIgnore::disabled('policy.advisories.audit', 'ignore');
+        $ignore = AdvisoryIgnore::disabled('policy.advisories', false);
 
         $batch = (new RepositoryAdvisoryLoader([$spy], false, null, $ignore))->load(['doctrine/cache' => '2.2.0']);
 
@@ -718,7 +718,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([[AdvisoryCoverage::ANSWERED, null]], self::outcomes($batch));
         self::assertNull(self::nameCoverage($batch, 'doctrine/cache')->reason());
         self::assertSame([RunNote::ADVISORIES_DISABLED_BY_POLICY], array_map(static fn (RunNote $note): string => $note->code(), $batch->notes()));
-        self::assertSame(['policy_key' => 'policy.advisories.audit', 'value' => 'ignore'], $batch->notes()[0]->data());
+        self::assertSame(['policy_key' => 'policy.advisories', 'value' => false], $batch->notes()[0]->data());
         self::assertSame([false], self::networkFailures($batch));
     }
 

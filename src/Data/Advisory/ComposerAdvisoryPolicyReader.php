@@ -38,7 +38,6 @@ final class ComposerAdvisoryPolicyReader implements AdvisoryPolicyReader
         return [
             'list' => $advisories->getIgnoreListForOperation('audit'),
             'severities' => $advisories->getIgnoreSeverityForOperation('audit'),
-            'audit' => $advisories->audit,
         ];
     }
 
