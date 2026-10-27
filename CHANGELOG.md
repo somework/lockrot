@@ -127,9 +127,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the holds of a refusal, or the root links that no update can change. The `php:` line prints it,
   and marks a root hold on a packages-dev package " in require-dev".
   ([The update that admits the target](docs/verdicts.md#the-update-that-admits-the-target))
-- **All formats:** the run notes `update_now_not_checked`, `move_check_failed` and
-  `package_name_invalid`. lockrot skips a lock entry whose name is no Composer package name.
-  ([Run notes](docs/notes.md#package_name_invalid))
+- **All formats:** the run notes `moves_not_checked`, `move_check_failed`, `update_now_reduced`,
+  `update_now_refused`, `update_now_not_checked` and `package_name_invalid` say what the move check
+  and `update now:` did. lockrot skips a lock entry whose name is no Composer package name.
+  ([Run notes](docs/notes.md#moves_not_checked))
+- **All formats:** the run notes `baseline_target_differs`, `baseline_fix_model_differs` and
+  `ignore_does_not_cover_advisories` say when the baseline does not compare fix changes, and when an
+  `ignore[]` entry meets a counted advisory. ([Run notes](docs/notes.md#baseline_target_differs))
 - **CLI, Config:** `--fail-on` takes a list, one value per kind: a grade, a flag (at or above in
   flag order), `vulnerable` or `vulnerable-medium|high|critical`, and `unchecked`. ([In
   CI](docs/ci.md))
@@ -261,6 +265,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- **Breaking:** **json, PHAR:** the unnumbered schema files in `resources/` are gone. Each file
+  carries its number: `lockrot-report.schema.json` is `lockrot-report-1.schema.json`, and the same
+  holds for `baseline`, `config` and `explain`. Action: validate against
+  `resources/lockrot-<name>-<number>.schema.json`, or against the URL. ([Schema](docs/schema.md))
 - **Breaking:** **Baseline:** 0.14 reads baseline-2 only, and a baseline-1 file exits 2. Action:
   review the findings, then run `--generate-baseline`, which overwrites the file. `known_since`
   starts again on that day. ([Baseline](docs/baseline.md))
