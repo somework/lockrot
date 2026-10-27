@@ -281,6 +281,24 @@ final class PhpWindowTest extends TestCase
         self::assertSame('8.3.2', $set['lower_edge']['php']);
     }
 
+    /** R4-3: config.platform.php 8.3.5 lies in the conflict hole 8.3.5 - 8.3.6, and PHP 8.3.7 installs the lock, so 8.3 stays in. */
+    public function testAPinnedPatchInsideAConflictHoleOfTheTargetMinorKeepsTheMinor(): void
+    {
+        $only = self::window(['packages' => [self::package('acme/a', ['php' => '~8.3.0'], ['php' => '8.3.5 - 8.3.6'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.3.5']]], '8.3')['without_dev'];
+        $wide = self::window(['packages' => [self::package('acme/a', ['php' => '>=7.4'], ['php' => '8.3.5 - 8.3.6'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.3.5']]], '8.3')['without_dev'];
+
+        self::assertSame([['8.3'], null], [$only['minors'], $only['closest']]);
+        self::assertSame([['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5'], false], [$wide['minors'], $wide['gaps']]);
+    }
+
+    /** No patch above the pinned 8.3.5 installs the lock: 8.3.0 to 8.3.4 do, but they are below the solve's php. */
+    public function testAPinnedPatchAboveTheLastAdmittedPatchOfTheTargetMinorLeavesItOut(): void
+    {
+        $set = self::window(['packages' => [self::package('acme/a', ['php' => '>=7.4'], ['php' => '>=8.3.5'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.3.5']]], '8.3')['without_dev'];
+
+        self::assertSame(['7.4', '8.0', '8.1', '8.2'], $set['minors']);
+    }
+
     /** A cap inside the target minor is no floor: the target point 8.4.99 fails, so 8.4 stays out although 8.4.0 installs the lock. */
     public function testACapInsideTheTargetMinorLeavesItOut(): void
     {

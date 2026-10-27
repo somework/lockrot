@@ -1,0 +1,25 @@
+{
+    "score_text": "18 = pinned 16 + capped 2 [¼ of 8]",
+    "next_step_text": "raise require.php to >=8.2, then require a tag — the newest on its own line is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: 4.x last released 4.17.0 2025-11-01 (0.9 years ago), its newest release; last push 2026-09-30 (less than three weeks ago)",
+    "explain_age": [
+        "installed  4.7.x-dev not read (a branch snapshot has no release branch)",
+        "4.x        4.17.0    2025-11-01   0.9 years ago                 below release-warn-years 3",
+        "newest     4.17.0    2025-11-01   0.9 years ago                 below release-warn-years 3",
+        "last push            2026-09-30   less than three weeks ago     below push-warn-years 3",
+        "libyears not measured: a branch snapshot has no release branch"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer require 'php:>=8.2' --no-update",
+        "composer require 'laminas/laminas-code:^4.17.0'",
+        "composer why-not laminas/laminas-code 4.17.0 --locked"
+    ],
+    "commands_cmd": [
+        "composer require \"php:>=8.2\" --no-update",
+        "composer require \"laminas/laminas-code:^4.17.0\"",
+        "composer why-not laminas/laminas-code 4.17.0 --locked"
+    ]
+}

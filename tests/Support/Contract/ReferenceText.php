@@ -20,8 +20,8 @@ final class ReferenceText
     /** The inputs of each string, as paths of `x-rendered-from`. A string outside the JSON names its own list. */
     public const INPUTS = [
         'score.text' => ['score.terms', 'score.modifiers', 'score.accepted', 'score.exact', 'score.total', 'score.rounded_down'],
-        'next_step.text' => ['next_step', 'package', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
-        'also.text' => ['next_step.also[]', 'package', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
+        'next_step.text' => ['next_step', 'package', 'version', 'signals[].id', 'signals[].data.newest_php', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
+        'also.text' => ['next_step.also[]', 'package', 'version', 'signals[].id', 'signals[].data.newest_php', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
         'gate.text' => ['gate', 'run.fail_on', 'run.fail_on_source', 'run.gates', 'run.mode', 'run.target_php', 'run.target_php_source'],
         'evidence' => ['flags[].id', 'flags[].summary', 'score.terms[].flag'],
         'gate_line' => ['gate.basis', 'score.total'],
@@ -463,6 +463,11 @@ final class ReferenceText
                 return 'no tagged release to move to; review the snapshot, or replace it';
             case 'no-move':
                 $reason = Fields::string($move, 'reason');
+                if ($reason === 'no_release_admits') {
+                    $s11 = array_values(array_filter(Fields::objects($in, 'signals'), static fn (array $signal): bool => ($signal['id'] ?? null) === 'S11'));
+
+                    return 'no move: no release above '.Fields::string($in, 'version').' admits PHP '.Fields::string(Fields::object($s11[0] ?? [], 'data'), 'newest_php');
+                }
 
                 return (self::NO_MOVE[$reason] ?? $kind).($reason === 'metadata_not_read' && Fields::string($move, 'source') === 'pinned' ? '; review the snapshot' : '');
             default:

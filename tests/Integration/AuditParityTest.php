@@ -151,13 +151,13 @@ final class AuditParityTest extends TestCase
         }
         $before = getenv('COMPOSER_POLICY');
         $cases = [
-            'policy: false' => [['policy' => false], null],
-            'policy.advisories: false' => [['policy' => ['advisories' => false]], null],
-            'policy.advisories.audit: ignore' => [['policy' => ['advisories' => ['audit' => 'ignore', 'ignore-id' => ['PKSA-s1' => 'reviewed']]]], null],
-            'COMPOSER_POLICY=0' => [['audit' => ['ignore' => ['PKSA-s1']]], '0'],
+            'policy: false' => [['policy' => false], null, true],
+            'policy.advisories: false' => [['policy' => ['advisories' => false]], null, true],
+            'policy.advisories.audit: ignore' => [['policy' => ['advisories' => ['audit' => 'ignore', 'ignore-id' => ['PKSA-s1' => 'reviewed']]]], null, false],
+            'COMPOSER_POLICY=0' => [['audit' => ['ignore' => ['PKSA-s1']]], '0', true],
         ];
         try {
-            foreach ($cases as $label => [$section, $env]) {
+            foreach ($cases as $label => [$section, $env, $noted]) {
                 putenv($env === null ? 'COMPOSER_POLICY' : 'COMPOSER_POLICY='.$env);
                 $config = self::config($section);
                 $auditor = new Auditor();
@@ -166,7 +166,7 @@ final class AuditParityTest extends TestCase
 
                 self::assertSame($composer, self::lockrotResult($config), $label);
                 self::assertNotSame([], $composer['counted'], $label.': advisories count');
-                self::assertNotNull($ignore->disabledBy(), $label.': the note is written');
+                self::assertSame($noted, $ignore->disabledBy() !== null, $label.': the note is written');
                 self::assertNull($ignore->whyUnreadable(), $label);
             }
         } finally {

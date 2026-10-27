@@ -30,6 +30,9 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 {
     private const CONTRACT = __DIR__.'/../fixtures/contract/';
 
+    /** The lists that the comparison keys by `id`: one signal or flag that only one side has moves no other item. */
+    private const BY_ID = ['signals', 'flags'];
+
     /**
      * The fields that each block golden reads (SPEC-0.14.md §7.9.14): dotted keys of the finding, `run.` and `details.`.
      * `{a,b}` reads each.
@@ -87,9 +90,9 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'signals[].data.advisories[].id', 'version', 'run.{include_dev,project_php_lowest,target_php}',
         ],
         'held_by' => [
-            'next_step.held_by[].{constraint,package,source,version}', 'next_step.held_by[].holder.{direct,flag_ids,verdict}',
-            'next_step.held_by[].holder.next_step.{constraint,kind,to_branch}', 'next_step.also[].held_by[].{constraint,package,source,version}',
-            'next_step.also[].held_by[].holder.{direct,flag_ids,verdict}', 'next_step.also[].held_by[].holder.next_step.{constraint,kind,to_branch}',
+            'next_step.held_by[].{constraint,link,package,source,target,version}', 'next_step.held_by[].holder.{direct,flag_ids,verdict}',
+            'next_step.held_by[].holder.next_step.{check,constraint,kind,to_branch}', 'next_step.also[].held_by[].{constraint,link,package,source,target,version}',
+            'next_step.also[].held_by[].holder.{direct,flag_ids,verdict}', 'next_step.also[].held_by[].holder.next_step.{check,constraint,kind,to_branch}',
             'run.graded_verdicts',
         ],
         'security' => [
@@ -201,28 +204,28 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         ],
         'tie‡' => [
             'verdict_line' => [
-                [['score.total', 'flags[].degree.liveness_complete', 'flags[].degree.reasons', 'flags[].headline.source', 'flags[].headline.value', 'flags[].id', 'flags[].role', 'score.terms[].flag', 'score.terms[].part', 'score.terms[].severity', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].title', 'signals[].data.branch', 'signals[].data.event', 'signals[].data.marked_by', 'signals[].data.newest_branch', 'signals[].data.newest_php', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years', 'signals[].data.reason', 'signals[].data.replacement', 'signals[].data.target_php', 'signals[].data.version', 'signals[].data.written_for_php', 'signals[].data.years', 'signals[].id'], self::TIE],
+                [['signals[S5]', 'flags[old-promise]', 'score.total', 'score.terms[].flag', 'score.terms[].part', 'score.terms[].severity'], self::TIE],
             ],
             'readings' => [
-                [['flags[].degree.liveness_complete', 'flags[].degree.reasons', 'flags[].headline.source', 'flags[].headline.value', 'flags[].id', 'flags[].role', 'score.terms[].flag', 'score.terms[].part', 'score.terms[].severity', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].title', 'signals[].data.branch', 'signals[].data.event', 'signals[].data.marked_by', 'signals[].data.newest_branch', 'signals[].data.newest_php', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years', 'signals[].data.reason', 'signals[].data.replacement', 'signals[].data.target_php', 'signals[].data.version', 'signals[].data.written_for_php', 'signals[].data.years', 'signals[].id'], self::TIE],
+                [['signals[S5]', 'flags[old-promise]', 'score.terms[].flag', 'score.terms[].part', 'score.terms[].severity'], self::TIE],
             ],
             'qualifiers' => [
-                [['flags[].id', 'score.terms[].flag', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].id', 'signals[].id'], self::TIE],
+                [['signals[S5]', 'flags[old-promise]', 'score.terms[].flag'], self::TIE],
             ],
             'moves' => [
-                [['next_step.version', 'next_step.commands', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'flags[].id', 'score.terms[].flag', 'signals[].data.advisories[].id'], self::TIE],
+                [['signals[S5]', 'flags[old-promise]', 'next_step.version', 'next_step.commands', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'score.terms[].flag'], self::TIE],
             ],
             'security' => [
-                [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.newest', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::TIE],
+                [['signals[S5]'], self::TIE],
             ],
             'branches_lead' => [
-                [['signals[].id', 'signals[].data.newest_branch', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::TIE],
+                [['signals[S5]'], self::TIE],
             ],
             'why' => [
-                [['score.exact', 'score.total', 'score.terms[].advisory', 'score.terms[].fix_kind', 'score.terms[].flag', 'score.terms[].multiplier', 'score.terms[].part', 'score.terms[].points', 'score.terms[].role', 'score.terms[].severity', 'score.terms[].weight', 'score.without[].at_least', 'score.without[].lead', 'score.without[].total', 'score.without[].verdict', 'score.without[].remove.id', 'score.without[].remove.kind', 'score.without[].revealed[].flag', 'score.without[].revealed[].role', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].id', 'signals[].data.advisories[].fix.to_branch', 'signals[].id'], self::TIE],
+                [['signals[S5]', 'score.exact', 'score.total', 'score.terms[].advisory', 'score.terms[].fix_kind', 'score.terms[].flag', 'score.terms[].multiplier', 'score.terms[].part', 'score.terms[].points', 'score.terms[].role', 'score.terms[].severity', 'score.terms[].weight', 'score.without[].at_least', 'score.without[].lead', 'score.without[].total', 'score.without[].verdict', 'score.without[].remove.id', 'score.without[].remove.kind', 'score.without[].revealed[].flag', 'score.without[].revealed[].role'], self::TIE],
             ],
             'checks' => [
-                [['signals[].id'], self::TIE],
+                [['signals[S5]'], self::TIE],
             ],
         ],
         'B-offline‡' => [
@@ -247,28 +250,28 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         ],
         'C-bitbucket‡' => [
             'verdict_line' => [
-                [['flags[].degree.reasons', 'flags[].headline.value', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].title', 'signals[].data.branch', 'signals[].data.event', 'signals[].data.marked_by', 'signals[].data.newest_branch', 'signals[].data.newest_php', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years', 'signals[].data.reason', 'signals[].data.replacement', 'signals[].data.target_php', 'signals[].data.version', 'signals[].data.written_for_php', 'signals[].data.years', 'signals[].id'], self::BITBUCKET],
+                [['signals[S3]', 'flags[].degree.reasons', 'flags[].headline.value'], self::BITBUCKET],
             ],
             'readings' => [
-                [['flags[].degree.reasons', 'flags[].headline.value', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].title', 'signals[].data.branch', 'signals[].data.event', 'signals[].data.marked_by', 'signals[].data.newest_branch', 'signals[].data.newest_php', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years', 'signals[].data.reason', 'signals[].data.replacement', 'signals[].data.target_php', 'signals[].data.version', 'signals[].data.written_for_php', 'signals[].data.years', 'signals[].id'], self::BITBUCKET],
+                [['signals[S3]', 'flags[].degree.reasons', 'flags[].headline.value'], self::BITBUCKET],
             ],
             'qualifiers' => [
-                [['signals[].data.advisories[].cve', 'signals[].data.advisories[].id', 'signals[].id'], self::BITBUCKET],
+                [['signals[S3]'], self::BITBUCKET],
             ],
             'moves' => [
-                [['signals[].data.advisories[].id'], self::BITBUCKET],
+                [['signals[S3]'], self::BITBUCKET],
             ],
             'security' => [
-                [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.newest', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::BITBUCKET],
+                [['signals[S3]'], self::BITBUCKET],
             ],
             'branches_lead' => [
-                [['signals[].id', 'signals[].data.newest_branch', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::BITBUCKET],
+                [['signals[S3]'], self::BITBUCKET],
             ],
             'why' => [
-                [['signals[].data.advisories[].cve', 'signals[].data.advisories[].id', 'signals[].data.advisories[].fix.to_branch', 'signals[].id'], self::BITBUCKET],
+                [['signals[S3]'], self::BITBUCKET],
             ],
             'checks' => [
-                [['signals[].id'], self::BITBUCKET],
+                [['signals[S3]'], self::BITBUCKET],
             ],
         ],
         'B-offline-high‡' => [
@@ -343,6 +346,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 
     private const TIE = 'The model removes S5 from the case to make the tie. The installed release requires php >=5.3.3 and is older than the PHP 8.0 release, so lockrot raises S5 (old-promise).';
 
+
     private const IF_APPLIED = 'The model reads no date of a row\'s release, so old-promise stays unverified (`undated`) and the row\'s score is an upper bound (`at_most`). lockrot dates the release and judges old-promise exactly.';
 
     /** The paths of a line that no case with inputs fills, each with its reason. */
@@ -377,6 +381,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].held_by[].holder.next_step.kind' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.to_branch' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.direct' => self::ALSO_HELD,
+        'next_step.also[].held_by[].holder.next_step.check' => self::ALSO_HELD,
         'next_step.also[].check.form' => self::ALSO_CHECK,
         'next_step.also[].check.reason' => self::ALSO_CHECK,
         'next_step.also[].check.installs' => self::ALSO_CHECK,
@@ -432,9 +437,20 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         $listed = [];
         foreach (self::DIFFERENCES[$id][$line] ?? [] as [$paths]) {
             foreach ($paths as $path) {
+                $item = self::item($path);
+                if ($item !== null) {
+                    // One signal or flag that only one side has: the other items keep their comparison.
+                    $modelItems = JsonPath::arrayAt($model, [$item[0]]);
+                    $lockrotItems = JsonPath::arrayAt($lockrot, [$item[0]]);
+                    self::assertNotSame(\array_key_exists($item[1], $modelItems), \array_key_exists($item[1], $lockrotItems), $id.' '.$line.': '.$path.' is on both sides again: take it off DIFFERENCES');
+                    unset($modelItems[$item[1]], $lockrotItems[$item[1]]);
+                    $model[$item[0]] = $modelItems;
+                    $lockrot[$item[0]] = $lockrotItems;
+                    continue;
+                }
                 self::assertNotSame(Fields::only($model, [$path]), Fields::only($lockrot, [$path]), $id.' '.$line.': '.$path.' agrees with the model again: take it off DIFFERENCES');
+                $listed[] = $path;
             }
-            $listed = array_merge($listed, $paths);
         }
         $kept = array_values(array_diff(self::paths(self::LINES[$line]), $listed));
 
@@ -509,7 +525,9 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             foreach ($lines as $line => $groups) {
                 self::assertArrayHasKey($line, self::LINES, $id);
                 foreach ($groups as [$paths, $reason]) {
-                    self::assertSame([], array_values(array_diff($paths, self::paths(self::LINES[$line]))), $id.' '.$line.': the line reads no such path');
+                    $read = array_map(static fn (string $path): string => self::item($path) === null ? $path : self::item($path)[0].'[]', $paths);
+                    $lists = array_map(static fn (string $path): string => explode('.', $path)[0], self::paths(self::LINES[$line]));
+                    self::assertSame([], array_values(array_diff($read, self::paths(self::LINES[$line]), $lists)), $id.' '.$line.': the line reads no such path');
                     self::assertNotSame('', $reason, $id.' '.$line);
                 }
             }
@@ -589,7 +607,30 @@ final class HydratedCasesMatchTheModelTest extends TestCase
      */
     private static function documentOf(array $finding, array $run, array $branches): array
     {
+        foreach (self::BY_ID as $list) {
+            $byId = [];
+            foreach (JsonPath::arrayAt($finding, [$list]) as $item) {
+                $byId[JsonPath::stringAt(JsonPath::decoded($item), ['id'])] = $item;
+            }
+            ksort($byId, \SORT_NATURAL);
+            $finding[$list] = $byId;
+        }
+
         return $finding + ['run' => $run, 'details' => ['metadata' => ['branches' => $branches]]];
+    }
+
+    /**
+     * The list and the id of a DIFFERENCES path that names one item, such as `signals[S5]`, else null.
+     *
+     * @return array{value-of<self::BY_ID>, string}|null
+     */
+    private static function item(string $path): ?array
+    {
+        if (preg_match('/^(signals|flags)\[([^\]]+)\]$/', $path, $match) !== 1) {
+            return null;
+        }
+
+        return [$match[1], $match[2]];
     }
 
     /**

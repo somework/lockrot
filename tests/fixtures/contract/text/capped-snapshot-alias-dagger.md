@@ -1,0 +1,15 @@
+### lockrot: 1 of 4 packages flagged — high 1
+
+**gate: fails** · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)
+
+| Verdict | Package | Version | Flags | Why | Via |
+|---|---|---|---|---|---|
+| **high** | `laminas/laminas-code` | 4.7.x-dev | pinned · capped | `18 = pinned 16 + capped 2 [¼ of 8]`<br>**Do:** raise require.php to \>=8.2, then require a tag — the newest on its own line is 4.17.0 (2025-11-01); 4.x needs php \~8.2.0 \|\| \~8.3.0 \|\| \~8.4.0 \|\| \~8.5.0, require.php allows 7.4 (a major raise)<br>*pinned:* pinned to branch snapshot 4.7.x-dev<br>*capped:* requires php \>=7.4, \<8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded<br>*age:* 4.x last released 4.17.0 2025-11-01 (0.9 years ago), its newest release; last push 2026-09-30 (less than three weeks ago) | direct |
+
+flags: pinned 1 · capped 1 · 1 package carries more than one
+depth: every flagged package is named in composer.json · direct 1
+libyears: the one package could not be measured
+advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+php: the lock installs on PHP 7.4 to 8.1, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
+
+<sub>4 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

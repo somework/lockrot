@@ -51,6 +51,7 @@ final class TargetFixComposerOracleTest extends TestCase
         'sites/wallabag-2.6.14' => [self::FIXTURES.'sites/wallabag-2.6.14/http/advisories', 'wallabag-2.6.14'],
         'apps/monicahq_monica' => [self::FIXTURES.'corpus/cache/advisories', 'monicahq_monica'],
         'sites/drupal-site' => [self::FIXTURES.'sites/drupal-site/http/advisories', 'drupal-site'],
+        'apps/PrestaShop_PrestaShop' => [self::FIXTURES.'corpus/cache/advisories', 'PrestaShop_PrestaShop'],
     ];
     private const FORMS = ['listed' => MoveCheck::INLINE, 'with-dependencies' => MoveCheck::WITH_DEPENDENCIES, 'with-all-dependencies' => MoveCheck::WITH_ALL_DEPENDENCIES];
     /** The day of the recording: the known minors are the ones that Composer knew. */

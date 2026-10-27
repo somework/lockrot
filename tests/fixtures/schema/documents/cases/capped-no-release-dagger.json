@@ -1098,8 +1098,8 @@
   "deepest": []
  },
  "libyears": {
-  "total": 2.95,
-  "direct_requirements": 2.95,
+  "total": 2,
+  "direct_requirements": 2,
   "measured": 1,
   "at_least_count": 0,
   "unmeasured": {
@@ -1115,7 +1115,7 @@
   "furthest_behind": {
    "package": "laminas/laminas-code",
    "version": "4.7.1",
-   "libyears": 2.95,
+   "libyears": 2,
    "at_least": false
   },
   "packages": 1
@@ -1380,7 +1380,7 @@
    "evidence": "capped: requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:46+00:00",
-   "libyears": 2.95,
+   "libyears": 2,
    "age": {
     "installed": {
      "at": "2022-11-21T01:32:31+00:00",
@@ -1389,23 +1389,23 @@
     },
     "installed_unmeasured": null,
     "release": {
-     "version": "4.17.0",
-     "at": "2025-11-01T09:38:14+00:00",
-     "years": 0.9,
+     "version": "4.16.0",
+     "at": "2024-11-20T13:15:13+00:00",
+     "years": 1.9,
      "level": null,
      "dated_by": null
     },
     "release_unmeasured": null,
     "branch_release": {
-     "version": "4.17.0",
-     "at": "2025-11-01T09:38:14+00:00",
-     "years": 0.9,
+     "version": "4.16.0",
+     "at": "2024-11-20T13:15:13+00:00",
+     "years": 1.9,
      "level": null,
      "dated_by": null
     },
     "branch_release_unmeasured": null,
     "push": {
-     "at": "2026-09-30T09:08:30Z",
+     "at": "2026-09-30T09:08:30+00:00",
      "years": 0,
      "level": null
     },

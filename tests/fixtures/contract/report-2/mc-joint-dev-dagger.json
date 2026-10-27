@@ -1284,9 +1284,9 @@
                                 "to_branch": "5.x",
                                 "constraint": "^5.4.43",
                                 "check": {
-                                    "result": "not_checked",
+                                    "result": "refused",
                                     "form": null,
-                                    "reason": "unloaded_name",
+                                    "reason": null,
                                     "installs": null
                                 }
                             }

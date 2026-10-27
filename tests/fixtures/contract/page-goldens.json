@@ -42,6 +42,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
@@ -211,7 +212,7 @@
           "direct 7",
           "1 hop away 2"
         ],
-        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
       },
       "libyears": {
         "figure": "22.06",
@@ -245,10 +246,11 @@
             "v4.4.44 (2022-07-28)"
           ]
         ],
+        "heading": "Furthest behind, top 5",
         "none": null
       },
       "radius_lead": [
-        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
+        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
         "2 flagged packages pulled in.",
         "1 of them sits under friendsofsymfony/oauth-server-bundle."
       ],
@@ -504,6 +506,7 @@
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "0 of 1 package flagged · 1 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
@@ -548,6 +551,7 @@
         "sub": "over 1 package · 0.00 from direct requirements",
         "unmeasured": null,
         "top": [],
+        "heading": null,
         "none": "Every measured package rounds to 0.0 libyears."
       },
       "radius_lead": [],
@@ -594,6 +598,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 25,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "37 of 183 packages flagged · 126 ok · 20 finished",
       "lead_scope": "all 37 in production · 14 required directly, 23 pulled in",
       "grade_chips": [
@@ -870,6 +875,7 @@
             "v1.4 (2026-02-28)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
@@ -1493,6 +1499,18 @@
         "Incomplete data: no advisory check ran. What this run could not see",
         "PHP: this lock installs on PHP 7.2 to 7.4 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
       ],
+      "state_links": [
+        {
+          "link": "What this run could not see",
+          "href": "#view=run",
+          "count": null
+        },
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
       "waffle_caption": "0 of 1 package flagged · 1 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
@@ -1543,6 +1561,7 @@
             "1.4.15 (2026-08-21)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [],
@@ -1598,6 +1617,13 @@
       "gate_link_rows": null,
       "state_lines": [
         "PHP: this lock installs on PHP 7.2 to 7.4 · your target, 8.4, is excluded by require.php and by 1 package: joomla/filter. The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
       ],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
@@ -1671,6 +1697,7 @@
             "3.0.7 (2026-09-29)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [
@@ -1753,6 +1780,13 @@
       "gate_link_rows": 84,
       "state_lines": [
         "PHP: this lock installs on PHP 7.4, so your target, 8.4, is excluded · 3 packages exclude 8.4: laminas/laminas-code, php-http/guzzle5-adapter and friendsoftwig/twigcs (require-dev) · not checked (the run checked no move). The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
       ],
       "waffle_caption": "111 of 210 packages flagged · 80 ok · 19 finished",
       "lead_scope": "all 111 in production · 61 required directly, 50 pulled in",
@@ -1984,7 +2018,7 @@
           "3 hops away 5",
           "4 hops away 2"
         ],
-        "sentence": "50 of 111 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line."
+        "sentence": "50 of 111 flagged packages are named by no line of composer.json; the deepest, hoa/ustring and hoa/zformat, sit 4 hops from the nearest line."
       },
       "libyears": {
         "figure": "406.59",
@@ -2033,10 +2067,11 @@
             "v8.1.0 (2026-05-29)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
-        "50 of 111 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line.",
+        "50 of 111 flagged packages are named by no line of composer.json; the deepest, hoa/ustring and hoa/zformat, sit 4 hops from the nearest line.",
         "50 flagged packages pulled in.",
         "7 of them sit under more than 8 direct requirements.",
         "20 of them sit under kphoen/rulerz-bundle, kphoen/rulerz and wallabag/phpepub."
@@ -3696,6 +3731,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 dev-only · 1 required directly",
       "grade_chips": [
@@ -3768,6 +3804,7 @@
             "v6.4.45 (2026-08-30)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [
@@ -3879,6 +3916,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
@@ -4048,7 +4086,7 @@
           "direct 7",
           "1 hop away 2"
         ],
-        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
       },
       "libyears": {
         "figure": "22.06",
@@ -4082,10 +4120,11 @@
             "v4.4.44 (2022-07-28)"
           ]
         ],
+        "heading": "Furthest behind, top 5",
         "none": null
       },
       "radius_lead": [
-        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
+        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
         "2 flagged packages pulled in.",
         "1 of them sits under friendsofsymfony/oauth-server-bundle."
       ],
@@ -4317,6 +4356,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
@@ -4405,6 +4445,7 @@
             "undated releases"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [
@@ -4483,6 +4524,13 @@
       "gate_link_rows": 1,
       "state_lines": [
         "Against lockrot-baseline.json: 1 new · 0 worsened · 1 known · 1 entry for packages that left the lock: lockrot-fixture/left-the-lock."
+      ],
+      "state_links": [
+        {
+          "link": null,
+          "href": null,
+          "count": null
+        }
       ],
       "waffle_caption": "2 of 16 packages flagged · 6 ok · 8 finished",
       "lead_scope": "all 2 in production · 1 required directly, 1 pulled in",
@@ -4604,6 +4652,7 @@
             "3.12.1 (2026-09-29)"
           ]
         ],
+        "heading": "Furthest behind, top 3",
         "none": null
       },
       "radius_lead": [
@@ -4698,6 +4747,7 @@
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
@@ -4867,7 +4917,7 @@
           "direct 7",
           "1 hop away 2"
         ],
-        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
       },
       "libyears": {
         "figure": "22.06",
@@ -4901,10 +4951,11 @@
             "v4.4.44 (2022-07-28)"
           ]
         ],
+        "heading": "Furthest behind, top 5",
         "none": null
       },
       "radius_lead": [
-        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
+        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
         "2 flagged packages pulled in.",
         "1 of them sits under friendsofsymfony/oauth-server-bundle."
       ],
@@ -5134,6 +5185,13 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.1 to 7.4 · your target, 8.4, is excluded by require.php and by 1 package: csa/guzzle-bundle. The PHP window"
       ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
@@ -5222,6 +5280,7 @@
             "8.2.0 (2026-09-06)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [
@@ -5309,6 +5368,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 12,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "14 of 55 packages flagged · 30 ok · 11 finished",
       "lead_scope": "all 14 in production · 10 required directly, 4 pulled in",
       "grade_chips": [
@@ -5558,6 +5618,7 @@
             "v5.5.1 (2026-02-14)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
@@ -5826,6 +5887,18 @@
         "PHP: this lock installs on PHP 7.2 to 7.4 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window",
         "extra.lockrot.ignore accepts maintenance flags, not advisories · 1 package it lists still counts for advisories. The run note"
       ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        },
+        {
+          "link": "The run note",
+          "href": "#view=run",
+          "count": null
+        }
+      ],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
@@ -5898,6 +5971,7 @@
             "v8.1.8 (2026-09-26)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [
@@ -5979,6 +6053,13 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.2 to 7.4 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
       ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 dev-only · 1 pulled in",
       "grade_chips": [
@@ -6052,6 +6133,7 @@
             "3.0.0 (2021-05-27)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [
@@ -6126,6 +6208,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production",
       "grade_chips": [
@@ -6193,6 +6276,7 @@
         "sub": "over 1 package · 0.00 from direct requirements",
         "unmeasured": null,
         "top": [],
+        "heading": null,
         "none": "Every measured package rounds to 0.0 libyears."
       },
       "radius_lead": [
@@ -6271,6 +6355,7 @@
       "gate_link": null,
       "gate_link_rows": null,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
@@ -6343,6 +6428,7 @@
             "v6.4.45 (2026-08-30)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [
@@ -6424,6 +6510,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
@@ -6496,6 +6583,7 @@
             "v6.4.45 (2026-08-30)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [
@@ -6581,6 +6669,7 @@
       "gate_link": "#view=packages&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "0 of 1 package flagged · 1 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
@@ -6625,6 +6714,7 @@
         "sub": "no package measured",
         "unmeasured": "Not measured: 1, dated only by a commit its tags share",
         "top": [],
+        "heading": null,
         "none": null
       },
       "radius_lead": [],
@@ -6678,6 +6768,13 @@
       "gate_link_rows": 6,
       "state_lines": [
         "PHP: without require-dev this lock installs on PHP 8.1 to 8.3, and with require-dev on no PHP (8.1 to 8.3 are excluded only by acme/string 1.0.0 >=8.4.1) · your target, 8.4, is excluded by require.php and by 1 package: acme/installer. The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
       ],
       "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
@@ -6848,7 +6945,7 @@
           "direct 7",
           "1 hop away 2"
         ],
-        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
       },
       "libyears": {
         "figure": "22.06",
@@ -6882,10 +6979,11 @@
             "v4.4.44 (2022-07-28)"
           ]
         ],
+        "heading": "Furthest behind, top 5",
         "none": null
       },
       "radius_lead": [
-        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
+        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
         "2 flagged packages pulled in.",
         "1 of them sits under friendsofsymfony/oauth-server-bundle."
       ],
@@ -7117,6 +7215,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
@@ -7286,7 +7385,7 @@
           "direct 7",
           "1 hop away 2"
         ],
-        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
       },
       "libyears": {
         "figure": "22.06",
@@ -7320,10 +7419,11 @@
             "v4.4.44 (2022-07-28)"
           ]
         ],
+        "heading": "Furthest behind, top 5",
         "none": null
       },
       "radius_lead": [
-        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
+        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
         "2 flagged packages pulled in.",
         "1 of them sits under friendsofsymfony/oauth-server-bundle."
       ],
@@ -7557,6 +7657,13 @@
       "state_lines": [
         "PHP: this lock installs on PHP 8.2 to 8.4 · Composer checks it at 8.4.1, the PHP that the lock records from config.platform.php, not the PHP of the machine. The PHP window"
       ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
       "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
@@ -7726,7 +7833,7 @@
           "direct 7",
           "1 hop away 2"
         ],
-        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
       },
       "libyears": {
         "figure": "22.06",
@@ -7760,10 +7867,11 @@
             "v4.4.44 (2022-07-28)"
           ]
         ],
+        "heading": "Furthest behind, top 5",
         "none": null
       },
       "radius_lead": [
-        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
+        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
         "2 flagged packages pulled in.",
         "1 of them sits under friendsofsymfony/oauth-server-bundle."
       ],
@@ -7996,6 +8104,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
@@ -8165,7 +8274,7 @@
           "direct 7",
           "1 hop away 2"
         ],
-        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
       },
       "libyears": {
         "figure": "22.06",
@@ -8199,10 +8308,11 @@
             "v4.4.44 (2022-07-28)"
           ]
         ],
+        "heading": "Furthest behind, top 5",
         "none": null
       },
       "radius_lead": [
-        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
+        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
         "2 flagged packages pulled in.",
         "1 of them sits under friendsofsymfony/oauth-server-bundle."
       ],
@@ -8432,6 +8542,13 @@
       "gate_link_rows": 83,
       "state_lines": [
         "PHP: this lock installs on PHP 7.4 · Composer checks it at 7.4.29, the PHP that the lock records from config.platform.php, not the PHP of the machine · 2 packages stop below the newest PHP, 8.5. The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
       ],
       "waffle_caption": "111 of 210 packages flagged · 80 ok · 19 finished",
       "lead_scope": "all 111 in production · 61 required directly, 50 pulled in",
@@ -8663,7 +8780,7 @@
           "3 hops away 5",
           "4 hops away 2"
         ],
-        "sentence": "50 of 111 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line."
+        "sentence": "50 of 111 flagged packages are named by no line of composer.json; the deepest, hoa/ustring and hoa/zformat, sit 4 hops from the nearest line."
       },
       "libyears": {
         "figure": "406.59",
@@ -8712,10 +8829,11 @@
             "v8.1.0 (2026-05-29)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
-        "50 of 111 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line.",
+        "50 of 111 flagged packages are named by no line of composer.json; the deepest, hoa/ustring and hoa/zformat, sit 4 hops from the nearest line.",
         "50 flagged packages pulled in.",
         "7 of them sit under more than 8 direct requirements.",
         "20 of them sit under kphoen/rulerz-bundle, kphoen/rulerz and wallabag/phpepub."
@@ -10353,6 +10471,13 @@
       "state_lines": [
         "PHP: this lock installs on PHP 8.3 to 8.4 · 2 packages stop below the newest PHP, 8.5. The PHP window"
       ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
       "waffle_caption": "4 of 25 packages flagged · 13 ok · 8 finished",
       "lead_scope": "all 4 in production · 1 required directly, 3 pulled in",
       "grade_chips": [
@@ -10545,6 +10670,7 @@
             "v1.4.0 (2025-12-03)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
@@ -10667,6 +10793,13 @@
       "gate_link_rows": null,
       "state_lines": [
         "PHP: this lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded · 3 packages exclude 8.5: moneyphp/money, nette/schema and brianium/paratest (require-dev) · Composer's solver at PHP 8.5 resolves this update: composer update moneyphp/money nette/schema brianium/paratest --with-all-dependencies. The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
       ],
       "waffle_caption": "4 of 25 packages flagged · 13 ok · 8 finished",
       "lead_scope": "all 4 in production · 1 required directly, 3 pulled in",
@@ -10860,6 +10993,7 @@
             "v1.4.0 (2025-12-03)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
@@ -10982,6 +11116,13 @@
       "gate_link_rows": 6,
       "state_lines": [
         "PHP: this lock installs on PHP 8.2 to 8.3 · Composer checks it at 8.2.0, the PHP that the lock records from config.platform.php, not the PHP of the machine · 1 package stops below the newest PHP, 8.5. The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
       ],
       "waffle_caption": "25 of 188 packages flagged · 138 ok · 25 finished",
       "lead_scope": "all 25 in production · 2 required directly, 23 pulled in",
@@ -11216,6 +11357,7 @@
             "v0.11.1 (2026-01-13)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
@@ -11672,6 +11814,13 @@
       "state_lines": [
         "PHP: without require-dev this lock installs on PHP 8.2 to 8.3, and with require-dev on no PHP (8.2 to 8.3 are excluded only by symfony/string v8.1.2 >=8.4.1) · your target, 8.4, is excluded by require.php and by 2 packages: laminas/laminas-skeleton-installer and vimeo/psalm (require-dev). The PHP window"
       ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
       "waffle_caption": "0 of 1 package flagged · 1 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
@@ -11716,6 +11865,7 @@
         "sub": "no package measured",
         "unmeasured": "Not measured: 1, undated releases",
         "top": [],
+        "heading": null,
         "none": null
       },
       "radius_lead": [],
@@ -11764,6 +11914,13 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded · 4 packages exclude 8.3: laminas/laminas-diactoros, laminas/laminas-escaper, laminas/laminas-feed and 1 more · Composer's solver at PHP 8.3 refuses their update: composer.json requires drupal/core-recommended ^9.3 and composer.json requires drupal/trusted_redirect ^1.9 and drupal/core 9.3.14 requires laminas/laminas-diactoros ^2.1 and drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 and drupal/trusted_redirect 1.9.0 requires drupal/core ^8 || ^9. The PHP window"
       ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
       "waffle_caption": "0 of 1 package flagged · 1 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
@@ -11814,6 +11971,7 @@
             "3.5.0 (2026-09-24)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [],
@@ -11862,6 +12020,13 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.3 to 8.1, so your target, 7.2, is excluded. The PHP window"
       ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
       "waffle_caption": "0 of 1 package flagged · 1 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
@@ -11912,6 +12077,7 @@
             "3.5.0 (2026-09-24)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [],
@@ -11959,6 +12125,13 @@
       "gate_link_rows": 83,
       "state_lines": [
         "PHP: this lock installs on PHP 7.4 · Composer checks it at 7.4.29, the PHP that the lock records from config.platform.php, not the PHP of the machine · 2 packages stop below the newest PHP, 8.5. The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
       ],
       "waffle_caption": "110 of 210 packages flagged · 80 ok · 20 finished",
       "lead_scope": "all 110 in production · 60 required directly, 50 pulled in",
@@ -12190,7 +12363,7 @@
           "3 hops away 5",
           "4 hops away 2"
         ],
-        "sentence": "50 of 110 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line."
+        "sentence": "50 of 110 flagged packages are named by no line of composer.json; the deepest, hoa/ustring and hoa/zformat, sit 4 hops from the nearest line."
       },
       "libyears": {
         "figure": "406.59",
@@ -12239,10 +12412,11 @@
             "v8.1.0 (2026-05-29)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
-        "50 of 110 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line.",
+        "50 of 110 flagged packages are named by no line of composer.json; the deepest, hoa/ustring and hoa/zformat, sit 4 hops from the nearest line.",
         "50 flagged packages pulled in.",
         "7 of them sit under more than 8 direct requirements.",
         "20 of them sit under kphoen/rulerz-bundle, kphoen/rulerz and wallabag/phpepub."
@@ -13867,6 +14041,13 @@
       "state_lines": [
         "PHP: this lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded · 3 packages exclude 8.5: moneyphp/money, nette/schema and brianium/paratest (require-dev) · set config.platform.php to your PHP 8.5 release, then Composer's solver resolves this update: composer update moneyphp/money nette/schema brianium/paratest --with-all-dependencies. The PHP window"
       ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
       "waffle_caption": "4 of 25 packages flagged · 13 ok · 8 finished",
       "lead_scope": "all 4 in production · 1 required directly, 3 pulled in",
       "grade_chips": [
@@ -14059,6 +14240,7 @@
             "v1.4.0 (2025-12-03)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
@@ -14181,6 +14363,13 @@
       "gate_link_rows": 1,
       "state_lines": [
         "PHP: this lock installs on PHP 8.3 to 8.4 · 2 packages stop below the newest PHP, 8.5. The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
       ],
       "waffle_caption": "6 of 35 packages flagged · 21 ok · 8 finished",
       "lead_scope": "all 6 in production · 1 required directly, 5 pulled in",
@@ -14431,6 +14620,7 @@
             "4.0.1 (2026-08-26)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
@@ -14704,6 +14894,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 14,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "25 of 167 packages flagged · 121 ok · 21 finished",
       "lead_scope": "all 25 in production · 16 required directly, 9 pulled in",
       "grade_chips": [
@@ -14792,7 +14983,7 @@
         "held_line": "1 of 14 findings that fail the gate is held by other packages. Their holders are in each sheet's Held by.",
         "held_link": "#view=findings&gate=fails%2Cheld",
         "held_link_rows": 1,
-        "way_out": "11 need another way out: 6 find an alternative, 1 raise PHP >=8.4, 1 test, 1 no move, 1 Composer refuses the move, 1 not checked: a package it needs could not be loaded",
+        "way_out": "11 need another way out: 6 find an alternative, 1 raise PHP >=8.4, 1 test, 1 no move, 2 not checked: a package it needs could not be loaded",
         "way_out_link": "#view=findings&gate=fails%2Cwayout",
         "way_out_link_rows": 11,
         "none": null
@@ -14999,6 +15190,7 @@
             "3.0.12 (2026-10-10)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
@@ -15215,10 +15407,10 @@
           "package": "intervention/image",
           "fails_gate": true,
           "reach": "direct",
-          "held": "held by its own release",
-          "command": null,
+          "held": "held by your composer.json",
+          "command": "composer require 'intervention/image:^3.11'",
           "raise_words": null,
-          "after": "after it: 0, ok · Composer refuses the move",
+          "after": "after it: 0, ok · not checked: a package it needs could not be loaded",
           "major": "a new major",
           "blocked": null,
           "ready": false,
@@ -15518,6 +15710,13 @@
       "state_lines": [
         "PHP: this lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded · 4 packages exclude 8.3: laminas/laminas-diactoros, laminas/laminas-escaper, laminas/laminas-feed and 1 more · Composer's solver at PHP 8.3 refuses their update: composer.json requires drupal/core-recommended ^9.3 and composer.json requires drupal/trusted_redirect ^1.9 and drupal/core 9.3.14 requires laminas/laminas-diactoros ^2.1 and drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 and drupal/trusted_redirect 1.9.0 requires drupal/core ^8 || ^9. The PHP window"
       ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
       "waffle_caption": "55 of 97 packages flagged · 29 ok · 13 finished",
       "lead_scope": "all 55 in production · 4 required directly, 51 pulled in",
       "grade_chips": [
@@ -15795,6 +15994,7 @@
             "v2.4.0 (2026-01-28)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
@@ -16833,6 +17033,18 @@
         "PHP: this lock installs on PHP 7.4, so your target, 8.4, is excluded · 3 packages exclude 8.4: laminas/laminas-code, php-http/guzzle5-adapter and friendsoftwig/twigcs (require-dev) · Composer's solver at PHP 8.4 refuses their update: composer.json requires php-http/guzzle5-adapter ^2.0. The PHP window",
         "Against lockrot-baseline.json: 61 new · 6 worsened · 48 known · 2 entries for packages that left the lock: behat/transliterator, true/punycode."
       ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        },
+        {
+          "link": null,
+          "href": null,
+          "count": null
+        }
+      ],
       "waffle_caption": "113 of 210 packages flagged · 78 ok · 19 finished",
       "lead_scope": "all 113 in production · 61 required directly, 52 pulled in",
       "grade_chips": [
@@ -17063,7 +17275,7 @@
           "3 hops away 5",
           "4 hops away 2"
         ],
-        "sentence": "51 of 113 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line. 1 more is named only in require-dev, which this run did not walk (pass --dev)."
+        "sentence": "51 of 113 flagged packages are named by no line of composer.json; the deepest, hoa/ustring and hoa/zformat, sit 4 hops from the nearest line. 1 more is named only in require-dev, which this run did not walk (pass --dev)."
       },
       "libyears": {
         "figure": "388.83",
@@ -17112,10 +17324,11 @@
             "v8.1.6 (2026-08-30)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
-        "51 of 113 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line. 1 more is named only in require-dev, which this run did not walk (pass --dev).",
+        "51 of 113 flagged packages are named by no line of composer.json; the deepest, hoa/ustring and hoa/zformat, sit 4 hops from the nearest line. 1 more is named only in require-dev, which this run did not walk (pass --dev).",
         "52 flagged packages pulled in.",
         "7 of them sit under more than 8 direct requirements.",
         "20 of them sit under kphoen/rulerz-bundle, kphoen/rulerz and wallabag/phpepub."
@@ -18988,6 +19201,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "9 of 9 packages flagged · 0 ok · 0 finished",
       "lead_scope": "all 9 in production · 7 required directly, 2 pulled in",
       "grade_chips": [
@@ -19157,7 +19371,7 @@
           "direct 7",
           "1 hop away 2"
         ],
-        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
+        "sentence": "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line."
       },
       "libyears": {
         "figure": "22.06",
@@ -19191,10 +19405,11 @@
             "v4.4.44 (2022-07-28)"
           ]
         ],
+        "heading": "Furthest behind, top 5",
         "none": null
       },
       "radius_lead": [
-        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php, symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
+        "2 of 9 flagged packages are named by no line of composer.json; the deepest, friendsofsymfony/oauth2-php and symfony/polyfill-intl-idn, sit 1 hop from the nearest line.",
         "2 flagged packages pulled in.",
         "1 of them sits under friendsofsymfony/oauth-server-bundle."
       ],
@@ -19428,6 +19643,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
@@ -19517,6 +19733,7 @@
             "v6.4.45 (2026-08-30)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [
@@ -19602,6 +19819,16 @@
       "state_lines": [
         "Offline run: 1 of 1 package has no grade, because lockrot read no metadata for it. What this run could not see"
       ],
+      "state_links": [
+        {
+          "link": "What this run could not see",
+          "href": "#view=run",
+          "count": {
+            "text": "1 of 1 package",
+            "href": "#view=packages&verdict=unknown"
+          }
+        }
+      ],
       "waffle_caption": "0 of 1 package flagged · 1 not judged · 0 ok · 0 finished",
       "lead_scope": null,
       "grade_chips": [],
@@ -19662,6 +19889,7 @@
         "sub": "no package measured",
         "unmeasured": "Not measured: 1, not from a Composer repository",
         "top": [],
+        "heading": null,
         "none": null
       },
       "radius_lead": [],
@@ -19712,6 +19940,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 14,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "25 of 167 packages flagged · 121 ok · 21 finished",
       "lead_scope": "all 25 in production · 16 required directly, 9 pulled in",
       "grade_chips": [
@@ -19816,7 +20045,7 @@
         "held_line": "1 of 14 findings that fail the gate is held by other packages. Their holders are in each sheet's Held by.",
         "held_link": "#view=findings&gate=fails%2Cheld",
         "held_link_rows": 1,
-        "way_out": "10 need another way out: 6 find an alternative, 1 raise PHP >=8.4, 1 test, 1 no move, 1 Composer refuses the move",
+        "way_out": "10 need another way out: 6 find an alternative, 1 raise PHP >=8.4, 1 test, 1 no move, 1 not checked: a package it needs could not be loaded",
         "way_out_link": "#view=findings&gate=fails%2Cwayout",
         "way_out_link_rows": 10,
         "none": null
@@ -20023,6 +20252,7 @@
             "3.0.12 (2026-10-10)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
@@ -20239,10 +20469,10 @@
           "package": "intervention/image",
           "fails_gate": true,
           "reach": "direct",
-          "held": "held by its own release",
-          "command": null,
+          "held": "held by your composer.json",
+          "command": "composer require 'intervention/image:^3.11'",
           "raise_words": null,
-          "after": "after it: 0, ok · Composer refuses the move",
+          "after": "after it: 0, ok · not checked: a package it needs could not be loaded",
           "major": "a new major",
           "blocked": null,
           "ready": false,
@@ -20586,18 +20816,12 @@
         ],
         "intervention/image": [
           {
-            "count": 2,
+            "count": 1,
             "shown": [
               {
                 "name": "your composer.json",
                 "grade": null,
                 "meta": "requires ^2.5",
-                "step": null
-              },
-              {
-                "name": "intervention/image 3.11.10, its own release",
-                "grade": null,
-                "meta": "requires intervention/gif ^4.2",
                 "step": null
               }
             ],
@@ -20624,6 +20848,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "6 of 10 packages flagged · 4 ok · 0 finished",
       "lead_scope": "all 6 in production · all 6 required directly",
       "grade_chips": [
@@ -20821,6 +21046,7 @@
             "v6.4.41 (2026-07-12)"
           ]
         ],
+        "heading": "Furthest behind, top 6",
         "none": null
       },
       "radius_lead": [
@@ -21061,6 +21287,13 @@
       "gate_link_rows": 20,
       "state_lines": [
         "PHP: this lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded · 4 packages exclude 8.3: laminas/laminas-diactoros, laminas/laminas-escaper, laminas/laminas-feed and 1 more · Composer's solver at PHP 8.3 refuses their update: composer.json requires drupal/core-recommended ^9.3 and composer.json requires drupal/trusted_redirect ^1.9 and drupal/core 9.3.14 requires laminas/laminas-diactoros ^2.1 and drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 and drupal/trusted_redirect 1.9.0 requires drupal/core ^8 || ^9. The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
       ],
       "waffle_caption": "55 of 97 packages flagged · 29 ok · 13 finished",
       "lead_scope": "all 55 in production · 4 required directly, 51 pulled in",
@@ -21339,6 +21572,7 @@
             "v2.4.0 (2026-01-28)"
           ]
         ],
+        "heading": "Furthest behind, top 8",
         "none": null
       },
       "radius_lead": [
@@ -22300,6 +22534,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "1 of 2 packages flagged · 1 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
@@ -22395,6 +22630,7 @@
             "8.0.1 (2026-07-04)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [
@@ -22520,6 +22756,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 1,
       "state_lines": [],
+      "state_links": [],
       "waffle_caption": "1 of 2 packages flagged · 1 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
@@ -22615,6 +22852,7 @@
             "v6.4.41 (2026-07-04)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [
@@ -22736,6 +22974,13 @@
       "state_lines": [
         "PHP: this lock installs on PHP 8.1 to 8.4 · 1 package stops below the newest PHP, 8.5. The PHP window"
       ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
       "waffle_caption": "1 of 2 packages flagged · 1 ok · 0 finished",
       "lead_scope": "1 in production · 1 required directly",
       "grade_chips": [
@@ -22831,6 +23076,7 @@
             "v6.4.41 (2026-07-04)"
           ]
         ],
+        "heading": "Furthest behind",
         "none": null
       },
       "radius_lead": [
@@ -22936,6 +23182,13 @@
       "gate_link_rows": null,
       "state_lines": [
         "PHP: this lock installs on PHP 7.3 to 8.0 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
       ],
       "waffle_caption": null,
       "lead_scope": null,

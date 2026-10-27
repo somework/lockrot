@@ -214,6 +214,8 @@ MOVE_CHECK_REASONS = ['baseline_refused', 'unloaded_name', 'offline', 'install_t
                       'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete']
 # The reasons that leave the baseline itself unchecked: the budget, a run that cannot solve at all, or a solve that Composer failed on.
 BASELINE_CHECK_REASONS = ['unloaded_name', 'offline', 'install_time_budget', 'no_composer_json', 'composer_json_invalid', 'solver_error']
+BLOCKING_SWITCHES = ['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING', 'COMPOSER_POLICY', 'COMPOSER_POLICY_ADVISORIES_BLOCK', 'config.policy',
+                     'config.policy.advisories', 'config.policy.advisories.block', 'config.audit.block-insecure']
 defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the move's `composer update` or `composer require` installs from the lock. "
                          "It names the form that resolves, or why lockrot did not ask. "
                          "Null on a kind that runs no Composer request, and in a run that checks no move."),
@@ -538,7 +540,7 @@ def move_props(with_also):
     if with_also:
         p['also'] = arr("The other part's move, the same object without `also` (§5.6 rule 3); empty when the lead move's `clears` and `unverified` hold every fact of that part.", ref('alsoMove'))
     p['text'] = rendered('The `do:` line, `MoveText` (§5.6, §7.11; versioned by `run.text_grammar`); never empty. A renderer that does not know `kind` (or a `no-move` `reason`) prints this string (§7.9).',
-                         [('next_step' if with_also else 'next_step.also[]'), 'package', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'])
+                         [('next_step' if with_also else 'next_step.also[]'), 'package', 'version', 'signals[].id', 'signals[].data.newest_php', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'])
     p['text']['minLength'] = 1
     return p
 
@@ -1404,11 +1406,14 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'text_grammar': d('The version of the sentence grammars: MoveText, GateText, FlagSentence, SignalSentence, NoteSentence, the suffix and the command renderings (§7.11, round 4). ScoreText is versioned apart, by `score_model.score_text_grammar`.', INT1),
     'score_model': ref('scoreModel'),
     'advisory_lookup': ref('advisoryLookup'),
-    'move_check': nul("How Composer's solver checked the run's moves (§5.6); null when the run checked no move.", obj('The move check of the run.', {
+    'move_check': nul("How Composer's solver checked the run's moves (§5.6). `composer lockrot` always writes it. A run that checks no move says why in `baseline` and `reason`.", obj('The move check of the run.', {
         'composer': nul('The version of the Composer that solved; null when nothing solved.', {'type': 'string', 'minLength': 1}),
         'blocks_advisories': d('Whether the solve removed the versions that an advisory affects, as Composer 2.9 and later do in an update.', {'type': 'boolean'}),
-        'blocking_disabled_by': arr("The environment variables that turned off the blocking of the Composer that solved: each one that this Composer reads and that holds a true value, in this order. Composer 2.10 and later read both, and 2.9.2 to 2.9.x read `COMPOSER_NO_SECURITY_BLOCKING`. Closed.",
-                                    closed(['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING']), uniqueItems=True),
+        'blocking_disabled_by': arr("The switches that turn off the advisory blocking of the running Composer, in this order: " + ', '.join('`%s`' % n for n in BLOCKING_SWITCHES) + ". "
+                                    "A switch is listed when it holds a value that turns the blocking off and no switch that Composer reads after it turns the blocking on again. "
+                                    "Composer 2.9.0 and 2.9.1 read only `config.audit.block-insecure`, and later 2.9 releases also read `COMPOSER_NO_SECURITY_BLOCKING`. "
+                                    "Composer 2.10 and later read every switch, and read `config.audit.block-insecure` only when `config.policy.advisories` is not set. Empty when no switch turns the blocking off. Closed.",
+                                    closed(BLOCKING_SWITCHES, 'One switch: an environment variable, or a key of composer.json `config`. Closed.'), uniqueItems=True),
         'ignores_extensions': d("Always true: the solve ignores every `ext-*` requirement, as `--ignore-platform-req=ext-*` does, so the extensions of the machine that runs lockrot decide no move.",
                                 {'type': 'boolean', 'enum': [True]}),
         'baseline': closed(['resolves', 'refused', 'not_checked'], ("The partial update of a name outside the lock: `refused` means Composer refuses the lock "
@@ -1490,7 +1495,7 @@ defs['noteAdvisoriesNotChecked']['description'] = ("`advisories_not_checked` (0.
     "versions and the moves' versions are checked together or not at all.")
 defs['noteAdvisoriesDisabledByPolicy'] = obj(("`advisories_disabled_by_policy` (§5.1, §6.2): Composer's policy stops Composer blocking installs and updates on "
                                                "advisories. It only informs: lockrot still asks and counts every advisory."), {
-    'policy_key': open_set(['policy', 'policy.advisories', 'policy.advisories.audit', 'COMPOSER_POLICY'],
+    'policy_key': open_set(['policy', 'policy.advisories', 'COMPOSER_POLICY'],
                            'The full Composer config key, or the environment variable `COMPOSER_POLICY`. Open.', POLICY_KEY),
     'value': d('Its value as configured (`false`, `"ignore"`, `"0"`).', {'type': ['boolean', 'string']}),
 })

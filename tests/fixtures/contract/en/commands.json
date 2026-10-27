@@ -126,6 +126,37 @@
             "argv": [
                 "composer",
                 "require",
+                "laminas/laminas-code:^4.17.0"
+            ],
+            "posix": "composer require 'laminas/laminas-code:^4.17.0'",
+            "cmd": "composer require \"laminas/laminas-code:^4.17.0\"",
+            "powershell": "composer --% require \"laminas/laminas-code:^4.17.0\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "laminas/laminas-code:^4.17.0",
+                "--dev"
+            ],
+            "posix": "composer require 'laminas/laminas-code:^4.17.0' --dev",
+            "cmd": "composer require \"laminas/laminas-code:^4.17.0\" --dev",
+            "powershell": "composer --% require \"laminas/laminas-code:^4.17.0\" --dev"
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "laminas/laminas-code:^5.0.0"
+            ],
+            "posix": "composer require 'laminas/laminas-code:^5.0.0'",
+            "cmd": "composer require \"laminas/laminas-code:^5.0.0\"",
+            "powershell": "composer --% require \"laminas/laminas-code:^5.0.0\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "laravel/framework:^12.69.0"
             ],
             "posix": "composer require 'laravel/framework:^12.69.0'",
@@ -484,6 +515,16 @@
             "argv": [
                 "composer",
                 "update",
+                "ezyang/htmlpurifier"
+            ],
+            "posix": "composer update ezyang/htmlpurifier",
+            "cmd": "composer update ezyang/htmlpurifier",
+            "powershell": "composer --% update ezyang/htmlpurifier"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
                 "guzzlehttp/guzzle",
                 "acme/gz-client"
             ],
@@ -500,6 +541,16 @@
             "posix": "composer update 'guzzlehttp/psr7:^2.12.3'",
             "cmd": "composer update \"guzzlehttp/psr7:^2.12.3\"",
             "powershell": "composer --% update \"guzzlehttp/psr7:^2.12.3\""
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "laminas/laminas-code"
+            ],
+            "posix": "composer update laminas/laminas-code",
+            "cmd": "composer update laminas/laminas-code",
+            "powershell": "composer --% update laminas/laminas-code"
         },
         {
             "argv": [
@@ -530,6 +581,26 @@
             "posix": "composer update matomo/network",
             "cmd": "composer update matomo/network",
             "powershell": "composer --% update matomo/network"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "moneyphp/money"
+            ],
+            "posix": "composer update moneyphp/money",
+            "cmd": "composer update moneyphp/money",
+            "powershell": "composer --% update moneyphp/money"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "nette/schema"
+            ],
+            "posix": "composer update nette/schema",
+            "cmd": "composer update nette/schema",
+            "powershell": "composer --% update nette/schema"
         },
         {
             "argv": [
@@ -571,16 +642,6 @@
             "posix": "composer update symfony/monolog-bridge",
             "cmd": "composer update symfony/monolog-bridge",
             "powershell": "composer --% update symfony/monolog-bridge"
-        },
-        {
-            "argv": [
-                "composer",
-                "update",
-                "symfony/monolog-bundle:^3.11.2"
-            ],
-            "posix": "composer update 'symfony/monolog-bundle:^3.11.2'",
-            "cmd": "composer update \"symfony/monolog-bundle:^3.11.2\"",
-            "powershell": "composer --% update \"symfony/monolog-bundle:^3.11.2\""
         },
         {
             "argv": [
@@ -721,6 +782,18 @@
             "argv": [
                 "composer",
                 "why-not",
+                "ezyang/htmlpurifier",
+                "v4.19.1",
+                "--locked"
+            ],
+            "posix": "composer why-not ezyang/htmlpurifier v4.19.1 --locked",
+            "cmd": "composer why-not ezyang/htmlpurifier v4.19.1 --locked",
+            "powershell": "composer --% why-not ezyang/htmlpurifier v4.19.1 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
                 "friendsofsymfony/oauth-server-bundle",
                 "1.6.2",
                 "--locked"
@@ -841,6 +914,42 @@
             "argv": [
                 "composer",
                 "why-not",
+                "laminas/laminas-code",
+                "4.17.0",
+                "--locked"
+            ],
+            "posix": "composer why-not laminas/laminas-code 4.17.0 --locked",
+            "cmd": "composer why-not laminas/laminas-code 4.17.0 --locked",
+            "powershell": "composer --% why-not laminas/laminas-code 4.17.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "laminas/laminas-code",
+                "4.18.0",
+                "--locked"
+            ],
+            "posix": "composer why-not laminas/laminas-code 4.18.0 --locked",
+            "cmd": "composer why-not laminas/laminas-code 4.18.0 --locked",
+            "powershell": "composer --% why-not laminas/laminas-code 4.18.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "laminas/laminas-code",
+                "5.0.0",
+                "--locked"
+            ],
+            "posix": "composer why-not laminas/laminas-code 5.0.0 --locked",
+            "cmd": "composer why-not laminas/laminas-code 5.0.0 --locked",
+            "powershell": "composer --% why-not laminas/laminas-code 5.0.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
                 "laravel/framework",
                 "v12.69.0",
                 "--locked"
@@ -908,6 +1017,30 @@
             "posix": "composer why-not matomo/referrer-spam-list 4.0.5 --locked",
             "cmd": "composer why-not matomo/referrer-spam-list 4.0.5 --locked",
             "powershell": "composer --% why-not matomo/referrer-spam-list 4.0.5 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "moneyphp/money",
+                "v4.9.0",
+                "--locked"
+            ],
+            "posix": "composer why-not moneyphp/money v4.9.0 --locked",
+            "cmd": "composer why-not moneyphp/money v4.9.0 --locked",
+            "powershell": "composer --% why-not moneyphp/money v4.9.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "nette/schema",
+                "v1.3.6",
+                "--locked"
+            ],
+            "posix": "composer why-not nette/schema v1.3.6 --locked",
+            "cmd": "composer why-not nette/schema v1.3.6 --locked",
+            "powershell": "composer --% why-not nette/schema v1.3.6 --locked"
         },
         {
             "argv": [

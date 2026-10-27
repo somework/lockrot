@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/capped",
+        "description": "nette/schema v1.3.2 \u2014 finding low (4 = capped 8 \u00f7 2 transitive) \u2014 capped: requires php 8.1 - 8.4: it stops at 8.4, so the newest PHP, 8.5, is excluded. Do: composer update nette/schema (gets v1.3.6) \u2014 clears capped. (via laravel/framework, pragmarx/google2fa-laravel)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "428c3cb7fde04a7db0d3357730e4c146b2523fdb8f9b02460b9825a4df2bb715",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 28
+            }
+        }
+    }
+]

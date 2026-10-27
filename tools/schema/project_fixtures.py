@@ -429,8 +429,10 @@ def rows_of(details):
 
 
 def inputs_of(case):
-    """What a hydrator feeds the Analyzer to rebuild the case: null when the case carries no branch rows and
-    lockrot reads its releases, or when it needs a run input that the hydrator does not take (see unhydrated()).
+    """What a hydrator feeds the Analyzer to rebuild the case, or null.
+
+    It is null when lockrot reads the case's releases and the case carries no branch rows and no `run_inputs._releases`.
+    It is also null when the case needs a run input that the hydrator does not take (see unhydrated()).
 
     The lock links the case's chain and its other direct dependents to the package, and holds every holder that a fix, a
     move or a branch row names. `dependents` holds the `require` names of each direct dependent that C08 measured, and
@@ -440,7 +442,9 @@ def inputs_of(case):
     f, run = case['finding'], case['run']
     rows = rows_of(case.get('details'))
     unread = f['metadata']['status'] == 'not_from_composer_repository'
-    if (not rows and not unread) or f['metadata']['status'] not in ('read', 'not_from_composer_repository') or unhydrated(case):
+    # The model's `run_inputs._releases` give the releases of a case that has no branch rows, such as a capped-* case.
+    given = bool((case.get('run_inputs') or {}).get('_releases'))
+    if (not rows and not unread and not given) or f['metadata']['status'] not in ('read', 'not_from_composer_repository') or unhydrated(case):
         return None
     facts = package_facts(f, rows)
     advisories = (next((s for s in f['signals'] if s['id'] == 'S9'), None) or {}).get('data', {}).get('advisories', [])
@@ -495,6 +499,8 @@ def inputs_of(case):
         dependents[name] = own
     # The links of lock entries that the model's ‡ run inputs give exactly, which the findings do not carry.
     lock_links(lock, (case.get('run_inputs') or {}).get('_lock_links') or {})
+    # The root constraints that the model's ‡ run inputs give exactly, where the projection writes `*`.
+    root_require.update((case.get('run_inputs') or {}).get('_root_require') or {})
     root = dict({'name': run['root_package'], 'require': dict({'php': run['project_php']} if run['project_php'] else {}, **dict(root_require, **root_links.pop('require', {})))}, **root_links)
     if root_dev:
         root['require-dev'] = dict(root_dev, **root.get('require-dev', {}))
@@ -537,7 +543,9 @@ def inputs_of(case):
         if world['check_passes'] is not None:
             inputs['check_passes'] = world['check_passes']
     if run_inputs.get('_releases') and inputs.get('releases') is not None:
-        inputs['releases'] = run_releases(run_inputs['_releases'], inputs['releases'])
+        # Without branch rows the run inputs list every release: a release that only the finding names is not one of them.
+        base = inputs['releases'] if rows else [r for r in inputs['releases'] if r['version'] == f['version']]
+        inputs['releases'] = run_releases(run_inputs['_releases'], base)
     if checks:
         inputs['checks'] = checks
         inputs['move_check'] = move_check_of(run['move_check'], world, run.get('php_window'))

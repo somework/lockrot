@@ -400,7 +400,7 @@ export type RunFailOnSource = "option" | "env" | "config" | "default";
 /** open set at #/definitions/run/properties/mode */
 export type RunMode = "check" | "generate_baseline" | (string & {});
 /** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/blocking_disabled_by/items */
-export type RunMoveCheckBlockingDisabledByItem = "COMPOSER_NO_BLOCKING" | "COMPOSER_NO_SECURITY_BLOCKING";
+export type RunMoveCheckBlockingDisabledByItem = "COMPOSER_NO_BLOCKING" | "COMPOSER_NO_SECURITY_BLOCKING" | "COMPOSER_POLICY" | "COMPOSER_POLICY_ADVISORIES_BLOCK" | "config.policy" | "config.policy.advisories" | "config.policy.advisories.block" | "config.audit.block-insecure";
 /** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/ignores_extensions */
 export type RunMoveCheckIgnoresExtensions = true;
 /** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/baseline */
@@ -410,7 +410,7 @@ export type RunMoveCheckReason = "unloaded_name" | "offline" | "install_time_bud
 /** closed set at #/definitions/run/properties/php_window/oneOf/0/properties/host_requires/items */
 export type RunPhpWindowHostRequiresItem = "php-debug" | "php-ipv6" | "php-zts";
 /** open set at #/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key */
-export type NoteAdvisoriesDisabledByPolicyPolicyKey = "policy" | "policy.advisories" | "policy.advisories.audit" | "COMPOSER_POLICY" | (string & {});
+export type NoteAdvisoriesDisabledByPolicyPolicyKey = "policy" | "policy.advisories" | "COMPOSER_POLICY" | (string & {});
 /** open set at #/definitions/noteAbandonedNotAuditedByComposer/properties/policy_key */
 export type NoteAbandonedNotAuditedByComposerPolicyKey = "policy" | "policy.abandoned" | "policy.abandoned.audit" | "audit.abandoned" | "COMPOSER_AUDIT_ABANDONED" | "COMPOSER_POLICY" | (string & {});
 /** open set at #/definitions/noteRepositoryActivityHostNotSupported/properties/hosts/items/properties/listed_in/oneOf/0 */

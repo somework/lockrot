@@ -2951,7 +2951,13 @@
   ],
   "values": [
    "COMPOSER_NO_BLOCKING",
-   "COMPOSER_NO_SECURITY_BLOCKING"
+   "COMPOSER_NO_SECURITY_BLOCKING",
+   "COMPOSER_POLICY",
+   "COMPOSER_POLICY_ADVISORIES_BLOCK",
+   "config.policy",
+   "config.policy.advisories",
+   "config.policy.advisories.block",
+   "config.audit.block-insecure"
   ],
   "open": false,
   "integer": false
@@ -3022,7 +3028,6 @@
   "values": [
    "policy",
    "policy.advisories",
-   "policy.advisories.audit",
    "COMPOSER_POLICY"
   ],
   "open": true,

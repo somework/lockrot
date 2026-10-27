@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/capped",
+        "description": "ezyang/htmlpurifier v4.17.0 \u2014 finding low (4 = capped 8 \u00f7 2 transitive) \u2014 capped: requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0: it stops at 8.3, so the newest PHP, 8.5, is excluded. Do: composer update ezyang/htmlpurifier (gets v4.19.1) \u2014 clears capped. (via mautic/core-lib)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "578a9f2ba7bd275571df1c19e453d818a235f1afde2c005fc5b102ce7b3af306",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

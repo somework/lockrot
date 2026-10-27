@@ -33,6 +33,7 @@ use Lockrot\Json\JsonReader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
@@ -979,6 +980,37 @@ final class LockrotCommandTest extends TestCase
         chdir(__DIR__.'/../../fixtures/skeletons/laravel');
         $tester = $this->tester();
         self::assertSame(2, $tester->execute(['--fail-on' => 'dead']));
+    }
+
+    /** Composer 2.10 refuses `yes` for a blocking variable, so the command that lockrot prints would fail. */
+    public function testABlockingVariableThatComposerRefusesIsExit2AndNamesTheVariable(): void
+    {
+        if (version_compare(ComposerFeatures::version(), '2.10.0-dev', '<')) {
+            self::markTestSkipped('Composer 2.10 and later read COMPOSER_NO_BLOCKING with Platform::getBoolEnv()');
+        }
+        $project = $this->tempDir('lockrot-blocking-variable-');
+        file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/blocking-variable-test', 'require' => ['acme/kept' => '^1.0']]));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
+        chdir($project);
+        $loader = $this->emptyLoader();
+        $command = $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer => self::withChecks(self::testAnalyzer($loader, $lockrot, $clock), $checks));
+        $previous = getenv('COMPOSER_NO_BLOCKING');
+        Platform::putEnv('COMPOSER_NO_BLOCKING', 'yes');
+        try {
+            $this->withComposerEnv($this->tempDir('lockrot-blocking-variable-cache-'), $this->tempDir('lockrot-blocking-variable-home-'), function () use ($command): void {
+                [$code, , $stderr] = $this->runCommandWithSplitStreams($command, ['--target-php' => '8.4']);
+
+                self::assertSame(2, $code);
+                self::assertStringStartsWith('lockrot: ', $stderr);
+                self::assertStringContainsString('COMPOSER_NO_BLOCKING', $stderr);
+            });
+        } finally {
+            if ($previous === false) {
+                Platform::clearEnv('COMPOSER_NO_BLOCKING');
+            } else {
+                Platform::putEnv('COMPOSER_NO_BLOCKING', $previous);
+            }
+        }
     }
 
     public function testAnInvalidTargetPhpOnTheCommandLineIsExit2(): void

@@ -101,12 +101,7 @@ final class AdvisoryIgnore
         $policy = \is_array($raw) ? $raw : [];
         $audit = $config->get('audit');
         $lists = $reader->policy($policy, \is_array($audit) ? $audit : []);
-        $disabledBy = null;
-        if (($policy['advisories'] ?? null) === false) {
-            $disabledBy = ['policy_key' => 'policy.advisories', 'value' => false];
-        } elseif ($lists['audit'] === 'ignore') {
-            $disabledBy = ['policy_key' => 'policy.advisories.audit', 'value' => 'ignore'];
-        }
+        $disabledBy = ($policy['advisories'] ?? null) === false ? ['policy_key' => 'policy.advisories', 'value' => false] : null;
 
         return new self($lists['list'], $lists['severities'], isset($policy['advisories']), null, $disabledBy);
     }
@@ -216,7 +211,7 @@ final class AdvisoryIgnore
 
     /**
      * The setting that stops Composer's own advisory checks, null when none does: `policy`,
-     * `policy.advisories`, `policy.advisories.audit` or the `COMPOSER_POLICY` variable. It stops
+     * `policy.advisories` or the `COMPOSER_POLICY` variable. It stops
      * install-time blocking only: `composer audit` still reports, and lockrot still asks.
      *
      * @return array{policy_key: string, value: bool|string}|null

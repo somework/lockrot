@@ -1,0 +1,6 @@
+::warning file=composer.lock,line=4,title=lockrot%3A low — capped::ezyang/htmlpurifier v4.17.0: 4 = capped 8 ÷ 2 transitive. Do: composer update ezyang/htmlpurifier (gets v4.19.1) — clears capped. capped: requires php ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0: it stops at 8.3, so the newest PHP, 8.5, is excluded. (via mautic/core-lib)
+::notice title=lockrot::1 package is not from a Composer repository: its release metadata and repository activity were not read
+flags: capped 1
+depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: ezyang/htmlpurifier, 1 hop (mautic/core-lib › ezyang/htmlpurifier)
+php: the lock installs on PHP 5.6 to 8.3, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
+gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

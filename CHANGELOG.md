@@ -110,9 +110,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **JSON:** `run.move_check.blocking_disabled_by` lists each of `COMPOSER_NO_BLOCKING` and
-  `COMPOSER_NO_SECURITY_BLOCKING` that the solving Composer reads and that holds a true value.
-  The move check then blocks no advisory and no abandoned package, as Composer's update does.
+- **JSON:** `run.move_check.blocking_disabled_by` lists each environment variable and
+  composer.json key that turns Composer's advisory blocking off. The move check then blocks no
+  advisory. A variable value that Composer refuses stops the run with exit code 2.
+  `policy.advisories.audit: ignore` alone writes no run note `advisories_disabled_by_policy`.
   ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** Composer's solver checks each move against the lock, and the move
   writes `check` with the release it `installs`. A refused move asks once more with its holders, and
@@ -178,8 +179,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `abandoned_ignore_unreadable` say what Composer's abandoned ignore list and its audit setting
   did. ([Run notes](docs/notes.md#abandoned_markings_ignored))
 - **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
-  (`config.policy: false`, `policy.advisories: false`, `policy.advisories.audit: ignore` or
-  `COMPOSER_POLICY=0`) that stops Composer from warning about advisories. lockrot still asks, and
+  (`config.policy: false`, `policy.advisories: false` or `COMPOSER_POLICY=0`) that stops Composer from warning about advisories. lockrot still asks, and
   every advisory still counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
 - **markdown:** `--markdown-max-bytes` keeps a report written through `--output` within a byte
   budget. The report ends at a whole row, and a last row counts the rows it left out.

@@ -9,6 +9,7 @@ use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
+use Composer\Repository\FilterRepository;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Deadline;
 use Lockrot\Solver\RepositoryVersions;
@@ -302,6 +303,36 @@ final class RepositoryVersionsTest extends TestCase
         }
     }
 
+    /** A repository that is not canonical leaves every name out of `namesFound`: its wrapped repository tells whether the `~dev` file is cached. */
+    public function testOfflineAnAdmittedNameWhoseDevFileComposerHasCachedLoadsItsDevVersionsFromANonCanonicalRepository(): void
+    {
+        $server = $this->server(['acme/lib' => ['1.0.0'], 'acme/lib~dev' => ['dev-main']]);
+        $server->start();
+        try {
+            $nonCanonical = static fn (): array => array_map(static fn ($repository): FilterRepository => new FilterRepository($repository, ['canonical' => false]), $server->repositories());
+            (new RepositoryVersions($nonCanonical(), [], false, Deadline::never(), 'dev', []))->versions('acme/lib');
+            putenv('COMPOSER_DISABLE_NETWORK=1');
+            try {
+                $offline = new RepositoryVersions($nonCanonical(), [], true, Deadline::never(), 'dev', []);
+
+                self::assertEqualsCanonicalizing(['1.0.0', 'dev-main'], self::pretty($offline->versions('acme/lib')));
+                self::assertNull($offline->failure('acme/lib'));
+            } finally {
+                putenv('COMPOSER_DISABLE_NETWORK');
+            }
+        } finally {
+            $server->stop();
+        }
+    }
+
+    public function testOfflineAnAdmittedNameThatLoadsAloneLoadsItsDevVersionsFromANonCanonicalRepository(): void
+    {
+        $filtered = new FilterRepository(self::recording(['acme/lib' => ['1.0.0', 'dev-main']], ['acme/bad']), ['canonical' => false]);
+        $versions = new RepositoryVersions([$filtered], [], true, Deadline::never(), 'dev', []);
+
+        self::assertSame([['1.0.0', 'dev-main'], null], [self::pretty($versions->versionsOf(['acme/lib', 'acme/bad'])['acme/lib']), $versions->failure('acme/lib')]);
+    }
+
     public function testOnlineAnAdmittedNameWhoseRepositoryHasNoDevFileLoadsItsTags(): void
     {
         $server = $this->server(['acme/lib' => ['1.0.0']]);
@@ -460,6 +491,130 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame(['acme/path' => [], 'acme/lib' => ['1.0.0']], array_map(static fn (array $packages): array => self::pretty($packages), $versions->versionsOf(['acme/path', 'acme/lib'])));
         self::assertSame([[['acme/lib'], 'stable']], $repository->asked);
         self::assertNull($versions->failure('acme/path'));
+    }
+
+    /** Composer wraps a repository that has `only`, `exclude` or `canonical` in a FilterRepository. */
+    public function testARepositoryWithOnlyServesItsNamesBeforeAPackagistNamesake(): void
+    {
+        $filtered = new FilterRepository(self::repository(['acme/lib' => ['1.4.0', '2.0.0'], 'other/lib' => ['5.0.0']]), ['only' => ['acme/*']]);
+        $packagist = self::repository(['acme/lib' => ['9.0.0'], 'other/lib' => ['1.0.0']]);
+        $versions = new RepositoryVersions([$filtered, $packagist], [], false, Deadline::never());
+
+        self::assertSame(['acme/lib' => ['1.4.0', '2.0.0'], 'other/lib' => ['1.0.0']], array_map(static fn (array $packages): array => self::pretty($packages), $versions->versionsOf(['acme/lib', 'other/lib'])));
+        self::assertSame(['1.4.0', '2.0.0'], self::pretty((new RepositoryVersions([$filtered, $packagist], [], false, Deadline::never()))->versions('acme/lib')));
+    }
+
+    public function testARepositoryWithExcludeLeavesTheExcludedNameToTheNextRepository(): void
+    {
+        $filtered = new FilterRepository(self::repository(['acme/lib' => ['2.0.0'], 'acme/tool' => ['3.0.0']]), ['exclude' => ['acme/tool']]);
+        $versions = new RepositoryVersions([$filtered, self::repository(['acme/tool' => ['1.0.0']])], [], false, Deadline::never());
+
+        self::assertSame(['acme/lib' => ['2.0.0'], 'acme/tool' => ['1.0.0']], array_map(static fn (array $packages): array => self::pretty($packages), $versions->versionsOf(['acme/lib', 'acme/tool'])));
+    }
+
+    /** A repository that is not canonical leaves the name to the next ones too, and the earlier repository keeps a version that both list. */
+    public function testANonCanonicalRepositoryAddsTheVersionsOfTheNextRepositories(): void
+    {
+        $first = self::package('acme/lib', '2.0.0');
+        $filtered = new FilterRepository(new RecordingComposerRepository([self::package('acme/lib', '1.0.0'), $first]), ['canonical' => false]);
+        $next = self::repository(['acme/lib' => ['2.0.0', '3.0.0'], 'acme/other' => ['1.0.0']]);
+        $versions = new RepositoryVersions([$filtered, $next], [], false, Deadline::never());
+
+        self::assertSame(['acme/lib' => ['1.0.0', '2.0.0', '3.0.0'], 'acme/other' => ['1.0.0']], array_map(static fn (array $packages): array => self::pretty($packages), $versions->versionsOf(['acme/lib', 'acme/other'])));
+        self::assertSame($first, $versions->versions('acme/lib')[1]);
+    }
+
+    public function testANonCanonicalRepositoryAddsTheVersionsOfTheNextRepositoriesForANameThatLoadsAlone(): void
+    {
+        $filtered = new FilterRepository(self::recording(['acme/lib' => ['1.0.0']], ['acme/bad']), ['canonical' => false]);
+        $versions = new RepositoryVersions([$filtered, self::repository(['acme/lib' => ['3.0.0']])], [], false, Deadline::never());
+
+        $loaded = $versions->versionsOf(['acme/lib', 'acme/bad']);
+
+        self::assertSame(['acme/lib' => ['1.0.0', '3.0.0'], 'acme/bad' => []], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+        self::assertSame(VersionSource::FAILED, $versions->failure('acme/bad'));
+    }
+
+    /** PoolBuilder asks no later repository for a name that a canonical repository finds, though it finds no version of it. */
+    public function testACanonicalRepositoryThatFindsANameWithNoVersionHidesTheNamesakeOfTheNextRepository(): void
+    {
+        $empty = new class () extends ComposerRepository {
+            public function __construct()
+            {
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                return ['namesFound' => array_keys($packageNameMap), 'packages' => []];
+            }
+        };
+        $together = new RepositoryVersions([$empty, self::repository(['acme/lib' => ['9.0.0']])], [], false, Deadline::never());
+        $alone = new RepositoryVersions([$empty, self::recording(['acme/lib' => ['9.0.0']], ['acme/bad'])], [], false, Deadline::never());
+
+        self::assertSame([[], null], [$together->versions('acme/lib'), $together->failure('acme/lib')]);
+        self::assertSame([[], null], [$alone->versionsOf(['acme/lib', 'acme/bad'])['acme/lib'], $alone->failure('acme/lib')]);
+    }
+
+    public function testANameThatLoadsAloneWithOnlyDevVersionsInACanonicalRepositoryHidesTheNamesakeOfTheNextRepository(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['dev-main']], ['acme/bad']), self::repository(['acme/lib' => ['9.0.0']])], [], false, Deadline::never());
+
+        self::assertSame(['dev-main'], self::pretty($versions->versionsOf(['acme/lib', 'acme/bad'])['acme/lib']));
+    }
+
+    public function testAnAdmittedNameThatLoadsAloneWithOnlyTagsInACanonicalRepositoryHidesTheNamesakeOfTheNextRepository(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['1.0.0']], ['acme/bad']), self::repository(['acme/lib' => ['9.0.0']])], [], false, Deadline::never(), 'dev', []);
+
+        self::assertSame(['1.0.0'], self::pretty($versions->versionsOf(['acme/lib', 'acme/bad'])['acme/lib']));
+    }
+
+    /** A request that fails after a repository that is not canonical leaves the name without its later versions: no answer. */
+    public function testANameThatLoadsAloneAndFailsAfterANonCanonicalRepositoryHasNoVersions(): void
+    {
+        $filtered = new FilterRepository(self::recording(['acme/lib' => ['1.0.0']]), ['canonical' => false]);
+        $versions = new RepositoryVersions([$filtered, self::recording([], ['acme/lib'])], [], false, Deadline::never());
+
+        self::assertSame([[], VersionSource::FAILED], [$versions->versions('acme/lib'), $versions->failure('acme/lib')]);
+    }
+
+    public function testANameThatLoadsAloneAndThatNoComposerRepositoryListsIsUnreachedWhenAnotherRepositoryCanServeIt(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['1.0.0']], ['acme/bad']), new ArrayRepository()], [], false, Deadline::never());
+
+        $versions->versionsOf(['acme/private', 'acme/bad']);
+
+        self::assertSame([VersionSource::UNREACHED, VersionSource::FAILED], [$versions->failure('acme/private'), $versions->failure('acme/bad')]);
+    }
+
+    public function testTheFailureOfANameStaysWhenALaterNameIsUnreached(): void
+    {
+        $versions = new RepositoryVersions([self::recording([], ['acme/bad']), new ArrayRepository()], [], false, Deadline::never());
+        $versions->versions('acme/bad');
+
+        $versions->versions('acme/private');
+
+        self::assertSame([VersionSource::FAILED, VersionSource::UNREACHED], [$versions->failure('acme/bad'), $versions->failure('acme/private')]);
+    }
+
+    /** A path, VCS or package repository can serve a name that the lock does not hold, and lockrot does not ask it. */
+    public function testANameThatNoComposerRepositoryListsIsUnreachedWhenAnotherRepositoryCanServeIt(): void
+    {
+        $withPath = new RepositoryVersions([self::repository(['acme/lib' => ['1.0.0']]), new ArrayRepository()], [], false, Deadline::never());
+        $withFilteredPath = new RepositoryVersions([new FilterRepository(new ArrayRepository(), ['only' => ['acme/*']])], [], false, Deadline::never());
+        $composerOnly = new RepositoryVersions([self::repository(['acme/lib' => ['1.0.0']])], [], false, Deadline::never());
+
+        self::assertSame([[], VersionSource::UNREACHED], [$withPath->versions('acme/private'), $withPath->failure('acme/private')]);
+        self::assertSame([['1.0.0'], null], [self::pretty($withPath->versions('acme/lib')), $withPath->failure('acme/lib')]);
+        self::assertSame([[], VersionSource::UNREACHED], [$withFilteredPath->versions('acme/private'), $withFilteredPath->failure('acme/private')]);
+        self::assertSame([[], null], [$composerOnly->versions('acme/private'), $composerOnly->failure('acme/private')]);
+    }
+
+    public function testOfflineANameThatNoComposerRepositoryListsStaysOffline(): void
+    {
+        $versions = new RepositoryVersions([self::repository([]), new ArrayRepository()], [], true, Deadline::never());
+
+        self::assertSame([[], VersionSource::OFFLINE], [$versions->versions('acme/private'), $versions->failure('acme/private')]);
     }
 
     /**

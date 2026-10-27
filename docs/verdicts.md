@@ -772,10 +772,24 @@ Limits of the check:
 - On Composer 2.9 and later, it removes the versions that an advisory affects, as Composer does in
   an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
   severities and the blocking of abandoned packages. It blocks every name that the update can move,
-  packages-dev and new dependencies included. `COMPOSER_NO_SECURITY_BLOCKING` on Composer 2.9.2 and
-  later, or `COMPOSER_NO_BLOCKING` on Composer 2.10 and later, set to a true value, turns this
-  blocking off, as in Composer. `run.move_check.blocking_disabled_by` and the `moves:` line then
-  name the variable.
+  packages-dev and new dependencies included. A switch that turns Composer's advisory blocking off
+  turns this blocking off too. `run.move_check.blocking_disabled_by` and the `moves:` line then name
+  each such switch. The switches, in their order:
+
+    - The environment variables `COMPOSER_NO_BLOCKING`, `COMPOSER_NO_SECURITY_BLOCKING`,
+      `COMPOSER_POLICY` and `COMPOSER_POLICY_ADVISORIES_BLOCK`.
+    - The composer.json keys `config.policy`, `config.policy.advisories`,
+      `config.policy.advisories.block` and `config.audit.block-insecure`.
+
+    The list names only the switches that the running Composer reads. It omits a switch when a
+    switch that Composer reads later turns the blocking on again. Composer 2.9.0 and 2.9.1 read only
+    `config.audit.block-insecure`, and later 2.9 releases also read `COMPOSER_NO_SECURITY_BLOCKING`.
+    Composer 2.10 and later read every switch. They read `config.audit.block-insecure` only when
+    `config.policy.advisories` is not set. `policy.advisories.audit` is not a switch.
+
+    When Composer refuses the value of one of the variables, such as `COMPOSER_NO_BLOCKING=maybe`,
+    lockrot stops with exit code 2 and prints Composer's message.
+
 - When a package that a resolving solve asks for could not be loaded, the solve can resolve at a
   lower release than Composer installs. The move is then not checked, with the load reason
   (`unloaded_name`, `offline` or `install_time_budget`). A refusal that needs such a package reads

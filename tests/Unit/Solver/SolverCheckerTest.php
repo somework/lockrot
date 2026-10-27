@@ -700,6 +700,32 @@ final class SolverCheckerTest extends TestCase
         yield 'the install-time budget ran out' => [VersionSource::BUDGET, MoveCheck::INSTALL_TIME_BUDGET];
     }
 
+    /** R4-1: a release needs a name that only a path, VCS or package repository serves, and Composer can install it. */
+    public function testARefusalThatWantsANameNoComposerRepositoryListsIsNotChecked(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/private' => '^1.0']]]],
+            ['acme/private' => VersionSource::UNREACHED]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize());
+    }
+
+    /** A virtual name such as `psr/log-implementation` is listed by no repository: a solve that a provider meets proves the move. */
+    public function testASolveThatResolvesBelowTheNewestWithANameNoComposerRepositoryListsResolves(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/logger' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/logger', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['psr/log-implementation' => '^1.0']], ['version' => '1.2.0', 'require' => ['php' => '>=9.0']]], 'acme/logger' => [['version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]]],
+            ['psr/log-implementation' => VersionSource::UNREACHED]
+        );
+
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '1.1.0'], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.2.0', null, '1.2.0'))->check()->jsonSerialize());
+    }
+
     public function testANewDependencyThatTheSourceLoadsResolves(): void
     {
         $source = new ArrayVersionSource([

@@ -1,0 +1,23 @@
+{
+    "score_text": "8 = capped 8",
+    "next_step_text": "composer update laminas/laminas-code (gets 4.18.0); not checked: capped",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 4.7.1 released 2022-11-21 (3.9 years ago); 4.x last released 4.18.0 2026-05-01 (0.4 years ago); newest release 5.0.0 2026-06-01 (0.3 years ago); last push 2026-09-30 (less than three weeks ago)",
+    "explain_age": [
+        "installed  4.7.1     2022-11-21   3.9 years ago",
+        "4.x        4.18.0    2026-05-01   0.4 years ago                 below release-warn-years 3",
+        "newest     5.0.0     2026-06-01   0.3 years ago                 below release-warn-years 3",
+        "last push            2026-09-30   less than three weeks ago     below push-warn-years 3",
+        "libyears 3.5 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer update laminas/laminas-code",
+        "composer why-not laminas/laminas-code 4.18.0 --locked"
+    ],
+    "commands_cmd": [
+        "composer update laminas/laminas-code",
+        "composer why-not laminas/laminas-code 4.18.0 --locked"
+    ]
+}

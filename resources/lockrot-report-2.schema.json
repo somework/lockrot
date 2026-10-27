@@ -4618,6 +4618,9 @@
           "x-rendered-from": [
             "next_step",
             "package",
+            "version",
+            "signals[].id",
+            "signals[].data.newest_php",
             "direct",
             "direct_dependents",
             "chain",
@@ -5862,6 +5865,9 @@
           "x-rendered-from": [
             "next_step.also[]",
             "package",
+            "version",
+            "signals[].id",
+            "signals[].data.newest_php",
             "direct",
             "direct_dependents",
             "chain",
@@ -21604,7 +21610,7 @@
           "$ref": "#/definitions/advisoryLookup"
         },
         "move_check": {
-          "description": "How Composer's solver checked the run's moves; null when the run checked no move.",
+          "description": "How Composer's solver checked the run's moves. `composer lockrot` always writes it. A run that checks no move says why in `baseline` and `reason`.",
           "oneOf": [
             {
               "description": "The move check of the run.",
@@ -21631,13 +21637,20 @@
                   "type": "boolean"
                 },
                 "blocking_disabled_by": {
-                  "description": "The environment variables that turned off the blocking of the Composer that solved: each one that this Composer reads and that holds a true value, in this order. Composer 2.10 and later read both, and 2.9.2 to 2.9.x read `COMPOSER_NO_SECURITY_BLOCKING`. Closed.",
+                  "description": "The switches that turn off the advisory blocking of the running Composer, in this order: `COMPOSER_NO_BLOCKING`, `COMPOSER_NO_SECURITY_BLOCKING`, `COMPOSER_POLICY`, `COMPOSER_POLICY_ADVISORIES_BLOCK`, `config.policy`, `config.policy.advisories`, `config.policy.advisories.block`, `config.audit.block-insecure`. A switch is listed when it holds a value that turns the blocking off and no switch that Composer reads after it turns the blocking on again. Composer 2.9.0 and 2.9.1 read only `config.audit.block-insecure`, and later 2.9 releases also read `COMPOSER_NO_SECURITY_BLOCKING`. Composer 2.10 and later read every switch, and read `config.audit.block-insecure` only when `config.policy.advisories` is not set. Empty when no switch turns the blocking off. Closed.",
                   "type": "array",
                   "items": {
+                    "description": "One switch: an environment variable, or a key of composer.json `config`. Closed.",
                     "type": "string",
                     "enum": [
                       "COMPOSER_NO_BLOCKING",
-                      "COMPOSER_NO_SECURITY_BLOCKING"
+                      "COMPOSER_NO_SECURITY_BLOCKING",
+                      "COMPOSER_POLICY",
+                      "COMPOSER_POLICY_ADVISORIES_BLOCK",
+                      "config.policy",
+                      "config.policy.advisories",
+                      "config.policy.advisories.block",
+                      "config.audit.block-insecure"
                     ]
                   },
                   "uniqueItems": true
@@ -22515,7 +22528,6 @@
           "x-known-values": [
             "policy",
             "policy.advisories",
-            "policy.advisories.audit",
             "COMPOSER_POLICY"
           ]
         },

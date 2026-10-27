@@ -30,12 +30,12 @@ interface AdvisoryPolicyReader
 
     /**
      * The lists for audit, from the normalised raw config. `list` holds advisory ids, CVEs, source
-     * ids and package names, each with its reason. `audit` is the advisory list's audit mode.
+     * ids and package names, each with its reason.
      *
      * @param array<mixed> $policy `config.policy`, an array
      * @param array<mixed> $audit  `config.audit`, an array
      *
-     * @return array{list: array<string, ?string>, severities: array<string, ?string>, audit: string}
+     * @return array{list: array<string, ?string>, severities: array<string, ?string>}
      *
      * @throws \Throwable when Composer rejects the lists
      */

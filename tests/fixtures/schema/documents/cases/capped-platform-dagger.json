@@ -818,20 +818,18 @@
    "host_requires": [],
    "with_dev": {
     "minors": [
-     "7.4",
-     "8.0",
      "8.1"
     ],
     "gaps": false,
     "lower_edge": {
-     "php": "7.4.0",
+     "php": "8.1.0",
      "set_by": [
       {
-       "name": "laminas/laminas-code",
-       "version": "4.7.1",
+       "name": null,
+       "version": null,
        "link": "require",
        "target": "php",
-       "constraint": ">=7.4, <8.2",
+       "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0",
        "dev": false
       }
      ]
@@ -853,20 +851,18 @@
    },
    "without_dev": {
     "minors": [
-     "7.4",
-     "8.0",
      "8.1"
     ],
     "gaps": false,
     "lower_edge": {
-     "php": "7.4.0",
+     "php": "8.1.0",
      "set_by": [
       {
-       "name": "laminas/laminas-code",
-       "version": "4.7.1",
+       "name": null,
+       "version": null,
        "link": "require",
        "target": "php",
-       "constraint": ">=7.4, <8.2",
+       "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0",
        "dev": false
       }
      ]
@@ -901,7 +897,16 @@
       "dev": false
      }
     ],
-    "lock_platform": [],
+    "lock_platform": [
+     {
+      "name": null,
+      "version": null,
+      "link": "require",
+      "target": "php",
+      "constraint": "~8.1.0 || ~8.2.0 || ~8.3.0",
+      "dev": false
+     }
+    ],
     "command": null,
     "check": "not_checked",
     "reason": null,
@@ -1422,7 +1427,7 @@
     },
     "branch_release_unmeasured": null,
     "push": {
-     "at": "2026-09-30T09:08:30Z",
+     "at": "2026-09-30T09:08:30+00:00",
      "years": 0,
      "level": null
     },

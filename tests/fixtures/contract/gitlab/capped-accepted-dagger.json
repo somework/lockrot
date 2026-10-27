@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/finished",
+        "description": "laminas/laminas-code 4.7.1 \u2014 finding finished (0 (capped accepted)).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "54f3e0a120c860105229bb111bdb85afc855d4850dd2aafc83afefc647bde859",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 20
+            }
+        }
+    }
+]

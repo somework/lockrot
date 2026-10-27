@@ -912,7 +912,7 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::metadataUnavailable(['vendor/a' => 'HTTP 503', 'vendor/b' => "offline: not present in Composer's cache"]),
             RunNote::monorepoParentUnavailable('laravel/framework', 'curl error 6'),
             RunNote::advisoryIgnoreUnreadable(''),
-            RunNote::advisoriesDisabledByPolicy('policy.advisories.audit', 'ignore'),
+            RunNote::advisoriesDisabledByPolicy('policy.advisories', false),
             RunNote::advisoriesUnavailable('packagist.org', new TransportException('HTTP 503')),
             RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, 1),
             RunNote::repositoryActivityNotChecked(),

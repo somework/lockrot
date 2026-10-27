@@ -10,3 +10,9 @@ sites/drupal-site	8.3	laminas/laminas-diactoros laminas/laminas-escaper laminas/
 skeletons/laminas	8.4	laminas/laminas-skeleton-installer vimeo/psalm	listed	2	Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (8.4.99; overridden via config.platform, actual: 8.5.12) does not satisfy that requirement.
 skeletons/laminas	8.4	laminas/laminas-skeleton-installer vimeo/psalm	with-dependencies	2	Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (8.4.99; overridden via config.platform, actual: 8.5.12) does not satisfy that requirement.
 skeletons/laminas	8.4	laminas/laminas-skeleton-installer vimeo/psalm	with-all-dependencies	2	Root composer.json requires php ~8.1.0 || ~8.2.0 || ~8.3.0 but your php version (8.4.99; overridden via config.platform, actual: 8.5.12) does not satisfy that requirement.
+apps/PrestaShop_PrestaShop	8.3	ezyang/htmlpurifier lcobucci/clock	listed	0	
+apps/PrestaShop_PrestaShop	8.3	ezyang/htmlpurifier lcobucci/clock	with-dependencies	0	
+apps/PrestaShop_PrestaShop	8.3	ezyang/htmlpurifier lcobucci/clock	with-all-dependencies	0	
+apps/PrestaShop_PrestaShop	8.4	ezyang/htmlpurifier lcobucci/clock lcobucci/jwt pelago/emogrifier	listed	2	Root composer.json requires pelago/emogrifier ^7.0.0 -> satisfiable by pelago/emogrifier[v7.0.0, v7.1.0, v7.2.0, v7.3.0].
+apps/PrestaShop_PrestaShop	8.4	ezyang/htmlpurifier lcobucci/clock lcobucci/jwt pelago/emogrifier	with-dependencies	0	
+apps/PrestaShop_PrestaShop	8.4	ezyang/htmlpurifier lcobucci/clock lcobucci/jwt pelago/emogrifier	with-all-dependencies	0	

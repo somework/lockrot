@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/capped",
+        "description": "laminas/laminas-code 4.7.1 \u2014 finding medium (8 = capped 8) \u2014 capped: requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded. Do: require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ~4.7.0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "8e7bba78bf48bc03707c80e41abd96925ae68df80e8c6d6e24c1156026219c5d",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 20
+            }
+        }
+    }
+]

@@ -226,7 +226,7 @@ final class RunFooter
         $data = $run->jsonSerialize();
         switch ($data['baseline']) {
             case MoveCheck::RESOLVES:
-                $off = $data['blocking_disabled_by'] === [] ? '' : ', with advisory blocking turned off by '.implode(' and ', $name === null ? $data['blocking_disabled_by'] : array_map($name, $data['blocking_disabled_by']));
+                $off = $data['blocking_disabled_by'] === [] ? '' : ', with advisory blocking turned off by '.self::listed($name === null ? $data['blocking_disabled_by'] : array_map($name, $data['blocking_disabled_by']));
 
                 return 'moves: checked with the solver of Composer '.$data['composer'].' against the lock'.$off.'; ext-* requirements not checked';
             case MoveCheck::REFUSED:
@@ -527,9 +527,16 @@ final class RunFooter
         if (\count($names) > self::NAMES_SHOWN) {
             return implode(', ', \array_slice($names, 0, self::NAMES_SHOWN)).' and '.(\count($names) - self::NAMES_SHOWN).' more';
         }
-        $count = \count($names);
 
-        return $count === 1 ? $names[0] : implode(', ', \array_slice($names, 0, $count - 1)).' and '.$names[$count - 1];
+        return self::listed($names);
+    }
+
+    /** @param non-empty-list<string> $names */
+    private static function listed(array $names): string
+    {
+        $last = array_pop($names);
+
+        return $names === [] ? $last : implode(', ', $names).' and '.$last;
     }
 
     private static function nOf(int $count, string $one, string $many): string

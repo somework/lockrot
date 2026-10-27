@@ -205,7 +205,7 @@ final class RunNote
     /**
      * Information only: the setting stops Composer's own advisory warnings, and lockrot still asks.
      *
-     * @param string      $policyKey the setting: `policy`, `policy.advisories`, `policy.advisories.audit` or `COMPOSER_POLICY`
+     * @param string      $policyKey the setting: `policy`, `policy.advisories` or `COMPOSER_POLICY`
      * @param bool|string $value     its value
      */
     public static function advisoriesDisabledByPolicy(string $policyKey, $value): self
