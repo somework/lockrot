@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Security;
 
+use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\Intervals;
@@ -86,8 +87,8 @@ final class FixFinder
         }
 
         $onInstalled = $installedBranch === null ? [] : ($byBranch[$installedBranch] ?? []);
-        $allowed = $this->newestAllowed($package->name(), $onInstalled, []);
-        $newestFor = fn (string $branch, ?Candidate $candidate): string => ($branch === $installedBranch ? $this->newestAllowed($package->name(), $onInstalled, $candidate === null ? [] : $candidate->heldBy()) : null) ?? $newest[$branch];
+        $allowed = $this->newestAllowed($package->name(), $onInstalled, null);
+        $newestFor = fn (string $branch, ?Candidate $candidate): string => ($branch === $installedBranch ? $this->newestAllowed($package->name(), $onInstalled, $candidate) : null) ?? $newest[$branch];
         $fixes = [];
         foreach ($ranges as $id => $range) {
             $fixes[$id] = $range === null ? Fix::unknown(Fix::AFFECTED_RANGE_UNKNOWN) : $this->fixOf($range, $byBranch, $own, $newestFor, $installedBranch);
@@ -331,17 +332,21 @@ final class FixFinder
     }
 
     /**
-     * The highest release on the installed branch that the target runs and that no link outside
-     * $heldBy excludes: a link in a move's `held_by` does not lower its `newest` (SPEC §5.3).
+     * The highest release on the installed branch that the target runs and that no link excludes.
+     * For $for, only a release at or above it counts, and no link in its `held_by` counts: the move
+     * clears that hold (SPEC §5.3). Null when no release qualifies, so `newest` never lies below the fix.
      *
      * @param list<Candidate> $onInstalled ascending
-     * @param list<Holder>    $heldBy
      */
-    private function newestAllowed(string $package, array $onInstalled, array $heldBy): ?string
+    private function newestAllowed(string $package, array $onInstalled, ?Candidate $for): ?string
     {
+        $heldBy = $for === null ? [] : $for->heldBy();
         $newest = null;
         foreach ($onInstalled as $candidate) {
             $release = $candidate->release();
+            if ($for !== null && Comparator::lessThan($release->normalized(), $for->release()->normalized())) {
+                continue;
+            }
             $excluding = array_filter($this->links->excluding($package, $release->normalized()), static fn (Holder $link): bool => !\in_array($link, $heldBy));
             if ($excluding === [] && $this->floor->admitsTarget($release->php()) !== false) {
                 $newest = $release->pretty();

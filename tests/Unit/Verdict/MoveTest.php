@@ -345,6 +345,22 @@ final class MoveTest extends TestCase
         self::assertSame('branch_releasing', array_column(JsonPath::arrayAt($move, ['clears']), 'basis', 'id')['left-behind'] ?? null);
     }
 
+    /**
+     * The highest 2.x tag 2.3.0 is old, but the backport 2.2.9 is the newest dated release. S8 dates
+     * the branch by 2.2.9, so the branch releases, and the move to it clears left-behind.
+     */
+    public function testABranchIsDatedByItsNewestDatedReleaseNotItsHighestTag(): void
+    {
+        $finding = self::analyse([
+            'lock' => [['time' => '2021-01-01T00:00:00+00:00']],
+            'releases' => [self::release('1.0.0', '2021-01-01', '>=7.2'), self::release('2.0.0', '2022-01-01', '>=7.2'), self::release('2.2.9', '2026-06-01', '>=7.2'), self::release('2.3.0', '2022-06-01', '>=7.2')],
+        ]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['require', 'left-behind', '2.x'], [$move['kind'], $move['source'], $move['to_branch']]);
+        self::assertSame('branch_releasing', array_column(JsonPath::arrayAt($move, ['clears']), 'basis', 'id')['left-behind'] ?? null);
+    }
+
     /** Offline, the move's own versions were never asked about: every rerun says so. */
     public function testAnOfflineMoveAssumesNoNewAdvisories(): void
     {
@@ -564,6 +580,20 @@ final class MoveTest extends TestCase
 
         self::assertSame(['update', '1.9.0', '1.9.0'], [$move['kind'], $move['version'], $move['newest']]);
         self::assertStringStartsWith('composer update a/b (gets 1.9.0)', JsonPath::stringAt($move, ['text']));
+    }
+
+    /** Ruling R3-2: h/hold holds the fix and the move clears it, but the conflict of c/c on 1.9.5 still lowers `newest` to 1.9.0. */
+    public function testARequireOnTheInstalledBranchGetsTheNewestThatTheFixReads(): void
+    {
+        $finding = self::analyse([
+            'lock' => [[], ['name' => 'h/hold', 'version' => '1.0.0', 'require' => ['a/b' => '1.0.0']], ['name' => 'c/c', 'version' => '1.0.0', 'conflict' => ['a/b' => '1.9.5']]],
+            'releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.9.0', '2020-01-01', '>=7.2'), self::release('1.9.5', '2020-02-01', '>=7.2')],
+            'advisories' => [self::ADVISORY],
+        ]);
+        $moves = array_merge([$finding['next_step']], JsonPath::arrayAt($finding, ['next_step', 'also']));
+
+        self::assertContains(['require', '1.9.0', '1.9.0'], array_map(static fn ($move): array => \is_array($move) ? [$move['kind'], $move['version'], $move['newest']] : [], $moves));
+        self::assertSame('1.9.0', JsonPath::stringAt($finding, ['security', 'installed_branch_fixes', 'newest']));
     }
 
     /** `security.partial` is null beside a move that is `composer update` to the same release. */

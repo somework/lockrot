@@ -309,6 +309,23 @@ final class FixFinderTest extends TestCase
         self::assertSame(['1.3.0', '1.3.0'], [$fix->version(), $fix->newest()]);
     }
 
+    /** No fixing release runs on the target PHP, so no allowed release lies at or above the fix: `newest` is the branch's newest. */
+    public function testAFixThatTheTargetPhpCannotRunKeepsItsNewestAtOrAboveItsVersion(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['1.2.0', null], ['1.3.0', '>=9.0'], ['1.4.0', '>=9.0']],
+            ['A' => '<1.3.0'],
+            new PhpFloor('8.4', null)
+        );
+        $fix = $fixes->forAdvisory('A');
+        $row = $fixes->installedBranch();
+        self::assertNotNull($row);
+
+        self::assertSame(['1.3.0', '1.4.0'], [$fix->version(), $fix->newest()], 'the fix');
+        self::assertSame(['1.3.0', '1.4.0'], [$row->lowest(), $row->newest()], 'installed_branch_fixes');
+    }
+
     /** The links come from packages and packages-dev, whatever --dev says: composer update reads both. */
     public function testADevPackageHoldsAProdPackage(): void
     {
