@@ -53,6 +53,17 @@ final class MoveCheckersTest extends TestCase
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.4-dev'));
     }
 
+    /** Composer normalises a bare major (`8`) to 8.0.0, so it lies in the target minor 8.0. */
+    public function testAPlatformPhpThatComposerNormalisesIntoTheTargetMinorIsKept(): void
+    {
+        self::assertSame(['8', '7', '8.0.0.0'], [MoveCheckers::platformPhp('8.0', '8'), MoveCheckers::platformPhp('7.0', '7'), MoveCheckers::platformPhp('8.0', '8.0.0.0')]);
+    }
+
+    public function testAPlatformPhpThatComposerCannotNormaliseIsNotInTheTargetMinor(): void
+    {
+        self::assertSame('8.0.99', MoveCheckers::platformPhp('8.0', 'eight'));
+    }
+
     /** The regular expression reads the target minor literally: its dot matches only a dot. */
     public function testAPlatformPhpThatMatchesTheTargetMinorOnlyAsAPatternIsNotInIt(): void
     {
