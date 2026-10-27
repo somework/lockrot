@@ -329,10 +329,10 @@ final class MoveTest extends TestCase
     }
 
     /**
-     * The solve installs 2.0.0, below the newest 2.3.0. 2.0.0 is older than three years, so the move
-     * clears nothing: it keeps its kind, and the score after it is the current total (SPEC I14).
+     * The solve installs 2.0.0, below the newest 2.3.0. S8 dates the 2.x branch by its newest dated
+     * release, 2.3.0, which is within release-warn-years, so the move clears left-behind.
      */
-    public function testAMoveWhoseInstalledReleaseClearsNothingKeepsItsKindWithNoScoreAfterIt(): void
+    public function testAMoveThatInstallsBelowTheNewestClearsLeftBehindOnAReleasingBranch(): void
     {
         $finding = self::analyse([
             'lock' => [['time' => '2021-01-01T00:00:00+00:00']],
@@ -342,8 +342,39 @@ final class MoveTest extends TestCase
         $move = JsonPath::arrayAt($finding, ['next_step']);
 
         self::assertSame(['require', 'left-behind', '2.0.0'], [$move['kind'], $move['source'], JsonPath::stringAt($move, ['check', 'installs'])]);
-        self::assertSame([], $move['clears']);
-        self::assertNull($move['if_applied']);
+        self::assertSame('branch_releasing', array_column(JsonPath::arrayAt($move, ['clears']), 'basis', 'id')['left-behind'] ?? null);
+    }
+
+    /**
+     * The highest 2.x tag 2.3.0 is old, but the backport 2.2.9 is the newest dated release. S8 dates
+     * the branch by 2.2.9, so the branch releases, and the move to it clears left-behind.
+     */
+    public function testABranchIsDatedByItsNewestDatedReleaseNotItsHighestTag(): void
+    {
+        $finding = self::analyse([
+            'lock' => [['time' => '2021-01-01T00:00:00+00:00']],
+            'releases' => [self::release('1.0.0', '2021-01-01', '>=7.2'), self::release('2.0.0', '2022-01-01', '>=7.2'), self::release('2.2.9', '2026-06-01', '>=7.2'), self::release('2.3.0', '2022-06-01', '>=7.2')],
+        ]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['require', 'left-behind', '2.x'], [$move['kind'], $move['source'], $move['to_branch']]);
+        self::assertSame('branch_releasing', array_column(JsonPath::arrayAt($move, ['clears']), 'basis', 'id')['left-behind'] ?? null);
+    }
+
+    /**
+     * Ruling R2-1: the solve installs 1.5.0, below the newest 1.9.0. 1.5.0 came out before the PHP
+     * 8.0 GA, so old-promise stays, although 1.9.0 came out after it.
+     */
+    public function testAnUpdateThatInstallsBelowTheNewestReadsOldPromiseOnTheInstalledRelease(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse([
+            'releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.5.0', '2020-06-01', '>=7.2'), self::release('1.9.0', '2021-06-01', '>=7.2')],
+            'checks' => ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => [], 'installs' => '1.5.0']],
+        ]), ['next_step']);
+
+        self::assertSame(['update', 'old-promise', '1.5.0'], [$move['kind'], $move['source'], JsonPath::stringAt($move, ['check', 'installs'])]);
+        self::assertNotContains('old-promise', array_column(JsonPath::arrayAt($move, ['clears']), 'id'));
+        self::assertContains('old-promise', array_column(JsonPath::arrayAt($move, ['leaves']), 'id'));
     }
 
     /** Offline, the move's own versions were never asked about: every rerun says so. */
@@ -565,6 +596,20 @@ final class MoveTest extends TestCase
 
         self::assertSame(['update', '1.9.0', '1.9.0'], [$move['kind'], $move['version'], $move['newest']]);
         self::assertStringStartsWith('composer update a/b (gets 1.9.0)', JsonPath::stringAt($move, ['text']));
+    }
+
+    /** Ruling R3-2: h/hold holds the fix and the move clears it, but the conflict of c/c on 1.9.5 still lowers `newest` to 1.9.0. */
+    public function testARequireOnTheInstalledBranchGetsTheNewestThatTheFixReads(): void
+    {
+        $finding = self::analyse([
+            'lock' => [[], ['name' => 'h/hold', 'version' => '1.0.0', 'require' => ['a/b' => '1.0.0']], ['name' => 'c/c', 'version' => '1.0.0', 'conflict' => ['a/b' => '1.9.5']]],
+            'releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.9.0', '2020-01-01', '>=7.2'), self::release('1.9.5', '2020-02-01', '>=7.2')],
+            'advisories' => [self::ADVISORY],
+        ]);
+        $moves = array_merge([$finding['next_step']], JsonPath::arrayAt($finding, ['next_step', 'also']));
+
+        self::assertContains(['require', '1.9.0', '1.9.0'], array_map(static fn ($move): array => \is_array($move) ? [$move['kind'], $move['version'], $move['newest']] : [], $moves));
+        self::assertSame('1.9.0', JsonPath::stringAt($finding, ['security', 'installed_branch_fixes', 'newest']));
     }
 
     /** `security.partial` is null beside a move that is `composer update` to the same release. */

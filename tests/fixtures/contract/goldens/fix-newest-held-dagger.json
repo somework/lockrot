@@ -1,0 +1,21 @@
+{
+    "score_text": "2 = vulnerable 2 [low advisory]",
+    "next_step_text": "move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle — clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (conflicts with ^5.4); the packages that hold it may need to move too; Composer's solver refuses it against the lock",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v5.3.14 released 2022-01-26 (4.7 years ago); 5.x last released v5.4.53 2026-05-20 (0.4 years ago); newest release v8.1.8 2026-09-26 (less than three weeks ago); last push 2026-10-01 (less than three weeks ago)",
+    "explain_age": [
+        "installed  v5.3.14   2022-01-26   4.7 years ago",
+        "5.x        v5.4.53   2026-05-20   0.4 years ago                 below release-warn-years 3",
+        "newest     v8.1.8    2026-09-26   less than three weeks ago     below release-warn-years 3",
+        "last push            2026-10-01   less than three weeks ago     below push-warn-years 3",
+        "libyears 4.7 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer why-not symfony/yaml v5.4.52 --locked"
+    ],
+    "commands_cmd": [
+        "composer why-not symfony/yaml v5.4.52 --locked"
+    ]
+}

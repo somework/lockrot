@@ -15,8 +15,9 @@ use Symfony\Component\Process\Process;
 
 /**
  * bin/lockrot's documents of real locks, on the live repositories, validate against the schemas that
- * they name. Wallabag 2.6.14 at PHP 7.4 has a move whose installed release clears nothing
- * (SPEC-0.14.md I14, ruling R2-9). Set GITHUB_TOKEN to read repository activity past the anonymous cap.
+ * they name. Wallabag 2.6.14 at PHP 7.4 has a move that installs below the newest release of its
+ * branch, and the branch's newest dated release clears left-behind (SPEC-0.14.md I14, ruling R3-3).
+ * Set GITHUB_TOKEN to read repository activity past the anonymous cap.
  *
  * @coversNothing
  *
@@ -65,7 +66,7 @@ final class RealReportsValidateTest extends TestCase
         $this->assertValid(Schemas::REPORT, $json, $fixture.' at '.$targetPhp, true);
     }
 
-    public function testTheExplanationOfAMoveWhoseInstalledReleaseClearsNothingValidatesAgainstExplain2(): void
+    public function testTheExplanationOfAMoveThatInstallsBelowTheNewestClearsLeftBehindAndValidatesAgainstExplain2(): void
     {
         $json = $this->lockrot('sites/wallabag-2.6.14', ['--target-php=7.4', '--explain=symfony/google-mailer', '--format=json']);
 
@@ -73,7 +74,12 @@ final class RealReportsValidateTest extends TestCase
         $document = json_decode($json, true);
         self::assertIsArray($document);
         $step = JsonPath::arrayAt($document, ['finding', 'next_step']);
-        self::assertSame([[], null], [$step['clears'], $step['if_applied']], 'the move installs a release that clears nothing: '.json_encode($step['check']));
+        self::assertSame(
+            [['kind' => 'flag', 'id' => 'left-behind', 'basis' => 'branch_releasing']],
+            $step['clears'],
+            'the target branch is dated by its newest dated release: '.json_encode($step['check']),
+        );
+        self::assertNotNull($step['if_applied']);
     }
 
     /** @param list<string> $arguments */

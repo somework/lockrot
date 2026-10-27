@@ -215,11 +215,22 @@ final class MoveContext
         return $newest ?? $row->highest();
     }
 
-    /** The row's date, or S8's date for the same branch when the row has none. */
+    /**
+     * The `newest` of a require, raise-php or blocked move: on the installed row, the row's
+     * `fixes.newest`, so the move and the S9 fix agree (ruling R3-2). Else the row's newest.
+     */
+    public function rowTarget(BranchRow $row): string
+    {
+        $fixes = $this->fixes === null || !$row->installed() ? null : $this->fixes->installedBranch();
+
+        return ($fixes === null ? null : $fixes->newest()) ?? $row->highest();
+    }
+
+    /** The date of the row's newest dated release, as S8 dates a branch, or S8's date for the same branch when the row has none. */
     public function releasedAt(BranchRow $row): ?\DateTimeImmutable
     {
-        if ($row->highestReleased() !== null) {
-            return $row->highestReleased();
+        if ($row->newestDatedReleased() !== null) {
+            return $row->newestDatedReleased();
         }
         $s8 = $this->finding->signalData(LeftBehindData::class);
 

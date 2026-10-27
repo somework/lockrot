@@ -65,7 +65,9 @@ final class CheckOutcome
      * solve resolves the move when it installs the moved package inside the move's constraint and
      * changes a holder's release. The move then has no hold and lists each changed holder. A new
      * install of the same tag is no change, but a branch version can move to another commit.
-     * A joint refusal gives its own holds. Any other answer keeps this refusal.
+     * A solve that moves a holder from a release to a dev version does not resolve the move: Composer
+     * blocks no advisory of a dev version. A joint refusal gives its own holds. Any other answer
+     * keeps this refusal.
      *
      * @param list<string> $holders
      */
@@ -83,9 +85,13 @@ final class CheckOutcome
         foreach ($holders as $holder) {
             $version = $joint->changes()[$holder] ?? null;
             $from = $joint->updatedFrom[$holder] ?? $this->holderVersion($holder);
-            if ($version !== null && ($version !== $from || VersionParser::parseStability($version) === 'dev')) {
-                $movesWith[] = ['package' => $holder, 'installed_version' => $from, 'version' => $version];
+            if ($version === null || ($version === $from && VersionParser::parseStability($version) !== 'dev')) {
+                continue;
             }
+            if (VersionParser::parseStability($version) === 'dev' && $from !== null && VersionParser::parseStability($from) !== 'dev') {
+                return $this;
+            }
+            $movesWith[] = ['package' => $holder, 'installed_version' => $from, 'version' => $version];
         }
         if ($movesWith === []) {
             return $this;

@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 final class MoveContractTest extends TestCase
 {
     private const VERSION = 'the model leaves `version` null on a move whose constraint comes from S8 : lockrot names the lowest admitted release, and the why-not step of a move that does not resolve names it';
-    private const DATED = 'the model dates a branch by its newest release only : a lower release leaves old-promise unverified, where lockrot dates it';
+    private const DATED = 'the model reads no date of a row\'s release, so old-promise stays unverified (`undated`) and the row\'s score is an upper bound : lockrot dates the release and judges old-promise exactly';
     private const TIE = 'the model removes S5 from the case to make the tie : the installed release is older than PHP 8.0, so lockrot raises S5 and the move differs';
 
     /**
@@ -43,7 +43,8 @@ final class MoveContractTest extends TestCase
         'partial-op‡' => [[['version', 'commands'], self::VERSION]],
         'unreached-dev‡' => [[['version', 'commands'], self::VERSION]],
         'B-offline-high‡' => [[['version', 'commands'], self::VERSION]],
-        'gets-below-clears-nothing‡' => [[['version'], self::VERSION]],
+        'gets-below-clears-left-behind‡' => [[['version'], self::VERSION]],
+        'mc-joint-dev‡' => [[['version', 'commands'], self::VERSION]],
         'require-dev-name‡' => [[['version', 'commands'], self::VERSION]],
         'capped-require-php' => [[['version', 'commands'], self::VERSION]],
         'adds-capped-raise-php' => [[['version', 'commands'], self::VERSION]],

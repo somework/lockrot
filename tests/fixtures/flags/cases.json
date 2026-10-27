@@ -128646,8 +128646,8 @@
    }
   },
   {
-   "id": "gets-below-clears-nothing‡",
-   "label": "a left-behind require that Composer resolves at v5.4.19, below the newest v5.4.45: that release is dated beyond release-warn-years, so the move clears nothing and writes no if_applied (ruling R2)",
+   "id": "gets-below-clears-left-behind‡",
+   "label": "a left-behind require that Composer resolves at v5.4.19, below the newest v5.4.45: the 5.x row is dated by v5.4.45, within release-warn-years, so the move clears left-behind (rulings R2, R3-3)",
    "project": "wallabag",
    "run": {
     "project": "wallabag/wallabag",
@@ -129630,17 +129630,27 @@
      },
      "crosses_major": true,
      "held_by": [],
-     "clears": [],
-     "unverified": [],
-     "adds": [],
-     "leaves": [
+     "clears": [
       {
        "kind": "flag",
-       "id": "left-behind"
+       "id": "left-behind",
+       "basis": "branch_releasing"
       }
      ],
-     "clears_all": false,
-     "if_applied": null,
+     "unverified": [],
+     "adds": [],
+     "leaves": [],
+     "clears_all": true,
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "lead": null,
+      "deciding_advisory": null,
+      "at_most": false,
+      "assumes": [
+       "clears_hold"
+      ]
+     },
      "check": {
       "result": "resolves",
       "form": "inline",
@@ -129660,7 +129670,7 @@
      ],
      "through": [],
      "also": [],
-     "text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45); 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; left-behind stays; a new major brings its own requirements; Composer's solver checked it against the lock"
+     "text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45) — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock"
     },
     "security": {
      "status": "clear",
@@ -129933,7 +129943,7 @@
    },
    "golden": {
     "score_text": "16 = left-behind 16",
-    "next_step_text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45); 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; left-behind stays; a new major brings its own requirements; Composer's solver checked it against the lock",
+    "next_step_text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45) — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock",
     "verdict_line": "High: its branch, 4.x, had its last release 4.5 years ago, behind 5.x.",
     "readings": [],
     "qualifiers": {
@@ -129964,8 +129974,8 @@
        "composer require 'symfony/google-mailer:^5.4'"
       ],
       "commands_label": "Command",
-      "clears": null,
-      "stays": "left-behind",
+      "clears": "left-behind",
+      "stays": null,
       "not_checked": null,
       "adds": [],
       "php": {
@@ -129982,7 +129992,7 @@
        ]
       },
       "after": {
-       "result": null,
+       "result": "0, ok",
        "conditions": [
         "checked with Composer"
        ]
@@ -130142,7 +130152,7 @@
      },
      {
       "version": "v5.4.19",
-      "time": null,
+      "time": "2023-01-01T08:32:19+00:00",
       "php": ">=7.2.5"
      },
      {
@@ -130194,6 +130204,5887 @@
       "reason": null,
       "installs": "v5.4.19",
       "holds": []
+     }
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": true,
+     "blocking_disabled_by": [],
+     "ignores_extensions": true,
+     "baseline": "resolves",
+     "reason": null,
+     "php": "8.4.99"
+    }
+   }
+  },
+  {
+   "id": "gets-below-clears-nothing‡",
+   "label": "an old-promise update that Composer resolves at v3.6.0, below the newest v3.11.2: v3.6.0 came out before the PHP 8.0 GA, so the move clears nothing, keeps its kind and writes no if_applied (rulings R2, R2-9)",
+   "project": "mautic-v4",
+   "run": {
+    "project": "mautic/mautic",
+    "root_package": "mautic/mautic",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "project_php": null,
+    "project_php_lowest": null,
+    "lock_file": "composer.lock",
+    "fail_on": "high",
+    "fail_on_source": "option",
+    "gates": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "threshold": "high"
+     }
+    ],
+    "strict_network": false,
+    "mode": "check",
+    "include_dev": false,
+    "thresholds": {
+     "release-warn-years": 3,
+     "release-high-years": 5,
+     "push-warn-years": 3,
+     "push-high-years": 5
+    },
+    "flag_ids": [
+     "abandoned",
+     "silent",
+     "pinned",
+     "left-behind",
+     "old-promise",
+     "stale",
+     "capped",
+     "vulnerable"
+    ],
+    "verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     "unknown",
+     "finished",
+     "ok"
+    ],
+    "graded_verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "signal_ids": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7",
+     "S8",
+     "S9",
+     "S10",
+     "S11"
+    ],
+    "fix_model": 1,
+    "text_grammar": 1,
+    "score_model": {
+     "id": 1,
+     "score_text_grammar": 1,
+     "flag_order": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "capped",
+      "vulnerable"
+     ],
+     "parts": [
+      {
+       "id": "maintenance",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "capped"
+       ],
+       "combine": "lead_plus_share"
+      },
+      {
+       "id": "security",
+       "flag_ids": [
+        "vulnerable"
+       ],
+       "combine": "max"
+      }
+     ],
+     "flags": [
+      {
+       "id": "abandoned",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "abandoned",
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S1",
+        "S3"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "silent",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "silent",
+        "pinned",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-high-years",
+        "push-high-years"
+       ],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "pinned",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 22,
+       "max_maintenance_flags": [
+        "pinned",
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S6"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "left-behind",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 20,
+       "max_maintenance_flags": [
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S8"
+       ],
+       "thresholds": [
+        "release-warn-years"
+       ],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "old-promise",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 18,
+       "max_maintenance_flags": [
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S5"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "stale",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 10,
+       "max_maintenance_flags": [
+        "stale",
+        "capped"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-warn-years",
+        "push-warn-years"
+       ],
+       "basis": {
+        "v013_base": "medium",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "capped",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 8,
+       "max_maintenance_flags": [
+        "capped"
+       ],
+       "raised_by": [
+        "S11"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "vulnerable",
+       "part": "security",
+       "points": null,
+       "band": null,
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": null,
+       "max_maintenance_flags": null,
+       "raised_by": [
+        "S9"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "severities"
+       },
+       "points_from": "severities"
+      }
+     ],
+     "severities": [
+      {
+       "id": "critical",
+       "points": 32,
+       "band": "critical",
+       "points_no_reachable_fix": 64,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 4,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "high",
+       "points": 16,
+       "band": "high",
+       "points_no_reachable_fix": 32,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 3,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "medium",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "unrated",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": "medium",
+       "basis": {
+        "points": "counts_as"
+       }
+      },
+      {
+       "id": "low",
+       "points": 2,
+       "band": "low",
+       "points_no_reachable_fix": 4,
+       "band_no_reachable_fix": "low",
+       "gate_rank": 1,
+       "counts_as": null,
+       "basis": {
+        "points": "share",
+        "of": "medium",
+        "share": {
+         "num": 1,
+         "den": 4
+        }
+       }
+      }
+     ],
+     "fix_kinds": [
+      {
+       "id": "update",
+       "ease": 1,
+       "doubles": false
+      },
+      {
+       "id": "upgrade",
+       "ease": 2,
+       "doubles": false
+      },
+      {
+       "id": "raise-php",
+       "ease": 3,
+       "doubles": false
+      },
+      {
+       "id": "unknown",
+       "ease": 4,
+       "doubles": false
+      },
+      {
+       "id": "blocked",
+       "ease": 5,
+       "doubles": true
+      },
+      {
+       "id": "none",
+       "ease": 6,
+       "doubles": true
+      }
+     ],
+     "bands": [
+      {
+       "verdict": "critical",
+       "floor": 32
+      },
+      {
+       "verdict": "high",
+       "floor": 16
+      },
+      {
+       "verdict": "medium",
+       "floor": 8
+      },
+      {
+       "verdict": "low",
+       "floor": 1
+      }
+     ],
+     "zero_verdicts": [
+      {
+       "verdict": "finished",
+       "when": "allowlisted"
+      },
+      {
+       "verdict": "unknown",
+       "when": "no_metadata"
+      },
+      {
+       "verdict": "ok",
+       "when": "otherwise"
+      }
+     ],
+     "exact_unit": 0.5,
+     "rounding": "floor_once",
+     "max_total": 104,
+     "bar_max": 64,
+     "bar_overflow": "clip",
+     "exclusive_groups": [
+      {
+       "id": "liveness",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "stale"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "branch",
+       "flag_ids": [
+        "pinned",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_age",
+       "flag_ids": [
+        "silent",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_push",
+       "flag_ids": [
+        "left-behind",
+        "stale"
+       ],
+       "holds_unless": {
+        "threshold": "push-warn-years",
+        "below": "release-warn-years"
+       }
+      },
+      {
+       "id": "php_bound",
+       "flag_ids": [
+        "old-promise",
+        "capped"
+       ],
+       "holds_unless": null
+      }
+     ],
+     "sort": [
+      {
+       "key": "verdict",
+       "path": "verdict",
+       "dir": "order",
+       "order": [
+        [
+         "critical"
+        ],
+        [
+         "high"
+        ],
+        [
+         "medium"
+        ],
+        [
+         "low"
+        ],
+        [
+         "unknown"
+        ],
+        [
+         "finished",
+         "ok"
+        ]
+       ],
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "security",
+       "path": "score.parts.security.contribution",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "score",
+       "path": "score.exact",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "direct",
+       "path": "direct",
+       "dir": "true_first",
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "package",
+       "path": "package",
+       "dir": "asc",
+       "collation": "bytes",
+       "default": null
+      }
+     ],
+     "rules": [
+      {
+       "id": "counted",
+       "stage": 1,
+       "kind": "select",
+       "applies_to": "flags",
+       "accept_group": "liveness",
+       "accept_covers": "listed_and_below",
+       "why": "accepted-facts-shown-not-counted",
+       "doc": "score-counted",
+       "illustration": null
+      },
+      {
+       "id": "lead-first",
+       "stage": 2,
+       "kind": "select",
+       "applies_to": "maintenance",
+       "order": "flag_order",
+       "share": {
+        "num": 1,
+        "den": 1
+       },
+       "why": "strongest-fact-in-full",
+       "doc": "score-lead-first",
+       "illustration": null
+      },
+      {
+       "id": "corroborating-share",
+       "stage": 3,
+       "kind": "share",
+       "applies_to": "maintenance",
+       "share": {
+        "num": 1,
+        "den": 4
+       },
+       "why": "correlated-evidence",
+       "doc": "score-corroborating-share",
+       "illustration": {
+        "lead": "left-behind",
+        "flag": "old-promise",
+        "weight": 16,
+        "points": 4
+       }
+      },
+      {
+       "id": "advisory-points",
+       "stage": 4,
+       "kind": "lookup",
+       "applies_to": "security",
+       "table": "severities",
+       "why": "severity-points",
+       "doc": "score-advisory-points",
+       "illustration": null
+      },
+      {
+       "id": "no-reachable-fix-multiplier",
+       "stage": 5,
+       "kind": "multiply",
+       "applies_to": "advisory",
+       "factor": 2,
+       "when_fix": [
+        "none",
+        "blocked"
+       ],
+       "why": "one-band-up",
+       "doc": "score-no-reachable-fix-multiplier",
+       "illustration": {
+        "severity": "high",
+        "before": 16,
+        "after": 32,
+        "band_before": "high",
+        "band_after": "critical"
+       }
+      },
+      {
+       "id": "security-max",
+       "stage": 6,
+       "kind": "max",
+       "applies_to": "security",
+       "tie_break": [
+        {
+         "key": "points",
+         "dir": "desc",
+         "collation": null
+        },
+        {
+         "key": "severity",
+         "dir": "order",
+         "collation": null
+        },
+        {
+         "key": "id",
+         "dir": "asc",
+         "collation": "bytes"
+        }
+       ],
+       "why": "one-number-per-part",
+       "doc": "score-security-max",
+       "illustration": null
+      },
+      {
+       "id": "divide-reach",
+       "stage": 7,
+       "kind": "divide",
+       "applies_to": "maintenance",
+       "by": 2,
+       "when": [
+        "transitive",
+        "unreached"
+       ],
+       "why": "reach-halves-maintenance",
+       "doc": "score-divide-reach",
+       "illustration": {
+        "flag": "abandoned",
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "security-exempt-from-reach",
+       "stage": 8,
+       "kind": "exempt",
+       "applies_to": "security",
+       "of": "divide-reach",
+       "why": "exploitability-independent-of-reach",
+       "doc": "score-security-exempt-from-reach",
+       "illustration": {
+        "severity": "critical",
+        "reach": "transitive",
+        "total": 32
+       }
+      },
+      {
+       "id": "sum",
+       "stage": 9,
+       "kind": "combine",
+       "applies_to": "total",
+       "op": "sum",
+       "ratio_from": "medium",
+       "why": "parts-add",
+       "doc": "score-sum",
+       "illustration": {
+        "maintenance": 16,
+        "security": 16,
+        "total": 32,
+        "band": "critical",
+        "low_maintenance": 4,
+        "low_security": 4,
+        "low_total": 8,
+        "low_band": "medium"
+       }
+      },
+      {
+       "id": "divide-dev",
+       "stage": 10,
+       "kind": "divide",
+       "applies_to": "total",
+       "by": 2,
+       "when": [
+        "dev"
+       ],
+       "why": "dev-halves-total",
+       "doc": "score-divide-dev",
+       "illustration": {
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "floor-once",
+       "stage": 11,
+       "kind": "floor",
+       "applies_to": "total",
+       "why": "integer-band-edges",
+       "doc": "score-floor-once",
+       "illustration": {
+        "exact": 4.5,
+        "total": 4
+       }
+      },
+      {
+       "id": "band-floors",
+       "stage": 12,
+       "kind": "band",
+       "applies_to": "total",
+       "ratio": 2,
+       "ratio_from": "medium",
+       "why": "two-floor-parts-make-next",
+       "doc": "score-band-floors",
+       "illustration": null
+      },
+      {
+       "id": "zero-verdicts",
+       "stage": 13,
+       "kind": "zero",
+       "applies_to": "total",
+       "table": "zero_verdicts",
+       "why": "score-zero-says-why",
+       "doc": "score-zero-verdicts",
+       "illustration": null
+      },
+      {
+       "id": "sort",
+       "stage": 14,
+       "kind": "order",
+       "applies_to": "findings",
+       "why": "advisory-findings-first",
+       "doc": "score-sort",
+       "illustration": null
+      },
+      {
+       "id": "gate-bounded-new",
+       "stage": 15,
+       "kind": "gate",
+       "applies_to": "gate",
+       "cap_multiplier": 2,
+       "why": "new-fact-sets-level",
+       "doc": "score-gate-bounded-new",
+       "illustration": {
+        "score": 36,
+        "new": 16,
+        "gate": 32
+       }
+      },
+      {
+       "id": "baseline-cover",
+       "stage": 16,
+       "kind": "cover",
+       "applies_to": "gate",
+       "order": "flag_order",
+       "covers": "listed_and_below",
+       "why": "recorded-lead-covers-below",
+       "doc": "score-baseline-cover",
+       "illustration": null
+      }
+     ],
+     "docs": "https://lockrot.dev/verdicts/model-1/"
+    },
+    "score_rules_used": {
+     "counted": 0,
+     "lead-first": 1,
+     "corroborating-share": 0,
+     "advisory-points": 0,
+     "no-reachable-fix-multiplier": 0,
+     "security-max": 0,
+     "divide-reach": 1,
+     "security-exempt-from-reach": 0,
+     "sum": 0,
+     "divide-dev": 0,
+     "floor-once": 0,
+     "band-floors": 1,
+     "zero-verdicts": 0,
+     "sort": null,
+     "gate-bounded-new": 0,
+     "baseline-cover": 0
+    },
+    "advisory_lookup": {
+     "scope": "all",
+     "scope_source": "default",
+     "packages_asked": 1,
+     "packages_not_asked": 0,
+     "other_repositories": 0,
+     "repositories": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "outcome": "answered",
+       "reason": null,
+       "message": null,
+       "packages_with_records": 0,
+       "records": 0
+      }
+     ]
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": true,
+     "blocking_disabled_by": [],
+     "ignores_extensions": true,
+     "baseline": "resolves",
+     "reason": null
+    },
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "5.6",
+       "7.0",
+       "7.1",
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "5.6.0",
+       "set_by": [
+        {
+         "name": "symfony/monolog-bundle",
+         "version": "v3.5.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=5.6",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "5.6",
+       "7.0",
+       "7.1",
+       "7.2",
+       "7.3",
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "5.6.0",
+       "set_by": [
+        {
+         "name": "symfony/monolog-bundle",
+         "version": "v3.5.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=5.6",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     },
+     "target_fix": null
+    }
+   },
+   "synthetic_inputs": [
+    "next_step.check: resolves inline, installs v3.6.0; v3.6.0 dated 2020-10-06 with php >=7.1.3, v3.11.2 dated 2026-04-02 with php >=8.1 (‡)"
+   ],
+   "finding": {
+    "package": "symfony/monolog-bundle",
+    "version": "v3.5.0",
+    "branch": "3.x",
+    "installed_php": {
+     "requires": ">=5.6",
+     "target_runs": true,
+     "project_allows": null
+    },
+    "verdict": "medium",
+    "priority": "medium",
+    "lead": "old-promise",
+    "rank": 102,
+    "flags": [
+     {
+      "id": "old-promise",
+      "role": "lead",
+      "baseline": null,
+      "signal_ids": [
+       "S5"
+      ],
+      "degree": null,
+      "headline": {
+       "unit": "php",
+       "value": 5,
+       "source": null
+      },
+      "summary": "released 2019-11-13 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+     }
+    ],
+    "score": {
+     "model": 1,
+     "total": 8,
+     "exact": 8,
+     "rounded_down": false,
+     "band": {
+      "floor": 8,
+      "next": "high",
+      "to_next": 8
+     },
+     "decided_by": "maintenance",
+     "parts": {
+      "maintenance": {
+       "status": "counted",
+       "contribution": 8,
+       "alone": {
+        "total": 8,
+        "verdict": "medium"
+       }
+      },
+      "security": {
+       "status": "clear",
+       "contribution": 0,
+       "alone": {
+        "total": 0,
+        "verdict": null
+       },
+       "of": 0,
+       "tied": []
+      }
+     },
+     "terms": [
+      {
+       "part": "maintenance",
+       "flag": "old-promise",
+       "role": "lead",
+       "weight": 16,
+       "divisor": 1,
+       "points": 16,
+       "contribution": 8
+      }
+     ],
+     "modifiers": [
+      {
+       "reason": "transitive",
+       "applies_to": "maintenance",
+       "divide_by": 2,
+       "before": 16,
+       "after": 8
+      }
+     ],
+     "accepted": [],
+     "without": [],
+     "text": "8 = old-promise 16 ÷ 2 transitive"
+    },
+    "next_step": {
+     "kind": "update",
+     "source": "old-promise",
+     "merged": [],
+     "fix_kind": null,
+     "reason": null,
+     "replacement": null,
+     "quiet_years": null,
+     "to_branch": "3.x",
+     "version": "v3.11.2",
+     "newest": "v3.11.2",
+     "constraint": null,
+     "latest": null,
+     "php_check": {
+      "requires": ">=8.1",
+      "project_allows": null,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "crosses_major": false,
+     "held_by": [],
+     "clears": [],
+     "unverified": [],
+     "adds": [],
+     "leaves": [
+      {
+       "kind": "flag",
+       "id": "old-promise"
+      }
+     ],
+     "clears_all": false,
+     "if_applied": null,
+     "check": {
+      "result": "resolves",
+      "form": "inline",
+      "reason": null,
+      "installs": "v3.6.0"
+     },
+     "moves_with": [],
+     "composer_moves_because": [],
+     "commands": [
+      [
+       "composer",
+       "update",
+       "symfony/monolog-bundle:^3.11.2"
+      ]
+     ],
+     "through": [
+      {
+       "package": "mautic/core-lib",
+       "installed_version": "4.3.x-dev",
+       "installed_requires": null,
+       "newest_stable": null,
+       "newest_requires": null,
+       "newest_requires_unmeasured": "not_from_composer_repository",
+       "local": true,
+       "newest_is_installed": null
+      }
+     ],
+     "also": [],
+     "text": "composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); old-promise stays; Composer's solver checked it against the lock"
+    },
+    "security": {
+     "status": "clear",
+     "check": "complete",
+     "complete": true,
+     "unchecked_reason": null,
+     "records": 0,
+     "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "answer": "answered",
+       "records": 0,
+       "reason": null
+      }
+     ],
+     "ignored": [],
+     "ignored_count": 0
+    },
+    "checks_missing": [],
+    "checks_skipped": [],
+    "unchecked_accepted": [],
+    "maintenance_judged": true,
+    "metadata": {
+     "status": "read",
+     "reason": null,
+     "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bundle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:29+00:00",
+     "cached_at": "2026-10-01T16:04:29+00:00"
+    },
+    "allowlist": null,
+    "abandoned_ignored": null,
+    "from_composer_repository": true,
+    "origin": {
+     "kind": "packagist",
+     "registry": "packagist.org",
+     "package_url": "https://packagist.org/packages/symfony/monolog-bundle",
+     "local": false
+    },
+    "replacement": null,
+    "replacement_url": null,
+    "note": null,
+    "libyears_unmeasured": null,
+    "libyears_at_least": false,
+    "direct": false,
+    "dev": false,
+    "reach": "transitive",
+    "chain": [
+     "mautic/core-lib",
+     "symfony/monolog-bundle"
+    ],
+    "depth": 1,
+    "depth_unmeasured": null,
+    "named_in": [],
+    "direct_dependents": [
+     "mautic/core-lib"
+    ],
+    "signals": [
+     {
+      "id": "S5",
+      "level": "warn",
+      "summary": "released 2019-11-13 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+      "data": {
+       "target_php": "8.4",
+       "target_major": "8.0",
+       "ga_date": "2020-11-26",
+       "php_constraint": ">=5.6",
+       "written_for_php": 5,
+       "released": "2019-11-13T13:11:14+00:00"
+      }
+     }
+    ],
+    "evidence": "old-promise: released 2019-11-13 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+    "allowlist_reason": null,
+    "data_date": "2026-10-01T17:40:14+00:00",
+    "libyears": 6.83,
+    "age": {
+     "installed": {
+      "at": "2019-11-13T13:11:14+00:00",
+      "years": 6.9,
+      "dated_by": null
+     },
+     "installed_unmeasured": null,
+     "release": {
+      "version": "v4.1.0",
+      "at": "2026-09-10T19:32:07+00:00",
+      "years": 0.1,
+      "level": null,
+      "dated_by": null
+     },
+     "release_unmeasured": null,
+     "branch_release": {
+      "version": "v3.11.2",
+      "at": "2026-04-02T18:23:01+00:00",
+      "years": 0.5,
+      "level": null,
+      "dated_by": null
+     },
+     "branch_release_unmeasured": null,
+     "push": {
+      "at": "2026-09-12T21:35:24+00:00",
+      "years": 0.1,
+      "level": null
+     },
+     "push_unmeasured": null
+    },
+    "baseline": null,
+    "gate": {
+     "reaches_fail_on": false,
+     "fails": false,
+     "exempt_by": null,
+     "by": [],
+     "basis": null
+    }
+   },
+   "details": {
+    "metadata": {
+     "installed_branch": "3.x",
+     "branches": [
+      {
+       "branch": "4.x",
+       "installed": false,
+       "highest": "v4.1.0",
+       "highest_released": "2026-09-10T19:32:07+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v4.1.0",
+       "newest_dated_released": "2026-09-10T19:32:07+00:00",
+       "dated_by": null,
+       "php": ">=8.2",
+       "highest_php": ">=8.2",
+       "admits_target_php": true,
+       "admits_project_php": null,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": null,
+       "highest_misses_project_php": null,
+       "released_years": 0.1,
+       "fixes": null
+      },
+      {
+       "branch": "3.x",
+       "installed": true,
+       "highest": "v3.11.2",
+       "highest_released": "2026-04-02T18:23:01+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v3.11.2",
+       "newest_dated_released": "2026-04-02T18:23:01+00:00",
+       "dated_by": null,
+       "php": ">=8.1",
+       "highest_php": ">=8.1",
+       "admits_target_php": true,
+       "admits_project_php": null,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": null,
+       "highest_misses_project_php": null,
+       "released_years": 0.5,
+       "fixes": null
+      },
+      {
+       "branch": "2.x",
+       "installed": false,
+       "highest": "v2.12.1",
+       "highest_released": "2017-01-02T19:04:26+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v2.12.1",
+       "newest_dated_released": "2017-01-02T19:04:26+00:00",
+       "dated_by": null,
+       "php": ">=5.3.2",
+       "highest_php": ">=5.3.2",
+       "admits_target_php": true,
+       "admits_project_php": null,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": null,
+       "highest_misses_project_php": null,
+       "released_years": 9.7,
+       "fixes": null
+      }
+     ]
+    }
+   },
+   "golden": {
+    "score_text": "8 = old-promise 16 ÷ 2 transitive",
+    "next_step_text": "composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); old-promise stays; Composer's solver checked it against the lock",
+    "verdict_line": "Medium: it was written for PHP 5 and admits 8.4 untested.",
+    "readings": [],
+    "qualifiers": {
+     "reach": [
+      "Production: not in packages-dev",
+      "Not required directly, through mautic/core-lib",
+      "Its maintenance counts half"
+     ],
+     "origin": null,
+     "not_judged": null,
+     "unchecked": [],
+     "not_run": [],
+     "php": null,
+     "php_edge": [
+      "It sets the lowest PHP this lock admits: 5.6.0"
+     ],
+     "accepted": [],
+     "gate": [
+      "does not reach the run's gate: grade high or above"
+     ]
+    },
+    "moves": [
+     {
+      "heading": "The move",
+      "action": "Update to v3.6.0 on 3.x, below the newest v3.11.2",
+      "platform_step": null,
+      "command_note": null,
+      "moves_with": null,
+      "commands": [
+       "composer update 'symfony/monolog-bundle:^3.11.2'"
+      ],
+      "commands_label": "Command",
+      "clears": null,
+      "stays": "old-promise",
+      "not_checked": null,
+      "adds": [],
+      "php": {
+       "head": "3.x needs php >=8.1",
+       "lines": [
+        {
+         "answer": "yes",
+         "text": "your target, 8.4, runs it"
+        }
+       ]
+      },
+      "after": {
+       "result": null,
+       "conditions": [
+        "checked with Composer"
+       ]
+      },
+      "composer": []
+     }
+    ],
+    "held_by": [
+     null
+    ],
+    "security": {
+     "summary": [
+      "no counted advisory",
+      "none on record for this name",
+      "lookup complete"
+     ],
+     "counts": [],
+     "meanwhile": null,
+     "caption": [],
+     "groups": [],
+     "rows": [],
+     "ignored": [],
+     "ladder": []
+    },
+    "branches_lead": [
+     "Your branch, 3.x, had its last release, v3.11.2, 0.5 years ago."
+    ],
+    "branch_rows": [
+     {
+      "branch": "4.x",
+      "marks": [
+       "newest"
+      ],
+      "latest": "v4.1.0",
+      "age": "0.1y",
+      "php": ">=8.2",
+      "php_words": null,
+      "bar": "v4.1.0, released 0.1 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "3.x",
+      "marks": [
+       "yours",
+       "the move"
+      ],
+      "latest": "v3.11.2",
+      "age": "0.5y",
+      "php": ">=8.1",
+      "php_words": null,
+      "bar": "v3.11.2, released 0.5 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "2.x",
+      "marks": [],
+      "latest": "v2.12.1",
+      "age": "9.7y",
+      "php": ">=5.3.2",
+      "php_words": null,
+      "bar": "v2.12.1, released 9.7 years ago",
+      "folded_in": null
+     }
+    ],
+    "age_rows": [
+     {
+      "label": "installed",
+      "value": "v3.5.0 · 2019-11-13 · 6.9 years ago"
+     },
+     {
+      "label": "3.x last",
+      "value": "v3.11.2 · 2026-04-02 · 0.5 years ago"
+     },
+     {
+      "label": "most recent",
+      "value": "v4.1.0 · 2026-09-10 · 0.1 years ago"
+     },
+     {
+      "label": "last push",
+      "value": "2026-09-12 · 0.1 years ago"
+     }
+    ],
+    "security_row": [
+     "no counted advisory",
+     "none on record for this name",
+     "lookup complete"
+    ],
+    "why": [
+     "8 · medium from 8 · 8 points short of high",
+     "old-promise 16 leads: the strongest maintenance fact counts in full",
+     "transitive: maintenance 16 ÷ 2 = 8",
+     "maintenance alone makes it medium"
+    ],
+    "gate_line": null,
+    "checks": "1 fired (S5) · 10 quiet · every check ran",
+    "baseline_suffix": null,
+    "commands_posix": [
+     "composer update 'symfony/monolog-bundle:^3.11.2'"
+    ],
+    "commands_cmd": [
+     "composer update \"symfony/monolog-bundle:^3.11.2\""
+    ],
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v3.5.0 released 2019-11-13 (6.9 years ago); 3.x last released v3.11.2 2026-04-02 (0.5 years ago); newest release v4.1.0 2026-09-10 (0.1 years ago); last push 2026-09-12 (0.1 years ago)"
+   },
+   "inputs": {
+    "root": {
+     "name": "mautic/mautic",
+     "require": {
+      "mautic/core-lib": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "symfony/monolog-bundle",
+      "version": "v3.5.0",
+      "time": "2019-11-13T13:11:14+00:00",
+      "php": ">=5.6",
+      "dev": false,
+      "origin": "packagist"
+     },
+     {
+      "name": "mautic/core-lib",
+      "version": "4.3.x-dev",
+      "dev": false,
+      "origin": "path",
+      "require": {
+       "symfony/monolog-bundle": "*"
+      }
+     }
+    ],
+    "releases": [
+     {
+      "version": "v2.12.1",
+      "time": "2017-01-02T19:04:26+00:00",
+      "php": ">=5.3.2"
+     },
+     {
+      "version": "v3.11.2",
+      "time": "2026-04-02T18:23:01+00:00",
+      "php": ">=8.1"
+     },
+     {
+      "version": "v3.5.0",
+      "time": "2019-11-13T13:11:14+00:00",
+      "php": ">=5.6"
+     },
+     {
+      "version": "v3.6.0",
+      "time": "2020-10-06T15:12:11+00:00",
+      "php": ">=7.1.3"
+     },
+     {
+      "version": "v4.1.0",
+      "time": "2026-09-10T19:32:07+00:00",
+      "php": ">=8.2"
+     }
+    ],
+    "advisories": [],
+    "records": 0,
+    "ignored": [],
+    "abandoned": null,
+    "activity": {
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bundle",
+     "status": "read",
+     "reason": null,
+     "pushed_at": "2026-09-12T21:35:24+00:00",
+     "archived": false
+    },
+    "dependents": {},
+    "run": {
+     "target_php": "8.4",
+     "project_php": null,
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    },
+    "checks": {
+     "update symfony/monolog-bundle ^3.11.2 ": {
+      "result": "resolves",
+      "form": "inline",
+      "reason": null,
+      "installs": "v3.6.0",
+      "holds": []
+     }
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": true,
+     "blocking_disabled_by": [],
+     "ignores_extensions": true,
+     "baseline": "resolves",
+     "reason": null,
+     "php": "8.4.99"
+    }
+   }
+  },
+  {
+   "id": "mc-joint-dev‡",
+   "label": "a joint solve that takes the holder symfony/validator from v4.4.48 to 4.4.x-dev: it does not count, so the require of symfony/translation ^5.4 stays refused with the hold of the first refusal (ruling R3-1)",
+   "project": "wallabag",
+   "run": {
+    "project": "wallabag/wallabag",
+    "root_package": "wallabag/wallabag",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "project_php": ">=7.4",
+    "project_php_lowest": "7.4.0",
+    "lock_file": "composer.lock",
+    "fail_on": "high",
+    "fail_on_source": "option",
+    "gates": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "threshold": "high"
+     }
+    ],
+    "strict_network": false,
+    "mode": "check",
+    "include_dev": false,
+    "thresholds": {
+     "release-warn-years": 3,
+     "release-high-years": 5,
+     "push-warn-years": 3,
+     "push-high-years": 5
+    },
+    "flag_ids": [
+     "abandoned",
+     "silent",
+     "pinned",
+     "left-behind",
+     "old-promise",
+     "stale",
+     "capped",
+     "vulnerable"
+    ],
+    "verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     "unknown",
+     "finished",
+     "ok"
+    ],
+    "graded_verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "signal_ids": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7",
+     "S8",
+     "S9",
+     "S10",
+     "S11"
+    ],
+    "fix_model": 1,
+    "text_grammar": 1,
+    "score_model": {
+     "id": 1,
+     "score_text_grammar": 1,
+     "flag_order": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "capped",
+      "vulnerable"
+     ],
+     "parts": [
+      {
+       "id": "maintenance",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "capped"
+       ],
+       "combine": "lead_plus_share"
+      },
+      {
+       "id": "security",
+       "flag_ids": [
+        "vulnerable"
+       ],
+       "combine": "max"
+      }
+     ],
+     "flags": [
+      {
+       "id": "abandoned",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "abandoned",
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S1",
+        "S3"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "silent",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "silent",
+        "pinned",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-high-years",
+        "push-high-years"
+       ],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "pinned",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 22,
+       "max_maintenance_flags": [
+        "pinned",
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S6"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "left-behind",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 20,
+       "max_maintenance_flags": [
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S8"
+       ],
+       "thresholds": [
+        "release-warn-years"
+       ],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "old-promise",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 18,
+       "max_maintenance_flags": [
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S5"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "stale",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 10,
+       "max_maintenance_flags": [
+        "stale",
+        "capped"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-warn-years",
+        "push-warn-years"
+       ],
+       "basis": {
+        "v013_base": "medium",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "capped",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 8,
+       "max_maintenance_flags": [
+        "capped"
+       ],
+       "raised_by": [
+        "S11"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "vulnerable",
+       "part": "security",
+       "points": null,
+       "band": null,
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": null,
+       "max_maintenance_flags": null,
+       "raised_by": [
+        "S9"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "severities"
+       },
+       "points_from": "severities"
+      }
+     ],
+     "severities": [
+      {
+       "id": "critical",
+       "points": 32,
+       "band": "critical",
+       "points_no_reachable_fix": 64,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 4,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "high",
+       "points": 16,
+       "band": "high",
+       "points_no_reachable_fix": 32,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 3,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "medium",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "unrated",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": "medium",
+       "basis": {
+        "points": "counts_as"
+       }
+      },
+      {
+       "id": "low",
+       "points": 2,
+       "band": "low",
+       "points_no_reachable_fix": 4,
+       "band_no_reachable_fix": "low",
+       "gate_rank": 1,
+       "counts_as": null,
+       "basis": {
+        "points": "share",
+        "of": "medium",
+        "share": {
+         "num": 1,
+         "den": 4
+        }
+       }
+      }
+     ],
+     "fix_kinds": [
+      {
+       "id": "update",
+       "ease": 1,
+       "doubles": false
+      },
+      {
+       "id": "upgrade",
+       "ease": 2,
+       "doubles": false
+      },
+      {
+       "id": "raise-php",
+       "ease": 3,
+       "doubles": false
+      },
+      {
+       "id": "unknown",
+       "ease": 4,
+       "doubles": false
+      },
+      {
+       "id": "blocked",
+       "ease": 5,
+       "doubles": true
+      },
+      {
+       "id": "none",
+       "ease": 6,
+       "doubles": true
+      }
+     ],
+     "bands": [
+      {
+       "verdict": "critical",
+       "floor": 32
+      },
+      {
+       "verdict": "high",
+       "floor": 16
+      },
+      {
+       "verdict": "medium",
+       "floor": 8
+      },
+      {
+       "verdict": "low",
+       "floor": 1
+      }
+     ],
+     "zero_verdicts": [
+      {
+       "verdict": "finished",
+       "when": "allowlisted"
+      },
+      {
+       "verdict": "unknown",
+       "when": "no_metadata"
+      },
+      {
+       "verdict": "ok",
+       "when": "otherwise"
+      }
+     ],
+     "exact_unit": 0.5,
+     "rounding": "floor_once",
+     "max_total": 104,
+     "bar_max": 64,
+     "bar_overflow": "clip",
+     "exclusive_groups": [
+      {
+       "id": "liveness",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "stale"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "branch",
+       "flag_ids": [
+        "pinned",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_age",
+       "flag_ids": [
+        "silent",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_push",
+       "flag_ids": [
+        "left-behind",
+        "stale"
+       ],
+       "holds_unless": {
+        "threshold": "push-warn-years",
+        "below": "release-warn-years"
+       }
+      },
+      {
+       "id": "php_bound",
+       "flag_ids": [
+        "old-promise",
+        "capped"
+       ],
+       "holds_unless": null
+      }
+     ],
+     "sort": [
+      {
+       "key": "verdict",
+       "path": "verdict",
+       "dir": "order",
+       "order": [
+        [
+         "critical"
+        ],
+        [
+         "high"
+        ],
+        [
+         "medium"
+        ],
+        [
+         "low"
+        ],
+        [
+         "unknown"
+        ],
+        [
+         "finished",
+         "ok"
+        ]
+       ],
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "security",
+       "path": "score.parts.security.contribution",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "score",
+       "path": "score.exact",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "direct",
+       "path": "direct",
+       "dir": "true_first",
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "package",
+       "path": "package",
+       "dir": "asc",
+       "collation": "bytes",
+       "default": null
+      }
+     ],
+     "rules": [
+      {
+       "id": "counted",
+       "stage": 1,
+       "kind": "select",
+       "applies_to": "flags",
+       "accept_group": "liveness",
+       "accept_covers": "listed_and_below",
+       "why": "accepted-facts-shown-not-counted",
+       "doc": "score-counted",
+       "illustration": null
+      },
+      {
+       "id": "lead-first",
+       "stage": 2,
+       "kind": "select",
+       "applies_to": "maintenance",
+       "order": "flag_order",
+       "share": {
+        "num": 1,
+        "den": 1
+       },
+       "why": "strongest-fact-in-full",
+       "doc": "score-lead-first",
+       "illustration": null
+      },
+      {
+       "id": "corroborating-share",
+       "stage": 3,
+       "kind": "share",
+       "applies_to": "maintenance",
+       "share": {
+        "num": 1,
+        "den": 4
+       },
+       "why": "correlated-evidence",
+       "doc": "score-corroborating-share",
+       "illustration": {
+        "lead": "left-behind",
+        "flag": "old-promise",
+        "weight": 16,
+        "points": 4
+       }
+      },
+      {
+       "id": "advisory-points",
+       "stage": 4,
+       "kind": "lookup",
+       "applies_to": "security",
+       "table": "severities",
+       "why": "severity-points",
+       "doc": "score-advisory-points",
+       "illustration": null
+      },
+      {
+       "id": "no-reachable-fix-multiplier",
+       "stage": 5,
+       "kind": "multiply",
+       "applies_to": "advisory",
+       "factor": 2,
+       "when_fix": [
+        "none",
+        "blocked"
+       ],
+       "why": "one-band-up",
+       "doc": "score-no-reachable-fix-multiplier",
+       "illustration": {
+        "severity": "high",
+        "before": 16,
+        "after": 32,
+        "band_before": "high",
+        "band_after": "critical"
+       }
+      },
+      {
+       "id": "security-max",
+       "stage": 6,
+       "kind": "max",
+       "applies_to": "security",
+       "tie_break": [
+        {
+         "key": "points",
+         "dir": "desc",
+         "collation": null
+        },
+        {
+         "key": "severity",
+         "dir": "order",
+         "collation": null
+        },
+        {
+         "key": "id",
+         "dir": "asc",
+         "collation": "bytes"
+        }
+       ],
+       "why": "one-number-per-part",
+       "doc": "score-security-max",
+       "illustration": null
+      },
+      {
+       "id": "divide-reach",
+       "stage": 7,
+       "kind": "divide",
+       "applies_to": "maintenance",
+       "by": 2,
+       "when": [
+        "transitive",
+        "unreached"
+       ],
+       "why": "reach-halves-maintenance",
+       "doc": "score-divide-reach",
+       "illustration": {
+        "flag": "abandoned",
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "security-exempt-from-reach",
+       "stage": 8,
+       "kind": "exempt",
+       "applies_to": "security",
+       "of": "divide-reach",
+       "why": "exploitability-independent-of-reach",
+       "doc": "score-security-exempt-from-reach",
+       "illustration": {
+        "severity": "critical",
+        "reach": "transitive",
+        "total": 32
+       }
+      },
+      {
+       "id": "sum",
+       "stage": 9,
+       "kind": "combine",
+       "applies_to": "total",
+       "op": "sum",
+       "ratio_from": "medium",
+       "why": "parts-add",
+       "doc": "score-sum",
+       "illustration": {
+        "maintenance": 16,
+        "security": 16,
+        "total": 32,
+        "band": "critical",
+        "low_maintenance": 4,
+        "low_security": 4,
+        "low_total": 8,
+        "low_band": "medium"
+       }
+      },
+      {
+       "id": "divide-dev",
+       "stage": 10,
+       "kind": "divide",
+       "applies_to": "total",
+       "by": 2,
+       "when": [
+        "dev"
+       ],
+       "why": "dev-halves-total",
+       "doc": "score-divide-dev",
+       "illustration": {
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "floor-once",
+       "stage": 11,
+       "kind": "floor",
+       "applies_to": "total",
+       "why": "integer-band-edges",
+       "doc": "score-floor-once",
+       "illustration": {
+        "exact": 4.5,
+        "total": 4
+       }
+      },
+      {
+       "id": "band-floors",
+       "stage": 12,
+       "kind": "band",
+       "applies_to": "total",
+       "ratio": 2,
+       "ratio_from": "medium",
+       "why": "two-floor-parts-make-next",
+       "doc": "score-band-floors",
+       "illustration": null
+      },
+      {
+       "id": "zero-verdicts",
+       "stage": 13,
+       "kind": "zero",
+       "applies_to": "total",
+       "table": "zero_verdicts",
+       "why": "score-zero-says-why",
+       "doc": "score-zero-verdicts",
+       "illustration": null
+      },
+      {
+       "id": "sort",
+       "stage": 14,
+       "kind": "order",
+       "applies_to": "findings",
+       "why": "advisory-findings-first",
+       "doc": "score-sort",
+       "illustration": null
+      },
+      {
+       "id": "gate-bounded-new",
+       "stage": 15,
+       "kind": "gate",
+       "applies_to": "gate",
+       "cap_multiplier": 2,
+       "why": "new-fact-sets-level",
+       "doc": "score-gate-bounded-new",
+       "illustration": {
+        "score": 36,
+        "new": 16,
+        "gate": 32
+       }
+      },
+      {
+       "id": "baseline-cover",
+       "stage": 16,
+       "kind": "cover",
+       "applies_to": "gate",
+       "order": "flag_order",
+       "covers": "listed_and_below",
+       "why": "recorded-lead-covers-below",
+       "doc": "score-baseline-cover",
+       "illustration": null
+      }
+     ],
+     "docs": "https://lockrot.dev/verdicts/model-1/"
+    },
+    "score_rules_used": {
+     "counted": 0,
+     "lead-first": 1,
+     "corroborating-share": 0,
+     "advisory-points": 0,
+     "no-reachable-fix-multiplier": 0,
+     "security-max": 0,
+     "divide-reach": 1,
+     "security-exempt-from-reach": 0,
+     "sum": 0,
+     "divide-dev": 0,
+     "floor-once": 0,
+     "band-floors": 1,
+     "zero-verdicts": 0,
+     "sort": null,
+     "gate-bounded-new": 0,
+     "baseline-cover": 0
+    },
+    "advisory_lookup": {
+     "scope": "all",
+     "scope_source": "default",
+     "packages_asked": 1,
+     "packages_not_asked": 0,
+     "other_repositories": 0,
+     "repositories": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "outcome": "answered",
+       "reason": null,
+       "message": null,
+       "packages_with_records": 1,
+       "records": 1
+      }
+     ]
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": true,
+     "blocking_disabled_by": [],
+     "ignores_extensions": true,
+     "baseline": "resolves",
+     "reason": null
+    },
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     },
+     "target_fix": null
+    }
+   },
+   "synthetic_inputs": [
+    "next_step.check: refused, the joint request with symfony/validator resolves with symfony/translation v5.4.45 and symfony/validator 4.4.x-dev, the answer of the wallabag run at 7.4; the hold symfony/validator v4.4.48 conflicts with symfony/translation >=5.0 (‡)"
+   ],
+   "finding": {
+    "package": "symfony/translation",
+    "version": "v4.4.47",
+    "branch": "4.x",
+    "installed_php": {
+     "requires": ">=7.1.3",
+     "target_runs": true,
+     "project_allows": true
+    },
+    "verdict": "medium",
+    "priority": "medium",
+    "lead": "left-behind",
+    "rank": 105,
+    "flags": [
+     {
+      "id": "left-behind",
+      "role": "lead",
+      "baseline": null,
+      "signal_ids": [
+       "S8"
+      ],
+      "degree": null,
+      "headline": {
+       "unit": "years",
+       "value": 4,
+       "source": "branch"
+      },
+      "summary": "branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)"
+     }
+    ],
+    "score": {
+     "model": 1,
+     "total": 8,
+     "exact": 8,
+     "rounded_down": false,
+     "band": {
+      "floor": 8,
+      "next": "high",
+      "to_next": 8
+     },
+     "decided_by": "maintenance",
+     "parts": {
+      "maintenance": {
+       "status": "counted",
+       "contribution": 8,
+       "alone": {
+        "total": 8,
+        "verdict": "medium"
+       }
+      },
+      "security": {
+       "status": "clear",
+       "contribution": 0,
+       "alone": {
+        "total": 0,
+        "verdict": null
+       },
+       "of": 0,
+       "tied": []
+      }
+     },
+     "terms": [
+      {
+       "part": "maintenance",
+       "flag": "left-behind",
+       "role": "lead",
+       "weight": 16,
+       "divisor": 1,
+       "points": 16,
+       "contribution": 8
+      }
+     ],
+     "modifiers": [
+      {
+       "reason": "transitive",
+       "applies_to": "maintenance",
+       "divide_by": 2,
+       "before": 16,
+       "after": 8
+      }
+     ],
+     "accepted": [],
+     "without": [],
+     "text": "8 = left-behind 16 ÷ 2 transitive"
+    },
+    "next_step": {
+     "kind": "require",
+     "source": "left-behind",
+     "merged": [],
+     "fix_kind": null,
+     "reason": null,
+     "replacement": null,
+     "quiet_years": null,
+     "to_branch": "5.x",
+     "version": null,
+     "newest": "v5.4.45",
+     "constraint": "^5.4",
+     "latest": null,
+     "php_check": {
+      "requires": ">=7.2.5",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "crosses_major": true,
+     "held_by": [
+      {
+       "source": "package",
+       "package": "symfony/validator",
+       "version": "v4.4.48",
+       "link": "conflict",
+       "target": null,
+       "constraint": ">=5.0",
+       "holder": {
+        "verdict": "high",
+        "lead": "left-behind",
+        "flag_ids": [
+         "left-behind",
+         "vulnerable"
+        ],
+        "replacement": null,
+        "direct": true,
+        "next_step": {
+         "kind": "require",
+         "to_branch": "5.x",
+         "constraint": "^5.4.43",
+         "check": null
+        }
+       }
+      }
+     ],
+     "clears": [
+      {
+       "kind": "flag",
+       "id": "left-behind",
+       "basis": "branch_releasing"
+      }
+     ],
+     "unverified": [],
+     "adds": [],
+     "leaves": [],
+     "clears_all": true,
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "lead": null,
+      "deciding_advisory": null,
+      "at_most": false,
+      "assumes": [
+       "clears_hold",
+       "composer_resolves"
+      ]
+     },
+     "check": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null
+     },
+     "moves_with": [],
+     "composer_moves_because": [
+      "holders",
+      "crosses_major"
+     ],
+     "commands": [],
+     "through": [
+      {
+       "package": "friendsofsymfony/user-bundle",
+       "installed_version": "v3.4.0",
+       "installed_requires": true,
+       "newest_stable": {
+        "version": "v4.1.0",
+        "released": "2026-02-13T21:22:55+00:00"
+       },
+       "newest_requires": true,
+       "newest_requires_unmeasured": null,
+       "local": false,
+       "newest_is_installed": false
+      }
+     ],
+     "also": [],
+     "text": "move symfony/translation to ^5.4 through friendsofsymfony/user-bundle — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/validator v4.4.48 (conflicts with >=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+    },
+    "security": {
+     "status": "clear",
+     "check": "complete",
+     "complete": true,
+     "unchecked_reason": null,
+     "records": 1,
+     "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "answer": "answered",
+       "records": 1,
+       "reason": null
+      }
+     ],
+     "ignored": [],
+     "ignored_count": 0
+    },
+    "checks_missing": [],
+    "checks_skipped": [],
+    "unchecked_accepted": [],
+    "maintenance_judged": true,
+    "metadata": {
+     "status": "read",
+     "reason": null,
+     "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/translation",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:02+00:00",
+     "cached_at": "2026-10-01T16:04:02+00:00"
+    },
+    "allowlist": null,
+    "abandoned_ignored": null,
+    "from_composer_repository": true,
+    "origin": {
+     "kind": "packagist",
+     "registry": "packagist.org",
+     "package_url": "https://packagist.org/packages/symfony/translation",
+     "local": false
+    },
+    "replacement": null,
+    "replacement_url": null,
+    "note": null,
+    "libyears_unmeasured": null,
+    "libyears_at_least": false,
+    "direct": false,
+    "dev": false,
+    "reach": "transitive",
+    "chain": [
+     "friendsofsymfony/user-bundle",
+     "symfony/translation"
+    ],
+    "depth": 1,
+    "depth_unmeasured": null,
+    "named_in": [],
+    "direct_dependents": [
+     "friendsofsymfony/user-bundle"
+    ],
+    "signals": [
+     {
+      "id": "S8",
+      "level": "warn",
+      "summary": "branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
+      "data": {
+       "branch": "4.x",
+       "branch_last_release": "2022-10-03T15:15:11+00:00",
+       "branch_last_version": "v4.4.47",
+       "years": 4,
+       "newest_branch": "8.x",
+       "newest_version": "v8.1.5",
+       "newest_release": "2026-08-21T17:47:34+00:00",
+       "newest_php": ">=8.4.1",
+       "newest_within_reach": false,
+       "floor_php": ">=7.4",
+       "floor_source": "project",
+       "reachable_branch": "5.x",
+       "reachable_version": "v5.4.45",
+       "reachable_release": "2024-09-25T14:11:13+00:00",
+       "suggested_constraint": "^5.4",
+       "dated_by": null,
+       "reachable_php": ">=7.2.5",
+       "reachable_admits": {
+        "project": true,
+        "target": true
+       },
+       "newest_years": 0.1,
+       "reachable_years": 2
+      }
+     }
+    ],
+    "evidence": "left-behind: branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
+    "allowlist_reason": null,
+    "data_date": "2026-10-01T17:39:46+00:00",
+    "libyears": 3.88,
+    "age": {
+     "installed": {
+      "at": "2022-10-03T15:15:11+00:00",
+      "years": 4,
+      "dated_by": null
+     },
+     "installed_unmeasured": null,
+     "release": {
+      "version": "v8.1.5",
+      "at": "2026-08-21T17:47:34+00:00",
+      "years": 0.1,
+      "level": null,
+      "dated_by": null
+     },
+     "release_unmeasured": null,
+     "branch_release": {
+      "version": "v4.4.47",
+      "at": "2022-10-03T15:15:11+00:00",
+      "years": 4,
+      "level": "warn",
+      "dated_by": null
+     },
+     "branch_release_unmeasured": null,
+     "push": {
+      "at": "2026-09-28T09:55:58+00:00",
+      "years": 0,
+      "level": null
+     },
+     "push_unmeasured": null
+    },
+    "baseline": null,
+    "gate": {
+     "reaches_fail_on": false,
+     "fails": false,
+     "exempt_by": null,
+     "by": [],
+     "basis": null
+    }
+   },
+   "details": {
+    "metadata": {
+     "installed_branch": "4.x",
+     "branches": [
+      {
+       "branch": "8.x",
+       "installed": false,
+       "highest": "v8.1.5",
+       "highest_released": "2026-08-21T17:47:34+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v8.1.5",
+       "newest_dated_released": "2026-08-21T17:47:34+00:00",
+       "dated_by": null,
+       "php": ">=8.4.1",
+       "highest_php": ">=8.4.1",
+       "admits_target_php": true,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
+       "misses_target_php": null,
+       "misses_project_php": "needs_newer",
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "needs_newer",
+       "released_years": 0.1,
+       "fixes": null
+      },
+      {
+       "branch": "7.x",
+       "installed": false,
+       "highest": "v7.4.17",
+       "highest_released": "2026-08-21T17:40:08+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v7.4.17",
+       "newest_dated_released": "2026-08-21T17:40:08+00:00",
+       "dated_by": null,
+       "php": ">=8.2",
+       "highest_php": ">=8.2",
+       "admits_target_php": true,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
+       "misses_target_php": null,
+       "misses_project_php": "needs_newer",
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "needs_newer",
+       "released_years": 0.1,
+       "fixes": null
+      },
+      {
+       "branch": "6.x",
+       "installed": false,
+       "highest": "v6.4.44",
+       "highest_released": "2026-08-20T19:22:13+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v6.4.44",
+       "newest_dated_released": "2026-08-20T19:22:13+00:00",
+       "dated_by": null,
+       "php": ">=8.1",
+       "highest_php": ">=8.1",
+       "admits_target_php": true,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
+       "misses_target_php": null,
+       "misses_project_php": "needs_newer",
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "needs_newer",
+       "released_years": 0.1,
+       "fixes": null
+      },
+      {
+       "branch": "5.x",
+       "installed": false,
+       "highest": "v5.4.45",
+       "highest_released": "2024-09-25T14:11:13+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v5.4.45",
+       "newest_dated_released": "2024-09-25T14:11:13+00:00",
+       "dated_by": null,
+       "php": ">=7.2.5",
+       "highest_php": ">=7.2.5",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 2,
+       "fixes": null
+      },
+      {
+       "branch": "4.x",
+       "installed": true,
+       "highest": "v4.4.47",
+       "highest_released": "2022-10-03T15:15:11+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v4.4.47",
+       "newest_dated_released": "2022-10-03T15:15:11+00:00",
+       "dated_by": null,
+       "php": ">=7.1.3",
+       "highest_php": ">=7.1.3",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 4,
+       "fixes": null
+      },
+      {
+       "branch": "3.x",
+       "installed": false,
+       "highest": "v3.4.47",
+       "highest_released": "2020-10-24T10:57:07+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v3.4.47",
+       "newest_dated_released": "2020-10-24T10:57:07+00:00",
+       "dated_by": null,
+       "php": "^5.5.9|>=7.0.8",
+       "highest_php": "^5.5.9|>=7.0.8",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 5.9,
+       "fixes": null
+      },
+      {
+       "branch": "2.x",
+       "installed": false,
+       "highest": "v2.8.52",
+       "highest_released": null,
+       "highest_commit_date": "2018-11-24T21:16:41+00:00",
+       "newest_dated": "v2.8.52",
+       "newest_dated_released": "2018-11-24T21:16:41+00:00",
+       "dated_by": null,
+       "php": ">=5.3.9",
+       "highest_php": ">=5.3.9",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": null,
+       "fixes": null
+      }
+     ]
+    }
+   },
+   "golden": {
+    "score_text": "8 = left-behind 16 ÷ 2 transitive",
+    "next_step_text": "move symfony/translation to ^5.4 through friendsofsymfony/user-bundle — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/validator v4.4.48 (conflicts with >=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock",
+    "verdict_line": "Medium: its branch, 4.x, had its last release 4.0 years ago, behind 5.x.",
+    "readings": [],
+    "qualifiers": {
+     "reach": [
+      "Production: not in packages-dev",
+      "Not required directly, through friendsofsymfony/user-bundle",
+      "Its maintenance counts half"
+     ],
+     "origin": null,
+     "not_judged": null,
+     "unchecked": [],
+     "not_run": [],
+     "php": null,
+     "php_edge": [],
+     "accepted": [],
+     "gate": [
+      "does not reach the run's gate: grade high or above"
+     ]
+    },
+    "moves": [
+     {
+      "heading": "The move",
+      "action": "Move it to ^5.4 through friendsofsymfony/user-bundle",
+      "platform_step": null,
+      "command_note": null,
+      "moves_with": null,
+      "commands": [],
+      "commands_label": null,
+      "clears": "left-behind",
+      "stays": null,
+      "not_checked": null,
+      "adds": [],
+      "php": {
+       "head": "5.x needs php >=7.2.5",
+       "lines": [
+        {
+         "answer": "yes",
+         "text": "your require.php allows it"
+        },
+        {
+         "answer": "yes",
+         "text": "your target, 8.4, runs it"
+        }
+       ]
+      },
+      "after": {
+       "result": "0, ok",
+       "conditions": [
+        "Composer refuses the move"
+       ]
+      },
+      "composer": [
+       {
+        "text": "The packages that hold it may need to move too",
+        "items": []
+       },
+       {
+        "text": "A new major brings its own requirements",
+        "items": []
+       }
+      ]
+     }
+    ],
+    "held_by": [
+     {
+      "count": 1,
+      "shown": [
+       {
+        "name": "symfony/validator v4.4.48",
+        "grade": "high",
+        "meta": "conflicts with >=5.0 · itself left-behind · vulnerable",
+        "step": "its own step: require ^5.4.43 on 5.x"
+       }
+      ],
+      "fold": null
+     }
+    ],
+    "security": {
+     "summary": [
+      "no counted advisory",
+      "1 on record for this name",
+      "lookup complete"
+     ],
+     "counts": [],
+     "meanwhile": null,
+     "caption": [],
+     "groups": [],
+     "rows": [],
+     "ignored": [],
+     "ladder": []
+    },
+    "branches_lead": [
+     "Your branch, 4.x, had its last release, v4.4.47, 4.0 years ago.",
+     "The move's branch, 5.x, released v5.4.45 2.0 years ago."
+    ],
+    "branch_rows": [
+     {
+      "branch": "8.x",
+      "marks": [
+       "newest"
+      ],
+      "latest": "v8.1.5",
+      "age": "0.1y",
+      "php": ">=8.4.1",
+      "php_words": "above your require.php",
+      "bar": "v8.1.5, released 0.1 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "7.x",
+      "marks": [],
+      "latest": "v7.4.17",
+      "age": "0.1y",
+      "php": ">=8.2",
+      "php_words": "above your require.php",
+      "bar": "v7.4.17, released 0.1 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "6.x",
+      "marks": [],
+      "latest": "v6.4.44",
+      "age": "0.1y",
+      "php": ">=8.1",
+      "php_words": "above your require.php",
+      "bar": "v6.4.44, released 0.1 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "5.x",
+      "marks": [
+       "the move"
+      ],
+      "latest": "v5.4.45",
+      "age": "2.0y",
+      "php": ">=7.2.5",
+      "php_words": null,
+      "bar": "v5.4.45, released 2.0 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "4.x",
+      "marks": [
+       "yours"
+      ],
+      "latest": "v4.4.47",
+      "age": "4.0y",
+      "php": ">=7.1.3",
+      "php_words": null,
+      "bar": "v4.4.47, released 4.0 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "3.x",
+      "marks": [],
+      "latest": "v3.4.47",
+      "age": "5.9y",
+      "php": "^5.5.9|>=7.0.8",
+      "php_words": null,
+      "bar": "v3.4.47, released 5.9 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "2.x",
+      "marks": [],
+      "latest": "v2.8.52",
+      "age": "undated",
+      "php": ">=5.3.9",
+      "php_words": null,
+      "bar": "v2.8.52, undated",
+      "folded_in": null
+     }
+    ],
+    "age_rows": [
+     {
+      "label": "installed",
+      "value": "v4.4.47 · 2022-10-03 · 4.0 years ago · the newest on 4.x"
+     },
+     {
+      "label": "most recent",
+      "value": "v8.1.5 · 2026-08-21 · 0.1 years ago"
+     },
+     {
+      "label": "last push",
+      "value": "2026-09-28 · less than three weeks ago"
+     }
+    ],
+    "security_row": [
+     "no counted advisory",
+     "1 on record for this name",
+     "lookup complete"
+    ],
+    "why": [
+     "8 · medium from 8 · 8 points short of high",
+     "left-behind 16 leads: the strongest maintenance fact counts in full",
+     "transitive: maintenance 16 ÷ 2 = 8",
+     "maintenance alone makes it medium"
+    ],
+    "gate_line": null,
+    "checks": "1 fired (S8) · 10 quiet · every check ran",
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": [],
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v4.4.47 released 2022-10-03 (4.0 years ago), the newest on 4.x; newest release v8.1.5 2026-08-21 (0.1 years ago); last push 2026-09-28 (less than three weeks ago)"
+   },
+   "inputs": {
+    "root": {
+     "name": "wallabag/wallabag",
+     "require": {
+      "php": ">=7.4",
+      "friendsofsymfony/user-bundle": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "symfony/translation",
+      "version": "v4.4.47",
+      "time": "2022-10-03T15:15:11+00:00",
+      "php": ">=7.1.3",
+      "dev": false,
+      "origin": "packagist"
+     },
+     {
+      "name": "friendsofsymfony/user-bundle",
+      "version": "v3.4.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/translation": "*"
+      }
+     },
+     {
+      "name": "symfony/validator",
+      "version": "v4.4.48",
+      "dev": false,
+      "origin": "packagist",
+      "conflict": {
+       "symfony/translation": ">=5.0"
+      }
+     }
+    ],
+    "releases": [
+     {
+      "version": "v2.8.52",
+      "time": "2018-11-24T21:16:41+00:00",
+      "php": ">=5.3.9",
+      "shared_commit": true
+     },
+     {
+      "version": "v3.4.47",
+      "time": "2020-10-24T10:57:07+00:00",
+      "php": "^5.5.9|>=7.0.8"
+     },
+     {
+      "version": "v4.4.47",
+      "time": "2022-10-03T15:15:11+00:00",
+      "php": ">=7.1.3"
+     },
+     {
+      "version": "v5.4.0",
+      "time": null,
+      "php": ">=7.2.5"
+     },
+     {
+      "version": "v5.4.45",
+      "time": "2024-09-25T14:11:13+00:00",
+      "php": ">=7.2.5"
+     },
+     {
+      "version": "v6.4.44",
+      "time": "2026-08-20T19:22:13+00:00",
+      "php": ">=8.1"
+     },
+     {
+      "version": "v7.4.17",
+      "time": "2026-08-21T17:40:08+00:00",
+      "php": ">=8.2"
+     },
+     {
+      "version": "v8.1.5",
+      "time": "2026-08-21T17:47:34+00:00",
+      "php": ">=8.4.1"
+     }
+    ],
+    "advisories": [],
+    "records": 1,
+    "ignored": [],
+    "abandoned": null,
+    "activity": {
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/translation",
+     "status": "read",
+     "reason": null,
+     "pushed_at": "2026-09-28T09:55:58+00:00",
+     "archived": false
+    },
+    "dependents": {
+     "friendsofsymfony/user-bundle": [
+      {
+       "version": "v3.4.0",
+       "time": null,
+       "require": {
+        "symfony/translation": "*"
+       }
+      },
+      {
+       "version": "v4.1.0",
+       "time": "2026-02-13T21:22:55+00:00",
+       "require": {
+        "symfony/translation": "*"
+       }
+      }
+     ]
+    },
+    "run": {
+     "target_php": "8.4",
+     "project_php": ">=7.4",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    },
+    "packages": {
+     "symfony/validator": {
+      "lock": {
+       "name": "symfony/validator",
+       "version": "v4.4.48",
+       "time": "2022-10-25T13:54:11+00:00",
+       "php": ">=7.1.3",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v2.8.52",
+        "time": "2018-11-14T14:06:48+00:00",
+        "php": ">=5.3.9",
+        "shared_commit": true
+       },
+       {
+        "version": "v3.4.47",
+        "time": "2020-10-28T05:23:51+00:00",
+        "php": "^5.5.9|>=7.0.8"
+       },
+       {
+        "version": "v4.4.48",
+        "time": "2022-10-25T13:54:11+00:00",
+        "php": ">=7.1.3"
+       },
+       {
+        "version": "v5.4.43",
+        "time": null,
+        "php": ">=7.2.5"
+       },
+       {
+        "version": "v5.4.48",
+        "time": "2024-11-27T08:58:20+00:00",
+        "php": ">=7.2.5"
+       },
+       {
+        "version": "v6.4.11",
+        "time": null,
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.47",
+        "time": "2026-09-29T11:58:14+00:00",
+        "php": ">=8.1"
+       },
+       {
+        "version": "v7.1.4",
+        "time": null,
+        "php": ">=8.2"
+       },
+       {
+        "version": "v7.4.20",
+        "time": "2026-09-29T12:35:16+00:00",
+        "php": ">=8.2"
+       },
+       {
+        "version": "v8.1.8",
+        "time": "2026-09-29T12:38:40+00:00",
+        "php": ">=8.4.1"
+       }
+      ],
+      "advisories": [
+       {
+        "id": "PKSA-w2tw-kmfg-rt9s",
+        "cve": "CVE-2024-50343",
+        "title": "Incorrect response from Validator when input ends with ` `",
+        "link": "https://symfony.com/cve-2024-50343",
+        "reported_at": "2024-08-30T08:00:00+00:00",
+        "severity": "low",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.43|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.11|>=7.0.0,<7.1.0|>=7.1.0,<7.1.4"
+       }
+      ],
+      "records": 3,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "symfony/validator",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-10-01T07:28:09+00:00",
+       "archived": false
+      },
+      "chain": [
+       "symfony/validator"
+      ],
+      "below": null
+     }
+    },
+    "checks": {
+     "update symfony/translation ^5.4 ": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null,
+      "holds": [
+       {
+        "source": "package",
+        "package": "symfony/validator",
+        "version": "v4.4.48",
+        "link": "conflict",
+        "target": null,
+        "constraint": ">=5.0",
+        "holder": {
+         "verdict": "high",
+         "lead": "left-behind",
+         "flag_ids": [
+          "left-behind",
+          "vulnerable"
+         ],
+         "replacement": null,
+         "direct": true,
+         "next_step": {
+          "kind": "require",
+          "to_branch": "5.x",
+          "constraint": "^5.4.43",
+          "check": null
+         }
+        }
+       }
+      ],
+      "joint": {
+       "names": [
+        "symfony/validator"
+       ],
+       "result": "resolves",
+       "form": "inline",
+       "reason": null,
+       "holds": [],
+       "installs": {
+        "symfony/translation": "v5.4.45",
+        "symfony/validator": "4.4.x-dev"
+       }
+      }
+     }
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": true,
+     "blocking_disabled_by": [],
+     "ignores_extensions": true,
+     "baseline": "resolves",
+     "reason": null,
+     "php": "8.4.99"
+    }
+   }
+  },
+  {
+   "id": "fix-newest-held‡",
+   "label": "a lock conflict holds every fixing release of the installed branch: the S9 fix newest and installed_branch_fixes.newest stay the branch's newest, as next_step.newest, because the move clears the hold (ruling R3-2)",
+   "project": "wallabag",
+   "run": {
+    "project": "wallabag/wallabag",
+    "root_package": "wallabag/wallabag",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "project_php": ">=7.4",
+    "project_php_lowest": "7.4.0",
+    "lock_file": "composer.lock",
+    "fail_on": "high",
+    "fail_on_source": "option",
+    "gates": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "threshold": "high"
+     }
+    ],
+    "strict_network": false,
+    "mode": "check",
+    "include_dev": false,
+    "thresholds": {
+     "release-warn-years": 3,
+     "release-high-years": 5,
+     "push-warn-years": 3,
+     "push-high-years": 5
+    },
+    "flag_ids": [
+     "abandoned",
+     "silent",
+     "pinned",
+     "left-behind",
+     "old-promise",
+     "stale",
+     "capped",
+     "vulnerable"
+    ],
+    "verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     "unknown",
+     "finished",
+     "ok"
+    ],
+    "graded_verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "signal_ids": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7",
+     "S8",
+     "S9",
+     "S10",
+     "S11"
+    ],
+    "fix_model": 1,
+    "text_grammar": 1,
+    "score_model": {
+     "id": 1,
+     "score_text_grammar": 1,
+     "flag_order": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "capped",
+      "vulnerable"
+     ],
+     "parts": [
+      {
+       "id": "maintenance",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "capped"
+       ],
+       "combine": "lead_plus_share"
+      },
+      {
+       "id": "security",
+       "flag_ids": [
+        "vulnerable"
+       ],
+       "combine": "max"
+      }
+     ],
+     "flags": [
+      {
+       "id": "abandoned",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "abandoned",
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S1",
+        "S3"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "silent",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "silent",
+        "pinned",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-high-years",
+        "push-high-years"
+       ],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "pinned",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 22,
+       "max_maintenance_flags": [
+        "pinned",
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S6"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "left-behind",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 20,
+       "max_maintenance_flags": [
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S8"
+       ],
+       "thresholds": [
+        "release-warn-years"
+       ],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "old-promise",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 18,
+       "max_maintenance_flags": [
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S5"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "stale",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 10,
+       "max_maintenance_flags": [
+        "stale",
+        "capped"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-warn-years",
+        "push-warn-years"
+       ],
+       "basis": {
+        "v013_base": "medium",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "capped",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 8,
+       "max_maintenance_flags": [
+        "capped"
+       ],
+       "raised_by": [
+        "S11"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "vulnerable",
+       "part": "security",
+       "points": null,
+       "band": null,
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": null,
+       "max_maintenance_flags": null,
+       "raised_by": [
+        "S9"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "severities"
+       },
+       "points_from": "severities"
+      }
+     ],
+     "severities": [
+      {
+       "id": "critical",
+       "points": 32,
+       "band": "critical",
+       "points_no_reachable_fix": 64,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 4,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "high",
+       "points": 16,
+       "band": "high",
+       "points_no_reachable_fix": 32,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 3,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "medium",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "unrated",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": "medium",
+       "basis": {
+        "points": "counts_as"
+       }
+      },
+      {
+       "id": "low",
+       "points": 2,
+       "band": "low",
+       "points_no_reachable_fix": 4,
+       "band_no_reachable_fix": "low",
+       "gate_rank": 1,
+       "counts_as": null,
+       "basis": {
+        "points": "share",
+        "of": "medium",
+        "share": {
+         "num": 1,
+         "den": 4
+        }
+       }
+      }
+     ],
+     "fix_kinds": [
+      {
+       "id": "update",
+       "ease": 1,
+       "doubles": false
+      },
+      {
+       "id": "upgrade",
+       "ease": 2,
+       "doubles": false
+      },
+      {
+       "id": "raise-php",
+       "ease": 3,
+       "doubles": false
+      },
+      {
+       "id": "unknown",
+       "ease": 4,
+       "doubles": false
+      },
+      {
+       "id": "blocked",
+       "ease": 5,
+       "doubles": true
+      },
+      {
+       "id": "none",
+       "ease": 6,
+       "doubles": true
+      }
+     ],
+     "bands": [
+      {
+       "verdict": "critical",
+       "floor": 32
+      },
+      {
+       "verdict": "high",
+       "floor": 16
+      },
+      {
+       "verdict": "medium",
+       "floor": 8
+      },
+      {
+       "verdict": "low",
+       "floor": 1
+      }
+     ],
+     "zero_verdicts": [
+      {
+       "verdict": "finished",
+       "when": "allowlisted"
+      },
+      {
+       "verdict": "unknown",
+       "when": "no_metadata"
+      },
+      {
+       "verdict": "ok",
+       "when": "otherwise"
+      }
+     ],
+     "exact_unit": 0.5,
+     "rounding": "floor_once",
+     "max_total": 104,
+     "bar_max": 64,
+     "bar_overflow": "clip",
+     "exclusive_groups": [
+      {
+       "id": "liveness",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "stale"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "branch",
+       "flag_ids": [
+        "pinned",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_age",
+       "flag_ids": [
+        "silent",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_push",
+       "flag_ids": [
+        "left-behind",
+        "stale"
+       ],
+       "holds_unless": {
+        "threshold": "push-warn-years",
+        "below": "release-warn-years"
+       }
+      },
+      {
+       "id": "php_bound",
+       "flag_ids": [
+        "old-promise",
+        "capped"
+       ],
+       "holds_unless": null
+      }
+     ],
+     "sort": [
+      {
+       "key": "verdict",
+       "path": "verdict",
+       "dir": "order",
+       "order": [
+        [
+         "critical"
+        ],
+        [
+         "high"
+        ],
+        [
+         "medium"
+        ],
+        [
+         "low"
+        ],
+        [
+         "unknown"
+        ],
+        [
+         "finished",
+         "ok"
+        ]
+       ],
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "security",
+       "path": "score.parts.security.contribution",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "score",
+       "path": "score.exact",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "direct",
+       "path": "direct",
+       "dir": "true_first",
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "package",
+       "path": "package",
+       "dir": "asc",
+       "collation": "bytes",
+       "default": null
+      }
+     ],
+     "rules": [
+      {
+       "id": "counted",
+       "stage": 1,
+       "kind": "select",
+       "applies_to": "flags",
+       "accept_group": "liveness",
+       "accept_covers": "listed_and_below",
+       "why": "accepted-facts-shown-not-counted",
+       "doc": "score-counted",
+       "illustration": null
+      },
+      {
+       "id": "lead-first",
+       "stage": 2,
+       "kind": "select",
+       "applies_to": "maintenance",
+       "order": "flag_order",
+       "share": {
+        "num": 1,
+        "den": 1
+       },
+       "why": "strongest-fact-in-full",
+       "doc": "score-lead-first",
+       "illustration": null
+      },
+      {
+       "id": "corroborating-share",
+       "stage": 3,
+       "kind": "share",
+       "applies_to": "maintenance",
+       "share": {
+        "num": 1,
+        "den": 4
+       },
+       "why": "correlated-evidence",
+       "doc": "score-corroborating-share",
+       "illustration": {
+        "lead": "left-behind",
+        "flag": "old-promise",
+        "weight": 16,
+        "points": 4
+       }
+      },
+      {
+       "id": "advisory-points",
+       "stage": 4,
+       "kind": "lookup",
+       "applies_to": "security",
+       "table": "severities",
+       "why": "severity-points",
+       "doc": "score-advisory-points",
+       "illustration": null
+      },
+      {
+       "id": "no-reachable-fix-multiplier",
+       "stage": 5,
+       "kind": "multiply",
+       "applies_to": "advisory",
+       "factor": 2,
+       "when_fix": [
+        "none",
+        "blocked"
+       ],
+       "why": "one-band-up",
+       "doc": "score-no-reachable-fix-multiplier",
+       "illustration": {
+        "severity": "high",
+        "before": 16,
+        "after": 32,
+        "band_before": "high",
+        "band_after": "critical"
+       }
+      },
+      {
+       "id": "security-max",
+       "stage": 6,
+       "kind": "max",
+       "applies_to": "security",
+       "tie_break": [
+        {
+         "key": "points",
+         "dir": "desc",
+         "collation": null
+        },
+        {
+         "key": "severity",
+         "dir": "order",
+         "collation": null
+        },
+        {
+         "key": "id",
+         "dir": "asc",
+         "collation": "bytes"
+        }
+       ],
+       "why": "one-number-per-part",
+       "doc": "score-security-max",
+       "illustration": null
+      },
+      {
+       "id": "divide-reach",
+       "stage": 7,
+       "kind": "divide",
+       "applies_to": "maintenance",
+       "by": 2,
+       "when": [
+        "transitive",
+        "unreached"
+       ],
+       "why": "reach-halves-maintenance",
+       "doc": "score-divide-reach",
+       "illustration": {
+        "flag": "abandoned",
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "security-exempt-from-reach",
+       "stage": 8,
+       "kind": "exempt",
+       "applies_to": "security",
+       "of": "divide-reach",
+       "why": "exploitability-independent-of-reach",
+       "doc": "score-security-exempt-from-reach",
+       "illustration": {
+        "severity": "critical",
+        "reach": "transitive",
+        "total": 32
+       }
+      },
+      {
+       "id": "sum",
+       "stage": 9,
+       "kind": "combine",
+       "applies_to": "total",
+       "op": "sum",
+       "ratio_from": "medium",
+       "why": "parts-add",
+       "doc": "score-sum",
+       "illustration": {
+        "maintenance": 16,
+        "security": 16,
+        "total": 32,
+        "band": "critical",
+        "low_maintenance": 4,
+        "low_security": 4,
+        "low_total": 8,
+        "low_band": "medium"
+       }
+      },
+      {
+       "id": "divide-dev",
+       "stage": 10,
+       "kind": "divide",
+       "applies_to": "total",
+       "by": 2,
+       "when": [
+        "dev"
+       ],
+       "why": "dev-halves-total",
+       "doc": "score-divide-dev",
+       "illustration": {
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "floor-once",
+       "stage": 11,
+       "kind": "floor",
+       "applies_to": "total",
+       "why": "integer-band-edges",
+       "doc": "score-floor-once",
+       "illustration": {
+        "exact": 4.5,
+        "total": 4
+       }
+      },
+      {
+       "id": "band-floors",
+       "stage": 12,
+       "kind": "band",
+       "applies_to": "total",
+       "ratio": 2,
+       "ratio_from": "medium",
+       "why": "two-floor-parts-make-next",
+       "doc": "score-band-floors",
+       "illustration": null
+      },
+      {
+       "id": "zero-verdicts",
+       "stage": 13,
+       "kind": "zero",
+       "applies_to": "total",
+       "table": "zero_verdicts",
+       "why": "score-zero-says-why",
+       "doc": "score-zero-verdicts",
+       "illustration": null
+      },
+      {
+       "id": "sort",
+       "stage": 14,
+       "kind": "order",
+       "applies_to": "findings",
+       "why": "advisory-findings-first",
+       "doc": "score-sort",
+       "illustration": null
+      },
+      {
+       "id": "gate-bounded-new",
+       "stage": 15,
+       "kind": "gate",
+       "applies_to": "gate",
+       "cap_multiplier": 2,
+       "why": "new-fact-sets-level",
+       "doc": "score-gate-bounded-new",
+       "illustration": {
+        "score": 36,
+        "new": 16,
+        "gate": 32
+       }
+      },
+      {
+       "id": "baseline-cover",
+       "stage": 16,
+       "kind": "cover",
+       "applies_to": "gate",
+       "order": "flag_order",
+       "covers": "listed_and_below",
+       "why": "recorded-lead-covers-below",
+       "doc": "score-baseline-cover",
+       "illustration": null
+      }
+     ],
+     "docs": "https://lockrot.dev/verdicts/model-1/"
+    },
+    "score_rules_used": {
+     "counted": 0,
+     "lead-first": 0,
+     "corroborating-share": 0,
+     "advisory-points": 1,
+     "no-reachable-fix-multiplier": 0,
+     "security-max": 1,
+     "divide-reach": 0,
+     "security-exempt-from-reach": 1,
+     "sum": 0,
+     "divide-dev": 0,
+     "floor-once": 0,
+     "band-floors": 1,
+     "zero-verdicts": 0,
+     "sort": null,
+     "gate-bounded-new": 0,
+     "baseline-cover": 0
+    },
+    "advisory_lookup": {
+     "scope": "all",
+     "scope_source": "default",
+     "packages_asked": 1,
+     "packages_not_asked": 0,
+     "other_repositories": 0,
+     "repositories": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "outcome": "answered",
+       "reason": null,
+       "message": null,
+       "packages_with_records": 1,
+       "records": 5
+      }
+     ]
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": true,
+     "blocking_disabled_by": [],
+     "ignores_extensions": true,
+     "baseline": "resolves",
+     "reason": null
+    },
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "7.4",
+       "8.0",
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "7.4.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": ">=7.4",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     },
+     "target_fix": null
+    }
+   },
+   "synthetic_inputs": [
+    "Composer refuses each move: incenteev/composer-parameter-handler v2.1.5 conflicts with symfony/yaml ^5.4 (‡)"
+   ],
+   "finding": {
+    "package": "symfony/yaml",
+    "version": "v5.3.14",
+    "branch": "5.x",
+    "installed_php": {
+     "requires": ">=7.2.5",
+     "target_runs": true,
+     "project_allows": true
+    },
+    "verdict": "low",
+    "priority": "low",
+    "lead": null,
+    "rank": 109,
+    "flags": [
+     {
+      "id": "vulnerable",
+      "role": "security",
+      "baseline": null,
+      "signal_ids": [
+       "S9"
+      ],
+      "degree": null,
+      "headline": {
+       "unit": "advisories",
+       "value": 3,
+       "source": null
+      },
+      "summary": "3 advisories: 3 low — all fixed on 5.x (upgrade); worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings"
+     }
+    ],
+    "score": {
+     "model": 1,
+     "total": 2,
+     "exact": 2,
+     "rounded_down": false,
+     "band": {
+      "floor": 1,
+      "next": "medium",
+      "to_next": 6
+     },
+     "decided_by": "security",
+     "parts": {
+      "maintenance": {
+       "status": "none",
+       "contribution": 0,
+       "alone": {
+        "total": 0,
+        "verdict": null
+       }
+      },
+      "security": {
+       "status": "counted",
+       "contribution": 2,
+       "alone": {
+        "total": 2,
+        "verdict": "low"
+       },
+       "of": 3,
+       "tied": [
+        "PKSA-ft77-7h5f-p3r6",
+        "PKSA-v5yj-8nmz-sk2q"
+       ]
+      }
+     },
+     "terms": [
+      {
+       "part": "security",
+       "flag": "vulnerable",
+       "role": "security",
+       "advisory": "PKSA-b14r-zh1d-vdrc",
+       "severity": "low",
+       "fix_kind": "upgrade",
+       "weight": 2,
+       "multiplier": 1,
+       "points": 2,
+       "contribution": 2
+      }
+     ],
+     "modifiers": [
+      {
+       "reason": "transitive",
+       "applies_to": "maintenance",
+       "divide_by": 2,
+       "before": 0,
+       "after": 0
+      }
+     ],
+     "accepted": [],
+     "without": [
+      {
+       "remove": {
+        "kind": "advisory",
+        "id": "PKSA-b14r-zh1d-vdrc"
+       },
+       "revealed": [],
+       "total": 2,
+       "verdict": "low",
+       "lead": null,
+       "deciding_advisory": "PKSA-ft77-7h5f-p3r6",
+       "at_least": false
+      }
+     ],
+     "text": "2 = vulnerable 2 [low advisory]"
+    },
+    "next_step": {
+     "kind": "require",
+     "source": "vulnerable",
+     "merged": [],
+     "fix_kind": "upgrade",
+     "reason": null,
+     "replacement": null,
+     "quiet_years": null,
+     "to_branch": "5.x",
+     "version": "v5.4.52",
+     "newest": "v5.4.53",
+     "constraint": "^5.4.52",
+     "latest": null,
+     "php_check": {
+      "requires": ">=7.2.5",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "crosses_major": false,
+     "held_by": [
+      {
+       "source": "package",
+       "package": "incenteev/composer-parameter-handler",
+       "version": "v2.1.5",
+       "link": "conflict",
+       "target": null,
+       "constraint": "^5.4",
+       "holder": {
+        "verdict": "ok",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "direct": true,
+        "next_step": null
+       }
+      }
+     ],
+     "clears": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-b14r-zh1d-vdrc",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-ft77-7h5f-p3r6",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-v5yj-8nmz-sk2q",
+       "basis": "outside_range"
+      }
+     ],
+     "unverified": [],
+     "adds": [],
+     "leaves": [],
+     "clears_all": true,
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "lead": null,
+      "deciding_advisory": null,
+      "at_most": false,
+      "assumes": [
+       "clears_hold",
+       "composer_resolves"
+      ]
+     },
+     "check": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null
+     },
+     "moves_with": [],
+     "composer_moves_because": [
+      "holders"
+     ],
+     "commands": [
+      [
+       "composer",
+       "why-not",
+       "symfony/yaml",
+       "v5.4.52",
+       "--locked"
+      ]
+     ],
+     "through": [
+      {
+       "package": "incenteev/composer-parameter-handler",
+       "installed_version": "v2.1.5",
+       "installed_requires": true,
+       "newest_stable": {
+        "version": "v2.3.0",
+        "released": "2025-11-26T14:10:46+00:00"
+       },
+       "newest_requires": true,
+       "newest_requires_unmeasured": null,
+       "local": false,
+       "newest_is_installed": false
+      },
+      {
+       "package": "nelmio/api-doc-bundle",
+       "installed_version": "v4.11.1",
+       "installed_requires": false,
+       "newest_stable": {
+        "version": "v5.12.2",
+        "released": "2026-09-14T11:12:11+00:00"
+       },
+       "newest_requires": null,
+       "newest_requires_unmeasured": "through_other_package",
+       "local": false,
+       "newest_is_installed": false
+      },
+      {
+       "package": "php-amqplib/rabbitmq-bundle",
+       "installed_version": "2.17.4",
+       "installed_requires": true,
+       "newest_stable": {
+        "version": "2.19.0",
+        "released": "2026-01-16T12:34:27+00:00"
+       },
+       "newest_requires": true,
+       "newest_requires_unmeasured": null,
+       "local": false,
+       "newest_is_installed": false
+      }
+     ],
+     "also": [],
+     "text": "move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle — clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (conflicts with ^5.4); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+    },
+    "security": {
+     "status": "vulnerable",
+     "check": "complete",
+     "complete": true,
+     "unchecked_reason": null,
+     "records": 5,
+     "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "answer": "answered",
+       "records": 5,
+       "reason": null
+      }
+     ],
+     "worst": "low",
+     "counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "unrated": 0,
+      "low": 3
+     },
+     "ignored": [],
+     "ignored_count": 0,
+     "fix_kind": "upgrade",
+     "installed_branch_fixes": {
+      "fixed": 3,
+      "unknown": 0,
+      "of": 3,
+      "fix_kind": "upgrade",
+      "lowest": "v5.4.52",
+      "newest": "v5.4.53",
+      "held_by": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "conflict",
+        "target": null,
+        "constraint": "^5.4",
+        "holder": {
+         "verdict": "ok",
+         "lead": null,
+         "flag_ids": [],
+         "replacement": null,
+         "direct": true,
+         "next_step": null
+        }
+       }
+      ],
+      "if_applied": {
+       "total": 0,
+       "verdict": "ok",
+       "at_most": false,
+       "assumes": [
+        "clears_hold",
+        "composer_resolves"
+       ]
+      },
+      "check": {
+       "result": "refused",
+       "form": null,
+       "reason": null,
+       "installs": null
+      }
+     },
+     "move_in": "next_step",
+     "gets": {
+      "version": "v5.4.53",
+      "php_check": {
+       "requires": ">=7.2.5",
+       "project_allows": true,
+       "target_runs": true,
+       "raise_to": null,
+       "raise_size": null
+      },
+      "clears": [
+       {
+        "kind": "advisory",
+        "id": "PKSA-b14r-zh1d-vdrc",
+        "basis": "outside_range"
+       },
+       {
+        "kind": "advisory",
+        "id": "PKSA-ft77-7h5f-p3r6",
+        "basis": "outside_range"
+       },
+       {
+        "kind": "advisory",
+        "id": "PKSA-v5yj-8nmz-sk2q",
+        "basis": "outside_range"
+       }
+      ],
+      "clears_all": true
+     },
+     "partial": null
+    },
+    "checks_missing": [],
+    "checks_skipped": [],
+    "unchecked_accepted": [],
+    "maintenance_judged": true,
+    "metadata": {
+     "status": "read",
+     "reason": null,
+     "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/yaml",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:02+00:00",
+     "cached_at": "2026-10-01T16:04:02+00:00"
+    },
+    "allowlist": null,
+    "abandoned_ignored": null,
+    "from_composer_repository": true,
+    "origin": {
+     "kind": "packagist",
+     "registry": "packagist.org",
+     "package_url": "https://packagist.org/packages/symfony/yaml",
+     "local": false
+    },
+    "replacement": null,
+    "replacement_url": null,
+    "note": null,
+    "libyears_unmeasured": null,
+    "libyears_at_least": false,
+    "direct": false,
+    "dev": false,
+    "reach": "transitive",
+    "chain": [
+     "incenteev/composer-parameter-handler",
+     "symfony/yaml"
+    ],
+    "depth": 1,
+    "depth_unmeasured": null,
+    "named_in": [],
+    "direct_dependents": [
+     "incenteev/composer-parameter-handler",
+     "nelmio/api-doc-bundle",
+     "php-amqplib/rabbitmq-bundle"
+    ],
+    "signals": [
+     {
+      "id": "S9",
+      "level": "warn",
+      "summary": "3 security advisories affect v5.3.14 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
+      "data": {
+       "advisories": [
+        {
+         "id": "PKSA-b14r-zh1d-vdrc",
+         "cve": "CVE-2026-45133",
+         "title": "YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+         "link": "https://symfony.com/cve-2026-45133",
+         "reported_at": "2026-05-20T08:00:00+00:00",
+         "severity": "low",
+         "severity_published": "low",
+         "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+         "counted": true,
+         "points": 2,
+         "deciding": true,
+         "fix": {
+          "kind": "upgrade",
+          "to_branch": "5.x",
+          "version": "v5.4.52",
+          "newest": "v5.4.53",
+          "on_installed_branch": true,
+          "php": ">=7.2.5",
+          "admits_target_php": true,
+          "admits_project_php": true,
+          "held_by": [
+           {
+            "source": "package",
+            "package": "incenteev/composer-parameter-handler",
+            "version": "v2.1.5",
+            "link": "conflict",
+            "target": null,
+            "constraint": "^5.4",
+            "holder": {
+             "verdict": "ok",
+             "lead": null,
+             "flag_ids": [],
+             "replacement": null,
+             "direct": true,
+             "next_step": null
+            }
+           }
+          ],
+          "reason": null
+         },
+         "baseline": null
+        },
+        {
+         "id": "PKSA-ft77-7h5f-p3r6",
+         "cve": "CVE-2026-45305",
+         "title": "YAML Parser ReDoS via Catastrophic Backtracking in Parser::cleanup() Regex",
+         "link": "https://symfony.com/cve-2026-45305",
+         "reported_at": "2026-05-20T08:00:00+00:00",
+         "severity": "low",
+         "severity_published": "low",
+         "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+         "counted": true,
+         "points": 2,
+         "deciding": false,
+         "fix": {
+          "kind": "upgrade",
+          "to_branch": "5.x",
+          "version": "v5.4.52",
+          "newest": "v5.4.53",
+          "on_installed_branch": true,
+          "php": ">=7.2.5",
+          "admits_target_php": true,
+          "admits_project_php": true,
+          "held_by": [
+           {
+            "source": "package",
+            "package": "incenteev/composer-parameter-handler",
+            "version": "v2.1.5",
+            "link": "conflict",
+            "target": null,
+            "constraint": "^5.4",
+            "holder": {
+             "verdict": "ok",
+             "lead": null,
+             "flag_ids": [],
+             "replacement": null,
+             "direct": true,
+             "next_step": null
+            }
+           }
+          ],
+          "reason": null
+         },
+         "baseline": null
+        },
+        {
+         "id": "PKSA-v5yj-8nmz-sk2q",
+         "cve": "CVE-2026-45304",
+         "title": "YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion (\"Billion Laughs\")",
+         "link": "https://symfony.com/cve-2026-45304",
+         "reported_at": "2026-05-20T08:00:00+00:00",
+         "severity": "low",
+         "severity_published": "low",
+         "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+         "counted": true,
+         "points": 2,
+         "deciding": false,
+         "fix": {
+          "kind": "upgrade",
+          "to_branch": "5.x",
+          "version": "v5.4.52",
+          "newest": "v5.4.53",
+          "on_installed_branch": true,
+          "php": ">=7.2.5",
+          "admits_target_php": true,
+          "admits_project_php": true,
+          "held_by": [
+           {
+            "source": "package",
+            "package": "incenteev/composer-parameter-handler",
+            "version": "v2.1.5",
+            "link": "conflict",
+            "target": null,
+            "constraint": "^5.4",
+            "holder": {
+             "verdict": "ok",
+             "lead": null,
+             "flag_ids": [],
+             "replacement": null,
+             "direct": true,
+             "next_step": null
+            }
+           }
+          ],
+          "reason": null
+         },
+         "baseline": null
+        }
+       ],
+       "releases_read": true,
+       "complete": true
+      }
+     }
+    ],
+    "evidence": "vulnerable: 3 advisories: 3 low — all fixed on 5.x (upgrade); worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+    "allowlist_reason": null,
+    "data_date": "2026-10-01T17:39:46+00:00",
+    "libyears": 4.66,
+    "age": {
+     "installed": {
+      "at": "2022-01-26T16:05:39+00:00",
+      "years": 4.7,
+      "dated_by": null
+     },
+     "installed_unmeasured": null,
+     "release": {
+      "version": "v8.1.8",
+      "at": "2026-09-26T06:33:49+00:00",
+      "years": 0,
+      "level": null,
+      "dated_by": null
+     },
+     "release_unmeasured": null,
+     "branch_release": {
+      "version": "v5.4.53",
+      "at": "2026-05-20T17:13:41+00:00",
+      "years": 0.4,
+      "level": null,
+      "dated_by": null
+     },
+     "branch_release_unmeasured": null,
+     "push": {
+      "at": "2026-10-01T12:53:29+00:00",
+      "years": 0,
+      "level": null
+     },
+     "push_unmeasured": null
+    },
+    "baseline": null,
+    "gate": {
+     "reaches_fail_on": false,
+     "fails": false,
+     "exempt_by": null,
+     "by": [],
+     "basis": null
+    }
+   },
+   "details": {
+    "metadata": {
+     "installed_branch": "5.x",
+     "branches": [
+      {
+       "branch": "8.x",
+       "installed": false,
+       "highest": "v8.1.8",
+       "highest_released": "2026-09-26T06:33:49+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v8.1.8",
+       "newest_dated_released": "2026-09-26T06:33:49+00:00",
+       "dated_by": null,
+       "php": ">=8.4.1",
+       "highest_php": ">=8.4.1",
+       "admits_target_php": true,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
+       "misses_target_php": null,
+       "misses_project_php": "needs_newer",
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "needs_newer",
+       "released_years": 0,
+       "fixes": {
+        "fixed": 3,
+        "unknown": 0,
+        "of": 3,
+        "fix_kind": "raise-php",
+        "lowest": "v8.0.12",
+        "newest": "v8.1.8",
+        "held_by": [
+         {
+          "source": "package",
+          "package": "incenteev/composer-parameter-handler",
+          "version": "v2.1.5",
+          "link": "conflict",
+          "target": null,
+          "constraint": "^5.4",
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
+         }
+        ],
+        "if_applied": {
+         "total": 0,
+         "verdict": "ok",
+         "at_most": false,
+         "assumes": [
+          "clears_hold",
+          "composer_resolves"
+         ]
+        },
+        "check": {
+         "result": "refused",
+         "form": null,
+         "reason": null,
+         "installs": null
+        }
+       }
+      },
+      {
+       "branch": "7.x",
+       "installed": false,
+       "highest": "v7.4.20",
+       "highest_released": "2026-09-26T06:31:10+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v7.4.20",
+       "newest_dated_released": "2026-09-26T06:31:10+00:00",
+       "dated_by": null,
+       "php": ">=8.2",
+       "highest_php": ">=8.2",
+       "admits_target_php": true,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
+       "misses_target_php": null,
+       "misses_project_php": "needs_newer",
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "needs_newer",
+       "released_years": 0,
+       "fixes": {
+        "fixed": 3,
+        "unknown": 0,
+        "of": 3,
+        "fix_kind": "raise-php",
+        "lowest": "v7.4.12",
+        "newest": "v7.4.20",
+        "held_by": [
+         {
+          "source": "package",
+          "package": "incenteev/composer-parameter-handler",
+          "version": "v2.1.5",
+          "link": "conflict",
+          "target": null,
+          "constraint": "^5.4",
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
+         }
+        ],
+        "if_applied": {
+         "total": 0,
+         "verdict": "ok",
+         "at_most": false,
+         "assumes": [
+          "clears_hold",
+          "composer_resolves"
+         ]
+        },
+        "check": {
+         "result": "refused",
+         "form": null,
+         "reason": null,
+         "installs": null
+        }
+       }
+      },
+      {
+       "branch": "6.x",
+       "installed": false,
+       "highest": "v6.4.47",
+       "highest_released": "2026-09-26T06:15:25+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v6.4.47",
+       "newest_dated_released": "2026-09-26T06:15:25+00:00",
+       "dated_by": null,
+       "php": ">=8.1",
+       "highest_php": ">=8.1",
+       "admits_target_php": true,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
+       "misses_target_php": null,
+       "misses_project_php": "needs_newer",
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "needs_newer",
+       "released_years": 0,
+       "fixes": {
+        "fixed": 3,
+        "unknown": 0,
+        "of": 3,
+        "fix_kind": "raise-php",
+        "lowest": "v6.4.40",
+        "newest": "v6.4.47",
+        "held_by": [
+         {
+          "source": "package",
+          "package": "incenteev/composer-parameter-handler",
+          "version": "v2.1.5",
+          "link": "conflict",
+          "target": null,
+          "constraint": "^5.4",
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
+         }
+        ],
+        "if_applied": {
+         "total": 0,
+         "verdict": "ok",
+         "at_most": false,
+         "assumes": [
+          "clears_hold",
+          "composer_resolves"
+         ]
+        },
+        "check": {
+         "result": "refused",
+         "form": null,
+         "reason": null,
+         "installs": null
+        }
+       }
+      },
+      {
+       "branch": "5.x",
+       "installed": true,
+       "highest": "v5.4.53",
+       "highest_released": "2026-05-20T17:13:41+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v5.4.53",
+       "newest_dated_released": "2026-05-20T17:13:41+00:00",
+       "dated_by": null,
+       "php": ">=7.2.5",
+       "highest_php": ">=7.2.5",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 0.4,
+       "fixes": {
+        "fixed": 3,
+        "unknown": 0,
+        "of": 3,
+        "fix_kind": "upgrade",
+        "lowest": "v5.4.52",
+        "newest": "v5.4.53",
+        "held_by": [
+         {
+          "source": "package",
+          "package": "incenteev/composer-parameter-handler",
+          "version": "v2.1.5",
+          "link": "conflict",
+          "target": null,
+          "constraint": "^5.4",
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
+         }
+        ],
+        "if_applied": {
+         "total": 0,
+         "verdict": "ok",
+         "at_most": false,
+         "assumes": [
+          "clears_hold",
+          "composer_resolves"
+         ]
+        },
+        "check": {
+         "result": "refused",
+         "form": null,
+         "reason": null,
+         "installs": null
+        }
+       }
+      },
+      {
+       "branch": "4.x",
+       "installed": false,
+       "highest": "v4.4.45",
+       "highest_released": "2022-08-02T15:47:23+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v4.4.45",
+       "newest_dated_released": "2022-08-02T15:47:23+00:00",
+       "dated_by": null,
+       "php": ">=7.1.3",
+       "highest_php": ">=7.1.3",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 4.2,
+       "fixes": {
+        "fixed": 0,
+        "unknown": 0,
+        "of": 3,
+        "fix_kind": null,
+        "lowest": null,
+        "newest": "v4.4.45",
+        "held_by": [],
+        "if_applied": null,
+        "check": null
+       }
+      },
+      {
+       "branch": "3.x",
+       "installed": false,
+       "highest": "v3.4.47",
+       "highest_released": "2020-10-24T10:57:07+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v3.4.47",
+       "newest_dated_released": "2020-10-24T10:57:07+00:00",
+       "dated_by": null,
+       "php": "^5.5.9|>=7.0.8",
+       "highest_php": "^5.5.9|>=7.0.8",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 5.9,
+       "fixes": {
+        "fixed": 0,
+        "unknown": 0,
+        "of": 3,
+        "fix_kind": null,
+        "lowest": null,
+        "newest": "v3.4.47",
+        "held_by": [],
+        "if_applied": null,
+        "check": null
+       }
+      },
+      {
+       "branch": "2.x",
+       "installed": false,
+       "highest": "v2.8.52",
+       "highest_released": null,
+       "highest_commit_date": "2018-11-11T11:18:13+00:00",
+       "newest_dated": "v2.8.52",
+       "newest_dated_released": "2018-11-11T11:18:13+00:00",
+       "dated_by": null,
+       "php": ">=5.3.9",
+       "highest_php": ">=5.3.9",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": null,
+       "fixes": {
+        "fixed": 0,
+        "unknown": 0,
+        "of": 3,
+        "fix_kind": null,
+        "lowest": null,
+        "newest": "v2.8.52",
+        "held_by": [],
+        "if_applied": null,
+        "check": null
+       }
+      }
+     ]
+    }
+   },
+   "golden": {
+    "score_text": "2 = vulnerable 2 [low advisory]",
+    "next_step_text": "move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle — clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (conflicts with ^5.4); the packages that hold it may need to move too; Composer's solver refuses it against the lock",
+    "verdict_line": "Low: 3 advisories affect your version. The worst is a low one (CVE-2026-45133: YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings).",
+    "readings": [],
+    "qualifiers": {
+     "reach": [
+      "Production: not in packages-dev",
+      "Not required directly, through:",
+      "incenteev/composer-parameter-handler",
+      "nelmio/api-doc-bundle",
+      "php-amqplib/rabbitmq-bundle"
+     ],
+     "origin": null,
+     "not_judged": null,
+     "unchecked": [],
+     "not_run": [],
+     "php": null,
+     "php_edge": [],
+     "accepted": [],
+     "gate": [
+      "does not reach the run's gate: grade high or above"
+     ]
+    },
+    "moves": [
+     {
+      "heading": "The move",
+      "action": "Move it to ^5.4.52 through the 3 packages in Reach",
+      "platform_step": null,
+      "command_note": "This shows which package holds the move.",
+      "moves_with": null,
+      "commands": [
+       "composer why-not symfony/yaml v5.4.52 --locked"
+      ],
+      "commands_label": "Check",
+      "clears": "all 3 advisories",
+      "stays": null,
+      "not_checked": null,
+      "adds": [],
+      "php": {
+       "head": "5.x needs php >=7.2.5",
+       "lines": [
+        {
+         "answer": "yes",
+         "text": "your require.php allows it"
+        },
+        {
+         "answer": "yes",
+         "text": "your target, 8.4, runs it"
+        }
+       ]
+      },
+      "after": {
+       "result": "0, ok",
+       "conditions": [
+        "Composer refuses the move"
+       ]
+      },
+      "composer": [
+       {
+        "text": "The packages that hold it may need to move too",
+        "items": []
+       }
+      ]
+     }
+    ],
+    "held_by": [
+     {
+      "count": 1,
+      "shown": [
+       {
+        "name": "incenteev/composer-parameter-handler v2.1.5",
+        "grade": null,
+        "meta": "conflicts with ^5.4",
+        "step": null
+       }
+      ],
+      "fold": null
+     }
+    ],
+    "security": {
+     "summary": [
+      "3 advisories:",
+      "5 on record for this name",
+      "fix: upgrade",
+      "lookup complete"
+     ],
+     "counts": [
+      "low 3"
+     ],
+     "meanwhile": null,
+     "caption": [
+      "By severity. Each affects your version, v5.3.14."
+     ],
+     "groups": [],
+     "rows": [
+      {
+       "name": "CVE-2026-45133",
+       "source": "PKSA-b14r-zh1d-vdrc",
+       "deciding": true,
+       "severity": "low",
+       "fix": "fix v5.4.52 on 5.x, your branch (upgrade)",
+       "affects": "affects 19 ranges",
+       "ranges": [
+        ">=2.0.0,<3.0.0|",
+        ">=3.0.0,<4.0.0|",
+        ">=4.0.0,<5.0.0|",
+        ">=5.0.0,<5.1.0|",
+        ">=5.1.0,<5.2.0|",
+        ">=5.2.0,<5.3.0|",
+        ">=5.3.0,<5.4.0|",
+        ">=5.4.0,<5.4.52|",
+        ">=6.0.0,<6.1.0|",
+        ">=6.1.0,<6.2.0|",
+        ">=6.2.0,<6.3.0|",
+        ">=6.3.0,<6.4.0|",
+        ">=6.4.0,<6.4.40|",
+        ">=7.0.0,<7.1.0|",
+        ">=7.1.0,<7.2.0|",
+        ">=7.2.0,<7.3.0|",
+        ">=7.3.0,<7.4.0|",
+        ">=7.4.0,<7.4.12|",
+        ">=8.0.0,<8.0.12"
+       ],
+       "same_as": null
+      },
+      {
+       "name": "CVE-2026-45305",
+       "source": "PKSA-ft77-7h5f-p3r6",
+       "deciding": false,
+       "severity": "low",
+       "fix": "fix v5.4.52 on 5.x, your branch (upgrade)",
+       "affects": "affects 19 ranges",
+       "ranges": [
+        ">=2.0.0,<3.0.0|",
+        ">=3.0.0,<4.0.0|",
+        ">=4.0.0,<5.0.0|",
+        ">=5.0.0,<5.1.0|",
+        ">=5.1.0,<5.2.0|",
+        ">=5.2.0,<5.3.0|",
+        ">=5.3.0,<5.4.0|",
+        ">=5.4.0,<5.4.52|",
+        ">=6.0.0,<6.1.0|",
+        ">=6.1.0,<6.2.0|",
+        ">=6.2.0,<6.3.0|",
+        ">=6.3.0,<6.4.0|",
+        ">=6.4.0,<6.4.40|",
+        ">=7.0.0,<7.1.0|",
+        ">=7.1.0,<7.2.0|",
+        ">=7.2.0,<7.3.0|",
+        ">=7.3.0,<7.4.0|",
+        ">=7.4.0,<7.4.12|",
+        ">=8.0.0,<8.0.12"
+       ],
+       "same_as": null
+      },
+      {
+       "name": "CVE-2026-45304",
+       "source": "PKSA-v5yj-8nmz-sk2q",
+       "deciding": false,
+       "severity": "low",
+       "fix": "fix v5.4.52 on 5.x, your branch (upgrade)",
+       "affects": "affects 19 ranges",
+       "ranges": [
+        ">=2.0.0,<3.0.0|",
+        ">=3.0.0,<4.0.0|",
+        ">=4.0.0,<5.0.0|",
+        ">=5.0.0,<5.1.0|",
+        ">=5.1.0,<5.2.0|",
+        ">=5.2.0,<5.3.0|",
+        ">=5.3.0,<5.4.0|",
+        ">=5.4.0,<5.4.52|",
+        ">=6.0.0,<6.1.0|",
+        ">=6.1.0,<6.2.0|",
+        ">=6.2.0,<6.3.0|",
+        ">=6.3.0,<6.4.0|",
+        ">=6.4.0,<6.4.40|",
+        ">=7.0.0,<7.1.0|",
+        ">=7.1.0,<7.2.0|",
+        ">=7.2.0,<7.3.0|",
+        ">=7.3.0,<7.4.0|",
+        ">=7.4.0,<7.4.12|",
+        ">=8.0.0,<8.0.12"
+       ],
+       "same_as": null
+      }
+     ],
+     "ignored": [],
+     "ladder": [
+      {
+       "branch": "5.x",
+       "marks": [
+        "your branch",
+        "the move"
+       ],
+       "lines": [
+        "5.x your branch the move clears 3 of 3 from v5.4.52",
+        "upgrade · held by incenteev/composer-parameter-handler",
+        "after it: 0, ok · Composer refuses the move"
+       ]
+      },
+      {
+       "branch": "6.x",
+       "marks": [],
+       "lines": [
+        "6.x clears 3 of 3 from v6.4.40",
+        "php floor raise · held by incenteev/composer-parameter-handler",
+        "after it: 0, ok · Composer refuses the move"
+       ]
+      },
+      {
+       "branch": "7.x",
+       "marks": [],
+       "lines": [
+        "7.x clears 3 of 3 from v7.4.12",
+        "php floor raise · held by incenteev/composer-parameter-handler",
+        "after it: 0, ok · Composer refuses the move"
+       ]
+      },
+      {
+       "branch": "8.x",
+       "marks": [],
+       "lines": [
+        "8.x clears 3 of 3 from v8.0.12",
+        "php floor raise · held by incenteev/composer-parameter-handler",
+        "after it: 0, ok · Composer refuses the move"
+       ]
+      }
+     ]
+    },
+    "branches_lead": [
+     "Your branch, 5.x, had its last release, v5.4.53, 0.4 years ago."
+    ],
+    "branch_rows": [
+     {
+      "branch": "8.x",
+      "marks": [
+       "newest"
+      ],
+      "latest": "v8.1.8",
+      "age": "< 3 wk",
+      "php": ">=8.4.1",
+      "php_words": "above your require.php",
+      "bar": "v8.1.8, released less than three weeks ago",
+      "folded_in": null
+     },
+     {
+      "branch": "7.x",
+      "marks": [],
+      "latest": "v7.4.20",
+      "age": "< 3 wk",
+      "php": ">=8.2",
+      "php_words": "above your require.php",
+      "bar": "v7.4.20, released less than three weeks ago",
+      "folded_in": null
+     },
+     {
+      "branch": "6.x",
+      "marks": [],
+      "latest": "v6.4.47",
+      "age": "< 3 wk",
+      "php": ">=8.1",
+      "php_words": "above your require.php",
+      "bar": "v6.4.47, released less than three weeks ago",
+      "folded_in": null
+     },
+     {
+      "branch": "5.x",
+      "marks": [
+       "yours",
+       "the move"
+      ],
+      "latest": "v5.4.53",
+      "age": "0.4y",
+      "php": ">=7.2.5",
+      "php_words": null,
+      "bar": "v5.4.53, released 0.4 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "4.x",
+      "marks": [],
+      "latest": "v4.4.45",
+      "age": "4.2y",
+      "php": ">=7.1.3",
+      "php_words": null,
+      "bar": "v4.4.45, released 4.2 years ago",
+      "folded_in": "older"
+     },
+     {
+      "branch": "3.x",
+      "marks": [],
+      "latest": "v3.4.47",
+      "age": "5.9y",
+      "php": "^5.5.9|>=7.0.8",
+      "php_words": null,
+      "bar": "v3.4.47, released 5.9 years ago",
+      "folded_in": "older"
+     },
+     {
+      "branch": "2.x",
+      "marks": [],
+      "latest": "v2.8.52",
+      "age": "undated",
+      "php": ">=5.3.9",
+      "php_words": null,
+      "bar": "v2.8.52, undated",
+      "folded_in": "older"
+     }
+    ],
+    "age_rows": [
+     {
+      "label": "installed",
+      "value": "v5.3.14 · 2022-01-26 · 4.7 years ago"
+     },
+     {
+      "label": "5.x last",
+      "value": "v5.4.53 · 2026-05-20 · 0.4 years ago"
+     },
+     {
+      "label": "most recent",
+      "value": "v8.1.8 · 2026-09-26 · less than three weeks ago"
+     },
+     {
+      "label": "last push",
+      "value": "2026-10-01 · less than three weeks ago"
+     }
+    ],
+    "security_row": [
+     "3 advisories: low 3",
+     "5 on record for this name",
+     "fix: upgrade",
+     "lookup complete",
+     "5.x your branch the move clears 3 of 3 from v5.4.52",
+     "upgrade · held by incenteev/composer-parameter-handler",
+     "after it: 0, ok · Composer refuses the move",
+     "6.x clears 3 of 3 from v6.4.40",
+     "php floor raise · held by incenteev/composer-parameter-handler",
+     "after it: 0, ok · Composer refuses the move",
+     "7.x clears 3 of 3 from v7.4.12",
+     "php floor raise · held by incenteev/composer-parameter-handler",
+     "after it: 0, ok · Composer refuses the move",
+     "8.x clears 3 of 3 from v8.0.12",
+     "php floor raise · held by incenteev/composer-parameter-handler",
+     "after it: 0, ok · Composer refuses the move"
+    ],
+    "why": [
+     "2 · low from 1 · 6 points short of medium",
+     "vulnerable 2: low advisory CVE-2026-45133, the worst of 3 (tied with CVE-2026-45305, CVE-2026-45304); its own fix (upgrade on 5.x) is reachable, so no × 2",
+     "transitive: no maintenance to halve; security is never halved for reach",
+     "the advisories alone make it low",
+     "without CVE-2026-45133: 2, low (tied: the others weigh the same)"
+    ],
+    "gate_line": null,
+    "checks": "1 fired (S9) · 10 quiet · every check ran",
+    "baseline_suffix": null,
+    "commands_posix": [
+     "composer why-not symfony/yaml v5.4.52 --locked"
+    ],
+    "commands_cmd": [
+     "composer why-not symfony/yaml v5.4.52 --locked"
+    ],
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v5.3.14 released 2022-01-26 (4.7 years ago); 5.x last released v5.4.53 2026-05-20 (0.4 years ago); newest release v8.1.8 2026-09-26 (less than three weeks ago); last push 2026-10-01 (less than three weeks ago)"
+   },
+   "inputs": {
+    "root": {
+     "name": "wallabag/wallabag",
+     "require": {
+      "php": ">=7.4",
+      "incenteev/composer-parameter-handler": "*",
+      "nelmio/api-doc-bundle": "*",
+      "php-amqplib/rabbitmq-bundle": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "symfony/yaml",
+      "version": "v5.3.14",
+      "time": "2022-01-26T16:05:39+00:00",
+      "php": ">=7.2.5",
+      "dev": false,
+      "origin": "packagist"
+     },
+     {
+      "name": "incenteev/composer-parameter-handler",
+      "version": "v2.1.5",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/yaml": "*"
+      },
+      "conflict": {
+       "symfony/yaml": "^5.4"
+      }
+     },
+     {
+      "name": "nelmio/api-doc-bundle",
+      "version": "v4.11.1",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/yaml": "*"
+      }
+     },
+     {
+      "name": "php-amqplib/rabbitmq-bundle",
+      "version": "2.17.4",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/yaml": "*"
+      }
+     }
+    ],
+    "releases": [
+     {
+      "version": "v2.8.52",
+      "time": "2018-11-11T11:18:13+00:00",
+      "php": ">=5.3.9",
+      "shared_commit": true
+     },
+     {
+      "version": "v3.4.47",
+      "time": "2020-10-24T10:57:07+00:00",
+      "php": "^5.5.9|>=7.0.8"
+     },
+     {
+      "version": "v4.4.45",
+      "time": "2022-08-02T15:47:23+00:00",
+      "php": ">=7.1.3"
+     },
+     {
+      "version": "v5.3.14",
+      "time": "2022-01-26T16:05:39+00:00",
+      "php": ">=7.2.5"
+     },
+     {
+      "version": "v5.4.52",
+      "time": null,
+      "php": ">=7.2.5"
+     },
+     {
+      "version": "v5.4.53",
+      "time": "2026-05-20T17:13:41+00:00",
+      "php": ">=7.2.5"
+     },
+     {
+      "version": "v6.4.40",
+      "time": null,
+      "php": ">=8.1"
+     },
+     {
+      "version": "v6.4.47",
+      "time": "2026-09-26T06:15:25+00:00",
+      "php": ">=8.1"
+     },
+     {
+      "version": "v7.4.12",
+      "time": null,
+      "php": ">=8.2"
+     },
+     {
+      "version": "v7.4.20",
+      "time": "2026-09-26T06:31:10+00:00",
+      "php": ">=8.2"
+     },
+     {
+      "version": "v8.0.12",
+      "time": null,
+      "php": ">=8.4.1"
+     },
+     {
+      "version": "v8.1.8",
+      "time": "2026-09-26T06:33:49+00:00",
+      "php": ">=8.4.1"
+     }
+    ],
+    "advisories": [
+     {
+      "id": "PKSA-b14r-zh1d-vdrc",
+      "cve": "CVE-2026-45133",
+      "title": "YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+      "link": "https://symfony.com/cve-2026-45133",
+      "reported_at": "2026-05-20T08:00:00+00:00",
+      "severity": "low",
+      "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
+     },
+     {
+      "id": "PKSA-ft77-7h5f-p3r6",
+      "cve": "CVE-2026-45305",
+      "title": "YAML Parser ReDoS via Catastrophic Backtracking in Parser::cleanup() Regex",
+      "link": "https://symfony.com/cve-2026-45305",
+      "reported_at": "2026-05-20T08:00:00+00:00",
+      "severity": "low",
+      "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
+     },
+     {
+      "id": "PKSA-v5yj-8nmz-sk2q",
+      "cve": "CVE-2026-45304",
+      "title": "YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion (\"Billion Laughs\")",
+      "link": "https://symfony.com/cve-2026-45304",
+      "reported_at": "2026-05-20T08:00:00+00:00",
+      "severity": "low",
+      "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
+     }
+    ],
+    "records": 5,
+    "ignored": [],
+    "abandoned": null,
+    "activity": {
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/yaml",
+     "status": "read",
+     "reason": null,
+     "pushed_at": "2026-10-01T12:53:29+00:00",
+     "archived": false
+    },
+    "dependents": {
+     "incenteev/composer-parameter-handler": [
+      {
+       "version": "v2.1.5",
+       "time": null,
+       "require": {
+        "symfony/yaml": "*"
+       }
+      },
+      {
+       "version": "v2.3.0",
+       "time": "2025-11-26T14:10:46+00:00",
+       "require": {
+        "symfony/yaml": "*"
+       }
+      }
+     ],
+     "nelmio/api-doc-bundle": [
+      {
+       "version": "v4.11.1",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v5.12.2",
+       "time": "2026-09-14T11:12:11+00:00",
+       "require": {}
+      }
+     ],
+     "php-amqplib/rabbitmq-bundle": [
+      {
+       "version": "2.17.4",
+       "time": null,
+       "require": {
+        "symfony/yaml": "*"
+       }
+      },
+      {
+       "version": "2.19.0",
+       "time": "2026-01-16T12:34:27+00:00",
+       "require": {
+        "symfony/yaml": "*"
+       }
+      }
+     ]
+    },
+    "run": {
+     "target_php": "8.4",
+     "project_php": ">=7.4",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    },
+    "packages": {
+     "incenteev/composer-parameter-handler": {
+      "lock": {
+       "name": "incenteev/composer-parameter-handler",
+       "version": "v2.1.5",
+       "time": "2022-05-25T10:57:22+00:00",
+       "php": ">=5.3.3",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v2.1.5",
+        "time": "2022-05-25T10:57:22+00:00",
+        "php": ">=5.3.3"
+       },
+       {
+        "version": "v2.3.0",
+        "time": "2025-11-26T14:10:46+00:00",
+        "php": null
+       }
+      ],
+      "advisories": [],
+      "records": 0,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "Incenteev/ParameterHandler",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2025-11-26T14:11:27Z",
+       "archived": false
+      },
+      "chain": [
+       "incenteev/composer-parameter-handler"
+      ],
+      "below": null
+     }
+    },
+    "checks": {
+     "update symfony/yaml ^5.4.52 ": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null,
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "conflict",
+        "target": null,
+        "constraint": "^5.4"
+       }
+      ]
+     },
+     "update symfony/yaml ^8.0.12 ": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null,
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "conflict",
+        "target": null,
+        "constraint": "^5.4"
+       }
+      ]
+     },
+     "update symfony/yaml ^7.4.12 ": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null,
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "conflict",
+        "target": null,
+        "constraint": "^5.4"
+       }
+      ]
+     },
+     "update symfony/yaml ^6.4.40 ": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null,
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "conflict",
+        "target": null,
+        "constraint": "^5.4"
+       }
+      ]
+     },
+     "update symfony/yaml ^8.0.12 >=8.4.1": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null,
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "conflict",
+        "target": null,
+        "constraint": "^5.4"
+       }
+      ]
+     },
+     "update symfony/yaml ^7.4.12 >=8.2": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null,
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "conflict",
+        "target": null,
+        "constraint": "^5.4"
+       }
+      ]
+     },
+     "update symfony/yaml ^6.4.40 >=8.1": {
+      "result": "refused",
+      "form": null,
+      "reason": null,
+      "installs": null,
+      "holds": [
+       {
+        "source": "package",
+        "package": "incenteev/composer-parameter-handler",
+        "version": "v2.1.5",
+        "link": "conflict",
+        "target": null,
+        "constraint": "^5.4"
+       }
+      ]
      }
     },
     "move_check": {

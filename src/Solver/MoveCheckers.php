@@ -8,6 +8,8 @@ use Composer\Config;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
+use Composer\Semver\Constraint\Constraint;
+use Composer\Semver\VersionParser;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Deadline;
@@ -70,11 +72,19 @@ final class MoveCheckers
      */
     public static function platformPhp(string $targetMinor, ?string $platform): string
     {
-        // Composer reads a version with no patch as patch 0 (`8.4` is 8.4.0).
-        if ($platform !== null && preg_match('/^'.preg_quote($targetMinor, '/').'(\.\d+)*$/', $platform) === 1) {
-            return $platform;
-        }
+        return $platform !== null && self::isStableIn($platform, $targetMinor) ? $platform : $targetMinor.'.'.self::NEWEST_PATCH;
+    }
 
-        return $targetMinor.'.'.self::NEWEST_PATCH;
+    /** Whether Composer reads $version as a stable release of $minor: `8` is 8.0.0. */
+    private static function isStableIn(string $version, string $minor): bool
+    {
+        try {
+            $parser = new VersionParser();
+
+            return VersionParser::parseStability($version) === 'stable'
+                && $parser->parseConstraints('~'.$minor.'.0')->matches(new Constraint('==', $parser->normalize($version)));
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
     }
 }

@@ -1,0 +1,21 @@
+{
+    "score_text": "8 = left-behind 16 ÷ 2 transitive",
+    "next_step_text": "move symfony/translation to ^5.4 through friendsofsymfony/user-bundle — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/validator v4.4.48 (conflicts with >=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v4.4.47 released 2022-10-03 (4.0 years ago), the newest on 4.x; newest release v8.1.5 2026-08-21 (0.1 years ago); last push 2026-09-28 (less than three weeks ago)",
+    "explain_age": [
+        "installed  v4.4.47   2022-10-03   4.0 years ago",
+        "4.x        v4.4.47   2022-10-03   4.0 years ago                 past release-warn-years 3",
+        "newest     v8.1.5    2026-08-21   0.1 years ago                 below release-warn-years 3",
+        "last push            2026-09-28   less than three weeks ago     below push-warn-years 3",
+        "libyears 3.9 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer why-not symfony/translation v5.4.0 --locked"
+    ],
+    "commands_cmd": [
+        "composer why-not symfony/translation v5.4.0 --locked"
+    ]
+}

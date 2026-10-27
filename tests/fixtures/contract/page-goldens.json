@@ -1742,7 +1742,7 @@
       "copy_summary": [
         "lockrot report for wallabag/wallabag · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
         "111 of 210 packages flagged (53%): 15 graded critical, 69 high, 22 medium, 5 low. Flags: abandoned 27, silent 10, pinned 1, left-behind 55, old-promise 18, stale 10, capped 2, vulnerable 19.",
-        "All 111 in production · 61 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 php floor raise · 406.6 libyears behind."
+        "All 111 in production · 61 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 php floor raise · at least 406.6 libyears behind."
       ],
       "grade_line": "Project grade: critical · 15 critical findings · 84 of 210 packages high or worse",
       "figure_line": "111 of 210 packages flagged · 80 ok · 19 finished",
@@ -4307,7 +4307,7 @@
       "copy_summary": [
         "lockrot report for wallabag/wallabag · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
         "1 of 1 package flagged (100%): 1 graded high. Flags: left-behind 1.",
-        "In production · required directly · no security advisory · 1.9 libyears behind."
+        "In production · required directly · no security advisory · at least 1.9 libyears behind."
       ],
       "grade_line": "Project grade: high · 1 high finding · 1 of 1 package high or worse",
       "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
@@ -8421,7 +8421,7 @@
       "copy_summary": [
         "lockrot report for wallabag/wallabag · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 7.4 · this run fails · --fail-on=high",
         "111 of 210 packages flagged (53%): 16 graded critical, 67 high, 23 medium, 5 low. Flags: abandoned 27, silent 10, pinned 1, left-behind 55, old-promise 8, stale 10, capped 2, vulnerable 19.",
-        "All 111 in production · 61 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 blocked · 406.6 libyears behind."
+        "All 111 in production · 61 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 blocked · at least 406.6 libyears behind."
       ],
       "grade_line": "Project grade: critical · 16 critical findings · 83 of 210 packages high or worse",
       "figure_line": "111 of 210 packages flagged · 80 ok · 19 finished",
@@ -11948,7 +11948,7 @@
       "copy_summary": [
         "lockrot report for wallabag/wallabag · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 7.4 · this run fails · --fail-on=high",
         "110 of 210 packages flagged (52%): 16 graded critical, 67 high, 22 medium, 5 low. Flags: abandoned 27, silent 10, pinned 1, left-behind 55, old-promise 8, stale 10, capped 1, vulnerable 19.",
-        "All 110 in production · 60 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 blocked · 406.6 libyears behind."
+        "All 110 in production · 60 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 blocked · at least 406.6 libyears behind."
       ],
       "grade_line": "Project grade: critical · 16 critical findings · 83 of 210 packages high or worse",
       "figure_line": "110 of 210 packages flagged · 80 ok · 20 finished",
@@ -15506,7 +15506,7 @@
       "copy_summary": [
         "lockrot report for drunomics/lupus-nuxtjs-drupal-stack-example · data as of 2026-10-22 · lockrot 0.14.0 · score model 1 · target PHP 8.3 · this run fails · --fail-on=high",
         "55 of 97 packages flagged (57%): 2 graded critical, 18 high, 30 medium, 5 low. Flags: abandoned 5, silent 1, left-behind 38, old-promise 8, stale 1, capped 4, vulnerable 16.",
-        "All 55 in production · 4 required directly, 51 pulled in · 122 security advisories on 16 packages (severity: 4 critical, 18 high, 40 medium, 43 unrated, 17 low) · fix by package: 1 composer update, 15 upgrade · 358.1 libyears behind."
+        "All 55 in production · 4 required directly, 51 pulled in · 122 security advisories on 16 packages (severity: 4 critical, 18 high, 40 medium, 43 unrated, 17 low) · fix by package: 1 composer update, 15 upgrade · at least 358.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 2 critical findings · 20 of 97 packages high or worse",
       "figure_line": "55 of 97 packages flagged · 29 ok · 13 finished",
@@ -16820,7 +16820,7 @@
       "copy_summary": [
         "lockrot report for wallabag/wallabag · data as of 2026-10-14 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
         "113 of 210 packages flagged (54%): 15 graded critical, 69 high, 23 medium, 6 low. Flags: abandoned 27, silent 10, pinned 1, left-behind 54, old-promise 18, stale 12, capped 2, vulnerable 20.",
-        "All 113 in production · 61 required directly, 52 pulled in · 64 security advisories on 20 packages (severity: 1 critical, 17 high, 30 medium, 3 unrated, 13 low) · fix by package: 8 composer update, 9 upgrade, 2 php floor raise, 1 no fix · 388.8 libyears behind."
+        "All 113 in production · 61 required directly, 52 pulled in · 64 security advisories on 20 packages (severity: 1 critical, 17 high, 30 medium, 3 unrated, 13 low) · fix by package: 8 composer update, 9 upgrade, 2 php floor raise, 1 no fix · at least 388.8 libyears behind."
       ],
       "grade_line": "Project grade: critical · 15 critical findings · 84 of 210 packages high or worse · 46 known to the baseline",
       "figure_line": "113 of 210 packages flagged · 78 ok · 19 finished",
@@ -18777,7 +18777,8 @@
       "php_rows": [
         "PHP window, with require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
         "PHP window, without require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
-        "Composer checks the lock at: 7.4.29 (config.platform.php)"
+        "Composer checks the lock at: 7.4.29 (config.platform.php)",
+        "composer install reads 7.4.29, and the move check solves at the target PHP 8.4.99."
       ],
       "platform_step": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages.",
       "sheet_moves": {
@@ -21049,7 +21050,7 @@
       "copy_summary": [
         "lockrot report for drunomics/lupus-nuxtjs-drupal-stack-example · data as of 2026-10-22 · lockrot 0.14.0 · score model 1 · target PHP 8.3 · this run fails · --fail-on=high",
         "55 of 97 packages flagged (57%): 2 graded critical, 18 high, 30 medium, 5 low. Flags: abandoned 5, silent 1, left-behind 38, old-promise 8, stale 1, capped 4, vulnerable 16.",
-        "All 55 in production · 4 required directly, 51 pulled in · 122 security advisories on 16 packages (severity: 4 critical, 18 high, 40 medium, 43 unrated, 17 low) · fix by package: 1 composer update, 15 upgrade · 358.1 libyears behind."
+        "All 55 in production · 4 required directly, 51 pulled in · 122 security advisories on 16 packages (severity: 4 critical, 18 high, 40 medium, 43 unrated, 17 low) · fix by package: 1 composer update, 15 upgrade · at least 358.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 2 critical findings · 20 of 97 packages high or worse",
       "figure_line": "55 of 97 packages flagged · 29 ok · 13 finished",

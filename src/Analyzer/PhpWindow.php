@@ -153,12 +153,17 @@ final class PhpWindow implements \JsonSerializable
         return $copy;
     }
 
-    /** Whether `target.php` lies below `lower_edge.php` of the set that `target.inside` reads. */
+    /**
+     * Whether the target lies below the lowest edge (SPEC §5.9): the set that `target.inside` reads
+     * keeps no window minor of the target, and `target.php` lies below its `lower_edge.php`.
+     */
     public function targetBelowLowest(): bool
     {
-        $lowest = ($this->data['with_dev'] ?? $this->data['without_dev'])['lower_edge'];
+        $set = $this->data['with_dev'] ?? $this->data['without_dev'];
+        $lowest = $set['lower_edge'];
 
-        return $lowest !== null && Comparator::lessThan(self::normalized($this->data['target']['php']), self::normalized($lowest['php']));
+        return $lowest !== null && !\in_array($this->targetMinor, $set['minors'], true)
+            && Comparator::lessThan(self::normalized($this->data['target']['php']), self::normalized($lowest['php']));
     }
 
     private static function normalized(string $php): string
@@ -319,7 +324,8 @@ final class PhpWindow implements \JsonSerializable
     private static function setWindow(array $links, array $minors, string $target, string $targetPoint): array
     {
         $point = static fn (string $minor): string => $minor === $target ? $targetPoint : $minor.'.'.MoveCheckers::NEWEST_PATCH;
-        $in = array_values(array_filter($minors, static fn (string $minor): bool => self::failing($links, $point($minor)) === []));
+        $in = array_values(array_filter($minors, static fn (string $minor): bool => self::failing($links, $point($minor)) === []
+            || ($minor === $target && self::belowFloor($links, $minor, $targetPoint))));
         $window = ['minors' => $in, 'gaps' => false, 'lower_edge' => null, 'upper_edge' => null, 'closest' => null];
         if ($in === []) {
             $fails = [];
@@ -361,17 +367,43 @@ final class PhpWindow implements \JsonSerializable
     private static function lowerEdge(array $links, array $minors, int $first, callable $point): array
     {
         $minor = $minors[$first];
-        $below = isset($minors[$first - 1]) ? $point($minors[$first - 1]) : null;
-        foreach (range(0, MoveCheckers::NEWEST_PATCH) as $patch) {
-            $php = $minor.'.'.$patch;
-            if (self::failing($links, $php) === []) {
-                return ['php' => $php, 'set_by' => $below === null ? [] : self::clean(self::failing($links, $below))];
+        $patch = self::lowestPatch($links, $minor);
+        if ($patch === null) {
+            // Only the target point admits the minor: config.platform.php names a patch past the range.
+            return ['php' => $point($minor), 'set_by' => self::clean(self::failing($links, $minor.'.'.MoveCheckers::NEWEST_PATCH))];
+        }
+        $below = $patch > 0 ? $minor.'.'.($patch - 1) : (isset($minors[$first - 1]) ? $point($minors[$first - 1]) : null);
+
+        return ['php' => $minor.'.'.$patch, 'set_by' => $below === null ? [] : self::clean(self::failing($links, $below))];
+    }
+
+    /**
+     * Whether $point lies below a patch floor inside $minor: a higher patch of the minor installs the
+     * lock, so the minor is in the window and its lowest patch is the lower edge (SPEC §5.9).
+     *
+     * @param list<PhpLink> $links
+     */
+    private static function belowFloor(array $links, string $minor, string $point): bool
+    {
+        $patch = self::lowestPatch($links, $minor);
+
+        return $patch !== null && Comparator::lessThan(self::normalized($point), self::normalized($minor.'.'.$patch));
+    }
+
+    /**
+     * The lowest Z from 0 to {@see MoveCheckers::NEWEST_PATCH} at which X.Y.Z installs the lock.
+     *
+     * @param list<PhpLink> $links
+     */
+    private static function lowestPatch(array $links, string $minor): ?int
+    {
+        for ($patch = 0; $patch <= MoveCheckers::NEWEST_PATCH; ++$patch) {
+            if (self::failing($links, $minor.'.'.$patch) === []) {
+                return $patch;
             }
-            $below = $php;
         }
 
-        // Only the target point admits the minor: config.platform.php names a patch past the range.
-        return ['php' => $point($minor), 'set_by' => self::clean(self::failing($links, $minor.'.'.MoveCheckers::NEWEST_PATCH))];
+        return null;
     }
 
     /**

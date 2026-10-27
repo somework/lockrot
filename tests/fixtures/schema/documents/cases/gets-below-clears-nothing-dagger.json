@@ -6,12 +6,12 @@
  },
  "generated_at": "2026-10-01T17:41:20+00:00",
  "run": {
-  "project": "wallabag/wallabag",
-  "root_package": "wallabag/wallabag",
+  "project": "mautic/mautic",
+  "root_package": "mautic/mautic",
   "target_php": "8.4",
   "target_php_source": "option",
-  "project_php": ">=7.4",
-  "project_php_lowest": "7.4.0",
+  "project_php": null,
+  "project_php_lowest": null,
   "lock_file": "composer.lock",
   "fail_on": "high",
   "fail_on_source": "option",
@@ -783,7 +783,7 @@
    "advisory-points": 0,
    "no-reachable-fix-multiplier": 0,
    "security-max": 0,
-   "divide-reach": 0,
+   "divide-reach": 1,
    "security-exempt-from-reach": 0,
    "sum": 0,
    "divide-dev": 0,
@@ -825,6 +825,11 @@
    "host_requires": [],
    "with_dev": {
     "minors": [
+     "5.6",
+     "7.0",
+     "7.1",
+     "7.2",
+     "7.3",
      "7.4",
      "8.0",
      "8.1",
@@ -835,14 +840,14 @@
     ],
     "gaps": false,
     "lower_edge": {
-     "php": "7.4.0",
+     "php": "5.6.0",
      "set_by": [
       {
-       "name": null,
-       "version": null,
+       "name": "symfony/monolog-bundle",
+       "version": "v3.5.0",
        "link": "require",
        "target": "php",
-       "constraint": ">=7.4",
+       "constraint": ">=5.6",
        "dev": false
       }
      ]
@@ -852,6 +857,11 @@
    },
    "without_dev": {
     "minors": [
+     "5.6",
+     "7.0",
+     "7.1",
+     "7.2",
+     "7.3",
      "7.4",
      "8.0",
      "8.1",
@@ -862,14 +872,14 @@
     ],
     "gaps": false,
     "lower_edge": {
-     "php": "7.4.0",
+     "php": "5.6.0",
      "set_by": [
       {
-       "name": null,
-       "version": null,
+       "name": "symfony/monolog-bundle",
+       "version": "v3.5.0",
        "link": "require",
        "target": "php",
-       "constraint": ">=7.4",
+       "constraint": ">=5.6",
        "dev": false
       }
      ]
@@ -884,7 +894,7 @@
    "target_fix": null
   }
  },
- "activity_cache_oldest_at": "2026-10-01T16:04:02+00:00",
+ "activity_cache_oldest_at": "2026-10-01T16:04:29+00:00",
  "activity_cache_age_hours": 1.6,
  "packages_checked": 1,
  "packages_flagged": 1,
@@ -895,8 +905,8 @@
  "network_failures": false,
  "counts": {
   "critical": 0,
-  "high": 1,
-  "medium": 0,
+  "high": 0,
+  "medium": 1,
   "low": 0,
   "unknown": 0,
   "finished": 0,
@@ -909,8 +919,8 @@
  },
  "priorities": {
   "critical": 0,
-  "high": 1,
-  "medium": 0,
+  "high": 0,
+  "medium": 1,
   "low": 0,
   "none": 0
  },
@@ -958,20 +968,6 @@
    }
   },
   "left-behind": {
-   "carrying": 1,
-   "leading": 1,
-   "accepted": {
-    "all": 0,
-    "in_graded": 0
-   },
-   "by_verdict": {
-    "critical": 0,
-    "high": 1,
-    "medium": 0,
-    "low": 0
-   }
-  },
-  "old-promise": {
    "carrying": 0,
    "leading": 0,
    "accepted": {
@@ -982,6 +978,20 @@
     "critical": 0,
     "high": 0,
     "medium": 0,
+    "low": 0
+   }
+  },
+  "old-promise": {
+   "carrying": 1,
+   "leading": 1,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
     "low": 0
    }
   },
@@ -1038,26 +1048,38 @@
    "no_composer_json": 0
   },
   "by_reach": {
-   "direct": 1,
-   "transitive": 0,
+   "direct": 0,
+   "transitive": 1,
    "unreached": 0
   },
-  "not_in_composer_json": 0,
+  "not_in_composer_json": 1,
   "require_dev_not_walked": 0,
   "production": 1,
   "development": 0,
   "by_depth": [
    {
     "depth": 0,
+    "flagged": 0
+   },
+   {
+    "depth": 1,
     "flagged": 1
    }
   ],
-  "max_depth": 0,
-  "deepest": []
+  "max_depth": 1,
+  "deepest": [
+   {
+    "package": "symfony/monolog-bundle",
+    "chain": [
+     "mautic/core-lib",
+     "symfony/monolog-bundle"
+    ]
+   }
+  ]
  },
  "libyears": {
-  "total": 4.13,
-  "direct_requirements": 4.13,
+  "total": 6.83,
+  "direct_requirements": 0,
   "measured": 1,
   "at_least_count": 0,
   "unmeasured": {
@@ -1071,22 +1093,20 @@
    "undated_releases": 0
   },
   "furthest_behind": {
-   "package": "symfony/google-mailer",
-   "version": "v4.4.41",
-   "libyears": 4.13,
+   "package": "symfony/monolog-bundle",
+   "version": "v3.5.0",
+   "libyears": 6.83,
    "at_least": false
   },
   "packages": 1
  },
  "baseline": null,
  "gate": {
-  "fails": true,
-  "tripped_by": [
-   "fail_on"
-  ],
+  "fails": false,
+  "tripped_by": [],
   "fail_on_applied": true,
-  "reaching": 1,
-  "failing": 1,
+  "reaching": 0,
+  "failing": 0,
   "exempt": {
    "baseline": 0
   },
@@ -1094,19 +1114,17 @@
    "known": 0,
    "new": 0,
    "worsened": 0,
-   "none": 1
+   "none": 0
   },
-  "failing_packages": [
-   "symfony/google-mailer"
-  ],
+  "failing_packages": [],
   "failing_by": [
    {
     "value": "high",
-    "failing": 1
+    "failing": 0
    }
   ],
   "not_applied": [],
-  "text": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)"
+  "text": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)"
  },
  "security": {
   "check": "complete",
@@ -1139,58 +1157,58 @@
   "update_now_command": null,
   "fix_unknown": 0
  },
- "data_date": "2026-10-01T17:39:46+00:00",
+ "data_date": "2026-10-01T17:40:14+00:00",
  "notes": [],
  "note_details": [],
  "findings": [
   {
-   "package": "symfony/google-mailer",
-   "version": "v4.4.41",
-   "branch": "4.x",
+   "package": "symfony/monolog-bundle",
+   "version": "v3.5.0",
+   "branch": "3.x",
    "installed_php": {
-    "requires": ">=7.1.3",
+    "requires": ">=5.6",
     "target_runs": true,
-    "project_allows": true
+    "project_allows": null
    },
-   "verdict": "high",
-   "priority": "high",
-   "lead": "left-behind",
+   "verdict": "medium",
+   "priority": "medium",
+   "lead": "old-promise",
    "rank": 1,
    "flags": [
     {
-     "id": "left-behind",
+     "id": "old-promise",
      "role": "lead",
      "baseline": null,
      "signal_ids": [
-      "S8"
+      "S5"
      ],
      "degree": null,
      "headline": {
-      "unit": "years",
-      "value": 4.5,
-      "source": "branch"
+      "unit": "php",
+      "value": 5,
+      "source": null
      },
-     "summary": "branch 4.x last released 2022-04-12 (4.5 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)"
+     "summary": "released 2019-11-13 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
     }
    ],
    "score": {
     "model": 1,
-    "total": 16,
-    "exact": 16,
+    "total": 8,
+    "exact": 8,
     "rounded_down": false,
     "band": {
-     "floor": 16,
-     "next": "critical",
-     "to_next": 16
+     "floor": 8,
+     "next": "high",
+     "to_next": 8
     },
     "decided_by": "maintenance",
     "parts": {
      "maintenance": {
       "status": "counted",
-      "contribution": 16,
+      "contribution": 8,
       "alone": {
-       "total": 16,
-       "verdict": "high"
+       "total": 8,
+       "verdict": "medium"
       }
      },
      "security": {
@@ -1207,40 +1225,48 @@
     "terms": [
      {
       "part": "maintenance",
-      "flag": "left-behind",
+      "flag": "old-promise",
       "role": "lead",
       "weight": 16,
       "divisor": 1,
       "points": 16,
-      "contribution": 16
+      "contribution": 8
      }
     ],
-    "modifiers": [],
+    "modifiers": [
+     {
+      "reason": "transitive",
+      "applies_to": "maintenance",
+      "divide_by": 2,
+      "before": 16,
+      "after": 8
+     }
+    ],
     "accepted": [],
     "without": [],
-    "text": "16 = left-behind 16"
+    "text": "8 = old-promise 16 ÷ 2 transitive"
    },
    "next_step": {
-    "kind": "require",
-    "source": "left-behind",
+    "kind": "update",
+    "source": "old-promise",
     "merged": [],
     "fix_kind": null,
     "reason": null,
     "replacement": null,
     "quiet_years": null,
-    "to_branch": "5.x",
-    "version": null,
-    "newest": "v5.4.45",
-    "constraint": "^5.4",
+    "to_branch": "3.x",
+    "version": "v3.11.2",
+    "newest": "v3.11.2",
+    "constraint": null,
     "latest": null,
     "php_check": {
-     "requires": ">=7.2.5",
-     "project_allows": true,
+     "requires": ">=8.1",
+     "project_allows": null,
      "target_runs": true,
      "raise_to": null,
      "raise_size": null
     },
-    "crosses_major": true,
+    "crosses_major": false,
     "held_by": [],
     "clears": [],
     "unverified": [],
@@ -1248,7 +1274,7 @@
     "leaves": [
      {
       "kind": "flag",
-      "id": "left-behind"
+      "id": "old-promise"
      }
     ],
     "clears_all": false,
@@ -1257,22 +1283,31 @@
      "result": "resolves",
      "form": "inline",
      "reason": null,
-     "installs": "v5.4.19"
+     "installs": "v3.6.0"
     },
     "moves_with": [],
-    "composer_moves_because": [
-     "crosses_major"
-    ],
+    "composer_moves_because": [],
     "commands": [
      [
       "composer",
-      "require",
-      "symfony/google-mailer:^5.4"
+      "update",
+      "symfony/monolog-bundle:^3.11.2"
      ]
     ],
-    "through": [],
+    "through": [
+     {
+      "package": "mautic/core-lib",
+      "installed_version": "4.3.x-dev",
+      "installed_requires": null,
+      "newest_stable": null,
+      "newest_requires": null,
+      "newest_requires_unmeasured": "not_from_composer_repository",
+      "local": true,
+      "newest_is_installed": null
+     }
+    ],
     "also": [],
-    "text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45); 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; left-behind stays; a new major brings its own requirements; Composer's solver checked it against the lock"
+    "text": "composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); old-promise stays; Composer's solver checked it against the lock"
    },
    "security": {
     "status": "clear",
@@ -1306,11 +1341,11 @@
     "reason": null,
     "forge": "github",
     "host": "github.com",
-    "repo": "symfony/google-mailer",
+    "repo": "symfony/monolog-bundle",
     "event": "push",
     "archived": false,
-    "fetched_at": "2026-10-01T16:04:02+00:00",
-    "cached_at": "2026-10-01T16:04:02+00:00"
+    "fetched_at": "2026-10-01T16:04:29+00:00",
+    "cached_at": "2026-10-01T16:04:29+00:00"
    },
    "allowlist": null,
    "abandoned_ignored": null,
@@ -1318,7 +1353,7 @@
    "origin": {
     "kind": "packagist",
     "registry": "packagist.org",
-    "package_url": "https://packagist.org/packages/symfony/google-mailer",
+    "package_url": "https://packagist.org/packages/symfony/monolog-bundle",
     "local": false
    },
    "replacement": null,
@@ -1326,103 +1361,74 @@
    "note": null,
    "libyears_unmeasured": null,
    "libyears_at_least": false,
-   "direct": true,
+   "direct": false,
    "dev": false,
-   "reach": "direct",
+   "reach": "transitive",
    "chain": [
-    "symfony/google-mailer"
+    "mautic/core-lib",
+    "symfony/monolog-bundle"
    ],
-   "depth": 0,
+   "depth": 1,
    "depth_unmeasured": null,
-   "named_in": [
-    "require"
-   ],
+   "named_in": [],
    "direct_dependents": [
-    "symfony/google-mailer"
+    "mautic/core-lib"
    ],
    "signals": [
     {
-     "id": "S8",
+     "id": "S5",
      "level": "warn",
-     "summary": "branch 4.x last released 2022-04-12 (4.5 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
+     "summary": "released 2019-11-13 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
      "data": {
-      "branch": "4.x",
-      "branch_last_release": "2022-04-12T15:19:55+00:00",
-      "branch_last_version": "v4.4.41",
-      "years": 4.5,
-      "newest_branch": "8.x",
-      "newest_version": "v8.1.0",
-      "newest_release": "2026-05-29T05:06:50+00:00",
-      "newest_php": ">=8.4.1",
-      "newest_within_reach": false,
-      "floor_php": ">=7.4",
-      "floor_source": "project",
-      "reachable_branch": "5.x",
-      "reachable_version": "v5.4.45",
-      "reachable_release": "2024-09-25T14:11:13+00:00",
-      "suggested_constraint": "^5.4",
-      "dated_by": null,
-      "reachable_php": ">=7.2.5",
-      "reachable_admits": {
-       "project": true,
-       "target": true
-      },
-      "newest_years": 0.3,
-      "reachable_years": 2
+      "target_php": "8.4",
+      "target_major": "8.0",
+      "ga_date": "2020-11-26",
+      "php_constraint": ">=5.6",
+      "written_for_php": 5,
+      "released": "2019-11-13T13:11:14+00:00"
      }
     }
    ],
-   "evidence": "left-behind: branch 4.x last released 2022-04-12 (4.5 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
+   "evidence": "old-promise: released 2019-11-13 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
    "allowlist_reason": null,
-   "data_date": "2026-10-01T17:39:46+00:00",
-   "libyears": 4.13,
+   "data_date": "2026-10-01T17:40:14+00:00",
+   "libyears": 6.83,
    "age": {
     "installed": {
-     "at": "2022-04-12T15:19:55+00:00",
-     "years": 4.5,
+     "at": "2019-11-13T13:11:14+00:00",
+     "years": 6.9,
      "dated_by": null
     },
     "installed_unmeasured": null,
     "release": {
-     "version": "v8.1.0",
-     "at": "2026-05-29T05:06:50+00:00",
-     "years": 0.3,
+     "version": "v4.1.0",
+     "at": "2026-09-10T19:32:07+00:00",
+     "years": 0.1,
      "level": null,
      "dated_by": null
     },
     "release_unmeasured": null,
     "branch_release": {
-     "version": "v4.4.41",
-     "at": "2022-04-12T15:19:55+00:00",
-     "years": 4.5,
-     "level": "warn",
+     "version": "v3.11.2",
+     "at": "2026-04-02T18:23:01+00:00",
+     "years": 0.5,
+     "level": null,
      "dated_by": null
     },
     "branch_release_unmeasured": null,
     "push": {
-     "at": "2026-08-02T09:30:53+00:00",
-     "years": 0.2,
+     "at": "2026-09-12T21:35:24+00:00",
+     "years": 0.1,
      "level": null
     },
     "push_unmeasured": null
    },
    "baseline": null,
    "gate": {
-    "reaches_fail_on": true,
-    "fails": true,
+    "reaches_fail_on": false,
+    "fails": false,
     "exempt_by": null,
-    "by": [
-     {
-      "value": "high",
-      "kind": "grade",
-      "facts": [
-       {
-        "kind": "flag",
-        "id": "left-behind"
-       }
-      ]
-     }
-    ],
+    "by": [],
     "basis": null
    }
   }

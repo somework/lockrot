@@ -4678,6 +4678,186 @@
         "move_in": "next_step",
         "partial": null
     },
+    "fix-newest-held\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.4.52",
+            "newest": "v5.4.53",
+            "constraint": "^5.4.52",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [
+                {
+                    "source": "package",
+                    "package": "incenteev/composer-parameter-handler",
+                    "version": "v2.1.5",
+                    "link": "conflict",
+                    "target": null,
+                    "constraint": "^5.4",
+                    "holder": {
+                        "verdict": "ok",
+                        "lead": null,
+                        "flag_ids": [],
+                        "direct": true,
+                        "replacement": null,
+                        "next_step": null
+                    }
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-b14r-zh1d-vdrc",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-ft77-7h5f-p3r6",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-v5yj-8nmz-sk2q",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": {
+                "result": "refused",
+                "form": null,
+                "reason": null,
+                "installs": null
+            },
+            "moves_with": [],
+            "composer_moves_because": [
+                "holders"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/yaml",
+                    "v5.4.52",
+                    "--locked"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "incenteev/composer-parameter-handler",
+                    "installed_version": "v2.1.5",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "v2.3.0",
+                        "released": "2025-11-26T14:10:46+00:00"
+                    },
+                    "newest_requires": true,
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
+                },
+                {
+                    "package": "nelmio/api-doc-bundle",
+                    "installed_version": "v4.11.1",
+                    "installed_requires": false,
+                    "newest_stable": {
+                        "version": "v5.12.2",
+                        "released": "2026-09-14T11:12:11+00:00"
+                    },
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": false
+                },
+                {
+                    "package": "php-amqplib/rabbitmq-bundle",
+                    "installed_version": "2.17.4",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "2.19.0",
+                        "released": "2026-01-16T12:34:27+00:00"
+                    },
+                    "newest_requires": true,
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
+                }
+            ],
+            "also": [],
+            "text": "move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (conflicts with ^5.4); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 3,
+            "unknown": 0,
+            "of": 3,
+            "fix_kind": "upgrade",
+            "lowest": "v5.4.52",
+            "newest": "v5.4.53",
+            "held_by": [
+                {
+                    "source": "package",
+                    "package": "incenteev/composer-parameter-handler",
+                    "version": "v2.1.5",
+                    "link": "conflict",
+                    "target": null,
+                    "constraint": "^5.4",
+                    "holder": {
+                        "verdict": "ok",
+                        "lead": null,
+                        "flag_ids": [],
+                        "direct": true,
+                        "replacement": null,
+                        "next_step": null
+                    }
+                }
+            ],
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": {
+                "result": "refused",
+                "form": null,
+                "reason": null,
+                "installs": null
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "flysystem": {
         "next_step": {
             "kind": "require",
@@ -4823,7 +5003,7 @@
         "move_in": "next_step",
         "partial": null
     },
-    "gets-below-clears-nothing\u2021": {
+    "gets-below-clears-left-behind\u2021": {
         "next_step": {
             "kind": "require",
             "source": "left-behind",
@@ -4846,17 +5026,27 @@
             },
             "crosses_major": true,
             "held_by": [],
-            "clears": [],
-            "unverified": [],
-            "adds": [],
-            "leaves": [
+            "clears": [
                 {
                     "kind": "flag",
-                    "id": "left-behind"
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
                 }
             ],
-            "clears_all": false,
-            "if_applied": null,
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
             "check": {
                 "result": "resolves",
                 "form": "inline",
@@ -4876,7 +5066,72 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45); 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; left-behind stays; a new major brings its own requirements; Composer's solver checked it against the lock"
+            "text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45) \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock"
+        }
+    },
+    "gets-below-clears-nothing\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "3.x",
+            "version": "v3.11.2",
+            "newest": "v3.11.2",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": null,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": {
+                "result": "resolves",
+                "form": "inline",
+                "reason": null,
+                "installs": "v3.6.0"
+            },
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "symfony/monolog-bundle:^3.11.2"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "mautic/core-lib",
+                    "installed_version": "4.3.x-dev",
+                    "installed_requires": null,
+                    "newest_stable": null,
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "not_from_composer_repository",
+                    "local": true,
+                    "newest_is_installed": null
+                }
+            ],
+            "also": [],
+            "text": "composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); old-promise stays; Composer's solver checked it against the lock"
         }
     },
     "gitlab-anon\u2021": {
@@ -7607,6 +7862,120 @@
         },
         "move_in": "next_step",
         "partial": null
+    },
+    "mc-joint-dev\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.4.0",
+            "newest": "v5.4.45",
+            "constraint": "^5.4",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "package",
+                    "package": "symfony/validator",
+                    "version": "v4.4.48",
+                    "link": "conflict",
+                    "target": null,
+                    "constraint": ">=5.0",
+                    "holder": {
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "require",
+                            "to_branch": "5.x",
+                            "constraint": "^5.4.43",
+                            "check": {
+                                "result": "not_checked",
+                                "form": null,
+                                "reason": "unloaded_name",
+                                "installs": null
+                            }
+                        }
+                    }
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": {
+                "result": "refused",
+                "form": null,
+                "reason": null,
+                "installs": null
+            },
+            "moves_with": [],
+            "composer_moves_because": [
+                "holders",
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/translation",
+                    "v5.4.0",
+                    "--locked"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "friendsofsymfony/user-bundle",
+                    "installed_version": "v3.4.0",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "v4.1.0",
+                        "released": "2026-02-13T21:22:55+00:00"
+                    },
+                    "newest_requires": true,
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
+                }
+            ],
+            "also": [],
+            "text": "move symfony/translation to ^5.4 through friendsofsymfony/user-bundle \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/validator v4.4.48 (conflicts with >=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+        }
     },
     "mc-joint-retag\u2021": {
         "next_step": {

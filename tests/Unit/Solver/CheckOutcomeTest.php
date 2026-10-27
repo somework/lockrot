@@ -186,6 +186,30 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([['package' => 'h/dev', 'installed_version' => 'dev-main', 'version' => 'dev-main']], $joined->movesWith());
     }
 
+    /** wallabag-7.4 symfony/translation: the joint solve moves the vulnerable symfony/validator from its tag to an unreleased branch snapshot. */
+    public function testAJointSolveThatMovesAHolderFromATagToADevVersionKeepsTheFirstRefusal(): void
+    {
+        $hold = new Holder(Holder::PACKAGE, 'symfony/validator', 'v4.4.48', Holder::CONFLICT, '>=5.0');
+        $outcome = new CheckOutcome(MoveCheck::refused(), [$hold]);
+        $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, 'v5.4.45')))->withChanges(['symfony/translation' => 'v5.4.45', 'symfony/validator' => '4.4.x-dev'], ['symfony/translation' => 'v4.4.47', 'symfony/validator' => 'v4.4.48']);
+
+        $joined = $outcome->joinedWith($joint, 'symfony/translation', '^5.4', ['symfony/validator']);
+
+        self::assertSame([MoveCheck::REFUSED, [$hold], []], [$joined->check()->result(), $joined->holds(), $joined->movesWith()]);
+    }
+
+    /** One holder that the solve moves to a dev version spoils the solve, although another holder moves to a tag. */
+    public function testAJointSolveThatMovesOneOfTwoHoldersToADevVersionKeepsTheFirstRefusal(): void
+    {
+        $holds = [new Holder(Holder::PACKAGE, 'h/tag', '1.0.0', Holder::REQUIRE, '^1.0'), new Holder(Holder::PACKAGE, 'h/dev', '1.0.0', Holder::REQUIRE, '^1.0')];
+        $outcome = new CheckOutcome(MoveCheck::refused(), $holds);
+        $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['acme/lib' => '2.0.0', 'h/tag' => '2.0.0', 'h/dev' => 'dev-main'], ['acme/lib' => '1.0.0', 'h/tag' => '1.0.0', 'h/dev' => '1.0.0']);
+
+        $joined = $outcome->joinedWith($joint, 'acme/lib', '^2.0', ['h/dev', 'h/tag']);
+
+        self::assertSame([MoveCheck::REFUSED, $holds, []], [$joined->check()->result(), $joined->holds(), $joined->movesWith()]);
+    }
+
     /** SPEC §5.6, case `mc-joint-retag‡`: the tag 1.0.0 of h/x points at a new commit, and a new install of the same tag changes no holder. */
     public function testAJointSolveThatInstallsAHolderAgainAtItsLockedTagKeepsTheFirstRefusal(): void
     {

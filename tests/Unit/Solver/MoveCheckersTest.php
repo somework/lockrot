@@ -50,7 +50,25 @@ final class MoveCheckersTest extends TestCase
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', null));
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '7.4.29'));
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.41.0'));
+        self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.5.1'));
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.4-dev'));
+    }
+
+    /** Composer normalises a bare major (`8`) to 8.0.0, so it lies in the target minor 8.0. */
+    public function testAPlatformPhpThatComposerNormalisesIntoTheTargetMinorIsKept(): void
+    {
+        self::assertSame(['8', '7', '8.0.0.0'], [MoveCheckers::platformPhp('8.0', '8'), MoveCheckers::platformPhp('7.0', '7'), MoveCheckers::platformPhp('8.0', '8.0.0.0')]);
+    }
+
+    public function testAPlatformPhpThatComposerCannotNormaliseIsNotInTheTargetMinor(): void
+    {
+        self::assertSame('8.0.99', MoveCheckers::platformPhp('8.0', 'eight'));
+    }
+
+    /** Composer reads `202010` as a date version with no minor. */
+    public function testAPlatformPhpThatComposerReadsAsADateIsNotInTheTargetMinor(): void
+    {
+        self::assertSame('8.0.99', MoveCheckers::platformPhp('8.0', '202010'));
     }
 
     /** The regular expression reads the target minor literally: its dot matches only a dot. */
