@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Check that resources/report/ holds a plain release of the renderer, attested by the renderer's
-# release workflow for the tag that the manifest names and the commit that update-renderer pinned ("Which renderer a lockrot release vendors" in
-# tools/report/README.md). The release pull request into main and the tag workflow run it.
+# Check that resources/report/ holds a plain release of the renderer. The renderer's release
+# workflow must attest it for the tag that the manifest names and the commit that update-renderer
+# pinned ("Which renderer a lockrot release vendors" in tools/report/README.md). The release pull
+# request into main and the tag workflow run it.
 #
 #   tools/report/check-vendored     exit 1 on a pre-release or a local build, non-zero on a missing attestation
 set -euo pipefail

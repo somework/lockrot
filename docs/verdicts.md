@@ -26,7 +26,9 @@ Verdict order, used by the grade values of [`--fail-on`](ci.md) and the report's
 
 - A *finding* is any entry in the report's `findings`: one per analysed package, `ok` included. A
   *graded* finding has a grade, `critical` to `low`. `--format=json` and `--format=html` carry
-  every finding. The other formats list the score-0 findings only with `--all`.
+  every finding. `table` and `markdown` list the score-0 findings only with `--all`. `github`,
+  `sarif` and `gitlab` also give a record to each one that fails `unchecked`
+  ([`--fail-on=unchecked` in the formats](ci.md#unchecked-in-the-formats)).
 
 - A finding's `lead` is its first counted maintenance flag, in flag order, or null. It names the
   cause that heads the score line. No gate or sort reads it.
@@ -876,7 +878,7 @@ it. It also gives the answer of Composer's solver:
   [the move check](#the-move-check) does.
 - `check` is `resolves`, `refused` or `not_checked`. On `resolves`, `command` holds the update that
   resolved. On `refused`, `held_by` lists the links that the refusal names, as a move's `held_by[]`
-  does. On `not_checked`, `reason` says why, and it is null when the run checked no move.
+  does. On `not_checked`, `reason` says why.
 - A root link on `php` or `php-64bit` that excludes the target is the root ceiling. No update can
   admit the target, so `check` is `refused` with no solve. `held_by` names each such root link with
   its section: `require`, `require-dev` or `conflict`.

@@ -358,7 +358,9 @@ maintainer.
 
     - The heading carries the day of the final `vX.Y.Z` tag, not the day of the rc tag. Write the
       planned tag day. If the final tag falls on another day, add a commit to the release pull
-      request that changes only that date. That commit changes no file of the contract bundle.
+      request that changes only that date. That commit changes no file of the contract bundle. If
+      the day changes after the merge, open a pull request into `main` that changes only that
+      date, and tag its merge commit.
 
     - Copy every `resources/lockrot-*.schema.json` file to
       `tests/fixtures/schema-evolution/schemas/X.Y.Z/` and pin their sha256 in `RELEASED_SCHEMAS`

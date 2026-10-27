@@ -174,8 +174,8 @@ composer lockrot --format=github --fail-on=high --target-php=8.4 \
   as a command ([PHAR](phar.md#what-the-phar-does-and-does-not-do)).
 - **Contents.** Each file is byte for byte what `--format=<that format>` prints for the same run.
   There are two exceptions. In a `table` file, lockrot writes no colours or console markup, and it
-  wraps the file at 120 columns, whatever the terminal. A `markdown` file keeps within
-  `--markdown-max-bytes`, so it can leave out rows that stdout prints.
+  wraps the file at 120 columns, whatever the terminal. A `markdown` file can leave out rows that
+  stdout prints, because of `--markdown-max-bytes`.
 - **Relative paths.** Relative to the directory lockrot runs in. `-d <dir>` changes it, so
   `composer --working-dir=app lockrot --output=json:r.json` writes `app/r.json`. In plugin mode,
   when the current directory has no `composer.json`, Composer's

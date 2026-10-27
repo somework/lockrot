@@ -14,7 +14,7 @@ cd "$(dirname "$0")/../.."
 REPO=somework/lockrot-report
 DEST=resources/report
 FILES=(report.html manifest.json)
-# A tag of the renderer can move. check-vendored verifies the attestation against this commit too.
+# A tag of the renderer can move: the pinned commit names the build that this script vendored.
 PIN=tools/report/renderer-commit
 
 usage() { sed -n '2,6p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }

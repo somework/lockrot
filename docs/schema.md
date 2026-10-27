@@ -313,7 +313,7 @@ shapes leave out the parts that do not apply. A score of 0 carries only `model`,
 | `score_rules_used` | object | Rule id → the number of findings on which the rule changed or decided a number. Null for `sort` |
 | `advisory_lookup` | object | `scope` and `scope_source`, the packages asked and not asked, and each Composer repository that can publish advisories, with its `outcome` ([Which advisories count](verdicts.md#which-advisories-count)) |
 | `move_check` | object or null | Which Composer checked the moves (`composer`), and whether it blocked the versions that an advisory affects. `blocking_disabled_by` lists the environment variables that turned that blocking off, `[]` when none did. `baseline` says whether Composer's solver resolves or refuses the lock itself, with `reason` when lockrot did not check it. `ignores_extensions` is always true: the solve ignores every `ext-*` requirement. `composer lockrot` always writes `move_check`. A run that checks no move says why in `baseline` and `reason` ([The move check](verdicts.md#the-move-check)) |
-| `php_window` | object or null | The PHP minors on which the lock installs, with require-dev (`with_dev`) and without (`without_dev`), and the links that set each edge. It also holds the lock's `platform-overrides.php` and the host features that a requirement names. `target` says whether the window admits the target PHP. `target_fix` names the update of the packages that exclude the target, and the answer of Composer's solver to it. Its `platform_step` says whether to set `config.platform.php` to your release of the target PHP first. Its `lock_platform` lists the root links that only the lock's `platform` holds. Null when the window is unknowable ([The PHP window](verdicts.md#the-php-window)) |
+| `php_window` | object or null | The PHP minors on which the lock installs, with require-dev (`with_dev`) and without (`without_dev`), and the links that set each edge. It also holds the lock's `platform-overrides.php` and the host features that a requirement names. `target` says whether the window admits the target PHP. `target_fix` names the update of the packages that exclude the target, and the answer of Composer's solver to it. Its `platform_step` says whether to set `config.platform.php` to your release of the target PHP first. Its `lock_platform` lists the root `require` links that exclude the target and that only the lock's `platform` or `platform-dev` holds. Null when the window is unknowable ([The PHP window](verdicts.md#the-php-window)) |
 
 ### The gate
 
@@ -497,8 +497,8 @@ Dates are RFC 3339 strings (`format: date-time`). These dates are plain `YYYY-MM
 - `allowlist.expires` and `unchecked_accepted[].accepted_by.expires`
 
 A years field, which the schema types as `years`, holds one decimal at most. A `libyears` field
-holds two decimals at most: a finding's `libyears`, `libyears.total` and
-`libyears.furthest_behind.libyears`.
+holds two decimals at most: a finding's `libyears`, `libyears.total`,
+`libyears.direct_requirements` and `libyears.furthest_behind.libyears`.
 
 ### The explanation
 
