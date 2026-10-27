@@ -9,6 +9,7 @@ use Lockrot\Clock;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Solver\MoveCheckers;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -237,6 +238,25 @@ final class PhpWindowTest extends TestCase
         self::assertNotNull($window['without_dev']['lower_edge']);
         self::assertSame('8.2.1', $window['without_dev']['lower_edge']['php']);
         self::assertSame(['>=8.2.1'], array_column($window['without_dev']['lower_edge']['set_by'], 'constraint'), 'read at 8.2.0, the patch below the edge');
+    }
+
+    /** The conflict on 8.2.0 fails only at 8.2.0, so it is no `set_by` of the edge 8.2.2. */
+    public function testThePatchFloorIsReadAtThePatchBelowIt(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php' => '>=8.2.2']), self::package('acme/b', [], ['php' => '8.2.0'])], 'packages-dev' => []];
+        $edge = self::window($lock, ['config' => ['platform' => ['php' => '8.2.0']]], '8.2')['without_dev']['lower_edge'];
+
+        self::assertNotNull($edge);
+        self::assertSame('8.2.2', $edge['php']);
+        self::assertSame(['>=8.2.2'], array_column($edge['set_by'], 'constraint'));
+    }
+
+    public function testAPatchFloorAtTheNewestPatchIsTheLowerEdge(): void
+    {
+        $edge = self::window(['packages' => [self::package('acme/a', ['php' => '>=8.2.'.MoveCheckers::NEWEST_PATCH])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.2.0']]], '8.2')['without_dev']['lower_edge'];
+
+        self::assertNotNull($edge);
+        self::assertSame('8.2.'.MoveCheckers::NEWEST_PATCH, $edge['php']);
     }
 
     public function testAPatchFloorInsideTheTargetMinorKeepsTheTargetFix(): void
