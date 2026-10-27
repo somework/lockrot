@@ -342,7 +342,7 @@ final class MoveTest extends TestCase
         $move = JsonPath::arrayAt($finding, ['next_step']);
 
         self::assertSame(['require', 'left-behind', '2.0.0'], [$move['kind'], $move['source'], JsonPath::stringAt($move, ['check', 'installs'])]);
-        self::assertContains(['id' => 'left-behind', 'basis' => 'branch_releasing'], array_map(static fn ($fact): array => ['id' => $fact['id'], 'basis' => $fact['basis'] ?? null], JsonPath::arrayAt($move, ['clears'])));
+        self::assertSame('branch_releasing', array_column(JsonPath::arrayAt($move, ['clears']), 'basis', 'id')['left-behind'] ?? null);
     }
 
     /** Offline, the move's own versions were never asked about: every rerun says so. */

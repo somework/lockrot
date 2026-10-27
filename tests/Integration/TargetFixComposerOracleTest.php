@@ -36,6 +36,8 @@ use PHPUnit\Framework\TestCase;
  * @coversNothing
  *
  * @group covers-nothing
+ *
+ * @phpstan-import-type Fix from PhpWindow
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
@@ -118,7 +120,7 @@ final class TargetFixComposerOracleTest extends TestCase
     /**
      * The run's `target_fix` from the real move check, at the solve point that the recording set.
      *
-     * @return array{packages: list<array{name: ?string}>, check: string, command: ?list<string>}
+     * @return Fix
      */
     private static function targetFix(FixtureRepositoryServer $server, string $dir, string $target): array
     {
