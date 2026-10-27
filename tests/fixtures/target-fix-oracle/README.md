@@ -23,6 +23,7 @@ with its own `COMPOSER_HOME` and `TMPDIR`. fragility-ok: provenance of a recordi
 
 `p2/` was recorded at the same moment with
 `bin/record-fixtures --into=tests/fixtures/target-fix-oracle/p2 --before=2026-10-27T03:12:46+00:00 --names=<name,name~dev,…>`. fragility-ok: provenance of a recording
+
 The names are the ones that the solve of each lock asked of packagist.org, and `p2/names.json` lists
 them. A partial update loads only the names that it unlocks and their new dependencies, so a lock's
 other names keep their locked versions. Packagist answers 404 to the virtual names
@@ -30,6 +31,9 @@ other names keep their locked versions. Packagist answers 404 to the virtual nam
 `psr/http-client-implementation` and `psr/http-factory-implementation`. The advisory answers are the
 ones that `TargetFixComposerOracleTest::ADVISORIES` names. `skeletons/laminas` has none: the root's
 own php requirement refuses it.
+
+A second run recorded the rows of `apps/PrestaShop_PrestaShop` in the same way, at 44853f68. fragility-ok: provenance of a recording
+Its p2 answers used `--before=2026-10-27T14:39:00+00:00`. fragility-ok: provenance of a recording
 
 The refusal of `sites/drupal-site` comes from advisory blocking: Composer does not load the
 `laminas/laminas-diactoros` releases that `drupal/core` and `drupal/core-recommended` require. A
