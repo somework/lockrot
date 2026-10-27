@@ -46,8 +46,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
   `require.php` stops below the newest PHP minor that the root php allows. It decides at once, and
   comes after `stale`, so `--fail-on=stale` keeps its reach. A baseline entry that records any
-  maintenance flag covers it. A grade gate at `medium` or `low` can fail where 0.13 passed. Action:
-  run once without a gate. ([Capped](docs/verdicts.md#capped))
+  maintenance flag covers it. Every grade gate can fail where 0.13 passed: its 8 points can lift a
+  score to `high` or `critical`. Action: run once without a gate. ([Capped](docs/verdicts.md#capped))
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
   is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
@@ -113,8 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **JSON:** `run.move_check.blocking_disabled_by` lists each environment variable and
   composer.json key that turns Composer's advisory blocking off. The move check then blocks no
-  advisory. A variable value that Composer refuses stops the run with exit code 2.
-  `policy.advisories.audit: ignore` alone writes no run note `advisories_disabled_by_policy`.
+  advisory. `policy.advisories.audit: ignore` alone writes no run note `advisories_disabled_by_policy`.
   ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** Composer's solver checks each move against the lock, and the move
   writes `check` with the release it `installs`. A refused move asks once more with its holders, and
@@ -224,6 +223,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   action writes its job summary from an `--offline` run, which shows no advisory on 0.14: upgrade
   the action before you set `version: latest`.
   ([Upgrading to 0.14](docs/changes/0.14.md#how-014-reaches-you))
+- **Breaking:** **Config:** on Composer 2.10 and later, a value that Composer refuses in
+  `COMPOSER_NO_BLOCKING`, `COMPOSER_NO_SECURITY_BLOCKING`, `COMPOSER_POLICY`,
+  `COMPOSER_POLICY_ADVISORIES_BLOCK` or `config.policy` exits 2, `--offline` too. 0.13 read none of
+  them. Action: set the variable to `0`, `1`, `true`, `false`, `on` or `off`, or fix the key.
+  ([The move check](docs/verdicts.md#the-move-check))
 - **Breaking:** **Config:** an `ignore[].flags`, `accept-unchecked` or `advisory-lookup` value that
   0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2. One
   run names each refusal of `fail-on` and `ignore[].flags`, and each schema error. Action: give

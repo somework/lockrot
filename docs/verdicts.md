@@ -788,7 +788,7 @@ Limits of the check:
     `config.policy.advisories` is not set. `policy.advisories.audit` is not a switch.
 
     When Composer refuses the value of one of the variables, such as `COMPOSER_NO_BLOCKING=maybe`,
-    lockrot stops with exit code 2 and prints Composer's message.
+    or the value of `config.policy`, lockrot stops with exit code 2 and prints Composer's message.
 
 - When a package that a resolving solve asks for could not be loaded, the solve can resolve at a
   lower release than Composer installs. The move is then not checked, with the load reason
