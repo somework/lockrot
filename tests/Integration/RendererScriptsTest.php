@@ -12,8 +12,8 @@ use Symfony\Component\Process\Process;
 /**
  * tools/report/update-renderer vendors the renderer, and tools/report/check-vendored is the check of
  * the release pull request and of phar.yml. Each runs in a copy of the repository layout, with a
- * stand-in `gh` that serves the named assets of a lockrot-report release from a directory,
- * refuses any other argument, and answers each attestation with FAKE_ATTESTATION. A verified
+ * stand-in `gh`. The stand-in serves the named assets of a lockrot-report release from a directory
+ * and refuses any other argument. It answers each attestation with FAKE_ATTESTATION. A verified
  * attestation prints FAKE_DIGEST, the source commit that `--jq` selects.
  *
  * @coversNothing
