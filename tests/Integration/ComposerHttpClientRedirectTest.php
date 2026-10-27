@@ -50,9 +50,6 @@ final class ComposerHttpClientRedirectTest extends TestCase
 
     protected function setUp(): void
     {
-        if (!HttpDownloader::isCurlEnabled()) {
-            self::markTestSkipped('Composer drops the header through curl only');
-        }
         $this->dir = sys_get_temp_dir().'/lockrot-redirect-'.bin2hex(random_bytes(4));
         mkdir($this->dir.'/root', 0777, true);
         file_put_contents($this->dir.'/root/router.php', self::ROUTER);
@@ -70,12 +67,12 @@ final class ComposerHttpClientRedirectTest extends TestCase
     }
 
     /** @return array<mixed> */
-    private function headersSeenAfter(string $path): array
+    private function headersSeenAfter(string $path, ?bool $refusesRedirects = null): array
     {
         $io = new NullIO();
         $config = HermeticComposerConfig::create($this->dir.'/home', $io);
         $config->merge(['config' => ['secure-http' => false]]);
-        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'));
+        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'), null, $refusesRedirects);
         $url = $this->server->url().$path;
 
         $result = $client->fetchAll([$url], self::HEADERS)[$url];
@@ -89,6 +86,9 @@ final class ComposerHttpClientRedirectTest extends TestCase
 
     public function testARedirectToAnotherHostArrivesWithoutLockrotsCredentials(): void
     {
+        if (!HttpDownloader::isCurlEnabled()) {
+            self::markTestSkipped('Composer takes prevent_url_access_callable through curl only');
+        }
         if (version_compare(Composer::getVersion(), '2.10.0-dev', '<')) {
             self::markTestSkipped('Composer 2.10 or later: an older Composer replays the headers (docs/internals.md#which-credentials)');
         }
@@ -103,6 +103,23 @@ final class ComposerHttpClientRedirectTest extends TestCase
         self::assertSame(
             ['authorization' => 'token secret', 'private_token' => 'secret', 'user_agent' => 'lockrot'],
             $this->headersSeenAfter('/same-host')
+        );
+    }
+
+    /** Ruling R5-40: a downloader that cannot stop a redirect, as Composer below 2.10 or without curl. */
+    public function testARedirectToAnotherHostArrivesWithoutLockrotsCredentialsOnAnyComposer(): void
+    {
+        self::assertSame(
+            ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot'],
+            $this->headersSeenAfter('/other-host', false)
+        );
+    }
+
+    public function testARedirectOnTheSameHostKeepsLockrotsCredentialsOnAnyComposer(): void
+    {
+        self::assertSame(
+            ['authorization' => 'token secret', 'private_token' => 'secret', 'user_agent' => 'lockrot'],
+            $this->headersSeenAfter('/same-host', false)
         );
     }
 }

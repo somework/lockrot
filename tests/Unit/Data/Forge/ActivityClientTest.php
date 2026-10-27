@@ -20,6 +20,12 @@ final class ActivityClientTest extends TestCase
     private const GL_PROJECT = 'https://gitlab.com/api/v4/projects/group%2Fsub%2Fproject';
     private const BB_COMMITS = 'https://api.bitbucket.org/2.0/repositories/workspace/repo/commits?pagelen=1';
 
+    /** @param list<string> $headers */
+    private static function forbidden(array $headers): HttpResult
+    {
+        return new HttpResult(self::GH_URL, 403, '{"message":"forbidden"}', new \DateTimeImmutable(self::FETCHED), null, $headers);
+    }
+
     /**
      * @param array<string, HttpResult|array{int, string}>       $map
      * @param \ArrayObject<int, array{list<string>, list<string>}> $batches
@@ -98,7 +104,7 @@ final class ActivityClientTest extends TestCase
     public function testGithubRateLimitAndOtherFailuresAreToldApart(): void
     {
         $batches = new \ArrayObject();
-        $client = new ActivityClient($this->http([self::GH_URL => [403, '{"message":"API rate limit exceeded"}']], $batches), ForgeAuth::anonymous());
+        $client = new ActivityClient($this->http([self::GH_URL => self::forbidden(['x-ratelimit-remaining: 0'])], $batches), ForgeAuth::anonymous());
         $batch = $client->fetch([self::github()]);
         self::assertTrue($batch->rateLimited('github.com'));
         self::assertSame(['github.com/Grandt/PHPZip' => 'HTTP 403'], $batch->failedOn(RepoRef::GITHUB));
@@ -113,8 +119,15 @@ final class ActivityClientTest extends TestCase
         $client = new ActivityClient($this->http([self::GH_URL => HttpResult::failure(self::GH_URL, 'timed out', new \DateTimeImmutable(self::FETCHED))], new \ArrayObject()), ForgeAuth::anonymous());
         self::assertSame(['github.com/Grandt/PHPZip' => 'timed out'], $client->fetch([self::github()])->failed());
 
-        // GitHub answers an exhausted quota with 403 and a secondary limit with 429. No other
-        // status is the repository host asking to be left alone.
+        // GitHub answers a limit with 403 or 429. A 403 is a limit only when its headers say so (ruling R5-38).
+        $client = new ActivityClient($this->http([self::GH_URL => self::forbidden(['retry-after: 60'])], new \ArrayObject()), ForgeAuth::anonymous());
+        self::assertTrue($client->fetch([self::github()])->rateLimited('github.com'), 'a secondary limit');
+
+        $client = new ActivityClient($this->http([self::GH_URL => self::forbidden(['x-ratelimit-remaining: 4999'])], new \ArrayObject()), ForgeAuth::anonymous());
+        $batch = $client->fetch([self::github()]);
+        self::assertFalse($batch->rateLimited('github.com'), 'a repository behind SAML or blocked');
+        self::assertSame(['github.com/Grandt/PHPZip' => 'HTTP 403'], $batch->failed());
+
         $client = new ActivityClient($this->http([self::GH_URL => [429, '']], new \ArrayObject()), ForgeAuth::anonymous());
         $batch = $client->fetch([self::github()]);
         self::assertTrue($batch->rateLimited('github.com'));
@@ -130,7 +143,7 @@ final class ActivityClientTest extends TestCase
         $otherUrl = 'https://api.github.com/repos/other/repo';
 
         $client = new ActivityClient($this->http([
-            self::GH_URL => [403, '{"message":"API rate limit exceeded"}'],
+            self::GH_URL => self::forbidden(['x-ratelimit-remaining: 0']),
             $otherUrl => [200, '{"archived":false,"pushed_at":"2020-01-01T00:00:00Z"}'],
         ], new \ArrayObject()), ForgeAuth::anonymous());
 
