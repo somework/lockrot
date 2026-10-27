@@ -167,8 +167,11 @@ final class MarkdownFormatter implements FormatterInterface
     private function footer(Report $report): array
     {
         $spans = [];
-        $name = static function (string $package) use (&$spans): string {
-            $placeholder = \sprintf("\x00%d\x00", \count($spans));
+        // A nonce, because self::text() writes a NUL and a literal `\x00` alike: data on a footer
+        // line cannot then spell a placeholder.
+        $nonce = bin2hex(random_bytes(16));
+        $name = static function (string $package) use (&$spans, $nonce): string {
+            $placeholder = \sprintf("\x00%s-%d\x00", $nonce, \count($spans));
             // The key is the placeholder as self::text() writes it, because the spans go in after it.
             $spans[self::text($placeholder)] = self::code($package);
 
@@ -222,6 +225,9 @@ final class MarkdownFormatter implements FormatterInterface
         // the lock of a fork's pull request is its author's text. An `@` after a letter or a digit
         // with no dotted domain after it is neither, such as the stability flag of `~0.4@dev`.
         $value = (string) preg_replace('/(?<![A-Za-z0-9])@|@(?=[A-Za-z0-9_\\\\-]+\\.[A-Za-z0-9])/', '@&#8203;', str_replace('://', '\\://', $value));
+        // GitHub renders `$…$` as math and `:name:` as an emoji, and neither a backslash nor an
+        // entity stops them. A `$` in a span and a zero-width space after the `:` do.
+        $value = (string) preg_replace('/:(?=(?:[A-Za-z0-9+-]|\\\\_)+:)/', ':&#8203;', str_replace('$', '<span>$</span>', $value));
 
         return (string) preg_replace('/(www)\./i', '$1\\\\.', $value);
     }

@@ -96,7 +96,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   json, sarif, gitlab or the `--explain` JSON, which write `##[` as `#\u0023[`, the same decoded text.
   ([What lockrot does](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **markdown:** text from the lock cannot mention a user or a team, or link a bare URL or an email
-  address, in a pull request comment or a job summary. ([`--format=markdown`](docs/ci.md#-formatmarkdown))
+  address, in a pull request comment or a job summary. It cannot render as math or as an emoji, or
+  stand in for a package name on a footer line. ([`--format=markdown`](docs/ci.md#-formatmarkdown))
 - **All formats:** a repository URL with a `.` or `..` path segment names no repository, so a lock
   cannot send the token to another API path of the repository host.
 
