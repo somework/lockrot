@@ -8,7 +8,7 @@ use Composer\Config;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
-use Composer\Semver\Semver;
+use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\VersionParser;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
@@ -79,7 +79,10 @@ final class MoveCheckers
     private static function isStableIn(string $version, string $minor): bool
     {
         try {
-            return VersionParser::parseStability($version) === 'stable' && Semver::satisfies($version, '~'.$minor.'.0');
+            $parser = new VersionParser();
+
+            return VersionParser::parseStability($version) === 'stable'
+                && $parser->parseConstraints('~'.$minor.'.0')->matches(new Constraint('==', $parser->normalize($version)));
         } catch (\UnexpectedValueException $e) {
             return false;
         }

@@ -70,7 +70,6 @@
         "Composer\\Semver\\Constraint\\MatchAllConstraint",
         "Composer\\Semver\\Constraint\\MultiConstraint",
         "Composer\\Semver\\Intervals",
-        "Composer\\Semver\\Semver",
         "Composer\\Semver\\VersionParser",
         "Composer\\Util\\Bitbucket",
         "Composer\\Util\\Http\\Response",
