@@ -148,6 +148,9 @@ final class UncheckedAcceptanceTest extends TestCase
         yield 'case, port, .git and a trailing slash' => ['https://Git.Example.com:8443/acme/x.git/', null, null, 'https://git.example.com:8443/acme/x', true];
         yield 'a slash before .git' => ['https://h.example/acme/x/.git', null, null, 'https://h.example/acme/x', true];
         yield 'another port' => ['https://git.example.com:8443/acme/x', null, null, 'https://git.example.com/acme/x', false];
+        yield 'the https default port written out' => ['https://git.example.com:443/acme/x', null, null, 'https://git.example.com/acme/x', true];
+        yield 'the http default port in the source' => ['http://git.example.com/acme/x', null, null, 'http://git.example.com:80/acme/x', true];
+        yield 'the https port on http' => ['http://git.example.com:443/acme/x', null, null, 'http://git.example.com/acme/x', false];
         yield 'another host' => ['https://a.example/acme/x', null, null, 'https://b.example/acme/x', false];
         yield 'another path' => ['https://h.example/acme/x', null, null, 'https://h.example/acme/y', false];
         yield 'a path in another case' => ['https://h.example/Acme/X', null, null, 'https://h.example/acme/x', false];
@@ -177,8 +180,9 @@ final class UncheckedAcceptanceTest extends TestCase
         $now = new \DateTimeImmutable(self::NOW);
         $accepts = static fn (string $entry, ?string $host): bool => UncheckedAcceptance::fromConfig([['check' => 'repository_activity', 'host' => $entry, 'reason' => 'x']])->acceptedBy($check, 'acme/x', $host, null, null, [], $now) !== null;
 
-        self::assertSame([true, true, false, false, false], [
+        self::assertSame([true, true, true, false, false, false], [
             $accepts('git.example.com', 'git.example.com'),
+            $accepts('git.example.com:08443', 'git.example.com:8443'),
             $accepts('git.example.com', 'git.example.com/group'),
             $accepts('git.example.com', 'git.example.comx'),
             $accepts('git.example.com:8443', 'git.example.com'),
