@@ -596,7 +596,8 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 ```text
   phpseclib/phpseclib 3.0.55  via php-amqplib/php-amqplib, php-amqplib/rabbitmq-bundle  ·  vulnerable
       8 = vulnerable 8 [medium advisory]
-      do: composer update 'phpseclib/phpseclib:^3.0.57' (gets 3.0.57) — clears the advisory; Composer's solver checked it against the lock
+      do: composer update 'phpseclib/phpseclib:^3.0.57'
+          (gets 3.0.57) — clears the advisory; Composer's solver checked it against the lock
 ```
 
 | Kind | For | The line |
@@ -1008,14 +1009,14 @@ run](example-run.md):
 ```text
   wallabag/rulerz-bundle dev-master  direct  ·  pinned
       16 = pinned 16
-      pulls in 15 flagged packages: hoa/consistency (abandoned), hoa/compiler (abandoned), hoa/event (abandoned),
-      hoa/exception (abandoned), hoa/file (abandoned) and 10 more
+      pulls in 15 flagged packages: hoa/consistency (abandoned · old-promise), hoa/compiler (abandoned), hoa/event
+      (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 10 more
 ```
 
-The evidence names the first few, each with its lead or `vulnerable`. `--format=json` carries them
-all under the signal's `data.packages`, each with its `verdict`, `lead`, `flag_ids` and `chain`. A
-direct requirement that scores 0 carries S7 too: its row prints only under `--all`, and the
-`pulled in by:` line counts it either way.
+The evidence names the first few, each with its counted flags in flag order, `vulnerable`
+included. `--format=json` carries them all under the signal's `data.packages`, each with its
+`verdict`, `lead`, `flag_ids` and `chain`. A direct requirement that scores 0 carries S7 too: its
+row prints only under `--all`, and the `pulled in by:` line counts it either way.
 
 ### Shared packages and `unattributed` {#shared-packages-and-unattributed}
 
@@ -1061,7 +1062,7 @@ through the packages that require it. The `depth:` footer line counts the graded
 far below `composer.json` they sit. From the [example run](example-run.md):
 
 ```text
-depth: 34 of 54 flagged packages are named by no line of composer.json · direct 20 · 1 hop 18 · 2 hops 9 ·
+depth: 36 of 58 flagged packages are named by no line of composer.json · direct 22 · 1 hop 20 · 2 hops 9 ·
 3 hops 5 · 4 hops 2 ·
 deepest: hoa/ustring and hoa/zformat, 4 hops (wallabag/rulerz › hoa/ruler › hoa/compiler › hoa/regex › hoa/ustring)
 ```
@@ -1167,7 +1168,7 @@ Libyears give one number for how far behind the whole lock is. The number decide
 From the [example run](example-run.md):
 
 ```text
-libyears: at least 187.9 behind across 194 of 200 packages · 119.8 from direct requirements ·
+libyears: at least 189.8 behind across 194 of 200 packages · 120.2 from direct requirements ·
 furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 ```
 
