@@ -11,6 +11,7 @@ use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Output\SarifRecords;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Signal;
+use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\SignalDataStub;
@@ -46,6 +47,19 @@ final class SarifRecordsTest extends TestCase
         $entry = BaselineEntries::of('a/b', '1.0.0', Verdict::STALE, '2026-06-01', $rows);
 
         return new SarifRecords($finding, null, BaselineComparison::compare(Baseline::of([$entry], '2026-09-14T00:00:00+00:00', '8.4', RunSettings::SOURCE_OPTION), $report, 'lockrot-baseline.json', ['a/b']));
+    }
+
+    /**
+     * SARIF 2.1.0 §3.11.6 reads `[text](any URI)` in plain text as an embedded link, and registry
+     * text reaches a message and an advisory rule. No `](` is left, so no link closes.
+     */
+    public function testRegistryTextCannotEmbedALinkInAMessageOrARule(): void
+    {
+        $message = SarifRecords::message('Update now: [read the fix](https://evil.example/x) or a\\](y)');
+        $rule = SarifRecords::rule('lockrot/advisory/PKSA-[x](https://evil.example/)', 'high', new Thresholds());
+
+        self::assertSame('Update now: [read the fix]\\(https://evil.example/x) or a\\]\\(y)', $message['text']);
+        self::assertSame('Security advisory PKSA-[x]\\(https://evil.example/) affects the installed version', $rule['shortDescription']['text']);
     }
 
     public function testTheAdvisoriesAreKnownOnlyWhenNoneIsNewReRatedOrWithALostFix(): void

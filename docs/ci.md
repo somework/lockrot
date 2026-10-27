@@ -376,7 +376,7 @@ The shape of one annotation:
   gives Composer's answer to
   [the update of the packages that exclude it](verdicts.md#the-update-that-admits-the-target).
 
-## `--format=sarif` {#-formatsarif}
+## <a name="-formatsarif"></a>`--format=sarif` {#-formatsarif}
 
 A [SARIF 2.1.0](https://json.schemastore.org/sarif-2.1.0.json) document for GitHub code scanning.
 Code scanning keeps the results in the Security tab and tracks them across runs. The upload needs
@@ -417,6 +417,8 @@ steps:
 - A tool that dismisses the alerts of suppressed results (such as `advanced-security/dismiss-alerts`)
   dismisses every result whose fact the baseline covers. A result that worsens loses its
   suppression.
+- A message holds text from a Composer repository, such as an advisory title. lockrot writes each
+  `](` in it as `]\(`, so a SARIF viewer reads no `[text](uri)` as a link.
 
 `originalUriBaseIds.%SRCROOT%` is the directory that the lock's path is relative to (the directory
 that lockrot runs in, or the lock's own when it lies outside it), as an absolute `file://` URL on

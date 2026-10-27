@@ -106,6 +106,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   address, an issue reference (`#1`, `GH-1`) or a commit hash, in a pull request comment or a job
   summary. It cannot render as math or as an emoji, or
   stand in for a package name on a footer line. ([`--format=markdown`](docs/ci.md#-formatmarkdown))
+- **sarif:** text from a Composer repository, such as an advisory title or id, cannot embed a link
+  (`[text](uri)`) in a message or a rule description. ([`--format=sarif`](docs/ci.md#-formatsarif))
 - **All formats:** a repository URL with a `.` or `..` path segment names no repository, so a lock
   cannot send the token to another API path of the repository host.
 
