@@ -338,7 +338,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 
     private const TIE = 'The model removes S5 from the case to make the tie. The installed release requires php >=5.3.3 and is older than the PHP 8.0 release, so lockrot raises S5 (old-promise).';
 
-    private const IF_APPLIED = 'The score after a move to the row follows its `fixes.lowest`. The model judges the row\'s newest tag as an upper bound, and lockrot judges its candidate exactly.';
+    private const IF_APPLIED = 'The model reads no date of a row\'s release, so old-promise stays unverified (`undated`) and the row\'s score is an upper bound (`at_most`). lockrot dates the release and judges old-promise exactly.';
 
     /** The paths of a line that no case with inputs fills, each with its reason. */
     private const UNFILLED = [
@@ -511,7 +511,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         }
     }
 
-    /** Each path of a line is filled by the model's or lockrot's fields of some case, or listed in UNFILLED. */
+    /** Each path of a line is filled by the model's fields of some case, or listed in UNFILLED. */
     public function testEveryPathOfALineIsFilledByACase(): void
     {
         $filled = [];
