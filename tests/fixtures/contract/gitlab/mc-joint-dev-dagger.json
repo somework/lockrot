@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/translation v4.4.47 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: move symfony/translation to ^5.4 through friendsofsymfony/user-bundle \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/validator v4.4.48 (conflicts with >=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock. (via friendsofsymfony/user-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "a925a7d1b2671547c2072fee8faaa33ccdc10dbb4a1413ec7001a8f3e1cc71e5",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 12
+            }
+        }
+    }
+]

@@ -576,6 +576,16 @@
             "argv": [
                 "composer",
                 "update",
+                "symfony/monolog-bundle:^3.11.2"
+            ],
+            "posix": "composer update 'symfony/monolog-bundle:^3.11.2'",
+            "cmd": "composer update \"symfony/monolog-bundle:^3.11.2\"",
+            "powershell": "composer --% update \"symfony/monolog-bundle:^3.11.2\""
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
                 "symfony/polyfill-intl-idn"
             ],
             "posix": "composer update symfony/polyfill-intl-idn",
@@ -1114,6 +1124,18 @@
             "posix": "composer why-not symfony/routing v6.4.41 --locked",
             "cmd": "composer why-not symfony/routing v6.4.41 --locked",
             "powershell": "composer --% why-not symfony/routing v6.4.41 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "symfony/translation",
+                "v5.4.0",
+                "--locked"
+            ],
+            "posix": "composer why-not symfony/translation v5.4.0 --locked",
+            "cmd": "composer why-not symfony/translation v5.4.0 --locked",
+            "powershell": "composer --% why-not symfony/translation v5.4.0 --locked"
         },
         {
             "argv": [

@@ -1,0 +1,5 @@
+::error file=composer.lock,line=4,title=lockrot%3A high — left-behind::symfony/google-mailer v4.4.41: 16 = left-behind 16. Do: require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45) — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock. left-behind: branch 4.x last released 2022-04-12 (4.5 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25).
+flags: left-behind 1
+depth: every flagged package is named in composer.json · direct 1
+php: the lock installs on PHP 7.4 to 8.5
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

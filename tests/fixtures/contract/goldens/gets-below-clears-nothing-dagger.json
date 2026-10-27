@@ -1,21 +1,21 @@
 {
-    "score_text": "16 = left-behind 16",
-    "next_step_text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45); 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; left-behind stays; a new major brings its own requirements; Composer's solver checked it against the lock",
+    "score_text": "8 = old-promise 16 ÷ 2 transitive",
+    "next_step_text": "composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); not checked: old-promise; Composer's solver checked it against the lock",
     "gate_line": null,
-    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed v4.4.41 released 2022-04-12 (4.5 years ago), the newest on 4.x; newest release v8.1.0 2026-05-29 (0.3 years ago); last push 2026-08-02 (0.2 years ago)",
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v3.5.0 released 2019-11-13 (6.9 years ago); 3.x last released v3.11.2 2026-04-02 (0.5 years ago); newest release v4.1.0 2026-09-10 (0.1 years ago); last push 2026-09-12 (0.1 years ago)",
     "explain_age": [
-        "installed  v4.4.41   2022-04-12   4.5 years ago",
-        "4.x        v4.4.41   2022-04-12   4.5 years ago                 past release-warn-years 3",
-        "newest     v8.1.0    2026-05-29   0.3 years ago                 below release-warn-years 3",
-        "last push            2026-08-02   0.2 years ago                 below push-warn-years 3",
-        "libyears 4.1 behind the newest stable release"
+        "installed  v3.5.0    2019-11-13   6.9 years ago",
+        "3.x        v3.11.2   2026-04-02   0.5 years ago                 below release-warn-years 3",
+        "newest     v4.1.0    2026-09-10   0.1 years ago                 below release-warn-years 3",
+        "last push            2026-09-12   0.1 years ago                 below push-warn-years 3",
+        "libyears 6.8 behind the newest stable release"
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer require 'symfony/google-mailer:^5.4'"
+        "composer update 'symfony/monolog-bundle:^3.11.2'"
     ],
     "commands_cmd": [
-        "composer require \"symfony/google-mailer:^5.4\""
+        "composer update \"symfony/monolog-bundle:^3.11.2\""
     ]
 }

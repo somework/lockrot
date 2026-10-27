@@ -1,17 +1,17 @@
 [
     {
         "type": "issue",
-        "check_name": "lockrot/left-behind",
-        "description": "symfony/google-mailer v4.4.41 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-04-12 (4.5 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45); 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; left-behind stays; a new major brings its own requirements; Composer's solver checked it against the lock.",
+        "check_name": "lockrot/old-promise",
+        "description": "symfony/monolog-bundle v3.5.0 \u2014 finding medium (8 = old-promise 16 \u00f7 2 transitive) \u2014 old-promise: released 2019-11-13 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); not checked: old-promise; Composer's solver checked it against the lock. (via mautic/core-lib)",
         "categories": [
             "Bug Risk"
         ],
-        "severity": "major",
-        "fingerprint": "77244121cfcd7be166b735f685bf30d2c2eb17b80eeb7c60fbb9bb2bb11e0f27",
+        "severity": "minor",
+        "fingerprint": "7170ecc4c65b4d7b4595cbd1f3c18f639eec5fa3707d35cb8f9aaa6419b98d70",
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 15
             }
         }
     }

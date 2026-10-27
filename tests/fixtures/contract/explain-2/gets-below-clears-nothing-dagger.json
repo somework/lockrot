@@ -4,56 +4,56 @@
         "version": "0.14.0",
         "schema": 2
     },
-    "package": "symfony/google-mailer",
-    "version": "v4.4.41",
+    "package": "symfony/monolog-bundle",
+    "version": "v3.5.0",
     "finding": {
-        "package": "symfony/google-mailer",
-        "version": "v4.4.41",
-        "branch": "4.x",
+        "package": "symfony/monolog-bundle",
+        "version": "v3.5.0",
+        "branch": "3.x",
         "installed_php": {
-            "requires": ">=7.1.3",
+            "requires": ">=5.6",
             "target_runs": true,
-            "project_allows": true
+            "project_allows": null
         },
-        "verdict": "high",
-        "priority": "high",
-        "lead": "left-behind",
+        "verdict": "medium",
+        "priority": "medium",
+        "lead": "old-promise",
         "rank": 1,
         "flags": [
             {
-                "id": "left-behind",
+                "id": "old-promise",
                 "role": "lead",
                 "baseline": null,
                 "signal_ids": [
-                    "S8"
+                    "S5"
                 ],
                 "degree": null,
                 "headline": {
-                    "unit": "years",
-                    "value": 4.5,
-                    "source": "branch"
+                    "unit": "php",
+                    "value": 5,
+                    "source": null
                 },
-                "summary": "branch 4.x last released 2022-04-12 (4.5 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)"
+                "summary": "released 2019-11-13 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
             }
         ],
         "score": {
             "model": 1,
-            "total": 16,
-            "exact": 16,
+            "total": 8,
+            "exact": 8,
             "rounded_down": false,
             "band": {
-                "floor": 16,
-                "next": "critical",
-                "to_next": 16
+                "floor": 8,
+                "next": "high",
+                "to_next": 8
             },
             "decided_by": "maintenance",
             "parts": {
                 "maintenance": {
                     "status": "counted",
-                    "contribution": 16,
+                    "contribution": 8,
                     "alone": {
-                        "total": 16,
-                        "verdict": "high"
+                        "total": 8,
+                        "verdict": "medium"
                     }
                 },
                 "security": {
@@ -70,72 +70,90 @@
             "terms": [
                 {
                     "part": "maintenance",
-                    "flag": "left-behind",
+                    "flag": "old-promise",
                     "role": "lead",
                     "weight": 16,
                     "divisor": 1,
                     "points": 16,
-                    "contribution": 16
+                    "contribution": 8
                 }
             ],
-            "modifiers": [],
+            "modifiers": [
+                {
+                    "reason": "transitive",
+                    "applies_to": "maintenance",
+                    "divide_by": 2,
+                    "before": 16,
+                    "after": 8
+                }
+            ],
             "accepted": [],
             "without": [],
-            "text": "16 = left-behind 16"
+            "text": "8 = old-promise 16 \u00f7 2 transitive"
         },
         "next_step": {
-            "kind": "require",
-            "source": "left-behind",
+            "kind": "update",
+            "source": "old-promise",
             "merged": [],
             "fix_kind": null,
             "reason": null,
             "replacement": null,
             "quiet_years": null,
-            "to_branch": "5.x",
-            "version": "v5.4.0",
-            "newest": "v5.4.45",
-            "constraint": "^5.4",
+            "to_branch": "3.x",
+            "version": "v3.11.2",
+            "newest": "v3.11.2",
+            "constraint": null,
             "latest": null,
             "php_check": {
-                "requires": ">=7.2.5",
-                "project_allows": true,
+                "requires": ">=8.1",
+                "project_allows": null,
                 "target_runs": true,
                 "raise_to": null,
                 "raise_size": null
             },
-            "crosses_major": true,
+            "crosses_major": false,
             "held_by": [],
             "clears": [],
-            "unverified": [],
-            "adds": [],
-            "leaves": [
+            "unverified": [
                 {
                     "kind": "flag",
-                    "id": "left-behind"
+                    "id": "old-promise",
+                    "reason": "undated"
                 }
             ],
+            "adds": [],
+            "leaves": [],
             "clears_all": false,
             "if_applied": null,
             "check": {
                 "result": "resolves",
                 "form": "inline",
                 "reason": null,
-                "installs": "v5.4.19"
+                "installs": "v3.6.0"
             },
             "moves_with": [],
-            "composer_moves_because": [
-                "crosses_major"
-            ],
+            "composer_moves_because": [],
             "commands": [
                 [
                     "composer",
-                    "require",
-                    "symfony/google-mailer:^5.4"
+                    "update",
+                    "symfony/monolog-bundle:^3.11.2"
                 ]
             ],
-            "through": [],
+            "through": [
+                {
+                    "package": "mautic/core-lib",
+                    "installed_version": "4.3.x-dev",
+                    "installed_requires": null,
+                    "newest_stable": null,
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "not_from_composer_repository",
+                    "local": true,
+                    "newest_is_installed": null
+                }
+            ],
             "also": [],
-            "text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45); 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; left-behind stays; a new major brings its own requirements; Composer's solver checked it against the lock"
+            "text": "composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); not checked: old-promise; Composer's solver checked it against the lock"
         },
         "security": {
             "status": "clear",
@@ -169,7 +187,7 @@
             "reason": null,
             "forge": "github",
             "host": "github.com",
-            "repo": "symfony/google-mailer",
+            "repo": "symfony/monolog-bundle",
             "event": "push",
             "archived": false,
             "fetched_at": "2026-09-14T00:00:00+00:00",
@@ -181,7 +199,7 @@
         "origin": {
             "kind": "packagist",
             "registry": "packagist.org",
-            "package_url": "https://packagist.org/packages/symfony/google-mailer",
+            "package_url": "https://packagist.org/packages/symfony/monolog-bundle",
             "local": false
         },
         "replacement": null,
@@ -189,110 +207,81 @@
         "note": null,
         "libyears_unmeasured": null,
         "libyears_at_least": false,
-        "direct": true,
+        "direct": false,
         "dev": false,
-        "reach": "direct",
+        "reach": "transitive",
         "chain": [
-            "symfony/google-mailer"
+            "mautic/core-lib",
+            "symfony/monolog-bundle"
         ],
-        "depth": 0,
+        "depth": 1,
         "depth_unmeasured": null,
-        "named_in": [
-            "require"
-        ],
+        "named_in": [],
         "direct_dependents": [
-            "symfony/google-mailer"
+            "mautic/core-lib"
         ],
         "signals": [
             {
-                "id": "S8",
+                "id": "S5",
                 "level": "warn",
-                "summary": "branch 4.x last released 2022-04-12 (4.5 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
+                "summary": "released 2019-11-13 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                 "data": {
-                    "branch": "4.x",
-                    "branch_last_release": "2022-04-12T15:19:55+00:00",
-                    "branch_last_version": "v4.4.41",
-                    "years": 4.5,
-                    "newest_branch": "8.x",
-                    "newest_version": "v8.1.0",
-                    "newest_release": "2026-05-29T05:06:50+00:00",
-                    "newest_php": ">=8.4.1",
-                    "newest_within_reach": false,
-                    "floor_php": ">=7.4",
-                    "floor_source": "project",
-                    "reachable_branch": "5.x",
-                    "reachable_version": "v5.4.45",
-                    "reachable_release": "2024-09-25T14:11:13+00:00",
-                    "suggested_constraint": "^5.4",
-                    "dated_by": null,
-                    "reachable_php": ">=7.2.5",
-                    "reachable_admits": {
-                        "project": true,
-                        "target": true
-                    },
-                    "newest_years": 0.3,
-                    "reachable_years": 2
+                    "target_php": "8.4",
+                    "target_major": "8.0",
+                    "ga_date": "2020-11-26",
+                    "php_constraint": ">=5.6",
+                    "written_for_php": 5,
+                    "released": "2019-11-13T13:11:14+00:00"
                 }
             }
         ],
-        "evidence": "left-behind: branch 4.x last released 2022-04-12 (4.5 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
+        "evidence": "old-promise: released 2019-11-13 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
         "allowlist_reason": null,
         "data_date": "2026-10-01T17:41:20+00:00",
-        "libyears": 4.13,
+        "libyears": 6.83,
         "age": {
             "installed": {
-                "at": "2022-04-12T15:19:55+00:00",
-                "years": 4.5,
+                "at": "2019-11-13T13:11:14+00:00",
+                "years": 6.9,
                 "dated_by": null
             },
             "installed_unmeasured": null,
             "release": {
-                "version": "v8.1.0",
-                "at": "2026-05-29T05:06:50+00:00",
-                "years": 0.3,
+                "version": "v4.1.0",
+                "at": "2026-09-10T19:32:07+00:00",
+                "years": 0.1,
                 "level": null,
                 "dated_by": null
             },
             "release_unmeasured": null,
             "branch_release": {
-                "version": "v4.4.41",
-                "at": "2022-04-12T15:19:55+00:00",
-                "years": 4.5,
-                "level": "warn",
+                "version": "v3.11.2",
+                "at": "2026-04-02T18:23:01+00:00",
+                "years": 0.5,
+                "level": null,
                 "dated_by": null
             },
             "branch_release_unmeasured": null,
             "push": {
-                "at": "2026-08-02T09:30:53+00:00",
-                "years": 0.2,
+                "at": "2026-09-12T21:35:24+00:00",
+                "years": 0.1,
                 "level": null
             },
             "push_unmeasured": null
         },
         "baseline": null,
         "gate": {
-            "reaches_fail_on": true,
-            "fails": true,
+            "reaches_fail_on": false,
+            "fails": false,
             "exempt_by": null,
-            "by": [
-                {
-                    "value": "high",
-                    "kind": "grade",
-                    "facts": [
-                        {
-                            "kind": "flag",
-                            "id": "left-behind"
-                        }
-                    ]
-                }
-            ],
+            "by": [],
             "basis": null
         }
     },
     "lock": {
-        "php": ">=7.1.3",
-        "released": "2022-04-12T15:19:55+00:00",
-        "repository": "https://github.com/symfony/google-mailer.git",
+        "php": ">=5.6",
+        "released": "2019-11-13T13:11:14+00:00",
+        "repository": "https://github.com/symfony/monolog-bundle.git",
         "from_composer_repository": true,
         "dev": false,
         "branch_snapshot": false,
@@ -301,135 +290,91 @@
     "metadata": {
         "abandoned": false,
         "replacement": null,
-        "releases_listed": 7,
+        "releases_listed": 5,
         "has_stable_release": true,
-        "last_stable_release": "2026-05-29T05:06:50+00:00",
-        "last_stable_version": "v8.1.0",
+        "last_stable_release": "2026-09-10T19:32:07+00:00",
+        "last_stable_version": "v4.1.0",
         "last_stable_dated_by": null,
-        "installed_release": "2022-04-12T15:19:55+00:00",
+        "installed_release": "2019-11-13T13:11:14+00:00",
         "installed_release_dated_by": null,
         "repository": null,
         "type": "library",
         "data_date": "2026-10-01T17:41:20+00:00",
         "branches": [
             {
-                "branch": "8.x",
+                "branch": "4.x",
                 "installed": false,
-                "highest": "v8.1.0",
-                "highest_released": "2026-05-29T05:06:50+00:00",
+                "highest": "v4.1.0",
+                "highest_released": "2026-09-10T19:32:07+00:00",
                 "highest_commit_date": null,
-                "newest_dated": "v8.1.0",
-                "newest_dated_released": "2026-05-29T05:06:50+00:00",
-                "dated_by": null,
-                "php": ">=8.4.1",
-                "highest_php": ">=8.4.1",
-                "admits_target_php": true,
-                "admits_project_php": false,
-                "php_blocked_by": "project",
-                "misses_target_php": null,
-                "misses_project_php": "needs_newer",
-                "highest_admits_target_php": true,
-                "highest_admits_project_php": false,
-                "highest_misses_project_php": "needs_newer",
-                "released_years": 0.3,
-                "fixes": null
-            },
-            {
-                "branch": "7.x",
-                "installed": false,
-                "highest": "v7.4.0",
-                "highest_released": "2025-07-31T09:31:17+00:00",
-                "highest_commit_date": null,
-                "newest_dated": "v7.4.0",
-                "newest_dated_released": "2025-07-31T09:31:17+00:00",
+                "newest_dated": "v4.1.0",
+                "newest_dated_released": "2026-09-10T19:32:07+00:00",
                 "dated_by": null,
                 "php": ">=8.2",
                 "highest_php": ">=8.2",
                 "admits_target_php": true,
-                "admits_project_php": false,
-                "php_blocked_by": "project",
+                "admits_project_php": null,
+                "php_blocked_by": null,
                 "misses_target_php": null,
-                "misses_project_php": "needs_newer",
+                "misses_project_php": null,
                 "highest_admits_target_php": true,
-                "highest_admits_project_php": false,
-                "highest_misses_project_php": "needs_newer",
-                "released_years": 1.2,
+                "highest_admits_project_php": null,
+                "highest_misses_project_php": null,
+                "released_years": 0.1,
                 "fixes": null
             },
             {
-                "branch": "6.x",
-                "installed": false,
-                "highest": "v6.4.13",
-                "highest_released": "2024-09-25T14:18:03+00:00",
+                "branch": "3.x",
+                "installed": true,
+                "highest": "v3.11.2",
+                "highest_released": "2026-04-02T18:23:01+00:00",
                 "highest_commit_date": null,
-                "newest_dated": "v6.4.13",
-                "newest_dated_released": "2024-09-25T14:18:03+00:00",
+                "newest_dated": "v3.11.2",
+                "newest_dated_released": "2026-04-02T18:23:01+00:00",
                 "dated_by": null,
                 "php": ">=8.1",
                 "highest_php": ">=8.1",
                 "admits_target_php": true,
-                "admits_project_php": false,
-                "php_blocked_by": "project",
+                "admits_project_php": null,
+                "php_blocked_by": null,
                 "misses_target_php": null,
-                "misses_project_php": "needs_newer",
+                "misses_project_php": null,
                 "highest_admits_target_php": true,
-                "highest_admits_project_php": false,
-                "highest_misses_project_php": "needs_newer",
-                "released_years": 2,
+                "highest_admits_project_php": null,
+                "highest_misses_project_php": null,
+                "released_years": 0.5,
                 "fixes": null
             },
             {
-                "branch": "5.x",
+                "branch": "2.x",
                 "installed": false,
-                "highest": "v5.4.45",
-                "highest_released": "2024-09-25T14:11:13+00:00",
+                "highest": "v2.12.1",
+                "highest_released": "2017-01-02T19:04:26+00:00",
                 "highest_commit_date": null,
-                "newest_dated": "v5.4.45",
-                "newest_dated_released": "2024-09-25T14:11:13+00:00",
+                "newest_dated": "v2.12.1",
+                "newest_dated_released": "2017-01-02T19:04:26+00:00",
                 "dated_by": null,
-                "php": ">=7.2.5",
-                "highest_php": ">=7.2.5",
+                "php": ">=5.3.2",
+                "highest_php": ">=5.3.2",
                 "admits_target_php": true,
-                "admits_project_php": true,
+                "admits_project_php": null,
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
                 "highest_admits_target_php": true,
-                "highest_admits_project_php": true,
+                "highest_admits_project_php": null,
                 "highest_misses_project_php": null,
-                "released_years": 2,
-                "fixes": null
-            },
-            {
-                "branch": "4.x",
-                "installed": true,
-                "highest": "v4.4.41",
-                "highest_released": "2022-04-12T15:19:55+00:00",
-                "highest_commit_date": null,
-                "newest_dated": "v4.4.41",
-                "newest_dated_released": "2022-04-12T15:19:55+00:00",
-                "dated_by": null,
-                "php": ">=7.1.3",
-                "highest_php": ">=7.1.3",
-                "admits_target_php": true,
-                "admits_project_php": true,
-                "php_blocked_by": null,
-                "misses_target_php": null,
-                "misses_project_php": null,
-                "highest_admits_target_php": true,
-                "highest_admits_project_php": true,
-                "highest_misses_project_php": null,
-                "released_years": 4.5,
+                "released_years": 9.7,
                 "fixes": null
             }
         ],
-        "installed_branch": "4.x"
+        "installed_branch": "3.x"
     },
     "run": {
         "target_php": "8.4",
         "target_php_source": "option",
-        "project_php": ">=7.4",
-        "project_php_lowest": "7.4.0",
+        "project_php": null,
+        "project_php_lowest": null,
         "fail_on": "high",
         "fail_on_source": "option",
         "gates": [
@@ -1226,6 +1171,19 @@
         }
     },
     "generated_at": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": []
+    "notes": [
+        "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+    ],
+    "note_details": [
+        {
+            "code": "not_from_composer_repository",
+            "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read",
+            "docs_url": "https://lockrot.dev/notes/#not_from_composer_repository",
+            "sets_network_failures": false,
+            "data": {
+                "package_count": 1,
+                "advisories_asked": true
+            }
+        }
+    ]
 }
