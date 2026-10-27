@@ -429,8 +429,9 @@ def rows_of(details):
 
 
 def inputs_of(case):
-    """What a hydrator feeds the Analyzer to rebuild the case: null when the case carries no branch rows and
-    lockrot reads its releases, or when it needs a run input that the hydrator does not take (see unhydrated()).
+    """What a hydrator feeds the Analyzer to rebuild the case: null when the case carries no branch rows and no
+    `run_inputs._releases` and lockrot reads its releases, or when it needs a run input that the hydrator does not take
+    (see unhydrated()).
 
     The lock links the case's chain and its other direct dependents to the package, and holds every holder that a fix, a
     move or a branch row names. `dependents` holds the `require` names of each direct dependent that C08 measured, and
@@ -440,7 +441,9 @@ def inputs_of(case):
     f, run = case['finding'], case['run']
     rows = rows_of(case.get('details'))
     unread = f['metadata']['status'] == 'not_from_composer_repository'
-    if (not rows and not unread) or f['metadata']['status'] not in ('read', 'not_from_composer_repository') or unhydrated(case):
+    # The model's `run_inputs._releases` give the releases of a case that has no branch rows, such as a capped-* case.
+    given = bool((case.get('run_inputs') or {}).get('_releases'))
+    if (not rows and not unread and not given) or f['metadata']['status'] not in ('read', 'not_from_composer_repository') or unhydrated(case):
         return None
     facts = package_facts(f, rows)
     advisories = (next((s for s in f['signals'] if s['id'] == 'S9'), None) or {}).get('data', {}).get('advisories', [])
