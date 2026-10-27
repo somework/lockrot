@@ -43,6 +43,7 @@ final class MoveContractTest extends TestCase
         'partial-op‡' => [[['version', 'commands'], self::VERSION]],
         'unreached-dev‡' => [[['version', 'commands'], self::VERSION]],
         'B-offline-high‡' => [[['version', 'commands'], self::VERSION]],
+        'gets-below-clears-nothing‡' => [[['version'], self::VERSION]],
         'require-dev-name‡' => [[['version', 'commands'], self::VERSION]],
         'capped-require-php' => [[['version', 'commands'], self::VERSION]],
         'adds-capped-raise-php' => [[['version', 'commands'], self::VERSION]],
