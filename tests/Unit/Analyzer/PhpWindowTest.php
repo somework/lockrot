@@ -290,6 +290,16 @@ final class PhpWindowTest extends TestCase
         self::assertSame(['excludes' => '8.4', 'links' => ['conflict']], self::upper($set));
     }
 
+    /** SPEC §5.9: the window keeps the target minor, so its point 8.4.0 below the edge 8.4.2 is not below the lowest edge. */
+    public function testATargetPointBelowAPatchFloorOfAKeptMinorIsNotBelowTheLowestEdge(): void
+    {
+        $window = PhpWindow::of(LockFile::fromArray(['packages' => [self::package('acme/a', ['php' => '>=8.4.2'])], 'packages-dev' => []]), ProjectConfig::fromArray(['config' => ['platform' => ['php' => '8.4.0']]]), '8.4', self::minors());
+        self::assertNotNull($window);
+
+        self::assertFalse($window->targetBelowLowest());
+        self::assertNotNull($window->withTargetFix(null)->toArray()['target_fix']);
+    }
+
     /** Below the target minor's floor, outside it: a target minor that no patch admits stays out, and `target_fix` stays null. */
     public function testATargetMinorBelowTheLowestEdgeGetsNoTargetFix(): void
     {

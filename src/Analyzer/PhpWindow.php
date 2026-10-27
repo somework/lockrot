@@ -11,7 +11,6 @@ use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\VersionParser;
-use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\Holder;
@@ -143,7 +142,7 @@ final class PhpWindow implements \JsonSerializable
      */
     public function withTargetFix(?MoveChecker $checker): self
     {
-        if ($this->data['target']['inside'] || $this->targetMinorBelowLowest()) {
+        if ($this->data['target']['inside'] || $this->targetBelowLowest()) {
             return $this;
         }
         $configured = ($checker === null ? null : $checker->configuredPhp()) ?? $this->projectPlatformPhp;
@@ -154,20 +153,17 @@ final class PhpWindow implements \JsonSerializable
         return $copy;
     }
 
-    /** Whether `target.php` lies below `lower_edge.php` of the set that `target.inside` reads. */
+    /**
+     * Whether the target lies below the lowest edge (SPEC §5.9): the set that `target.inside` reads
+     * keeps no window minor of the target, and `target.php` lies below its `lower_edge.php`.
+     */
     public function targetBelowLowest(): bool
     {
-        $lowest = ($this->data['with_dev'] ?? $this->data['without_dev'])['lower_edge'];
+        $set = $this->data['with_dev'] ?? $this->data['without_dev'];
+        $lowest = $set['lower_edge'];
 
-        return $lowest !== null && Comparator::lessThan(self::normalized($this->data['target']['php']), self::normalized($lowest['php']));
-    }
-
-    /** Whether the target minor lies below the minor of `lower_edge.php`: a patch floor inside the target minor keeps `target_fix`. */
-    private function targetMinorBelowLowest(): bool
-    {
-        $lowest = ($this->data['with_dev'] ?? $this->data['without_dev'])['lower_edge'];
-
-        return $lowest !== null && Comparator::lessThan(self::normalized($this->targetMinor), self::normalized(PhpReleaseDates::minorOf($lowest['php'])));
+        return $lowest !== null && !\in_array($this->targetMinor, $set['minors'], true)
+            && Comparator::lessThan(self::normalized($this->data['target']['php']), self::normalized($lowest['php']));
     }
 
     private static function normalized(string $php): string
