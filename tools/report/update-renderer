@@ -14,6 +14,8 @@ cd "$(dirname "$0")/../.."
 REPO=somework/lockrot-report
 DEST=resources/report
 FILES=(report.html manifest.json)
+# A tag of the renderer can move. check-vendored verifies the attestation against this commit too.
+PIN=tools/report/renderer-commit
 
 usage() { sed -n '2,6p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
 [ $# -ge 1 ] || usage
@@ -25,14 +27,19 @@ if [ "$1" = "--from-dir" ]; then
   [ $# -eq 2 ] || usage
   for file in "${FILES[@]}"; do cp "$2/$file" "$work/$file"; done
   echo "update-renderer: vendoring a LOCAL build from $2 — not attested; do not release with it" >&2
+  commit=
 else
   tag=$1
   [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]] || { echo "update-renderer: expected a tag like v1.2.3 or v1.2.3-rc.1, got $tag" >&2; exit 2; }
   gh release download "$tag" --repo "$REPO" --dir "$work" "${FILES[@]/#/--pattern=}"
   # Only the renderer's release workflow, run for this tag, attests a page that lockrot vendors.
+  commits=
   for file in "${FILES[@]}"; do
-    gh attestation verify "$work/$file" --repo "$REPO" --signer-workflow "$REPO/.github/workflows/release.yml" --source-ref "refs/tags/$tag" >/dev/null
+    commits+=$(gh attestation verify "$work/$file" --repo "$REPO" --signer-workflow "$REPO/.github/workflows/release.yml" --source-ref "refs/tags/$tag" \
+      --format json --jq '.[].verificationResult.signature.certificate.sourceRepositoryDigest')$'\n'
   done
+  commit=$(printf '%s' "$commits" | sort -u | sed '/^$/d')
+  [[ $commit =~ ^[0-9a-f]{40}$ ]] || { echo "update-renderer: the attestations of $tag name no one source commit: ${commit:-none}" >&2; exit 1; }
 fi
 
 expected=$(php -r '$m = json_decode(file_get_contents($argv[1]), true); echo $m["files"]["report.html"] ?? "";' "$work/manifest.json")
@@ -51,5 +58,10 @@ fi
 
 mkdir -p "$DEST"
 for file in "${FILES[@]}"; do cp "$work/$file" "$DEST/$file"; done
+if [ -n "$commit" ]; then
+  echo "$commit" > "$PIN"
+else
+  rm -f "$PIN"
+fi
 version=$(php -r 'echo json_decode(file_get_contents($argv[1]), true)["version"] ?? "?";' "$DEST/manifest.json")
 echo "update-renderer: resources/report/ now holds lockrot-report $version"

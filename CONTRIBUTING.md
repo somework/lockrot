@@ -301,7 +301,8 @@ tools/report/update-renderer vX.Y.Z
 
 - The script needs `gh`. It verifies that the renderer's `release.yml` attested the files for that
   tag, the page against the sha256 in its manifest, and that the manifest names the requested
-  version.
+  version. It writes the source commit that the attestations name to
+  `tools/report/renderer-commit`. A tag can move, so `check-vendored` verifies that commit too.
   `tests/Unit/Output/RendererManifestTest.php` rechecks the page against the manifest on every run.
 - `--from-dir DIR` vendors a local build for development. It is not attested. Never release with it.
 - `vX.Y.Z-rc.N` vendors a pre-release. A lockrot release vendors a plain `vX.Y.Z`

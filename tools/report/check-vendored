@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Check that resources/report/ holds a plain release of the renderer, attested by the renderer's
-# release workflow for the tag that the manifest names ("Which renderer a lockrot release vendors" in
+# release workflow for the tag that the manifest names and the commit that update-renderer pinned ("Which renderer a lockrot release vendors" in
 # tools/report/README.md). The release pull request into main and the tag workflow run it.
 #
 #   tools/report/check-vendored     exit 1 on a pre-release or a local build, non-zero on a missing attestation
@@ -10,6 +10,10 @@ cd "$(dirname "$0")/../.."
 REPO=somework/lockrot-report
 version=$(jq -r .version resources/report/manifest.json)
 [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::resources/report/ holds lockrot-report $version, not a release"; exit 1; }
+# A tag of the renderer can move, and a moved tag gets a second attestation. The commit that
+# update-renderer pinned picks the build that it vendored.
+commit=$(cat tools/report/renderer-commit 2>/dev/null || true)
+[[ $commit =~ ^[0-9a-f]{40}$ ]] || { echo "::error::tools/report/renderer-commit names no commit: run tools/report/update-renderer v$version"; exit 1; }
 for file in report.html manifest.json; do
-  gh attestation verify "resources/report/$file" --repo "$REPO" --signer-workflow "$REPO/.github/workflows/release.yml" --source-ref "refs/tags/v$version"
+  gh attestation verify "resources/report/$file" --repo "$REPO" --signer-workflow "$REPO/.github/workflows/release.yml" --source-ref "refs/tags/v$version" --source-digest "$commit"
 done
