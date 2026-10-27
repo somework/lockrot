@@ -130,10 +130,7 @@ final class RepositoryVersions implements VersionSource
             $found = [];
             foreach ([self::STABLE, self::DEV] as $stabilities) {
                 $asked = array_diff_key($pending, $listed) + $tagged;
-                if ($asked === []) {
-                    break;
-                }
-                $result = $repository->loadPackages($asked, $stabilities, []);
+                $result = self::ask($repository, $asked, $stabilities);
                 $found += array_fill_keys($result['namesFound'], null);
                 $answered = [];
                 foreach ($result['packages'] as $package) {
@@ -144,7 +141,7 @@ final class RepositoryVersions implements VersionSource
                 foreach ($answered as $name => $packages) {
                     $this->loaded[$name] = self::withNewVersions($this->loaded[$name], $packages);
                 }
-                $listed += array_intersect_key($pending, $answered);
+                $listed = array_intersect_key($pending, $answered);
                 if ($stabilities === self::DEV) {
                     foreach (array_keys($tagged) as $name) {
                         $this->failOfflineWithoutDevFile($name, $result, $repository);
@@ -154,12 +151,10 @@ final class RepositoryVersions implements VersionSource
                 }
             }
             // A repository that is not canonical lists a name without claiming it: the later ones add their versions.
-            $claimed = array_intersect_key($pending, $found);
-            $this->complete += $claimed;
-            $pending = array_diff_key($pending, $claimed);
+            $this->complete += $found;
+            $pending = array_diff_key($pending, $found);
         }
-        $this->complete += array_intersect_key($pending, array_filter($this->loaded));
-        $this->failUnlisted(array_keys(array_diff_key($pending, $this->complete)));
+        $this->failUnlisted(array_keys(array_diff_key($pending, array_filter($this->loaded))));
     }
 
     /** @return list<BasePackage> */
@@ -237,10 +232,7 @@ final class RepositoryVersions implements VersionSource
      */
     private static function withNewVersions(array $loaded, array $packages): array
     {
-        $known = [];
-        foreach ($loaded as $package) {
-            $known[self::base($package)->getVersion()] = true;
-        }
+        $known = array_flip(array_map(static fn (BasePackage $package): string => self::base($package)->getVersion(), $loaded));
         foreach ($packages as $package) {
             if (!isset($known[self::base($package)->getVersion()])) {
                 $loaded[] = $package;
@@ -248,6 +240,19 @@ final class RepositoryVersions implements VersionSource
         }
 
         return $loaded;
+    }
+
+    /**
+     * The repository's answer for $names, with no request for none.
+     *
+     * @param array<string, null> $names
+     * @param array<key-of<BasePackage::STABILITIES>, BasePackage::STABILITY_*> $stabilities
+     *
+     * @return array{namesFound: array<string>, packages: array<BasePackage>}
+     */
+    private static function ask(RepositoryInterface $repository, array $names, array $stabilities): array
+    {
+        return $names === [] ? ['namesFound' => [], 'packages' => []] : $repository->loadPackages($names, $stabilities, []);
     }
 
     /**

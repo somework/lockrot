@@ -249,12 +249,12 @@ final class AdvisoryBlocking
         if (!isset($policy['advisories']) && $audit !== []) {
             return ($audit['block-insecure'] ?? true) ? [] : [self::AUDIT_KEY];
         }
-        $advisories = $policy['advisories'] ?? [];
-        if ($advisories === false) {
+        if (($policy['advisories'] ?? []) === false) {
             return [self::ADVISORIES_KEY];
         }
 
-        return (bool) (\is_array($advisories) ? $advisories['block'] ?? true : true) ? [] : [self::BLOCK_KEY];
+        // The caller asks only when the blocking is off, and a `policy.advisories` list blocks unless its `block` is false.
+        return [self::BLOCK_KEY];
     }
 
     /**

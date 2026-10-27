@@ -555,6 +555,48 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([[], null], [$alone->versionsOf(['acme/lib', 'acme/bad'])['acme/lib'], $alone->failure('acme/lib')]);
     }
 
+    public function testANameThatLoadsAloneWithOnlyDevVersionsInACanonicalRepositoryHidesTheNamesakeOfTheNextRepository(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['dev-main']], ['acme/bad']), self::repository(['acme/lib' => ['9.0.0']])], [], false, Deadline::never());
+
+        self::assertSame(['dev-main'], self::pretty($versions->versionsOf(['acme/lib', 'acme/bad'])['acme/lib']));
+    }
+
+    public function testAnAdmittedNameThatLoadsAloneWithOnlyTagsInACanonicalRepositoryHidesTheNamesakeOfTheNextRepository(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['1.0.0']], ['acme/bad']), self::repository(['acme/lib' => ['9.0.0']])], [], false, Deadline::never(), 'dev', []);
+
+        self::assertSame(['1.0.0'], self::pretty($versions->versionsOf(['acme/lib', 'acme/bad'])['acme/lib']));
+    }
+
+    /** A request that fails after a repository that is not canonical leaves the name without its later versions: no answer. */
+    public function testANameThatLoadsAloneAndFailsAfterANonCanonicalRepositoryHasNoVersions(): void
+    {
+        $filtered = new FilterRepository(self::recording(['acme/lib' => ['1.0.0']]), ['canonical' => false]);
+        $versions = new RepositoryVersions([$filtered, self::recording([], ['acme/lib'])], [], false, Deadline::never());
+
+        self::assertSame([[], VersionSource::FAILED], [$versions->versions('acme/lib'), $versions->failure('acme/lib')]);
+    }
+
+    public function testANameThatLoadsAloneAndThatNoComposerRepositoryListsIsUnreachedWhenAnotherRepositoryCanServeIt(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['1.0.0']], ['acme/bad']), new ArrayRepository()], [], false, Deadline::never());
+
+        $versions->versionsOf(['acme/private', 'acme/bad']);
+
+        self::assertSame([VersionSource::UNREACHED, VersionSource::FAILED], [$versions->failure('acme/private'), $versions->failure('acme/bad')]);
+    }
+
+    public function testTheFailureOfANameStaysWhenALaterNameIsUnreached(): void
+    {
+        $versions = new RepositoryVersions([self::recording([], ['acme/bad']), new ArrayRepository()], [], false, Deadline::never());
+        $versions->versions('acme/bad');
+
+        $versions->versions('acme/private');
+
+        self::assertSame([VersionSource::FAILED, VersionSource::UNREACHED], [$versions->failure('acme/bad'), $versions->failure('acme/private')]);
+    }
+
     /** A path, VCS or package repository can serve a name that the lock does not hold, and lockrot does not ask it. */
     public function testANameThatNoComposerRepositoryListsIsUnreachedWhenAnotherRepositoryCanServeIt(): void
     {
