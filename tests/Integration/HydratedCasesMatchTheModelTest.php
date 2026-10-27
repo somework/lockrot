@@ -382,7 +382,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].held_by[].holder.next_step.to_branch' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.direct' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.check' => self::ALSO_HELD,
-        'next_step.held_by[].holder.next_step.check' => 'No case of the model gives the own step of a holder a check.',
         'next_step.also[].check.form' => self::ALSO_CHECK,
         'next_step.also[].check.reason' => self::ALSO_CHECK,
         'next_step.also[].check.installs' => self::ALSO_CHECK,

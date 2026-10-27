@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| medium | `laminas/laminas-code` | 4.7.1 | capped | `8 = capped 8`<br>**Do:** composer update laminas/laminas-code (gets 4.17.0) — clears capped<br>*capped:* requires php \>=7.4, \<8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded<br>*age:* installed 4.7.1 released 2022-11-21 (3.9 years ago); 4.x last released 4.17.0 2025-11-01 (0.9 years ago), its newest release; last push 2026-09-30 (less than three weeks ago) | direct |
+| medium | `laminas/laminas-code` | 4.7.1 | capped | `8 = capped 8`<br>**Do:** require laminas/laminas-code ^4.17.0 — clears capped; 4.x needs php \~8.2.0 \|\| \~8.3.0 \|\| \~8.4.0 \|\| \~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires \~4.7.0)<br>*capped:* requires php \>=7.4, \<8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded<br>*age:* installed 4.7.1 released 2022-11-21 (3.9 years ago); 4.x last released 4.17.0 2025-11-01 (0.9 years ago), its newest release; last push 2026-09-30 (less than three weeks ago) | direct |
 
 flags: capped 1
 depth: every flagged package is named in composer.json · direct 1

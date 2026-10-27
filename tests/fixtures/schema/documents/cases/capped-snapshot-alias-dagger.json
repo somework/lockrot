@@ -1385,7 +1385,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require a tag — the newest on its own line is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
+    "text": "raise require.php to >=8.2, then require a tag — the newest on its own line is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
    },
    "security": {
     "status": "clear",
@@ -1522,7 +1522,7 @@
     },
     "branch_release_unmeasured": null,
     "push": {
-     "at": "2026-09-30T09:08:30Z",
+     "at": "2026-09-30T09:08:30+00:00",
      "years": 0,
      "level": null
     },

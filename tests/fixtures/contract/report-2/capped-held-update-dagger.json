@@ -1243,7 +1243,7 @@
                 "text": "8 = capped 8"
             },
             "next_step": {
-                "kind": "update",
+                "kind": "require",
                 "source": "capped",
                 "merged": [],
                 "fix_kind": null,
@@ -1253,7 +1253,7 @@
                 "to_branch": "4.x",
                 "version": "4.17.0",
                 "newest": "4.17.0",
-                "constraint": null,
+                "constraint": "^4.17.0",
                 "latest": null,
                 "php_check": {
                     "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
@@ -1263,7 +1263,17 @@
                     "raise_size": null
                 },
                 "crosses_major": false,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": null,
+                        "constraint": "~4.7.0",
+                        "holder": null
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -1282,7 +1292,8 @@
                     "deciding_advisory": null,
                     "at_most": false,
                     "assumes": [
-                        "clears_hold"
+                        "clears_hold",
+                        "composer_resolves"
                     ]
                 },
                 "check": null,
@@ -1291,8 +1302,8 @@
                 "commands": [
                     [
                         "composer",
-                        "update",
-                        "laminas/laminas-code"
+                        "require",
+                        "laminas/laminas-code:^4.17.0"
                     ],
                     [
                         "composer",
@@ -1304,7 +1315,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update laminas/laminas-code (gets 4.17.0) \u2014 clears capped"
+                "text": "require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ~4.7.0)"
             },
             "security": {
                 "status": "clear",

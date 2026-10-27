@@ -71764,7 +71764,7 @@ export const d_capped_held_update_dagger = {
                 "text": "8 = capped 8"
             },
             "next_step": {
-                "kind": "update",
+                "kind": "require",
                 "source": "capped",
                 "merged": [],
                 "fix_kind": null,
@@ -71774,7 +71774,7 @@ export const d_capped_held_update_dagger = {
                 "to_branch": "4.x",
                 "version": "4.17.0",
                 "newest": "4.17.0",
-                "constraint": null,
+                "constraint": "^4.17.0",
                 "latest": null,
                 "php_check": {
                     "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
@@ -71784,7 +71784,17 @@ export const d_capped_held_update_dagger = {
                     "raise_size": null
                 },
                 "crosses_major": false,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": null,
+                        "constraint": "~4.7.0",
+                        "holder": null
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -71803,7 +71813,8 @@ export const d_capped_held_update_dagger = {
                     "deciding_advisory": null,
                     "at_most": false,
                     "assumes": [
-                        "clears_hold"
+                        "clears_hold",
+                        "composer_resolves"
                     ]
                 },
                 "check": null,
@@ -71812,8 +71823,8 @@ export const d_capped_held_update_dagger = {
                 "commands": [
                     [
                         "composer",
-                        "update",
-                        "laminas/laminas-code"
+                        "require",
+                        "laminas/laminas-code:^4.17.0"
                     ],
                     [
                         "composer",
@@ -71825,7 +71836,7 @@ export const d_capped_held_update_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update laminas/laminas-code (gets 4.17.0) \u2014 clears capped"
+                "text": "require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ~4.7.0)"
             },
             "security": {
                 "status": "clear",
@@ -97115,8 +97126,8 @@ export const d_capped_snapshot_alias_dagger = {
                     "version": "4.17.0",
                     "released": "2025-11-01T09:38:14+00:00",
                     "is_installed": false,
-                    "relation": null,
-                    "snapshot_time": null
+                    "relation": "newer",
+                    "snapshot_time": "2022-11-21T01:32:31+00:00"
                 },
                 "php_check": {
                     "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
@@ -97269,8 +97280,8 @@ export const d_capped_snapshot_alias_dagger = {
                         "last_stable_release": "2025-11-01T09:38:14+00:00",
                         "last_stable_version": "4.17.0",
                         "last_stable_dated_by": null,
-                        "snapshot_time": null,
-                        "tag_relation": null
+                        "snapshot_time": "2022-11-21T01:32:31+00:00",
+                        "tag_relation": "newer"
                     }
                 },
                 {

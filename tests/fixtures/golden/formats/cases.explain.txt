@@ -3576,7 +3576,7 @@ score     8 = capped 8     medium from 8
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        composer update laminas/laminas-code (gets 4.17.0) — clears capped
+do        require laminas/laminas-code ^4.17.0 — clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ~4.7.0)
           clears capped
 
 flags

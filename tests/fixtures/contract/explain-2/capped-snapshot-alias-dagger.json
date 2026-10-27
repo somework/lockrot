@@ -148,8 +148,8 @@
                 "version": "4.17.0",
                 "released": "2025-11-01T09:38:14+00:00",
                 "is_installed": false,
-                "relation": null,
-                "snapshot_time": null
+                "relation": "newer",
+                "snapshot_time": "2022-11-21T01:32:31+00:00"
             },
             "php_check": {
                 "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
@@ -302,8 +302,8 @@
                     "last_stable_release": "2025-11-01T09:38:14+00:00",
                     "last_stable_version": "4.17.0",
                     "last_stable_dated_by": null,
-                    "snapshot_time": null,
-                    "tag_relation": null
+                    "snapshot_time": "2022-11-21T01:32:31+00:00",
+                    "tag_relation": "newer"
                 }
             },
             {
@@ -376,7 +376,7 @@
     },
     "lock": {
         "php": ">=7.4, <8.2",
-        "released": null,
+        "released": "2022-11-21T01:32:31+00:00",
         "repository": "https://github.com/laminas/laminas-code.git",
         "from_composer_repository": true,
         "dev": false,

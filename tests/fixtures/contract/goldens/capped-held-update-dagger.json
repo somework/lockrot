@@ -1,6 +1,6 @@
 {
     "score_text": "8 = capped 8",
-    "next_step_text": "composer update laminas/laminas-code (gets 4.17.0) — clears capped",
+    "next_step_text": "require laminas/laminas-code ^4.17.0 — clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ~4.7.0)",
     "gate_line": null,
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 4.7.1 released 2022-11-21 (3.9 years ago); 4.x last released 4.17.0 2025-11-01 (0.9 years ago), its newest release; last push 2026-09-30 (less than three weeks ago)",
@@ -13,11 +13,11 @@
     ],
     "baseline_suffix": null,
     "commands_posix": [
-        "composer update laminas/laminas-code",
+        "composer require 'laminas/laminas-code:^4.17.0'",
         "composer why-not laminas/laminas-code 4.17.0 --locked"
     ],
     "commands_cmd": [
-        "composer update laminas/laminas-code",
+        "composer require \"laminas/laminas-code:^4.17.0\"",
         "composer why-not laminas/laminas-code 4.17.0 --locked"
     ]
 }

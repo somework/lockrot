@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "d0a0493a827fc992aea6a18995400cbff78084c548d942e1d1f83014116d957f",
+        "tests/fixtures/flags/cases.json": "30701509235ba247b33ba525ec7fe3265f9d158ad6c1db2cfc65e73aa0b4f123",
         "tests/fixtures/flags/composite.json": "931aa288bfbfee92d7103d91a1d3c78a9d0d5625dd044f214ca72e1c9c73a6e7",
-        "tests/fixtures/flags/provenance.json": "410746b65bad067d91c43dec0132db9cad0665a163a283de10a05655d8db0ac0"
+        "tests/fixtures/flags/provenance.json": "def613698926bcc277070ad7e88d477011bd50abb0037a08704158c4122f5c8d"
     },
     "version_mask": {
         "paths": [
@@ -50,24 +50,23 @@
     "case_lock": "each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out",
     "model_goldens": {
         "compared": {
-            "age_line": 139,
-            "baseline_suffix": 159,
-            "commands_cmd": 143,
-            "commands_posix": 143,
-            "gate_line": 160,
-            "next_step_text": 118,
-            "run_gate_line": 161,
-            "score_text": 160
+            "age_line": 160,
+            "baseline_suffix": 162,
+            "commands_cmd": 144,
+            "commands_posix": 144,
+            "gate_line": 163,
+            "next_step_text": 122,
+            "run_gate_line": 164,
+            "score_text": 163
         },
         "inputs_differ": {
-            "age_line": 25,
-            "baseline_suffix": 5,
-            "commands_cmd": 21,
-            "commands_posix": 21,
-            "gate_line": 4,
-            "next_step_text": 46,
-            "run_gate_line": 3,
-            "score_text": 4
+            "age_line": 4,
+            "baseline_suffix": 2,
+            "commands_cmd": 20,
+            "commands_posix": 20,
+            "gate_line": 1,
+            "next_step_text": 42,
+            "score_text": 1
         }
     },
     "page_goldens": {

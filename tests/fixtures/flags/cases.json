@@ -198879,7 +198879,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -198953,13 +198953,13 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": true,
+       "php_blocked_by": "target",
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": true,
        "highest_misses_project_php": null,
        "released_years": 6.8,
        "fixes": null
@@ -199085,7 +199085,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -199746,7 +199746,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -200928,7 +200928,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -201002,14 +201002,14 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
        "misses_target_php": null,
-       "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
-       "highest_misses_project_php": null,
+       "misses_project_php": "stops_before",
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "stops_before",
        "released_years": 6.8,
        "fixes": null
       }
@@ -201133,7 +201133,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -201792,7 +201792,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -202974,7 +202974,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -203070,14 +203070,14 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
        "misses_target_php": null,
-       "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
-       "highest_misses_project_php": null,
+       "misses_project_php": "stops_before",
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "stops_before",
        "released_years": 6.8,
        "fixes": null
       }
@@ -203212,7 +203212,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -203880,7 +203880,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -205065,7 +205065,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -205161,14 +205161,14 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
        "misses_target_php": null,
-       "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
-       "highest_misses_project_php": null,
+       "misses_project_php": "stops_before",
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "stops_before",
        "released_years": 6.8,
        "fixes": null
       }
@@ -205308,7 +205308,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -205971,7 +205971,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -207156,7 +207156,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -207252,14 +207252,14 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
        "misses_target_php": null,
-       "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
-       "highest_misses_project_php": null,
+       "misses_project_php": "stops_before",
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "stops_before",
        "released_years": 6.8,
        "fixes": null
       }
@@ -207399,7 +207399,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -208072,7 +208072,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -209245,7 +209245,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -209341,14 +209341,14 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
        "misses_target_php": null,
-       "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
-       "highest_misses_project_php": null,
+       "misses_project_php": "stops_before",
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "stops_before",
        "released_years": 6.8,
        "fixes": null
       }
@@ -209475,7 +209475,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -210148,7 +210148,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -211071,7 +211071,8 @@
     }
    },
    "synthetic_inputs": [
-    "require.php >=8.2; composer.json requires laminas/laminas-code ~4.7.0 (‡)"
+    "require.php >=8.2; composer.json requires laminas/laminas-code ~4.7.0 (‡)",
+    "next_step.held_by[].constraint and the S9 rows' fix.held_by on the same branch (the reports carry no lock links)"
    ],
    "finding": {
     "package": "laminas/laminas-code",
@@ -211171,7 +211172,17 @@
       "raise_size": null
      },
      "crosses_major": false,
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "root",
+       "package": null,
+       "version": null,
+       "link": "require",
+       "target": null,
+       "constraint": "~4.7.0",
+       "holder": null
+      }
+     ],
      "clears": [
       {
        "kind": "flag",
@@ -211190,7 +211201,8 @@
       "deciding_advisory": null,
       "at_most": false,
       "assumes": [
-       "clears_hold"
+       "clears_hold",
+       "composer_resolves"
       ]
      },
      "check": null,
@@ -211212,7 +211224,7 @@
      ],
      "through": [],
      "also": [],
-     "text": "require laminas/laminas-code ^4.17.0 — clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it"
+     "text": "require laminas/laminas-code ^4.17.0 — clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ~4.7.0)"
     },
     "security": {
      "status": "clear",
@@ -211330,7 +211342,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -211404,14 +211416,14 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
        "misses_target_php": null,
-       "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
-       "highest_misses_project_php": null,
+       "misses_project_php": "stops_before",
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "stops_before",
        "released_years": 6.8,
        "fixes": null
       }
@@ -211420,7 +211432,7 @@
    },
    "golden": {
     "score_text": "8 = capped 8",
-    "next_step_text": "require laminas/laminas-code ^4.17.0 — clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it",
+    "next_step_text": "require laminas/laminas-code ^4.17.0 — clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ~4.7.0)",
     "verdict_line": "Medium: it stops at 8.1, so the newest PHP, 8.5, is excluded.",
     "readings": [],
     "qualifiers": {
@@ -211485,7 +211497,18 @@
      }
     ],
     "held_by": [
-     null
+     {
+      "count": 1,
+      "shown": [
+       {
+        "name": "your composer.json",
+        "grade": null,
+        "meta": "requires ~4.7.0",
+        "step": null
+       }
+      ],
+      "fold": null
+     }
     ],
     "security": {
      "summary": [
@@ -211535,7 +211558,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -212194,7 +212217,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -213340,7 +213363,7 @@
      ],
      "through": [],
      "also": [],
-     "text": "require a tag — the newest on its own line is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
+     "text": "raise require.php to >=8.2, then require a tag — the newest on its own line is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
     },
     "security": {
      "status": "clear",
@@ -213477,7 +213500,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -213509,7 +213532,7 @@
      "branches": [
       {
        "branch": "4.x",
-       "installed": true,
+       "installed": false,
        "highest": "4.17.0",
        "highest_released": "2025-11-01T09:38:14+00:00",
        "highest_commit_date": null,
@@ -213562,13 +213585,13 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": true,
+       "php_blocked_by": "target",
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": true,
        "highest_misses_project_php": null,
        "released_years": 6.8,
        "fixes": null
@@ -213578,7 +213601,7 @@
    },
    "golden": {
     "score_text": "18 = pinned 16 + capped 2 [¼ of 8]",
-    "next_step_text": "require a tag — the newest on its own line is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)",
+    "next_step_text": "raise require.php to >=8.2, then require a tag — the newest on its own line is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)",
     "verdict_line": "High: it is pinned to the branch snapshot 4.7.x-dev.",
     "readings": [
      {
@@ -213667,15 +213690,14 @@
      "ladder": []
     },
     "branches_lead": [
-     "Your branch, 4.x, had its last release, 4.17.0, 0.9 years ago.",
-     "It has no higher branch."
+     "A branch snapshot, 4.7.x-dev, is installed."
     ],
     "branch_rows": [
      {
       "branch": "4.x",
       "marks": [
-       "yours",
-       "the move"
+       "the move",
+       "newest"
       ],
       "latest": "4.17.0",
       "age": "0.9y",
@@ -213700,7 +213722,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -214364,7 +214386,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -215510,7 +215532,7 @@
      ],
      "through": [],
      "also": [],
-     "text": "require a tag — the newest is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
+     "text": "raise require.php to >=8.2, then require a tag — the newest is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
     },
     "security": {
      "status": "clear",
@@ -215641,7 +215663,7 @@
      "branch_release": null,
      "branch_release_unmeasured": "branch_snapshot",
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -215726,13 +215748,13 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": true,
+       "php_blocked_by": "target",
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": true,
        "highest_misses_project_php": null,
        "released_years": 6.8,
        "fixes": null
@@ -215742,7 +215764,7 @@
    },
    "golden": {
     "score_text": "18 = pinned 16 + capped 2 [¼ of 8]",
-    "next_step_text": "require a tag — the newest is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)",
+    "next_step_text": "raise require.php to >=8.2, then require a tag — the newest is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)",
     "verdict_line": "High: it is pinned to the branch snapshot dev-main.",
     "readings": [
      {
@@ -215863,7 +215885,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -216527,7 +216549,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -217685,7 +217707,7 @@
      ],
      "through": [],
      "also": [],
-     "text": "require a tag — the newest is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
+     "text": "raise require.php to >=8.2, then require a tag — the newest is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
     },
     "security": {
      "status": "clear",
@@ -217816,7 +217838,7 @@
      "branch_release": null,
      "branch_release_unmeasured": "branch_snapshot",
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -217901,13 +217923,13 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": true,
+       "php_blocked_by": "target",
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": true,
        "highest_misses_project_php": null,
        "released_years": 6.8,
        "fixes": null
@@ -217917,7 +217939,7 @@
    },
    "golden": {
     "score_text": "18 = pinned 16 + capped 2 [¼ of 8]",
-    "next_step_text": "require a tag — the newest is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)",
+    "next_step_text": "raise require.php to >=8.2, then require a tag — the newest is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)",
     "verdict_line": "High: it is pinned to the branch snapshot dev-main.",
     "readings": [
      {
@@ -218038,7 +218060,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -218707,7 +218729,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -219906,7 +219928,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -219980,12 +220002,12 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
+       "admits_target_php": false,
        "admits_project_php": null,
-       "php_blocked_by": null,
+       "php_blocked_by": "target",
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
+       "highest_admits_target_php": false,
        "highest_admits_project_php": null,
        "highest_misses_project_php": null,
        "released_years": 6.8,
@@ -220107,7 +220129,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -220765,7 +220787,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -223735,7 +223757,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -223809,13 +223831,13 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": true,
+       "php_blocked_by": "target",
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": true,
        "highest_misses_project_php": null,
        "released_years": 6.8,
        "fixes": null
@@ -223900,7 +223922,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -224551,7 +224573,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -237993,7 +238015,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -238067,13 +238089,13 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": true,
+       "php_blocked_by": "target",
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": true,
        "highest_misses_project_php": null,
        "released_years": 6.8,
        "fixes": null
@@ -238200,7 +238222,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -238864,7 +238886,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -240006,7 +240028,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -240080,12 +240102,12 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
+       "admits_target_php": true,
        "admits_project_php": null,
        "php_blocked_by": null,
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
+       "highest_admits_target_php": true,
        "highest_admits_project_php": null,
        "highest_misses_project_php": null,
        "released_years": 6.8,
@@ -240847,7 +240869,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -242005,7 +242027,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -242079,13 +242101,13 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
+       "admits_target_php": true,
+       "admits_project_php": true,
        "php_blocked_by": null,
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
        "highest_misses_project_php": null,
        "released_years": 6.8,
        "fixes": null
@@ -242851,7 +242873,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -244016,7 +244038,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -244090,13 +244112,13 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": true,
+       "php_blocked_by": "target",
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": true,
        "highest_misses_project_php": null,
        "released_years": 6.8,
        "fixes": null
@@ -244204,7 +244226,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -244852,7 +244874,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -247335,7 +247357,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -247442,13 +247464,13 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": true,
+       "php_blocked_by": "target",
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": true,
        "highest_misses_project_php": null,
        "released_years": 6.8,
        "fixes": null
@@ -247574,7 +247596,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -248235,7 +248257,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -252886,7 +252908,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-30T09:08:30Z",
+      "at": "2026-09-30T09:08:30+00:00",
       "years": 0,
       "level": null
      },
@@ -253007,13 +253029,13 @@
        "dated_by": null,
        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
        "highest_php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-       "admits_target_php": null,
-       "admits_project_php": null,
-       "php_blocked_by": null,
+       "admits_target_php": false,
+       "admits_project_php": true,
+       "php_blocked_by": "target",
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": true,
        "highest_misses_project_php": null,
        "released_years": 6.8,
        "fixes": null
@@ -253139,7 +253161,7 @@
       "latest": "2.6.3",
       "age": "6.8y",
       "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-      "php_words": null,
+      "php_words": "your target does not run it",
       "bar": "2.6.3, released 6.8 years ago",
       "folded_in": null
      }
@@ -253800,7 +253822,7 @@
      "repo": "laminas/laminas-code",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-30T09:08:30Z",
+     "pushed_at": "2026-09-30T09:08:30+00:00",
      "archived": false
     },
     "dependents": {},
@@ -264598,7 +264620,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-07-07T18:12:10Z",
+      "at": "2026-07-07T18:12:10+00:00",
       "years": 0.2,
       "level": null
      },
@@ -265120,7 +265142,7 @@
      "repo": "moneyphp/money",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-07-07T18:12:10Z",
+     "pushed_at": "2026-07-07T18:12:10+00:00",
      "archived": false
     },
     "dependents": {},
@@ -266337,7 +266359,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-10T09:53:48Z",
+      "at": "2026-09-10T09:53:48+00:00",
       "years": 0.1,
       "level": null
      },
@@ -266367,13 +266389,13 @@
        "dated_by": null,
        "php": "8.1 - 8.5",
        "highest_php": "8.1 - 8.5",
-       "admits_target_php": null,
-       "admits_project_php": null,
+       "admits_target_php": true,
+       "admits_project_php": true,
        "php_blocked_by": null,
        "misses_target_php": null,
        "misses_project_php": null,
-       "highest_admits_target_php": null,
-       "highest_admits_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
        "highest_misses_project_php": null,
        "released_years": 0.1,
        "fixes": null
@@ -266661,7 +266683,7 @@
      "repo": "nette/schema",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-10T09:53:48Z",
+     "pushed_at": "2026-09-10T09:53:48+00:00",
      "archived": false
     },
     "dependents": {
@@ -267897,7 +267919,7 @@
      },
      "branch_release_unmeasured": null,
      "push": {
-      "at": "2026-09-15T15:43:13Z",
+      "at": "2026-09-15T15:43:13+00:00",
       "years": 0,
       "level": null
      },
@@ -268190,7 +268212,7 @@
      "repo": "ezyang/htmlpurifier",
      "status": "read",
      "reason": null,
-     "pushed_at": "2026-09-15T15:43:13Z",
+     "pushed_at": "2026-09-15T15:43:13+00:00",
      "archived": false
     },
     "dependents": {},
