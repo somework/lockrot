@@ -173,11 +173,11 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * lockrot never reads the root package's version, so it sets Composer's default up front. That
+     * Sets Composer's default root version up front, unless COMPOSER_ROOT_VERSION holds one. That
      * skips the VersionGuesser probe of git, hg, fossil and svn, and its warning "could not detect
-     * the root package version". Call it before parent::initialize(), which builds the first
-     * Composer instance. In plugin mode Composer already built its instance, so this takes effect
-     * only without one.
+     * the root package version". The move check solves the root at this version, so a `self.version`
+     * link reads 1.0.0. Call it before parent::initialize(). In plugin mode
+     * Composer already built its instance, so this takes effect only without one.
      */
     private function quietRootVersionGuessing(): void
     {

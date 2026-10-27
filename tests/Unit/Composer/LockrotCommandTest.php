@@ -1684,8 +1684,7 @@ final class LockrotCommandTest extends TestCase
         // default it lands on anyway. Setting that default up front skips both.
         yield 'unset' => [false, '1.0.0'];
         yield 'empty' => ['', '1.0.0'];
-        // Anything the caller chose is theirs: lockrot never reads the root package's own version,
-        // so it has no reason to overwrite one.
+        // Composer solves the root at the version that the caller chose, so the move check does too.
         yield 'already set' => ['9.9.9', '9.9.9'];
     }
 
