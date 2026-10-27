@@ -78,6 +78,22 @@ final class ComposerSolverTest extends TestCase
         self::assertSame([['acme/lib' => '1.1.0', 'acme/other' => 'dev-main'], ['acme/lib' => '1.0.0', 'acme/other' => 'dev-main']], [$solution->installs(), $solution->updatedFrom()]);
     }
 
+    /** `composer require` reloads composer.json, so a `#commit` pin of the old requirement no longer holds the branch. */
+    public function testARequireThatRewritesAPinnedBranchRequirementDropsItsCommitPin(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/other' => 'dev-main#aaaa']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $root->setMinimumStability('dev');
+        $root->setReferences(['acme/other' => 'aaaa']);
+        $locked = [['name' => 'acme/other', 'version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'aaaa']]];
+        $remote = ['acme/other' => [['version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'bbbb']]]];
+        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote), []);
+
+        $solution = $solver->solve(SolveRequest::require('acme/other', ['acme/other' => 'dev-main'], false));
+
+        self::assertSame(['acme/other' => 'dev-main'], $solution->installs(), 'the branch moves from aaaa to bbbb');
+    }
+
     /** Composer updates a branch at the same commit when only its metadata differs, here `abandoned`. */
     public function testAnUpdateOfABranchAtTheSameCommitIsNoChange(): void
     {

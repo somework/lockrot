@@ -374,7 +374,7 @@ final class ComposerSolver
 
     /**
      * `composer require` loads composer.json again after it writes the change, so a changed name
-     * takes the stability flag of its new constraint and loses its root alias.
+     * takes the stability flag and the `#commit` reference of its new constraint and loses its root alias.
      *
      * @param array<string, string> $changes name => constraint, as `require name:constraint` without
      *                                       `--dev` writes it: in `require`, and out of `require-dev`
@@ -398,6 +398,7 @@ final class ComposerSolver
         $root->setDevRequires($devRequires);
         if ($changes !== []) {
             $root->setStabilityFlags(RootPackageLoader::extractStabilityFlags($changes, $root->getMinimumStability(), array_diff_key($root->getStabilityFlags(), $changes)));
+            $root->setReferences(RootPackageLoader::extractReferences($changes, array_diff_key($root->getReferences(), $changes)));
             $aliases = [];
             foreach ($root->getAliases() as $alias) {
                 if (!isset($changes[$alias['package']])) {
