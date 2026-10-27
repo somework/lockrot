@@ -82,6 +82,7 @@ final class BaselineWriterTest extends TestCase
 
         self::assertSame([['A1', '2026-06-01']], self::advisories($carried->entryFor('acme/pkg')));
         self::assertSame(['acme/pkg'], $carried->carriedForward());
+        self::assertSame(['advisories' => ['acme/pkg']], $carried->carriedHolding(), 'the run counts the flags');
         self::assertSame([], self::advisories($dropped->entryFor('acme/pkg')));
         self::assertSame([], $dropped->carriedForward());
         self::assertSame([['A1', '2026-06-01']], self::advisories($counted->entryFor('acme/pkg')));
@@ -99,8 +100,19 @@ final class BaselineWriterTest extends TestCase
 
         self::assertSame([['A1', '2026-06-01']], self::advisories($kept->entryFor('acme/pkg')));
         self::assertSame(['acme/pkg'], $kept->carriedForward());
+        self::assertSame(['flags and advisories' => ['acme/pkg']], $kept->carriedHolding());
         self::assertNull($gone->entryFor('acme/pkg'));
         self::assertSame([], $gone->carriedForward());
+    }
+
+    /** Ruling R5-42: an entry that holds only a flag is carried as flags, not as advisories. */
+    public function testACarriedEntryIsNamedByWhatItHolds(): void
+    {
+        $before = Baseline::fromReport(self::report('2026-06-01', [self::finding(['abandoned'], [])]));
+
+        $kept = Baseline::fromReport(self::report('2026-10-01', [self::incomplete(self::finding([], []))]), $before);
+
+        self::assertSame(['flags' => ['acme/pkg']], $kept->carriedHolding());
     }
 
     public function testAFirstEntryOnAnIncompleteLookupHoldsWhatItCountsAsAList(): void

@@ -420,10 +420,10 @@ final class LockrotCommand extends BaseCommand
     {
         $baseline = Baseline::fromReport($report, $existing);
         $file->write($baseline);
-        $carried = $baseline->carriedForward();
-        if ($carried !== []) {
+        foreach ($baseline->carriedHolding() as $kept => $carried) {
             $this->writeError($output, \sprintf(
-                'lockrot: the advisory lookup did not complete, so the baseline keeps the recorded advisories of %d %s: %s',
+                'lockrot: the advisory lookup did not complete, so the baseline keeps the recorded %s of %d %s: %s',
+                $kept,
                 \count($carried),
                 \count($carried) === 1 ? 'package' : 'packages',
                 implode(', ', $carried)
