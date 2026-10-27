@@ -2,7 +2,9 @@ name: CI
 # A push runs CI only on main and release/**, so another branch with an open PR runs once per push,
 # on its pull_request event. A push to main or release/** runs the mutation gate over the whole
 # tree. A tag runs phar.yml, not this file. A new push to a PR cancels the run for the old head,
-# because the ruleset waits for the new head's checks. On main, every push keeps its own run.
+# because the ruleset waits for the new head's checks. On main, every push gets a group of its own:
+# GitHub cancels a pending run when a newer run joins its group, and phar.yml refuses a tag whose
+# commit has no successful push run. On release/**, a newer push replaces a pending run.
 # full-check.yml, not this file, runs on a push to release/full-check-**.
 on:
   push:
@@ -12,7 +14,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}${{ github.ref == 'refs/heads/main' && format('-{0}', github.run_id) || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   # A style or type error stops the run before the rows take runners. On a push the rows still end
@@ -149,6 +151,20 @@ jobs:
       - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - uses: ./.github/actions/move-check-oracle
+  # EnginePageCasesTest compares the engine pages only on the composer/composer that recorded them,
+  # and the latest rows follow each new Composer release. This job installs lockrot's own lock, which
+  # the recording must match, so a skip fails here. A ruleset requires a check by its job name, so a
+  # renamed job drops out of the ruleset.
+  engine-pages:
+    runs-on: ubuntu-latest
+    steps:
+      # composer install runs package code, and no later step needs the token.
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - uses: shivammathur/setup-php@v2
+        with: {php-version: '8.4', coverage: none}
+      - run: composer install --no-interaction
+      - run: vendor/bin/phpunit --fail-on-skipped --fail-on-empty-test-suite tests/Integration/EnginePageCasesTest.php
   quality:
     runs-on: ubuntu-latest
     steps:

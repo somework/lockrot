@@ -49,8 +49,8 @@ final class EnginePageCasesTest extends TestCase
     }
 
     /**
-     * A bump of composer/composer in lockrot's lock fails here and asks for a re-record, so no CI row
-     * compares the case unnoticed.
+     * A bump of composer/composer in lockrot's lock fails here and asks for a re-record. The
+     * engine-pages job of ci.yml installs that lock, so there the comparison cannot skip.
      *
      * @dataProvider cases
      */
