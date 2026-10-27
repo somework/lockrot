@@ -113,6 +113,31 @@ final class PharTest extends TestCase
     }
 
     /**
+     * box.json's finder and compactors put the vendored page into the archive, and no source-tree
+     * check reads the archive. The page that the archive writes must keep the manifest's policy,
+     * hashed over its own inline script and stylesheet as a browser hashes them, and embed report-2.
+     */
+    public function testTheArchiveWritesTheVendoredPageUnderTheManifestsPolicy(): void
+    {
+        $process = $this->runPhar(['-d', \dirname(__DIR__).'/fixtures/skeletons/laravel', '--format=html', '--target-php=8.4', '--offline']);
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        $page = $process->getOutput();
+        $manifest = json_decode((string) file_get_contents(\dirname(__DIR__, 2).'/resources/report/manifest.json'), true);
+        self::assertIsArray($manifest);
+
+        self::assertSame(1, preg_match('{<meta http-equiv="Content-Security-Policy" content="([^"]+)">}', $page, $policy), 'the page carries one policy');
+        foreach (['script', 'style'] as $kind) {
+            self::assertSame(1, preg_match_all('{<'.$kind.'>(.*?)</'.$kind.'>}s', $page, $inline), 'one inline '.$kind);
+            self::assertSame($manifest['csp'][$kind] ?? null, 'sha256-'.base64_encode(hash('sha256', $inline[1][0], true)), 'the archive changed the inline '.$kind);
+            self::assertStringContainsString($kind."-src '".$manifest['csp'][$kind]."'", $policy[1]);
+        }
+        self::assertSame(1, preg_match('{<script id="lockrot-data" type="application/json">(.*?)</script>}s', $page, $data), 'the page embeds the report');
+        $embedded = json_decode($data[1], true);
+        self::assertIsArray($embedded);
+        self::assertSame('https://lockrot.dev/schema/report-2.json', $embedded['report']['$schema'] ?? null);
+    }
+
+    /**
      * The archive reads the GitHub answers from its activity cache, dated the day of the run, where the
      * in-process recording reads them fresh. So the cache readings (`fetched_at`, `cached_at` and the
      * root cache age) are masked with the tool version and the server port.
