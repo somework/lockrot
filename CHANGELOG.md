@@ -267,6 +267,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **sarif:** a message writes each literal `{` as `{{` and each `}` as `}}`, as SARIF 2.1.0
   requires, so a viewer that fills placeholders shows an advisory title such as `{% use %}` as written.
+- **sarif:** `originalUriBaseIds.%SRCROOT%.uri` is `file:///` for a project in `/` and
+  `file://server/share/proj/` for one on a UNC share. It read `file:////` and `file:///server/…`.
 - **All formats:** the anonymous cap note counts one package in the singular ("1 candidate package").
 - **All formats:** `run.project_php_lowest` of a post-release `require.php` bound, such as
   `>=7.4.0-p1`, is the next patch, `7.4.1`. It read `7.4.0`, which the bound excludes.

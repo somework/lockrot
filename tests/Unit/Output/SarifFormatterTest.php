@@ -32,6 +32,7 @@ use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class SarifFormatterTest extends TestCase
@@ -579,6 +580,26 @@ final class SarifFormatterTest extends TestCase
         self::assertStringStartsWith('file:///', $uri);
         self::assertStringStartsNotWith('file:////', $uri);
         self::assertStringEndsWith('/lockrot-sarif-c:/drive-'.$suffix.'/', $uri);
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function projectDirectories(): iterable
+    {
+        yield 'the root' => ['/', 'file:///'];
+        yield 'a POSIX directory' => ['/app', 'file:///app/'];
+        yield 'a Windows drive' => ['C:\\proj', 'file:///C:/proj/'];
+        yield 'a UNC share' => ['\\\\server\\share\\proj', 'file://server/share/proj/'];
+    }
+
+    /**
+     * RFC 8089: the root directory is `file:///`, and a UNC host is the URI's authority.
+     *
+     * @dataProvider projectDirectories
+     */
+    #[DataProvider('projectDirectories')]
+    public function testTheSrcrootUriNamesTheProjectDirectory(string $project, string $uri): void
+    {
+        self::assertSame($uri, SarifFormatter::directoryUri($project));
     }
 
     /**
