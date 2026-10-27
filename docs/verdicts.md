@@ -887,7 +887,9 @@ it. It also gives the answer of Composer's solver:
   the reason of the baseline, not `unloaded_name`.
 
 `target_fix` is null when the window admits the target, and when the target lies below the lowest
-edge of the set that `target.inside` reads. No update of a package can lower that edge.
+edge of the set that `target.inside` reads. Below the lowest edge, lockrot does not search for a
+downgrade. A `composer update` of the packages that set that edge can still downgrade them into the
+window, when you run it at the target PHP.
 
 The `php:` line of the table, markdown and github formats prints the window. When the minors of
 `with_dev` differ, the line prints `with_dev` and `without_dev`. The line adds the target when the
