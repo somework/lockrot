@@ -64,6 +64,12 @@ final class MoveCheckersTest extends TestCase
         self::assertSame('8.0.99', MoveCheckers::platformPhp('8.0', 'eight'));
     }
 
+    /** Composer reads `202010` as a date version with no minor. */
+    public function testAPlatformPhpThatComposerReadsAsADateIsNotInTheTargetMinor(): void
+    {
+        self::assertSame('8.0.99', MoveCheckers::platformPhp('8.0', '202010'));
+    }
+
     /** The regular expression reads the target minor literally: its dot matches only a dot. */
     public function testAPlatformPhpThatMatchesTheTargetMinorOnlyAsAPatternIsNotInIt(): void
     {

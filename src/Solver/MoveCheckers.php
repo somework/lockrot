@@ -74,7 +74,7 @@ final class MoveCheckers
         return $platform !== null && self::minorOf($platform) === $targetMinor ? $platform : $targetMinor.'.'.self::NEWEST_PATCH;
     }
 
-    /** The minor that Composer reads from $version (`8` is 8.0.0), null for a version that is not stable or does not parse. */
+    /** The minor that Composer reads from $version (`8` is 8.0.0), null for a version that is not stable, has no minor or does not parse. */
     private static function minorOf(string $version): ?string
     {
         $parser = new VersionParser();
@@ -83,11 +83,11 @@ final class MoveCheckers
         } catch (\UnexpectedValueException $e) {
             return null;
         }
-        if (VersionParser::parseStability($normalized) !== 'stable') {
+        $parts = explode('.', $normalized);
+        if (VersionParser::parseStability($normalized) !== 'stable' || \count($parts) < 2) {
             return null;
         }
-        [$major, $minor] = explode('.', $normalized);
 
-        return $major.'.'.$minor;
+        return $parts[0].'.'.$parts[1];
     }
 }
