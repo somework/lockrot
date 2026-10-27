@@ -27,6 +27,7 @@ final class SolverChecker implements MoveChecker
         VersionSource::OFFLINE => MoveCheck::OFFLINE,
         VersionSource::BUDGET => MoveCheck::INSTALL_TIME_BUDGET,
         VersionSource::FAILED => MoveCheck::UNLOADED_NAME,
+        VersionSource::UNREACHED => MoveCheck::UNLOADED_NAME,
     ];
 
     private ComposerSolver $solver;
@@ -383,7 +384,7 @@ final class SolverChecker implements MoveChecker
         foreach ($moved as $name) {
             $failures[] = $this->solver->source()->failure($name);
         }
-        foreach ([VersionSource::BUDGET, VersionSource::OFFLINE, VersionSource::FAILED] as $failure) {
+        foreach ([VersionSource::BUDGET, VersionSource::OFFLINE, VersionSource::FAILED, VersionSource::UNREACHED] as $failure) {
             if (\in_array($failure, $failures, true)) {
                 return self::NOT_LOADED[$failure];
             }

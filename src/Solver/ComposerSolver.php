@@ -195,7 +195,8 @@ final class ComposerSolver
         }
 
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
-        return Solution::resolved($installs, $from, $this->failures($loaded->asked()));
+        // A virtual name, which a package provides, is unreached too: only a refusal that wants an unreached name proves nothing.
+        return Solution::resolved($installs, $from, array_diff($this->failures($loaded->asked()), [VersionSource::UNREACHED]));
     }
 
     /**

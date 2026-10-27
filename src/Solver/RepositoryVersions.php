@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
+use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Package\Version\StabilityFilter;
 use Composer\Repository\ComposerRepository;
+use Composer\Repository\FilterRepository;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Deadline;
 
@@ -15,7 +17,8 @@ use Lockrot\Deadline;
  * then `dev` for a name with no tagged release or one that the root admits at `dev`, as Composer's
  * repository loads a name's `~dev` file. Composer serves a file
  * that this process already fetched from its cache, so a name that the run read costs no request.
- * The first repository that lists a name wins, as a canonical repository shadows the later ones.
+ * The first canonical repository that lists a name shadows the later ones. A repository with `only`,
+ * `exclude` or `canonical` is asked as Composer asks it, through its FilterRepository.
  *
  * @internal
  */
@@ -29,8 +32,9 @@ final class RepositoryVersions implements VersionSource
     ];
     private const DEV = ['dev' => BasePackage::STABILITY_DEV];
 
-    /** @var array<ComposerRepository> */
+    /** @var array<RepositoryInterface> each a ComposerRepository, or a FilterRepository around one */
     private array $repositories;
+    private bool $otherRepositories;
     /** @var array<string, true> */
     private array $notFromComposerRepository;
     private bool $offline;
@@ -47,7 +51,7 @@ final class RepositoryVersions implements VersionSource
     private array $stabilityFlags;
 
     /**
-     * @param list<RepositoryInterface> $repositories              only ComposerRepository instances are asked
+     * @param list<RepositoryInterface> $repositories              only a ComposerRepository is asked, through the FilterRepository that wraps it
      * @param list<string>              $notFromComposerRepository the locked names that a path, VCS or package repository serves: the lock's version is their only version
      * @param string                    $minimumStability          the root's `minimum-stability`
      * @param array<string, BasePackage::STABILITY_*> $stabilityFlags the root's stability flags, by name
@@ -57,7 +61,8 @@ final class RepositoryVersions implements VersionSource
         $floor = BasePackage::$stabilities[$minimumStability] ?? BasePackage::STABILITY_STABLE;
         $this->acceptable = array_filter(BasePackage::$stabilities, static fn (int $value): bool => $value <= $floor);
         $this->stabilityFlags = $stabilityFlags;
-        $this->repositories = array_filter($repositories, static fn (RepositoryInterface $repository): bool => $repository instanceof ComposerRepository);
+        $this->repositories = array_filter($repositories, static fn (RepositoryInterface $repository): bool => ($repository instanceof FilterRepository ? $repository->getRepository() : $repository) instanceof ComposerRepository);
+        $this->otherRepositories = \count($this->repositories) < \count($repositories);
         $this->notFromComposerRepository = array_fill_keys($notFromComposerRepository, true);
         $this->offline = $offline;
         $this->deadline = $deadline;
@@ -121,33 +126,40 @@ final class RepositoryVersions implements VersionSource
         }
         foreach ($this->repositories as $repository) {
             $tagged = [];
+            $listed = [];
+            $found = [];
             foreach ([self::STABLE, self::DEV] as $stabilities) {
-                $asked = $pending + $tagged;
+                $asked = array_diff_key($pending, $listed) + $tagged;
                 if ($asked === []) {
-                    return;
+                    break;
                 }
                 $result = $repository->loadPackages($asked, $stabilities, []);
+                $found += array_fill_keys($result['namesFound'], null);
+                $answered = [];
                 foreach ($result['packages'] as $package) {
                     if ($package instanceof BasePackage && \array_key_exists($package->getName(), $asked)) {
-                        $this->loaded[$package->getName()][] = $package;
+                        $answered[$package->getName()][] = $package;
                     }
                 }
-                $listed = array_intersect_key($pending, array_filter($this->loaded));
-                $pending = array_diff_key($pending, $listed);
+                foreach ($answered as $name => $packages) {
+                    $this->loaded[$name] = self::withNewVersions($this->loaded[$name], $packages);
+                }
+                $listed += array_intersect_key($pending, $answered);
                 if ($stabilities === self::DEV) {
-                    $this->complete += $tagged + $listed;
                     foreach (array_keys($tagged) as $name) {
                         $this->failOfflineWithoutDevFile($name, $result);
                     }
                 } else {
                     $tagged = array_filter($listed, fn (string $name): bool => $this->admitsDev($name), \ARRAY_FILTER_USE_KEY);
-                    $this->complete += array_diff_key($listed, $tagged);
                 }
             }
+            // A repository that is not canonical lists a name without claiming it: the later ones add their versions.
+            $claimed = array_intersect_key($listed, $found);
+            $this->complete += $claimed;
+            $pending = array_diff_key($pending, $claimed);
         }
-        if ($this->offline) {
-            $this->failures += array_fill_keys(array_keys($pending), self::OFFLINE);
-        }
+        $this->complete += array_intersect_key($pending, array_filter($this->loaded));
+        $this->failUnlisted(array_keys(array_diff_key($pending, $this->complete)));
     }
 
     /** @return list<BasePackage> */
@@ -159,36 +171,83 @@ final class RepositoryVersions implements VersionSource
             return [];
         }
         $failed = false;
+        $loaded = [];
         foreach ($this->repositories as $repository) {
             $versions = [];
             try {
-                $versions = self::named($repository->loadPackages([$name => null], self::STABLE, []), $name);
+                $tags = $repository->loadPackages([$name => null], self::STABLE, []);
+                $versions = self::named($tags, $name);
+                $found = $tags['namesFound'];
                 if ($versions === [] || $this->admitsDev($name)) {
                     $dev = $repository->loadPackages([$name => null], self::DEV, []);
                     if ($versions !== [] && $this->failOfflineWithoutDevFile($name, $dev)) {
                         return [];
                     }
                     $versions = array_merge($versions, self::named($dev, $name));
+                    $found = array_merge($found, $dev['namesFound']);
                 }
             } catch (\Exception $e) {
                 $failed = true;
-                // The first repository that lists the name wins: its tags without its dev versions are no answer.
+                // A repository that lists the name answers for it: its tags without its dev versions are no answer.
                 if ($versions !== []) {
                     break;
                 }
                 continue;
             }
-            if ($versions !== []) {
-                return $versions;
+            $loaded = self::withNewVersions($loaded, $versions);
+            if ($versions !== [] && \in_array($name, $found, true)) {
+                return $loaded;
             }
         }
         if ($failed) {
             $this->failures[$name] = self::FAILED;
-        } elseif ($this->offline) {
-            $this->failures[$name] = self::OFFLINE;
+
+            return [];
+        }
+        if ($loaded === []) {
+            $this->failUnlisted([$name]);
         }
 
-        return [];
+        return $loaded;
+    }
+
+    /**
+     * Why lockrot has no versions of names that no Composer repository lists: offline, Composer's
+     * cache may lack the answer. Online, a path, VCS or package repository of the project can serve them.
+     *
+     * @param list<string> $names
+     */
+    private function failUnlisted(array $names): void
+    {
+        if ($this->offline) {
+            $this->failures += array_fill_keys($names, self::OFFLINE);
+        } elseif ($this->otherRepositories) {
+            $this->failures += array_fill_keys($names, self::UNREACHED);
+        }
+    }
+
+    /**
+     * $packages without the versions that $loaded holds: Composer prefers the earlier repository's
+     * copy of a version that two repositories list.
+     *
+     * @param list<BasePackage> $loaded
+     * @param list<BasePackage> $packages
+     *
+     * @return list<BasePackage>
+     */
+    private static function withNewVersions(array $loaded, array $packages): array
+    {
+        $known = [];
+        foreach ($loaded as $package) {
+            $known[self::base($package)->getVersion()] = true;
+        }
+        foreach ($packages as $package) {
+            if (!isset($known[self::base($package)->getVersion()])) {
+                $loaded[] = $package;
+            }
+        }
+
+        return $loaded;
     }
 
     /**
@@ -217,6 +276,11 @@ final class RepositoryVersions implements VersionSource
         $this->loaded[$name] = [];
 
         return true;
+    }
+
+    private static function base(BasePackage $package): BasePackage
+    {
+        return $package instanceof AliasPackage ? $package->getAliasOf() : $package;
     }
 
     private function admitsDev(string $name): bool
