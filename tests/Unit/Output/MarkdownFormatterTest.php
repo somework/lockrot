@@ -214,7 +214,7 @@ final class MarkdownFormatterTest extends TestCase
         $out = self::formatter()->format($report, true);
 
         self::assertStringContainsString('| `` acme/ev`il `` | 1.0.0 \<b\>x\</b\> |', $out);
-        self::assertStringContainsString('\<img src=x onerror=alert(1)\> \[fine\](https\://example.com) \*ok\* \&lt;b\&gt; \#1 a\|b', $out);
+        self::assertStringContainsString('\<img src=x onerror=alert(1)\> \[fine\](https\://example.com) \*ok\* \&lt;b\&gt; \#&#8203;1 a\|b', $out);
         self::assertStringContainsString('- note: GitHub unreachable: \<script\>alert(1)\</script\> \[x\](y)', $out);
         self::assertSame(0, preg_match('/(?<!\\\\)<(img|script|b>)/', $out), 'every < from package metadata is escaped');
     }
@@ -251,6 +251,26 @@ final class MarkdownFormatterTest extends TestCase
         self::assertStringContainsString('@&#8203;github/security-team see www\\.evil.example/login or https\\://evil.example/x and mail me@&#8203;evil.example', $out);
         self::assertStringContainsString('- note: ask @&#8203;octocat at http\\://evil.example', $out);
         self::assertSame(0, preg_match('/@(?!&#8203;)|www\\.|(?<!\\\\):\/\//i', $out), 'no live mention, www link or scheme link');
+    }
+
+    /**
+     * GitHub links `#1`, `GH-1` and a word of 7 to 40 lowercase hex digits to an issue or a commit
+     * of the repository, a backslash before `#` included, and a `#1` link adds a cross-reference to
+     * issue 1. A zero-width space inside each reference stops the link. A hex run inside a version
+     * or a longer word is no reference and keeps its bytes.
+     */
+    public function testLockTextCannotReferenceAnIssueOrACommit(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            (new FindingBuilder())->withPackage('acme/kept')->withSignals([new Signal(Signal::LEVEL_WARN, 'x', SignalDataStub::of(Signal::S2, []))])->withAllowlistReason('see #12, acme/kept#3, gh-4 and (7750418) or 775041854cfc37c5ed11d5644b35d8f7a9c24695.')->withDataDate($at)->build(),
+        ], Notes::texts(['fixed in 1.0.0-77504185, not 7750418A or 775041']), $at, 1, 0);
+
+        $out = self::formatter()->format($report, true);
+
+        self::assertStringContainsString('see \\#&#8203;12, acme/kept\\#&#8203;3, gh&#8203;-4 and (7&#8203;750418) or 7&#8203;75041854cfc37c5ed11d5644b35d8f7a9c24695.', $out);
+        self::assertStringContainsString('- note: fixed in 1.0.0-77504185, not 7750418A or 775041', $out);
+        self::assertSame(0, preg_match('/(?<!&)#[0-9]|(?i:gh)-[0-9]|(?<![\w.-]|&#8203;)[0-9a-f]{7,40}(?!\w)/', $out), 'no live issue or commit reference: '.$out);
     }
 
     /**
