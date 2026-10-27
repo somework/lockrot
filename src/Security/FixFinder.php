@@ -86,15 +86,13 @@ final class FixFinder
         }
 
         $onInstalled = $installedBranch === null ? [] : ($byBranch[$installedBranch] ?? []);
-        $allowed = $this->newestAllowed($package->name(), $onInstalled);
-        if ($allowed !== null && $installedBranch !== null && isset($newest[$installedBranch])) {
-            $newest[$installedBranch] = $allowed;
-        }
+        $allowed = $this->newestAllowed($package->name(), $onInstalled, []);
+        $newestFor = fn (string $branch, ?Candidate $candidate): string => ($branch === $installedBranch ? $this->newestAllowed($package->name(), $onInstalled, $candidate === null ? [] : $candidate->heldBy()) : null) ?? $newest[$branch];
         $fixes = [];
         foreach ($ranges as $id => $range) {
-            $fixes[$id] = $range === null ? Fix::unknown(Fix::AFFECTED_RANGE_UNKNOWN) : $this->fixOf($range, $byBranch, $own, $newest, $installedBranch);
+            $fixes[$id] = $range === null ? Fix::unknown(Fix::AFFECTED_RANGE_UNKNOWN) : $this->fixOf($range, $byBranch, $own, $newestFor, $installedBranch);
         }
-        $rows = self::branches($newest, $byBranch, $installedBranch, $ranged, $own, \count($advisories));
+        $rows = self::branches($newest, $newestFor, $byBranch, $installedBranch, $ranged, $own, \count($advisories));
         $move = self::move($rows, \count($advisories));
 
         return new PackageFixes(
@@ -175,9 +173,9 @@ final class FixFinder
      *
      * @param array<string, list<Candidate>> $byBranch the lowest branch first, ascending per branch
      * @param list<ConstraintInterface>      $own      the ranges of the advisories the facts do not count
-     * @param array<string, string>          $newest   the newest release by branch key, on the installed branch the newest that the lock's links allow
+     * @param callable(string, Candidate): string $newestFor the newest release of a branch key for a fixing candidate
      */
-    private function fixOf(ConstraintInterface $range, array $byBranch, array $own, array $newest, ?string $installedBranch): Fix
+    private function fixOf(ConstraintInterface $range, array $byBranch, array $own, callable $newestFor, ?string $installedBranch): Fix
     {
         $best = null;
         foreach ($byBranch as $candidates) {
@@ -187,7 +185,7 @@ final class FixFinder
             }
         }
 
-        return $best === null ? Fix::none() : Fix::to($best, $newest[$best->branchKey()], $installedBranch, $this->floor);
+        return $best === null ? Fix::none() : Fix::to($best, $newestFor($best->branchKey(), $best), $installedBranch, $this->floor);
     }
 
     /**
@@ -272,14 +270,15 @@ final class FixFinder
      * release lies outside. Its candidate is the easiest release of its window for those ranges
      * ({@see window()}), then the lowest, and the row's class is that release's class.
      *
-     * @param array<string, string>               $newest
-     * @param array<string, list<Candidate>>      $byBranch ascending per branch
+     * @param array<string, string>               $newest    the newest release by branch key
+     * @param callable(string, ?Candidate): string $newestFor the newest release of a branch key for its row's candidate
+     * @param array<string, list<Candidate>>      $byBranch  ascending per branch
      * @param array<string, ConstraintInterface>  $ranged
      * @param list<ConstraintInterface>           $own
      *
      * @return list<BranchFixes>
      */
-    private static function branches(array $newest, array $byBranch, ?string $installedBranch, array $ranged, array $own, int $of): array
+    private static function branches(array $newest, callable $newestFor, array $byBranch, ?string $installedBranch, array $ranged, array $own, int $of): array
     {
         $keys = array_map('strval', array_keys($newest));
         usort($keys, static fn (string $a, string $b): int => version_compare($b, $a));
@@ -289,7 +288,7 @@ final class FixFinder
             $top = $candidates === [] ? null : $candidates[\count($candidates) - 1];
             $cleared = $top === null ? [] : self::cleared($top, $ranged);
             $candidate = $cleared === [] ? null : self::easiestIn(self::window($candidates, array_intersect_key($ranged, array_flip($cleared)), $own));
-            $rows[] = new BranchFixes(ReleaseBranch::label($key), $key === $installedBranch, $of - \count($ranged), $of, $candidate, $newest[$key], $cleared);
+            $rows[] = new BranchFixes(ReleaseBranch::label($key), $key === $installedBranch, $of - \count($ranged), $of, $candidate, $newestFor($key, $candidate), $cleared);
         }
 
         return $rows;
@@ -331,13 +330,20 @@ final class FixFinder
         return new Gets($release->release()->pretty(), $check, $clears, \count($clears) === $of);
     }
 
-    /** @param list<Candidate> $onInstalled ascending */
-    private function newestAllowed(string $package, array $onInstalled): ?string
+    /**
+     * The highest release on the installed branch that the target runs and that no link outside
+     * $heldBy excludes: a link in a move's `held_by` does not lower its `newest` (SPEC §5.3).
+     *
+     * @param list<Candidate> $onInstalled ascending
+     * @param list<Holder>    $heldBy
+     */
+    private function newestAllowed(string $package, array $onInstalled, array $heldBy): ?string
     {
         $newest = null;
         foreach ($onInstalled as $candidate) {
             $release = $candidate->release();
-            if ($this->links->excluding($package, $release->normalized()) === [] && $this->floor->admitsTarget($release->php()) !== false) {
+            $excluding = array_filter($this->links->excluding($package, $release->normalized()), static fn (Holder $link): bool => !\in_array($link, $heldBy));
+            if ($excluding === [] && $this->floor->admitsTarget($release->php()) !== false) {
                 $newest = $release->pretty();
             }
         }

@@ -276,6 +276,39 @@ final class FixFinderTest extends TestCase
         self::assertSame([['source' => Holder::PACKAGE, 'package' => 'c/conflicting', 'version' => '3.0.0', 'link' => Holder::CONFLICT, 'constraint' => '>=1.2']], self::holders($fix->heldBy()));
     }
 
+    /** A link in the fix's own `held_by` does not lower `newest`: the move clears that hold (SPEC 5.3, S9 row). */
+    public function testTheLinkThatHoldsTheFixDoesNotLowerItsNewest(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['1.1.0', null], ['1.2.0', null], ['1.3.0', null], ['1.4.0', null]],
+            ['A' => '<1.3.0'],
+            new PhpFloor('8.4', null),
+            [['name' => 'c/c', 'version' => '1.0.0', 'conflict' => ['a/b' => '>=1.3.0']]]
+        );
+        $fix = $fixes->forAdvisory('A');
+        $row = $fixes->installedBranch();
+        self::assertNotNull($row);
+
+        self::assertSame(['1.3.0', '1.4.0'], [$fix->version(), $fix->newest()], 'the fix');
+        self::assertSame('1.4.0', $row->newest(), 'installed_branch_fixes');
+        self::assertSame('1.2.0', $fixes->newestOnInstalledBranch(), 'an update with no hold');
+    }
+
+    /** A link that the fix's `held_by` does not hold still lowers `newest`. */
+    public function testALinkOutsideTheFixHoldsLowersItsNewest(): void
+    {
+        $fix = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['1.3.0', null], ['1.4.0', null]],
+            ['A' => '<1.3.0'],
+            new PhpFloor('8.4', null),
+            [['name' => 'c/c', 'version' => '1.0.0', 'conflict' => ['a/b' => '>=1.3.0']], ['name' => 'd/d', 'version' => '1.0.0', 'conflict' => ['a/b' => '1.4.0']]]
+        )->forAdvisory('A');
+
+        self::assertSame(['1.3.0', '1.3.0'], [$fix->version(), $fix->newest()]);
+    }
+
     /** The links come from packages and packages-dev, whatever --dev says: composer update reads both. */
     public function testADevPackageHoldsAProdPackage(): void
     {
