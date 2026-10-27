@@ -367,7 +367,7 @@ final class CaseHydrator
             new ActivityFetchPlanner($auth),
             $locator,
             BuiltinAllowlist::load(),
-            SignalSet::default($clock, new Thresholds(), $targetPhp, PhpReleaseDates::load(), $projectPhp),
+            SignalSet::default($clock, new Thresholds(), $targetPhp, PhpReleaseDates::load(), $projectPhp, $lock->platform()['php'] ?? null),
             $clock,
             ($activity['reason'] ?? null) === NotCheckedRule::OFFLINE,
             self::advisoryLoader($packages, self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null),

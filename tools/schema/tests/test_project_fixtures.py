@@ -109,6 +109,13 @@ class ACaseWithoutBranchRowsHydratesFromItsRunReleases(unittest.TestCase):
         self.assertIsNotNone(inputs)
         self.assertIn({'version': '4.17.0', 'time': '2025-01-01T00:00:00+00:00', 'php': '~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0'}, inputs['releases'])
 
+    def test_a_release_that_only_the_finding_names_stays_out_of_the_run_releases(self):
+        finding = dict(self.FINDING, age={'release': {'version': '4.18.0', 'at': '2025-06-01T00:00:00+00:00'}})
+
+        inputs = project_fixtures.inputs_of({'finding': finding, 'run': self.RUN, 'run_inputs': {'_releases': self.RELEASES}})
+
+        self.assertEqual(['4.17.0', '4.7.1'], [r['version'] for r in inputs['releases']])
+
     def test_a_case_without_branch_rows_and_without_run_releases_gets_none(self):
         self.assertIsNone(project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN}))
 

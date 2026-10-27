@@ -540,7 +540,9 @@ def inputs_of(case):
         if world['check_passes'] is not None:
             inputs['check_passes'] = world['check_passes']
     if run_inputs.get('_releases') and inputs.get('releases') is not None:
-        inputs['releases'] = run_releases(run_inputs['_releases'], inputs['releases'])
+        # Without branch rows the run inputs list every release: a release that only the finding names is not one of them.
+        base = inputs['releases'] if rows else [r for r in inputs['releases'] if r['version'] == f['version']]
+        inputs['releases'] = run_releases(run_inputs['_releases'], base)
     if checks:
         inputs['checks'] = checks
         inputs['move_check'] = move_check_of(run['move_check'], world, run.get('php_window'))
