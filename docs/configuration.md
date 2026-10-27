@@ -400,8 +400,8 @@ on every run ([What `--fail-on=unchecked` fails on](ci.md#what-unchecked-fails-o
   an ssh source as `ssh://host:2222/path`. A URL without a scheme is the scp form, which names its
   user (`git@host:path`). lockrot compares the host and port without case, then the path, without
   the scheme, a trailing `/` and `.git`. A port with leading zeros (`:0443`) or the default port of
-  the scheme (`https://host:443`) matches the same host and URL without it. A package installed from a `file://` URL is accepted only
-  by `package`.
+  the scheme (`https://host:443`) matches the same host and URL without it. A package installed from
+  a `file://` URL is accepted only by `package`.
 - **Accepting `release_metadata` accepts the unknown fixes too.** On a package from vcs or an
   unknown origin, the releases lockrot did not read are also the releases that the fix of each
   advisory needs. Each counted advisory then has the fix `unknown`, which never doubles. If no

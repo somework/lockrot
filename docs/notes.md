@@ -15,7 +15,7 @@ do, what each gap does to findings, and what to do about it.
 | [`metadata_unavailable`](#metadata_unavailable) | Metadata did not arrive for some packages | yes | Those packages are `unknown` | Depends on the [`reason`](#metadata_unavailable) |
 | [`monorepo_parent_unavailable`](#monorepo_parent_unavailable) | A monorepo's metadata did not arrive | yes | The split packages whose dates need that parent stay unmeasured, with S10 `undated_releases` | Rerun |
 | [`advisory_ignore_unreadable`](#advisory_ignore_unreadable) | Composer rejected the advisory ignore settings | no | Every advisory counts, ignored ones included | Fix `config.policy` or `config.audit`, as the note's `message` says |
-| [`advisories_disabled_by_policy`](#advisories_disabled_by_policy) | Composer's policy stops Composer from blocking advisories | no | None: lockrot still checks advisories | Nothing for lockrot. Composer does not block an affected version in an install or an update of this project |
+| [`advisories_disabled_by_policy`](#advisories_disabled_by_policy) | Composer's policy turns off Composer's advisory blocking | no | None: lockrot still checks advisories | Nothing for lockrot. Composer does not block an affected version in an install or an update of this project |
 | [`advisories_unavailable`](#advisories_unavailable) | A Composer repository's advisory request failed | yes when unreachable, no for any other error the repository raised, such as an answer lockrot could not read | That repository's advisories are missing | Rerun. For any other error, check the repository that `composer_repository` names |
 | [`advisories_not_checked`](#advisories_not_checked) | Advisories were not looked up, or only partly | no | The packages that the lookup missed carry S10 `advisories`, and their advisories add no points | `offline`: run online. `composer_too_old`: use Composer 2.4 or newer. `install_time_budget`: raise the [budget](install-time.md#time-budget) |
 | [`repository_activity_not_checked`](#repository_activity_not_checked) | No repository host was asked | no | S10 `install_time_budget` | Raise the [budget](install-time.md#time-budget), or run `composer lockrot` |
@@ -123,10 +123,10 @@ advisory.
 
 ### <a name="advisories_disabled_by_policy"></a>Advisories disabled by policy {#advisories_disabled_by_policy}
 
-The project's Composer policy stops Composer from blocking the versions that a security advisory
-affects in an install or an update. `composer audit` still reports the advisories. lockrot asks its
-repositories as usual, and the advisories they return count. lockrot writes the note only when the
-lookup ran.
+The project's Composer policy turns off Composer's advisory blocking: an install or an update can
+take a version that a security advisory affects. `composer audit` still reports the advisories.
+lockrot asks its repositories as usual, and the advisories they return count. lockrot writes the
+note only when the lookup ran.
 
 - `data`: `policy_key`, the setting, and `value`, its value.
 - Findings: no change.

@@ -166,9 +166,11 @@ jobs:
         with: {name: lockrot.phar, path: build}
       - run: php build/lockrot.phar --version
       - run: php build/lockrot.phar -d tests/fixtures/skeletons/laravel --format=json --target-php=8.4 --offline > /dev/null
-      # The archive's page under the manifest's policy is PharTest's. This run proves that the page
-      # loads on the PHP floor.
-      - run: php build/lockrot.phar -d tests/fixtures/skeletons/laravel --format=html --target-php=8.4 --offline | grep -q '<script id="lockrot-data" type="application/json">'
+      # The archive's page under the manifest's policy is PharTest's. This run checks that the
+      # archive writes the page on the PHP floor.
+      - run: |
+          php build/lockrot.phar -d tests/fixtures/skeletons/laravel --format=html --target-php=8.4 --offline > build/report.html
+          grep -q '<script id="lockrot-data" type="application/json">' build/report.html
   release:
     needs: [phar, smoke-php74]
     if: startsWith(github.ref, 'refs/tags/')

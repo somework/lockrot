@@ -674,8 +674,7 @@ check-jsonschema --schemafile ci/lockrot-report.schema.json lockrot.json
 Validators disagree on a trailing newline.
 [justinrainbow/json-schema](https://github.com/jsonrainbow/json-schema), the validator that
 Composer bundles, compiles a `pattern` with no `D` modifier, so `$` also matches before a final
-`\n`. It accepts a value such as `"json\n"` that Ajv and check-jsonschema reject. lockrot writes
-no control character in a string, so only a hand-edited file shows the difference.
+`\n`. It accepts a value such as `"json\n"` that Ajv and check-jsonschema reject.
 
 [Ajv](https://ajv.js.org/) 8 needs three things for these files:
 

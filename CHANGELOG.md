@@ -46,8 +46,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
   `require.php` stops below the newest PHP minor that the root php allows. It decides at once, and
   comes after `stale`, so `--fail-on=stale` keeps its reach. A baseline entry that records any
-  maintenance flag covers it. Every grade gate can fail where 0.13 passed: its 8 points can lift a
-  score to `high` or `critical`. Action: run once without a gate. ([Capped](docs/verdicts.md#capped))
+  maintenance flag covers it. A grade gate at `high`, `medium` or `low` can fail where 0.13 passed:
+  its 8 points can lift a score to `high`. Action: run once without a gate.
+  ([Capped](docs/verdicts.md#capped))
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
   is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
@@ -113,9 +114,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **JSON:** `run.move_check.blocking_disabled_by` lists each environment variable and
-  composer.json key that turns Composer's advisory blocking off. The move check then blocks no
-  advisory. `policy.advisories.audit: ignore` alone writes no run note `advisories_disabled_by_policy`.
+- **JSON:** `run.move_check.blocking_disabled_by` lists each environment variable and composer.json
+  key that turns Composer's advisory blocking off. The move check then blocks no advisory.
+  `policy.advisories.audit: ignore` alone writes no run note `advisories_disabled_by_policy`.
   ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** Composer's solver checks each move against the lock, and the move
   writes `check` with the release it `installs`. A refused move asks once more with its holders, and
@@ -181,9 +182,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `abandoned_ignore_unreadable` say what Composer's abandoned ignore list and its audit setting
   did. ([Run notes](docs/notes.md#abandoned_markings_ignored))
 - **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
-  (`config.policy: false`, `policy.advisories: false` or `COMPOSER_POLICY=0`) that stops Composer
-  from blocking advisories in an install or an update. lockrot still asks, and every advisory still
-  counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
+  (`config.policy: false`, `policy.advisories: false` or `COMPOSER_POLICY=0`) that turns off
+  Composer's advisory blocking in an install or an update. lockrot still asks, and every advisory
+  still counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
 - **markdown:** `--markdown-max-bytes` keeps a report written through `--output` within a byte
   budget. The report ends at a whole row, and a last row counts the rows it left out.
   ([In CI](docs/ci.md))

@@ -23,9 +23,8 @@ final class BaselineDocsExampleTest extends TestCase
 
         $quoted = array_values(array_filter(explode("\n", $example[1] ?? ''), static fn (string $line): bool => $line !== '…'));
         self::assertNotSame([], $quoted);
-        $text = implode("\n", $recorded);
         foreach ($quoted as $line) {
-            self::assertStringContainsString($line, $text, 'docs/baseline.md quotes a line that tests/fixtures/baselined/wallabag-main/check/report.table.txt does not hold');
+            self::assertContains($line, $recorded, 'docs/baseline.md quotes a line that tests/fixtures/baselined/wallabag-main/check/report.table.txt does not hold');
         }
     }
 }

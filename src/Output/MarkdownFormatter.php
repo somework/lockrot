@@ -229,8 +229,8 @@ final class MarkdownFormatter implements FormatterInterface
         // entity stops them. A `$` in a span and a zero-width space after the `:` do.
         $value = (string) preg_replace('/:(?=(?:[A-Za-z0-9+-]|\\\\_)+:)/', ':&#8203;', str_replace('$', '<span>$</span>', $value));
         // GitHub links `#1`, `GH-1` and a word of 7 to 40 lowercase hex digits to an issue or a
-        // commit, an escaped `\#` too, and `#1` adds a cross-reference to issue 1. A zero-width
-        // space inside the reference stops the link.
+        // commit. A backslash before `#` does not stop it, and `#1` adds a cross-reference to issue
+        // 1. A zero-width space inside the reference stops the link.
         $value = (string) preg_replace(
             ['/\\\\#(?=[0-9])/', '/(?<![A-Za-z0-9_])(gh)(?=-[0-9])/i', '/(?<![\w.-])([0-9a-f])(?=[0-9a-f]{6,39}(?![A-Za-z0-9_]))/'],
             ['\\\\#&#8203;', '$1&#8203;', '$1&#8203;'],
