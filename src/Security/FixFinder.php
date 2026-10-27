@@ -89,11 +89,17 @@ final class FixFinder
         $onInstalled = $installedBranch === null ? [] : ($byBranch[$installedBranch] ?? []);
         $allowed = $this->newestAllowed($package->name(), $onInstalled, null);
         $newestFor = fn (string $branch, ?Candidate $candidate): string => ($branch === $installedBranch ? $this->newestAllowed($package->name(), $onInstalled, $candidate) : null) ?? $newest[$branch];
+        $rows = self::branches($newest, $newestFor, $byBranch, $installedBranch, $ranged, $own, \count($advisories));
+        $rowNewest = [];
+        foreach ($rows as $row) {
+            $rowNewest[$row->branch()] = $row->newest();
+        }
+        // On one branch the S9 fix, the row and the move read one `newest` (SPEC 5.3, the S9 row).
+        $branchNewest = static fn (string $branch): string => $rowNewest[ReleaseBranch::label($branch)] ?? $newest[$branch];
         $fixes = [];
         foreach ($ranges as $id => $range) {
-            $fixes[$id] = $range === null ? Fix::unknown(Fix::AFFECTED_RANGE_UNKNOWN) : $this->fixOf($range, $byBranch, $own, $newestFor, $installedBranch);
+            $fixes[$id] = $range === null ? Fix::unknown(Fix::AFFECTED_RANGE_UNKNOWN) : $this->fixOf($range, $byBranch, $own, $branchNewest, $installedBranch);
         }
-        $rows = self::branches($newest, $newestFor, $byBranch, $installedBranch, $ranged, $own, \count($advisories));
         $move = self::move($rows, \count($advisories));
 
         return new PackageFixes(
@@ -174,7 +180,7 @@ final class FixFinder
      *
      * @param array<string, list<Candidate>> $byBranch the lowest branch first, ascending per branch
      * @param list<ConstraintInterface>      $own      the ranges of the advisories the facts do not count
-     * @param callable(string, Candidate): string $newestFor the newest release of a branch key for a fixing candidate
+     * @param callable(string): string        $newestFor the `newest` of a branch key's row
      */
     private function fixOf(ConstraintInterface $range, array $byBranch, array $own, callable $newestFor, ?string $installedBranch): Fix
     {
@@ -186,7 +192,7 @@ final class FixFinder
             }
         }
 
-        return $best === null ? Fix::none() : Fix::to($best, $newestFor($best->branchKey(), $best), $installedBranch, $this->floor);
+        return $best === null ? Fix::none() : Fix::to($best, $newestFor($best->branchKey()), $installedBranch, $this->floor);
     }
 
     /**
@@ -329,6 +335,18 @@ final class FixFinder
         $clears = self::cleared($release, $ranged);
 
         return new Gets($release->release()->pretty(), $check, $clears, \count($clears) === $of);
+    }
+
+    /**
+     * The `newest` of a move to $for on its branch (SPEC 5.6, `version` and `newest`).
+     *
+     * @param list<StableRelease> $releases ascending
+     */
+    public function newestOf(string $package, array $releases, Candidate $for): ?string
+    {
+        $onBranch = array_values(array_filter($this->candidates($package, $releases), static fn (Candidate $candidate): bool => $candidate->branchKey() === $for->branchKey()));
+
+        return $this->newestAllowed($package, $onBranch, $for);
     }
 
     /**

@@ -9,6 +9,7 @@ use Composer\Package\Loader\ArrayLoader;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\VersionParser;
 use Lockrot\Clock;
+use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
@@ -92,6 +93,41 @@ final class MoveBuilderTest extends TestCase
         $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
 
         self::assertSame([['composer', 'require', 'a/b:^2.0', '--with-all-dependencies']], $move->commands());
+    }
+
+    /**
+     * SPEC 5.6, `version` and `newest`: h/h `<1.3` holds the move's own 1.3.0, so it does not lower
+     * `newest`, though the row's candidate 1.1.0 reads 1.2.0.
+     */
+    public function testARequireOnTheInstalledRowNeverReadsANewestBelowItsVersion(): void
+    {
+        $releases = [];
+        foreach (['1.0.0', '1.1.0', '1.2.0', '1.3.0'] as $version) {
+            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $version, 'time' => '2026-01-01T00:00:00+00:00']);
+            self::assertInstanceOf(BasePackage::class, $release);
+            $releases[] = $release;
+        }
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'], ['name' => 'h/h', 'version' => '1.0.0', 'require' => ['a/b' => '<1.3']]]]);
+        $locked = $lock->find('a/b');
+        self::assertNotNull($locked);
+        $facts = new PackageFacts($locked, PackageMetadata::fromPackages('a/b', $releases, new \DateTimeImmutable(self::NOW), '1.0.0.0'), null, [new Advisory('A', null, null, null, 'high', null, (new VersionParser())->parseConstraints('<1.1.0'))]);
+        $floor = new PhpFloor('8.4');
+        $finder = new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty()));
+        $fixes = $finder->find($facts, $facts->advisories());
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $context = new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', null), $facts->metadata(), BranchRow::all($facts, $floor, Clock::fixed(self::NOW), null, $fixes), $fixes, $finder, $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
+        $row = $context->installedRow();
+        self::assertNotNull($row);
+        [$lower, $constraint] = $context->lowestAdmitted($row, '^1.3.0');
+        self::assertNotNull($lower);
+        self::assertNotNull($constraint);
+        $installedRow = $fixes->installedBranch();
+        self::assertNotNull($installedRow);
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::OLD_PROMISE)->to($row, $lower, $constraint), [], null, $context);
+
+        self::assertSame(['1.1.0', '1.2.0'], [$installedRow->lowest(), $installedRow->newest()], 'the row');
+        self::assertSame(['1.3.0', '1.3.0'], [$move->version(), $move->newest()], 'the move');
     }
 
     /** The project's php point 7.4 does not run the release, so the request raises php too. */

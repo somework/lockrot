@@ -52,7 +52,7 @@ final class MoveBuilder
         $subject = $context->subject();
         $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $draft->constraint() : null;
         $version = \in_array($kind, Move::ROW_KINDS, true) ? ($lower === null ? null : $lower->release()->pretty()) : ($kind === Move::TAG && $latest !== null ? $latest->version() : null);
-        $newest = $row === null ? null : ($kind === Move::UPDATE ? $context->updateTarget($row) : (\in_array($kind, [Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) ? $context->rowTarget($row) : null));
+        $newest = $row === null ? null : ($kind === Move::UPDATE ? $context->updateTarget($row) : (\in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $context->rowTarget($row, $lower) : ($kind === Move::BLOCKED ? $context->rowTarget($row) : null)));
         $checks = $context->checks();
         $query = $checks === null ? null : self::query($kind, $subject, $constraint, $version, $phpCheck, $newest);
         $outcome = $query === null || $checks === null ? null : $checks->check($query);
