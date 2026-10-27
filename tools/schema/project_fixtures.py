@@ -359,6 +359,11 @@ def package_facts(f, rows):
         lower = re.match(r'^\^(\d+\.\d+)$', mv.get('constraint') or '')
         if mv.get('version') is None and row is not None and lower:
             release(('v' if (row['highest'] or '').startswith('v') else '') + lower.group(1) + '.0', None, row['php'])
+        # A solve that installs a release below the row's newest judges that release (ruling R2). The model dates a branch
+        # by its newest release only, so the installed release stays undated.
+        installs = (mv.get('check') or {}).get('installs')
+        if installs and row is not None:
+            release(installs, None, row['php'])
     age = f.get('age') or {}
     s6 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S6'), None) or {}
     # A snapshot has no release date: its lock time is the snapshot's commit time.

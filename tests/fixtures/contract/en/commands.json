@@ -251,6 +251,16 @@
             "argv": [
                 "composer",
                 "require",
+                "symfony/google-mailer:^5.4"
+            ],
+            "posix": "composer require 'symfony/google-mailer:^5.4'",
+            "cmd": "composer require \"symfony/google-mailer:^5.4\"",
+            "powershell": "composer --% require \"symfony/google-mailer:^5.4\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "symfony/mailer:^6.4.40"
             ],
             "posix": "composer require 'symfony/mailer:^6.4.40'",

@@ -276,6 +276,11 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
+        'gets-below-clears-nothing‡' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
+            ],
+        ],
         'require-dev-name‡' => [
             'moves' => [
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],

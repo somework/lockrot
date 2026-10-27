@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/google-mailer v4.4.41 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-04-12 (4.5 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45); 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; left-behind stays; a new major brings its own requirements; Composer's solver checked it against the lock.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "77244121cfcd7be166b735f685bf30d2c2eb17b80eeb7c60fbb9bb2bb11e0f27",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

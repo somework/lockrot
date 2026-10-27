@@ -170,7 +170,7 @@ critical (11)
       (vulnerable), paragonie/sodium_compat (vulnerable),
       brick/math (left-behind)
 
-high (20)
+high (21)
   robrichards/xmlseclibs 3.1.1  via mautic/core-lib  ·  old-promise · vulnerable
       24 = old-promise 16 ÷ 2 transitive + vulnerable 16 [high advisory] (baseline: new package)
       do: composer update robrichards/xmlseclibs
@@ -440,6 +440,19 @@ high (20)
                    (2026-07-10), needs php ~8.4.0 || ~8.5.0
                    above the project's php >=7.4; no
                    releasing branch within reach
+  symfony/google-mailer v4.4.41  direct  ·  left-behind
+      16 = left-behind 16 (baseline: new package)
+      do: require symfony/google-mailer ^5.4 (gets v5.4.19,
+          below the newest v5.4.45); 5.x needs php >=7.2.5,
+          which require.php allows; the target php 8.4 runs
+          it; left-behind stays; a new major brings its own
+          requirements; Composer's solver checked it against
+          the lock
+      left-behind  branch 4.x last released 2022-04-12 (4.5
+                   years ago); 8.x released v8.1.0
+                   (2026-05-29), needs php >=8.4.1 above the
+                   project's php >=7.4; 5.x released v5.4.45
+                   (2024-09-25)
   tobscure/json-api dev-joomla-backports  direct  ·  pinned
       16 = pinned 16 (baseline: new package)
       do: no move: lockrot did not read its releases, so it
@@ -711,13 +724,13 @@ not flagged (5)
       gate 0 = min(0, 2 × 0) (the new facts bound it); new: 0
       checks missing: S2 (undated releases)
 
-54 packages checked · 49 flagged: critical 11 · high 20 ·
+55 packages checked · 50 flagged: critical 11 · high 21 ·
 medium 13 · low 5
 flags: abandoned 7 · silent 1 · pinned 5 ·
-left-behind 16 · old-promise 13 · stale 9 · capped 3 ·
+left-behind 17 · old-promise 13 · stale 9 · capped 3 ·
 vulnerable 19 · 21 packages carry more than one
-depth: 19 of 49 flagged packages are named by no line of composer.json ·
-direct 29 · 1 hop 13 · 2 hops 3 · 4 hops 1 ·
+depth: 19 of 50 flagged packages are named by no line of composer.json ·
+direct 30 · 1 hop 13 · 2 hops 3 · 4 hops 1 ·
 unreached 3 ·
 deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs) ·
 1 more is named only in require-dev, which this run did not walk (pass --dev)
@@ -727,20 +740,20 @@ packages-dev not checked (pass --dev)
 fix, by package: composer update 7 · upgrade 4 ·
 php floor raise 6 · fix unknown 1 · no fix 1
 update now: composer update phpoffice/phpspreadsheet robrichards/xmlseclibs symfony/http-foundation league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn
-libyears: at least 117.7 behind across 44 of 54 packages ·
-69.1 from direct requirements ·
+libyears: at least 121.8 behind across 45 of 55 packages ·
+73.3 from direct requirements ·
 furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: mautic/core-lib 6 · guzzlehttp/guzzle 2 ·
 akaunting/laravel-apexcharts 1 ·
 genealabs/laravel-model-caching 1 · jfcherng/php-diff 1 ·
 … and 6 more
-advisories: 54 packages asked ·
+advisories: 55 packages asked ·
 packagist.org answered (286 on record for 22 packages)
 php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 10 packages that exclude it is not checked (the run checked no move)
-baseline: 3 known · 43 new · 4 worsened ·
+baseline: 3 known · 44 new · 4 worsened ·
 0 stale (lockrot-baseline.json)
 gate: fails · --fail-on=high,unchecked ·
-31 findings fail it (high 30, unchecked 3); 2 reach it and are known to the baseline ·
+32 findings fail it (high 31, unchecked 3); 2 reach it and are known to the baseline ·
 target php 8.4 (--target-php)
 Data as of 2026-10-01 (package repositories, repository
 hosts) · score model 1. Run composer lockrot --format=json
