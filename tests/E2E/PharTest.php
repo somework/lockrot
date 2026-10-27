@@ -8,6 +8,7 @@ use Lockrot\SelfUpdate\ReleaseKey;
 use Lockrot\Tests\Support\Contract\BaselinedScenario;
 use Lockrot\Tests\Support\FixtureCliRun;
 use Lockrot\Tests\Support\GitHubReleases;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SigningKeys;
 use Lockrot\Tests\Support\StaticFileServer;
 use Lockrot\Tests\Support\VersionMask;
@@ -122,19 +123,17 @@ final class PharTest extends TestCase
         $process = $this->runPhar(['-d', \dirname(__DIR__).'/fixtures/skeletons/laravel', '--format=html', '--target-php=8.4', '--offline']);
         self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
         $page = $process->getOutput();
-        $manifest = json_decode((string) file_get_contents(\dirname(__DIR__, 2).'/resources/report/manifest.json'), true);
-        self::assertIsArray($manifest);
+        $manifest = JsonPath::decodeFile(\dirname(__DIR__, 2).'/resources/report/manifest.json');
 
         self::assertSame(1, preg_match('{<meta http-equiv="Content-Security-Policy" content="([^"]+)">}', $page, $policy), 'the page carries one policy');
         foreach (['script', 'style'] as $kind) {
+            $hash = JsonPath::stringAt($manifest, ['csp', $kind]);
             self::assertSame(1, preg_match_all('{<'.$kind.'>(.*?)</'.$kind.'>}s', $page, $inline), 'one inline '.$kind);
-            self::assertSame($manifest['csp'][$kind] ?? null, 'sha256-'.base64_encode(hash('sha256', $inline[1][0], true)), 'the archive changed the inline '.$kind);
-            self::assertStringContainsString($kind."-src '".$manifest['csp'][$kind]."'", $policy[1]);
+            self::assertSame($hash, 'sha256-'.base64_encode(hash('sha256', $inline[1][0], true)), 'the archive changed the inline '.$kind);
+            self::assertStringContainsString($kind."-src '".$hash."'", $policy[1] ?? '');
         }
         self::assertSame(1, preg_match('{<script id="lockrot-data" type="application/json">(.*?)</script>}s', $page, $data), 'the page embeds the report');
-        $embedded = json_decode($data[1], true);
-        self::assertIsArray($embedded);
-        self::assertSame('https://lockrot.dev/schema/report-2.json', $embedded['report']['$schema'] ?? null);
+        self::assertSame('https://lockrot.dev/schema/report-2.json', JsonPath::stringAt(JsonPath::decoded(json_decode($data[1] ?? '', true)), ['report', '$schema']));
     }
 
     /**

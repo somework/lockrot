@@ -21,7 +21,7 @@ final class BaselineDocsExampleTest extends TestCase
         $recording = (string) file_get_contents(self::ROOT.'tests/fixtures/baselined/wallabag-main/check/report.table.txt');
         $recorded = array_map('rtrim', explode("\n", (string) preg_replace('/<\/?fg(=[a-z]+)?>/', '', $recording)));
 
-        $quoted = array_values(array_filter(explode("\n", $example[1]), static fn (string $line): bool => $line !== '…'));
+        $quoted = array_values(array_filter(explode("\n", $example[1] ?? ''), static fn (string $line): bool => $line !== '…'));
         self::assertNotSame([], $quoted);
         $text = implode("\n", $recorded);
         foreach ($quoted as $line) {
