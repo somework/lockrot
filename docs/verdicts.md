@@ -484,9 +484,9 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
 - For a package installed from vcs or a path, the advisory is published for the package of that
   name. Check that the version you hold is the one the advisory names.
 
-- Composer's policy never stops the lookup. Under `policy: false`, `COMPOSER_POLICY=0`,
-  `policy.advisories: false` or `policy.advisories.audit: ignore`, lockrot asks and counts every
-  advisory. These switches stop Composer from blocking an install or an update. The note
+- Composer's policy never stops the lookup. Under `policy: false`, `COMPOSER_POLICY=0` or
+  `policy.advisories: false`, lockrot asks and counts every advisory. These switches stop Composer
+  from blocking an install or an update, and `composer audit` still reports the advisories. The note
   [`advisories_disabled_by_policy`](notes.md#advisories_disabled_by_policy) says so.
 
 - An advisory with no severity counts as `unrated`. An advisory with no affected range counts, with
@@ -718,7 +718,8 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
   names its holds. Any other joint solve keeps the move `refused` with the holds of the first
   refusal. That includes a solve that moves a holder from a release to a dev version, because
   advisory blocking does not check a dev version. A holder that is a dev version before and after
-  the solve still counts.
+  the solve still counts. A solve that moves a holder below its locked release also keeps the move
+  `refused`, because that step is no update of the holder.
 - **The why-not step.** An `update`, `require`, `raise-php` or `tag` move whose check does not
   resolve ends with `composer why-not <package> <version> --locked`. The version is the move's
   `version`.

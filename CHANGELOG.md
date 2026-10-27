@@ -179,8 +179,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `abandoned_ignore_unreadable` say what Composer's abandoned ignore list and its audit setting
   did. ([Run notes](docs/notes.md#abandoned_markings_ignored))
 - **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
-  (`config.policy: false`, `policy.advisories: false` or `COMPOSER_POLICY=0`) that stops Composer from warning about advisories. lockrot still asks, and
-  every advisory still counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
+  (`config.policy: false`, `policy.advisories: false` or `COMPOSER_POLICY=0`) that stops Composer
+  from blocking advisories in an install or an update. lockrot still asks, and every advisory still
+  counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
 - **markdown:** `--markdown-max-bytes` keeps a report written through `--output` within a byte
   budget. The report ends at a whole row, and a last row counts the rows it left out.
   ([In CI](docs/ci.md))
