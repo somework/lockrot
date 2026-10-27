@@ -50,6 +50,7 @@ final class MoveCheckersTest extends TestCase
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', null));
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '7.4.29'));
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.41.0'));
+        self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.5.1'));
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.4-dev'));
     }
 

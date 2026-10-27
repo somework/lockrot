@@ -8,6 +8,7 @@ use Composer\Config;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
+use Composer\Semver\Semver;
 use Composer\Semver\VersionParser;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
@@ -71,23 +72,16 @@ final class MoveCheckers
      */
     public static function platformPhp(string $targetMinor, ?string $platform): string
     {
-        return $platform !== null && self::minorOf($platform) === $targetMinor ? $platform : $targetMinor.'.'.self::NEWEST_PATCH;
+        return $platform !== null && self::isStableIn($platform, $targetMinor) ? $platform : $targetMinor.'.'.self::NEWEST_PATCH;
     }
 
-    /** The minor that Composer reads from $version (`8` is 8.0.0), null for a version that is not stable, has no minor or does not parse. */
-    private static function minorOf(string $version): ?string
+    /** Whether Composer reads $version as a stable release of $minor: `8` is 8.0.0. */
+    private static function isStableIn(string $version, string $minor): bool
     {
-        $parser = new VersionParser();
         try {
-            $normalized = $parser->normalize($version);
+            return VersionParser::parseStability($version) === 'stable' && Semver::satisfies($version, '~'.$minor.'.0');
         } catch (\UnexpectedValueException $e) {
-            return null;
+            return false;
         }
-        $parts = explode('.', $normalized);
-        if (VersionParser::parseStability($normalized) !== 'stable' || !isset($parts[1])) {
-            return null;
-        }
-
-        return $parts[0].'.'.$parts[1];
     }
 }
