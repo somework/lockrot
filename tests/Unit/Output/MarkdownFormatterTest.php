@@ -272,6 +272,21 @@ final class MarkdownFormatterTest extends TestCase
     }
 
     /**
+     * A workflow can print the comment to the job log, where the runner reads a legacy `##[`
+     * command anywhere in a line. A code span carries a name from the lock as written.
+     */
+    public function testACodeSpanBreaksTheLegacyLogCommand(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([(new FindingBuilder())->withPackage('evil/a##[error]x')->withVerdict(Verdict::ABANDONED)->withChain(['evil/a##[error]x'])->withDataDate($at)->build()], [], $at, 1, 0);
+
+        $out = self::formatter()->format($report);
+
+        self::assertStringContainsString('| `evil/a##\x5Berror]x` |', $out);
+        self::assertStringNotContainsString('##[', $out);
+    }
+
+    /**
      * A footer line names packages as code spans. Text from a repository or the lock on any footer
      * line cannot stand in for one of them.
      */
