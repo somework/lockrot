@@ -15,8 +15,9 @@ use Lockrot\Security\Holder;
 /**
  * Checks each move with {@see ComposerSolver}: the inline form first, then `-w`, then `-W`. The
  * first form that resolves is the move's form. A refusal of all three names its holds: the rules of
- * the last refusal and the {@see HoldScan} of the release that the move names. A refusal that needs
- * a name that the {@see VersionSource} could not load is not a refusal: the move is not checked.
+ * the last refusal and the {@see HoldScan} of the release that the move names. A solve that needs a
+ * name that the {@see VersionSource} could not load is not checked, unless it installs the move's
+ * newest release: with that name, Composer can only refuse less or install higher.
  *
  * @internal
  */
@@ -67,7 +68,13 @@ final class SolverChecker implements MoveChecker
             if ($solution === null || $this->failed($solution)) {
                 $this->baseline = new CheckOutcome(MoveCheck::notChecked($solution === null ? MoveCheck::INSTALL_TIME_BUDGET : MoveCheck::SOLVER_ERROR));
             } else {
-                $this->baseline = $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), [], $solution->problem());
+                // A baseline that resolves lets each move's own solve decide.
+                $unloaded = $solution->resolves() ? null : $this->notLoaded($solution);
+                if ($unloaded !== null) {
+                    $this->baseline = new CheckOutcome(MoveCheck::notChecked($unloaded));
+                } else {
+                    $this->baseline = $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), [], $solution->problem());
+                }
             }
         }
 
@@ -165,7 +172,7 @@ final class SolverChecker implements MoveChecker
         }
         if ($names === []) {
             // `composer update --lock` allows a name that the lock does not hold, as the baseline does.
-            $solution = $this->attempt(SolveRequest::unlock([SolveRequest::BASELINE_NAME]));
+            $solution = $this->attempt(SolveRequest::unlock([SolveRequest::BASELINE_NAME]), null);
             if (!$solution instanceof Solution) {
                 return $solution;
             }
@@ -208,7 +215,7 @@ final class SolverChecker implements MoveChecker
         if ($unchecked !== null) {
             return $unchecked;
         }
-        $solution = $this->attempt($query->jointRequest($holders), $query->package(), ...$holders);
+        $solution = $this->attempt($query->jointRequest($holders), $query->newest(), $query->package(), ...$holders);
         if (!$solution instanceof Solution) {
             return $solution;
         }
@@ -225,7 +232,9 @@ final class SolverChecker implements MoveChecker
     /**
      * The request as listed, then `-w`, then `-W`: the first form that resolves and installs
      * $newest, else the resolving form that installs the highest release, the first on a tie, with
-     * its solution; a null form and the last refusal; or the outcome of a solve that did not run.
+     * its solution; a null form and the last refusal; or the outcome of the first solve that did
+     * not run or that a load stopped. Such a solve does not end the walk, so a later form that
+     * installs $newest still wins, and it wins over a refusal.
      *
      * @param non-empty-list<string> $moved the names that the request moves, the move's package first
      *
@@ -233,26 +242,26 @@ final class SolverChecker implements MoveChecker
      */
     private function forms(SolveRequest $request, array $moved, ?string $newest = null)
     {
-        $last = null;
         $resolved = null;
         // `-W` frees more packages than `-w`, and Composer 2.9 and later then block more of their
         // locked versions, so `-W` can refuse a move that `-w` resolves: each form is asked in turn.
         foreach ([SolveRequest::LISTED => MoveCheck::INLINE, SolveRequest::WITH_DEPENDENCIES => MoveCheck::WITH_DEPENDENCIES, SolveRequest::WITH_ALL_DEPENDENCIES => MoveCheck::WITH_ALL_DEPENDENCIES] as $transitive => $form) {
-            $solution = $this->attempt($request->withTransitive($transitive), ...$moved);
+            $solution = $this->attempt($request->withTransitive($transitive), $newest, ...$moved);
             if (!$solution instanceof Solution) {
-                return $resolved ?? $solution;
+                $fallback = isset($fallback) && $fallback instanceof CheckOutcome ? $fallback : $solution;
+                continue;
             }
             if ($solution->resolves() && self::installsNewest($solution, $moved[0], $newest)) {
                 return [$form, $solution];
             }
             if ($solution->resolves()) {
                 $resolved = $resolved !== null && !self::installsHigher($solution, $resolved[1], $moved[0]) ? $resolved : [$form, $solution];
-            } else {
-                $last = $solution;
             }
+            // A wider form asks for each name that a narrower form asks for, so no form refuses after one that stopped.
+            $fallback = [null, $solution];
         }
 
-        return $resolved ?? [null, $last];
+        return $resolved ?? $fallback;
     }
 
     /** Whether the solve installs $newest of $package, or $newest is null. */
@@ -308,11 +317,11 @@ final class SolverChecker implements MoveChecker
 
     /**
      * The solution, or the outcome of a solve that the budget stops or that needs a name the
-     * source could not load.
+     * source could not load and does not install $newest of the first moved name.
      *
      * @return Solution|CheckOutcome
      */
-    private function attempt(SolveRequest $request, string ...$moved)
+    private function attempt(SolveRequest $request, ?string $newest, string ...$moved)
     {
         if ($this->deadline->isPast()) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::INSTALL_TIME_BUDGET));
@@ -321,7 +330,10 @@ final class SolverChecker implements MoveChecker
         if ($this->failed($solution)) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::SOLVER_ERROR));
         }
-        $unloaded = $solution->resolves() ? null : $this->notLoaded($solution, ...$moved);
+        if ($newest !== null && $solution->resolves() && self::installsNewest($solution, $moved[0], $newest)) {
+            return $solution;
+        }
+        $unloaded = $this->notLoaded($solution, ...$moved);
 
         return $unloaded === null ? $solution : new CheckOutcome(MoveCheck::notChecked($unloaded));
     }
@@ -364,7 +376,7 @@ final class SolverChecker implements MoveChecker
         return $error !== null;
     }
 
-    /** The reason of a refusal that needs a name the source could not load, the moved names included, null for a real refusal. */
+    /** The reason of a solve that needs a name the source could not load, the moved names included, null when it proves something. */
     private function notLoaded(Solution $solution, string ...$moved): ?string
     {
         $failures = $solution->unloaded();

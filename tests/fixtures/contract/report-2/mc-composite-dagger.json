@@ -1492,7 +1492,24 @@
                     }
                 },
                 "move_in": "next_step",
-                "gets": null,
+                "gets": {
+                    "version": "7.15.2",
+                    "php_check": {
+                        "requires": "^7.2.5 || ^8.0",
+                        "project_allows": true,
+                        "target_runs": true,
+                        "raise_to": null,
+                        "raise_size": null
+                    },
+                    "clears": [
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-gcrk-3vtt-1r14",
+                            "basis": "outside_range"
+                        }
+                    ],
+                    "clears_all": true
+                },
                 "partial": null
             },
             "checks_missing": [],
@@ -2240,7 +2257,24 @@
                     }
                 },
                 "move_in": "next_step",
-                "gets": null,
+                "gets": {
+                    "version": "v6.4.40",
+                    "php_check": {
+                        "requires": ">=8.1",
+                        "project_allows": true,
+                        "target_runs": true,
+                        "raise_to": null,
+                        "raise_size": null
+                    },
+                    "clears": [
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-28rh-rzzn-djk4",
+                            "basis": "outside_range"
+                        }
+                    ],
+                    "clears_all": true
+                },
                 "partial": null
             },
             "checks_missing": [],

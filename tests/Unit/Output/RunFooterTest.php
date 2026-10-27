@@ -167,6 +167,28 @@ final class RunFooterTest extends TestCase
         self::assertSame('moves: not checked (the project has no composer.json)', RunFooter::moveCheck($report));
     }
 
+    /** @return iterable<string, array{MoveCheck::*, string}> */
+    public static function baselineLoadReasons(): iterable
+    {
+        yield 'unloaded_name' => [MoveCheck::UNLOADED_NAME, 'moves: not checked (a package the lock needs could not be loaded)'];
+        yield 'offline' => [MoveCheck::OFFLINE, "moves: not checked (a package the lock needs is not in Composer's cache)"];
+    }
+
+    /**
+     * The words of a move's check name the move ("it"). The line has no move, so it names the lock.
+     *
+     * @dataProvider baselineLoadReasons
+     */
+    #[DataProvider('baselineLoadReasons')]
+    public function testTheMovesLineOfABaselineThatALoadStoppedNamesTheLock(string $reason, string $line): void
+    {
+        $checks = new MoveChecks(new UncheckedMoves($reason), true);
+        $report = self::report([])->withMoveChecks(new MoveCheckRun(null, false, [], MoveCheck::notChecked($reason)), UpdateNow::of([], $checks));
+
+        self::assertSame($line, RunFooter::moveCheck($report));
+        self::assertStringStartsWith('a package it needs ', MoveCheck::reasonWords($reason));
+    }
+
     public function testThePhpLineNamesTheMinorsOnceWhenBothSetsAgree(): void
     {
         $line = self::phpLine(['packages' => [self::package('acme/a', ['php' => '>=8.2'])], 'packages-dev' => []], [], '8.4');

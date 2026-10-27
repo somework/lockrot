@@ -34,6 +34,11 @@ final class RunFooter
     private const LOOKUP_WORDS = ['partial' => 'lookup partial', 'not_run' => 'not checked'];
     private const REPOSITORY_WORDS = ['transport' => 'network error', 'invalid_response' => 'unreadable answer'];
     private const NAMES_SHOWN = 3;
+    /** The shared words of these reasons name a move ("it"). The `moves:` line has no move, so it names the lock. */
+    private const BASELINE_REASON_WORDS = [
+        MoveCheck::UNLOADED_NAME => 'a package the lock needs could not be loaded',
+        MoveCheck::OFFLINE => "a package the lock needs is not in Composer's cache",
+    ];
 
     /** `critical 3 · high 2 · low 2`: the grades with a finding, in verdict order. */
     public static function gradeCounts(Report $report): string
@@ -227,7 +232,7 @@ final class RunFooter
             case MoveCheck::REFUSED:
                 return "moves: not checked, because Composer's solver refuses the lock itself (see the moves_not_checked note)";
             default:
-                return 'moves: not checked ('.MoveCheck::reasonWords((string) $data['reason']).')';
+                return 'moves: not checked ('.(self::BASELINE_REASON_WORDS[$data['reason']] ?? MoveCheck::reasonWords((string) $data['reason'])).')';
         }
     }
 

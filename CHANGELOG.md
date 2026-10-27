@@ -74,6 +74,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   tell now reach each Composer repository that publishes advisories. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
   ([What lockrot contacts](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
+- **All formats:** the move check loads the metadata of packages that a solve needs and the run did
+  not read. With Composer 2.9 or later and advisory blocking on, it asks for their advisories by name.
+  This affects a project that limits its network access or the names it sends. Action: pass
+  `--offline`, or set `extra.lockrot.advisory-lookup` to `composer-repositories`.
+  ([What lockrot contacts](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **All formats:** `next_step.commands`, `security.update_now_command`, the `update now:` line and
   the command in the `do:` line hold only arguments from one set that every shell quotes safely. A
   step with a version, branch or name from the lock or a repository outside it is left out, so a
@@ -86,8 +91,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   escape (`\x1B`), also in `--explain`, in the error lines on stderr, as in the install-time
   summary. So does a character that prints as nothing, such as a zero-width space (`\u{200B}`). A
   lock cannot clear your screen, write your clipboard, plant a link in your terminal or hide text.
-  A github format run line and an error line on stderr cannot start a `::` workflow command or
-  hold a `##[` command.
+  A line of the github or table format, of `--explain`, of the install-time summary or of the
+  error output on stderr cannot start a `::` workflow command or hold a `##[` command.
   ([What lockrot does](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **markdown:** text from the lock cannot mention a user or a team, or link a bare URL or an email
   address, in a pull request comment or a job summary. ([`--format=markdown`](docs/ci.md#-formatmarkdown))
@@ -100,7 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `COMPOSER_NO_SECURITY_BLOCKING` that the solving Composer reads and that holds a true value.
   The move check then blocks no advisory and no abandoned package, as Composer's update does.
   ([The move check](docs/verdicts.md#the-move-check))
-- **All formats:** Composer's solver checks each move offline against the lock, and the move
+- **All formats:** Composer's solver checks each move against the lock, and the move
   writes `check` with the release it `installs`. A refused move asks once more with its holders, and
   `moves_with[]` names the holders that move. A move still refused names its holds in `held_by[]`
   and prints only `composer why-not --locked`. ([The move check](docs/verdicts.md#the-move-check))
@@ -154,7 +159,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that lockrot cannot ask. ([Run notes](docs/notes.md#repository_activity_host_not_supported))
 - **json:** `libyears_at_least` marks a lower bound, and the root `libyears.at_least_count` counts
   them. `security.records` and `security.feeds[]` say what each advisory repository holds and did
-  for the name. `run.advisory_lookup` says what the one advisory lookup of the run did.
+  for the name. `run.advisory_lookup` says what the run's own advisory lookup did.
   ([Schema](docs/schema.md))
 - **All formats:** the run notes `abandoned_markings_ignored`, `abandoned_not_audited_by_composer`
   and `abandoned_ignore_unreadable` say what Composer's abandoned ignore list and its audit setting
@@ -262,6 +267,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **sarif:** a message writes each literal `{` as `{{` and each `}` as `}}`, as SARIF 2.1.0
   requires, so a viewer that fills placeholders shows an advisory title such as `{% use %}` as written.
 - **All formats:** the anonymous cap note counts one package in the singular ("1 candidate package").
+- **All formats:** `run.project_php_lowest` of a post-release `require.php` bound, such as
+  `>=7.4.0-p1`, is the next patch, `7.4.1`. It read `7.4.0`, which the bound excludes.
+  ([The PHP test in explain](docs/verdicts.md#the-php-test-in-explain))
 - **All formats:** lockrot no longer proposes an `update` move that Composer refuses. On Composer
   2.9 and later, the plain `composer update <package>` of such a move installed a dev snapshot, and
   `update now:` held it beside the moves that resolve. ([The move check](docs/verdicts.md#the-move-check))

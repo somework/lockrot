@@ -38,6 +38,17 @@ final class RecordingComposerRepository extends ComposerRepository
         $this->everyName = $everyName;
     }
 
+    public function getRepoName(): string
+    {
+        return 'recording repo';
+    }
+
+    /** It serves versions only: a test gives the advisories a repository of their own. */
+    public function hasSecurityAdvisories(): bool
+    {
+        return false;
+    }
+
     public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
     {
         $this->asked[] = [array_map('strval', array_keys($packageNameMap)), (string) array_key_first($acceptableStabilities)];

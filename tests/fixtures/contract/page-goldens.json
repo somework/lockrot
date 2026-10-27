@@ -875,7 +875,7 @@
       "radius_lead": [
         "23 of 37 flagged packages are named by no line of composer.json; the deepest, hoa/event, hoa/stream, hoa/ustring and 1 more, sit 3 hops from the nearest line.",
         "23 flagged packages pulled in.",
-        "2 of them sit under no direct requirement.",
+        "2 of them sit under more than 8 direct requirements.",
         "13 of them sit under lorisleiva/laravel-search-string."
       ],
       "advisories_lead": {
@@ -2038,7 +2038,7 @@
       "radius_lead": [
         "50 of 111 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line.",
         "50 flagged packages pulled in.",
-        "7 of them sit under no direct requirement.",
+        "7 of them sit under more than 8 direct requirements.",
         "20 of them sit under kphoen/rulerz-bundle, kphoen/rulerz and wallabag/phpepub."
       ],
       "advisories_lead": {
@@ -4621,7 +4621,7 @@
         {
           "grade": "high",
           "count": "2 packages",
-          "gate": "1 fail the gate",
+          "gate": "1 fails the gate",
           "major": "1 of 1 move crosses a major"
         }
       ],
@@ -5588,7 +5588,7 @@
           "grade": "medium",
           "count": "2 packages",
           "gate": null,
-          "major": "1 of 1 move crosses a major"
+          "major": null
         }
       ],
       "findings_rows": [
@@ -6057,7 +6057,7 @@
       "radius_lead": [
         "1 of 1 flagged package is named by no line of composer.json; the deepest, jfcherng/php-color-output, sits 1 hop from the nearest line.",
         "1 flagged package pulled in.",
-        "1 of them sits under no direct requirement."
+        "1 of them sits under more than 8 direct requirements."
       ],
       "advisories_lead": {
         "figure": null,
@@ -8717,7 +8717,7 @@
       "radius_lead": [
         "50 of 111 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line.",
         "50 flagged packages pulled in.",
-        "7 of them sit under no direct requirement.",
+        "7 of them sit under more than 8 direct requirements.",
         "20 of them sit under kphoen/rulerz-bundle, kphoen/rulerz and wallabag/phpepub."
       ],
       "advisories_lead": {
@@ -11240,7 +11240,7 @@
           "grade": "medium",
           "count": "11 packages",
           "gate": null,
-          "major": "9 of 9 moves cross a major"
+          "major": "7 of 9 moves cross a major"
         },
         {
           "grade": "low",
@@ -12244,7 +12244,7 @@
       "radius_lead": [
         "50 of 110 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line.",
         "50 flagged packages pulled in.",
-        "7 of them sit under no direct requirement.",
+        "7 of them sit under more than 8 direct requirements.",
         "20 of them sit under kphoen/rulerz-bundle, kphoen/rulerz and wallabag/phpepub."
       ],
       "advisories_lead": {
@@ -15004,7 +15004,7 @@
       "radius_lead": [
         "9 of 25 flagged packages are named by no line of composer.json; the deepest, defuse/php-encryption, mtdowling/jmespath.php, tmilos/lexer and 1 more, sit 2 hops from the nearest line.",
         "9 flagged packages pulled in.",
-        "1 of them sits under no direct requirement.",
+        "1 of them sits under more than 8 direct requirements.",
         "6 of them sit under arietimmerman/laravel-scim-server and laravel/passport."
       ],
       "advisories_lead": {
@@ -15821,7 +15821,7 @@
           "grade": "high",
           "count": "18 packages",
           "gate": "all fail the gate",
-          "major": "10 of 12 moves cross a major"
+          "major": "9 of 12 moves cross a major"
         },
         {
           "grade": "medium",
@@ -17117,7 +17117,7 @@
       "radius_lead": [
         "51 of 113 flagged packages are named by no line of composer.json; the deepest, hoa/ustring, hoa/zformat, sit 4 hops from the nearest line. 1 more is named only in require-dev, which this run did not walk (pass --dev).",
         "52 flagged packages pulled in.",
-        "7 of them sit under no direct requirement.",
+        "7 of them sit under more than 8 direct requirements.",
         "20 of them sit under kphoen/rulerz-bundle, kphoen/rulerz and wallabag/phpepub."
       ],
       "advisories_lead": {
@@ -20027,7 +20027,7 @@
       "radius_lead": [
         "9 of 25 flagged packages are named by no line of composer.json; the deepest, defuse/php-encryption, mtdowling/jmespath.php, tmilos/lexer and 1 more, sit 2 hops from the nearest line.",
         "9 flagged packages pulled in.",
-        "1 of them sits under no direct requirement.",
+        "1 of them sits under more than 8 direct requirements.",
         "6 of them sit under arietimmerman/laravel-scim-server and laravel/passport."
       ],
       "advisories_lead": {
@@ -21364,7 +21364,7 @@
           "grade": "high",
           "count": "18 packages",
           "gate": "all fail the gate",
-          "major": "10 of 12 moves cross a major"
+          "major": "9 of 12 moves cross a major"
         },
         {
           "grade": "medium",

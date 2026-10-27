@@ -50,6 +50,9 @@ final class TerminalText
         |(?<invalid>[\x80-\xFF])
     )/x';
 
+    /** One character of Unicode category Zs, in UTF-8. */
+    private const SPACE_SEPARATOR = '(?: |\xC2\xA0|\xE1\x9A\x80|\xE2\x80[\x80-\x8A\xAF]|\xE2\x81\x9F|\xE3\x80\x80)';
+
     private const NAMED = ["\n" => '\\n', "\r" => '\\r', "\t" => '\\t'];
 
     /** The UTF-8 lead-byte marker by the length of an `unsafe` character. */
@@ -86,7 +89,16 @@ final class TerminalText
      */
     public static function neutraliseLogLines(string $text): string
     {
-        return (string) preg_replace('/^(\p{Zs}*):(?=:)/mu', '$1\x3A', str_replace('##[', '##\x5B', self::neutraliseLines($text)));
+        return self::breakLogCommands(self::neutraliseLines($text));
+    }
+
+    /**
+     * Breaks the workflow commands of {@see self::neutraliseLogLines()} and leaves every other byte,
+     * an escape sequence included. The pattern matches bytes, so invalid UTF-8 cannot fail it.
+     */
+    public static function breakLogCommands(string $text): string
+    {
+        return (string) preg_replace('/^('.self::SPACE_SEPARATOR.'*):(?=:)/m', '$1\x3A', str_replace('##[', '##\x5B', $text));
     }
 
     public static function warning(string $line, bool $decorated): string

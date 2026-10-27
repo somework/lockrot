@@ -137,7 +137,7 @@ final class InstallTimeSummary
         $repositories = array_values($composer->getRepositoryManager()->getRepositories());
 
         // The check counts against the same budget: a move that it reaches too late is not checked.
-        $checks = static fn (): MoveChecks => MoveChecks::of(MoveCheckers::forProject($composer->getPackage(), $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), $deadline));
+        $checks = static fn (): MoveChecks => MoveChecks::of(MoveCheckers::forProject($composer->getPackage(), $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), $deadline, $lockrot->advisoryLookup()));
         $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $event->getIO(), $config, $repositories, $project, $lockrot, $env, $deadline, $checks, $lock->platform()['php'] ?? null);
 
         $report = $analyzer->analyzePackages($packages, $lock, $project, $event->isDevMode());

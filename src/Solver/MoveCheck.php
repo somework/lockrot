@@ -45,7 +45,7 @@ final class MoveCheck implements \JsonSerializable
     public const REASONS = [self::BASELINE_REFUSED, self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NOT_FROM_COMPOSER_REPOSITORY, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::NO_RELEASE_READ, self::PASS_CAP, self::SOLVER_ERROR, self::ADVISORY_LOOKUP_INCOMPLETE];
 
     /** The reasons that leave the baseline itself unchecked (`run.move_check.reason`), in the schema's order. */
-    public const BASELINE_REASONS = [self::INSTALL_TIME_BUDGET, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::SOLVER_ERROR];
+    public const BASELINE_REASONS = [self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::SOLVER_ERROR];
 
     /** Why lockrot did not ask Composer's solver about the move, by `check.reason`. */
     private const REASON_WORDS = [

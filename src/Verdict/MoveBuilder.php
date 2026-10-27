@@ -105,7 +105,8 @@ final class MoveBuilder
         $movesWith = $joint ? $outcome->movesWith() : [];
         $because = self::because($kind, $crosses, $heldBy, $subject);
         $ifApplied = null;
-        if (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
+        // A solve below the newest release can clear nothing: the score after such a move is the current total (SPEC I14).
+        if ($clears !== [] && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
             $resolves = $check !== null && $check->isResolved();
             $assumes = array_merge([IfApplied::CLEARS_HOLD], !$resolves && ($because !== [] || $heldBy !== []) ? [IfApplied::COMPOSER_RESOLVES] : [], $context->advisoriesComplete() ? [] : [IfApplied::NO_NEW_ADVISORIES]);
             $ifApplied = self::rerun($draft, $clears, $unverified, $adds, $context, $assumes);

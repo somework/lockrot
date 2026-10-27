@@ -1534,7 +1534,7 @@
                 "gets": {
                     "version": "v6.4.40",
                     "php_check": {
-                        "requires": ">=8.2 <8.5",
+                        "requires": ">=8.2",
                         "project_allows": false,
                         "target_runs": true,
                         "raise_to": ">=8.2",

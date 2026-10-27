@@ -73,4 +73,10 @@ final class LoadedVersions extends ArrayRepository
 
         return ['namesFound' => array_keys(array_filter($asked)), 'packages' => $result];
     }
+
+    /** @return list<string> the names that the pool builder asked for */
+    public function asked(): array
+    {
+        return array_keys($this->byName);
+    }
 }

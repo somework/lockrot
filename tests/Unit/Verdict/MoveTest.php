@@ -328,6 +328,24 @@ final class MoveTest extends TestCase
         self::assertStringContainsString('(gets v5.4.52, below the newest v5.4.53)', JsonPath::stringAt($finding, ['next_step', 'text']));
     }
 
+    /**
+     * The solve installs 2.0.0, below the newest 2.3.0. 2.0.0 is older than three years, so the move
+     * clears nothing: it keeps its kind, and the score after it is the current total (SPEC I14).
+     */
+    public function testAMoveWhoseInstalledReleaseClearsNothingKeepsItsKindWithNoScoreAfterIt(): void
+    {
+        $finding = self::analyse([
+            'lock' => [['time' => '2021-01-01T00:00:00+00:00']],
+            'releases' => [self::release('1.0.0', '2021-01-01', '>=7.2'), self::release('1.9.0', '2021-06-01', '>=7.2'), self::release('2.0.0', '2022-01-01', '>=7.2'), self::release('2.3.0', '2026-06-01', '>=7.2')],
+            'checks' => ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => [], 'installs' => '2.0.0']],
+        ]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['require', 'left-behind', '2.0.0'], [$move['kind'], $move['source'], JsonPath::stringAt($move, ['check', 'installs'])]);
+        self::assertSame([], $move['clears']);
+        self::assertNull($move['if_applied']);
+    }
+
     /** Offline, the move's own versions were never asked about: every rerun says so. */
     public function testAnOfflineMoveAssumesNoNewAdvisories(): void
     {

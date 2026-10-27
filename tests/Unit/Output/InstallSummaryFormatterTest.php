@@ -226,6 +226,15 @@ final class InstallSummaryFormatterTest extends TestCase
         self::assertStringContainsString('  note: note '.$text, $plain);
     }
 
+    /** A CI runner reads `##[` anywhere in a line of the Composer log as a workflow command. */
+    public function testAVersionFromTheLockPrintsNoWorkflowCommand(): void
+    {
+        $lines = self::lines(self::report([(new FindingBuilder())->withPackage('vendor/pkg')->withVersion('dev-##[group]x')->withVerdict(Verdict::ABANDONED)->build()], ['::error::a']));
+
+        self::assertContains('vendor/pkg dev-##\\x5Bgroup]x: abandoned', array_map(static fn (string $line): string => substr($line, (int) strpos($line, 'vendor/')), $lines));
+        self::assertSame([], preg_grep('/##\[|^\p{Zs}*::/u', $lines));
+    }
+
     /** @return iterable<string, array{string}> */
     public static function textsThatLookLikeMarkup(): iterable
     {

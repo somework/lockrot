@@ -1,6 +1,6 @@
-### lockrot: 49 of 54 packages flagged — critical 11 · high 20 · medium 13 · low 5
+### lockrot: 50 of 55 packages flagged — critical 11 · high 21 · medium 13 · low 5
 
-**gate: fails** · --fail-on=high,unchecked · 33 findings fail it (high 31, unchecked 4) · target php 8.4 (--target-php)
+**gate: fails** · --fail-on=high,unchecked · 34 findings fail it (high 32, unchecked 4) · target php 8.4 (--target-php)
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
@@ -33,6 +33,7 @@
 | **high** | `pagerfanta/twig` | v3.8.0 | left-behind | `16 = left-behind 16`<br>**Do:** raise require.php to \>=8.1, then require pagerfanta/twig ^4.9 — clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve<br>*left-behind:* branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1 above the project's php \>=7.4; no releasing branch within reach<br>pulls in 1 flagged package: pagerfanta/core (left-behind)<br>checks missing: S2 (undated releases) | direct |
 | **high** | `roots/wp-config` | 1.0.0 | old-promise | `16 = old-promise 16`<br>**Do:** test it on PHP 8.4<br>*old-promise:* released 2018-08-10 for PHP 5 (php "\>=5.6"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested<br>*age:* installed 1.0.0 released 2018-08-10 (8.1 years ago), the newest on 1.x; newest release v2.0.0-beta.1 2026-03-21 (0.5 years ago); last push 2026-03-29 (0.5 years ago) | direct |
 | **high** | `scheb/2fa-bundle` | v5.13.2 | left-behind | `16 = left-behind 16`<br>**Do:** raise require.php to \>=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php \~8.0.0 \|\| \~8.1.0 \|\| \~8.2.0 \|\| \~8.3.0 \|\| \~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve<br>*left-behind:* branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php \~8.4.0 \|\| \~8.5.0 above the project's php \>=7.4; no releasing branch within reach | direct |
+| **high** | `symfony/google-mailer` | v4.4.41 | left-behind | `16 = left-behind 16`<br>**Do:** require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45); 5.x needs php \>=7.2.5, which require.php allows; the target php 8.4 runs it; left-behind stays; a new major brings its own requirements; Composer's solver checked it against the lock<br>*left-behind:* branch 4.x last released 2022-04-12 (4.5 years ago); 8.x released v8.1.0 (2026-05-29), needs php \>=8.4.1 above the project's php \>=7.4; 5.x released v5.4.45 (2024-09-25) | direct |
 | **high** | `tobscure/json-api` | dev-joomla-backports | pinned | `16 = pinned 16`<br>**Do:** no move: lockrot did not read its releases, so it names none; review the snapshot<br>*pinned:* pinned to branch snapshot dev-joomla-backports<br>checks missing: S2, S3, S4, S8 (not from a Composer repository) | direct |
 | **high** | `fgrosse/phpasn1` | v2.5.0 | abandoned | `16 = abandoned 32 ÷ 2 unreached`<br>**Do:** find a replacement (none named); lockrot found no path from your requirements to it: \`composer why\` names what requires it<br>*abandoned:* marked abandoned by its registry; its repository is archived on GitHub; last release 2022-12-19 (3.8 years ago); last push 2023-04-23 (3.4 years ago) | unreached |
 | medium | `joomla/filter` | 2.0.5 | vulnerable | `8 = vulnerable 8 [medium advisory]`<br>**Do:** raise require.php to \>=8.1, then require joomla/filter ^3.0.5 — clears the advisory; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve<br>*vulnerable:* 1 advisory: 1 medium — all fixed on 2.x (blocked); advisory: CVE-2025-54476 Joomla! CMS vulnerable to XSS via the input filter<br>*age:* installed 2.0.5 released 2024-08-20 (2.1 years ago); 2.x last released 2.0.6 2025-09-30 (1.0 years ago); newest release 3.0.7 2026-09-29 (less than three weeks ago); last push 2026-09-29 (less than three weeks ago) | direct |
@@ -59,14 +60,14 @@
 | ok | `doctrine/annotations` | 2.0.2 | ok | `0`<br>*abandoned marking ignored* (policy.abandoned: doctrine/\*): the annotations reader goes with the ORM 3 upgrade | mautic/core-lib |
 | **ok** | `scheb/2fa-google-authenticator` | v8.6.1 | ok | `0`<br>checks missing: S2 (undated releases) | pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more |
 
-flags: abandoned 7 · silent 1 · pinned 5 · left-behind 16 · old-promise 13 · stale 9 · capped 3 · vulnerable 19 · 21 packages carry more than one
-depth: 19 of 49 flagged packages are named by no line of composer.json · direct 29 · 1 hop 13 · 2 hops 3 · 4 hops 1 · unreached 3 · deepest: `robrichards/xmlseclibs`, 4 hops (`mautic/core-lib` › `lightsaml/sp-bundle` › `lightsaml/symfony-bridge` › `lightsaml/lightsaml` › `robrichards/xmlseclibs`) · 1 more is named only in require-dev, which this run did not walk (pass --dev)
+flags: abandoned 7 · silent 1 · pinned 5 · left-behind 17 · old-promise 13 · stale 9 · capped 3 · vulnerable 19 · 21 packages carry more than one
+depth: 19 of 50 flagged packages are named by no line of composer.json · direct 30 · 1 hop 13 · 2 hops 3 · 4 hops 1 · unreached 3 · deepest: `robrichards/xmlseclibs`, 4 hops (`mautic/core-lib` › `lightsaml/sp-bundle` › `lightsaml/symfony-bridge` › `lightsaml/lightsaml` › `robrichards/xmlseclibs`) · 1 more is named only in require-dev, which this run did not walk (pass --dev)
 security: 19 vulnerable packages · 88 advisories: 3 critical, 29 high, 40 medium, 3 unrated, 13 low
-libyears: at least 117.7 behind across 44 of 54 packages · 69.1 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
+libyears: at least 121.8 behind across 45 of 55 packages · 73.3 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: `mautic/core-lib` 6 · `guzzlehttp/guzzle` 2 · `akaunting/laravel-apexcharts` 1 · `genealabs/laravel-model-caching` 1 · `jfcherng/php-diff` 1 · … and 6 more
-advisories: 54 packages asked · packagist.org answered (286 on record for 22 packages)
+advisories: 55 packages asked · packagist.org answered (286 on record for 22 packages)
 php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 10 packages that exclude it is not checked (the run checked no move)
 
 **Update now:** `composer update phpoffice/phpspreadsheet robrichards/xmlseclibs symfony/http-foundation league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn`
 
-<sub>54 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>55 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

@@ -4823,6 +4823,62 @@
         "move_in": "next_step",
         "partial": null
     },
+    "gets-below-clears-nothing\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.4.0",
+            "newest": "v5.4.45",
+            "constraint": "^5.4",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": {
+                "result": "resolves",
+                "form": "inline",
+                "reason": null,
+                "installs": "v5.4.19"
+            },
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "symfony/google-mailer:^5.4"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45); 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; left-behind stays; a new major brings its own requirements; Composer's solver checked it against the lock"
+        }
+    },
     "gitlab-anon\u2021": {
         "next_step": {
             "kind": "find-alternative",

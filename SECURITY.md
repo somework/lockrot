@@ -86,6 +86,14 @@ the list of its packages gets only the names on that list. lockrot sends no vers
 packages from a Composer repository
 ([Which advisories count](docs/verdicts.md#which-advisories-count)).
 
+The move check asks Composer's solver about each move, and the solver loads the metadata of each
+package that a solve needs. A file that the run already fetched comes from Composer's cache, so
+only a package that the run did not read costs a request: a new dependency of a move, or a `~dev`
+file. On Composer 2.9 and later, while Composer's advisory blocking is on, the move check also
+asks for the advisories of each name that a solve loads and that no earlier lookup covered. It sends the name only, as the run's lookup does. With
+`composer-repositories`, it does not send the name of a locked package from outside a Composer
+repository ([The move check](docs/verdicts.md#the-move-check)).
+
 Credentials:
 
 - lockrot reads `LOCKROT_GITHUB_TOKEN`, `GITHUB_TOKEN`, `LOCKROT_GITLAB_TOKEN` and `GITLAB_TOKEN`
@@ -144,8 +152,9 @@ repositories publish, and finds no vulnerability of its own.
   your terminal.
 
 - **Workflow commands.** A GitHub Actions runner reads a line that starts with `::`, and a `##[`
-  anywhere in a line, as a command. The plain lines of the `github` format and the error lines on
-  stderr break both forms, so text from the lock cannot start a command.
+  anywhere in a line, as a command. The plain lines of the `github` format, the `table` format, the
+  text of `--explain`, the install-time summary and the error lines on stderr break both forms. So
+  text from the lock cannot start a command.
 
 ## Key custody and rotation
 

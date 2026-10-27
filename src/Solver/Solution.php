@@ -45,10 +45,11 @@ final class Solution
     /**
      * @param array<string, string> $installs
      * @param array<string, string> $updatedFrom name => the locked pretty version, for each name that the solve updates
+     * @param array<string, string> $unloaded    the names that the solve asked for and could not load
      */
-    public static function resolved(array $installs, array $updatedFrom = []): self
+    public static function resolved(array $installs, array $updatedFrom = [], array $unloaded = []): self
     {
-        $solution = new self($installs, [], null, []);
+        $solution = new self($installs, [], null, $unloaded);
         $solution->updatedFrom = $updatedFrom;
 
         return $solution;

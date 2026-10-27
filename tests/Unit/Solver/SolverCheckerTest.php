@@ -328,6 +328,58 @@ final class SolverCheckerTest extends TestCase
     }
 
     /**
+     * R2-4: composer.json requires acme/new, which the lock lacks and the source could not load. The
+     * baseline's refusal says nothing about the lock, so it reads the load reason.
+     *
+     * @dataProvider unloadedNames
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('unloadedNames')]
+    public function testABaselineThatNeedsARootRequirementTheSourceCouldNotLoadIsNotChecked(string $failure, string $reason): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/new' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]],
+            ['acme/new' => $failure]
+        );
+
+        $baseline = $checker->baseline()->check();
+        $move = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check();
+
+        self::assertSame([MoveCheck::NOT_CHECKED, $reason], [$baseline->result(), $baseline->reason()]);
+        self::assertSame([MoveCheck::NOT_CHECKED, $reason], [$move->result(), $move->reason()]);
+    }
+
+    /** A repository answered that it lists no acme/new: Composer refuses the lock itself. */
+    public function testABaselineThatNeedsARootRequirementThatNoRepositoryListsIsRefused(): void
+    {
+        $checker = self::checker(['acme/lib' => '^1.0', 'acme/new' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0']]]);
+
+        self::assertSame(MoveCheck::REFUSED, $checker->baseline()->check()->result());
+    }
+
+    /** A source can read a platform name as not loaded, offline for one. No repository serves a platform name. */
+    public function testABaselineThatTheRootsPhpRequirementRefusesIsRefusedOffline(): void
+    {
+        $checker = self::checker(['acme/lib' => '^1.0', 'php' => '<7.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], [], ['php' => VersionSource::OFFLINE]);
+
+        self::assertSame(MoveCheck::REFUSED, $checker->baseline()->check()->result());
+    }
+
+    /** Of two names that did not load, the reason of the run state wins: offline before a failed repository. */
+    public function testASolveWithTwoNamesThatDidNotLoadReadsTheOfflineReason(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0'], ['version' => '1.2.0', 'require' => ['acme/first' => '^1.0', 'acme/second' => '^1.0']]]],
+            ['acme/first' => VersionSource::FAILED, 'acme/second' => VersionSource::OFFLINE]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::OFFLINE, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
+    }
+
+    /**
      * D6: a refusal that needs a name the source could not load says nothing about the project.
      *
      * @dataProvider unloadedNames
@@ -343,6 +395,182 @@ final class SolverCheckerTest extends TestCase
         );
 
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->jsonSerialize());
+    }
+
+    /**
+     * Ruling R2-3: 1.2.0 needs a name that did not load, so the solve resolves at 1.1.0 on a pool that
+     * lacks it. That solve proves nothing.
+     *
+     * @dataProvider unloadedNames
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('unloadedNames')]
+    public function testASolveThatResolvesWithoutANameTheSourceCouldNotLoadIsNotChecked(string $failure, string $reason): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0'], ['version' => '1.2.0', 'require' => ['acme/new-dependency' => '^1.0']]]],
+            ['acme/new-dependency' => $failure]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
+    }
+
+    /**
+     * Offline, a virtual name such as psr/log-implementation reads as not loaded, because no
+     * repository lists it. A solve that installs the newest release proves the move all the same.
+     */
+    public function testASolveThatInstallsTheNewestReleaseResolvesWithANameTheSourceCouldNotLoad(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/impl' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['psr/log-implementation' => '^1.0']], ['name' => 'acme/impl', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['psr/log-implementation' => '^1.0']], ['version' => '1.1.0', 'require' => ['psr/log-implementation' => '^1.0']]], 'acme/impl' => [['version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]]],
+            ['psr/log-implementation' => VersionSource::OFFLINE]
+        );
+
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '1.1.0'], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.1.0'))->check()->jsonSerialize());
+    }
+
+    /**
+     * The inline form resolves below the newest release on a pool that lacks a virtual name, which
+     * proves nothing. `-w` frees acme/dep and installs the newest release, which proves the move.
+     */
+    public function testAFormThatALoadStoppedBelowTheNewestReleaseGivesWayToAFormThatInstallsIt(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/impl' => '^1.0'],
+            [
+                ['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/dep' => '^1.0', 'psr/log-implementation' => '^1.0']],
+                ['name' => 'acme/dep', 'version' => '1.0.0'],
+                ['name' => 'acme/impl', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']],
+            ],
+            [
+                'acme/lib' => [
+                    ['version' => '1.0.0', 'require' => ['acme/dep' => '^1.0', 'psr/log-implementation' => '^1.0']],
+                    ['version' => '1.1.0', 'require' => ['acme/dep' => '^1.0', 'psr/log-implementation' => '^1.0']],
+                    ['version' => '1.2.0', 'require' => ['acme/dep' => '^1.1', 'psr/log-implementation' => '^1.0']],
+                ],
+                'acme/dep' => [['version' => '1.0.0'], ['version' => '1.1.0']],
+                'acme/impl' => [['version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]],
+            ],
+            ['psr/log-implementation' => VersionSource::OFFLINE]
+        );
+
+        self::assertSame(['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'installs' => '1.2.0'], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
+    }
+
+    /**
+     * The inline form installs 1.1.0 with every name loaded. `-w` frees acme/dep, whose 1.1.0 needs
+     * an offline name. `-W` also frees acme/other and installs the newest 1.2.0, which proves the move.
+     */
+    public function testAFormThatALoadStoppedAfterALowerFormResolvedGivesWayToAFormThatInstallsTheNewestRelease(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/other' => '^1.0 || ^2.0'],
+            [
+                ['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/dep' => '^1.0']],
+                ['name' => 'acme/dep', 'version' => '1.0.0', 'require' => ['acme/other' => '^1.0']],
+                ['name' => 'acme/other', 'version' => '1.0.0'],
+            ],
+            [
+                'acme/lib' => [['version' => '1.0.0', 'require' => ['acme/dep' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/dep' => '^1.0']], ['version' => '1.2.0', 'require' => ['acme/dep' => '^1.1']]],
+                'acme/dep' => [['version' => '1.0.0', 'require' => ['acme/other' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/off' => '^1.0']], ['version' => '1.2.0', 'require' => ['acme/other' => '^2.0']]],
+                'acme/other' => [['version' => '1.0.0'], ['version' => '2.0.0']],
+            ],
+            ['acme/off' => VersionSource::OFFLINE]
+        );
+
+        self::assertSame(['result' => 'resolves', 'form' => 'with-all-dependencies', 'reason' => null, 'installs' => '1.2.0'], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
+    }
+
+    /** The inline form refuses with every name loaded. `-w` frees acme/dep, whose 1.1.0 needs an offline name, so the refusal proves nothing. */
+    public function testAFormThatALoadStoppedWinsOverAnEarlierRefusal(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/dep' => '^1.0']], ['name' => 'acme/dep', 'version' => '1.0.0']],
+            [
+                'acme/lib' => [['version' => '1.0.0', 'require' => ['acme/dep' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/dep' => '^1.1']]],
+                'acme/dep' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/off' => '^1.0']]],
+            ],
+            ['acme/off' => VersionSource::OFFLINE]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'offline', 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.1.0'))->check()->jsonSerialize());
+    }
+
+    /** The inline form needs acme/gone, which failed to load. `-w` also needs an offline name, which comes first in the load reasons: the first stopped form names the reason. */
+    public function testTheFirstFormThatALoadStoppedNamesTheReason(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/dep' => '^1.0']], ['name' => 'acme/dep', 'version' => '1.0.0']],
+            [
+                'acme/lib' => [['version' => '1.0.0', 'require' => ['acme/dep' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/gone' => '^1.0']], ['version' => '1.2.0', 'require' => ['acme/dep' => '^1.1']]],
+                'acme/dep' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/off' => '^1.0']]],
+            ],
+            ['acme/gone' => VersionSource::FAILED, 'acme/off' => VersionSource::OFFLINE]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'unloaded_name', 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
+    }
+
+    /** The inline form needs an offline name. Composer fails on `-w`, which frees acme/dep: the move keeps the load reason. */
+    public function testAFormThatALoadStoppedKeepsItsReasonWhenComposerFailsOnALaterForm(): void
+    {
+        $source = new ArrayVersionSource(
+            [
+                'acme/lib' => [['version' => '1.0.0', 'require' => ['acme/dep' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/off' => '^1.0']], ['version' => '1.2.0', 'require' => ['acme/dep' => '^1.1']]],
+                'acme/dep' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/bad' => '^1.0']]],
+            ],
+            ['acme/off' => VersionSource::OFFLINE],
+            ['acme/bad' => new \UnexpectedValueException('Could not parse version constraint')]
+        );
+        $checker = self::checkerWith(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/dep' => '^1.0']], ['name' => 'acme/dep', 'version' => '1.0.0']], $source);
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'offline', 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
+        self::assertSame(\UnexpectedValueException::class, ($checker->solverError() ?? [])['class'] ?? null);
+    }
+
+    /** The budget runs out after the baseline resolves and before the move's first form: every form reads the budget. */
+    public function testAMoveThatTheBudgetStopsBeforeItsFirstFormIsNotChecked(): void
+    {
+        // The deadline starts at the first reading, and the clock is inside the budget only when the baseline asks it.
+        $readings = [0.0, 0.0];
+        $now = static function () use (&$readings): float {
+            return array_shift($readings) ?? 100.0;
+        };
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]), []);
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::inSeconds(10.0, $now));
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'install_time_budget', 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.1.0'))->check()->jsonSerialize());
+    }
+
+    /** A move with no newest release has no release that proves it, so a solve on a pool that lacks a name stays not checked. */
+    public function testAMoveWithNoNewestReleaseThatResolvesWithoutANameTheSourceCouldNotLoadIsNotChecked(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0'], ['version' => '1.2.0', 'require' => ['acme/new-dependency' => '^1.0']]]],
+            ['acme/new-dependency' => VersionSource::OFFLINE]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'offline', 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->jsonSerialize());
+    }
+
+    /** No form installs the newest release, and the load stopped the inline form: the move stays not checked. */
+    public function testAFormThatALoadStoppedStaysWhenNoLaterFormResolvesWithoutTheLoad(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/impl' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['psr/log-implementation' => '^1.0']], ['name' => 'acme/impl', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['psr/log-implementation' => '^1.0']], ['version' => '1.1.0', 'require' => ['psr/log-implementation' => '^1.0']], ['version' => '1.2.0', 'require' => ['acme/missing' => '^1.0']]], 'acme/impl' => [['version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]]],
+            ['psr/log-implementation' => VersionSource::OFFLINE]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'offline', 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
     }
 
     /**

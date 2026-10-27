@@ -406,7 +406,7 @@ export type RunMoveCheckIgnoresExtensions = true;
 /** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/baseline */
 export type RunMoveCheckBaseline = "resolves" | "refused" | "not_checked";
 /** open set at #/definitions/run/properties/move_check/oneOf/0/properties/reason/oneOf/0 */
-export type RunMoveCheckReason = "install_time_budget" | "no_composer_json" | "composer_json_invalid" | "solver_error" | (string & {});
+export type RunMoveCheckReason = "unloaded_name" | "offline" | "install_time_budget" | "no_composer_json" | "composer_json_invalid" | "solver_error" | (string & {});
 /** closed set at #/definitions/run/properties/php_window/oneOf/0/properties/host_requires/items */
 export type RunPhpWindowHostRequiresItem = "php-debug" | "php-ipv6" | "php-zts";
 /** open set at #/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key */

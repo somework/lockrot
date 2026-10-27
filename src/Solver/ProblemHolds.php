@@ -115,6 +115,9 @@ final class ProblemHolds
      */
     private function addRootRequire(Rule $rule, string $name, string $constraint, string $rootName, array $moved, array $requested): void
     {
+        if ($rule->getLiterals() === []) {
+            $this->wanted[$name] = $name;
+        }
         if (!isset($requested[$name])) {
             $this->holds[] = $this->rootHold($rootName, $name, $constraint, $moved);
         } elseif ($rule->getLiterals() === []) {

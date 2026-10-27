@@ -158,13 +158,19 @@ public Drupal site locks showed both.
 - lockrot asks each repository for tagged releases first. It fetches a package's `~dev` branch
   file only when the package has no tagged release.
 
+- The move check loads the versions of each package that a solve needs. A package that the run
+  already read, or a file in Composer's cache, costs no request. A new dependency of a move, or a
+  `~dev` file that the solve needs, can cost a request ([The move check](verdicts.md#the-move-check)).
+
 - Dating a split package by its monorepo can cost one more request
   ([Dates from the monorepo](verdicts.md#dates-from-the-monorepo)).
 
 - Advisories come from every repository that publishes them, not only the first
-  ([Advisories not checked](notes.md#advisories_not_checked)). lockrot makes one lookup per run:
-  it sends each repository the names of every package that the run checks, whatever its origin,
-  and never a version. It asks for every advisory of each name, and matches the versions itself:
+  ([Advisories not checked](notes.md#advisories_not_checked)). The run makes one lookup: it sends
+  each repository the names of every package that the run checks, whatever its origin, and never
+  a version. On Composer 2.9 and later, while advisory blocking is on, the move check can ask
+  again for names that a solve loads and that no earlier lookup covered, such as a new dependency
+  of a move. It asks for every advisory of each name, and matches the versions itself:
   the installed version, and the versions that each move admits. `extra.lockrot.advisory-lookup:
   composer-repositories` sends only the names of the packages from a Composer repository
   ([Which advisories count](verdicts.md#which-advisories-count)).

@@ -25,7 +25,7 @@ final class PoolAdvisoriesTest extends TestCase
 
     public function testOneLookupAsksThePartialRecordsOfEachNameThatTheRunDidNotCoverOnce(): void
     {
-        $advisories = $this->advisories()->withRecords(['acme/covered' => [self::advisory('acme/covered', '<1.0')]], ['acme/clean']);
+        $advisories = $this->advisories()->withRecords(['acme/covered' => [self::advisory('acme/covered', '<1.0')]], ['acme/covered', 'acme/clean']);
 
         $ranges = $advisories->ranges(['acme/new', 'acme/covered', 'acme/new', 'acme/clean']);
         $advisories->ranges(['acme/new']);
@@ -48,6 +48,52 @@ final class PoolAdvisoriesTest extends TestCase
 
         self::assertSame(['acme/new'], $advisories->unread(['acme/covered', 'acme/new', 'acme/other']));
         self::assertSame([[['acme/new'], false]], $this->asked);
+    }
+
+    /** Ruling R2-47: one repository answered acme/partial and another failed, so the run's lookup did not read it in full. */
+    public function testANameWithRecordsThatTheRunsLookupDidNotReadInFullIsUnreadAndNotAskedAgain(): void
+    {
+        $advisories = $this->advisories()->withRecords(['acme/partial' => [self::advisory('acme/partial', '<1.0')]], ['acme/read']);
+
+        $ranges = $advisories->ranges(['acme/partial', 'acme/read']);
+
+        self::assertSame(['acme/partial'], $advisories->unread(['acme/partial', 'acme/read']));
+        self::assertSame(['acme/partial' => ['<1.0']], self::pretty($ranges));
+        self::assertSame([], $this->asked);
+    }
+
+    public function testANameThatALaterLookupReadsInFullIsNoLongerUnread(): void
+    {
+        $partial = $this->advisories()->withRecords(['acme/partial' => [self::advisory('acme/partial', '<1.0')]], []);
+
+        $read = $partial->withRecords(['acme/partial' => [self::advisory('acme/partial', '<1.0')]], ['acme/partial']);
+
+        self::assertSame([[], ['acme/partial']], [$read->unread(['acme/partial']), $partial->unread(['acme/partial'])]);
+    }
+
+    /** Ruling R2-24: under `advisory-lookup: composer-repositories` a name that no Composer repository serves is never sent. */
+    public function testAKeptOutNameIsNeverAskedAndStaysUnread(): void
+    {
+        $advisories = new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), function (array $names, bool $complete): array {
+            $this->asked[] = [$names, $complete];
+
+            return [];
+        }, ['acme/vcs']);
+
+        $advisories->ranges(['acme/vcs', 'acme/new']);
+        $advisories->ranges(['acme/vcs']);
+
+        self::assertSame([[['acme/new'], false]], $this->asked);
+        self::assertSame(['acme/vcs'], $advisories->unread(['acme/vcs', 'acme/new']));
+    }
+
+    public function testAKeptOutNameThatTheRunsLookupReadStaysRead(): void
+    {
+        $advisories = (new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): array => [], ['acme/vcs']))->withRecords([], ['acme/vcs']);
+
+        $advisories->ranges(['acme/other']);
+
+        self::assertSame([], $advisories->unread(['acme/vcs']));
     }
 
     public function testTheNamesOfTwoLookupsThatCouldNotReadThemBothStayUnread(): void

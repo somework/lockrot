@@ -219,9 +219,10 @@ final class PhpFloor
 
     /**
      * The lowest stable `X.Y.Z` that a php constraint admits by its lower bound, as
-     * {@see lowestAsString()} reads `require.php`. An exclusive bound, or one with a non-zero
-     * fourth segment, admits no `X.Y.Z` of its own, so the point is the next patch. Null with no
-     * lower bound, an unreadable constraint or a date version such as `>=201001`.
+     * {@see lowestAsString()} reads `require.php`. An exclusive bound, a post-release bound
+     * (`-p1`), or one with a non-zero fourth segment admits no `X.Y.Z` of its own, so the point is
+     * the next patch. Null with no lower bound, an unreadable constraint or a date version such as
+     * `>=201001`.
      */
     public static function pointOf(string $constraint): ?string
     {
@@ -240,7 +241,7 @@ final class PhpFloor
             return null;
         }
         [$major, $minor, $patch, $fourth] = array_map('intval', $segments);
-        if ($fourth !== 0 || (!$lower->isInclusive() && $numbers === $version)) {
+        if ($fourth !== 0 || (!$lower->isInclusive() && $numbers === $version) || strpos($version, '-patch') !== false) {
             ++$patch;
         }
 
