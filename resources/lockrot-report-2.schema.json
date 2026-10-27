@@ -282,7 +282,7 @@
       }
     },
     "exposure_rule": {
-      "description": "The rule `exposure` and S7 attribute by: a flagged package that is not a direct requirement counts under each direct requirement it is reachable from when there is at least one and at most `max_fan_in` of them. The direct requirements are this run's: `require-dev` counts when `include_dev` is true. The value is what this run used, not a promise; a minor release may change it. Absent from documents written before 0.13.0.",
+      "description": "The rule `exposure` and S7 attribute by: a flagged package that is not a direct requirement counts under each direct requirement it is reachable from when there is at least one and at most `max_fan_in` of them. The direct requirements are this run's: `require-dev` counts when `include_dev` is true. The value is what this run used, not a promise; a minor release may change it.",
       "type": "object",
       "required": [
         "max_fan_in"
@@ -10164,7 +10164,7 @@
           "type": "boolean"
         },
         "exempt_by": {
-          "description": "What keeps a reaching finding from failing: `baseline` (a `known` finding, or a `worsened` one whose gate score stays below the value). Set only under a baseline entry. An open set.",
+          "description": "What keeps a reaching finding from failing: `baseline` when the finding reaches a value and the baseline is why it fails none. A grade value does not fail while the gate score stays below it. A flag value does not fail while the baseline entry covers each counted flag that reaches it, and a `vulnerable` value while the entry knows each counted advisory that reaches it. An `unchecked` value does not fail while the gate score is 0. So a `known` finding is exempt from every value. Set only under a baseline entry. An open set.",
           "oneOf": [
             {
               "type": "string",
@@ -12767,7 +12767,7 @@
       ]
     },
     "advisoryLookup": {
-      "description": "How the one advisory lookup of the run went: its scope, the packages it asked, and the outcome of each advisory-capable repository.",
+      "description": "How the run's own advisory lookup went: its scope, the packages it asked, and the outcome of each advisory-capable repository. The lookups that the move check's solves make on Composer 2.9 and later are not in it.",
       "type": "object",
       "required": [
         "scope",

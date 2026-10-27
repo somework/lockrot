@@ -37,6 +37,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   unknown origin. A path package and a package outside the `composer-repositories` scope are skips.
   Action: list a GitLab host in `gitlab-domains`, or accept a lasting gap in `accept-unchecked`. On
   Composer below 2.4, upgrade Composer or run the PHAR. ([What was not checked](docs/verdicts.md#what-was-not-checked))
+- **Breaking:** **Install-time:** with `install-time-strict` and `fail-on: unchecked`, an advisory
+  gap stops the install: `no_feed`, `lookup_failed`, an exhausted budget, and every changing install
+  on Composer 2.2 and 2.3 (`composer_too_old`, which `accept-unchecked` cannot accept). Action:
+  remove `unchecked` from that `fail-on`, or accept a `no_feed` gap in `accept-unchecked`. On
+  Composer 2.2 and 2.3, upgrade Composer to 2.4 or later.
+  ([`install-time-strict`](docs/install-time.md#install-time-strict))
 - **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
   `require.php` stops below the newest PHP minor that the root php allows. It decides at once, and
   comes after `stale`, so `--fail-on=stale` keeps its reach. A baseline entry that records any
@@ -92,10 +98,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   summary. So does a character that prints as nothing, such as a zero-width space (`\u{200B}`). A
   lock cannot clear your screen, write your clipboard, plant a link in your terminal or hide text.
   A line of the github or table format, of `--explain`, of the install-time summary or of the
-  error output on stderr cannot start a `::` workflow command or hold a `##[` command.
+  error output on stderr cannot start a `::` workflow command or hold a `##[` command. Neither can
+  json, sarif, gitlab, the report in the html page or the `--explain` JSON, which write `##[` as
+  `#\u0023[`, the same decoded text.
   ([What lockrot does](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **markdown:** text from the lock cannot mention a user or a team, or link a bare URL or an email
-  address, in a pull request comment or a job summary. ([`--format=markdown`](docs/ci.md#-formatmarkdown))
+  address, in a pull request comment or a job summary. It cannot render as math or as an emoji, or
+  stand in for a package name on a footer line. ([`--format=markdown`](docs/ci.md#-formatmarkdown))
 - **All formats:** a repository URL with a `.` or `..` path segment names no repository, so a lock
   cannot send the token to another API path of the repository host.
 
@@ -211,8 +220,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the action before you set `version: latest`.
   ([Upgrading to 0.14](docs/changes/0.14.md#how-014-reaches-you))
 - **Breaking:** **Config:** an `ignore[].flags`, `accept-unchecked` or `advisory-lookup` value that
-  0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2.
-  Action: give the key a valid value, or drop it.
+  0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2. One
+  run names each refusal of `fail-on` and `ignore[].flags`, and each schema error. Action: give
+  the key a valid value, or drop it.
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
   with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.
@@ -225,6 +235,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   table footer adds the `flags:`, `depth:`, `security:`, `fix, by package:`, `update now:` and
   `advisories:` lines, and markdown, github and install-time print a part of them.
   ([In CI](docs/ci.md))
+- **Install-time:** when nothing is graded and the gate fails, the block prints its short form with
+  the `gate:` line. The block shows up to two notes.
+  ([Never silent](docs/install-time.md#never-silent-about-a-package-it-could-not-check))
 - **All formats:** findings sort by verdict, then the points of the deciding advisory, then score.
 - **json:** `libyears_unmeasured` and the keys of `libyears.unmeasured` follow `metadata.status`
   and `age`. `metadata_unavailable` is `unavailable` or `not_found`. `no_stable_release_date` is
@@ -266,6 +279,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **sarif:** a message writes each literal `{` as `{{` and each `}` as `}}`, as SARIF 2.1.0
   requires, so a viewer that fills placeholders shows an advisory title such as `{% use %}` as written.
+- **sarif:** `originalUriBaseIds.%SRCROOT%.uri` is `file:///` for a project in `/` and
+  `file://server/share/proj/` for one on a UNC share. It read `file:////` and `file:///server/…`.
 - **All formats:** the anonymous cap note counts one package in the singular ("1 candidate package").
 - **All formats:** `run.project_php_lowest` of a post-release `require.php` bound, such as
   `>=7.4.0-p1`, is the next patch, `7.4.1`. It read `7.4.0`, which the bound excludes.

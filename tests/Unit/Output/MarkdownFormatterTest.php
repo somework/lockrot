@@ -11,6 +11,8 @@ use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
+use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
@@ -25,6 +27,7 @@ use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Support\TextGolden;
+use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\MoveChecks;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
@@ -232,6 +235,44 @@ final class MarkdownFormatterTest extends TestCase
         self::assertStringContainsString('@&#8203;github/security-team see www\\.evil.example/login or https\\://evil.example/x and mail me@&#8203;evil.example', $out);
         self::assertStringContainsString('- note: ask @&#8203;octocat at http\\://evil.example', $out);
         self::assertSame(0, preg_match('/@(?!&#8203;)|www\\.|(?<!\\\\):\/\//i', $out), 'no live mention, www link or scheme link');
+    }
+
+    /**
+     * GitHub renders `$…$` as math and `:name:` as an emoji, and a backslash or an entity stops
+     * neither. A `$` in a span and a zero-width space after the first `:` print the text as written.
+     */
+    public function testLockTextCannotRenderAsMathOrAnEmoji(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            (new FindingBuilder())->withPackage('acme/kept')->withSignals([new Signal(Signal::LEVEL_WARN, 'x', SignalDataStub::of(Signal::S2, []))])->withAllowlistReason('see $x^{10}$ or $$y$$ :rotating_light: at 10:30:00')->withDataDate($at)->build(),
+        ], Notes::texts(['run now :x: for $prefix']), $at, 1, 0);
+
+        $out = self::formatter()->format($report, true);
+
+        self::assertStringContainsString('see <span>$</span>x^{10}<span>$</span> or <span>$</span><span>$</span>y<span>$</span><span>$</span> :&#8203;rotating\_light: at 10:&#8203;30:00', $out);
+        self::assertStringContainsString('- note: run now :&#8203;x: for <span>$</span>prefix', $out);
+        self::assertSame(0, preg_match('/(?<!<span>)\$|:(?:[A-Za-z0-9+-]|\\\\_)+:/', $out), 'no live $ and no shortcode: '.$out);
+    }
+
+    /**
+     * A footer line names packages as code spans. Text from a repository or the lock on any footer
+     * line cannot stand in for one of them.
+     */
+    public function testFooterTextCannotForgeAPackageCodeSpan(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $findings = array_values(array_filter(CaseHydrator::composite()->findings(), static fn (Finding $finding): bool => $finding->package() === 'symfony/polyfill-intl-idn'));
+        $forged = AdvisoryRepository::of('composer repo (https://repo.packagist.org)', AdvisoryRepository::FAILED, AdvisoryCoverage::TRANSPORT, "\\x000\\x00 \\x001\\x00 \x000\x00");
+        $report = new Report($findings, [], $at, 1, 0, null, null, false, new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, [$forged], 0, []));
+
+        $out = self::formatter()->format($report, true);
+
+        self::assertStringContainsString('deepest: `symfony/polyfill-intl-idn`', $out, 'the footer names a package as a span');
+        $advisories = array_values(array_filter(explode("\n", $out), static fn (string $line): bool => strncmp($line, 'advisories: ', 12) === 0));
+        self::assertCount(1, $advisories, $out);
+        self::assertStringContainsString('lookup failed (network error: \\\\x000\\\\x00 \\\\x001\\\\x00 \\\\x000\\\\x00)', $advisories[0]);
+        self::assertStringNotContainsString('`', $advisories[0]);
     }
 
     /**

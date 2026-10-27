@@ -31,6 +31,6 @@ final class JsonFormatter implements FormatterInterface
             throw new \RuntimeException('Cannot encode report as JSON: '.json_last_error_msg());
         }
 
-        return $json."\n";
+        return TerminalText::breakJsonLogCommands($json)."\n";
     }
 }

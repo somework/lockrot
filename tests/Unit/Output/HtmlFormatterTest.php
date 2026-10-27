@@ -140,6 +140,16 @@ final class HtmlFormatterTest extends TestCase
         self::assertSame($nasty, J::stringAt($payload, ['report', 'findings', 0, 'package']), 'and it still reads back unchanged');
     }
 
+    /** The GitHub Actions runner reads `##[` anywhere in a line of a log, and `--format=html` can go to stdout. */
+    public function testThePageWritesNoWorkflowCommandAndThePayloadReadsBackTheLockText(): void
+    {
+        $command = 'evil/x##[add-mask]y';
+        $page = $this->page($this->report([$this->finding($command)]));
+
+        self::assertStringNotContainsString('##[', $page);
+        self::assertSame($command, J::stringAt(self::payloadOf($page), ['report', 'findings', 0, 'package']));
+    }
+
     /**
      * @return iterable<string, array{list<array{string, string}>, int, string, string}>
      */

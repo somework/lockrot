@@ -336,7 +336,7 @@ Each finding's `gate`:
 | Key | Type | Holds |
 |---|---|---|
 | `reaches_fail_on` | boolean | Whether the finding reaches some value of `run.gates`, read from the score and the flags before the baseline. Always false under `none` |
-| `exempt_by` | string or null | `baseline` when the finding reaches a value and the baseline is why it does not fail: a `known` finding, or a `worsened` one whose gate score stays below the value. Otherwise null. An open set |
+| `exempt_by` | string or null | `baseline` when the finding reaches a value and the baseline is why it fails none. A grade value does not fail while the gate score stays below it. A flag value does not fail while the baseline entry covers each counted flag that reaches it. A `vulnerable` value does not fail while the entry knows each counted advisory that reaches it. An `unchecked` value does not fail while the gate score is 0. So a `known` finding is exempt from every value. Otherwise null. An open set |
 | `fails` | boolean | True exactly when `reaches_fail_on` is true, `exempt_by` is null and the root `fail_on_applied` is true |
 | `by` | array | `{value, kind, facts}` per value that the finding fails, naming the facts whose records are marked `error` |
 | `basis` | object or null | The baseline arithmetic: the score, what the new facts add, and the gate score `min(score, 2 × new)`. Null without a baseline entry |
@@ -370,7 +370,7 @@ A graded finding's `score` holds every number of the sum, so a reader never repe
 | `band` | `floor`, the floor of the grade, `next`, the next grade up, and `to_next`, the points short of it |
 | `decided_by` | `maintenance`, `security`, `combination` (the sum decides the band) or `either`. An open set |
 | `parts` | Per part, `maintenance` and `security`: its `status`, its `contribution` and the grade it reaches alone. `security` adds `of`, the counted advisories, and `tied` |
-| `terms` | One per counted fact, the lead first and the security term last: `weight`, `divisor` or `multiplier`, `points` and `contribution`. The contributions add up to `exact` |
+| `terms` | One per counted flag, in flag order, the lead first and the security term last. The security term stands for every counted advisory. Each term holds `weight`, `divisor` or `multiplier`, `points` and `contribution`. The contributions add up to `exact` |
 | `modifiers` | Each halving in order: `reason` (`transitive`, `unreached`, `dev`), `applies_to`, `divide_by`, `before` and `after` |
 | `accepted` | Each accepted flag, with `if_counted`: the score if it counted |
 | `without` | The score without each counted flag, and without the deciding advisory: new runs of the rules |
@@ -427,10 +427,13 @@ the rest of the line unchanged.
 |---|---|---|
 | `vulnerable` | At least one advisory counts | `worst`, `counts` by severity, `fix_kind`, `installed_branch_fixes`, `gets` (what `composer update` installs), `partial`, `move_in` (where the move is) |
 | `clear` | The lookup was complete and found nothing that counts | |
-| `unchecked` | The lookup did not run, or ran in part, and found nothing that counts | `unchecked_reason` |
+| `unchecked` | The lookup did not run, or ran in part, and found nothing that counts | |
 
-Every shape carries `check` (`complete`, `partial` or `not_run`), `records`, `feeds[]` and
-`ignored[]`, the advisories that Composer's audit policy ignores. Each S9 row carries the
+Every shape carries `check` (`complete`, `partial` or `not_run`), `complete` (whether `check` is
+`complete`), `unchecked_reason`, `records`, `feeds[]`, `ignored[]` and `ignored_count`.
+`unchecked_reason` says why the lookup did not complete, on a `vulnerable` finding too. It is null
+on a complete lookup. `ignored[]` holds the advisories that Composer's audit
+policy ignores. Each S9 row carries the
 advisory's `fix`: `{kind, to_branch, version, newest, on_installed_branch, php, admits_target_php,
 admits_project_php, held_by, reason}`
 ([Fix](verdicts.md#fix)).

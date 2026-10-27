@@ -10,7 +10,7 @@ use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Verdict\Finding;
 
 /**
- * report-2's `run.advisory_lookup`: how the one advisory lookup of the run went, its packages counted
+ * report-2's `run.advisory_lookup`: how the run's own advisory lookup went, its packages counted
  * from the findings.
  *
  * @internal

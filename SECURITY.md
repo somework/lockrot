@@ -153,8 +153,9 @@ repositories publish, and finds no vulnerability of its own.
 
 - **Workflow commands.** A GitHub Actions runner reads a line that starts with `::`, and a `##[`
   anywhere in a line, as a command. The plain lines of the `github` format, the `table` format, the
-  text of `--explain`, the install-time summary and the error lines on stderr break both forms. So
-  text from the lock cannot start a command.
+  text of `--explain`, the install-time summary and the error lines on stderr break both forms. The
+  json, sarif and gitlab formats, the report in the `html` page and the `--explain` JSON write `##[`
+  as `#\u0023[`, which decodes to the same text. So text from the lock cannot start a command.
 
 ## Key custody and rotation
 

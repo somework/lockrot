@@ -343,6 +343,9 @@ tools/corpus/corpus check   --out head --explain-out head
 
 ## Cutting a release
 
+Each tag of this recipe, of lockrot or of lockrot-report, needs the explicit approval of the
+maintainer.
+
 1. On a release branch:
 
     - Set `Lockrot\Version::STRING` in `src/Version.php` to the new version.
@@ -362,10 +365,19 @@ tools/corpus/corpus check   --out head --explain-out head
       `ChangedGoldensTest` fails unless `RELEASED_AT` names the newest release that `CHANGELOG.md`
       lists. `VersionTest` fails unless `Version::STRING` names that release.
 
-    - Vendor a renderer release ([The HTML report page](#the-html-report-page)). When the contract
-      bundle changes, run `tools/report/record` first, so that the renderer release pins the new
-      `bundle_sha256`. Then release lockrot-report `vX.Y.Z` and run
-      `tools/report/update-renderer vX.Y.Z`.
+    - Vendor a renderer release ([The HTML report page](#the-html-report-page)) in this order. Each
+      build of [lockrot-report](https://github.com/somework/lockrot-report) fetches its pinned
+      lockrot commit by its sha. The rebase merge into `main` leaves the release branch's commits
+      unreachable from `main`, so a tag must keep the pinned commit reachable.
+
+        1. When the contract bundle changes, run `tools/report/record`. Commit it with the version,
+           the dated CHANGELOG heading, the schema copies and the golden pins of this step.
+        2. Tag that commit `vX.Y.Z-rc.N` and push the tag. The tag keeps the commit reachable, so
+           the renderer needs no repin after the merge. `phar.yml` ignores a `-rc.` tag. Packagist
+           lists it as a pre-release, which a project on stable minimum-stability does not install.
+        3. Pin the renderer to that commit, then release lockrot-report `vX.Y.Z`.
+        4. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This
+           commit must not change the contract bundle.
 
 2. Build the PHAR and check that `php build/lockrot.phar --version` prints the new version.
 3. Before the merge, check what the tag needs outside this repository:
@@ -392,6 +404,16 @@ tools/corpus/corpus check   --out head --explain-out head
 
     It builds, signs and attests the PHAR, runs it on PHP 7.4, then publishes the GitHub release
     and asks lockrot.dev to rebuild.
+
+    If the release widens a `-2` schema (a value of an open set, an optional field), the tag run
+    of `phar.yml` fails at its schema check. lockrot.dev serves the previous tag's file under a
+    number that both tags publish, and the `schemas.yml` run cannot replace it. Packagist reads the
+    tag at once, so recover before any other step of the release:
+
+    1. Run `gh workflow run deploy.yml --repo somework/lockrot.dev`. The deploy reads the new tag
+       and publishes its schemas.
+    2. When the deploy passes, re-run the failed `phar.yml` job (`gh run rerun <run id> --failed`).
+       It then publishes the release and asks lockrot.dev to rebuild.
 7. When the published release changes what lockrot writes (a schema differs from the previous
    release's), record it and pin the hashes ([Recording a release](#recording-a-release)).
 

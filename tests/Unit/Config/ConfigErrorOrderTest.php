@@ -100,6 +100,29 @@ final class ConfigErrorOrderTest extends TestCase
         self::assertSame([], $error->details());
     }
 
+    /**
+     * One run names every refusal, lockrot's own first. The schema does not repeat a path that
+     * lockrot's own check refused.
+     */
+    public function testOneRunReportsEveryConfigRefusal(): void
+    {
+        $error = self::configError([
+            'fail-on' => 'high,dead',
+            'ignore' => [['package' => 'a/b', 'reason' => 'r', 'flags' => 'stale']],
+            'advisory-lookup' => 1,
+        ]);
+
+        $lines = explode("\n", $error->getMessage());
+        self::assertStringStartsWith('extra.lockrot.fail-on: unknown value "dead".', $lines[0], $error->getMessage());
+        self::assertSame('extra.lockrot.ignore[0] "flags" must be an array of maintenance flags, such as ["stale"]', $lines[1], $error->getMessage());
+        self::assertSame('extra.lockrot is invalid:', $lines[2], $error->getMessage());
+        self::assertSame(['advisory-lookup'], array_values(array_unique(array_map(
+            static fn (string $line): string => (string) preg_replace('{^  - ([^:]+):.*$}', '$1', $line),
+            \array_slice($lines, 3)
+        ))), $error->getMessage());
+        self::assertStringNotContainsString('fail-on', implode("\n", $error->details()), 'lockrot already named fail-on');
+    }
+
     /** @param array<string, mixed> $lockrot */
     private static function configError(array $lockrot): ConfigException
     {

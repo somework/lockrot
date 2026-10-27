@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Output\TableFormatter;
@@ -12,6 +13,7 @@ use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class JsonFormatterTest extends TestCase
@@ -106,5 +108,36 @@ final class JsonFormatterTest extends TestCase
         $json = json_decode($out, true);
         self::assertIsArray($json);
         self::assertSame(['version' => Version::STRING, 'schema' => 2], $json['lockrot']);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function documentFormats(): iterable
+    {
+        yield 'json' => ['json'];
+        yield 'sarif' => ['sarif'];
+        yield 'gitlab' => ['gitlab'];
+    }
+
+    /**
+     * A CI runner reads `##[` anywhere in a line as a workflow command, so a document breaks it
+     * with a JSON escape that decodes to the same text.
+     *
+     * @dataProvider documentFormats
+     */
+    #[DataProvider('documentFormats')]
+    public function testADocumentFormatWritesNoWorkflowCommandAndDecodesToTheLockText(string $format): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $report = new Report([
+            (new FindingBuilder())->withPackage('vendor/pkg')->withVersion('dev-###[add-mask]x')->withVerdict(Verdict::ABANDONED)->withChain(['vendor/pkg'])->withDataDate($at)->build(),
+        ], Notes::texts(['::error::a ##[warning]b']), $at, 1, 0);
+
+        $out = Formatters::for($format, FormatContext::create(null, 'none'))->format($report);
+
+        self::assertStringNotContainsString('##[', $out);
+        self::assertSame([], preg_grep('/^\s*::/', explode("\n", $out)), $out);
+        $decoded = json_encode(json_decode($out, true), \JSON_UNESCAPED_SLASHES);
+        self::assertIsString($decoded);
+        self::assertStringContainsString('dev-###[add-mask]x', $decoded);
     }
 }

@@ -53,7 +53,7 @@
       "minLength": 1
     },
     "advisoryLookup": {
-      "description": "How the one advisory lookup of the run went: its scope, the packages it asked, and the outcome of each advisory-capable repository.",
+      "description": "How the run's own advisory lookup went: its scope, the packages it asked, and the outcome of each advisory-capable repository. The lookups that the move check's solves make on Composer 2.9 and later are not in it.",
       "type": "object",
       "required": [
         "scope",

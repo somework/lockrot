@@ -134,6 +134,6 @@ final class GitlabFormatter implements FormatterInterface
             throw new \RuntimeException('Cannot encode report as GitLab Code Quality JSON: '.json_last_error_msg());
         }
 
-        return $json."\n";
+        return TerminalText::breakJsonLogCommands($json)."\n";
     }
 }

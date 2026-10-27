@@ -819,7 +819,10 @@ defs['gateFact'] = obj("A fact whose record is `error` for one gate value (§6.2
 defs['findingGate'] = obj("Where the finding stands against the gate values (§6.1, §6.2, §6.4). Text formats render the gate basis line (`GateText`) from `basis`.", {
     'reaches_fail_on': d("Whether the finding reaches some value of `run.gates[]`, reading the score and the flags before the baseline (0.13's meaning, §6.1).", {'type': 'boolean'}),
     'fails': d('Whether it fails the run: it reaches a value, `exempt_by` is null and the root `gate.fail_on_applied` is true; a grade value reads the gate score.', {'type': 'boolean'}),
-    'exempt_by': nul("What keeps a reaching finding from failing: `baseline` (a `known` finding, or a `worsened` one whose gate score stays below the value). Set only under a baseline entry (I15b). An open set.",
+    'exempt_by': nul("What keeps a reaching finding from failing: `baseline` when the finding reaches a value and the baseline is why it fails none. "
+                     "A grade value does not fail while the gate score stays below it. A flag value does not fail while the baseline entry covers each "
+                     "counted flag that reaches it, and a `vulnerable` value while the entry knows each counted advisory that reaches it. An `unchecked` "
+                     "value does not fail while the gate score is 0. So a `known` finding is exempt from every value. Set only under a baseline entry (I15b). An open set.",
                      {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['baseline']}),
     'by': arr("One entry per value of `run.gates[]` the finding fails (`by[].value` ∈ `run.gates[]`), naming the facts whose records are `error` (§6.2; `Output\\RecordMarks` is the single producer).",
               obj('One failing value.', {
@@ -1128,7 +1131,8 @@ defs['advisoryRepository'] = obj("One advisory-capable Composer repository of th
     {'description': '`failed`: a reason and a message.', 'properties': {'outcome': {'enum': ['failed']}, 'reason': {'type': 'string'}, 'message': {'type': 'string'}, 'packages_with_records': _N, 'records': _N}},
     {'description': '`not_asked`: a reason, no message.', 'properties': {'outcome': {'enum': ['not_asked']}, 'reason': {'type': 'string'}, 'message': _N, 'packages_with_records': _N, 'records': _N}},
 ])
-defs['advisoryLookup'] = obj("How the one advisory lookup of the run went (C75): its scope, the packages it asked, and the outcome of each advisory-capable repository.", {
+defs['advisoryLookup'] = obj("How the run's own advisory lookup went (C75): its scope, the packages it asked, and the outcome of each advisory-capable repository. "
+                             "The lookups that the move check's solves make on Composer 2.9 and later are not in it.", {
     'scope': closed(['all', 'composer-repositories'], ("`extra.lockrot.advisory-lookup` as config-2 spells it: `all` (every locked package, the default) or "
                                                        "`composer-repositories`. Closed.")),
     'scope_source': closed(['config', 'default'], 'Where `scope` came from. Closed.'),
@@ -1761,7 +1765,9 @@ ROOT = {
     'exposure': d("Direct requirements that pull in graded transitive packages, `[{package, flagged}]`, one per finding that carries S7, its `flagged` equal to S7's: "
                    "every graded transitive package reached from 1 to `exposure_rule.max_fan_in` direct requirements is named by each of them (vulnerable-only ones included).",
                    copy.deepcopy(R1['properties']['exposure'])),
-    'exposure_rule': copy.deepcopy(R1['properties']['exposure_rule']),
+    # report-2 requires the key, so report-1's "Absent from documents written before 0.13.0." does not apply
+    'exposure_rule': dict(copy.deepcopy(R1['properties']['exposure_rule']),
+                          description=R1['properties']['exposure_rule']['description'].replace(' Absent from documents written before 0.13.0.', '')),
     'unattributed': arr("Graded transitive packages reached from more than `exposure_rule.max_fan_in` direct requirements, vulnerable-only ones included; report-2 adds `lead` "
                          "and `flag_ids` (the counted flags), and `verdict` is the grade. With S7 they name every graded package a direct requirement reaches.",
                         obj('An unattributed package.', {'package': ref('packageName'), 'verdict': ref('grade'), 'lead': nul('Its lead (jq: read `.lead`, §8.4).', ref('maintenanceFlag')),

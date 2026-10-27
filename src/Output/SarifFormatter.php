@@ -167,18 +167,27 @@ final class SarifFormatter implements FormatterInterface
     /**
      * An absolute file URI with the trailing slash that SARIF 2.1.0 §3.4.4 requires of a directory.
      * Each segment is percent-encoded on its own so the separators survive: a directory can hold a
-     * space, `#`, `?` or non-ASCII.
+     * space, `#`, `?` or non-ASCII. A UNC host is the authority (RFC 8089 Appendix E.3.1).
      */
-    private static function directoryUri(string $directory): string
+    public static function directoryUri(string $directory): string
     {
-        $segments = [];
-        foreach (explode('/', trim(str_replace('\\', '/', $directory), '/')) as $segment) {
+        $path = str_replace('\\', '/', $directory);
+        $authority = '';
+        if (preg_match('{^//([^/]+)(.*)$}s', $path, $unc) === 1) {
+            $authority = $unc[1];
+            $path = $unc[2];
+        }
+        $uri = 'file://'.rawurlencode($authority).'/';
+        foreach (explode('/', $path) as $segment) {
+            if ($segment === '') {
+                continue;
+            }
             // rawurlencode() also escapes ":", which RFC 3986 allows unescaped inside a path segment
             // and which a Windows drive letter needs — file:///C:/project/, not file:///C%3A/project/.
-            $segments[] = str_replace('%3A', ':', rawurlencode($segment));
+            $uri .= str_replace('%3A', ':', rawurlencode($segment)).'/';
         }
 
-        return 'file:///'.implode('/', $segments).'/';
+        return $uri;
     }
 
     /**
@@ -202,6 +211,6 @@ final class SarifFormatter implements FormatterInterface
 
         // SARIF types `rank` as a float (100.0). Every other whole number reads as report-2 writes it (SPEC-0.14.md §8.5.4).
         // The pretty print puts the keys of runs[].results[] 20 spaces deep, so a deeper `rank` in a property bag stays whole.
-        return (string) preg_replace('{^( {20}"rank": -?\d+)(,?)$}m', '$1.0$2', $json)."\n";
+        return TerminalText::breakJsonLogCommands((string) preg_replace('{^( {20}"rank": -?\d+)(,?)$}m', '$1.0$2', $json))."\n";
     }
 }

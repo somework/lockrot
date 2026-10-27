@@ -26,7 +26,7 @@ then environment variable, then `extra.lockrot`, then the default.
 | Key | Type | Default | Effect | Option / variable |
 |---|---|---|---|---|
 | `fail-on` | string, or an array of strings | `none` | The values that make the run exit `1`: a grade, a flag, a `vulnerable` value and `unchecked`, at most one of each kind ([values](#fail-on-values), [choosing them](ci.md)) | `--fail-on`, `LOCKROT_FAIL_ON` |
-| `target-php` | string such as `"8.4"` | `config.platform.php`, else the running PHP | The PHP version the project runs on. S5 checks whether the installed release predates this PHP's major ([Old promise](verdicts.md#old-promise)), and S8 names only a branch that can install on it ([Within reach](verdicts.md#within-reach)) | `--target-php`, `LOCKROT_TARGET_PHP` |
+| `target-php` | string such as `"8.4"` | `config.platform.php`, else the running PHP | The PHP version the project runs on. S5 checks whether the installed release predates this PHP's major ([Old promise](verdicts.md#old-promise)), and S8 names only a branch that can install on it ([Within reach](verdicts.md#within-reach)). An advisory whose fix does not run on it is `blocked` and counts double ([Fix](verdicts.md#fix)). The move check solves at it ([The move check](verdicts.md#the-move-check)), and the PHP window says whether the lock installs on it ([The PHP window](verdicts.md#the-php-window)) | `--target-php`, `LOCKROT_TARGET_PHP` |
 | `format` | string | `table` | What stdout gets: `table`, `json`, `github`, `sarif`, `gitlab`, `markdown` or `html` ([ci.md](ci.md)). The exit code is the same for every format | `--format` |
 | `include-dev` | boolean | `false` | Also check `packages-dev`. A development package's whole [score](verdicts.md#score) is halved | `--dev` (turns it on only) |
 | `baseline` | string | `lockrot-baseline.json` | The [baseline](baseline.md) file, relative to `composer.json` or absolute. A file that this key names must exist, except under `--generate-baseline`. The default file can be missing | `--baseline` |
@@ -113,6 +113,9 @@ line instead ([install-time.md](install-time.md#never-fails-the-install)).
   ([`config-2.json`](https://lockrot.dev/schema/config-2.json), see [schema.md](schema.md)).
   Integer keys take JSON integers: `3`, not `"3"`.
 - `format` accepts only the values its [key row](#extralockrot-keys) lists.
+- One run names each refusal of `fail-on` and of `ignore[].flags` first. Then it names each schema
+  error of the values that those checks did not refuse. A check of an `ignore[]` entry after the
+  schema, such as a date in `expires` that does not exist, stops at the first refusal.
 - An empty `--fail-on=` or `--baseline=` is an error, never a fall-back to the next source.
 
 ### Unknown keys

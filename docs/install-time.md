@@ -62,22 +62,24 @@ installs or updates something.
 
 ## Never silent about a package it could not check {#never-silent-about-a-package-it-could-not-check}
 
-A package whose metadata never arrived is `unknown`, which is not graded. When nothing is
-graded but the run had a network failure (a note with `sets_network_failures: true`), a short
-block prints instead of nothing:
+A package whose metadata never arrived is `unknown`, which is not graded. When nothing is graded,
+a short block prints instead of nothing if the run had a network failure (a note with
+`sets_network_failures: true`) or the gate fails. With nothing graded, only `fail-on: unchecked`
+can fail the gate.
 
 | Header | When |
 |---|---|
 | `lockrot: <n> of <m> changed packages could not be checked` | `<n>` packages are `unknown` |
-| `lockrot: <m> changed packages checked, one check incomplete` | Metadata arrived for every package, and a later lookup failed: advisories, a monorepo parent's metadata, or a repository host |
+| `lockrot: <m> changed packages checked, one check incomplete` | No package is `unknown`, and a check did not complete: advisories, a monorepo parent's metadata, a repository host, or another check that a finding's S10 names |
 
-Up to three notes and the footer follow the header. They are the run's first notes, so the one
-behind the failure can fall past the cut. `composer lockrot --format=json` lists every note, each
-with its `sets_network_failures` ([run notes](notes.md)).
+The [`gate:` line](ci.md#reading-the-gate-line) follows the header when the gate fails. Then up to
+two notes and the footer follow. They are the run's first notes, so the one behind the failure can
+fall past the cut, and the footer does not count the rest. `composer lockrot --format=json` lists
+every note, each with its `sets_network_failures` ([run notes](notes.md)).
 
-Silence means nothing is graded and no note is a network failure. It does not mean every check
-ran: skipped repository activity, a skipped advisory check or the anonymous cap
-([run notes](notes.md)) prints nothing on its own. The unknown-key line still prints.
+Silence means that nothing is graded, no note is a network failure and the gate passes. It does not
+mean that every check ran: skipped repository activity, a skipped advisory check or the anonymous
+cap ([run notes](notes.md)) prints nothing on its own. The unknown-key line still prints.
 
 ## Time budget
 
@@ -149,8 +151,15 @@ transaction before any package operation runs, and Composer exits `1`. The messa
   `install-time-strict` stops nothing.
 - A gap in what the run could see stops the install only through `fail-on: unchecked`, which
   matches every finding that carries S10 ([what was not checked](verdicts.md#what-was-not-checked)).
-  Such a finding can be `ok` and missing from the block. Advisory gaps and `metadata_unavailable` do
-  not stop the install on their own, and `--strict-network` has no install-time counterpart.
+  Such a finding can be `ok` and missing from the block. `--strict-network` has no install-time
+  counterpart.
+- An advisory gap is S10 too. With `fail-on: unchecked`, an advisory lookup that runs out of budget
+  (`install_time_budget`), fails (`lookup_failed`) or finds no feed (`no_feed`) stops the install.
+  So does a package whose metadata did not arrive and that carries a counted advisory
+  (`releases_unknown`).
+- On Composer 2.2 and 2.3, lockrot cannot look up advisories (`composer_too_old`), so
+  `fail-on: unchecked` stops every install that changes a package. `accept-unchecked` cannot
+  accept that reason. Upgrade Composer to 2.4 or later, or remove `unchecked` from `fail-on`.
 - lockrot never stops a `--dry-run`, since no operation is about to run.
 
 A stopped `composer require` or `composer update` leaves `composer.lock` updated (and, for
