@@ -1,6 +1,8 @@
 name: PHAR
+# A vX.Y.Z-rc.N tag only keeps a release-branch commit reachable for the renderer's pin (CONTRIBUTING,
+# "Cutting a release"). It is no release, so it builds nothing.
 on:
-  push: {tags: ['v*']}
+  push: {tags: ['v*', '!v*-rc.*']}
   workflow_dispatch:
 # A signed build carries two signatures and a GitHub attestation. The GPG signature (lockrot.phar.asc)
 # is for people and PHIVE, and the build checks it against lockrot-release-key.asc. The RSA signature
@@ -44,7 +46,9 @@ jobs:
         env: {GH_TOKEN: '${{ github.token }}'}
         run: tools/report/check-vendored
       # Every report, explanation, baseline and config names its schema by URL in `$schema`, so the
-      # release waits until lockrot.dev serves the schemas that this tag carries.
+      # release waits until lockrot.dev serves the schemas that this tag carries. lockrot.dev serves
+      # the newest tag's file for a number that a tag publishes, so a release that widens a -2 schema
+      # fails here until a lockrot.dev deploy reads this tag (CONTRIBUTING, "Cutting a release").
       - name: lockrot.dev serves the schemas of the tag
         if: startsWith(github.ref, 'refs/tags/')
         # A named bash shell runs with pipefail, so a curl failure fails the pipe into jq.
@@ -53,7 +57,7 @@ jobs:
           for doc in report explain baseline config; do
             url="https://lockrot.dev/schema/$doc-2.json"
             served="$(curl -fsSL --retry 3 "$url" | jq -S .)" || { echo "::error::$url does not answer"; exit 1; }
-            [ "$served" = "$(jq -S . "resources/lockrot-$doc-2.schema.json")" ] || { echo "::error::$url differs from resources/lockrot-$doc-2.schema.json"; exit 1; }
+            [ "$served" = "$(jq -S . "resources/lockrot-$doc-2.schema.json")" ] || { echo "::error::$url differs from resources/lockrot-$doc-2.schema.json. If this tag widens the schema, run gh workflow run deploy.yml --repo somework/lockrot.dev, wait for it, then re-run this job"; exit 1; }
           done
       # Composer is part of the reproducible-build recipe: it writes vendor/composer/*.php from its own
       # source. A rebuilder uses the version that this file pins at the tag.
