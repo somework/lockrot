@@ -212,8 +212,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the action before you set `version: latest`.
   ([Upgrading to 0.14](docs/changes/0.14.md#how-014-reaches-you))
 - **Breaking:** **Config:** an `ignore[].flags`, `accept-unchecked` or `advisory-lookup` value that
-  0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2.
-  Action: give the key a valid value, or drop it.
+  0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2. One
+  run names every refused value. Action: give the key a valid value, or drop it.
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
   with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.

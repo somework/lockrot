@@ -146,40 +146,39 @@ final class ProjectIgnoreListTest extends TestCase
         ProjectIgnoreList::fromExtra(['ignore' => [['package' => 'acme/legacy', 'reason' => 'kept', 'flags' => ['vulnerable']]]]);
     }
 
-    /** @return iterable<string, array{mixed}> */
-    public static function notAList(): iterable
+    public function testAnEmptyFlagsListIsRefusedAfterAnEntryWithout(): void
     {
-        yield 'an empty list' => [[]];
-        yield 'a string' => ['stale'];
+        $refusals = ProjectIgnoreList::flagRefusals([['package' => 'acme/a', 'reason' => 'r'], ['package' => 'acme/b', 'reason' => 'r', 'flags' => []]]);
+
+        self::assertSame([1], array_keys($refusals));
+        self::assertSame('extra.lockrot.ignore[1] "flags" must list at least one maintenance flag', $refusals[1]->getMessage());
     }
 
-    /**
-     * @param mixed $flags
-     *
-     * @dataProvider notAList
-     */
-    #[DataProvider('notAList')]
-    public function testFlagsMustBeAListAfterAnEntryWithout($flags): void
+    /** config-1 read any `flags` value, so a 0.13 config can hold one flag as a string. */
+    public function testFlagsThatAreNoArrayNameTheArrayForm(): void
     {
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('extra.lockrot.ignore[1] "flags" must list at least one maintenance flag');
+        $refusals = ProjectIgnoreList::flagRefusals([['package' => 'acme/a', 'reason' => 'r', 'flags' => 'stale']]);
 
-        ProjectIgnoreList::checkFlags([['package' => 'acme/a', 'reason' => 'r'], ['package' => 'acme/b', 'reason' => 'r', 'flags' => $flags]]);
+        self::assertSame([0], array_keys($refusals));
+        self::assertSame('extra.lockrot.ignore[0] "flags" must be an array of maintenance flags, such as ["stale"]', $refusals[0]->getMessage());
     }
 
-    public function testAFlagThatIsNoMaintenanceFlagIsRefused(): void
+    public function testEveryEntryWithBadFlagsIsRefused(): void
     {
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('extra.lockrot.ignore[0] "flags" must list maintenance flags only: abandoned, silent, pinned, left-behind, old-promise, stale, capped');
+        $refusals = ProjectIgnoreList::flagRefusals([
+            ['package' => 'acme/a', 'reason' => 'r', 'flags' => ['stale', 'dead']],
+            ['package' => 'acme/b', 'reason' => 'r', 'flags' => ['stale']],
+            ['package' => 'acme/c', 'reason' => 'r', 'flags' => 'stale'],
+        ]);
 
-        ProjectIgnoreList::checkFlags([['package' => 'acme/a', 'reason' => 'r', 'flags' => ['stale', 'dead']]]);
+        self::assertSame([0, 2], array_keys($refusals));
+        self::assertSame('extra.lockrot.ignore[0] "flags" must list maintenance flags only: abandoned, silent, pinned, left-behind, old-promise, stale, capped', $refusals[0]->getMessage());
     }
 
     public function testALongIndexIsCutAt255Bytes(): void
     {
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('extra.lockrot.ignore['.str_repeat('k', 255).'…] "flags" must list at least one maintenance flag');
+        $refusals = ProjectIgnoreList::flagRefusals([str_repeat('k', 300) => ['flags' => []]]);
 
-        ProjectIgnoreList::checkFlags([str_repeat('k', 300) => ['flags' => []]]);
+        self::assertSame(['extra.lockrot.ignore['.str_repeat('k', 255).'…] "flags" must list at least one maintenance flag'], array_map(static fn (ConfigException $e): string => $e->getMessage(), array_values($refusals)));
     }
 }

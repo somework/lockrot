@@ -37,13 +37,20 @@ final class ProjectIgnoreList
      *
      * @param mixed $rows `extra.lockrot.ignore`
      *
-     * @throws ConfigException for a flag that is not a maintenance flag, or an empty list
+     * @return array<array-key, ConfigException> by the index of each entry whose `flags` lockrot refuses
      */
-    public static function checkFlags($rows): void
+    public static function flagRefusals($rows): array
     {
+        $refusals = [];
         foreach (\is_array($rows) ? $rows : [] as $index => $row) {
-            self::flags((string) $index, \is_array($row) ? ($row['flags'] ?? null) : null);
+            try {
+                self::flags((string) $index, \is_array($row) ? ($row['flags'] ?? null) : null);
+            } catch (ConfigException $e) {
+                $refusals[$index] = $e;
+            }
         }
+
+        return $refusals;
     }
 
     /**
@@ -51,7 +58,7 @@ final class ProjectIgnoreList
      *
      * @return ?list<string> each flag once, null for an entry without `flags`
      *
-     * @throws ConfigException for a flag that is not a maintenance flag, or an empty list
+     * @throws ConfigException for a value that is no array, an empty list, or a flag that is not a maintenance flag
      */
     private static function flags(string $index, $flags): ?array
     {
@@ -59,7 +66,10 @@ final class ProjectIgnoreList
             return null;
         }
         $at = TerminalText::escape($index, 255);
-        if (!\is_array($flags) || $flags === []) {
+        if (!\is_array($flags)) {
+            throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] "flags" must be an array of maintenance flags, such as ["stale"]', $at));
+        }
+        if ($flags === []) {
             throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] "flags" must list at least one maintenance flag', $at));
         }
         $out = [];

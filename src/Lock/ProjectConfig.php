@@ -139,19 +139,50 @@ final class ProjectConfig
         }
 
         $lockrotExtra = JsonReader::stringKeyed($lockrotRaw);
-        try {
-            // lockrot's own checks speak before the schema's enum and pattern errors.
-            $failOn = $lockrotExtra['fail-on'] ?? null;
-            if (\is_string($failOn) || (\is_array($failOn) && JsonReader::isList($failOn) && array_filter($failOn, 'is_string') === $failOn)) {
+        // lockrot's own checks speak before the schema's enum and pattern errors. The schema does
+        // not read a value that they refused, and one run names every refusal.
+        $refusals = [];
+        $schemaInput = $lockrotExtra;
+        $failOn = $lockrotExtra['fail-on'] ?? null;
+        if (\is_string($failOn) || (\is_array($failOn) && JsonReader::isList($failOn) && array_filter($failOn, 'is_string') === $failOn)) {
+            try {
                 FailOn::parse($failOn, 'extra.lockrot.fail-on');
+            } catch (ConfigException $e) {
+                $refusals[] = $e;
+                unset($schemaInput['fail-on']);
             }
-            ProjectIgnoreList::checkFlags($lockrotExtra['ignore'] ?? null);
-            ConfigSchema::validate($lockrotExtra);
+        }
+        $rows = $lockrotExtra['ignore'] ?? null;
+        foreach (ProjectIgnoreList::flagRefusals($rows) as $index => $e) {
+            $refusals[] = $e;
+            if (\is_array($rows) && \is_array($rows[$index])) {
+                unset($rows[$index]['flags']);
+                $schemaInput['ignore'] = $rows;
+            }
+        }
+        try {
+            ConfigSchema::validate($schemaInput);
         } catch (ConfigException $e) {
-            throw self::withUnknownKeys($e, $lockrotExtra);
+            $refusals[] = $e;
+        }
+        if ($refusals !== []) {
+            throw self::withUnknownKeys(self::joined($refusals), $lockrotExtra);
         }
 
         return $lockrotExtra;
+    }
+
+    /** @param non-empty-list<ConfigException> $refusals */
+    private static function joined(array $refusals): ConfigException
+    {
+        if (\count($refusals) === 1) {
+            return $refusals[0];
+        }
+
+        return ConfigException::withDetails(
+            implode("\n", array_map(static fn (ConfigException $e): string => $e->getMessage(), $refusals)),
+            array_merge(...array_map(static fn (ConfigException $e): array => $e->details(), $refusals))
+        );
     }
 
     /**
