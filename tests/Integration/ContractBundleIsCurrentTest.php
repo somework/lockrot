@@ -52,7 +52,7 @@ final class ContractBundleIsCurrentTest extends TestCase
             'capped-unread‡' => 'its fetch failed, so the model has no releases to give',
         ];
         $provenance = JsonPath::decodeFile(ContractBundle::DIRECTORY.'/provenance.json');
-        $capped = array_values(array_filter(JsonPath::arrayAt($provenance, ['cases_without_inputs']), static fn ($id): bool => strpos((string) $id, 'capped-') === 0));
+        $capped = array_values(array_filter(JsonPath::arrayAt($provenance, ['cases_without_inputs']), static fn ($id): bool => \is_string($id) && strpos($id, 'capped-') === 0));
 
         self::assertSame(array_keys($withoutInputs), $capped, 'a capped case without inputs needs a reason here, and a hydrated one leaves the list');
     }
