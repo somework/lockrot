@@ -329,10 +329,10 @@ final class MoveTest extends TestCase
     }
 
     /**
-     * The solve installs 2.0.0, below the newest 2.3.0. 2.0.0 is older than three years, so the move
-     * clears nothing: it keeps its kind, and the score after it is the current total (SPEC I14).
+     * The solve installs 2.0.0, below the newest 2.3.0. S8 dates the 2.x branch by its newest dated
+     * release, 2.3.0, which is within release-warn-years, so the move clears left-behind.
      */
-    public function testAMoveWhoseInstalledReleaseClearsNothingKeepsItsKindWithNoScoreAfterIt(): void
+    public function testAMoveThatInstallsBelowTheNewestClearsLeftBehindOnAReleasingBranch(): void
     {
         $finding = self::analyse([
             'lock' => [['time' => '2021-01-01T00:00:00+00:00']],
@@ -342,8 +342,7 @@ final class MoveTest extends TestCase
         $move = JsonPath::arrayAt($finding, ['next_step']);
 
         self::assertSame(['require', 'left-behind', '2.0.0'], [$move['kind'], $move['source'], JsonPath::stringAt($move, ['check', 'installs'])]);
-        self::assertSame([], $move['clears']);
-        self::assertNull($move['if_applied']);
+        self::assertContains(['id' => 'left-behind', 'basis' => 'branch_releasing'], array_map(static fn ($fact): array => ['id' => $fact['id'], 'basis' => $fact['basis'] ?? null], JsonPath::arrayAt($move, ['clears'])));
     }
 
     /** Offline, the move's own versions were never asked about: every rerun says so. */

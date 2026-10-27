@@ -67,7 +67,7 @@ final class MoveBuilder
         $below = $installs === null ? null : $context->release($installs);
         $judged = $below === null || $row === null ? $row : (BranchRow::ofRelease($below, $row->installed(), $context->floor()) ?? $row);
         if ($draft->isRowMove() && $judged !== null) {
-            [$clears, $unverified] = self::clearsFor($judged, $lower, self::countedMaintenance($finding), $context->advisoryIds(), $context);
+            [$clears, $unverified] = self::clearsFor($judged, $lower, self::countedMaintenance($finding), $context->advisoryIds(), $context, $row);
         }
         if ($kind === Move::TAG) {
             $clears = [MoveFact::on(MoveFact::FLAG, FlagSet::PINNED, MoveFact::TAGS_ONLY)];
@@ -186,14 +186,16 @@ final class MoveBuilder
      *
      * @param list<string> $flags
      * @param list<string> $advisories ids
+     * @param ?BranchRow   $branch     the branch row of $row, which dates the branch as S8 does: a row
+     *                                 of a release below the newest is dated by the branch's newest release
      *
      * @return array{0: list<MoveFact>, 1: list<MoveFact>}
      */
-    public static function clearsFor(BranchRow $row, ?Candidate $lower, array $flags, array $advisories, MoveContext $context): array
+    public static function clearsFor(BranchRow $row, ?Candidate $lower, array $flags, array $advisories, MoveContext $context, ?BranchRow $branch = null): array
     {
         $clears = [];
         $unverified = [];
-        if (\in_array(FlagSet::LEFT_BEHIND, $flags, true) && !$row->installed() && $context->isReleasing($context->releasedAt($row))) {
+        if (\in_array(FlagSet::LEFT_BEHIND, $flags, true) && !$row->installed() && $context->isReleasing($context->releasedAt($branch ?? $row))) {
             $clears[] = MoveFact::on(MoveFact::FLAG, FlagSet::LEFT_BEHIND, MoveFact::BRANCH_RELEASING);
         }
         if (\in_array(FlagSet::OLD_PROMISE, $flags, true)) {
