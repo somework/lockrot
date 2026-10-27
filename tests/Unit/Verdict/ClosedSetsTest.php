@@ -483,9 +483,8 @@ final class ClosedSetsTest extends TestCase
     }
 
     /**
-     * The clause for integer sets, on a synthetic schema that holds one: no shipped file has an
-     * integer set. Its row passes, and the same node read as a string set, or with a value that
-     * is no integer, fails.
+     * The clause for integer sets, on a synthetic schema that holds one. Its row passes, and the
+     * same node read as a string set, or with a value that is no integer, fails.
      */
     public function testAnIntegerSetIsAnIntegerWithItsKnownIntegersAndNoPattern(): void
     {
@@ -557,6 +556,26 @@ final class ClosedSetsTest extends TestCase
         foreach (self::openSets() as $where => [, , , $phrase]) {
             self::assertStringContainsString($phrase, $list, $where.': docs/schema.md\'s list of open sets');
         }
+    }
+
+    /**
+     * An integer set has no pattern, so a reader who builds a strict copy from the list of open
+     * sets must find each one there by its property name.
+     */
+    public function testEveryIntegerSetOfReport2IsNamedInTheSchemaPagesList(): void
+    {
+        $schema = self::schema(Schemas::REPORT, 2);
+        $list = self::listAfter(self::section(self::page('schema.md'), '## Open sets'), 'Objects are open');
+
+        $integers = [];
+        foreach (self::withKnownValues($schema, '#') as $pointer) {
+            $node = JsonPath::arrayAt($schema, \array_slice(explode('/', $pointer), 1));
+            if (($node['type'] ?? null) === 'integer') {
+                $integers[] = $pointer;
+                self::assertStringContainsString('`'.basename($pointer).'`', $list, $pointer.': docs/schema.md\'s list of open sets');
+            }
+        }
+        self::assertNotSame([], $integers, 'report-2 holds integer sets');
     }
 
     private static function listAfter(string $text, string $opening): string

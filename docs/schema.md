@@ -113,6 +113,8 @@ grows in minor releases. These are the ones that a reader meets most:
 - in report-2, the `reason` of a move's `check`, of `run.move_check` and of
   `run.php_window.target_fix`
 - in report-2, the words of `run.score_model`
+- in report-2, the integers `divisor` of a maintenance score term, `multiplier` of the security
+  term and `divide_by` of a modifier
 - the configuration's `format`, and format names wherever lockrot writes one.
 
 Repository hosts are an open set in a run note's `forge_id` and in report-2's `forge` of S3, S4 and
@@ -122,7 +124,8 @@ Repository hosts are an open set in a run note's `forge_id` and in report-2's `f
 How the schemas write an open set:
 
 - It is a string with a `pattern`, plus `x-known-values`, the values that this release writes.
-  Every known value matches the `pattern`, and the list only grows under one number.
+  Every known value matches the `pattern`, and the list only grows under one number. An integer
+  set has no `pattern`: it is an `integer` with a `minimum`, and its `x-known-values` are integers.
 
 - A draft-04 validator ignores `x-known-values`, so your copy accepts a value that a later release
   adds.
@@ -667,6 +670,12 @@ lockrot, refresh the copy, so that it lists new fields and types a new signal's 
 curl -fsSL -o ci/lockrot-report.schema.json https://lockrot.dev/schema/report-2.json
 check-jsonschema --schemafile ci/lockrot-report.schema.json lockrot.json
 ```
+
+Validators disagree on a trailing newline.
+[justinrainbow/json-schema](https://github.com/jsonrainbow/json-schema), the validator that
+Composer bundles, compiles a `pattern` with no `D` modifier, so `$` also matches before a final
+`\n`. It accepts a value such as `"json\n"` that Ajv and check-jsonschema reject. lockrot writes
+no control character in a string, so only a hand-edited file shows the difference.
 
 [Ajv](https://ajv.js.org/) 8 needs three things for these files:
 
