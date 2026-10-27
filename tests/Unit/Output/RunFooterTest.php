@@ -162,6 +162,14 @@ final class RunFooterTest extends TestCase
         self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by `COMPOSER_NO_BLOCKING` and `COMPOSER_NO_SECURITY_BLOCKING`; ext-* requirements not checked', RunFooter::moveCheck($report, static fn (string $name): string => '`'.$name.'`'));
     }
 
+    public function testTheMovesLineJoinsThreeSwitchesAsAListWithAndBeforeTheLast(): void
+    {
+        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $report = self::report([])->withMoveChecks(new MoveCheckRun('2.10.3', false, ['COMPOSER_POLICY', 'config.policy', 'config.policy.advisories'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
+
+        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by COMPOSER_POLICY, config.policy and config.policy.advisories; ext-* requirements not checked', RunFooter::moveCheck($report));
+    }
+
     public function testTheMovesLineOfARunThatBlocksNoAdvisoryAddsNoWords(): void
     {
         $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
