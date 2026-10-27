@@ -26,7 +26,9 @@ Verdict order, used by the grade values of [`--fail-on`](ci.md) and the report's
 
 - A *finding* is any entry in the report's `findings`: one per analysed package, `ok` included. A
   *graded* finding has a grade, `critical` to `low`. `--format=json` and `--format=html` carry
-  every finding. The other formats list the score-0 findings only with `--all`.
+  every finding. `table` and `markdown` list the score-0 findings only with `--all`. `github`,
+  `sarif` and `gitlab` also give a record to each one that fails `unchecked`
+  ([`--fail-on=unchecked` in the formats](ci.md#unchecked-in-the-formats)).
 
 - A finding's `lead` is its first counted maintenance flag, in flag order, or null. It names the
   cause that heads the score line. No gate or sort reads it.
@@ -713,7 +715,10 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
   update of laravel/socialite (to v5.30.0)". A package that composer.json
   requires gets `composer require <package>:<constraint> --no-update` first, then
   `composer update <package>` and the holders. When the joint request is refused, `held_by[]`
-  names its holds.
+  names its holds. Any other joint solve keeps the move `refused` with the holds of the first
+  refusal. That includes a solve that moves a holder from a release to a dev version, because
+  advisory blocking does not check a dev version. A holder that is a dev version before and after
+  the solve still counts.
 - **The why-not step.** An `update`, `require`, `raise-php` or `tag` move whose check does not
   resolve ends with `composer why-not <package> <version> --locked`. The version is the move's
   `version`.
@@ -840,6 +845,10 @@ How lockrot reads the window:
 - lockrot reads the target's minor at the PHP that [the move check](#the-move-check) solves at
   instead, and `target.php` holds that PHP. The move check reads `config.platform.php` from
   Composer's config, the global `config.json` included. A cap inside a minor, such as `<8.4.5`, leaves that minor out.
+- When the set does not admit that PHP, the target's minor stays in the window if the set admits
+  a later patch of that minor. So with `config.platform.php` 8.4.0, a patch floor such as
+  `>=8.4.2` keeps 8.4 in the window, and `lower_edge.php` reads 8.4.2. A cap below that PHP leaves
+  the minor out.
 - lockrot reads the edges and `gaps` on the known minors. PHP 6 and PHP 7.5 to 7.9 do not exist, so
   `~7.4.0 || ~8.0.0` has no gap.
 - `lower_edge.php` is the lowest PHP of the first minor in the window. `lower_edge.set_by` lists the
@@ -869,7 +878,7 @@ it. It also gives the answer of Composer's solver:
   [the move check](#the-move-check) does.
 - `check` is `resolves`, `refused` or `not_checked`. On `resolves`, `command` holds the update that
   resolved. On `refused`, `held_by` lists the links that the refusal names, as a move's `held_by[]`
-  does. On `not_checked`, `reason` says why, and it is null when the run checked no move.
+  does. On `not_checked`, `reason` says why.
 - A root link on `php` or `php-64bit` that excludes the target is the root ceiling. No update can
   admit the target, so `check` is `refused` with no solve. `held_by` names each such root link with
   its section: `require`, `require-dev` or `conflict`.
@@ -887,9 +896,11 @@ it. It also gives the answer of Composer's solver:
   the reason of the baseline, not `unloaded_name`.
 
 `target_fix` is null when the window admits the target, and when the target lies below the lowest
-edge of the set that `target.inside` reads. Below the lowest edge, lockrot does not search for a
-downgrade. A `composer update` of the packages that set that edge can still downgrade them into the
-window, when you run it at the target PHP.
+edge of the set that `target.inside` reads. The target lies below the lowest edge when that set's
+window does not have the target's minor and the target lies below `lower_edge.php`. A target whose
+minor the window keeps above a patch floor is not below it, so `target_fix` exists. Below the
+lowest edge, lockrot does not search for a downgrade. A `composer update` of the packages that set
+that edge can still downgrade them into the window, when you run it at the target PHP.
 
 The `php:` line of the table, markdown and github formats prints the window. When the minors of
 `with_dev` differ, the line prints `with_dev` and `without_dev`. The line adds the target when the

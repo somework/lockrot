@@ -175,6 +175,22 @@ final class MarkdownFormatterTest extends TestCase
         self::assertStringContainsString('| ok | `a/fine` | 1.0.0 | ok | `0` | direct |', self::formatter()->format($report, true));
     }
 
+    /** docs/ci.md#unchecked-in-the-formats: `table` and `markdown` list a score-0 finding only with `--all`. */
+    public function testAScoreZeroFindingThatFailsUncheckedHasNoRowWithoutShowAll(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            (new FindingBuilder())->withPackage('a/stale')->withVerdict(Verdict::STALE)->withDataDate($at)->build(),
+            FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true),
+        ], [], $at, 2, 0);
+
+        $out = self::formatter('high,unchecked')->format($report);
+
+        self::assertStringContainsString('| `a/stale` |', $out);
+        self::assertStringNotContainsString('`a/offline`', $out);
+        self::assertStringContainsString('| `a/offline` |', self::formatter('high,unchecked')->format($report, true));
+    }
+
     public function testNotesAreABulletListBeforeTheSubLine(): void
     {
         $out = self::formatter()->format(self::report());
@@ -253,6 +269,21 @@ final class MarkdownFormatterTest extends TestCase
         self::assertStringContainsString('see <span>$</span>x^{10}<span>$</span> or <span>$</span><span>$</span>y<span>$</span><span>$</span> :&#8203;rotating\_light: at 10:&#8203;30:00', $out);
         self::assertStringContainsString('- note: run now :&#8203;x: for <span>$</span>prefix', $out);
         self::assertSame(0, preg_match('/(?<!<span>)\$|:(?:[A-Za-z0-9+-]|\\\\_)+:/', $out), 'no live $ and no shortcode: '.$out);
+    }
+
+    /**
+     * A workflow can print the comment to the job log, where the runner reads a legacy `##[`
+     * command anywhere in a line. A code span carries a name from the lock as written.
+     */
+    public function testACodeSpanBreaksTheLegacyLogCommand(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([(new FindingBuilder())->withPackage('evil/a##[error]x')->withVerdict(Verdict::ABANDONED)->withChain(['evil/a##[error]x'])->withDataDate($at)->build()], [], $at, 1, 0);
+
+        $out = self::formatter()->format($report);
+
+        self::assertStringContainsString('| `evil/a##\x5Berror]x` |', $out);
+        self::assertStringNotContainsString('##[', $out);
     }
 
     /**

@@ -97,9 +97,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   escape (`\x1B`), also in `--explain`, in the error lines on stderr, as in the install-time
   summary. So does a character that prints as nothing, such as a zero-width space (`\u{200B}`). A
   lock cannot clear your screen, write your clipboard, plant a link in your terminal or hide text.
-  A line of the github or table format, of `--explain`, of the install-time summary or of the
-  error output on stderr cannot start a `::` workflow command or hold a `##[` command. Neither can
-  json, sarif, gitlab, the report in the html page or the `--explain` JSON, which write `##[` as
+  A line of the github, markdown or table format, of `--explain`, of the install-time summary or of
+  the error output on stderr cannot start a `::` workflow command or hold a `##[` command. Neither
+  can json, sarif, gitlab, the report in the html page or the `--explain` JSON, which write `##[` as
   `#\u0023[`, the same decoded text.
   ([What lockrot does](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **markdown:** text from the lock cannot mention a user or a team, or link a bare URL or an email
@@ -127,9 +127,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the holds of a refusal, or the root links that no update can change. The `php:` line prints it,
   and marks a root hold on a packages-dev package " in require-dev".
   ([The update that admits the target](docs/verdicts.md#the-update-that-admits-the-target))
-- **All formats:** the run notes `update_now_not_checked`, `move_check_failed` and
-  `package_name_invalid`. lockrot skips a lock entry whose name is no Composer package name.
-  ([Run notes](docs/notes.md#package_name_invalid))
+- **All formats:** the run notes `moves_not_checked`, `move_check_failed`, `update_now_reduced`,
+  `update_now_refused`, `update_now_not_checked` and `package_name_invalid` say what the move check
+  and `update now:` did. lockrot skips a lock entry whose name is no Composer package name.
+  ([Run notes](docs/notes.md#moves_not_checked))
+- **All formats:** the run notes `baseline_target_differs`, `baseline_fix_model_differs` and
+  `ignore_does_not_cover_advisories` say when the baseline does not compare fix changes, and when an
+  `ignore[]` entry meets a counted advisory. ([Run notes](docs/notes.md#baseline_target_differs))
 - **CLI, Config:** `--fail-on` takes a list, one value per kind: a grade, a flag (at or above in
   flag order), `vulnerable` or `vulnerable-medium|high|critical`, and `unchecked`. ([In
   CI](docs/ci.md))
@@ -261,6 +265,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- **Breaking:** **json, PHAR:** the unnumbered schema files in `resources/` are gone. Each file
+  carries its number: `lockrot-report.schema.json` is `lockrot-report-1.schema.json`, and the same
+  holds for `baseline`, `config` and `explain`. Action: validate against
+  `resources/lockrot-<name>-<number>.schema.json`, or against the URL. ([Schema](docs/schema.md))
 - **Breaking:** **Baseline:** 0.14 reads baseline-2 only, and a baseline-1 file exits 2. Action:
   review the findings, then run `--generate-baseline`, which overwrites the file. `known_since`
   starts again on that day. ([Baseline](docs/baseline.md))

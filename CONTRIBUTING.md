@@ -301,7 +301,8 @@ tools/report/update-renderer vX.Y.Z
 
 - The script needs `gh`. It verifies that the renderer's `release.yml` attested the files for that
   tag, the page against the sha256 in its manifest, and that the manifest names the requested
-  version.
+  version. It writes the source commit that the attestations name to
+  `tools/report/renderer-commit`. A tag can move, so `check-vendored` verifies that commit too.
   `tests/Unit/Output/RendererManifestTest.php` rechecks the page against the manifest on every run.
 - `--from-dir DIR` vendors a local build for development. It is not attested. Never release with it.
 - `vX.Y.Z-rc.N` vendors a pre-release. A lockrot release vendors a plain `vX.Y.Z`
@@ -350,15 +351,22 @@ maintainer.
 
     - Set `Lockrot\Version::STRING` in `src/Version.php` to the new version.
 
-    - Rename `## [Unreleased]` in `CHANGELOG.md` to `## [X.Y.Z] - YYYY-MM-DD`, dated on the tag
-      day, and write its summary (`.claude/rules/changelog.md`). Then open a new empty
-      `## [Unreleased]` above it. In the compare links at the end of the file, point
-      `[Unreleased]` to `vX.Y.Z...HEAD` and add an `[X.Y.Z]` link.
+    - Rename `## [Unreleased]` in `CHANGELOG.md` to `## [X.Y.Z] - YYYY-MM-DD`, and write its
+      summary (`.claude/rules/changelog.md`). Then open a new empty `## [Unreleased]` above it. In
+      the compare links at the end of the file, point `[Unreleased]` to `vX.Y.Z...HEAD` and add an
+      `[X.Y.Z]` link.
+
+    - The heading carries the day of the final `vX.Y.Z` tag, not the day of the rc tag. Write the
+      planned tag day. If the final tag falls on another day, add a commit to the release pull
+      request that changes only that date. That commit changes no file of the contract bundle. If
+      the day changes after the merge, open a pull request into `main` that changes only that
+      date, and tag its merge commit.
 
     - Copy every `resources/lockrot-*.schema.json` file to
       `tests/fixtures/schema-evolution/schemas/X.Y.Z/` and pin their sha256 in `RELEASED_SCHEMAS`
       in `SchemaEvolutionTest`. `SchemaEvolutionTest` fails unless the releases that `CHANGELOG.md`
-      lists, the keys of `RELEASED_SCHEMAS` and the directories under `schemas/` match exactly.
+      lists, the keys of `RELEASED_SCHEMAS` and the directories under `schemas/` match exactly. If
+      a schema differs from the previous release's, add the version to `RECORDING_PENDING`.
 
     - Pin the sha256 of each formatter golden in `ChangedGoldensTest::RELEASED`, set
       `RELEASED_AT` to the new version, and empty `CHANGED`. From `FIRST_RELEASE` on,
@@ -415,7 +423,10 @@ maintainer.
     2. When the deploy passes, re-run the failed `phar.yml` job (`gh run rerun <run id> --failed`).
        It then publishes the release and asks lockrot.dev to rebuild.
 7. When the published release changes what lockrot writes (a schema differs from the previous
-   release's), record it and pin the hashes ([Recording a release](#recording-a-release)).
+   release's), record it and pin the hashes ([Recording a release](#recording-a-release)). Then
+   remove the version from `RECORDING_PENDING`. `SchemaEvolutionTest` fails when a release whose
+   schemas changed has no recording, unless it is the newest release and waits in
+   `RECORDING_PENDING`.
 
 ## Related
 

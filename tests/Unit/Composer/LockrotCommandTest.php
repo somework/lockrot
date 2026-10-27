@@ -44,6 +44,7 @@ use Lockrot\Tests\Support\SplitStreamOutput;
 use Lockrot\Tests\Support\SplitStreamTester;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\MoveChecks;
+use Lockrot\Verdict\ScoreModel;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -343,6 +344,21 @@ final class LockrotCommandTest extends TestCase
         foreach (LockrotConfig::FORMATS as $format) {
             self::assertStringContainsString($format, $description, $format.' is accepted but not listed in --help');
         }
+    }
+
+    /**
+     * `composer list` shows the description: it names every flag, `vulnerable` included, because
+     * every counted advisory scores. `--all` adds the findings that have no grade.
+     */
+    public function testTheCommandDescriptionNamesEveryFlagAndAllAddsTheUngraded(): void
+    {
+        $command = $this->command();
+
+        foreach (ScoreModel::FLAG_ORDER as $flag) {
+            self::assertMatchesRegularExpression('/(?<![a-z-])'.preg_quote($flag, '/').'(?![a-z-])/', $command->getDescription(), $flag);
+        }
+        self::assertStringNotContainsString('no fix is coming', $command->getDescription());
+        self::assertSame('Show every package, not only graded ones', $command->getDefinition()->getOption('all')->getDescription());
     }
 
     /** `--help` names every value that `--fail-on` accepts, and that it takes a list. */

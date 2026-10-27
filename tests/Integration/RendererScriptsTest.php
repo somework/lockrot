@@ -12,8 +12,9 @@ use Symfony\Component\Process\Process;
 /**
  * tools/report/update-renderer vendors the renderer, and tools/report/check-vendored is the check of
  * the release pull request and of phar.yml. Each runs in a copy of the repository layout, with a
- * stand-in `gh` that serves the named assets of a lockrot-report release from a directory,
- * refuses any other argument, and answers each attestation with FAKE_ATTESTATION.
+ * stand-in `gh`. The stand-in serves the named assets of a lockrot-report release from a directory
+ * and refuses any other argument. It answers each attestation with FAKE_ATTESTATION. A verified
+ * attestation prints FAKE_DIGEST, the source commit that `--jq` selects.
  *
  * @coversNothing
  *
@@ -25,6 +26,7 @@ final class RendererScriptsTest extends TestCase
 {
     private const ROOT = __DIR__.'/../..';
     private const SCRIPTS = ['update-renderer', 'check-vendored'];
+    private const COMMIT = 'e72b02bb9180858e5a84a119aad8466993b47627';
     private const FAKE_GH = <<<'BASH'
         #!/usr/bin/env bash
         echo "$*" >> "$FAKE_LOG"
@@ -42,7 +44,7 @@ final class RendererScriptsTest extends TestCase
             done
             [ ${#patterns[@]} -gt 0 ] || exit 97
             for pattern in "${patterns[@]}"; do cp "$FAKE_RELEASE/$pattern" "$dir"/ || exit 95; done ;;
-          "attestation verify") exit "${FAKE_ATTESTATION:-0}" ;;
+          "attestation verify") [ "${FAKE_ATTESTATION:-0}" = 0 ] || exit "$FAKE_ATTESTATION"; printf '%s' "${FAKE_DIGEST:-}" ;;
           *) exit 99 ;;
         esac
         BASH;
@@ -79,6 +81,23 @@ final class RendererScriptsTest extends TestCase
         self::assertFileEquals($this->root.'/release/report.html', $this->root.'/resources/report/report.html');
         self::assertFileEquals($this->root.'/release/manifest.json', $this->root.'/resources/report/manifest.json');
         self::assertStringContainsString('--signer-workflow somework/lockrot-report/.github/workflows/release.yml --source-ref refs/tags/v1.2.3', $this->log());
+        self::assertSame(self::COMMIT."\n", file_get_contents($this->root.'/tools/report/renderer-commit'), 'the commit that the attestation names');
+        self::assertSame(2, substr_count($this->log(), '--format json --jq .[].verificationResult.signature.certificate.sourceRepositoryDigest'), 'each file names its source commit');
+    }
+
+    /** A tag can move: each attested file must name one source commit, the same one. */
+    public function testAnAttestationWithoutOneSourceCommitVendorsNothing(): void
+    {
+        $this->release('1.2.3', true);
+
+        foreach (['', 'not-a-commit', self::COMMIT."\n".str_repeat('a', 40)] as $digest) {
+            $process = $this->runScript('update-renderer', ['v1.2.3'], ['FAKE_DIGEST' => $digest]);
+
+            self::assertSame(1, $process->getExitCode(), $digest.': '.$process->getErrorOutput());
+            self::assertStringContainsString('one source commit', $process->getErrorOutput());
+            self::assertDirectoryDoesNotExist($this->root.'/resources/report');
+            self::assertFileDoesNotExist($this->root.'/tools/report/renderer-commit');
+        }
     }
 
     public function testATagThatIsNoReleaseTagIsRefusedBeforeAnyDownload(): void
@@ -128,11 +147,13 @@ final class RendererScriptsTest extends TestCase
     {
         $this->release('1.2.3', true);
 
+        file_put_contents($this->root.'/tools/report/renderer-commit', self::COMMIT."\n");
         $process = $this->runScript('update-renderer', ['--from-dir', $this->root.'/release']);
 
         self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
         self::assertFileEquals($this->root.'/release/report.html', $this->root.'/resources/report/report.html');
         self::assertSame('', $this->log());
+        self::assertFileDoesNotExist($this->root.'/tools/report/renderer-commit', 'a local build pins no commit');
     }
 
     public function testTheCheckPassesAnAttestedRelease(): void
@@ -142,8 +163,20 @@ final class RendererScriptsTest extends TestCase
         $process = $this->runScript('check-vendored', []);
 
         self::assertSame(0, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
-        self::assertStringContainsString('attestation verify resources/report/report.html --repo somework/lockrot-report --signer-workflow somework/lockrot-report/.github/workflows/release.yml --source-ref refs/tags/v1.2.3', $this->log());
-        self::assertStringContainsString('attestation verify resources/report/manifest.json', $this->log());
+        self::assertStringContainsString('attestation verify resources/report/report.html --repo somework/lockrot-report --signer-workflow somework/lockrot-report/.github/workflows/release.yml --source-ref refs/tags/v1.2.3 --source-digest '.self::COMMIT, $this->log());
+        self::assertStringContainsString('attestation verify resources/report/manifest.json --repo somework/lockrot-report --signer-workflow somework/lockrot-report/.github/workflows/release.yml --source-ref refs/tags/v1.2.3 --source-digest '.self::COMMIT, $this->log());
+    }
+
+    public function testTheCheckRefusesAReleaseWithNoPinnedCommit(): void
+    {
+        $this->vendored('1.2.3');
+        unlink($this->root.'/tools/report/renderer-commit');
+
+        $process = $this->runScript('check-vendored', []);
+
+        self::assertSame(1, $process->getExitCode());
+        self::assertStringContainsString('tools/report/renderer-commit names no commit', $process->getOutput());
+        self::assertSame('', $this->log());
     }
 
     public function testTheCheckRefusesAPreRelease(): void
@@ -179,6 +212,7 @@ final class RendererScriptsTest extends TestCase
         mkdir($this->root.'/resources/report', 0777, true);
         file_put_contents($this->root.'/resources/report/report.html', '<!doctype html>');
         file_put_contents($this->root.'/resources/report/manifest.json', (string) json_encode(['version' => $version]));
+        file_put_contents($this->root.'/tools/report/renderer-commit', self::COMMIT."\n");
     }
 
     /**
@@ -191,6 +225,7 @@ final class RendererScriptsTest extends TestCase
             'PATH' => $this->root.'/bin:'.\dirname(\PHP_BINARY).':'.(string) getenv('PATH'),
             'FAKE_LOG' => $this->root.'/gh.log',
             'FAKE_RELEASE' => $this->root.'/release',
+            'FAKE_DIGEST' => self::COMMIT,
         ]);
         $process->setTimeout(60)->run();
 

@@ -37,7 +37,7 @@ final class MarkdownFormatter implements FormatterInterface
         $gate = $this->context->gateOf($report);
         $head = [$this->heading($report), '', self::gateLine(RunGateText::parts($gate, $this->context->runOf($report)))];
         $rows = [];
-        foreach ($this->context->recordFindings($report, $showAll) as $finding) {
+        foreach ($showAll ? $report->sorted() : $report->graded() as $finding) {
             $rows[] = $this->row($finding, $report, $gate);
         }
         $footer = $this->footer($report);
@@ -235,12 +235,13 @@ final class MarkdownFormatter implements FormatterInterface
     /**
      * A code span. Backslash escapes do not apply inside one, so the delimiter is one backtick
      * longer than the longest run inside, as CommonMark requires. `|` is still escaped: GitHub's
-     * table parser reads it before the code span.
+     * table parser reads it before the code span. `##[` prints as `##\x5B`, as in the github format,
+     * because a job log that shows the comment reads it as a runner command.
      */
     private static function code(string $value): string
     {
         $value = TerminalText::neutralise(str_replace(["\r\n", "\r", "\n"], ' ', $value));
-        $value = str_replace('|', '\\|', $value);
+        $value = str_replace(['|', '##['], ['\\|', '##\\x5B'], $value);
         $longest = 0;
         preg_match_all('/`+/', $value, $runs);
         foreach ($runs[0] as $run) {

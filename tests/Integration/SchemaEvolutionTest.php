@@ -33,7 +33,15 @@ final class SchemaEvolutionTest extends TestCase
     private const CHANGELOG = __DIR__.'/../../CHANGELOG.md';
 
     /** Every recorded version. A version is added, never re-recorded and never dropped. */
-    private const RECORDED = ['0.9.0', '0.10.0', '0.11.0'];
+    private const RECORDED = ['0.9.0', '0.10.0', '0.11.0', '0.13.0'];
+
+    /**
+     * The newest release whose schemas changed, from its release pull request until its recording
+     * (CONTRIBUTING, "Recording a release"): the PHAR exists only after the tag.
+     *
+     * @var list<string>
+     */
+    private const RECORDING_PENDING = [];
 
     /**
      * The sha256 of each recording's provenance.json, which holds the sha256 of every document next
@@ -43,6 +51,7 @@ final class SchemaEvolutionTest extends TestCase
         '0.9.0' => '48b1b381222c097ec6ceef678eb07a999d63e0e0f3d2fbe400ea1f70d13b9ba1',
         '0.10.0' => '083f3bf484d352e1a9b2d006bbc73833447a7d71b45dd301bbbf886456197073',
         '0.11.0' => '965555027bece3c8a9352093f423d5876a1e5cca8966544f7ec9fc474c82f595',
+        '0.13.0' => '5bd042161e522874505b5bc92446d01de14822386f19312d18262ddf9d91d402',
     ];
 
     /** The digest GitHub lists for each release's lockrot.phar asset (`gh release view v<version> --json assets`). */
@@ -50,6 +59,7 @@ final class SchemaEvolutionTest extends TestCase
         '0.9.0' => '9c334523667627810a04d5903aec683124d2df98421d5b7ab100d40749cb8c1c',
         '0.10.0' => 'e0f7e783a1344fec6f43340f4f0712031facf7e064a4a3cec3ace98e82eb3d45',
         '0.11.0' => 'd8196dbe5b5dbe4aa8cb626f5b135e3cb0ccd8d6989b587b8fe05eee8ceb301a',
+        '0.13.0' => '935883f2d2f52ce0f801f9ede846ee5eb42565aa5fd57b47137a82db8c611b1f',
     ];
 
     /** The signal ids each recorded report carries, and its explanations between them. */
@@ -57,13 +67,14 @@ final class SchemaEvolutionTest extends TestCase
         '0.9.0' => [Signal::S1, Signal::S2, Signal::S3, Signal::S4, Signal::S5, Signal::S6, Signal::S7, Signal::S8, Signal::S9],
         '0.10.0' => [Signal::S1, Signal::S2, Signal::S3, Signal::S4, Signal::S5, Signal::S6, Signal::S7, Signal::S8, Signal::S9],
         '0.11.0' => [Signal::S1, Signal::S2, Signal::S3, Signal::S4, Signal::S5, Signal::S6, Signal::S7, Signal::S8, Signal::S9, Signal::S10],
+        '0.13.0' => [Signal::S1, Signal::S2, Signal::S3, Signal::S4, Signal::S5, Signal::S6, Signal::S7, Signal::S8, Signal::S9, Signal::S10],
     ];
 
     /**
      * Whether the release writes the report's `run` block and each finding's `baseline` standing.
      * The schema keeps both optional, which the recording of a release that writes neither holds it to.
      */
-    private const WRITES_RUN_AND_STANDING = ['0.9.0' => false, '0.10.0' => true, '0.11.0' => true];
+    private const WRITES_RUN_AND_STANDING = ['0.9.0' => false, '0.10.0' => true, '0.11.0' => true, '0.13.0' => true];
 
     /** The baseline file each recording keeps, under the name the report was given for it. */
     private const BASELINE = 'lockrot-schema-evolution-baseline.json';
@@ -227,6 +238,33 @@ final class SchemaEvolutionTest extends TestCase
 
         self::assertSame($released, array_keys(self::RELEASED_SCHEMAS), 'the releases the changelog lists');
         self::assertSame($released, self::entries(self::SCHEMAS, true), 'the releases schemas/ holds');
+    }
+
+    /**
+     * CONTRIBUTING, "Cutting a release": a release whose schemas differ from the previous release's
+     * changes what lockrot writes, so its output is recorded. The first numbered release has no
+     * previous row and is recorded too. Only the newest release can wait for its recording.
+     */
+    public function testEveryReleaseThatChangedItsSchemasIsRecorded(): void
+    {
+        $releases = array_keys(self::RELEASED_SCHEMAS);
+        $previous = null;
+        $missing = [];
+        $changed = [];
+        foreach (self::RELEASED_SCHEMAS as $version => $files) {
+            if ($files !== $previous) {
+                $changed[] = $version;
+            }
+            if ($files !== $previous && !\in_array($version, array_merge(self::RECORDED, self::RECORDING_PENDING), true)) {
+                $missing[] = $version;
+            }
+            $previous = $files;
+        }
+
+        self::assertSame([], $missing, 'run bin/record-schema-evolution for each of these releases');
+        self::assertSame([], array_values(array_diff(self::RECORDING_PENDING, [end($releases)])), 'only the newest release waits for its recording');
+        self::assertSame([], array_values(array_intersect(self::RECORDING_PENDING, self::RECORDED)), 'a recorded release waits for nothing');
+        self::assertSame([], array_values(array_diff(self::RECORDING_PENDING, $changed)), 'a release whose schemas did not change waits for nothing');
     }
 
     /**
