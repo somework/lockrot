@@ -1243,59 +1243,71 @@
                 "text": "8 = capped 8"
             },
             "next_step": {
-                "kind": "update",
+                "kind": "require",
                 "source": "capped",
                 "merged": [],
                 "fix_kind": null,
                 "reason": null,
                 "replacement": null,
                 "quiet_years": null,
-                "to_branch": "4.x",
-                "version": "4.17.0",
-                "newest": "4.17.0",
-                "constraint": null,
+                "to_branch": "5.x",
+                "version": "5.0.0",
+                "newest": "5.0.0",
+                "constraint": "^5.0.0",
                 "latest": null,
                 "php_check": {
-                    "requires": null,
-                    "project_allows": null,
-                    "target_runs": null,
+                    "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                    "project_allows": true,
+                    "target_runs": true,
                     "raise_to": null,
                     "raise_size": null
                 },
-                "crosses_major": false,
+                "crosses_major": true,
                 "held_by": [],
-                "clears": [],
-                "unverified": [
+                "clears": [
                     {
                         "kind": "flag",
                         "id": "capped",
-                        "reason": "no_release_data"
+                        "basis": "admits_newest_php"
                     }
                 ],
+                "unverified": [],
                 "adds": [],
                 "leaves": [],
-                "clears_all": false,
-                "if_applied": null,
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold",
+                        "composer_resolves"
+                    ]
+                },
                 "check": null,
                 "moves_with": [],
-                "composer_moves_because": [],
+                "composer_moves_because": [
+                    "crosses_major"
+                ],
                 "commands": [
                     [
                         "composer",
-                        "update",
-                        "laminas/laminas-code"
+                        "require",
+                        "laminas/laminas-code:^5.0.0"
                     ],
                     [
                         "composer",
                         "why-not",
                         "laminas/laminas-code",
-                        "4.17.0",
+                        "5.0.0",
                         "--locked"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update laminas/laminas-code (gets 4.17.0); not checked: capped"
+                "text": "require laminas/laminas-code ^5.0.0 \u2014 clears capped; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "clear",
@@ -1378,8 +1390,8 @@
                         "stops_at": "8.1",
                         "excludes_target": true,
                         "admits_newest": {
-                            "version": "4.17.0",
-                            "branch": "4.x",
+                            "version": "5.0.0",
+                            "branch": "5.x",
                             "blocking": null
                         }
                     }
@@ -1405,9 +1417,9 @@
                 },
                 "release_unmeasured": null,
                 "branch_release": {
-                    "version": "4.17.0",
-                    "at": "2025-11-01T09:38:14+00:00",
-                    "years": 0.9,
+                    "version": "4.16.0",
+                    "at": "2024-11-20T13:15:13+00:00",
+                    "years": 1.9,
                     "level": null,
                     "dated_by": null
                 },

@@ -22522,7 +22522,6 @@
           "x-known-values": [
             "policy",
             "policy.advisories",
-            "policy.advisories.audit",
             "COMPOSER_POLICY"
           ]
         },

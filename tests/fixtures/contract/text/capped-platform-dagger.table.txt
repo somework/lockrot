@@ -3,7 +3,8 @@
       8 = capped 8
       do: composer update laminas/laminas-code
           (gets 4.17.0) — clears capped
-      capped       requires php \>=7.4, \<8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded
+      capped       requires php \>=7.4, \<8.2: it stops at 8.1, so 8.3, the newest PHP that the lock's platform allows, is
+                   excluded
       age: installed 4.7.1 released 2022-11-21 (3.9 years ago); 4.x last released 4.17.0 2025-11-01 (0.9 years
            ago), its newest release; last push 2026-09-30 (less than three weeks ago)
 

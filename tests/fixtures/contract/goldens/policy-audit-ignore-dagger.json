@@ -1,0 +1,25 @@
+{
+    "score_text": "8 = vulnerable 8 [medium advisory]",
+    "next_step_text": "raise require.php to >=8.1, then require joomla/filter ^3.0.5 — clears the advisory; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high,unchecked · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 2.0.5 released 2024-08-20 (2.1 years ago); 2.x last released 2.0.6 2025-09-30 (1.0 years ago); newest release 3.0.7 2026-09-29 (less than three weeks ago); last push 2026-09-29 (less than three weeks ago)",
+    "explain_age": [
+        "installed  2.0.5     2024-08-20   2.1 years ago",
+        "2.x        2.0.6     2025-09-30   1.0 years ago                 below release-warn-years 3",
+        "newest     3.0.7     2026-09-29   less than three weeks ago     below release-warn-years 3",
+        "last push            2026-09-29   less than three weeks ago     below push-warn-years 3",
+        "libyears 2.1 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer require 'php:>=8.1' --no-update",
+        "composer require 'joomla/filter:^3.0.5'",
+        "composer why-not joomla/filter 3.0.5 --locked"
+    ],
+    "commands_cmd": [
+        "composer require \"php:>=8.1\" --no-update",
+        "composer require \"joomla/filter:^3.0.5\"",
+        "composer why-not joomla/filter 3.0.5 --locked"
+    ]
+}

@@ -84,59 +84,39 @@
             "text": "8 = capped 8"
         },
         "next_step": {
-            "kind": "update",
+            "kind": "no-move",
             "source": "capped",
             "merged": [],
             "fix_kind": null,
-            "reason": null,
+            "reason": "no_release_admits",
             "replacement": null,
             "quiet_years": null,
-            "to_branch": "4.x",
-            "version": "4.17.0",
-            "newest": "4.17.0",
+            "to_branch": null,
+            "version": null,
+            "newest": null,
             "constraint": null,
             "latest": null,
-            "php_check": {
-                "requires": null,
-                "project_allows": null,
-                "target_runs": null,
-                "raise_to": null,
-                "raise_size": null
-            },
-            "crosses_major": false,
+            "php_check": null,
+            "crosses_major": null,
             "held_by": [],
             "clears": [],
-            "unverified": [
+            "unverified": [],
+            "adds": [],
+            "leaves": [
                 {
                     "kind": "flag",
-                    "id": "capped",
-                    "reason": "no_release_data"
+                    "id": "capped"
                 }
             ],
-            "adds": [],
-            "leaves": [],
             "clears_all": false,
             "if_applied": null,
             "check": null,
             "moves_with": [],
             "composer_moves_because": [],
-            "commands": [
-                [
-                    "composer",
-                    "update",
-                    "laminas/laminas-code"
-                ],
-                [
-                    "composer",
-                    "why-not",
-                    "laminas/laminas-code",
-                    "4.17.0",
-                    "--locked"
-                ]
-            ],
+            "commands": [],
             "through": [],
             "also": [],
-            "text": "composer update laminas/laminas-code (gets 4.17.0); not checked: capped"
+            "text": "no move: no release above 4.7.1 admits PHP 8.5"
         },
         "security": {
             "status": "clear",
@@ -218,18 +198,14 @@
                     "requires": ">=7.4, <8.2",
                     "stops_at": "8.1",
                     "excludes_target": true,
-                    "admits_newest": {
-                        "version": "4.17.0",
-                        "branch": "4.x",
-                        "blocking": null
-                    }
+                    "admits_newest": null
                 }
             }
         ],
         "evidence": "capped: requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded",
         "allowlist_reason": null,
         "data_date": "2026-10-01T17:41:20+00:00",
-        "libyears": 2.95,
+        "libyears": 2,
         "age": {
             "installed": {
                 "at": "2022-11-21T01:32:31+00:00",
@@ -238,17 +214,17 @@
             },
             "installed_unmeasured": null,
             "release": {
-                "version": "4.17.0",
-                "at": "2025-11-01T09:38:14+00:00",
-                "years": 0.9,
+                "version": "4.16.0",
+                "at": "2024-11-20T13:15:13+00:00",
+                "years": 1.9,
                 "level": null,
                 "dated_by": null
             },
             "release_unmeasured": null,
             "branch_release": {
-                "version": "4.17.0",
-                "at": "2025-11-01T09:38:14+00:00",
-                "years": 0.9,
+                "version": "4.16.0",
+                "at": "2024-11-20T13:15:13+00:00",
+                "years": 1.9,
                 "level": null,
                 "dated_by": null
             },
@@ -281,10 +257,10 @@
     "metadata": {
         "abandoned": false,
         "replacement": null,
-        "releases_listed": 111,
+        "releases_listed": 110,
         "has_stable_release": true,
-        "last_stable_release": "2025-11-01T09:38:14+00:00",
-        "last_stable_version": "4.17.0",
+        "last_stable_release": "2024-11-20T13:15:13+00:00",
+        "last_stable_version": "4.16.0",
         "last_stable_dated_by": null,
         "installed_release": "2022-11-21T01:32:31+00:00",
         "installed_release_dated_by": null,
@@ -295,23 +271,23 @@
             {
                 "branch": "4.x",
                 "installed": true,
-                "highest": "4.17.0",
-                "highest_released": "2025-11-01T09:38:14+00:00",
+                "highest": "4.16.0",
+                "highest_released": "2024-11-20T13:15:13+00:00",
                 "highest_commit_date": null,
-                "newest_dated": "4.17.0",
-                "newest_dated_released": "2025-11-01T09:38:14+00:00",
+                "newest_dated": "4.16.0",
+                "newest_dated_released": "2024-11-20T13:15:13+00:00",
                 "dated_by": null,
-                "php": null,
-                "highest_php": null,
-                "admits_target_php": null,
-                "admits_project_php": null,
-                "php_blocked_by": null,
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+                "highest_php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+                "admits_target_php": true,
+                "admits_project_php": false,
+                "php_blocked_by": "project",
                 "misses_target_php": null,
-                "misses_project_php": null,
-                "highest_admits_target_php": null,
-                "highest_admits_project_php": null,
-                "highest_misses_project_php": null,
-                "released_years": 0.9,
+                "misses_project_php": "needs_newer",
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": false,
+                "highest_misses_project_php": "needs_newer",
+                "released_years": 1.9,
                 "fixes": null
             },
             {

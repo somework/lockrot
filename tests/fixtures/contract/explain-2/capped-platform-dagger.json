@@ -33,7 +33,7 @@
                     "value": "8.1",
                     "source": null
                 },
-                "summary": "requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded"
+                "summary": "requires php >=7.4, <8.2: it stops at 8.1, so 8.3, the newest PHP that the lock's platform allows, is excluded"
             }
         ],
         "score": {
@@ -220,10 +220,10 @@
             {
                 "id": "S11",
                 "level": "warn",
-                "summary": "php \">=7.4, <8.2\" stops at 8.1; the newest PHP, 8.5, is excluded",
+                "summary": "php \">=7.4, <8.2\" stops at 8.1; 8.3, the newest PHP that the lock's platform allows, is excluded",
                 "data": {
-                    "newest_php": "8.5",
-                    "newest_php_source": "known",
+                    "newest_php": "8.3",
+                    "newest_php_source": "platform_php",
                     "requires": ">=7.4, <8.2",
                     "stops_at": "8.1",
                     "excludes_target": true,
@@ -235,7 +235,7 @@
                 }
             }
         ],
-        "evidence": "capped: requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded",
+        "evidence": "capped: requires php >=7.4, <8.2: it stops at 8.1, so 8.3, the newest PHP that the lock's platform allows, is excluded",
         "allowlist_reason": null,
         "data_date": "2026-10-01T17:41:20+00:00",
         "libyears": 2.95,

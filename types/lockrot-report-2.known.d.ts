@@ -410,7 +410,7 @@ export type RunMoveCheckReason = "unloaded_name" | "offline" | "install_time_bud
 /** closed set at #/definitions/run/properties/php_window/oneOf/0/properties/host_requires/items */
 export type RunPhpWindowHostRequiresItem = "php-debug" | "php-ipv6" | "php-zts";
 /** open set at #/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key */
-export type NoteAdvisoriesDisabledByPolicyPolicyKey = "policy" | "policy.advisories" | "policy.advisories.audit" | "COMPOSER_POLICY" | (string & {});
+export type NoteAdvisoriesDisabledByPolicyPolicyKey = "policy" | "policy.advisories" | "COMPOSER_POLICY" | (string & {});
 /** open set at #/definitions/noteAbandonedNotAuditedByComposer/properties/policy_key */
 export type NoteAbandonedNotAuditedByComposerPolicyKey = "policy" | "policy.abandoned" | "policy.abandoned.audit" | "audit.abandoned" | "COMPOSER_AUDIT_ABANDONED" | "COMPOSER_POLICY" | (string & {});
 /** open set at #/definitions/noteRepositoryActivityHostNotSupported/properties/hosts/items/properties/listed_in/oneOf/0 */

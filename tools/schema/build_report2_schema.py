@@ -1495,7 +1495,7 @@ defs['noteAdvisoriesNotChecked']['description'] = ("`advisories_not_checked` (0.
     "versions and the moves' versions are checked together or not at all.")
 defs['noteAdvisoriesDisabledByPolicy'] = obj(("`advisories_disabled_by_policy` (§5.1, §6.2): Composer's policy stops Composer blocking installs and updates on "
                                                "advisories. It only informs: lockrot still asks and counts every advisory."), {
-    'policy_key': open_set(['policy', 'policy.advisories', 'policy.advisories.audit', 'COMPOSER_POLICY'],
+    'policy_key': open_set(['policy', 'policy.advisories', 'COMPOSER_POLICY'],
                            'The full Composer config key, or the environment variable `COMPOSER_POLICY`. Open.', POLICY_KEY),
     'value': d('Its value as configured (`false`, `"ignore"`, `"0"`).', {'type': ['boolean', 'string']}),
 })

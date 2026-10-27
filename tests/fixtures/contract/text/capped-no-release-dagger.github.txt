@@ -1,4 +1,4 @@
-::warning file=composer.lock,line=20,title=lockrot%3A medium — capped::laminas/laminas-code 4.7.1: 8 = capped 8. Do: composer update laminas/laminas-code (gets 4.17.0); not checked: capped. capped: requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded.
+::warning file=composer.lock,line=20,title=lockrot%3A medium — capped::laminas/laminas-code 4.7.1: 8 = capped 8. Do: no move: no release above 4.7.1 admits PHP 8.5. capped: requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded.
 flags: capped 1
 depth: every flagged package is named in composer.json · direct 1
 php: the lock installs on PHP 7.4 to 8.1, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
