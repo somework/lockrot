@@ -14792,7 +14792,7 @@
         "held_line": "1 of 14 findings that fail the gate is held by other packages. Their holders are in each sheet's Held by.",
         "held_link": "#view=findings&gate=fails%2Cheld",
         "held_link_rows": 1,
-        "way_out": "11 need another way out: 6 find an alternative, 1 raise PHP >=8.4, 1 test, 1 no move, 1 Composer refuses the move, 1 not checked: a package it needs could not be loaded",
+        "way_out": "11 need another way out: 6 find an alternative, 1 raise PHP >=8.4, 1 test, 1 no move, 2 not checked: a package it needs could not be loaded",
         "way_out_link": "#view=findings&gate=fails%2Cwayout",
         "way_out_link_rows": 11,
         "none": null
@@ -15215,10 +15215,10 @@
           "package": "intervention/image",
           "fails_gate": true,
           "reach": "direct",
-          "held": "held by its own release",
-          "command": null,
+          "held": "held by your composer.json",
+          "command": "composer require 'intervention/image:^3.11'",
           "raise_words": null,
-          "after": "after it: 0, ok · Composer refuses the move",
+          "after": "after it: 0, ok · not checked: a package it needs could not be loaded",
           "major": "a new major",
           "blocked": null,
           "ready": false,
@@ -19816,7 +19816,7 @@
         "held_line": "1 of 14 findings that fail the gate is held by other packages. Their holders are in each sheet's Held by.",
         "held_link": "#view=findings&gate=fails%2Cheld",
         "held_link_rows": 1,
-        "way_out": "10 need another way out: 6 find an alternative, 1 raise PHP >=8.4, 1 test, 1 no move, 1 Composer refuses the move",
+        "way_out": "10 need another way out: 6 find an alternative, 1 raise PHP >=8.4, 1 test, 1 no move, 1 not checked: a package it needs could not be loaded",
         "way_out_link": "#view=findings&gate=fails%2Cwayout",
         "way_out_link_rows": 10,
         "none": null
@@ -20239,10 +20239,10 @@
           "package": "intervention/image",
           "fails_gate": true,
           "reach": "direct",
-          "held": "held by its own release",
-          "command": null,
+          "held": "held by your composer.json",
+          "command": "composer require 'intervention/image:^3.11'",
           "raise_words": null,
-          "after": "after it: 0, ok · Composer refuses the move",
+          "after": "after it: 0, ok · not checked: a package it needs could not be loaded",
           "major": "a new major",
           "blocked": null,
           "ready": false,
@@ -20586,18 +20586,12 @@
         ],
         "intervention/image": [
           {
-            "count": 2,
+            "count": 1,
             "shown": [
               {
                 "name": "your composer.json",
                 "grade": null,
                 "meta": "requires ^2.5",
-                "step": null
-              },
-              {
-                "name": "intervention/image 3.11.10, its own release",
-                "grade": null,
-                "meta": "requires intervention/gif ^4.2",
                 "step": null
               }
             ],

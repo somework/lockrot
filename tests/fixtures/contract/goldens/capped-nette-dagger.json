@@ -1,0 +1,23 @@
+{
+    "score_text": "4 = capped 8 ÷ 2 transitive",
+    "next_step_text": "composer update nette/schema (gets v1.3.6) — clears capped",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v1.3.2 released 2024-10-06 (2.0 years ago); 1.x last released v1.3.6 2026-08-16 (0.1 years ago), its newest release; last push 2026-09-10 (0.1 years ago)",
+    "explain_age": [
+        "installed  v1.3.2    2024-10-06   2.0 years ago",
+        "1.x        v1.3.6    2026-08-16   0.1 years ago                 below release-warn-years 3",
+        "newest     v1.3.6    2026-08-16   0.1 years ago                 below release-warn-years 3",
+        "last push            2026-09-10   0.1 years ago                 below push-warn-years 3",
+        "libyears 1.9 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer update nette/schema",
+        "composer why-not nette/schema v1.3.6 --locked"
+    ],
+    "commands_cmd": [
+        "composer update nette/schema",
+        "composer why-not nette/schema v1.3.6 --locked"
+    ]
+}

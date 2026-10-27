@@ -45,6 +45,18 @@ final class ContractBundleIsCurrentTest extends TestCase
         self::assertSame(JsonPath::decoded($recorded['goldens']), JsonPath::arrayAt($provenance, ['model_goldens']));
     }
 
+    /** Every capped case that the model gives inputs for hydrates (R4-17). */
+    public function testTheCappedCasesWithoutInputsAreOnlyTheListedOnes(): void
+    {
+        $withoutInputs = [
+            'capped-unread‡' => 'its fetch failed, so the model has no releases to give',
+        ];
+        $provenance = JsonPath::decodeFile(ContractBundle::DIRECTORY.'/provenance.json');
+        $capped = array_values(array_filter(JsonPath::arrayAt($provenance, ['cases_without_inputs']), static fn ($id): bool => strpos((string) $id, 'capped-') === 0));
+
+        self::assertSame(array_keys($withoutInputs), $capped, 'a capped case without inputs needs a reason here, and a hydrated one leaves the list');
+    }
+
     public function testTheBundleHashIsTheHashOfTheCommittedFiles(): void
     {
         self::assertSame(trim((string) file_get_contents(ContractBundle::DIRECTORY.'/bundle_sha256')), ContractBundle::sha256(ContractBundle::bundleFiles()));

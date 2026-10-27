@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/capped",
+        "description": "moneyphp/money v4.7.1 \u2014 finding medium (8 = capped 8) \u2014 capped: requires php ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded. Do: composer update moneyphp/money (gets v4.9.0) \u2014 clears capped.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "77b99c3b8986e1641684ddb0dddaabc4445047265c0a784d69443598c7a065c8",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 12
+            }
+        }
+    }
+]

@@ -1,0 +1,209 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/capped",
+                            "name": "capped",
+                            "shortDescription": {
+                                "text": "capped: The installed version's php constraint stops below the newest PHP the project allows"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version's php requirement has an upper bound below the newest PHP minor that the project allows."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
+            "results": [
+                {
+                    "ruleId": "lockrot/capped",
+                    "ruleIndex": 0,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "laminas/laminas-code 4.7.1 \u2014 finding medium, 8 = capped 8 \u2014 capped: requires php >=7.4, <8.2: it stops at 8.1, so the newest PHP, 8.5, is excluded. Do: no move runs on the target: 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 and the target php 7.4 does not run it."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "laminas/laminas-code"
+                    },
+                    "properties": {
+                        "package": "laminas/laminas-code",
+                        "version": "4.7.1",
+                        "verdict": "medium",
+                        "priority": "medium",
+                        "lead": "capped",
+                        "score_total": 8,
+                        "score_text": "8 = capped 8",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "capped"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "laminas/laminas-code"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "doctrine/doctrine-migrations-bundle",
+                            "doctrine/migrations",
+                            "laminas/laminas-code",
+                            "symfony/proxy-manager-bridge"
+                        ],
+                        "signal_ids": [
+                            "S11"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2022-11-21T01:32:31+00:00",
+                                "years": 3.9,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "4.17.0",
+                                "at": "2025-11-01T09:38:14+00:00",
+                                "years": 0.9,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "4.17.0",
+                                "at": "2025-11-01T09:38:14+00:00",
+                                "years": 0.9,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-09-30T09:08:30+00:00",
+                                "years": 0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "capped",
+                            "role": "lead",
+                            "weight": 8,
+                            "divisor": 1,
+                            "points": 8,
+                            "contribution": 8
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 20
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 0,
+                    "exitCodeDescription": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 7.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": false,
+                            "tripped_by": [],
+                            "fail_on_applied": true,
+                            "reaching": 0,
+                            "failing": 0,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "standing": {
+                                "known": 0,
+                                "new": 0,
+                                "worsened": 0,
+                                "none": 0
+                            },
+                            "failing_packages": [],
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 0
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 7.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    }
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 0,
+                            "records": 0
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "score_text": "4 = capped 8 ÷ 2 transitive",
+    "next_step_text": "composer update ezyang/htmlpurifier (gets v4.19.1) — clears capped",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v4.17.0 released 2023-11-17 (2.9 years ago); 4.x last released v4.19.1 2026-09-15 (less than three weeks ago), its newest release; last push 2026-09-15 (less than three weeks ago)",
+    "explain_age": [
+        "installed  v4.17.0   2023-11-17   2.9 years ago",
+        "4.x        v4.19.1   2026-09-15   less than three weeks ago     below release-warn-years 3",
+        "newest     v4.19.1   2026-09-15   less than three weeks ago     below release-warn-years 3",
+        "last push            2026-09-15   less than three weeks ago     below push-warn-years 3",
+        "libyears 2.8 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer update ezyang/htmlpurifier",
+        "composer why-not ezyang/htmlpurifier v4.19.1 --locked"
+    ],
+    "commands_cmd": [
+        "composer update ezyang/htmlpurifier",
+        "composer why-not ezyang/htmlpurifier v4.19.1 --locked"
+    ]
+}

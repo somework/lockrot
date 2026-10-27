@@ -1,0 +1,5 @@
+::warning file=composer.lock,line=12,title=lockrot%3A medium — capped::moneyphp/money v4.7.1: 8 = capped 8. Do: composer update moneyphp/money (gets v4.9.0) — clears capped. capped: requires php ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded.
+flags: capped 1
+depth: every flagged package is named in composer.json · direct 1
+php: the lock installs on PHP 8.1 to 8.4; moneyphp/money excludes 8.5
+gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

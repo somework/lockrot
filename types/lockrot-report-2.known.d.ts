@@ -400,7 +400,7 @@ export type RunFailOnSource = "option" | "env" | "config" | "default";
 /** open set at #/definitions/run/properties/mode */
 export type RunMode = "check" | "generate_baseline" | (string & {});
 /** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/blocking_disabled_by/items */
-export type RunMoveCheckBlockingDisabledByItem = "COMPOSER_NO_BLOCKING" | "COMPOSER_NO_SECURITY_BLOCKING";
+export type RunMoveCheckBlockingDisabledByItem = "COMPOSER_NO_BLOCKING" | "COMPOSER_NO_SECURITY_BLOCKING" | "COMPOSER_POLICY" | "COMPOSER_POLICY_ADVISORIES_BLOCK" | "config.policy" | "config.policy.advisories" | "config.policy.advisories.block" | "config.audit.block-insecure";
 /** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/ignores_extensions */
 export type RunMoveCheckIgnoresExtensions = true;
 /** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/baseline */

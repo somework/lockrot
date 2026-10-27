@@ -1,0 +1,17 @@
+{
+    "score_text": "8 = capped 8",
+    "next_step_text": "no move runs on the target: 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 and the target php 7.4 does not run it",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 7.4 (--target-php)",
+    "age_line": "age: installed 4.7.1 released 2022-11-21 (3.9 years ago); 4.x last released 4.17.0 2025-11-01 (0.9 years ago), its newest release; last push 2026-09-30 (less than three weeks ago)",
+    "explain_age": [
+        "installed  4.7.1     2022-11-21   3.9 years ago",
+        "4.x        4.17.0    2025-11-01   0.9 years ago                 below release-warn-years 3",
+        "newest     4.17.0    2025-11-01   0.9 years ago                 below release-warn-years 3",
+        "last push            2026-09-30   less than three weeks ago     below push-warn-years 3",
+        "libyears 3.0 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

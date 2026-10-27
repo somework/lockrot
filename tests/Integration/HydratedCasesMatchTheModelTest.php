@@ -288,9 +288,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'moves' => [
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
-            'held_by' => [
-                [['next_step.held_by[].holder.next_step.check'], self::UNLOADED_HOLDER],
-            ],
         ],
         'require-dev-name‡' => [
             'moves' => [
@@ -349,7 +346,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 
     private const TIE = 'The model removes S5 from the case to make the tie. The installed release requires php >=5.3.3 and is older than the PHP 8.0 release, so lockrot raises S5 (old-promise).';
 
-    private const UNLOADED_HOLDER = 'The hydrated lock lacks a package that the holder\'s own step needs, so lockrot records that step as not checked (`unloaded_name`). The model gives the step no check.';
 
     private const IF_APPLIED = 'The model reads no date of a row\'s release, so old-promise stays unverified (`undated`) and the row\'s score is an upper bound (`at_most`). lockrot dates the release and judges old-promise exactly.';
 
