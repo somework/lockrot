@@ -303,6 +303,36 @@ final class RepositoryVersionsTest extends TestCase
         }
     }
 
+    /** A repository that is not canonical leaves every name out of `namesFound`: its wrapped repository tells whether the `~dev` file is cached. */
+    public function testOfflineAnAdmittedNameWhoseDevFileComposerHasCachedLoadsItsDevVersionsFromANonCanonicalRepository(): void
+    {
+        $server = $this->server(['acme/lib' => ['1.0.0'], 'acme/lib~dev' => ['dev-main']]);
+        $server->start();
+        try {
+            $nonCanonical = static fn (): array => array_map(static fn ($repository): FilterRepository => new FilterRepository($repository, ['canonical' => false]), $server->repositories());
+            (new RepositoryVersions($nonCanonical(), [], false, Deadline::never(), 'dev', []))->versions('acme/lib');
+            putenv('COMPOSER_DISABLE_NETWORK=1');
+            try {
+                $offline = new RepositoryVersions($nonCanonical(), [], true, Deadline::never(), 'dev', []);
+
+                self::assertEqualsCanonicalizing(['1.0.0', 'dev-main'], self::pretty($offline->versions('acme/lib')));
+                self::assertNull($offline->failure('acme/lib'));
+            } finally {
+                putenv('COMPOSER_DISABLE_NETWORK');
+            }
+        } finally {
+            $server->stop();
+        }
+    }
+
+    public function testOfflineAnAdmittedNameThatLoadsAloneLoadsItsDevVersionsFromANonCanonicalRepository(): void
+    {
+        $filtered = new FilterRepository(self::recording(['acme/lib' => ['1.0.0', 'dev-main']], ['acme/bad']), ['canonical' => false]);
+        $versions = new RepositoryVersions([$filtered], [], true, Deadline::never(), 'dev', []);
+
+        self::assertSame([['1.0.0', 'dev-main'], null], [self::pretty($versions->versionsOf(['acme/lib', 'acme/bad'])['acme/lib']), $versions->failure('acme/lib')]);
+    }
+
     public function testOnlineAnAdmittedNameWhoseRepositoryHasNoDevFileLoadsItsTags(): void
     {
         $server = $this->server(['acme/lib' => ['1.0.0']]);
@@ -503,6 +533,26 @@ final class RepositoryVersionsTest extends TestCase
 
         self::assertSame(['acme/lib' => ['1.0.0', '3.0.0'], 'acme/bad' => []], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
         self::assertSame(VersionSource::FAILED, $versions->failure('acme/bad'));
+    }
+
+    /** PoolBuilder asks no later repository for a name that a canonical repository finds, though it finds no version of it. */
+    public function testACanonicalRepositoryThatFindsANameWithNoVersionHidesTheNamesakeOfTheNextRepository(): void
+    {
+        $empty = new class () extends ComposerRepository {
+            public function __construct()
+            {
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                return ['namesFound' => array_keys($packageNameMap), 'packages' => []];
+            }
+        };
+        $together = new RepositoryVersions([$empty, self::repository(['acme/lib' => ['9.0.0']])], [], false, Deadline::never());
+        $alone = new RepositoryVersions([$empty, self::recording(['acme/lib' => ['9.0.0']], ['acme/bad'])], [], false, Deadline::never());
+
+        self::assertSame([[], null], [$together->versions('acme/lib'), $together->failure('acme/lib')]);
+        self::assertSame([[], null], [$alone->versionsOf(['acme/lib', 'acme/bad'])['acme/lib'], $alone->failure('acme/lib')]);
     }
 
     /** A path, VCS or package repository can serve a name that the lock does not hold, and lockrot does not ask it. */

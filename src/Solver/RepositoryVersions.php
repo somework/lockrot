@@ -147,14 +147,14 @@ final class RepositoryVersions implements VersionSource
                 $listed += array_intersect_key($pending, $answered);
                 if ($stabilities === self::DEV) {
                     foreach (array_keys($tagged) as $name) {
-                        $this->failOfflineWithoutDevFile($name, $result);
+                        $this->failOfflineWithoutDevFile($name, $result, $repository);
                     }
                 } else {
                     $tagged = array_filter($listed, fn (string $name): bool => $this->admitsDev($name), \ARRAY_FILTER_USE_KEY);
                 }
             }
             // A repository that is not canonical lists a name without claiming it: the later ones add their versions.
-            $claimed = array_intersect_key($listed, $found);
+            $claimed = array_intersect_key($pending, $found);
             $this->complete += $claimed;
             $pending = array_diff_key($pending, $claimed);
         }
@@ -180,7 +180,7 @@ final class RepositoryVersions implements VersionSource
                 $found = $tags['namesFound'];
                 if ($versions === [] || $this->admitsDev($name)) {
                     $dev = $repository->loadPackages([$name => null], self::DEV, []);
-                    if ($versions !== [] && $this->failOfflineWithoutDevFile($name, $dev)) {
+                    if ($versions !== [] && $this->failOfflineWithoutDevFile($name, $dev, $repository)) {
                         return [];
                     }
                     $versions = array_merge($versions, self::named($dev, $name));
@@ -195,7 +195,7 @@ final class RepositoryVersions implements VersionSource
                 continue;
             }
             $loaded = self::withNewVersions($loaded, $versions);
-            if ($versions !== [] && \in_array($name, $found, true)) {
+            if (\in_array($name, $found, true)) {
                 return $loaded;
             }
         }
@@ -263,13 +263,17 @@ final class RepositoryVersions implements VersionSource
     /**
      * Offline, Composer reads a `~dev` file that its cache lacks as a 404, and its answer leaves the
      * name out of `namesFound`. The tags alone are then no answer, so the name is OFFLINE
-     * (docs/verdicts.md#the-move-check).
+     * (docs/verdicts.md#the-move-check). A repository that is not canonical leaves every name out,
+     * so the repository that it wraps answers.
      *
      * @param array{namesFound: array<string>} $result the dev answer of the repository that lists the name's tags
      */
-    private function failOfflineWithoutDevFile(string $name, array $result): bool
+    private function failOfflineWithoutDevFile(string $name, array $result, RepositoryInterface $repository): bool
     {
         if (!$this->offline || \in_array($name, $result['namesFound'], true)) {
+            return false;
+        }
+        if ($repository instanceof FilterRepository && \in_array($name, $repository->getRepository()->loadPackages([$name => null], self::DEV, [])['namesFound'], true)) {
             return false;
         }
         $this->failures[$name] = self::OFFLINE;
