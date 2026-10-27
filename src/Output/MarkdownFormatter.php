@@ -37,7 +37,7 @@ final class MarkdownFormatter implements FormatterInterface
         $gate = $this->context->gateOf($report);
         $head = [$this->heading($report), '', self::gateLine(RunGateText::parts($gate, $this->context->runOf($report)))];
         $rows = [];
-        foreach ($this->context->recordFindings($report, $showAll) as $finding) {
+        foreach ($showAll ? $report->sorted() : $report->graded() as $finding) {
             $rows[] = $this->row($finding, $report, $gate);
         }
         $footer = $this->footer($report);
