@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| medium | `symfony/monolog-bundle` | v3.5.0 | old-promise | `8 = old-promise 16 ÷ 2 transitive`<br>**Do:** composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); not checked: old-promise; Composer's solver checked it against the lock<br>*old-promise:* released 2019-11-13 for PHP 5 (php "\>=5.6"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested<br>*age:* installed v3.5.0 released 2019-11-13 (6.9 years ago); 3.x last released v3.11.2 2026-04-02 (0.5 years ago); newest release v4.1.0 2026-09-10 (0.1 years ago); last push 2026-09-12 (0.1 years ago) | mautic/core-lib |
+| medium | `symfony/monolog-bundle` | v3.5.0 | old-promise | `8 = old-promise 16 ÷ 2 transitive`<br>**Do:** composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); old-promise stays; Composer's solver checked it against the lock<br>*old-promise:* released 2019-11-13 for PHP 5 (php "\>=5.6"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested<br>*age:* installed v3.5.0 released 2019-11-13 (6.9 years ago); 3.x last released v3.11.2 2026-04-02 (0.5 years ago); newest release v4.1.0 2026-09-10 (0.1 years ago); last push 2026-09-12 (0.1 years ago) | mautic/core-lib |
 
 flags: old-promise 1
 depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: `symfony/monolog-bundle`, 1 hop (`mautic/core-lib` › `symfony/monolog-bundle`)

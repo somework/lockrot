@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "d9f6880ad58808905d31460ef390bf742d4bc41450284b222af746cf24fe047d",
+        "tests/fixtures/flags/cases.json": "d238b23f16cc42e2f38c03114245f94d969ab97f8eb41068cbd9fd34f52f0b4a",
         "tests/fixtures/flags/composite.json": "931aa288bfbfee92d7103d91a1d3c78a9d0d5625dd044f214ca72e1c9c73a6e7",
-        "tests/fixtures/flags/provenance.json": "bdd166cb22afadd665c3d8f2560a3f70fdd84feeb82c13b73d34826242d0c76a"
+        "tests/fixtures/flags/provenance.json": "03c5716ce322e42807a6c4ae501272ea624e90fafdcff0099b4f11f44c3d5e2c"
     },
     "version_mask": {
         "paths": [
@@ -76,7 +76,7 @@
             "commands_cmd": 121,
             "commands_posix": 121,
             "gate_line": 140,
-            "next_step_text": 101,
+            "next_step_text": 102,
             "run_gate_line": 141,
             "score_text": 140
         },
@@ -86,7 +86,7 @@
             "commands_cmd": 20,
             "commands_posix": 20,
             "gate_line": 1,
-            "next_step_text": 40,
+            "next_step_text": 39,
             "score_text": 1
         }
     },

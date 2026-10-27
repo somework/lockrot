@@ -114,15 +114,14 @@
             "crosses_major": false,
             "held_by": [],
             "clears": [],
-            "unverified": [
+            "unverified": [],
+            "adds": [],
+            "leaves": [
                 {
                     "kind": "flag",
-                    "id": "old-promise",
-                    "reason": "undated"
+                    "id": "old-promise"
                 }
             ],
-            "adds": [],
-            "leaves": [],
             "clears_all": false,
             "if_applied": null,
             "check": {
@@ -153,7 +152,7 @@
                 }
             ],
             "also": [],
-            "text": "composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); not checked: old-promise; Composer's solver checked it against the lock"
+            "text": "composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); old-promise stays; Composer's solver checked it against the lock"
         },
         "security": {
             "status": "clear",

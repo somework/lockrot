@@ -1,6 +1,6 @@
 {
     "score_text": "8 = old-promise 16 ÷ 2 transitive",
-    "next_step_text": "composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); not checked: old-promise; Composer's solver checked it against the lock",
+    "next_step_text": "composer update 'symfony/monolog-bundle:^3.11.2' (gets v3.6.0, below the newest v3.11.2); old-promise stays; Composer's solver checked it against the lock",
     "gate_line": null,
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v3.5.0 released 2019-11-13 (6.9 years ago); 3.x last released v3.11.2 2026-04-02 (0.5 years ago); newest release v4.1.0 2026-09-10 (0.1 years ago); last push 2026-09-12 (0.1 years ago)",

@@ -628,8 +628,8 @@ medium (15)
   symfony/monolog-bundle v3.5.0  via mautic/core-lib  ·  old-promise
       8 = old-promise 16 ÷ 2 transitive (baseline: new package)
       do: composer update 'symfony/monolog-bundle:^3.11.2'
-          (gets v3.6.0, below the newest v3.11.2); not
-          checked: old-promise; Composer's solver checked it
+          (gets v3.6.0, below the newest v3.11.2);
+          old-promise stays; Composer's solver checked it
           against the lock
       old-promise  released 2019-11-13 for PHP 5 (php
                    ">=5.6"), before PHP 8 existed (8.0 GA
