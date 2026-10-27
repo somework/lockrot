@@ -361,6 +361,22 @@ final class MoveTest extends TestCase
         self::assertSame('branch_releasing', array_column(JsonPath::arrayAt($move, ['clears']), 'basis', 'id')['left-behind'] ?? null);
     }
 
+    /**
+     * Ruling R2-1: the solve installs 1.5.0, below the newest 1.9.0. 1.5.0 came out before the PHP
+     * 8.0 GA, so old-promise stays, although 1.9.0 came out after it.
+     */
+    public function testAnUpdateThatInstallsBelowTheNewestReadsOldPromiseOnTheInstalledRelease(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse([
+            'releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.5.0', '2020-06-01', '>=7.2'), self::release('1.9.0', '2021-06-01', '>=7.2')],
+            'checks' => ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => [], 'installs' => '1.5.0']],
+        ]), ['next_step']);
+
+        self::assertSame(['update', 'old-promise', '1.5.0'], [$move['kind'], $move['source'], JsonPath::stringAt($move, ['check', 'installs'])]);
+        self::assertNotContains('old-promise', array_column(JsonPath::arrayAt($move, ['clears']), 'id'));
+        self::assertContains('old-promise', array_column(JsonPath::arrayAt($move, ['leaves']), 'id'));
+    }
+
     /** Offline, the move's own versions were never asked about: every rerun says so. */
     public function testAnOfflineMoveAssumesNoNewAdvisories(): void
     {
