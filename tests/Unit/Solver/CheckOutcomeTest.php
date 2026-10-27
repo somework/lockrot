@@ -198,6 +198,27 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([MoveCheck::REFUSED, [$hold], []], [$joined->check()->result(), $joined->holds(), $joined->movesWith()]);
     }
 
+    /** R4-2: the joint solve downgrades h/x from 2.0.0 to 1.9.0, so the step that it gives is no update of h/x. */
+    public function testAJointSolveThatMovesAHolderBelowItsLockedReleaseKeepsTheFirstRefusal(): void
+    {
+        $holds = [new Holder(Holder::PACKAGE, 'h/up', '1.0.0', Holder::REQUIRE, '^1.0'), new Holder(Holder::PACKAGE, 'h/x', '2.0.0', Holder::REQUIRE, '^1')];
+        $outcome = new CheckOutcome(MoveCheck::refused(), $holds);
+        $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['p/kg' => '2.0.0', 'h/up' => '1.1.0', 'h/x' => '1.9.0'], ['p/kg' => '1.0.0', 'h/up' => '1.0.0', 'h/x' => '2.0.0']);
+
+        $joined = $outcome->joinedWith($joint, 'p/kg', '^2.0', ['h/up', 'h/x']);
+
+        self::assertSame([MoveCheck::REFUSED, $holds, []], [$joined->check()->result(), $joined->holds(), $joined->movesWith()]);
+    }
+
+    /** A holder that moves from one dev version to another has no order: only a release below a release is a downgrade. */
+    public function testAJointSolveThatMovesAHolderToAHigherReleaseResolvesTheMove(): void
+    {
+        $outcome = new CheckOutcome(MoveCheck::refused(), [new Holder(Holder::PACKAGE, 'h/x', 'v1.9.0', Holder::REQUIRE, '^1')]);
+        $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['p/kg' => '2.0.0', 'h/x' => 'v1.10.0'], ['p/kg' => '1.0.0', 'h/x' => 'v1.9.0']);
+
+        self::assertSame([['package' => 'h/x', 'installed_version' => 'v1.9.0', 'version' => 'v1.10.0']], $outcome->joinedWith($joint, 'p/kg', '^2.0', ['h/x'])->movesWith());
+    }
+
     /** One holder that the solve moves to a dev version spoils the solve, although another holder moves to a tag. */
     public function testAJointSolveThatMovesOneOfTwoHoldersToADevVersionKeepsTheFirstRefusal(): void
     {

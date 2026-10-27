@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
+use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\VersionParser;
@@ -66,8 +67,9 @@ final class CheckOutcome
      * changes a holder's release. The move then has no hold and lists each changed holder. A new
      * install of the same tag is no change, but a branch version can move to another commit.
      * A solve that moves a holder from a release to a dev version does not resolve the move: Composer
-     * blocks no advisory of a dev version. A joint refusal gives its own holds. Any other answer
-     * keeps this refusal.
+     * blocks no advisory of a dev version. Nor does a solve that moves a holder below its release: the
+     * step is no update of the holder. A joint refusal gives its own holds. Any other answer keeps
+     * this refusal.
      *
      * @param list<string> $holders
      */
@@ -88,7 +90,7 @@ final class CheckOutcome
             if ($version === null || ($version === $from && VersionParser::parseStability($version) !== 'dev')) {
                 continue;
             }
-            if (VersionParser::parseStability($version) === 'dev' && $from !== null && VersionParser::parseStability($from) !== 'dev') {
+            if ($from !== null && VersionParser::parseStability($from) !== 'dev' && (VersionParser::parseStability($version) === 'dev' || self::below($version, $from))) {
                 return $this;
             }
             $movesWith[] = ['package' => $holder, 'installed_version' => $from, 'version' => $version];
@@ -193,6 +195,17 @@ final class CheckOutcome
         }
 
         return null;
+    }
+
+    /** Whether release $version is below release $than, false when one does not parse. */
+    private static function below(string $version, string $than): bool
+    {
+        $parser = new VersionParser();
+        try {
+            return Comparator::lessThan($parser->normalize($version), $parser->normalize($than));
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
     }
 
     private static function satisfies(string $constraint, string $version): bool
