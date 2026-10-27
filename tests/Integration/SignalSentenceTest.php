@@ -17,6 +17,7 @@ use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
@@ -149,8 +150,11 @@ final class SignalSentenceTest extends TestCase
         if (($d['newest_within_reach'] ?? null) === true) {
             return $sentence;
         }
-        $floor = self::text($d, 'floor_source') === 'project' ? "the project's php " : 'the target PHP ';
-        $sentence .= ', needs php '.self::text($d, 'newest_php').' above '.$floor.self::text($d, 'floor_php');
+        $project = self::text($d, 'floor_source') === 'project';
+        $floor = ($project ? "the project's php " : 'the target PHP ').self::text($d, 'floor_php');
+        $side = $project ? (new PhpFloor(null, self::text($d, 'floor_php')))->missesProject(self::text($d, 'newest_php')) : (new PhpFloor(self::text($d, 'floor_php')))->missesTarget(self::text($d, 'newest_php'));
+        $words = ['stops_before' => ', which stops before '.$floor, 'skips' => ', which skips '.$floor, 'unsatisfiable' => ', which no PHP runs'][$side] ?? ' above '.$floor;
+        $sentence .= ', needs php '.self::text($d, 'newest_php').$words;
         if (($d['reachable_branch'] ?? null) === null) {
             return $sentence.'; no releasing branch within reach';
         }

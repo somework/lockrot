@@ -136,6 +136,30 @@ final class PhpFloor
         return self::side($parsed, $this->projectLowest);
     }
 
+    /**
+     * S8's words for a branch php that $floor (a {@see describe()} text) does not admit, by its
+     * `misses_*` side: only `needs_newer` reads as a PHP above the floor.
+     */
+    public static function missWords(?string $side, string $floor): string
+    {
+        switch ($side) {
+            case self::STOPS_BEFORE:
+                return ', which stops before '.$floor;
+            case self::SKIPS:
+                return ', which skips '.$floor;
+            case self::UNSATISFIABLE:
+                return ', which no PHP runs';
+            default:
+                return ' above '.$floor;
+        }
+    }
+
+    /** {@see missesProject()} for {@see self::PROJECT}, else {@see missesTarget()}. */
+    public function misses(string $kind, ?string $constraint): ?string
+    {
+        return $kind === self::PROJECT ? $this->missesProject($constraint) : $this->missesTarget($constraint);
+    }
+
     public function describe(string $kind): string
     {
         return ($kind === self::PROJECT ? 'the project\'s php ' : 'the target PHP ').(string) $this->php($kind);

@@ -45,6 +45,8 @@ final class FlagSentenceTest extends TestCase
         yield 'a reachable branch below the newest' => [[], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the target's php 8.4; 2.x released 2.9.0 (2026-03-01)"];
         yield 'the project floor holds it' => [['floor_source' => 'project', 'floor_php' => '8.2'], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the project's php 8.2; 2.x released 2.9.0 (2026-03-01)"];
         yield 'no branch within reach' => [['reachable_branch' => null, 'reachable_version' => null, 'reachable_release' => null], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the target's php 8.4; no releasing branch within reach"];
+        yield 'a php that stops before the target' => [['newest_php' => '~8.2.0 || ~8.3.0'], $head."; 3.x released 3.4.1 (2026-06-01), needs php ~8.2.0 || ~8.3.0, which stops before the target's php 8.4; 2.x released 2.9.0 (2026-03-01)"];
+        yield 'a php that skips the project floor' => [['newest_php' => '~7.4.0 || >=8.3', 'floor_source' => 'project', 'floor_php' => '>=8.2'], $head."; 3.x released 3.4.1 (2026-06-01), needs php ~7.4.0 || >=8.3, which skips the project's php >=8.2; 2.x released 2.9.0 (2026-03-01)"];
         yield 'no word on the reach of the newest' => [['newest_within_reach' => null], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the target's php 8.4; 2.x released 2.9.0 (2026-03-01)"];
         yield 'a release dated by the monorepo' => [['newest_within_reach' => true, 'dated_by' => 'acme/monorepo'], 'branch 1.x last released 2019-03-02 (7.5 years ago, dated by acme/monorepo); 3.x released 3.4.1 (2026-06-01)'];
     }

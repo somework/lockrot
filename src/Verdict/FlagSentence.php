@@ -18,6 +18,7 @@ use Lockrot\Signal\Data\NoReleaseData;
 use Lockrot\Signal\Data\OldPromiseData;
 use Lockrot\Signal\Data\PinnedData;
 use Lockrot\Signal\Data\SignalData;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
 
 /**
@@ -163,7 +164,10 @@ final class FlagSentence
         if ($d->newestWithinReach()) {
             return $out.'; '.$newest;
         }
-        $out .= \sprintf("; %s, needs php %s above the %s's php %s", $newest, (string) $d->newestPhp(), $d->floorSource() === 'project' ? 'project' : 'target', (string) $d->floorPhp());
+        $project = $d->floorSource() === PhpFloor::PROJECT;
+        $floor = $project ? new PhpFloor(null, $d->floorPhp()) : new PhpFloor($d->floorPhp());
+        $words = PhpFloor::missWords($floor->misses($project ? PhpFloor::PROJECT : PhpFloor::TARGET, $d->newestPhp()), \sprintf("the %s's php %s", $project ? 'project' : 'target', (string) $d->floorPhp()));
+        $out .= \sprintf('; %s, needs php %s%s', $newest, (string) $d->newestPhp(), $words);
         $reachable = $d->reachable();
         if ($reachable !== null) {
             return $out.\sprintf('; %s released %s (%s)', $reachable->branch(), $reachable->version(), substr($reachable->release(), 0, 10));
