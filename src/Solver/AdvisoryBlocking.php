@@ -85,15 +85,16 @@ final class AdvisoryBlocking
             return self::none();
         }
         $version = ComposerFeatures::version();
-        $disabledBy = array_values(array_filter(ComposerFeatures::blockingVariables($version), static fn (string $name): bool => self::isTrue($name, $version) === true));
         if (class_exists(PolicyConfig::class)) {
-            $policyVariable = self::isTrue(self::POLICY_VARIABLE, $version);
-            $advisoriesVariable = self::isTrue(self::ADVISORIES_VARIABLE, $version);
+            $policyVariable = self::isTrue(self::POLICY_VARIABLE);
+            // PolicyConfig::fromConfig() returns before it reads this variable when `policy` is off.
+            $advisoriesVariable = $config->get('policy') === false ? null : self::isTrue(self::ADVISORIES_VARIABLE);
             try {
                 $policy = PolicyConfig::fromConfig($config);
             } catch (\Throwable $e) {
-                return $disabledBy === [] ? self::everyAdvisory() : self::none($disabledBy);
+                return self::everyAdvisory();
             }
+            $disabledBy = self::noBlocking($version);
             if (!$policy->enabled || !$policy->advisories->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE)) {
                 return self::none(array_merge($disabledBy, self::policySwitch($config, $policyVariable, $advisoriesVariable)));
             }
@@ -103,6 +104,7 @@ final class AdvisoryBlocking
 
             return new self(true, $policy->advisories->getIgnoreListForOperation('block'), $policy->advisories->getIgnoreSeverityForOperation('block'), $policy->abandoned->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE), $policy->abandoned->getFlatIgnoreForOperation('block'));
         }
+        $disabledBy = self::noBlocking($version);
         // Composer 2.10 has no AuditConfig::fromConfig().
         $factory = [AuditConfig::class, 'fromConfig'];
         try {
@@ -188,25 +190,42 @@ final class AdvisoryBlocking
     }
 
     /**
-     * A variable as this Composer reads it: Composer 2.10 and later with Platform::getBoolEnv(),
-     * which refuses a value outside its set, and Composer 2.9 as `(bool) Platform::getEnv()`.
-     * Null when the variable is not set.
+     * The variables of BaseCommand::createPolicyConfig() that turn the blocking off. Each sets its
+     * command option with `(bool) Platform::getEnv()`, so `false` and `off` count. Composer 2.10
+     * also reads each with Platform::getBoolEnv() until one is on.
+     *
+     * @return list<value-of<self::SWITCHES>>
+     *
+     * @throws ConfigException when Composer refuses the value of a variable that it reads
+     */
+    private static function noBlocking(string $version): array
+    {
+        $disabledBy = [];
+        $checked = version_compare($version, '2.10.0-dev', '>=');
+        foreach (ComposerFeatures::blockingVariables($version) as $name) {
+            $checked = $checked && self::isTrue($name) !== true;
+            if (!\in_array(Platform::getEnv($name), [false, '', '0'], true)) {
+                $disabledBy[] = $name;
+            }
+        }
+
+        return $disabledBy;
+    }
+
+    /**
+     * A variable as Composer 2.10 reads it with Platform::getBoolEnv(), which refuses a value
+     * outside its set. Null when the variable is not set or empty.
      *
      * @param non-empty-string $name
      *
      * @throws ConfigException with Composer's words, which name the variable
      */
-    private static function isTrue(string $name, string $version): ?bool
+    private static function isTrue(string $name): ?bool
     {
-        if (version_compare($version, '2.10.0-dev', '<')) {
-            $value = Platform::getEnv($name);
-
-            return $value === false ? null : (bool) $value;
-        }
         try {
             return Platform::getBoolEnv($name);
         } catch (\RuntimeException $e) {
-            throw new ConfigException($e->getMessage(), 0, $e);
+            throw new ConfigException($e->getMessage());
         }
     }
 

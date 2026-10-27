@@ -110,10 +110,13 @@ final class AdvisoryBlockingTest extends TestCase
     }
 
     /**
+     * BaseCommand::initialize() sets the option of each variable with `(bool) Platform::getEnv()`,
+     * and createPolicyConfig() reads that option, so `false` and `off` turn the blocking off too.
+     *
      * @dataProvider falseWordsOfComposer210
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('falseWordsOfComposer210')]
-    public function testOnComposer210AVariableThatGetBoolEnvReadsAsFalseLeavesTheBlockingOn(string $value): void
+    public function testOnComposer210AVariableThatGetBoolEnvReadsAsFalseTurnsTheBlockingOffThroughItsOption(string $value): void
     {
         self::requireComposer210();
         Platform::putEnv('COMPOSER_NO_BLOCKING', $value);
@@ -121,7 +124,7 @@ final class AdvisoryBlockingTest extends TestCase
 
         $blocking = AdvisoryBlocking::fromConfig(self::config([]));
 
-        self::assertSame([true, []], [$blocking->blocks(), $blocking->disabledBy()]);
+        self::assertSame([false, ['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING']], [$blocking->blocks(), $blocking->disabledBy()]);
     }
 
     /** @return iterable<string, array{string}> */
@@ -129,6 +132,42 @@ final class AdvisoryBlockingTest extends TestCase
     {
         yield 'false' => ['false'];
         yield 'off' => ['off'];
+    }
+
+    /** createPolicyConfig() stops at the first variable that getBoolEnv() reads as on, so Composer runs. */
+    public function testOnComposer210ComposerNoBlockingOnLeavesARefusedComposerNoSecurityBlockingUnchecked(): void
+    {
+        self::requireComposer210();
+        Platform::putEnv('COMPOSER_NO_BLOCKING', '1');
+        Platform::putEnv('COMPOSER_NO_SECURITY_BLOCKING', 'yes');
+
+        $blocking = AdvisoryBlocking::fromConfig(self::config([]));
+
+        self::assertSame([false, ['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING']], [$blocking->blocks(), $blocking->disabledBy()]);
+    }
+
+    /** PolicyConfig::fromConfig() returns before it reads COMPOSER_POLICY_ADVISORIES_BLOCK, so Composer runs. */
+    public function testOnComposer210APolicyThatIsOffLeavesARefusedComposerPolicyAdvisoriesBlockUnchecked(): void
+    {
+        self::requireComposer210();
+        Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', 'yes');
+        $config = new Config(false);
+        $config->merge(['config' => ['policy' => false]]);
+
+        self::assertSame(['config.policy'], AdvisoryBlocking::fromConfig($config)->disabledBy());
+    }
+
+    /** createPolicyConfig() reads the policy before the variables, so the update fails on the policy. */
+    public function testOnComposer210APolicyThatComposerRejectsBlocksEveryAdvisoryWhateverTheVariablesSay(): void
+    {
+        self::requireComposer210();
+        Platform::putEnv('COMPOSER_NO_BLOCKING', '1');
+        $config = new Config(false);
+        $config->merge(['config' => ['policy' => ['advisories' => ['ignore-id' => [1]]]]]);
+
+        $blocking = AdvisoryBlocking::fromConfig($config);
+
+        self::assertSame([true, []], [$blocking->blocks(), $blocking->disabledBy()]);
     }
 
     /**
