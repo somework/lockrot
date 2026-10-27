@@ -760,6 +760,13 @@ Limits of the check:
   not a move that lockrot proposes.
 - It offers a package that no Composer repository serves, such as a package from a path or VCS
   repository, at its locked version only.
+- It does not read a vcs repository. When a canonical vcs repository before a Composer repository
+  can serve a name that a solve needs, Composer takes the name from the vcs repository only. Such a
+  move reads `not_checked` with `unloaded_name`.
+- It solves with the root version from `COMPOSER_ROOT_VERSION` when that variable is set, as
+  Composer does. Otherwise the root version is `1.0.0`, where Composer guesses it from the vcs
+  checkout. So a root `replace` or `provide` of `self.version`, or a package that requires the
+  root package, can resolve in lockrot and fail in Composer, or the reverse.
 - With `--offline`, a package that composer.json admits at `dev` needs its `~dev` file in
   Composer's cache. Without that file, the move is not checked (`check.reason` `offline`). From
   these repositories, such a package with tags and no dev version also reads `not_checked` with
