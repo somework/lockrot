@@ -358,7 +358,8 @@ maintainer.
     - Copy every `resources/lockrot-*.schema.json` file to
       `tests/fixtures/schema-evolution/schemas/X.Y.Z/` and pin their sha256 in `RELEASED_SCHEMAS`
       in `SchemaEvolutionTest`. `SchemaEvolutionTest` fails unless the releases that `CHANGELOG.md`
-      lists, the keys of `RELEASED_SCHEMAS` and the directories under `schemas/` match exactly.
+      lists, the keys of `RELEASED_SCHEMAS` and the directories under `schemas/` match exactly. If
+      a schema differs from the previous release's, add the version to `RECORDING_PENDING`.
 
     - Pin the sha256 of each formatter golden in `ChangedGoldensTest::RELEASED`, set
       `RELEASED_AT` to the new version, and empty `CHANGED`. From `FIRST_RELEASE` on,
@@ -415,7 +416,10 @@ maintainer.
     2. When the deploy passes, re-run the failed `phar.yml` job (`gh run rerun <run id> --failed`).
        It then publishes the release and asks lockrot.dev to rebuild.
 7. When the published release changes what lockrot writes (a schema differs from the previous
-   release's), record it and pin the hashes ([Recording a release](#recording-a-release)).
+   release's), record it and pin the hashes ([Recording a release](#recording-a-release)). Then
+   remove the version from `RECORDING_PENDING`. `SchemaEvolutionTest` fails when a release whose
+   schemas changed has no recording, unless it is the newest release and waits in
+   `RECORDING_PENDING`.
 
 ## Related
 
