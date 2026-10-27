@@ -433,6 +433,47 @@ final class SolverCheckerTest extends TestCase
     }
 
     /**
+     * The inline form resolves below the newest release on a pool that lacks a virtual name, which
+     * proves nothing. `-w` frees acme/dep and installs the newest release, which proves the move.
+     */
+    public function testAFormThatALoadStoppedBelowTheNewestReleaseGivesWayToAFormThatInstallsIt(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/impl' => '^1.0'],
+            [
+                ['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/dep' => '^1.0', 'psr/log-implementation' => '^1.0']],
+                ['name' => 'acme/dep', 'version' => '1.0.0'],
+                ['name' => 'acme/impl', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']],
+            ],
+            [
+                'acme/lib' => [
+                    ['version' => '1.0.0', 'require' => ['acme/dep' => '^1.0', 'psr/log-implementation' => '^1.0']],
+                    ['version' => '1.1.0', 'require' => ['acme/dep' => '^1.0', 'psr/log-implementation' => '^1.0']],
+                    ['version' => '1.2.0', 'require' => ['acme/dep' => '^1.1', 'psr/log-implementation' => '^1.0']],
+                ],
+                'acme/dep' => [['version' => '1.0.0'], ['version' => '1.1.0']],
+                'acme/impl' => [['version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]],
+            ],
+            ['psr/log-implementation' => VersionSource::OFFLINE]
+        );
+
+        self::assertSame(['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'installs' => '1.2.0'], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
+    }
+
+    /** No form installs the newest release, and the load stopped the inline form: the move stays not checked. */
+    public function testAFormThatALoadStoppedStaysWhenNoLaterFormResolvesWithoutTheLoad(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/impl' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['psr/log-implementation' => '^1.0']], ['name' => 'acme/impl', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['psr/log-implementation' => '^1.0']], ['version' => '1.1.0', 'require' => ['psr/log-implementation' => '^1.0']], ['version' => '1.2.0', 'require' => ['acme/missing' => '^1.0']]], 'acme/impl' => [['version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]]],
+            ['psr/log-implementation' => VersionSource::OFFLINE]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'offline', 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
+    }
+
+    /**
      * D6: the moved package's own versions did not load, so the solve has no target to refuse.
      *
      * @dataProvider unloadedNames
