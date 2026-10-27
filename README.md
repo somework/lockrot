@@ -185,7 +185,9 @@ On other CI systems, use the PHAR or the Docker image `ghcr.io/somework/lockrot`
   ([Baseline](https://lockrot.dev/baseline/)).
 - **Allowlist:** packages on the built-in allowlist (`psr/*`, `symfony/polyfill-*` and others)
   report as `finished`. Add your own under `extra.lockrot.ignore`, each with a `package` and a
-  `reason` ([The allowlist](https://lockrot.dev/configuration/#the-allowlist)).
+  `reason` ([The allowlist](https://lockrot.dev/configuration/#the-allowlist)). The allowlist
+  accepts maintenance flags only: an allowlisted package with a counted advisory is graded and
+  `vulnerable`, with its maintenance marked as accepted.
 
 ## Configuration
 
@@ -195,7 +197,7 @@ variable, which wins over `composer.json`. The keys that most projects set:
 | `extra.lockrot` key | CLI option | Default | Effect |
 |---|---|---|---|
 | `fail-on` | `--fail-on` | `none` | The values that exit `1`: a grade, a flag, a `vulnerable` value, `unchecked`, or `none` |
-| `target-php` | `--target-php` | `config.platform.php`, else the running PHP | The PHP version that the project runs on: decides `old-promise`, and the newer branch that a `left-behind` finding names |
+| `target-php` | `--target-php` | `config.platform.php`, else the running PHP | The PHP version that the project runs on: decides `old-promise`, the newer branch that a `left-behind` finding names, whether an advisory's fix runs on it (a fix that does not counts double), the PHP of the move check, and whether the lock installs on it |
 | `include-dev` | `--dev` | `false` | Also check `packages-dev` |
 | `format` | `--format` | `table` | Output format |
 | `ignore` | — | `[]` | Project allowlist |

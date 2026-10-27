@@ -85,4 +85,18 @@ final class NotesPageTest extends TestCase
             self::assertStringContainsString('`sets_network_failures`', $section, $code);
         }
     }
+
+    /** The page opens with a lookup table, so a reader who meets any code finds its row. */
+    public function testTheLookupTableHasARowForEveryCode(): void
+    {
+        $page = (string) file_get_contents(self::DOCS.'notes.md');
+        $table = substr($page, 0, (int) strpos($page, "\n## "));
+        preg_match_all('/^\| \[`([a-z_]+)`\]\(#\1\) \|/m', $table, $rows);
+
+        $codes = RunNote::CODES;
+        sort($codes);
+        $listed = $rows[1];
+        sort($listed);
+        self::assertSame($codes, $listed);
+    }
 }
