@@ -10,9 +10,9 @@ use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryRepository;
-use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
@@ -269,10 +269,10 @@ final class MarkdownFormatterTest extends TestCase
         $out = self::formatter()->format($report, true);
 
         self::assertStringContainsString('deepest: `symfony/polyfill-intl-idn`', $out, 'the footer names a package as a span');
-        $advisories = preg_grep('/^advisories: /', explode("\n", $out));
+        $advisories = array_values(array_filter(explode("\n", $out), static fn (string $line): bool => strncmp($line, 'advisories: ', 12) === 0));
         self::assertCount(1, $advisories, $out);
-        self::assertStringContainsString('lookup failed (network error: \\\\x000\\\\x00 \\\\x001\\\\x00 \\\\x000\\\\x00)', (string) reset($advisories));
-        self::assertStringNotContainsString('`', (string) reset($advisories));
+        self::assertStringContainsString('lookup failed (network error: \\\\x000\\\\x00 \\\\x001\\\\x00 \\\\x000\\\\x00)', $advisories[0]);
+        self::assertStringNotContainsString('`', $advisories[0]);
     }
 
     /**

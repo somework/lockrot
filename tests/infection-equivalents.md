@@ -126,7 +126,7 @@ entry in the commit that changes the line.
 - `src/Output/ReportTarget.php` GreaterThan `if (strpos($spec, $known.':') === 0 && \strlen($known) > \strlen($format)) {` — two format names of one length cannot both start a spec before its colon, so `>=` picks the same name.
 - `src/Output/TerminalWidth.php` Coalesce `$width = self::fromEnv($env) ?? self::fromConsoleTerminal($env) ?? self::fromApplication($application) ?? FormatContext::DEFAULT_WIDTH;` — `fromConsoleTerminal()` gives null when `COLUMNS` is set, so the order of the first two steps does not matter.
 - `src/Output/HtmlFormatter.php` UnwrapArrayFilter and UnwrapArrayValues `return \is_array($reads) ? array_values(array_filter($reads, 'is_int')) : [];` — the vendored manifest lists its report numbers as a JSON list of integers, so the filter keeps every item and the keys stay `0..n-1`.
-- `src/Output/SarifFormatter.php` CastString `return (string) preg_replace('{^( {20}"rank": -?\d+)(,?)$}m', '$1.0$2', $json)."\n";` — the pattern is a constant that compiles, so `preg_replace()` returns a string and never null.
+- `src/Output/SarifFormatter.php` CastString `return TerminalText::breakJsonLogCommands((string) preg_replace('{^( {20}"rank": -?\d+)(,?)$}m', '$1.0$2', $json))."\n";` — the pattern is a constant that compiles, so `preg_replace()` returns a string and never null.
 
 ## src/Security
 
