@@ -84,7 +84,7 @@ final class MoveCheckers
             return null;
         }
         $parts = explode('.', $normalized);
-        if (VersionParser::parseStability($normalized) !== 'stable' || \count($parts) < 2) {
+        if (VersionParser::parseStability($normalized) !== 'stable' || !isset($parts[1])) {
             return null;
         }
 

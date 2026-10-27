@@ -295,12 +295,12 @@ final class FixFinderTest extends TestCase
         self::assertSame('1.2.0', $fixes->newestOnInstalledBranch(), 'an update with no hold');
     }
 
-    /** A link that the fix's `held_by` does not hold still lowers `newest`. */
+    /** A link that the fix's `held_by` does not hold still lowers `newest`, and the release 1.2.0 below the fix does not end the search. */
     public function testALinkOutsideTheFixHoldsLowersItsNewest(): void
     {
         $fix = $this->find(
             ['name' => 'a/b', 'version' => '1.0.0'],
-            [['1.0.0', null], ['1.3.0', null], ['1.4.0', null]],
+            [['1.0.0', null], ['1.2.0', null], ['1.3.0', null], ['1.4.0', null]],
             ['A' => '<1.3.0'],
             new PhpFloor('8.4', null),
             [['name' => 'c/c', 'version' => '1.0.0', 'conflict' => ['a/b' => '>=1.3.0']], ['name' => 'd/d', 'version' => '1.0.0', 'conflict' => ['a/b' => '1.4.0']]]
