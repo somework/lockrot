@@ -10,6 +10,7 @@ use Composer\Package\CompletePackage;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\VersionParser;
 use Composer\Util\Platform;
+use Lockrot\Exception\ConfigException;
 use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\ComposerFeatures;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +32,8 @@ final class AdvisoryBlockingTest extends TestCase
     {
         Platform::clearEnv('COMPOSER_NO_BLOCKING');
         Platform::clearEnv('COMPOSER_NO_SECURITY_BLOCKING');
+        Platform::clearEnv('COMPOSER_POLICY_ADVISORIES_BLOCK');
+        Platform::clearEnv('COMPOSER_POLICY');
     }
 
     /**
@@ -104,6 +107,166 @@ final class AdvisoryBlockingTest extends TestCase
     {
         yield 'zero' => ['0'];
         yield 'empty' => [''];
+    }
+
+    /**
+     * @dataProvider falseWordsOfComposer210
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('falseWordsOfComposer210')]
+    public function testOnComposer210AVariableThatGetBoolEnvReadsAsFalseLeavesTheBlockingOn(string $value): void
+    {
+        self::requireComposer210();
+        Platform::putEnv('COMPOSER_NO_BLOCKING', $value);
+        Platform::putEnv('COMPOSER_NO_SECURITY_BLOCKING', $value);
+
+        $blocking = AdvisoryBlocking::fromConfig(self::config([]));
+
+        self::assertSame([true, []], [$blocking->blocks(), $blocking->disabledBy()]);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function falseWordsOfComposer210(): iterable
+    {
+        yield 'false' => ['false'];
+        yield 'off' => ['off'];
+    }
+
+    /**
+     * Composer 2.10 refuses `yes`: `Invalid value for COMPOSER_NO_BLOCKING: yes`. The command that
+     * lockrot prints would fail, so lockrot stops too.
+     *
+     * @dataProvider variablesThatGetBoolEnvReads
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('variablesThatGetBoolEnvReads')]
+    public function testOnComposer210AValueThatComposerRefusesStopsTheRunAndNamesTheVariable(string $name): void
+    {
+        self::requireComposer210();
+        Platform::putEnv($name, 'yes');
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage($name);
+
+        AdvisoryBlocking::fromConfig(self::config([]));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function variablesThatGetBoolEnvReads(): iterable
+    {
+        foreach (['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING', 'COMPOSER_POLICY', 'COMPOSER_POLICY_ADVISORIES_BLOCK'] as $name) {
+            yield $name => [$name];
+        }
+    }
+
+    public function testOnComposer210ComposerPolicyAdvisoriesBlockOffTurnsTheBlockingOffAndIsNamed(): void
+    {
+        self::requireComposer210();
+        Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', '0');
+
+        $blocking = AdvisoryBlocking::fromConfig(self::config([]));
+
+        self::assertSame([false, ['COMPOSER_POLICY_ADVISORIES_BLOCK']], [$blocking->blocks(), $blocking->disabledBy()]);
+        self::assertSame([], self::ranges($blocking, 'high'));
+    }
+
+    /** The variable overrides the config, as PolicyConfig::fromConfig() applies it. */
+    public function testOnComposer210ComposerPolicyAdvisoriesBlockOnKeepsTheBlockingThatTheConfigTurnsOff(): void
+    {
+        self::requireComposer210();
+        Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', '1');
+
+        $blocking = AdvisoryBlocking::fromConfig(self::config(['block-insecure' => false]));
+
+        self::assertSame([true, []], [$blocking->blocks(), $blocking->disabledBy()]);
+    }
+
+    /**
+     * @dataProvider policyKeysThatTurnTheBlockingOff
+     *
+     * @param array<string, mixed>|false $policy the config's `policy`
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('policyKeysThatTurnTheBlockingOff')]
+    public function testOnComposer210APolicyKeyThatTurnsTheBlockingOffIsNamed($policy, string $switch): void
+    {
+        self::requireComposer210();
+        $config = new Config(false);
+        $config->merge(['config' => ['policy' => $policy]]);
+
+        $blocking = AdvisoryBlocking::fromConfig($config);
+
+        self::assertSame([false, [$switch]], [$blocking->blocks(), $blocking->disabledBy()]);
+    }
+
+    /** @return iterable<string, array{mixed, string}> */
+    public static function policyKeysThatTurnTheBlockingOff(): iterable
+    {
+        yield 'policy' => [false, 'config.policy'];
+        yield 'policy.advisories' => [['advisories' => false], 'config.policy.advisories'];
+        yield 'policy.advisories.block' => [['advisories' => ['block' => false]], 'config.policy.advisories.block'];
+    }
+
+    /** `policy.advisories` replaces the legacy `audit`, so its `block-insecure` is not read. */
+    public function testOnComposer210PolicyAdvisoriesOverridesTheAuditBlockInsecureKey(): void
+    {
+        self::requireComposer210();
+        $config = self::config(['block-insecure' => false]);
+        $config->merge(['config' => ['policy' => ['advisories' => ['audit' => 'ignore']]]]);
+
+        $blocking = AdvisoryBlocking::fromConfig($config);
+
+        self::assertSame([true, []], [$blocking->blocks(), $blocking->disabledBy()], '`audit: ignore` is no blocking switch');
+    }
+
+    public function testOnComposer210ComposerPolicyOffTurnsTheBlockingOffAndOverridesThePolicyKey(): void
+    {
+        self::requireComposer210();
+        Platform::putEnv('COMPOSER_POLICY', '0');
+
+        $blocking = AdvisoryBlocking::fromConfig(self::config([]));
+
+        self::assertSame([false, ['COMPOSER_POLICY']], [$blocking->blocks(), $blocking->disabledBy()]);
+    }
+
+    /** A `policy` that is off leaves COMPOSER_POLICY_ADVISORIES_BLOCK unread: PolicyConfig::fromConfig() returns before it. */
+    public function testOnComposer210APolicyThatIsOffIsNamedAlthoughComposerPolicyAdvisoriesBlockIsOn(): void
+    {
+        self::requireComposer210();
+        Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', '1');
+        $config = new Config(false);
+        $config->merge(['config' => ['policy' => false]]);
+
+        self::assertSame(['config.policy'], AdvisoryBlocking::fromConfig($config)->disabledBy());
+    }
+
+    /** COMPOSER_POLICY on turns a `policy` that the config turns off on again. */
+    public function testOnComposer210ComposerPolicyOnKeepsTheBlockingThatThePolicyKeyTurnsOff(): void
+    {
+        self::requireComposer210();
+        Platform::putEnv('COMPOSER_POLICY', 'on');
+        $config = new Config(false);
+        $config->merge(['config' => ['policy' => false]]);
+
+        $blocking = AdvisoryBlocking::fromConfig($config);
+
+        self::assertSame([true, []], [$blocking->blocks(), $blocking->disabledBy()]);
+    }
+
+    public function testTheAuditBlockInsecureKeyIsNamedWhenItTurnsTheBlockingOff(): void
+    {
+        $blocking = AdvisoryBlocking::fromConfig(self::config(['block-insecure' => false]));
+
+        self::assertSame([false, ['config.audit.block-insecure']], [$blocking->blocks(), $blocking->disabledBy()]);
+    }
+
+    /** Each switch that turns the blocking off on its own is named, in the order of AdvisoryBlocking::SWITCHES. */
+    public function testOnComposer210EverySwitchThatTurnsTheBlockingOffIsNamedInTheListOrder(): void
+    {
+        self::requireComposer210();
+        Platform::putEnv('COMPOSER_NO_SECURITY_BLOCKING', '1');
+        Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', 'off');
+
+        self::assertSame(['COMPOSER_NO_SECURITY_BLOCKING', 'COMPOSER_POLICY_ADVISORIES_BLOCK'], AdvisoryBlocking::fromConfig(self::config([]))->disabledBy());
+        Platform::clearEnv('COMPOSER_POLICY_ADVISORIES_BLOCK');
+        self::assertSame(['COMPOSER_NO_SECURITY_BLOCKING', 'config.audit.block-insecure'], AdvisoryBlocking::fromConfig(self::config(['block-insecure' => false]))->disabledBy());
     }
 
     public function testAnAdvisoryThatTheAuditAloneIgnoresIsBlocked(): void
@@ -185,6 +348,13 @@ final class AdvisoryBlockingTest extends TestCase
 
         self::assertFalse(AdvisoryBlocking::fromConfig(self::config(['block-insecure' => false]))->blocksAbandoned($abandoned));
         self::assertFalse(AdvisoryBlocking::everyAdvisory()->blocksAbandoned($abandoned));
+    }
+
+    private static function requireComposer210(): void
+    {
+        if (version_compare(ComposerFeatures::version(), '2.10.0-dev', '<')) {
+            self::markTestSkipped('Composer 2.10 and later read the blocking variables with Platform::getBoolEnv() and read config.policy');
+        }
     }
 
     /** @param array<string, mixed> $audit */

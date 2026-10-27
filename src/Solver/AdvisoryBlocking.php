@@ -13,6 +13,7 @@ use Composer\Policy\ListPolicyConfig;
 use Composer\Policy\PolicyConfig;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Util\Platform;
+use Lockrot\Exception\ConfigException;
 
 /**
  * What Composer 2.9 and later block in an update: the settings of the `block` operation, read
@@ -24,6 +25,14 @@ use Composer\Util\Platform;
  */
 final class AdvisoryBlocking
 {
+    /** Every switch that turns the blocking of advisories off, in the order of `run.move_check.blocking_disabled_by`. */
+    public const SWITCHES = ['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING', self::POLICY_VARIABLE, self::ADVISORIES_VARIABLE, self::POLICY_KEY, self::ADVISORIES_KEY, self::BLOCK_KEY, self::AUDIT_KEY];
+    private const POLICY_VARIABLE = 'COMPOSER_POLICY';
+    private const ADVISORIES_VARIABLE = 'COMPOSER_POLICY_ADVISORIES_BLOCK';
+    private const POLICY_KEY = 'config.policy';
+    private const ADVISORIES_KEY = 'config.policy.advisories';
+    private const BLOCK_KEY = 'config.policy.advisories.block';
+    private const AUDIT_KEY = 'config.audit.block-insecure';
     private bool $blocks;
     /** @var array<int|string, ?string> */
     private array $list;
@@ -32,7 +41,7 @@ final class AdvisoryBlocking
     private bool $abandoned;
     /** @var array<int|string, ?string> */
     private array $abandonedIgnore;
-    /** @var list<string> */
+    /** @var list<value-of<self::SWITCHES>> */
     private array $disabledBy;
 
     /**
@@ -41,7 +50,7 @@ final class AdvisoryBlocking
      * @param array<int|string, ?string> $list            the ignore list for blocking
      * @param array<string, ?string>     $severities      the severities that blocking ignores
      * @param array<int|string, ?string> $abandonedIgnore the abandoned packages that blocking ignores
-     * @param list<string>               $disabledBy      the environment variables that turned the blocking off
+     * @param list<value-of<self::SWITCHES>> $disabledBy the {@see SWITCHES} that turned the blocking off
      */
     private function __construct(bool $blocks, array $list, array $severities, bool $abandoned, array $abandonedIgnore, array $disabledBy = [])
     {
@@ -53,7 +62,7 @@ final class AdvisoryBlocking
         $this->disabledBy = $disabledBy;
     }
 
-    /** @param list<string> $disabledBy */
+    /** @param list<value-of<self::SWITCHES>> $disabledBy */
     private static function none(array $disabledBy = []): self
     {
         return new self(false, [], [], false, [], $disabledBy);
@@ -65,25 +74,31 @@ final class AdvisoryBlocking
         return new self(true, [], [], false, []);
     }
 
-    /** A config that Composer rejects blocks every advisory: the update that it runs fails anyway. */
+    /**
+     * A config that Composer rejects blocks every advisory: the update that it runs fails anyway.
+     *
+     * @throws ConfigException when Composer refuses the value of a variable that turns the blocking off
+     */
     public static function fromConfig(Config $config): self
     {
         if (!ComposerFeatures::blocksAdvisories()) {
             return self::none();
         }
-        // Composer sets the option of each variable on `(bool) Platform::getEnv()`, so `0` and an empty value leave the blocking on.
-        $disabledBy = array_values(array_filter(ComposerFeatures::blockingVariables(ComposerFeatures::version()), static fn (string $name): bool => (bool) Platform::getEnv($name)));
-        if ($disabledBy !== []) {
-            return self::none($disabledBy);
-        }
+        $version = ComposerFeatures::version();
+        $disabledBy = array_values(array_filter(ComposerFeatures::blockingVariables($version), static fn (string $name): bool => self::isTrue($name, $version) === true));
         if (class_exists(PolicyConfig::class)) {
+            $policyVariable = self::isTrue(self::POLICY_VARIABLE, $version);
+            $advisoriesVariable = self::isTrue(self::ADVISORIES_VARIABLE, $version);
             try {
                 $policy = PolicyConfig::fromConfig($config);
             } catch (\Throwable $e) {
-                return self::everyAdvisory();
+                return $disabledBy === [] ? self::everyAdvisory() : self::none($disabledBy);
             }
             if (!$policy->enabled || !$policy->advisories->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE)) {
-                return self::none();
+                return self::none(array_merge($disabledBy, self::policySwitch($config, $policyVariable, $advisoriesVariable)));
+            }
+            if ($disabledBy !== []) {
+                return self::none($disabledBy);
             }
 
             return new self(true, $policy->advisories->getIgnoreListForOperation('block'), $policy->advisories->getIgnoreSeverityForOperation('block'), $policy->abandoned->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE), $policy->abandoned->getFlatIgnoreForOperation('block'));
@@ -93,11 +108,14 @@ final class AdvisoryBlocking
         try {
             $audit = \is_callable($factory) ? $factory($config) : null;
         } catch (\Throwable $e) {
-            return self::everyAdvisory();
+            return $disabledBy === [] ? self::everyAdvisory() : self::none($disabledBy);
         }
         $settings = \is_object($audit) ? get_object_vars($audit) : [];
         if (($settings['blockInsecure'] ?? true) === false) {
-            return self::none();
+            return self::none(array_merge($disabledBy, [self::AUDIT_KEY]));
+        }
+        if ($disabledBy !== []) {
+            return self::none($disabledBy);
         }
         // Composer 2.9.2 and later split each list by operation, 2.9.0 and 2.9.1 block with the whole audit list and no severity.
         if (\array_key_exists('ignoreListForBlocking', $settings)) {
@@ -112,7 +130,7 @@ final class AdvisoryBlocking
         return $this->blocks;
     }
 
-    /** @return list<string> the environment variables that turned the blocking off */
+    /** @return list<value-of<self::SWITCHES>> the switches that turned the blocking off, in the order of {@see SWITCHES} */
     public function disabledBy(): array
     {
         return $this->disabledBy;
@@ -167,6 +185,57 @@ final class AdvisoryBlocking
     {
         // @phpstan-ignore argument.type (the list keeps the shape that this Composer's Auditor reads)
         return $this->abandoned && (new Auditor())->filterAbandonedPackages([$package], $this->abandonedIgnore) !== [];
+    }
+
+    /**
+     * A variable as this Composer reads it: Composer 2.10 and later with Platform::getBoolEnv(),
+     * which refuses a value outside its set, and Composer 2.9 as `(bool) Platform::getEnv()`.
+     * Null when the variable is not set.
+     *
+     * @param non-empty-string $name
+     *
+     * @throws ConfigException with Composer's words, which name the variable
+     */
+    private static function isTrue(string $name, string $version): ?bool
+    {
+        if (version_compare($version, '2.10.0-dev', '<')) {
+            $value = Platform::getEnv($name);
+
+            return $value === false ? null : (bool) $value;
+        }
+        try {
+            return Platform::getBoolEnv($name);
+        } catch (\RuntimeException $e) {
+            throw new ConfigException($e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * The switch that turned the blocking of advisories off, as Composer 2.10 reads them: `policy`
+     * after COMPOSER_POLICY, then `policy.advisories` or the legacy `audit` that it replaces, then
+     * COMPOSER_POLICY_ADVISORIES_BLOCK, which a `policy` that is off leaves unread.
+     *
+     * @return list<value-of<self::SWITCHES>> one switch, none when Composer reads no switch as off
+     */
+    private static function policySwitch(Config $config, ?bool $policyVariable, ?bool $advisoriesVariable): array
+    {
+        if ($config->get('policy') === false) {
+            return [$policyVariable === false ? self::POLICY_VARIABLE : self::POLICY_KEY];
+        }
+        if ($advisoriesVariable !== null) {
+            return $advisoriesVariable ? [] : [self::ADVISORIES_VARIABLE];
+        }
+        $policy = \is_array($config->get('policy')) ? $config->get('policy') : [];
+        $audit = \is_array($config->get('audit')) ? $config->get('audit') : [];
+        if (!isset($policy['advisories']) && $audit !== []) {
+            return ($audit['block-insecure'] ?? true) ? [] : [self::AUDIT_KEY];
+        }
+        $advisories = $policy['advisories'] ?? [];
+        if ($advisories === false) {
+            return [self::ADVISORIES_KEY];
+        }
+
+        return (bool) (\is_array($advisories) ? $advisories['block'] ?? true : true) ? [] : [self::BLOCK_KEY];
     }
 
     /**

@@ -142,6 +142,17 @@ final class RunFooterTest extends TestCase
         self::assertSame('advisories: 0 packages asked, 1 not asked · packagist.org answered (3 on record for 2 packages) · 2 other repositories publish no advisories', RunFooter::advisories(self::report([self::notAsked('a/one')], $coverage)));
     }
 
+    /** The blocking that the config or COMPOSER_POLICY_ADVISORIES_BLOCK turns off reads as off too. */
+    public function testTheMovesLineNamesAConfigKeyOrThePolicyVariableThatTurnedTheBlockingOff(): void
+    {
+        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $byConfig = self::report([])->withMoveChecks(new MoveCheckRun('2.10.3', false, ['config.audit.block-insecure'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
+        $byVariable = self::report([])->withMoveChecks(new MoveCheckRun('2.10.3', false, ['COMPOSER_NO_SECURITY_BLOCKING', 'COMPOSER_POLICY_ADVISORIES_BLOCK'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
+
+        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by config.audit.block-insecure; ext-* requirements not checked', RunFooter::moveCheck($byConfig));
+        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by COMPOSER_NO_SECURITY_BLOCKING and COMPOSER_POLICY_ADVISORIES_BLOCK; ext-* requirements not checked', RunFooter::moveCheck($byVariable));
+    }
+
     public function testTheMovesLineNamesEachVariableThatTurnedTheBlockingOff(): void
     {
         $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
