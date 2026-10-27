@@ -401,7 +401,7 @@ final class PhpWindow implements \JsonSerializable
      */
     private static function lowestPatch(array $links, string $minor): ?int
     {
-        foreach (range(0, MoveCheckers::NEWEST_PATCH) as $patch) {
+        for ($patch = 0; $patch <= MoveCheckers::NEWEST_PATCH; ++$patch) {
             if (self::failing($links, $minor.'.'.$patch) === []) {
                 return $patch;
             }
