@@ -197,7 +197,7 @@ variable, which wins over `composer.json`. The keys that most projects set:
 | `extra.lockrot` key | CLI option | Default | Effect |
 |---|---|---|---|
 | `fail-on` | `--fail-on` | `none` | The values that exit `1`: a grade, a flag, a `vulnerable` value, `unchecked`, or `none` |
-| `target-php` | `--target-php` | `config.platform.php`, else the running PHP | The PHP version that the project runs on: decides `old-promise`, the newer branch that a `left-behind` finding names, whether an advisory's fix runs on it (a fix that does not counts double), the PHP of the move check, and whether the lock installs on it |
+| `target-php` | `--target-php` | `config.platform.php`, else the running PHP | The PHP version that the project runs on. It decides `old-promise`, `left-behind`, the advisory fixes that count double, the move check and the PHP window ([target PHP](https://lockrot.dev/configuration/#extralockrot-keys)) |
 | `include-dev` | `--dev` | `false` | Also check `packages-dev` |
 | `format` | `--format` | `table` | Output format |
 | `ignore` | — | `[]` | Project allowlist |

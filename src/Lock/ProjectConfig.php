@@ -152,10 +152,10 @@ final class ProjectConfig
                 unset($schemaInput['fail-on']);
             }
         }
-        $rows = $lockrotExtra['ignore'] ?? null;
+        $rows = \is_array($lockrotExtra['ignore'] ?? null) ? $lockrotExtra['ignore'] : [];
         foreach (ProjectIgnoreList::flagRefusals($rows) as $index => $e) {
             $refusals[] = $e;
-            if (\is_array($rows) && \is_array($rows[$index])) {
+            if (\is_array($rows[$index])) {
                 unset($rows[$index]['flags']);
                 $schemaInput['ignore'] = $rows;
             }
@@ -175,10 +175,6 @@ final class ProjectConfig
     /** @param non-empty-list<ConfigException> $refusals */
     private static function joined(array $refusals): ConfigException
     {
-        if (\count($refusals) === 1) {
-            return $refusals[0];
-        }
-
         return ConfigException::withDetails(
             implode("\n", array_map(static fn (ConfigException $e): string => $e->getMessage(), $refusals)),
             array_merge(...array_map(static fn (ConfigException $e): array => $e->details(), $refusals))

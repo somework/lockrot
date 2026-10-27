@@ -40,7 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** **Install-time:** with `install-time-strict` and `fail-on: unchecked`, an advisory
   gap stops the install: `no_feed`, `lookup_failed`, an exhausted budget, and every changing install
   on Composer 2.2 and 2.3 (`composer_too_old`, which `accept-unchecked` cannot accept). Action:
-  remove `unchecked` from that `fail-on`, or upgrade Composer to 2.4 or later.
+  remove `unchecked` from that `fail-on`, or accept a `no_feed` gap in `accept-unchecked`. On
+  Composer 2.2 and 2.3, upgrade Composer to 2.4 or later.
   ([`install-time-strict`](docs/install-time.md#install-time-strict))
 - **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
   `require.php` stops below the newest PHP minor that the root php allows. It decides at once, and
@@ -98,7 +99,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   lock cannot clear your screen, write your clipboard, plant a link in your terminal or hide text.
   A line of the github or table format, of `--explain`, of the install-time summary or of the
   error output on stderr cannot start a `::` workflow command or hold a `##[` command. Neither can
-  json, sarif, gitlab or the `--explain` JSON, which write `##[` as `#\u0023[`, the same decoded text.
+  json, sarif, gitlab, the report in the html page or the `--explain` JSON, which write `##[` as
+  `#\u0023[`, the same decoded text.
   ([What lockrot does](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **markdown:** text from the lock cannot mention a user or a team, or link a bare URL or an email
   address, in a pull request comment or a job summary. It cannot render as math or as an emoji, or
@@ -219,7 +221,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Upgrading to 0.14](docs/changes/0.14.md#how-014-reaches-you))
 - **Breaking:** **Config:** an `ignore[].flags`, `accept-unchecked` or `advisory-lookup` value that
   0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2. One
-  run names every refused value. Action: give the key a valid value, or drop it.
+  run names each refusal of `fail-on` and `ignore[].flags`, and each schema error. Action: give
+  the key a valid value, or drop it.
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
   with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.

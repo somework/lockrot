@@ -113,8 +113,9 @@ line instead ([install-time.md](install-time.md#never-fails-the-install)).
   ([`config-2.json`](https://lockrot.dev/schema/config-2.json), see [schema.md](schema.md)).
   Integer keys take JSON integers: `3`, not `"3"`.
 - `format` accepts only the values its [key row](#extralockrot-keys) lists.
-- One run names every refused value of `extra.lockrot`. lockrot's own messages for `fail-on` and
-  `ignore[].flags` come first, then the schema errors of the other keys.
+- One run names each refusal of `fail-on` and of `ignore[].flags` first. Then it names each schema
+  error of the values that those checks did not refuse. A check of an `ignore[]` entry after the
+  schema, such as a date in `expires` that does not exist, stops at the first refusal.
 - An empty `--fail-on=` or `--baseline=` is an error, never a fall-back to the next source.
 
 ### Unknown keys
