@@ -85,6 +85,7 @@ final class RealReportsValidateTest extends TestCase
         copy(self::FIXTURES.$fixture.'/composer.json', $project.'/composer.json');
         copy(self::FIXTURES.$fixture.'/composer.lock', $project.'/composer.lock');
 
+        // The live repositories hold releases after the suite's fixed date, so the run reads the real clock, as the real reports did.
         $env = ['COMPOSER_HOME' => $home, 'COMPOSER_CACHE_DIR' => $home.'/cache', 'TMPDIR' => $tmp, 'LOCKROT_TODAY' => false];
         $process = new Process(array_merge([\PHP_BINARY, self::ENTRY, '-d', $project], $arguments), null, $env);
         $process->setTimeout(900)->run();
