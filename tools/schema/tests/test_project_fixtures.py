@@ -44,6 +44,23 @@ class AWorldGivesThePackagesReleases(unittest.TestCase):
         self.assertEqual([{'version': 'v6.4.39', 'time': None, 'php': None}] + self.PROJECTED, releases)
 
 
+class TheRunInputsGiveThePackagesReleases(unittest.TestCase):
+    PROJECTED = [{'version': 'v3.11.2', 'time': None, 'php': '>=8.1'}, {'version': 'v3.6.0', 'time': None, 'php': '>=8.1'}]
+
+    def test_a_release_takes_the_php_and_the_time_that_the_run_inputs_give_it(self):
+        given = [{'version': 'v3.6.0', 'time': '2020-10-06T15:12:11+00:00', 'php': '>=7.1.3'}]
+
+        releases = project_fixtures.run_releases(given, self.PROJECTED)
+
+        self.assertEqual({'version': 'v3.6.0', 'time': '2020-10-06T15:12:11+00:00', 'php': '>=7.1.3'}, releases[1])
+        self.assertEqual(self.PROJECTED[0], releases[0])
+
+    def test_a_release_that_only_the_run_inputs_hold_joins(self):
+        given = [{'version': 'v3.5.1', 'time': '2020-01-01T00:00:00+00:00', 'php': '>=7.1.3'}]
+
+        self.assertIn({'version': 'v3.5.1', 'time': '2020-01-01T00:00:00+00:00', 'php': '>=7.1.3'}, project_fixtures.run_releases(given, self.PROJECTED))
+
+
 class TheMoveCheckNamesThePhpOfTheSolve(unittest.TestCase):
     RUN = {'composer': '2.10.3', 'baseline': 'refused', 'reason': None}
 

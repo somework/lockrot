@@ -536,6 +536,8 @@ def inputs_of(case):
             inputs['releases'] = world_releases(own, inputs['releases'])
         if world['check_passes'] is not None:
             inputs['check_passes'] = world['check_passes']
+    if run_inputs.get('_releases') and inputs.get('releases') is not None:
+        inputs['releases'] = run_releases(run_inputs['_releases'], inputs['releases'])
     if checks:
         inputs['checks'] = checks
         inputs['move_check'] = move_check_of(run['move_check'], world, run.get('php_window'))
@@ -564,9 +566,15 @@ def lock_links(lock, links):
 def world_releases(world, releases):
     """The package's releases, with the php and the time that the solver's world gives each one: the finding names only the
     releases that its rows and fixes read, and a fix's release there takes its row's php."""
+    return run_releases([{'version': w['version'], 'time': w.get('time'), 'php': (w.get('require') or {}).get('php')} for w in world], releases)
+
+
+def run_releases(given, releases):
+    """The package's releases, with the time and the php that each `{version, time, php}` of $given sets. A version that
+    the projection lacks joins it. The run inputs' `_releases` use this form."""
     by_version = {r['version']: r for r in releases}
-    for w in world:
-        by_version[w['version']] = dict(by_version.get(w['version'], {}), version=w['version'], time=w.get('time'), php=(w.get('require') or {}).get('php'))
+    for g in given:
+        by_version[g['version']] = dict(by_version.get(g['version'], {}), version=g['version'], time=g.get('time'), php=g.get('php'))
     return sorted(by_version.values(), key=lambda r: r['version'])
 
 
