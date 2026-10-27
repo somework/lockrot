@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Analyzer;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Output\RunFooter;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingRelations;
 use Lockrot\Tests\Support\JsonPath;
@@ -34,6 +35,22 @@ final class UpdateNowTest extends TestCase
         self::assertSame([self::PACKAGE], JsonPath::arrayAt($document, ['security', 'update_now']));
         self::assertSame(['composer', 'update', self::PACKAGE.':^2.3.2'], JsonPath::arrayAt($document, ['security', 'update_now_command']));
         self::assertSame([], FindingRelations::violations($document), 'the root recount agrees');
+    }
+
+    /** Ruling R5-5: the branch top v2.3.5 needs php >=8.2 and require.php is ^8.1, so the line raises php first, as the member's own move does. */
+    public function testTheUpdateNowLineCarriesTheRaiseThatAMembersMoveNeeds(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]];
+        $inputs['releases'] = array_merge(JsonPath::arrayAt($inputs, ['releases']), [['version' => 'v2.3.5', 'time' => '2026-07-01T00:00:00+00:00', 'php' => '>=8.2']]);
+        $case['inputs'] = $inputs;
+        $report = CaseHydrator::report($case);
+        $move = JsonPath::arrayAt(self::finding(JsonPath::decoded($report->toArray()), self::PACKAGE), ['next_step']);
+
+        self::assertSame([['composer', 'require', 'php:>=8.2', '--no-update'], ['composer', 'update', self::PACKAGE.':^2.3.2']], $move['commands'], 'the member\'s own move');
+        self::assertSame('raise require.php to >=8.2, then ', RunFooter::platformStep($report));
+        self::assertSame(['composer', 'update', self::PACKAGE.':^2.3.2'], $report->updateNowCommand());
     }
 
     public function testACombinedUpdateThatIsNotCheckedHasNoMembersAndANoteSaysWhy(): void

@@ -26,16 +26,18 @@ final class UpdateNow
     /** @var list<string>|null */
     private ?array $command;
     private ?RunNote $note;
+    private ?string $raiseTo;
 
     /**
      * @param list<string>      $members
      * @param list<string>|null $command
      */
-    private function __construct(array $members, ?array $command, ?RunNote $note)
+    private function __construct(array $members, ?array $command, ?RunNote $note, ?string $raiseTo = null)
     {
         $this->members = $members;
         $this->command = $command;
         $this->note = $note;
+        $this->raiseTo = $raiseTo;
     }
 
     /** @param list<Finding> $findings in report order */
@@ -87,7 +89,35 @@ final class UpdateNow
     {
         $argv = self::argv($inline, $checks, $findings);
 
-        return new self($argv === null ? [] : array_keys($inline), $argv, $note);
+        return new self($argv === null ? [] : array_keys($inline), $argv, $note, $argv === null ? null : self::raiseOf($inline, $findings));
+    }
+
+    /**
+     * The highest `raise_to` of the members' moves: each move raises require.php before its own
+     * update (ruling R5-5), so the combined update needs the highest one.
+     *
+     * @param array<string, string> $inline
+     * @param list<Finding>         $findings
+     */
+    private static function raiseOf(array $inline, array $findings): ?string
+    {
+        $raise = null;
+        foreach ($findings as $finding) {
+            $move = isset($inline[$finding->package()]) ? $finding->nextStep() : null;
+            $check = $move === null ? null : $move->phpCheck();
+            $to = $check === null ? null : $check->raiseTo();
+            if ($to !== null && ($raise === null || version_compare(substr($to, 2), substr($raise, 2), '>'))) {
+                $raise = $to;
+            }
+        }
+
+        return $raise;
+    }
+
+    /** The `>=` constraint that require.php needs before the command, null when it needs none. */
+    public function raiseTo(): ?string
+    {
+        return $this->raiseTo;
     }
 
     /** @return list<string> */
