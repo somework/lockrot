@@ -101,6 +101,15 @@ final class TerminalText
         return (string) preg_replace('/^('.self::SPACE_SEPARATOR.'*):(?=:)/m', '$1\x3A', str_replace('##[', '##\x5B', $text));
     }
 
+    /**
+     * {@see self::breakLogCommands()} for a JSON document: `#\u0023[` decodes to the same `##[`. A
+     * line of the pretty print starts with a space or a bracket, so `::` never leads one.
+     */
+    public static function breakJsonLogCommands(string $json): string
+    {
+        return str_replace('##[', '#\u0023[', $json);
+    }
+
     public static function warning(string $line, bool $decorated): string
     {
         return $decorated ? (new OutputFormatterStyle('black', 'yellow'))->apply($line) : $line;

@@ -67,6 +67,18 @@ final class ExplainFormatterTest extends TestCase
         return new Explanation($finding, F::facts(F::package(['version' => $finding->version()]), F::metadata([[$finding->version(), '2020-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', self::report(['run note']));
     }
 
+    /** A CI runner reads `##[` anywhere in a line as a workflow command. */
+    public function testExplainJsonWritesNoWorkflowCommandAndDecodesToTheLockText(): void
+    {
+        $out = (new ExplainFormatter())->json(self::explain((new FindingBuilder())->withVersion('dev-##[add-mask]x')->build()));
+
+        self::assertStringNotContainsString('##[', $out);
+        $json = json_decode($out, true);
+        self::assertIsArray($json);
+        self::assertIsArray($json['finding']);
+        self::assertSame('dev-##[add-mask]x', $json['finding']['version']);
+    }
+
     public function testTheMonologBridgeCaseReadsEveryBlockInOrder(): void
     {
         $text = self::plain(self::caseExplanation('B'));
