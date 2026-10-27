@@ -994,6 +994,7 @@ final class LockrotCommandTest extends TestCase
         chdir($project);
         $loader = $this->emptyLoader();
         $command = $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer => self::withChecks(self::testAnalyzer($loader, $lockrot, $clock), $checks));
+        $previous = getenv('COMPOSER_NO_BLOCKING');
         Platform::putEnv('COMPOSER_NO_BLOCKING', 'yes');
         try {
             $this->withComposerEnv($this->tempDir('lockrot-blocking-variable-cache-'), $this->tempDir('lockrot-blocking-variable-home-'), function () use ($command): void {
@@ -1004,7 +1005,11 @@ final class LockrotCommandTest extends TestCase
                 self::assertStringContainsString('COMPOSER_NO_BLOCKING', $stderr);
             });
         } finally {
-            Platform::clearEnv('COMPOSER_NO_BLOCKING');
+            if ($previous === false) {
+                Platform::clearEnv('COMPOSER_NO_BLOCKING');
+            } else {
+                Platform::putEnv('COMPOSER_NO_BLOCKING', $previous);
+            }
         }
     }
 

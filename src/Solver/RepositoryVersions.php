@@ -208,7 +208,7 @@ final class RepositoryVersions implements VersionSource
 
     /**
      * Why lockrot has no versions of names that no Composer repository lists: offline, Composer's
-     * cache may lack the answer. Online, a path, VCS or package repository of the project can serve them.
+     * cache can lack the answer. Online, a path, VCS or package repository of the project can serve them.
      *
      * @param list<string> $names
      */

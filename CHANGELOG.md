@@ -110,14 +110,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **JSON:** `run.move_check.blocking_disabled_by` lists each switch that turns off the advisory
-  blocking of the solving Composer. The switches are `COMPOSER_NO_BLOCKING`,
-  `COMPOSER_NO_SECURITY_BLOCKING`, `COMPOSER_POLICY`, `COMPOSER_POLICY_ADVISORIES_BLOCK`,
-  `config.policy`, `config.policy.advisories`, `config.policy.advisories.block` and
-  `config.audit.block-insecure`. The move check then blocks no advisory, as Composer's update does.
-  A value of one of the four variables that Composer refuses stops the run with exit code 2.
-  `policy.advisories.audit: ignore` is not a switch, and alone it writes no run note
-  `advisories_disabled_by_policy`, because Composer does not read it.
+- **JSON:** `run.move_check.blocking_disabled_by` lists each environment variable and
+  composer.json key that turns Composer's advisory blocking off. The move check then blocks no
+  advisory. A variable value that Composer refuses stops the run with exit code 2.
+  `policy.advisories.audit: ignore` alone writes no run note `advisories_disabled_by_policy`.
   ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** Composer's solver checks each move against the lock, and the move
   writes `check` with the release it `installs`. A refused move asks once more with its holders, and

@@ -210,7 +210,7 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([MoveCheck::REFUSED, $holds, []], [$joined->check()->result(), $joined->holds(), $joined->movesWith()]);
     }
 
-    /** A holder that moves from one dev version to another has no order: only a release below a release is a downgrade. */
+    /** The downgrade test orders versions by number: v1.10.0 is above v1.9.0, although a string order puts it below. */
     public function testAJointSolveThatMovesAHolderToAHigherReleaseResolvesTheMove(): void
     {
         $outcome = new CheckOutcome(MoveCheck::refused(), [new Holder(Holder::PACKAGE, 'h/x', 'v1.9.0', Holder::REQUIRE, '^1')]);

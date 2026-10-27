@@ -429,9 +429,10 @@ def rows_of(details):
 
 
 def inputs_of(case):
-    """What a hydrator feeds the Analyzer to rebuild the case: null when the case carries no branch rows and no
-    `run_inputs._releases` and lockrot reads its releases, or when it needs a run input that the hydrator does not take
-    (see unhydrated()).
+    """What a hydrator feeds the Analyzer to rebuild the case, or null.
+
+    It is null when lockrot reads the case's releases and the case carries no branch rows and no `run_inputs._releases`.
+    It is also null when the case needs a run input that the hydrator does not take (see unhydrated()).
 
     The lock links the case's chain and its other direct dependents to the package, and holds every holder that a fix, a
     move or a branch row names. `dependents` holds the `require` names of each direct dependent that C08 measured, and

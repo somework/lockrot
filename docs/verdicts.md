@@ -785,9 +785,10 @@ Limits of the check:
     switch that Composer reads later turns the blocking on again. Composer 2.9.0 and 2.9.1 read only
     `config.audit.block-insecure`, and later 2.9 releases also read `COMPOSER_NO_SECURITY_BLOCKING`.
     Composer 2.10 and later read every switch. They read `config.audit.block-insecure` only when
-    `config.policy.advisories` is not set. `policy.advisories.audit` is not a switch. When Composer
-    refuses the value of one of the variables, such as `COMPOSER_NO_BLOCKING=maybe`, lockrot stops
-    with exit code 2 and prints Composer's message.
+    `config.policy.advisories` is not set. `policy.advisories.audit` is not a switch.
+
+    When Composer refuses the value of one of the variables, such as `COMPOSER_NO_BLOCKING=maybe`,
+    lockrot stops with exit code 2 and prints Composer's message.
 
 - When a package that a resolving solve asks for could not be loaded, the solve can resolve at a
   lower release than Composer installs. The move is then not checked, with the load reason
