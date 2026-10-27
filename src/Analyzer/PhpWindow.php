@@ -325,7 +325,7 @@ final class PhpWindow implements \JsonSerializable
     {
         $point = static fn (string $minor): string => $minor === $target ? $targetPoint : $minor.'.'.MoveCheckers::NEWEST_PATCH;
         $in = array_values(array_filter($minors, static fn (string $minor): bool => self::failing($links, $point($minor)) === []
-            || ($minor === $target && self::belowFloor($links, $minor, $targetPoint))));
+            || ($minor === $target && self::laterPatchInstalls($links, $minor, $targetPoint))));
         $window = ['minors' => $in, 'gaps' => false, 'lower_edge' => null, 'upper_edge' => null, 'closest' => null];
         if ($in === []) {
             $fails = [];
@@ -378,16 +378,20 @@ final class PhpWindow implements \JsonSerializable
     }
 
     /**
-     * Whether $point lies below a patch floor inside $minor: a higher patch of the minor installs the
-     * lock, so the minor is in the window and its lowest patch is the lower edge (SPEC §5.9).
+     * Whether a patch of $minor above $point installs the lock: a patch floor or a conflict hole
+     * that holds the point. The minor is then in the window (SPEC §5.9, the later-patch rule).
      *
      * @param list<PhpLink> $links
      */
-    private static function belowFloor(array $links, string $minor, string $point): bool
+    private static function laterPatchInstalls(array $links, string $minor, string $point): bool
     {
-        $patch = self::lowestPatch($links, $minor);
+        for ($patch = 0; $patch <= MoveCheckers::NEWEST_PATCH; ++$patch) {
+            if (Comparator::greaterThan(self::normalized($minor.'.'.$patch), self::normalized($point)) && self::failing($links, $minor.'.'.$patch) === []) {
+                return true;
+            }
+        }
 
-        return $patch !== null && Comparator::lessThan(self::normalized($point), self::normalized($minor.'.'.$patch));
+        return false;
     }
 
     /**
