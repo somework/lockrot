@@ -275,7 +275,7 @@ these keys. [Upgrading to 0.14](changes/0.14.md) has the steps.
     - The 0.5.0 archive checks the checksum only. Releases before 0.6.0 carry no self-update
       signature, so no archive that checks signatures installs one.
 
-### `self-update` exit codes {#self-update-exit-codes}
+### <a name="self-update-exit-codes"></a>`self-update` exit codes {#self-update-exit-codes}
 
 `self-update` uses lockrot's [exit codes](ci.md#exit-codes) with meanings of its own:
 

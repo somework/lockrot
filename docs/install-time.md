@@ -60,7 +60,7 @@ block, outside its ten, whether or not anything is graded
 runs: not under `LOCKROT_DISABLE`, not with `install-time: off`, and only for a transaction that
 installs or updates something.
 
-## Never silent about a package it could not check {#never-silent-about-a-package-it-could-not-check}
+## <a name="never-silent-about-a-package-it-could-not-check"></a>Never silent about a package it could not check {#never-silent-about-a-package-it-could-not-check}
 
 A package whose metadata never arrived is `unknown`, which is not graded. When nothing is graded,
 a short block prints instead of nothing if the run had a network failure (a note with
@@ -125,7 +125,7 @@ a lock, or lower it to spend less time on the check.
 | One `lockrot: install-time check skipped: …` line | lockrot could not run the check: a malformed `extra.lockrot` or lockrot environment variable, an unreadable `composer.lock`, an unreadable [baseline](baseline.md#install-time) file, an `extra.lockrot.baseline` that names a missing one, or a defect in lockrot | Continues, and `install-time-strict` does not apply | Run `composer lockrot`. For a configuration problem, it names the problem and exits `2` ([exit codes](ci.md#exit-codes)) |
 | `lockrot: install-time-strict stopped the install; gate: fails …` and Composer exits `1` | [`install-time-strict`](#install-time-strict) is on and the gate fails | Stopped | See [after a stop](#install-time-strict) |
 
-## `install-time-strict` {#install-time-strict}
+## <a name="install-time-strict"></a>`install-time-strict` {#install-time-strict}
 
 ```json
 {

@@ -21,7 +21,7 @@ then environment variable, then `extra.lockrot`, then the default.
 }
 ```
 
-## `extra.lockrot` keys {#extralockrot-keys}
+## <a name="extralockrot-keys"></a>`extra.lockrot` keys {#extralockrot-keys}
 
 | Key | Type | Default | Effect | Option / variable |
 |---|---|---|---|---|
@@ -347,7 +347,7 @@ No Composer setting turns a lockrot check off. The settings that stop `composer 
 reporting abandoned packages, or from blocking an install on an advisory, change only what Composer
 does. [Composer's abandoned ignore list](verdicts.md#abandoned) has the details.
 
-## Accepting a check that lockrot cannot run {#accept-unchecked}
+## <a name="accept-unchecked"></a>Accepting a check that lockrot cannot run {#accept-unchecked}
 
 `extra.lockrot.accept-unchecked` accepts a check that lockrot did not run and that no rerun can
 close. An accepted check leaves S10, so [`--fail-on=unchecked`](ci.md#what-unchecked-fails-on) does

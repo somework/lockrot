@@ -38,7 +38,7 @@ do, what each gap does to findings, and what to do about it.
 | [`not_from_composer_repository`](#not_from_composer_repository) | Some packages come from no Composer repository, and lockrot does not check them | no | `from_composer_repository` is false. S10 `not_from_composer_repository` on a vcs or unknown origin | Nothing on the project's side. A `type: composer` repository's operator can make it advertise a notify URL |
 | [`package_name_invalid`](#package_name_invalid) | Some lock entries carry a name that is no Composer package name | no | Those entries get no finding | Check the lock entries that the note's `packages` names |
 
-## Reading a note {#reading-a-note}
+## <a name="reading-a-note"></a>Reading a note {#reading-a-note}
 
 Every output format prints each note as a sentence. The [JSON report](schema.md) and the
 `--explain` document also carry it typed in `note_details`, at the same index as its sentence in
@@ -121,7 +121,7 @@ advisory.
   score.
 - `sets_network_failures`: no.
 
-### Advisories disabled by policy {#advisories_disabled_by_policy}
+### <a name="advisories_disabled_by_policy"></a>Advisories disabled by policy {#advisories_disabled_by_policy}
 
 The project's Composer policy stops Composer from warning about security advisories. lockrot asks
 its repositories as usual, and the advisories they return count. The note says that Composer will
@@ -147,7 +147,7 @@ One Composer repository did not return advisories. lockrot still asked the other
 - `sets_network_failures`: yes when lockrot could not reach the repository. No for any other error
   that the repository raised, such as an answer lockrot could not read.
 
-### Advisories not checked {#advisories_not_checked}
+### <a name="advisories_not_checked"></a>Advisories not checked {#advisories_not_checked}
 
 The advisory lookup did not run, or stopped before it asked every repository.
 
@@ -223,7 +223,7 @@ The host did not answer for some repositories.
 - Findings: S10 `fetch_failed`.
 - `sets_network_failures`: yes.
 
-### Not found {#repository_activity_not_found}
+### <a name="repository_activity_not_found"></a>Not found {#repository_activity_not_found}
 
 The host answered 404 for some repositories: private, renamed or removed.
 
@@ -233,7 +233,7 @@ The host answered 404 for some repositories: private, renamed or removed.
   host rate-limited other repositories.
 - `sets_network_failures`: no.
 
-### Host not supported {#repository_activity_host_not_supported}
+### <a name="repository_activity_host_not_supported"></a>Host not supported {#repository_activity_host_not_supported}
 
 Some repository URLs are on a host that lockrot cannot ask. lockrot asks github.com, bitbucket.org
 and every host in Composer's `gitlab-domains`, and no other host.
@@ -260,7 +260,7 @@ lockrot cannot ask other repository host software, such as Forgejo or Gitea, or 
 
 ## Composer's abandoned ignore list
 
-### Abandoned markings ignored {#abandoned_markings_ignored}
+### <a name="abandoned_markings_ignored"></a>Abandoned markings ignored {#abandoned_markings_ignored}
 
 Composer's abandoned ignore list matched these packages, so lockrot did not count their abandoned
 marking (S1). An archived repository and the release and push dates still count.
@@ -300,7 +300,7 @@ Composer rejected the project's abandoned ignore list, so every abandoned markin
 
 ## Moves
 
-### Moves not checked {#moves_not_checked}
+### <a name="moves_not_checked"></a>Moves not checked {#moves_not_checked}
 
 Composer's solver refuses a partial update of a name outside the lock: the lock itself does not
 install at the target PHP. Every move would be refused for the same reason, so lockrot checks none,
@@ -355,7 +355,7 @@ on. The note names the first such failure of the run.
 
 ## Gate and baseline
 
-### Baseline target differs {#baseline_target_differs}
+### <a name="baseline_target_differs"></a>Baseline target differs {#baseline_target_differs}
 
 The baseline file was written for another target PHP. lockrot does not compare fix changes against
 it. It still compares flags, advisory ids and severities.
@@ -386,7 +386,7 @@ policy if that is the decision.
 
 ## The lock
 
-### Not from a Composer repository {#not_from_composer_repository}
+### <a name="not_from_composer_repository"></a>Not from a Composer repository {#not_from_composer_repository}
 
 Some lock entries carry no Composer `notification-url`, and lockrot asked no repository about them.
 Such an entry is a `path`, `vcs`, `artifact` or inline `package` one, or comes from a

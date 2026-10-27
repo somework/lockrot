@@ -42,7 +42,7 @@ gate: fails · --fail-on=high · 11 findings fail it; 30 reach it and are known 
 target php 8.4 (--target-php)
 ```
 
-## What `--generate-baseline` does
+## <a name="what-generate-baseline-does"></a>What `--generate-baseline` does
 
 - Writes `lockrot-baseline.json` next to `composer.json`, or the path in `--baseline` or
   [`extra.lockrot.baseline`](configuration.md#extralockrot-keys), relative to `composer.json` or
