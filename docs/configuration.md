@@ -399,7 +399,8 @@ on every run ([What `--fail-on=unchecked` fails on](ci.md#what-unchecked-fails-o
   `https://deploy:secret@…` and `ssh://git@…` are errors, because a user name can be a token. Write
   an ssh source as `ssh://host:2222/path`. A URL without a scheme is the scp form, which names its
   user (`git@host:path`). lockrot compares the host and port without case, then the path, without
-  the scheme, a trailing `/` and `.git`. A package installed from a `file://` URL is accepted only
+  the scheme, a trailing `/` and `.git`. A port with leading zeros (`:0443`) or the default port of
+  the scheme (`https://host:443`) matches the same host and URL without it. A package installed from a `file://` URL is accepted only
   by `package`.
 - **Accepting `release_metadata` accepts the unknown fixes too.** On a package from vcs or an
   unknown origin, the releases lockrot did not read are also the releases that the fix of each
@@ -433,7 +434,7 @@ These variables exist for lockrot's own tests and are not part of the configurat
 
 | Variable | Effect |
 |---|---|
-| `LOCKROT_TODAY` | An ISO 8601 date or date-time, such as `2026-09-14`, used as "now": every age (S2, S4, S8), `generated_at` and the `expires` check of ignore entries. Libyears do not depend on it |
+| `LOCKROT_TODAY` | An ISO 8601 date or date-time, such as `2026-09-14`, used as "now": every age (S2, S4, S8), `generated_at` and the `expires` check of `ignore` and `accept-unchecked` entries. Libyears do not depend on it |
 | `LOCKROT_RELEASE_URL` | The release list `lockrot.phar self-update` reads, in the shape of GitHub's `GET /repos/{owner}/{repo}/releases`, instead of GitHub's |
 | `LOCKROT_RELEASE_KEY` | A PEM file whose public key `lockrot.phar self-update` verifies release signatures with, instead of the key built into the archive |
 
