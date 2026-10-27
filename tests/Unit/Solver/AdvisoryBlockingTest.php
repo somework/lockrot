@@ -157,17 +157,46 @@ final class AdvisoryBlockingTest extends TestCase
         self::assertSame(['config.policy'], AdvisoryBlocking::fromConfig($config)->disabledBy());
     }
 
-    /** createPolicyConfig() reads the policy before the variables, so the update fails on the policy. */
-    public function testOnComposer210APolicyThatComposerRejectsBlocksEveryAdvisoryWhateverTheVariablesSay(): void
+    /**
+     * createPolicyConfig() reads the policy before the blocking variables, so every update fails on
+     * the policy, and lockrot stops with Composer's words.
+     *
+     * @dataProvider policiesThatComposerRejects
+     *
+     * @param array<string, mixed>  $policy
+     * @param array<string, string> $variables
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('policiesThatComposerRejects')]
+    public function testOnComposer210APolicyThatComposerRejectsStopsTheRunAndNamesIt(array $policy, array $variables, string $named): void
     {
         self::requireComposer210();
         Platform::putEnv('COMPOSER_NO_BLOCKING', '1');
+        foreach ($variables as $name => $value) {
+            Platform::putEnv($name, $value);
+        }
         $config = new Config(false);
-        $config->merge(['config' => ['policy' => ['advisories' => ['ignore-id' => [1]]]]]);
+        $config->merge(['config' => ['policy' => $policy]]);
 
-        $blocking = AdvisoryBlocking::fromConfig($config);
+        try {
+            AdvisoryBlocking::fromConfig($config);
+            self::fail('a policy that Composer rejects must stop the run');
+        } catch (ConfigException $e) {
+            self::assertStringContainsString($named, $e->getMessage());
+        } finally {
+            foreach (array_keys($variables) as $name) {
+                Platform::clearEnv($name);
+            }
+        }
+    }
 
-        self::assertSame([true, []], [$blocking->blocks(), $blocking->disabledBy()]);
+    /** @return iterable<string, array{array<string, mixed>, array<string, string>, string}> the policy, the variables, a word that the message holds */
+    public static function policiesThatComposerRejects(): iterable
+    {
+        yield 'an ignore-id that is no string' => [['advisories' => ['ignore-id' => [1]]], [], 'policy'];
+        yield 'a malware ignore constraint that does not parse' => [['malware' => ['ignore' => ['a/b' => ['constraint' => 'not a constraint!']]]], [], 'policy'];
+        foreach (['COMPOSER_POLICY_MALWARE_BLOCK', 'COMPOSER_POLICY_ABANDONED_BLOCK', 'COMPOSER_SECURITY_BLOCKING_ABANDONED', 'COMPOSER_AUDIT_ABANDONED'] as $name) {
+            yield $name => [[], [$name => 'maybe'], $name];
+        }
     }
 
     /**
