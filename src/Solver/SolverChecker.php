@@ -232,8 +232,9 @@ final class SolverChecker implements MoveChecker
     /**
      * The request as listed, then `-w`, then `-W`: the first form that resolves and installs
      * $newest, else the resolving form that installs the highest release, the first on a tie, with
-     * its solution; a null form and the last refusal; or the outcome of a solve that did not run.
-     * A form that a load stopped yields to a later form that resolves, and wins over a refusal.
+     * its solution; a null form and the last refusal; or the outcome of the first solve that did
+     * not run or that a load stopped. Such a solve does not end the walk, so a later form that
+     * installs $newest still wins, and it wins over a refusal.
      *
      * @param non-empty-list<string> $moved the names that the request moves, the move's package first
      *
@@ -246,12 +247,8 @@ final class SolverChecker implements MoveChecker
         // locked versions, so `-W` can refuse a move that `-w` resolves: each form is asked in turn.
         foreach ([SolveRequest::LISTED => MoveCheck::INLINE, SolveRequest::WITH_DEPENDENCIES => MoveCheck::WITH_DEPENDENCIES, SolveRequest::WITH_ALL_DEPENDENCIES => MoveCheck::WITH_ALL_DEPENDENCIES] as $transitive => $form) {
             $solution = $this->attempt($request->withTransitive($transitive), $newest, ...$moved);
-            $stopped = isset($fallback) && $fallback instanceof CheckOutcome ? $fallback : null;
             if (!$solution instanceof Solution) {
-                if ($resolved !== null || !\in_array($solution->check()->reason(), self::NOT_LOADED, true)) {
-                    return $resolved ?? $stopped ?? $solution;
-                }
-                $fallback = $stopped ?? $solution;
+                $fallback = isset($fallback) && $fallback instanceof CheckOutcome ? $fallback : $solution;
                 continue;
             }
             if ($solution->resolves() && self::installsNewest($solution, $moved[0], $newest)) {
@@ -260,7 +257,8 @@ final class SolverChecker implements MoveChecker
             if ($solution->resolves()) {
                 $resolved = $resolved !== null && !self::installsHigher($solution, $resolved[1], $moved[0]) ? $resolved : [$form, $solution];
             }
-            $fallback = $stopped ?? [null, $solution];
+            // A wider form asks for each name that a narrower form asks for, so no form refuses after one that stopped.
+            $fallback = [null, $solution];
         }
 
         return $resolved ?? $fallback;
