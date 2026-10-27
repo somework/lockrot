@@ -152,9 +152,9 @@ jobs:
         with: {persist-credentials: false}
       - uses: ./.github/actions/move-check-oracle
   # EnginePageCasesTest compares the engine pages only on the composer/composer that recorded them,
-  # and the latest rows follow each new Composer release. This job installs lockrot's own lock, which
-  # the recording must match, so a skip fails here. A ruleset requires a check by its job name, so a
-  # renamed job drops out of the ruleset.
+  # and the latest rows follow each new Composer release. This job installs the composer/composer of
+  # build/phar/composer.lock, which the PHAR bundles and the recording must match, so a skip fails
+  # here. A ruleset requires a check by its job name, so a renamed job drops out of the ruleset.
   engine-pages:
     runs-on: ubuntu-latest
     steps:
@@ -163,7 +163,9 @@ jobs:
         with: {persist-credentials: false}
       - uses: shivammathur/setup-php@v2
         with: {php-version: '8.4', coverage: none}
-      - run: composer install --no-interaction
+      # composer.lock is not committed, so composer install would take the newest composer/composer.
+      - run: composer require --dev --no-update "composer/composer:$(jq -r '.packages[] | select(.name == "composer/composer") | .version' build/phar/composer.lock)"
+      - run: composer update --no-interaction --prefer-dist
       - run: vendor/bin/phpunit --fail-on-skipped --fail-on-empty-test-suite tests/Integration/EnginePageCasesTest.php
   quality:
     runs-on: ubuntu-latest

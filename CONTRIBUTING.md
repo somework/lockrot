@@ -343,7 +343,8 @@ tools/corpus/corpus check   --out head --explain-out head
 
 ## Cutting a release
 
-Each tag of this recipe, of lockrot or of lockrot-report, needs the maintainer's explicit go.
+Each tag of this recipe, of lockrot or of lockrot-report, needs the explicit approval of the
+maintainer.
 
 1. On a release branch:
 
@@ -364,12 +365,13 @@ Each tag of this recipe, of lockrot or of lockrot-report, needs the maintainer's
       `ChangedGoldensTest` fails unless `RELEASED_AT` names the newest release that `CHANGELOG.md`
       lists. `VersionTest` fails unless `Version::STRING` names that release.
 
-    - Vendor a renderer release ([The HTML report page](#the-html-report-page)) in this order. The
-      renderer's release workflow refuses a lockrot pin that no lockrot tag or `main` reaches, and
-      the rebase merge into `main` leaves the release branch's commits unreachable from `main`.
+    - Vendor a renderer release ([The HTML report page](#the-html-report-page)) in this order. Each
+      build of [lockrot-report](https://github.com/somework/lockrot-report) fetches its pinned
+      lockrot commit by its sha. The rebase merge into `main` leaves the release branch's commits
+      unreachable from `main`, so a tag must keep the pinned commit reachable.
 
         1. When the contract bundle changes, run `tools/report/record`. Commit it with the version,
-           the dated CHANGELOG heading and the goldens of the bullets above.
+           the dated CHANGELOG heading, the schema copies and the golden pins of this step.
         2. Tag that commit `vX.Y.Z-rc.N` and push the tag. The tag keeps the commit reachable, so
            the renderer needs no repin after the merge. `phar.yml` ignores a `-rc.` tag. Packagist
            lists it as a pre-release, which a project on stable minimum-stability does not install.
@@ -405,8 +407,8 @@ Each tag of this recipe, of lockrot or of lockrot-report, needs the maintainer's
 
     If the release widens a `-2` schema (a value of an open set, an optional field), the tag run
     of `phar.yml` fails at its schema check. lockrot.dev serves the previous tag's file under a
-    number that both tags publish, and step 5 cannot replace it. Packagist reads the tag at once,
-    so recover on the same day:
+    number that both tags publish, and the `schemas.yml` run cannot replace it. Packagist reads the
+    tag at once, so recover before any other step of the release:
 
     1. Run `gh workflow run deploy.yml --repo somework/lockrot.dev`. The deploy reads the new tag
        and publishes its schemas.
