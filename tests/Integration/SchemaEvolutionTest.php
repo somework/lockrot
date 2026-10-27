@@ -36,8 +36,8 @@ final class SchemaEvolutionTest extends TestCase
     private const RECORDED = ['0.9.0', '0.10.0', '0.11.0', '0.13.0'];
 
     /**
-     * The newest release, from its release pull request until step 7 of "Cutting a release" records
-     * what its PHAR writes: the PHAR exists only after the tag.
+     * The newest release whose schemas changed, from its release pull request until its recording
+     * (CONTRIBUTING, "Recording a release"): the PHAR exists only after the tag.
      *
      * @var list<string>
      */
@@ -241,16 +241,20 @@ final class SchemaEvolutionTest extends TestCase
     }
 
     /**
-     * CONTRIBUTING, "Cutting a release", step 7: a release whose schemas differ from the previous
-     * release's changes what lockrot writes, so its output is recorded. The first numbered release
-     * has no previous row and is recorded too. Only the newest release can wait for its recording.
+     * CONTRIBUTING, "Cutting a release": a release whose schemas differ from the previous release's
+     * changes what lockrot writes, so its output is recorded. The first numbered release has no
+     * previous row and is recorded too. Only the newest release can wait for its recording.
      */
     public function testEveryReleaseThatChangedItsSchemasIsRecorded(): void
     {
         $releases = array_keys(self::RELEASED_SCHEMAS);
         $previous = null;
         $missing = [];
+        $changed = [];
         foreach (self::RELEASED_SCHEMAS as $version => $files) {
+            if ($files !== $previous) {
+                $changed[] = $version;
+            }
             if ($files !== $previous && !\in_array($version, array_merge(self::RECORDED, self::RECORDING_PENDING), true)) {
                 $missing[] = $version;
             }
@@ -260,6 +264,7 @@ final class SchemaEvolutionTest extends TestCase
         self::assertSame([], $missing, 'run bin/record-schema-evolution for each of these releases');
         self::assertSame([], array_values(array_diff(self::RECORDING_PENDING, [end($releases)])), 'only the newest release waits for its recording');
         self::assertSame([], array_values(array_intersect(self::RECORDING_PENDING, self::RECORDED)), 'a recorded release waits for nothing');
+        self::assertSame([], array_values(array_diff(self::RECORDING_PENDING, $changed)), 'a release whose schemas did not change waits for nothing');
     }
 
     /**

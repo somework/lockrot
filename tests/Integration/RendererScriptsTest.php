@@ -82,6 +82,7 @@ final class RendererScriptsTest extends TestCase
         self::assertFileEquals($this->root.'/release/manifest.json', $this->root.'/resources/report/manifest.json');
         self::assertStringContainsString('--signer-workflow somework/lockrot-report/.github/workflows/release.yml --source-ref refs/tags/v1.2.3', $this->log());
         self::assertSame(self::COMMIT."\n", file_get_contents($this->root.'/tools/report/renderer-commit'), 'the commit that the attestation names');
+        self::assertSame(2, substr_count($this->log(), '--format json --jq .[].verificationResult.signature.certificate.sourceRepositoryDigest'), 'each file names its source commit');
     }
 
     /** A tag can move: each attested file must name one source commit, the same one. */
@@ -163,7 +164,7 @@ final class RendererScriptsTest extends TestCase
 
         self::assertSame(0, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
         self::assertStringContainsString('attestation verify resources/report/report.html --repo somework/lockrot-report --signer-workflow somework/lockrot-report/.github/workflows/release.yml --source-ref refs/tags/v1.2.3 --source-digest '.self::COMMIT, $this->log());
-        self::assertStringContainsString('attestation verify resources/report/manifest.json', $this->log());
+        self::assertStringContainsString('attestation verify resources/report/manifest.json --repo somework/lockrot-report --signer-workflow somework/lockrot-report/.github/workflows/release.yml --source-ref refs/tags/v1.2.3 --source-digest '.self::COMMIT, $this->log());
     }
 
     public function testTheCheckRefusesAReleaseWithNoPinnedCommit(): void
