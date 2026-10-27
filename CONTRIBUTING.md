@@ -351,10 +351,14 @@ maintainer.
 
     - Set `Lockrot\Version::STRING` in `src/Version.php` to the new version.
 
-    - Rename `## [Unreleased]` in `CHANGELOG.md` to `## [X.Y.Z] - YYYY-MM-DD`, dated on the tag
-      day, and write its summary (`.claude/rules/changelog.md`). Then open a new empty
-      `## [Unreleased]` above it. In the compare links at the end of the file, point
-      `[Unreleased]` to `vX.Y.Z...HEAD` and add an `[X.Y.Z]` link.
+    - Rename `## [Unreleased]` in `CHANGELOG.md` to `## [X.Y.Z] - YYYY-MM-DD`, and write its
+      summary (`.claude/rules/changelog.md`). Then open a new empty `## [Unreleased]` above it. In
+      the compare links at the end of the file, point `[Unreleased]` to `vX.Y.Z...HEAD` and add an
+      `[X.Y.Z]` link.
+
+    - The heading carries the day of the final `vX.Y.Z` tag, not the day of the rc tag. Write the
+      planned tag day. If the final tag falls on another day, add a commit to the release pull
+      request that changes only that date. That commit changes no file of the contract bundle.
 
     - Copy every `resources/lockrot-*.schema.json` file to
       `tests/fixtures/schema-evolution/schemas/X.Y.Z/` and pin their sha256 in `RELEASED_SCHEMAS`
