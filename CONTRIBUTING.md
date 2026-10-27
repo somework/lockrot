@@ -383,8 +383,13 @@ maintainer.
         2. Tag that commit `vX.Y.Z-rc.N` and push the tag. The tag keeps the commit reachable, so
            the renderer needs no repin after the merge. `phar.yml` ignores a `-rc.` tag. Packagist
            lists it as a pre-release, which a project on stable minimum-stability does not install.
-        3. Pin the renderer to that commit, then release lockrot-report `vX.Y.Z`.
-        4. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This
+        3. Pin the renderer to that commit, then tag a renderer pre-release `vX.Y.Z-rc.M`. Run
+           `tools/report/update-renderer vX.Y.Z-rc.M`, commit the files that it writes, and wait
+           for the release pull request's CI to pass. A change to the renderer's `release.yml`
+           then runs first on a pre-release.
+        4. Release lockrot-report `vX.Y.Z` with a commit that changes only the version of that
+           pre-release.
+        5. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This
            commit must not change the contract bundle.
 
 2. Build the PHAR and check that `php build/lockrot.phar --version` prints the new version.
