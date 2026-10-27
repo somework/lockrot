@@ -76,7 +76,7 @@ final class HtmlFormatter implements FormatterInterface
             throw new \RuntimeException('Cannot encode the report for the page: '.json_last_error_msg());
         }
 
-        return str_replace(['</', '<!--'], ['<\\/', '<\\u0021--'], $json);
+        return TerminalText::breakJsonLogCommands(str_replace(['</', '<!--'], ['<\\/', '<\\u0021--'], $json));
     }
 
     private static function text(string $value): string
