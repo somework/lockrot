@@ -90,7 +90,8 @@ grows in minor releases. These are the ones that a reader meets most:
 - a run note's `code`, and the `forge_id` and `reason` in its `data`
 - the explanation's `php_blocked_by`, `misses_target_php` and `misses_project_php`
 - in report-2, `run.gates[].kind` and a finding's `gate.by[].kind`
-- in report-2, a flag's `role` and its `headline.value`, a score term's `role`, a modifier's
+- in report-2, a flag's `role` and the `headline.value` of a `pinned` flag (the `abandoned` one is
+  closed: `archived` or `marked`), a score term's `role`, a modifier's
   `reason` and `applies_to`, and the `status` of each score part
 - in report-2, `security.check` and `security.unchecked_reason`, an S9 fix's `reason`, and an
   ignored advisory's `by` and `matched`
@@ -246,7 +247,7 @@ shapes leave out the parts that do not apply. A score of 0 carries only `model`,
 | `libyears` | object | Totals over the findings' `libyears`: see [Libyears](#libyears) |
 | `baseline` | object or null | `path`, the counts `known`, `new` and `worsened`, and `stale`, the baselined names absent from the lock. Null when the run read no baseline |
 | `gate` | object | Why the run exits as it does: see [The gate](#the-gate) |
-| `security` | object | The run's advisory totals: the lookup's `check`, packages and advisories by status and severity, vulnerable packages per fix kind, `update_now` and its command |
+| `security` | object | The run's advisory totals: the lookup's `check`, packages and advisories by status and severity, vulnerable packages per fix kind, `fix_unknown` (the vulnerable findings whose fix kind is `unknown`), `update_now` and its command |
 | `data_date` | date-time or null | The oldest finding `data_date` |
 | `notes` | array of strings | What the run could not see, as sentences: text, not contract |
 | `note_details` | array | The same notes, typed: see [Run notes](#run-notes) |
@@ -272,7 +273,7 @@ shapes leave out the parts that do not apply. A score of 0 carries only `model`,
 | `metadata` | object | `status` (`read`, `not_from_composer_repository`, `unavailable`, `not_found`) and why it was not read |
 | `activity` | object | What the repository activity lookup did: `status`, `reason`, `forge`, `host`, `repo`, `event`, `archived`, `fetched_at` and `cached_at` |
 | `age` | object | Four readings on the run clock (`installed`, `release`, `branch_release`, `push`), each with `years`, and a `<reading>_unmeasured` reason beside each null one |
-| `allowlist` | object or null | Who accepted the package's flags (`by`: `builtin`, `project`, `type`), the `pattern`, `reason`, `reason_id`, `reason_by`, `expires` and `flag_ids` (null: every maintenance flag) |
+| `allowlist` | object or null | Who accepted the package's flags (`by`: `builtin`, `project`, `type`), the `pattern`, `reason`, `reason_id`, `reason_by`, `expires`, `flag_ids` (null: every maintenance flag) and `version` (the version that the entry is limited to, null when it names none) |
 | `allowlist_reason` | string or null | The reason of an entry that accepts the whole package |
 | `abandoned_ignored` | object or null | The mark that [Composer's abandoned ignore list](verdicts.md#abandoned) removed: `by`, `rules` and `marking` |
 | `from_composer_repository`, `origin` | | Where the lock entry came from: see [Where a package came from](#where-a-package-came-from) |
@@ -311,8 +312,8 @@ shapes leave out the parts that do not apply. A score of 0 carries only `model`,
 | `score_model` | object | The whole score model: weights, severities, fix kinds, bands, sort and rules ([Score model 1](verdicts/model-1.md)) |
 | `score_rules_used` | object | Rule id → the number of findings on which the rule changed or decided a number. Null for `sort` |
 | `advisory_lookup` | object | `scope` and `scope_source`, the packages asked and not asked, and each Composer repository that can publish advisories, with its `outcome` ([Which advisories count](verdicts.md#which-advisories-count)) |
-| `move_check` | object or null | Which Composer checked the moves (`composer`), and whether it blocked the versions that an advisory affects. `blocking_disabled_by` lists the environment variables that turned that blocking off, `[]` when none did. `baseline` says whether Composer's solver resolves or refuses the lock itself, with `reason` when lockrot did not check it. Null when the run checked no move ([The move check](verdicts.md#the-move-check)) |
-| `php_window` | object or null | The PHP minors on which the lock installs, with require-dev (`with_dev`) and without (`without_dev`), and the links that set each edge. It also holds the lock's `platform-overrides.php` and the host features that a requirement names. `target` says whether the window admits the target PHP. `target_fix` names the update of the packages that exclude the target, and the answer of Composer's solver to it. Null when the window is unknowable ([The PHP window](verdicts.md#the-php-window)) |
+| `move_check` | object or null | Which Composer checked the moves (`composer`), and whether it blocked the versions that an advisory affects. `blocking_disabled_by` lists the environment variables that turned that blocking off, `[]` when none did. `baseline` says whether Composer's solver resolves or refuses the lock itself, with `reason` when lockrot did not check it. `ignores_extensions` is always true: the solve ignores every `ext-*` requirement. `composer lockrot` always writes `move_check`. A run that checks no move says why in `baseline` and `reason` ([The move check](verdicts.md#the-move-check)) |
+| `php_window` | object or null | The PHP minors on which the lock installs, with require-dev (`with_dev`) and without (`without_dev`), and the links that set each edge. It also holds the lock's `platform-overrides.php` and the host features that a requirement names. `target` says whether the window admits the target PHP. `target_fix` names the update of the packages that exclude the target, and the answer of Composer's solver to it. Its `platform_step` says whether to set `config.platform.php` to your release of the target PHP first. Its `lock_platform` lists the root links that only the lock's `platform` holds. Null when the window is unknowable ([The PHP window](verdicts.md#the-php-window)) |
 
 ### The gate
 
@@ -495,7 +496,9 @@ Dates are RFC 3339 strings (`format: date-time`). These dates are plain `YYYY-MM
 - the `baseline.since` of a flag and of an S9 row
 - `allowlist.expires` and `unchecked_accepted[].accepted_by.expires`
 
-Every years field holds one decimal at most.
+A years field, which the schema types as `years`, holds one decimal at most. A `libyears` field
+holds two decimals at most: a finding's `libyears`, `libyears.total` and
+`libyears.furthest_behind.libyears`.
 
 ### The explanation
 
