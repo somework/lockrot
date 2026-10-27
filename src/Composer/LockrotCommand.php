@@ -101,12 +101,12 @@ final class LockrotCommand extends BaseCommand
     {
         $this
             ->setAliases(['rot'])
-            ->setDescription('Shows dependency rot in composer.lock: abandoned, silent, pinned, left-behind, old-promise and capped packages, with the security advisories no fix is coming for')
+            ->setDescription('Shows dependency rot in composer.lock: abandoned, silent, pinned, left-behind, old-promise, stale, capped and vulnerable packages, each with a score and a grade')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'Output format: table, json, github (workflow annotations), sarif (SARIF 2.1.0), gitlab (Code Quality JSON), markdown (PR comment) or html (one self-contained page)')
             ->addOption('fail-on', null, InputOption::VALUE_REQUIRED, 'Exit 1 when a finding reaches one of these values, comma-separated, at most one of each kind: a grade (critical, high, medium, low), a flag (abandoned, silent, pinned, left-behind, old-promise, stale, capped), an advisory severity (vulnerable, vulnerable-medium, vulnerable-high, vulnerable-critical) or `unchecked`, a finding whose check did not run. The default `none` never fails')
             ->addOption('target-php', null, InputOption::VALUE_REQUIRED, 'PHP version the project targets, e.g. 8.4 (default: config.platform.php or the running PHP)')
             ->addOption('dev', null, InputOption::VALUE_NONE, 'Include packages-dev')
-            ->addOption('all', null, InputOption::VALUE_NONE, 'Show every package, not only flagged ones')
+            ->addOption('all', null, InputOption::VALUE_NONE, 'Show every package, not only graded ones')
             ->addOption('offline', null, InputOption::VALUE_NONE, 'Use cached data only, never go to the network')
             ->addOption('strict-network', null, InputOption::VALUE_NONE, 'Exit 1 when a repository or a repository host (GitHub, GitLab, Bitbucket) could not be reached')
             ->addOption('baseline', null, InputOption::VALUE_REQUIRED, 'Baseline file to read or write (default: lockrot-baseline.json next to composer.json)')
