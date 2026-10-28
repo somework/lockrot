@@ -39,7 +39,7 @@ final class MoveCheckersTest extends TestCase
     public function testAPlatformPhpWithNoPatchInTheTargetMinorIsKeptAsWritten(): void
     {
         $php = MoveCheckers::platformPhp('8.4', '8.4');
-        $solver = new ComposerSolver(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => $php]), new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['php' => '>=8.4.1']]]]), []);
+        $solver = new ComposerSolver(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => $php]), new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['php' => '>=8.4.1']]]]));
 
         $outcome = (new SolverChecker($solver, [], $php, false, Deadline::never()))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
@@ -282,7 +282,8 @@ final class MoveCheckersTest extends TestCase
 
     /**
      * Ruling R2-24: under `advisory-lookup: composer-repositories`, the `-W` solve frees acme/vcs,
-     * which a VCS repository serves. The move check keeps its name out of the advisory lookup.
+     * which a VCS repository serves. The move check keeps its name out of the advisory lookup, and
+     * the resolve that still holds it proves nothing (ruling R2-47, widened by R6).
      */
     public function testTheMoveChecksAdvisoryLookupKeepsOutAVcsNameThatAMoveWithAllDependenciesFrees(): void
     {
@@ -327,7 +328,7 @@ final class MoveCheckersTest extends TestCase
             ->withAdvisories([], ['acme/lib', 'acme/zeta']);
         $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
 
-        self::assertSame([MoveCheck::RESOLVES, MoveCheck::WITH_ALL_DEPENDENCIES], [$check->result(), $check->form()]);
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::ADVISORY_LOOKUP_INCOMPLETE], [$check->result(), $check->reason()]);
         self::assertNotContains('acme/vcs', $feed->asked, 'asked: '.implode(', ', $feed->asked));
     }
 

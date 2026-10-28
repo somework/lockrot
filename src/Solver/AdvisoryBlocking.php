@@ -5,20 +5,18 @@ declare(strict_types=1);
 namespace Lockrot\Solver;
 
 use Composer\Advisory\Auditor;
-use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Config;
-use Composer\Package\PackageInterface;
+use Composer\DependencyResolver\SecurityAdvisoryPoolFilter;
+use Composer\IO\NullIO;
 use Composer\Policy\ListPolicyConfig;
 use Composer\Policy\PolicyConfig;
-use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Util\Platform;
 use Lockrot\Exception\ConfigException;
 
 /**
- * What Composer 2.9 and later block in an update: the settings of the `block` operation, read
- * through the API of the Composer that runs lockrot, and applied with Composer's own Auditor, as
- * `SecurityAdvisoryPoolFilter` applies them. phpstan analyses against the newest Composer, so the
- * Composer 2.9 settings are read as the object's properties.
+ * Whether an update blocks advisories, read through the API of the Composer that runs lockrot, and
+ * Composer's own `SecurityAdvisoryPoolFilter` that blocks them. The filter is Composer's internal
+ * API: when this Composer cannot build it, each solve with blocking on fails with that error.
  *
  * @internal
  */
@@ -33,44 +31,50 @@ final class AdvisoryBlocking
     private const BLOCK_KEY = 'config.policy.advisories.block';
     private const AUDIT_KEY = 'config.audit.block-insecure';
     private bool $blocks;
-    /** @var array<int|string, ?string> */
-    private array $list;
-    /** @var array<string, ?string> */
-    private array $severities;
-    private bool $abandoned;
-    /** @var array<int|string, ?string> */
-    private array $abandonedIgnore;
+    private ?SecurityAdvisoryPoolFilter $filter = null;
+    private ?\Throwable $filterError = null;
     /** @var list<value-of<self::SWITCHES>> */
     private array $disabledBy;
 
-    /**
-     * Each list keeps the keys that this Composer's Auditor reads: a list on Composer 2.9.0 and 2.9.1.
-     *
-     * @param array<int|string, ?string> $list            the ignore list for blocking
-     * @param array<string, ?string>     $severities      the severities that blocking ignores
-     * @param array<int|string, ?string> $abandonedIgnore the abandoned packages that blocking ignores
-     * @param list<value-of<self::SWITCHES>> $disabledBy the {@see SWITCHES} that turned the blocking off
-     */
-    private function __construct(bool $blocks, array $list, array $severities, bool $abandoned, array $abandonedIgnore, array $disabledBy = [])
+    /** @param list<value-of<self::SWITCHES>> $disabledBy the {@see SWITCHES} that turned the blocking off */
+    private function __construct(bool $blocks, array $disabledBy = [])
     {
         $this->blocks = $blocks;
-        $this->list = $list;
-        $this->severities = $severities;
-        $this->abandoned = $abandoned;
-        $this->abandonedIgnore = $abandonedIgnore;
         $this->disabledBy = $disabledBy;
     }
 
     /** @param list<value-of<self::SWITCHES>> $disabledBy */
     private static function none(array $disabledBy = []): self
     {
-        return new self(false, [], [], false, [], $disabledBy);
+        return new self(false, $disabledBy);
     }
 
-    /** Every advisory blocks, and no abandoned package: a test's Composer 2.9 default. */
+    /** Composer's blocking with $policy, or the error of a filter that this Composer cannot build. */
+    private static function blocking(PolicyConfig $policy): self
+    {
+        $blocking = new self(true);
+        try {
+            $blocking->filter = new SecurityAdvisoryPoolFilter(new Auditor(), $policy, new NullIO());
+        } catch (\Throwable $e) {
+            $blocking->filterError = $e;
+        }
+
+        return $blocking;
+    }
+
+    /** Composer's default policy: every advisory blocks, and no abandoned package. */
     public static function everyAdvisory(): self
     {
-        return new self(true, [], [], false, []);
+        return self::blocking(PolicyConfig::fromConfig(new Config(false)));
+    }
+
+    /** Blocking on, with a pool filter that this Composer could not build: for a test of that failure. */
+    public static function unbuildable(\Throwable $error): self
+    {
+        $blocking = new self(true);
+        $blocking->filterError = $error;
+
+        return $blocking;
     }
 
     /**
@@ -95,7 +99,7 @@ final class AdvisoryBlocking
             return self::none($disabledBy);
         }
 
-        return new self(true, $policy->advisories->getIgnoreListForOperation('block'), $policy->advisories->getIgnoreSeverityForOperation('block'), $policy->abandoned->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE), $policy->abandoned->getFlatIgnoreForOperation('block'));
+        return self::blocking($policy);
     }
 
     public function blocks(): bool
@@ -109,55 +113,15 @@ final class AdvisoryBlocking
         return $this->disabledBy;
     }
 
-    /**
-     * The ranges that an update blocks, by package name.
-     *
-     * @param array<string, list<PartialSecurityAdvisory>> $records every record of each name
-     *
-     * @return array<string, list<ConstraintInterface>>
-     */
-    public function ranges(array $records): array
+    /** Composer's pool filter, null when the blocking is off or when this Composer could not build it ({@see filterError()}). */
+    public function poolFilter(): ?SecurityAdvisoryPoolFilter
     {
-        if (!$this->blocks || $records === []) {
-            return [];
-        }
-        $ranges = [];
-        // Composer before 2.9 has no public processAdvisories(): with no ignore rule, every record blocks.
-        if ($this->list === [] && $this->severities === []) {
-            foreach ($records as $name => $advisories) {
-                foreach ($advisories as $advisory) {
-                    $ranges[$name][] = $advisory->affectedVersions;
-                }
-            }
-
-            return $ranges;
-        }
-        // @phpstan-ignore argument.type (the list keeps the shape that this Composer's Auditor reads)
-        foreach ((new Auditor())->processAdvisories($records, $this->list, $this->severities)['advisories'] as $name => $advisories) {
-            foreach ($advisories as $advisory) {
-                $ranges[$name][] = $advisory->affectedVersions;
-            }
-        }
-
-        return $ranges;
+        return $this->filter;
     }
 
-    /**
-     * Whether partial records leave out what the ignore list matches: Composer 2.9.2 and later then
-     * ask the complete records.
-     *
-     * @param array<string, list<PartialSecurityAdvisory>> $records
-     */
-    public function needsComplete(array $records): bool
+    public function filterError(): ?\Throwable
     {
-        // @phpstan-ignore function.alreadyNarrowedType (Composer 2.9.0 and 2.9.1 have no such method), argument.type (the list keeps the shape that this Composer's Auditor reads)
-        return method_exists(Auditor::class, 'needsCompleteAdvisoryLoad') && (new Auditor())->needsCompleteAdvisoryLoad($records, $this->list);
-    }
-
-    public function blocksAbandoned(PackageInterface $package): bool
-    {
-        // @phpstan-ignore argument.type (the list keeps the shape that this Composer's Auditor reads)
-        return $this->abandoned && (new Auditor())->filterAbandonedPackages([$package], $this->abandonedIgnore) !== [];
+        return $this->filterError;
     }
 
     /**

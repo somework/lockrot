@@ -56,7 +56,7 @@ final class SolverChecker implements MoveChecker
     {
         $this->configuredPhp = $configuredPhp;
         $this->advisories = $advisories;
-        $this->solver = $solver;
+        $this->solver = $advisories === null ? $solver : $solver->withAdvisories($advisories);
         $this->scan = new HoldScan($solver->root(), $solver->locked());
         $this->notFromComposerRepository = $notFromComposerRepository;
         $this->platformPhp = $platformPhp;
@@ -64,6 +64,7 @@ final class SolverChecker implements MoveChecker
         $this->deadline = $deadline;
     }
 
+    /** Its own ladder, not {@see attempt()}: a resolving baseline ignores its unloaded names (ruling R2-4). */
     public function baseline(): CheckOutcome
     {
         if ($this->baseline === null) {
@@ -104,13 +105,11 @@ final class SolverChecker implements MoveChecker
         if (!$solution instanceof Solution) {
             return $solution;
         }
-        if ($this->installsUnread($solution)) {
-            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE));
+        if (!$solution->resolves()) {
+            return new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds()), $solution->problem());
         }
 
-        return $solution->resolves()
-            ? (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)))->withChanges($solution->installs(), $solution->updatedFrom())
-            : new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds()), $solution->problem());
+        return $this->unread($solution) ?? (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)))->withChanges($solution->installs(), $solution->updatedFrom());
     }
 
     public function platformPhp(): string
@@ -173,7 +172,7 @@ final class SolverChecker implements MoveChecker
                 return $solution;
             }
 
-            return $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds()));
+            return $solution->resolves() ? $this->unread($solution) ?? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds()));
         }
         $tried = $this->forms(SolveRequest::unlock($names), $names);
         if ($tried instanceof CheckOutcome) {
@@ -181,7 +180,7 @@ final class SolverChecker implements MoveChecker
         }
         [$form, $solution] = $tried;
 
-        return $form === null ? new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds())) : new CheckOutcome(MoveCheck::resolves($form));
+        return $form === null ? new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds())) : $this->unread($solution) ?? new CheckOutcome(MoveCheck::resolves($form));
     }
 
     private function solve(MoveQuery $query): CheckOutcome
@@ -198,11 +197,8 @@ final class SolverChecker implements MoveChecker
             return $tried;
         }
         [$form, $solution] = $tried;
-        if ($form !== null && $this->installsUnread($solution)) {
-            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE));
-        }
 
-        return $form === null ? $this->refusal($solution, $query) : $this->resolved($form, $solution, $query);
+        return $form === null ? $this->refusal($solution, $query) : $this->unread($solution) ?? $this->resolved($form, $solution, $query);
     }
 
     public function joint(MoveQuery $query, array $holders): CheckOutcome
@@ -218,11 +214,8 @@ final class SolverChecker implements MoveChecker
         if (!$solution->resolves()) {
             return $this->refusal($solution, $query);
         }
-        if ($this->installsUnread($solution)) {
-            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE));
-        }
 
-        return (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, $solution->installs()[$query->package()] ?? null)))->withChanges($solution->installs(), $solution->updatedFrom());
+        return $this->unread($solution) ?? (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, $solution->installs()[$query->package()] ?? null)))->withChanges($solution->installs(), $solution->updatedFrom());
     }
 
     /**
@@ -294,10 +287,10 @@ final class SolverChecker implements MoveChecker
         }
     }
 
-    /** Composer blocks only the advisories that it reads, so a solve that installs a name whose records the lookup could not read proves nothing. */
-    private function installsUnread(Solution $solution): bool
+    /** Composer blocks only the advisories that it reads, so a resolve that holds a name whose records the lookup could not read proves nothing. */
+    private function unread(Solution $solution): ?CheckOutcome
     {
-        return $this->advisories !== null && $this->advisories->unread(array_keys($solution->installs())) !== [];
+        return $solution->advisoryUnread() === [] ? null : new CheckOutcome(MoveCheck::notChecked(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE));
     }
 
     /** A move is not checked while the baseline does not resolve: for the baseline's reason, or because it is refused. */
