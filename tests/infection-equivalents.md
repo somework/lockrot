@@ -51,12 +51,13 @@ entry in the commit that changes the line.
 - `src/Composer/ComposerHttpClient.php` CastString `$origin = (string) substr($origin, 4);` — the `in_array()` before it admits only hosts longer than 4 characters, so `substr()` never returns false.
 - `src/Composer/ComposerHttpClient.php` CastInt `$status = $e instanceof TransportException ? (int) ($e->getStatusCode() ?? 0) : 0;` — `getStatusCode() ?? 0` is already an int.
 - `src/Composer/ComposerHttpClient.php` UnwrapArrayValues `$results[$url] = new HttpResult($url, $response->getStatusCode(), $response->getBody(), $this->clock->now(), null, array_values($response->getHeaders()));` — Composer's `Response` holds the header lines as a list.
-- `src/Composer/ComposerHttpClient.php` UnwrapArrayFilter UnwrapArrayValues `return new HttpResult($url, $status, null, $this->clock->now(), RepositoryUrl::inText($e->getMessage()), array_values(array_filter($headers, 'is_string')));` — Composer's downloaders give a `TransportException` its header lines as a list of strings.
+- `src/Composer/ComposerHttpClient.php` UnwrapArrayFilter, UnwrapArrayValues `return new HttpResult($url, $status, null, $this->clock->now(), RepositoryUrl::inText($e->getMessage()), array_values(array_filter($headers, 'is_string')));` — Composer's downloaders give a `TransportException` its header lines as a list of strings.
 - `src/Composer/ComposerHttpClient.php` FalseValue `$body = $filesystem->getContents(Url::getOrigin($this->config, $target), $target, false, $options + ['redirects' => \PHP_INT_MAX]);` — the `redirects` option marks the request as a redirect, and `RemoteFilesystem` shows no progress for a redirect.
 - `src/Composer/ComposerHttpClient.php` CastInt `$status = (int) RemoteFilesystem::findStatusCode($headers);` — `getContents()` returns only after an answer, and each answer starts with a status line.
 - `src/Composer/ComposerHttpClient.php` LessThan `$location = $status >= 300 && $status < 400 ? Response::findHeaderValue($headers, 'location') : null;` — `RemoteFilesystem` throws on a 400 answer, so no 400 status reaches this line.
 - `src/Composer/ComposerHttpClient.php` CastString `$scheme = (string) parse_url($base, \PHP_URL_SCHEME);` — the base is a URL that lockrot requested, so it has a scheme.
 - `src/Composer/ComposerHttpClient.php` CastString `return (string) preg_replace('{^([^:]+://[^/?#]+).*$}', '$1', $base).$location;` — the pattern is a literal, so `preg_replace()` never returns null.
+- `src/Composer/ComposerHttpClient.php` CastString `return (string) preg_replace('{^(.+/)[^/?]*(?:\?.*)?$}', '${1}', $base).$location;` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Composer/InstallTimeSummary.php` UnwrapArrayValues `$repositories = array_values($composer->getRepositoryManager()->getRepositories());` — the repository manager only appends and prepends, so its array is already a list.
 - `src/Composer/InstallTimeSummary.php` TrueValue, Foreach_ `foreach ($lock->packages(true) as $package) {` — these names reach `BaselineComparison::compare()` for the stale list only, and the install-time summary prints no stale list.
 - `src/Composer/LockrotCommand.php` Throw_ `throw $this->bootstrapError;` — the statements after it read the same manifest and throw the same exception, so the exit code and the message stay the same.
@@ -159,12 +160,12 @@ entry in the commit that changes the line.
 
 ## src/Solver
 
-- `src/Solver/AdvisoryBlocking.php` DecrementInteger IncrementInteger `throw new ConfigException('Composer rejects the policy configuration: '.$e->getMessage(), 0, $e);` — no code reads the code of this exception.
+- `src/Solver/AdvisoryBlocking.php` DecrementInteger, IncrementInteger `throw new ConfigException('Composer rejects the policy configuration: '.$e->getMessage(), 0, $e);` — no code reads the code of this exception.
 - `src/Solver/ComposerSolver.php` Concat `$inputs = SolverInputs::of($pool, $request, $root).serialize($preferred);` — a cache key. A `serialize()` string ends where its own syntax ends, so either order tells the inputs apart.
 - `src/Solver/MoveCheckers.php` UnwrapArrayUnique `foreach (array_unique(array_filter([$package->getSourceUrl(), $package->getDistUrl()])) as $url) {` — only `in_array()` reads the names that a URL serves, so a name twice in the list changes no answer.
 - `src/Solver/MoveCheckers.php` Ternary `$solver = self::minimalChanges($config) ? $solver->withMinimalChanges() : $solver;` — a move check reads only the moved package's release, and minimal changes changes only the releases of the other names.
 - `src/Solver/MoveCheckers.php` CastBool x2 `return (bool) Platform::getEnv('COMPOSER_MINIMAL_CHANGES') || (bool) $config->get('update-with-minimal-changes');` — `||` returns a bool, and `(bool)` reads `'0'` as PHP's `||` does.
-- `src/Solver/RepositoryVersions.php` UnwrapArrayFilter UnwrapArrayValues `$options[$key] = array_values(array_filter($config[$key], 'is_string'));` — Composer builds the repository's `FilterRepository` from the same config, and it fails on an entry that is neither a string nor a number. No number matches a `vendor/name`, and `FilterRepository` reads only the values.
+- `src/Solver/RepositoryVersions.php` UnwrapArrayFilter, UnwrapArrayValues `$options[$key] = array_values(array_filter($config[$key], 'is_string'));` — Composer builds the repository's `FilterRepository` from the same config, and it fails on an entry that is neither a string nor a number. No number matches a `vendor/name`, and `FilterRepository` reads only the values.
 
 ## src/Verdict
 
