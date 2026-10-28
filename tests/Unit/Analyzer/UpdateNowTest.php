@@ -94,6 +94,14 @@ final class UpdateNowTest extends TestCase
         self::assertSame([], FindingRelations::violations($document), 'the root recount agrees');
     }
 
+    /** With no command there is no raise, so the line removes nothing from require-dev. */
+    public function testAnUpdateNowWithoutACommandRemovesNothingFromRequireDev(): void
+    {
+        $report = self::reportOf('move-check‡', ['combined' => ['result' => 'not_checked', 'form' => null, 'reason' => 'install_time_budget', 'holds' => []]]);
+
+        self::assertSame([null, null, false], [$report->updateNowCommand(), $report->updateNowRaise(), $report->updateNowRaiseRemovesRequireDev()]);
+    }
+
     public function testACombinedUpdateThatComposerRefusesHasNoMembers(): void
     {
         $document = self::document(['result' => 'refused', 'form' => null, 'reason' => null, 'holds' => [['source' => 'root', 'package' => null, 'version' => null, 'link' => 'conflict', 'target' => self::PACKAGE, 'constraint' => '>=2.3']]]);
