@@ -9,6 +9,7 @@ use Lockrot\Analyzer\RunSettings;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
+use Lockrot\Lock\PackageName;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
@@ -127,9 +128,12 @@ final class Baseline
     }
 
     /**
+     * Each `findings` key is read as the package's Composer name ({@see PackageName}).
+     *
      * @param array<string, mixed> $data
      *
-     * @throws ConfigException when the document does not match resources/lockrot-baseline-2.schema.json
+     * @throws ConfigException when the document does not match resources/lockrot-baseline-2.schema.json,
+     *                         or when two keys name one package
      */
     public static function fromArray(array $data): self
     {
@@ -142,11 +146,17 @@ final class Baseline
             throw new ConfigException('baseline file is invalid: findings must be an object');
         }
         $entries = [];
+        $keys = [];
         foreach ($findings as $package => $entry) {
             if (!\is_string($package)) {
                 throw new ConfigException('baseline file is invalid: findings must map package names to objects');
             }
-            $entries[] = self::entryFromArray($package, $entry);
+            $name = PackageName::key($package);
+            if (isset($keys[$name])) {
+                throw new ConfigException(\sprintf('baseline file is invalid: findings lists %s twice, as %s and %s', $name, $keys[$name], $package));
+            }
+            $keys[$name] = $package;
+            $entries[] = self::entryFromArray($name, $entry);
         }
 
         return self::of(
