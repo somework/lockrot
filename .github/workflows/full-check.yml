@@ -46,7 +46,7 @@ jobs:
       fail-fast: false
       matrix:
         shard:
-          - {name: moves, filter: 'src/Verdict/Move.php src/Verdict/MoveBuilder.php src/Verdict/MoveContext.php src/Verdict/MoveText.php src/Verdict/MaintenanceMove.php', min_msi: 98}
+          - {name: moves, filter: 'src/Verdict/Move.php src/Verdict/MoveBuilder.php src/Verdict/MoveContext.php src/Verdict/MoveText.php src/Verdict/ListWords.php src/Verdict/MaintenanceMove.php', min_msi: 98}
           - {name: findings, filter: 'src/Verdict/Finding.php src/Verdict/FindingDetails.php src/Verdict/GradedPackage.php src/Verdict/NextStep.php src/Verdict/Score.php src/Verdict/SecurityPartial.php src/Verdict/SecurityStanding.php', min_msi: 98}
           - {name: verdicts, filter: 'src/Verdict/Age.php src/Verdict/CommandArgument.php src/Verdict/FailOn.php src/Verdict/FailOnValue.php src/Verdict/FlagSentence.php src/Verdict/FlagSet.php src/Verdict/Latest.php src/Verdict/MoveChecks.php src/Verdict/MoveDraft.php src/Verdict/MoveFact.php src/Verdict/MoveSubject.php src/Verdict/Moves.php src/Verdict/Replacement.php src/Verdict/ScoreModel.php src/Verdict/ShellCommand.php src/Verdict/ThroughCheck.php src/Verdict/ThroughEntry.php src/Verdict/Verdict.php', min_msi: 98}
           - {name: score, filter: 'src/Score', min_msi: 98}
