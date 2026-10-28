@@ -11,6 +11,7 @@ use Composer\Util\Filesystem;
 use Composer\Util\HttpDownloader;
 use Lockrot\Clock;
 use Lockrot\Composer\ComposerHttpClient;
+use Lockrot\Deadline;
 use Lockrot\Tests\Support\HermeticComposerConfig;
 use Lockrot\Tests\Support\PhpBuiltinServer;
 use PHPUnit\Framework\TestCase;
@@ -90,7 +91,7 @@ final class ComposerHttpClientRedirectTest extends TestCase
             self::markTestSkipped('Composer takes prevent_url_access_callable through curl only');
         }
         if (version_compare(Composer::getVersion(), '2.10.0-dev', '<')) {
-            self::markTestSkipped('Composer 2.10 or later: an older Composer replays the headers (docs/internals.md#which-credentials)');
+            self::markTestSkipped('Composer takes prevent_url_access_callable from 2.10: the OnAnyComposer test covers an older one');
         }
         self::assertSame(
             ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot'],
@@ -106,13 +107,31 @@ final class ComposerHttpClientRedirectTest extends TestCase
         );
     }
 
-    /** Ruling R5-40: a downloader that cannot stop a redirect, as Composer below 2.10 or without curl. */
+    /** A downloader that cannot stop a redirect, as Composer below 2.10 or without curl. */
     public function testARedirectToAnotherHostArrivesWithoutLockrotsCredentialsOnAnyComposer(): void
     {
         self::assertSame(
             ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot'],
             $this->headersSeenAfter('/other-host', false)
         );
+    }
+
+    /** Such a downloader sends the requests with lockrot's credentials one at a time, so each one checks the install-time budget. */
+    public function testARequestWithLockrotsCredentialsAfterTheBudgetRanOutIsNotSent(): void
+    {
+        $readings = [0.0, 10.0];
+        $now = static function () use (&$readings): float {
+            return \count($readings) > 1 ? (float) array_shift($readings) : $readings[0];
+        };
+        $io = new NullIO();
+        $config = HermeticComposerConfig::create($this->dir.'/home', $io);
+        $config->merge(['config' => ['secure-http' => false]]);
+        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'), Deadline::inSeconds(5.0, $now), false);
+        $url = $this->server->url().'/headers';
+
+        $result = $client->fetchAll([$url], self::HEADERS)[$url];
+
+        self::assertSame([0, null], [$result->status(), $result->body()]);
     }
 
     public function testARedirectOnTheSameHostKeepsLockrotsCredentialsOnAnyComposer(): void

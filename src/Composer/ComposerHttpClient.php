@@ -231,6 +231,13 @@ final class ComposerHttpClient implements HttpClientInterface
         $filesystem = new RemoteFilesystem($this->io, $this->config, $this->downloader->getOptions(), (bool) $this->config->get('disable-tls'));
         $target = $url;
         for ($hop = 0; $hop <= self::MAX_REDIRECTS && $target !== ''; ++$hop) {
+            // Each request blocks until it ends, so it takes only what the install-time budget has left.
+            if ($this->deadline->isPast()) {
+                $results[$url] = HttpResult::failure($url, 'install-time budget spent', $this->clock->now());
+
+                return;
+            }
+            $options['http']['timeout'] = $this->timeoutSeconds();
             try {
                 $body = $filesystem->getContents(Url::getOrigin($this->config, $target), $target, false, $options + ['redirects' => \PHP_INT_MAX]);
             } catch (\Throwable $e) {
