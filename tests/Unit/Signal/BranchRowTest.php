@@ -87,7 +87,7 @@ final class BranchRowTest extends TestCase
     {
         $facts = $this->facts([new Advisory('A', null, null, null, 'high', null, (new VersionParser())->parseConstraints('<3.0.0'))]);
         $floor = new PhpFloor('8.2', '>=8.2');
-        $fixes = (new FixFinder($floor, LinkIndex::of(LockFile::fromArray([]), ProjectConfig::empty())))->find($facts);
+        $fixes = (new FixFinder($floor, LinkIndex::of(LockFile::empty(), ProjectConfig::empty())))->find($facts);
 
         $rows = BranchRow::all($facts, $floor, Clock::fixed(self::NOW), null, $fixes);
 

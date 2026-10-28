@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Lockrot\Lock;
 
 use Composer\Package\AliasPackage;
+use Composer\Package\BasePackage;
 use Composer\Package\CompleteAliasPackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Repository\LockArrayRepository;
+use Composer\Repository\PlatformRepository;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
+use Lockrot\Output\FormatContext;
 
 /** @internal */
 final class LockFile
@@ -41,14 +44,27 @@ final class LockFile
         $this->locked = $locked;
     }
 
-    public static function fromFile(string $path): self
+    /** @param string|null $name the lock's name in messages, its file name unless given */
+    public static function fromFile(string $path, ?string $name = null): self
     {
-        return self::fromArray(JsonReader::readObject($path));
+        return self::fromArray(JsonReader::readObject($path), $name ?? basename($path));
     }
 
-    /** @param array<string, mixed> $lock */
-    public static function fromArray(array $lock): self
+    /**
+     * A lock loads only when Composer's ArrayLoader loads every entry and Composer's Locker can read
+     * its other keys. Three rules are lockrot's own: `packages` is present and is a list, each `name`
+     * is a string, and no name is listed twice, case ignored, because a finding needs one entry. A
+     * platform map follows Composer instead: the later of two keys that differ in case wins.
+     *
+     * @param array<string, mixed> $lock
+     * @param string               $name the lock's name in messages
+     *
+     * @throws ConfigException when the lock breaks one of these rules
+     */
+    public static function fromArray(array $lock, string $name = FormatContext::DEFAULT_LOCK_NAME): self
     {
+        $aliases = self::aliases($lock['aliases'] ?? null, $name);
+        $overridePhp = self::overridePhpOf(['platform' => $lock['platform'] ?? null, 'platform-dev' => $lock['platform-dev'] ?? null], $lock['platform-overrides'] ?? [], $name);
         $packages = [];
         $loader = new ArrayLoader();
         // Composer's Locker loads the lock for an update with these options.
@@ -57,46 +73,15 @@ final class LockFile
         $aliased = [];
         $skipped = [];
         $devNames = [];
+        $seen = [];
         foreach ([['packages', false], ['packages-dev', true]] as [$key, $dev]) {
-            $entries = $lock[$key] ?? null;
-            $entries = \is_array($entries) ? array_values($entries) : [];
-            foreach ($entries as $index => $entry) {
-                if (!\is_array($entry)) {
-                    throw new ConfigException(\sprintf(
-                        'composer.lock entry #%d in %s cannot be loaded: entry must be a JSON object',
-                        $index,
-                        $key
-                    ));
+            foreach (self::entries($lock[$key] ?? null, $key, $name) as $index => $entry) {
+                [$loaded, $forUpdate, $aliasVersions] = self::load($entry, \sprintf('%s entry #%d in %s cannot be loaded: ', $name, $index, $key), $loader, $lockLoader);
+                $id = PackageName::key($loaded->getName());
+                if (isset($seen[$id])) {
+                    throw new ConfigException(\sprintf('%s lists %s twice: %s and entry #%d in %s', $name, $id, $seen[$id], $index, $key));
                 }
-                try {
-                    $loaded = $loader->load($entry);
-                    $forUpdate = $lockLoader->load($entry);
-                } catch (\UnexpectedValueException $e) {
-                    throw new ConfigException(\sprintf(
-                        'composer.lock entry #%d in %s cannot be loaded: %s',
-                        $index,
-                        $key,
-                        $e->getMessage()
-                    ), 0, $e);
-                }
-                // A package that declares `extra.branch-alias`, or is a `default-branch`, loads as an
-                // alias package. Unwrap it, so that the entry's own version, require and source fields
-                // are read, and keep the alias version: `composer audit` matches advisories on it.
-                $aliasVersions = [];
-                if ($loaded instanceof AliasPackage) {
-                    $aliasVersions[] = $loaded->getVersion();
-                    $loaded = $loaded->getAliasOf();
-                }
-                // Unreachable: with its default class, ArrayLoader::load() returns a CompletePackage or
-                // an alias of one, which the unwrap removes. The check narrows the type for PHPStan.
-                if (!$loaded instanceof CompletePackage) {
-                    throw new ConfigException(\sprintf(
-                        'composer.lock entry #%d in %s cannot be loaded: loader returned %s instead of a CompletePackage',
-                        $index,
-                        $key,
-                        \get_class($loaded)
-                    ));
-                }
+                $seen[$id] = \sprintf('entry #%d in %s', $index, $key);
                 $locked->addPackage($forUpdate);
                 if ($dev) {
                     $devNames[] = $loaded->getName();
@@ -111,9 +96,9 @@ final class LockFile
                 $aliased[$package->name()] = $forUpdate instanceof AliasPackage ? $forUpdate->getAliasOf() : $forUpdate;
             }
         }
-        foreach (\is_array($lock['aliases'] ?? null) ? $lock['aliases'] : [] as $alias) {
-            $of = \is_array($alias) && \is_string($alias['package'] ?? null) ? ($aliased[$alias['package']] ?? null) : null;
-            if ($of instanceof CompletePackage && \is_string($alias['alias_normalized'] ?? null) && \is_string($alias['alias'] ?? null)) {
+        foreach ($aliases as $alias) {
+            $of = $aliased[PackageName::key($alias['package'])] ?? null;
+            if ($of instanceof CompletePackage) {
                 $rootAlias = new CompleteAliasPackage($of, $alias['alias_normalized'], $alias['alias']);
                 $rootAlias->setRootPackageAlias(true);
                 $locked->addPackage($rootAlias);
@@ -125,11 +110,120 @@ final class LockFile
         $file->devNames = $devNames;
         $file->platform = self::stringValues($lock['platform'] ?? null);
         $file->platformDev = self::stringValues($lock['platform-dev'] ?? null);
-        $file->platformOverridePhp = self::stringValues($lock['platform-overrides'] ?? null)['php'] ?? null;
+        $file->platformOverridePhp = $overridePhp;
         // Composer's Locker refuses an install with require-dev when the key is missing.
         $file->hasDevKey = isset($lock['packages-dev']);
 
         return $file;
+    }
+
+    /**
+     * @param mixed $entries
+     *
+     * @return list<mixed>
+     */
+    private static function entries($entries, string $key, string $name): array
+    {
+        // Composer's Locker reads `packages` without a check, and `packages-dev` only when it is set.
+        if ($entries === null && $key === 'packages-dev') {
+            return [];
+        }
+        if (!\is_array($entries) || ($entries !== [] && !JsonReader::isList($entries))) {
+            throw new ConfigException(\sprintf('%s: %s must be a list of package entries', $name, $key));
+        }
+
+        return $entries;
+    }
+
+    /**
+     * @param mixed $entry
+     *
+     * @return array{0: CompletePackage, 1: BasePackage, 2: list<string>} the package, the package as an update loads it, its alias versions
+     */
+    private static function load($entry, string $refusal, ArrayLoader $loader, ArrayLoader $lockLoader): array
+    {
+        if (!\is_array($entry)) {
+            throw new ConfigException($refusal.'entry must be a JSON object');
+        }
+        // Composer's loader takes the name as given: a number reads as a name on one Composer and
+        // is a TypeError on another.
+        if (isset($entry['name']) && !\is_string($entry['name'])) {
+            throw new ConfigException($refusal.'"name" must be a string');
+        }
+        try {
+            $loaded = $loader->load($entry);
+            $forUpdate = $lockLoader->load($entry);
+        } catch (\Throwable $e) {
+            // ArrayLoader changes no state, so any failure means that the entry cannot be loaded.
+            throw new ConfigException($refusal.$e->getMessage(), 0, $e);
+        }
+        // A package that declares `extra.branch-alias`, or is a `default-branch`, loads as an
+        // alias package. Unwrap it, so that the entry's own version, require and source fields
+        // are read, and keep the alias version: `composer audit` matches advisories on it.
+        $aliasVersions = [];
+        if ($loaded instanceof AliasPackage) {
+            $aliasVersions[] = $loaded->getVersion();
+            $loaded = $loaded->getAliasOf();
+        }
+        // Unreachable: with its default class, ArrayLoader::load() returns a CompletePackage or
+        // an alias of one, which the unwrap removes. The check narrows the type for PHPStan.
+        if (!$loaded instanceof CompletePackage) {
+            throw new ConfigException($refusal.'loader returned '.\get_class($loaded).' instead of a CompletePackage');
+        }
+
+        return [$loaded, $forUpdate, $aliasVersions];
+    }
+
+    /**
+     * `platform-overrides.php` as Composer's PlatformRepository reads it: names in lower case, the
+     * later of two keys wins, and each value is a string or `false`.
+     *
+     * @param array{platform: mixed, platform-dev: mixed} $platform
+     * @param mixed                                       $overrides
+     */
+    private static function overridePhpOf(array $platform, $overrides, string $name): ?string
+    {
+        // Composer's Locker passes `platform` and `platform-dev` to an array parameter when they are
+        // not empty, and `platform-overrides` when it is set.
+        foreach ($platform as $key => $links) {
+            if (!empty($links) && !\is_array($links)) {
+                throw new ConfigException(\sprintf('%s: %s must be an object', $name, $key));
+            }
+        }
+        if (!\is_array($overrides)) {
+            throw new ConfigException($name.': platform-overrides must be an object');
+        }
+        try {
+            new PlatformRepository([], $overrides);
+        } catch (\Throwable $e) {
+            throw new ConfigException($name.': platform-overrides cannot be loaded: '.$e->getMessage(), 0, $e);
+        }
+
+        $php = array_change_key_case($overrides, \CASE_LOWER)['php'] ?? null;
+
+        return \is_string($php) ? $php : null;
+    }
+
+    /**
+     * @param mixed $aliases
+     *
+     * @return list<array{package: string, alias: string, alias_normalized: string}>
+     */
+    private static function aliases($aliases, string $name): array
+    {
+        if ($aliases === null) {
+            return [];
+        }
+        $valid = \is_array($aliases) && ($aliases === [] || JsonReader::isList($aliases));
+        foreach ($valid ? $aliases : [] as $alias) {
+            $valid = $valid && \is_array($alias) && \is_string($alias['package'] ?? null) && \is_string($alias['alias'] ?? null) && \is_string($alias['alias_normalized'] ?? null);
+        }
+        if (!$valid) {
+            throw new ConfigException($name.': aliases must be a list of objects with the strings package, alias and alias_normalized');
+        }
+
+        /** @var list<array{package: string, alias: string, alias_normalized: string}> $aliases */
+        return $aliases;
     }
 
     /**
