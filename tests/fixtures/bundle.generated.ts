@@ -162392,7 +162392,9 @@ export const d_mc_baseline_refused_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -167087,7 +167089,9 @@ export const d_mc_canonical_package_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -168642,7 +168646,9 @@ export const d_mc_canonical_vcs_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -170316,7 +170322,9 @@ export const d_mc_canonical_vcs_unmatched_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -171984,7 +171992,9 @@ export const d_mc_composite_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -176033,7 +176043,9 @@ export const d_mc_dev_update_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -177753,7 +177765,9 @@ export const d_mc_filter_only_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -179405,7 +179419,9 @@ export const d_mc_gets_below_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -181078,7 +181094,9 @@ export const d_mc_gets_next_form_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -182746,7 +182764,9 @@ export const d_mc_inline_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -184255,7 +184275,9 @@ export const d_mc_joint_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -187408,7 +187430,9 @@ export const d_mc_joint_down_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -189082,7 +189106,9 @@ export const d_mc_joint_retag_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -190756,7 +190782,9 @@ export const d_mc_link_newest_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -193923,7 +193951,9 @@ export const d_mc_minimal_changes_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -195739,7 +195769,9 @@ export const d_mc_newest_above_row_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -197597,7 +197629,9 @@ export const d_mc_package_hold_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -199348,7 +199382,9 @@ export const d_mc_pass_cap_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -201104,7 +201140,9 @@ export const d_mc_raise_php_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -202629,7 +202667,9 @@ export const d_mc_replan_major_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -204322,7 +204362,9 @@ export const d_mc_root_hold_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -205995,7 +206037,9 @@ export const d_mc_root_version_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -207550,7 +207594,9 @@ export const d_mc_split_both_refused_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -209377,7 +209423,9 @@ export const d_mc_split_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -211237,7 +211285,9 @@ export const d_mc_split_maintenance_larger_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -213078,7 +213128,9 @@ export const d_mc_split_not_checked_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -215013,7 +215065,9 @@ export const d_mc_update_now_reduced_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -215399,12 +215453,12 @@ export const d_mc_update_now_reduced_dagger = {
     },
     "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [
-        "update now: the command leaves out symfony/yaml, typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0."
+        "update now: the command leaves out symfony/yaml and typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0."
     ],
     "note_details": [
         {
             "code": "update_now_reduced",
-            "text": "update now: the command leaves out symfony/yaml, typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0.",
+            "text": "update now: the command leaves out symfony/yaml and typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0.",
             "docs_url": "https://lockrot.dev/notes/#update_now_reduced",
             "sets_network_failures": false,
             "data": {
@@ -217278,7 +217332,9 @@ export const d_mc_update_now_refused_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -219163,7 +219219,9 @@ export const d_mc_with_all_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -220831,7 +220889,9 @@ export const d_mc_with_deps_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -222499,7 +222559,9 @@ export const d_move_check_dagger = {
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
