@@ -52,7 +52,7 @@ final class FindingRelationsTest extends TestCase
     public function testEveryFixtureDocumentHoldsEveryRelation(): void
     {
         $paths = self::documents();
-        self::assertCount(373, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
+        self::assertCount(375, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
         $broken = [];
         foreach (array_merge($paths, [self::COMPOSITE]) as $path) {
             $document = self::read($path);

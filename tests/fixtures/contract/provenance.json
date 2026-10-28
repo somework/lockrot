@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "aeb4769fe566cd63ba51b783b51de6e4664b0976423728512fadfd6de2a5cedf",
+        "tests/fixtures/flags/cases.json": "66e76f37312d6f7a82c6c03953ec4926175d82cc5d3908d140ca62b1d3d14c67",
         "tests/fixtures/flags/composite.json": "931aa288bfbfee92d7103d91a1d3c78a9d0d5625dd044f214ca72e1c9c73a6e7",
-        "tests/fixtures/flags/provenance.json": "50ac0081c981768b3002a60acbc266b565f1e6e52c70f44b8bbba5676c8e2fb0"
+        "tests/fixtures/flags/provenance.json": "1fff0322061d2774ac386db5a00d2752aa7fbede9b97884d9076c33dc9e74bbd"
     },
     "version_mask": {
         "paths": [
@@ -44,7 +44,9 @@
         "host-accept-expired‡",
         "no-feed-accepted‡",
         "vcs-accepted‡",
-        "mc-plain-update‡"
+        "mc-plain-update‡",
+        "mc-update-now-plain‡",
+        "mc-update-now-below‡"
     ],
     "model_only": "model-only/ holds the model documents of cases_without_inputs: the hydrator cannot rebuild those cases, so lockrot did not write them",
     "baseline_2": "the gate-row baselines of tests/fixtures/schema/documents/baseline/gate-rows/, read by Baseline::fromArray() and written by BaselineFile::write()",

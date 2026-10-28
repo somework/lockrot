@@ -648,6 +648,8 @@ def unhydrated(case):
     rows = [r['branch'] for r in rows_of(case.get('details'))]
     if case.get('solver_world') is not None and rows and newest and '-' not in newest and not on_branch(newest, rows):
         # lockrot opens a row for each branch of the releases, and the model designs the rows of a solver world.
+        # A repository release on another branch (guzzlehttp/psr7 3.0.0 beside the 2.x row of the mc-update-now cases)
+        # gets a row that the model does not design, and its move check has no recorded answer.
         return 'designed-rows'
     return None
 

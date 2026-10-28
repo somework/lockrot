@@ -1,7 +1,7 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "7e604794527a266a952a9f1cd8dc0441f271993a5de39df09cc290cfc4592104",
+  "cases.json": "d9fd1130c1711826f3e392355016eb36791f7ea341620c254d7940d2eb79410d",
   "model_run_date": "2026-10-28"
  },
  "suite": "the model suite reports every step passed",
@@ -28,7 +28,9 @@
   "host-accept-expired‡",
   "no-feed-accepted‡",
   "vcs-accepted‡",
-  "mc-plain-update‡"
+  "mc-plain-update‡",
+  "mc-update-now-plain‡",
+  "mc-update-now-below‡"
  ],
  "negative_bases": [
   "composite",
