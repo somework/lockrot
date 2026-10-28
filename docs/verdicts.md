@@ -129,7 +129,7 @@ nothing. The report tells them apart here:
 If the successor is already in the lock, remove the old package. An `abandoned` that only S3 raised
 (an archived repository with no mark) moves to `find a replacement`.
 
-### Composer's abandoned ignore list {#abandoned}
+### <a name="abandoned"></a>Composer's abandoned ignore list {#abandoned}
 
 lockrot reads Composer's abandoned ignore list as `composer audit` reads it: a listed package raises
 no S1. The list is `config.policy.abandoned.ignore` on Composer 2.10 and later, and
@@ -154,7 +154,7 @@ no S1. The list is `config.policy.abandoned.ignore` on Composer 2.10 and later, 
 - An `ignore[]` entry with `flags: [abandoned]` is not this list. It accepts the liveness reading
   of the package (`abandoned`, `silent` and `stale`), and the flags stay listed as accepted.
 
-## Pinned: what S6 carries {#what-s6-carries}
+## <a name="what-s6-carries"></a>Pinned: what S6 carries {#what-s6-carries}
 
 S6's evidence reads the same whether or not the package ever released. Its `data` in
 `--format=json` tells the cases apart:
@@ -259,7 +259,7 @@ and suggests nothing: the way forward is a PHP upgrade, and the `do:` line says 
 ([Signal data](schema.md#signal-data)). The report's `run` carries the target PHP as
 `target_php`, and the project's `require.php` constraint as `project_php`.
 
-#### The PHP test in `--explain` {#the-php-test-in-explain}
+#### <a name="the-php-test-in-explain"></a>The PHP test in `--explain` {#the-php-test-in-explain}
 
 [`--explain`](configuration.md#explaining-one-package) applies this test to every branch, the
 installed one and those below it included. A row's php is the requirement of its branch's newest
@@ -463,7 +463,7 @@ What the lookup found still counts. A package with no counted advisory then read
 never `clear`, in `security.status`. The note [`advisories_not_checked`](notes.md#advisories_not_checked)
 names the reason.
 
-### Which advisories count {#which-advisories-count}
+### <a name="which-advisories-count"></a>Which advisories count {#which-advisories-count}
 
 lockrot asks for the advisories of every package that the run checks, by name, whatever its
 origin: Packagist, a private repository, vcs, a path or an archive. packages-dev are asked only with
@@ -484,9 +484,10 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
 - For a package installed from vcs or a path, the advisory is published for the package of that
   name. Check that the version you hold is the one the advisory names.
 
-- Composer's policy never stops the lookup. Under `policy: false`, `COMPOSER_POLICY=0`,
-  `policy.advisories: false` or `policy.advisories.audit: ignore`, lockrot asks and counts every
-  advisory. These switches stop Composer from blocking an install or an update. The note
+- Composer's policy never stops the lookup. Under `policy: false`, `COMPOSER_POLICY=0` or
+  `policy.advisories: false`, lockrot asks and counts every advisory. These switches stop Composer
+  from blocking an update (`composer update`, `require` or `remove`), and `composer audit` still
+  reports the advisories. The note
   [`advisories_disabled_by_policy`](notes.md#advisories_disabled_by_policy) says so.
 
 - An advisory with no severity counts as `unrated`. An advisory with no affected range counts, with
@@ -520,7 +521,7 @@ advisories: 200 packages asked · packagist.org answered (181 on record for 49 p
 
 - `severity_published` keeps Composer's own word.
 
-### Fix {#fix}
+### <a name="fix"></a>Fix {#fix}
 
 Each counted advisory gets a fix kind. lockrot reads every stable release above the installed one,
 on the installed branch and every higher one, with each release's own `require.php`, and the lock's
@@ -590,7 +591,7 @@ lockrot drops.
 - The [baseline](baseline.md) accepts an advisory as known for the gate. It still counts in the
   score.
 
-### The move {#move}
+### <a name="move"></a>The move {#move}
 
 A graded finding's `do:` line names one move: what to run, what it clears, and what holds it. JSON
 writes the move as `next_step`. Abridged from the [example run](example-run.md):
@@ -662,7 +663,7 @@ The table, markdown and github formats, `--explain` and the install-time block p
 in its POSIX form, for a POSIX shell. For cmd.exe or PowerShell, render `commands[]` as
 [The move](schema.md#the-move) shows, or use the copy menu of the html page.
 
-### The move check {#the-move-check}
+### <a name="the-move-check"></a>The move check {#the-move-check}
 
 lockrot asks Composer's own solver about every move that runs a Composer request: the lead move,
 each move in `next_step.also[]`, and the move to each branch row's candidate. It builds the request
@@ -718,7 +719,8 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
   names its holds. Any other joint solve keeps the move `refused` with the holds of the first
   refusal. That includes a solve that moves a holder from a release to a dev version, because
   advisory blocking does not check a dev version. A holder that is a dev version before and after
-  the solve still counts.
+  the solve still counts. A solve that moves a holder below its locked release also keeps the move
+  `refused`, because that step is no update of the holder.
 - **The why-not step.** An `update`, `require`, `raise-php` or `tag` move whose check does not
   resolve ends with `composer why-not <package> <version> --locked`. The version is the move's
   `version`.
@@ -757,8 +759,27 @@ Limits of the check:
   [stability flag](https://getcomposer.org/doc/04-schema.md#package-links) admits `dev` for the
   package, and so does the check. A move to a dev snapshot is
   not a move that lockrot proposes.
-- It offers a package that no Composer repository serves, such as a package from a path or VCS
-  repository, at its locked version only.
+- It reads package and path repositories as Composer reads them, and each serves the names that it
+  declares. A canonical repository of any type that serves a name hides that name in every later
+  repository.
+- It does not load a vcs, git or artifact repository, because a load clones or downloads the
+  repository. Such a repository serves only the names that the lock records with a `source` or
+  `dist` URL equal to the repository URL. The URLs compare without case, a trailing `.git` or a
+  trailing slash.
+- It offers a name that the lock records from a vcs repository at its locked version only. A move
+  of that name reads `not_checked` with `not_from_composer_repository`. A move whose solve needs
+  such a name at a release other than the locked one reads `not_checked` with `unloaded_name`.
+- A vcs repository that no lock entry matches shadows no name in the check. In Composer, its
+  packages can shadow a name that lockrot reads from a later repository.
+- It takes the root version from composer.json's `version`, else from `COMPOSER_ROOT_VERSION` when
+  it is set and not empty, as Composer does. Without both, the standalone run solves the root at
+  `1.0.0`, and Composer guesses the root version from the vcs checkout. A root `replace` or `provide` of `self.version` can then
+  resolve in lockrot and fail in Composer, or the reverse. So can a package that requires the root
+  package. In plugin mode, the root version is Composer's own guess.
+- It reads [`update-with-minimal-changes`](https://getcomposer.org/doc/06-config.md#update-with-minimal-changes)
+  and `COMPOSER_MINIMAL_CHANGES` on Composer 2.7 and later, as Composer does. It does not read
+  `COMPOSER_PREFER_STABLE`, `COMPOSER_PREFER_LOWEST`, `COMPOSER_WITH_DEPENDENCIES` or
+  `COMPOSER_WITH_ALL_DEPENDENCIES`.
 - With `--offline`, a package that composer.json admits at `dev` needs its `~dev` file in
   Composer's cache. Without that file, the move is not checked (`check.reason` `offline`). From
   these repositories, such a package with tags and no dev version also reads `not_checked` with
@@ -788,7 +809,8 @@ Limits of the check:
     `config.policy.advisories` is not set. `policy.advisories.audit` is not a switch.
 
     When Composer refuses the value of one of the variables, such as `COMPOSER_NO_BLOCKING=maybe`,
-    lockrot stops with exit code 2 and prints Composer's message.
+    or a key under `config.policy` or `config.audit`, lockrot stops with exit code 2. It prints
+    `Composer rejects the policy configuration:` and Composer's message, which can omit the key.
 
 - When a package that a resolving solve asks for could not be loaded, the solve can resolve at a
   lower release than Composer installs. The move is then not checked, with the load reason
@@ -824,7 +846,7 @@ Limits of the check:
   get a move that resolves and its command, but Composer refuses an update with require-dev on
   such a lock.
 
-### The PHP window {#the-php-window}
+### <a name="the-php-window"></a>The PHP window {#the-php-window}
 
 On which PHP minors does your lock install? `run.php_window` answers with require-dev and without.
 `with_dev` reads the packages, packages-dev and the root with its `require-dev`. `without_dev` reads
@@ -879,7 +901,7 @@ How lockrot reads the window:
 The window is null when a package or the root provides or replaces `php` or `php-64bit`, or when a
 php link does not parse. It judges no package and changes no move.
 
-#### The update that admits the target {#the-update-that-admits-the-target}
+#### <a name="the-update-that-admits-the-target"></a>The update that admits the target {#the-update-that-admits-the-target}
 
 When the window excludes the target PHP, `target_fix` gives one update of the packages that exclude
 it. It also gives the answer of Composer's solver:
@@ -938,7 +960,7 @@ wallabag 2.6.14 at the target PHP 8.4, whose composer.json requires `php-http/gu
 php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of the 3 packages that exclude it: composer.json requires php-http/guzzle5-adapter ^2.0
 ```
 
-## The score {#score}
+## <a name="score"></a>The score {#score}
 
 The score adds up the counted flags. Every report carries the whole model in `run.score_model`, and
 [Score model 1](verdicts/model-1.md) gives each rule with its numbers.
@@ -993,7 +1015,7 @@ Findings sort by verdict, then by the security part, highest first, then by scor
 before transitive, then by package name. So inside a band, a package with a serious advisory comes
 first.
 
-### The `priority` alias {#priority}
+### <a name="priority"></a>The `priority` alias {#priority}
 
 report-2 keeps `priority` beside `verdict`: the grade of a graded finding, else `none`. `priority`
 and the root `priorities` are [deprecated](compatibility.md#deprecation): read `verdict` and the
@@ -1045,7 +1067,7 @@ included. `--format=json` carries them all under the signal's `data.packages`, e
 `verdict`, `lead`, `flag_ids` and `chain`. A direct requirement that scores 0 carries S7 too: its
 row prints only under `--all`, and the `pulled in by:` line counts it either way.
 
-### Shared packages and `unattributed` {#shared-packages-and-unattributed}
+### <a name="shared-packages-and-unattributed"></a>Shared packages and `unattributed` {#shared-packages-and-unattributed}
 
 A graded transitive package reached from more direct requirements than the run's
 `exposure_rule.max_fan_in` is shared infrastructure, such as a framework's own contracts reached

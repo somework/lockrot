@@ -57,6 +57,19 @@ final class FindingBlockTest extends TestCase
         return FindingBlock::baselineSuffix($finding, $comparison->standingOf('a/b'));
     }
 
+    /** A finding at score 0 can fail the gate on an unchecked check, and its row then names its entry. */
+    public function testAnUngradedFindingWithAnEntryReadsKnown(): void
+    {
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $report = (new Report([$finding], [], new \DateTimeImmutable('2026-10-01T00:00:00+00:00'), 1, 0))
+            ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_OPTION, null));
+        $entry = BaselineEntries::of('a/b', '1.0.0', Verdict::ABANDONED, '2026-06-01');
+        $comparison = BaselineComparison::compare(Baseline::of([$entry], '2026-09-14T00:00:00+00:00', '8.4', RunSettings::SOURCE_OPTION), $report, 'lockrot-baseline.json', ['a/b']);
+
+        self::assertFalse($finding->isGraded());
+        self::assertSame('(baseline: known)', FindingBlock::baselineSuffix($finding, $comparison->standingOf('a/b')));
+    }
+
     public function testTheReachNamesAtMostThreeDirectDependentsAndCountsTheRest(): void
     {
         $five = (new FindingBuilder())->withPackage('a/leaf')->withChain(['a/r1', 'a/leaf'])->withDirectDependents(['a/r1', 'a/r2', 'a/r3', 'a/r4', 'a/r5'])->build();

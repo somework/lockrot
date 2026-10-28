@@ -13,7 +13,7 @@ a closed set, a known value the union lacks), so the contract is split in two:
                                       hand edit types a closed or open set as `string`, or the union and the schema disagree
 
   python3 tools/schema/ts/emit_dts.py      writes the unions, known-map.json and the probes
-  python3 tools/schema/ts/emit_dts.py --prototype <file>   also writes the shapes as the schema gives them, to compare
+  python3 tools/schema/ts/emit_dts.py --prototype <file>   writes only the shapes as the schema gives them, to compare
                                                            with the hand-kept file after a schema change
 """
 import json
@@ -200,6 +200,7 @@ if '--prototype' in sys.argv:
     if sys.argv.index('--prototype') + 1 >= len(sys.argv):
         sys.exit('emit_dts.py: --prototype needs a file path')
     open(sys.argv[sys.argv.index('--prototype') + 1], 'w').write('\n'.join(out + body) + '\n')
+    sys.exit(0)
 
 known = ['// GENERATED from lockrot-report-2.schema.json by tools/schema/ts/emit_dts.py: do not edit.',
          '// One literal union per enum (closed) and x-known-values (open: a later release may add a value) node.', '']

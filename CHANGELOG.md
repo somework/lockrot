@@ -46,8 +46,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
   `require.php` stops below the newest PHP minor that the root php allows. It decides at once, and
   comes after `stale`, so `--fail-on=stale` keeps its reach. A baseline entry that records any
-  maintenance flag covers it. A grade gate at `medium` or `low` can fail where 0.13 passed. Action:
-  run once without a gate. ([Capped](docs/verdicts.md#capped))
+  maintenance flag covers it. A grade gate at `high`, `medium` or `low` can fail where 0.13 passed:
+  its 8 points can lift a score to `high`. Action: run once without a gate.
+  ([Capped](docs/verdicts.md#capped))
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
   is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
@@ -90,9 +91,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   step with a version, branch or name from the lock or a repository outside it is left out, so a
   hostile lock cannot inject into a pasted command. This affects a reader who copies these commands. Action: if a step is missing,
   check that lock entry before you write the command by hand. ([The move](docs/schema.md#the-move))
-- **CLI:** a repository host's redirect to another host no longer receives lockrot's
-  `Authorization` or `PRIVATE-TOKEN` header, on Composer 2.10 or later with curl. lockrot asks the
-  redirect target again without it. ([Which credentials](docs/internals.md#which-credentials))
+- **CLI:** a repository host's redirect to another origin no longer receives lockrot's
+  `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the redirect target again without it. ([Which credentials](docs/internals.md#which-credentials))
 - **table, github, markdown:** a control character from the lock or a repository prints as an
   escape (`\x1B`), also in `--explain`, in the error lines on stderr, as in the install-time
   summary. So does a character that prints as nothing, such as a zero-width space (`\u{200B}`). A
@@ -102,23 +102,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   can json, sarif, gitlab, the report in the html page or the `--explain` JSON, which write `##[` as
   `#\u0023[`, the same decoded text.
   ([What lockrot does](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
-- **markdown:** text from the lock cannot mention a user or a team, or link a bare URL or an email
-  address, in a pull request comment or a job summary. It cannot render as math or as an emoji, or
+- **markdown:** text from the lock cannot mention a user or a team, or link a bare URL, an email
+  address, an issue reference (`#1`, `GH-1`) or a commit hash, in a pull request comment or a job
+  summary. It cannot render as math or as an emoji, or
   stand in for a package name on a footer line. ([`--format=markdown`](docs/ci.md#-formatmarkdown))
+- **sarif:** text from a Composer repository, such as an advisory title or id, cannot embed a link
+  (`[text](uri)`) in a message or a rule description. ([`--format=sarif`](docs/ci.md#-formatsarif))
 - **All formats:** a repository URL with a `.` or `..` path segment names no repository, so a lock
   cannot send the token to another API path of the repository host.
 
 ### Added
 
-- **JSON:** `run.move_check.blocking_disabled_by` lists each environment variable and
-  composer.json key that turns Composer's advisory blocking off. The move check then blocks no
-  advisory. A variable value that Composer refuses stops the run with exit code 2.
+- **JSON:** `run.move_check.blocking_disabled_by` lists each environment variable and composer.json
+  key that turns Composer's advisory blocking off. The move check then blocks no advisory.
   `policy.advisories.audit: ignore` alone writes no run note `advisories_disabled_by_policy`.
   ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** Composer's solver checks each move against the lock, and the move
   writes `check` with the release it `installs`. A refused move asks once more with its holders, and
   `moves_with[]` names the holders that move. A move still refused names its holds in `held_by[]`
   and prints only `composer why-not --locked`. ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** the move check reads `update-with-minimal-changes` and `COMPOSER_MINIMAL_CHANGES`
+  on Composer 2.7 and later, as Composer does. It loads no vcs, git or artifact repository. A
+  package that the lock records from a vcs repository stays at its locked version, and its move
+  reads `not_checked`. ([The move check](docs/verdicts.md#the-move-check))
+- **json:** `security.update_now_command` holds no PHP raise step. Only the `update now:` line says
+  to raise `require.php` first. ([Security](docs/schema.md#advisories-with-no-fix-expected))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
   installs, with require-dev and without, and the links that set each edge. The minors and edges
   assume no override, and `platform_override` names the lock's `platform-overrides.php`. The text
@@ -179,8 +187,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `abandoned_ignore_unreadable` say what Composer's abandoned ignore list and its audit setting
   did. ([Run notes](docs/notes.md#abandoned_markings_ignored))
 - **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
-  (`config.policy: false`, `policy.advisories: false` or `COMPOSER_POLICY=0`) that stops Composer from warning about advisories. lockrot still asks, and
-  every advisory still counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
+  (`config.policy: false`, `policy.advisories: false` or `COMPOSER_POLICY=0`) that turns off
+  Composer's advisory blocking in an update (`composer update`, `require` or `remove`). lockrot
+  still asks, and every advisory still counts.
+  ([Run notes](docs/notes.md#advisories_disabled_by_policy))
 - **markdown:** `--markdown-max-bytes` keeps a report written through `--output` within a byte
   budget. The report ends at a whole row, and a last row counts the rows it left out.
   ([In CI](docs/ci.md))
@@ -223,6 +233,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   action writes its job summary from an `--offline` run, which shows no advisory on 0.14: upgrade
   the action before you set `version: latest`.
   ([Upgrading to 0.14](docs/changes/0.14.md#how-014-reaches-you))
+- **Breaking:** **Config:** on Composer 2.10 and later, a value that Composer refuses in
+  `COMPOSER_NO_BLOCKING`, `COMPOSER_NO_SECURITY_BLOCKING`, `COMPOSER_POLICY`,
+  `COMPOSER_POLICY_ADVISORIES_BLOCK`, `config.policy` or `config.audit` exits 2, `--offline` too.
+  0.13 read none of them. Action: set the variable to `0`, `1`, `true`, `false`, `on` or `off`,
+  or fix the key.
+  ([The move check](docs/verdicts.md#the-move-check))
 - **Breaking:** **Config:** an `ignore[].flags`, `accept-unchecked` or `advisory-lookup` value that
   0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2. One
   run names each refusal of `fail-on` and `ignore[].flags`, and each schema error. Action: give

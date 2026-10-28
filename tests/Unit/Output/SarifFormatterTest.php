@@ -62,9 +62,9 @@ final class SarifFormatterTest extends TestCase
     }
 
     /** acme/abandoned is on line 4 of the lock written here, acme/silent on line 8. */
-    private function lockPath(string $name = 'composer.lock'): string
+    private function lockPath(string $name = 'composer.lock', string $dirPrefix = ''): string
     {
-        $dir = sys_get_temp_dir().'/lockrot-sarif-'.bin2hex(random_bytes(8));
+        $dir = sys_get_temp_dir().'/lockrot-sarif-'.$dirPrefix.bin2hex(random_bytes(8));
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }
@@ -402,11 +402,29 @@ final class SarifFormatterTest extends TestCase
         self::assertSame('composer.lock', JsonPath::stringAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uri']));
     }
 
-    public function testWordingAvoidsBannedTerms(): void
+    /** @return iterable<string, array{string}> */
+    public static function lockDirectories(): iterable
     {
-        $out = strtolower($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->allVerdictsReport(), true));
+        yield 'a random directory' => [''];
+        yield 'a directory whose name holds a banned word' => ['dead-'];
+    }
+
+    /** @dataProvider lockDirectories */
+    #[DataProvider('lockDirectories')]
+    public function testWordingAvoidsBannedTerms(string $dirPrefix): void
+    {
+        $sarif = $this->formatter(Verdict::SILENT, $this->lockPath('composer.lock', $dirPrefix))->format($this->allVerdictsReport(), true);
+        $words = [];
+        // A `uri` holds the lock's path, which the run chooses: only the other strings are the formatter's words.
+        $log = JsonPath::decoded(json_decode($sarif, true));
+        array_walk_recursive($log, static function ($value, $key) use (&$words): void {
+            if ($key !== 'uri' && \is_string($value)) {
+                $words[] = strtolower($value);
+            }
+        });
+        self::assertNotSame([], $words);
         foreach (['vulnerable', 'broken', 'insecure', 'dead'] as $banned) {
-            self::assertStringNotContainsString($banned, $out);
+            self::assertStringNotContainsString($banned, implode("\n", $words));
         }
     }
 

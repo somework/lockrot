@@ -146,7 +146,7 @@ final class SarifRecords
             return [
                 'id' => $ruleId,
                 'name' => $name,
-                'shortDescription' => ['text' => 'Security advisory '.substr($name, \strlen('advisory/')).' affects the installed version'],
+                'shortDescription' => ['text' => self::noLink('Security advisory '.substr($name, \strlen('advisory/')).' affects the installed version')],
                 'fullDescription' => ['text' => 'A counted security advisory affects the installed version: '.$bucket->bucket().' severity.'],
                 'defaultConfiguration' => ['level' => FormatContext::LEVEL_WARNING],
                 'helpUri' => self::HELP_URI.'#security-advisories',
@@ -187,7 +187,16 @@ final class SarifRecords
      */
     public static function message(string $text): array
     {
-        return ['text' => strtr($text, ['{' => '{{', '}' => '}}'])];
+        return ['text' => self::noLink(strtr($text, ['{' => '{{', '}' => '}}']))];
+    }
+
+    /**
+     * SARIF 2.1.0 §3.11.6 reads `[text](any URI)` in plain text as an embedded link, and the text
+     * of a Composer repository reaches a message. With no `](` left, no link text closes.
+     */
+    private static function noLink(string $text): string
+    {
+        return str_replace('](', ']\\(', $text);
     }
 
     /**

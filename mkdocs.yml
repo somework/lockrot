@@ -1,7 +1,7 @@
 site_name: lockrot
 site_url: https://lockrot.dev/
 site_description: >-
-  Find abandoned, unmaintained and branch-pinned packages in composer.lock. Composer plugin and PHAR with evidence, priority, baseline and CI exit codes.
+  Find abandoned, unmaintained and branch-pinned packages in composer.lock. Composer plugin and PHAR with evidence, a score, a baseline and CI exit codes.
 site_author: Igor Pinchuk
 copyright: Released under the MIT licence. Copyright Igor Pinchuk.
 

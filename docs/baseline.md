@@ -37,12 +37,12 @@ From the run of a recorded project with a baseline, abridged:
       36 = silent 32 + old-promise 4 [¼ of 16] (baseline: silent new)
       gate 36 = min(36, 2 × 32) (the score is lower); new: 32 = silent 32
 …
-baseline: 45 known · 25 new · 2 worsened · 9 stale (lockrot-baseline.json)
+baseline: 47 known · 26 new · 2 worsened · 9 stale (lockrot-baseline.json)
 gate: fails · --fail-on=high · 11 findings fail it; 30 reach it and are known to the baseline ·
 target php 8.4 (--target-php)
 ```
 
-## What `--generate-baseline` does
+## <a name="what-generate-baseline-does"></a>What `--generate-baseline` does
 
 - Writes `lockrot-baseline.json` next to `composer.json`, or the path in `--baseline` or
   [`extra.lockrot.baseline`](configuration.md#extralockrot-keys), relative to `composer.json` or
@@ -149,9 +149,9 @@ Matching rules:
   [`baseline_fix_model_differs`](notes.md#baseline_fix_model_differs)).
 - **Whichever value.** A `known` finding fails no `--fail-on` value, `unchecked` included. A
   `worsened` finding fails `unchecked` on whatever S10 it carries.
-- **Graded findings only.** A baseline never covers an `ok`, `finished` or `unknown` finding, so
-  one that carries [S10](verdicts.md#what-was-not-checked) still fails `--fail-on=unchecked`
-  however often you regenerate.
+- **Graded findings only.** An entry covers graded findings only. An `ok`, `finished` or `unknown`
+  finding that carries [S10](verdicts.md#what-was-not-checked) fails `--fail-on=unchecked`, also
+  when an incomplete lookup carried its entry forward.
 - **Stale entries stay.** A normal run never edits the file. Regenerate the file to drop them.
 
 ### The gate score

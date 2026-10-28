@@ -120,7 +120,7 @@ Composer or Symfony can stop before lockrot runs, with their own exit `1`:
 | Exit `1`, `There are no commands defined in the "json" namespace` | `php lockrot.phar --output json:r.json`: before the command name, Symfony reads a value after a space as the command | Join the value with `=`: `--output=json:r.json` |
 | Exit `1`, Composer's error box about `composer.json`, in plugin mode | Composer cannot parse or validate `composer.json` | Fix the file. The PHAR reads the file itself and exits `2` for it |
 
-## Reading the gate line {#reading-the-gate-line}
+## <a name="reading-the-gate-line"></a>Reading the gate line {#reading-the-gate-line}
 
 Every text format prints one `gate:` line that says whether the run fails and why:
 
@@ -237,7 +237,7 @@ For other CI systems, run the PHAR as in [PHAR in CI](phar.md#in-ci), or the
 | `html` | One self-contained page to read, attach or publish | [`--format=html`](#-formathtml) |
 | `json` | Scripts and dashboards: every field | [`--format=json`](#-formatjson) |
 
-### How each format marks a finding {#how-each-format-marks-a-finding}
+### <a name="how-each-format-marks-a-finding"></a>How each format marks a finding {#how-each-format-marks-a-finding}
 
 `github`, `sarif` and `gitlab` write records: one annotation per package in `github`, one result
 per counted flag and per counted advisory in `sarif`, one issue per counted flag in `gitlab`. Each
@@ -376,7 +376,7 @@ The shape of one annotation:
   gives Composer's answer to
   [the update of the packages that exclude it](verdicts.md#the-update-that-admits-the-target).
 
-## `--format=sarif` {#-formatsarif}
+## <a name="-formatsarif"></a>`--format=sarif` {#-formatsarif}
 
 A [SARIF 2.1.0](https://json.schemastore.org/sarif-2.1.0.json) document for GitHub code scanning.
 Code scanning keeps the results in the Security tab and tracks them across runs. The upload needs
@@ -417,6 +417,8 @@ steps:
 - A tool that dismisses the alerts of suppressed results (such as `advanced-security/dismiss-alerts`)
   dismisses every result whose fact the baseline covers. A result that worsens loses its
   suppression.
+- A message holds text from a Composer repository, such as an advisory title. lockrot writes each
+  `](` in it as `]\(`, so a SARIF viewer reads no `[text](uri)` as a link.
 
 `originalUriBaseIds.%SRCROOT%` is the directory that the lock's path is relative to (the directory
 that lockrot runs in, or the lock's own when it lies outside it), as an absolute `file://` URL on
@@ -427,14 +429,14 @@ anywhere else, strip it first ([what a report reveals](schema.md#where-a-package
 jq 'del(.runs[].originalUriBaseIds)' lockrot.sarif > lockrot.public.sarif
 ```
 
-### SARIF exit code {#sarif-exit-code}
+### <a name="sarif-exit-code"></a>SARIF exit code {#sarif-exit-code}
 
 `runs[0].invocations[0].exitCode` is the exit code that the gate decides: `1` when `gate.fails`,
 else `0`. `exitCodeDescription` is the [`gate:` line](#reading-the-gate-line), and the invocation's
 `properties.gate` holds the json report's `gate`. `executionSuccessful` stays `true`: the run
 worked, and the gate failed.
 
-## `--format=gitlab` {#-formatgitlab}
+## <a name="-formatgitlab"></a>`--format=gitlab` {#-formatgitlab}
 
 A [GitLab Code Quality](https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format)
 report: a JSON array with one issue per counted flag. Publish it as a `codequality` artifact:
@@ -475,7 +477,7 @@ new or fixed against the target branch
 - The format has no field for a document-level note, so the report's notes are not in it. Use
   `--format=json` for them.
 
-## `--format=markdown` {#-formatmarkdown}
+## <a name="-formatmarkdown"></a>`--format=markdown` {#-formatmarkdown}
 
 A report shaped for a pull-request comment or a job summary. The steps after lockrot run with
 `if: always()`, so they post the comment when the gate fails too:
@@ -524,9 +526,10 @@ The shape of the table:
 
 lockrot renders every value from the project or from package metadata as plain text, and
 backslash-escapes Markdown and HTML punctuation. A `composer.lock` under someone else's control
-cannot put an image, a tag or link markup into the comment. It cannot mention a user or a team,
-or make a bare URL or an email address into a link. It cannot render `$…$` as math or `:name:` as
-an emoji. A control character prints as an escape, such as `\x1B`.
+cannot put an image, a tag or link markup into the comment. It cannot mention a user or a team, or
+make a bare URL or an email address into a link. It cannot link `#1`, `GH-1` or a commit hash to an
+issue or a commit of your repository. It cannot render `$…$` as math or `:name:` as an emoji. A
+control character prints as an escape, such as `\x1B`.
 
 ## `--format=html` {#-formathtml}
 
@@ -563,7 +566,7 @@ every package, so the file grows with the lock.
 that adds its own policy header gets the intersection of the two. `script-src 'unsafe-inline'` and
 `style-src 'unsafe-inline'` in that header are enough.
 
-### The JSON beside the page {#the-json-beside-the-page}
+### <a name="the-json-beside-the-page"></a>The JSON beside the page {#the-json-beside-the-page}
 
 To keep the report as a JSON file next to the page, ask for both in one run:
 

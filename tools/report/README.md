@@ -15,8 +15,9 @@ These scripts connect lockrot with its report renderer,
 
 - A lockrot release vendors a plain `vX.Y.Z` of the renderer. Never tag lockrot with a pre-release
   or a `--from-dir` build in `resources/report/`.
-- A pull request into a release branch can vendor a pre-release `vX.Y.Z-rc.N`. This lets the
-  release branch test the page before the renderer release.
+- The release recipe vendors a pre-release `vX.Y.Z-rc.N` first, then the release
+  ([Cutting a release](../../CONTRIBUTING.md#cutting-a-release)). The release branch tests the page
+  of the pre-release before the renderer release.
 - Cut the renderer release with a commit that changes only the version of its newest
   pre-release. The page carries that version, so its bytes, its CSP hash and its manifest differ
   from the pre-release. The CI of the lockrot release pull request that vendors the release tests

@@ -3325,7 +3325,7 @@
                     "minLength": 1
                 },
                 "project_php_lowest": {
-                    "description": "The lowest PHP `require.php` admits: its lower bound normalised to MAJOR.MINOR.PATCH, a fourth segment and a stability suffix dropped (`7.2.5.0-dev` is `7.2.5`, `^7.4.0-RC1` gives `7.4.0`; `7.2.0` for `^7.2 || ^8.0.0`; an exclusive bound gives the next patch: `>7.4` gives `7.4.1`, and the post-release bound `>=7.4.0-p1` gives `7.4.1`). Null exactly when the constraint has no lowest: no `require.php`, `*`, an alternative with no lower bound (`<8`), or a constraint it cannot parse. Print it with a trailing `.0` patch dropped.",
+                    "description": "The lowest PHP `require.php` admits: its lower bound normalised to MAJOR.MINOR.PATCH, a fourth segment and a stability suffix dropped (`7.2.5.0-dev` is `7.2.5`, `^7.4.0-RC1` gives `7.4.0`; `7.2.0` for `^7.2 || ^8.0.0`; an exclusive stable bound gives the next patch: `>7.4` gives `7.4.1`, and the post-release bound `>=7.4.0-p1` gives `7.4.1`; an exclusive pre-release bound gives its release: `>7.4.0-RC1` gives `7.4.0`). Null exactly when the constraint has no lowest: no `require.php`, `*`, an alternative with no lower bound (`<8`), or a constraint it cannot parse. Print it with a trailing `.0` patch dropped.",
                     "oneOf": [
                         {
                             "type": "string",

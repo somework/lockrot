@@ -86,9 +86,13 @@ carries `User-Agent: lockrot`.
 - Exception: Composer's entry for the host can be a client certificate, or custom headers without a
   credential header. Then Composer adds no credential header, and lockrot sends its own.
 
-- When a host redirects to another host, lockrot asks that host again without its own header.
-  This needs Composer 2.10 or later with the curl extension. With an older Composer,
-  Composer sends lockrot's header to the redirect target too.
+- When a host redirects to another origin, lockrot asks that origin again without its own header.
+  Where Composer cannot stop a redirect (below 2.10, or without the curl extension), lockrot
+  follows each same-origin redirect of a request with its header itself.
+
+- Where Composer cannot stop a redirect, lockrot sends the requests with its header one at a time,
+  not in parallel. In an install-time run, the [budget](install-time.md#time-budget) can end before
+  the later requests. lockrot sends no request after the budget ends.
 
 - lockrot exchanges a `bitbucket-oauth` consumer for a bearer token, once per run, the first time
   it asks about a Bitbucket repository: a `client_credentials` request to
@@ -187,9 +191,9 @@ public Drupal site locks showed both.
 - Each cached answer holds the response's status, body and fetch time. lockrot stores no request
   header, so it stores no token.
 
-- lockrot does not cache a failed request (a transport error, 401, 403, 429 or 5xx). When an older
-  answer for the URL is cached, lockrot uses it, and the footer shows its age. A 404 is an answer,
-  and lockrot caches it.
+- lockrot does not cache a failed request: a transport error, a 5xx, or a 4xx other than 404, 401
+  and 429 included. When an older answer for the URL is cached, lockrot uses it, and the footer
+  shows its age. A 404 is an answer, and lockrot caches it.
 
 - With Composer's cache disabled (`composer --no-cache`), lockrot keeps answers in memory for the
   run and writes nothing.
@@ -235,6 +239,9 @@ run.
 - Repository metadata comes from Composer's cache. lockrot reports a package that is missing from
   it as unavailable ([Metadata unavailable](notes.md#metadata_unavailable)), not as absent from the
   repository.
+
+- In plugin mode, lockrot reads the repositories that the config declares, not the ones that
+  plugins add, because a plugin repository can reach the network.
 
 - Repository activity comes from lockrot's cache, however old. A package whose repository is
   missing from it carries S10 with reason `offline`

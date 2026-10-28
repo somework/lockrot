@@ -225632,7 +225632,13 @@ export const d_ok_unchecked_entry_dagger = {
         "furthest_behind": null,
         "packages": 1
     },
-    "baseline": null,
+    "baseline": {
+        "path": "lockrot-baseline.json",
+        "known": 1,
+        "new": 0,
+        "worsened": 0,
+        "stale": []
+    },
     "gate": {
         "fails": true,
         "tripped_by": [
@@ -225645,10 +225651,10 @@ export const d_ok_unchecked_entry_dagger = {
             "baseline": 0
         },
         "standing": {
-            "known": 0,
+            "known": 1,
             "new": 0,
             "worsened": 0,
-            "none": 1
+            "none": 0
         },
         "failing_packages": [
             "scheb/2fa-google-authenticator"
@@ -225838,7 +225844,28 @@ export const d_ok_unchecked_entry_dagger = {
                 },
                 "push_unmeasured": null
             },
-            "baseline": null,
+            "baseline": {
+                "status": "known",
+                "recorded": {
+                    "lead": "abandoned",
+                    "flags": {
+                        "abandoned": {
+                            "known_since": "2026-06-01"
+                        }
+                    },
+                    "advisory_count": 0,
+                    "first_seen": "2026-06-01",
+                    "target_php": "8.4",
+                    "fix_model": 1
+                },
+                "advisories_now": {
+                    "known": 0,
+                    "new": 0,
+                    "re_rated": 0,
+                    "fix_lost": 0
+                },
+                "worsened_by": []
+            },
             "gate": {
                 "reaches_fail_on": true,
                 "fails": true,
@@ -225855,7 +225882,19 @@ export const d_ok_unchecked_entry_dagger = {
                         ]
                     }
                 ],
-                "basis": null
+                "basis": {
+                    "score": 0,
+                    "verdict": null,
+                    "cap": 0,
+                    "limited_by": "cap",
+                    "new": {
+                        "total": 0,
+                        "exact": 0,
+                        "rounded_down": false,
+                        "terms": [],
+                        "modifiers": []
+                    }
+                }
             }
         }
     ]
