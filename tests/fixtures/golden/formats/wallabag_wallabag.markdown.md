@@ -1,6 +1,6 @@
 ### lockrot: 52 of 200 packages flagged — critical 3 · high 35 · medium 9 · low 5
 
-**gate: fails** · --fail-on=high · 38 findings fail it · advisories not applied to 200 packages: not checked (Composer below 2.4) · target php 8.4 (--target-php)
+**gate: fails** · --fail-on=high · 38 findings fail it · advisories not applied to 200 packages: not checked (no repository publishes advisories) · target php 8.4 (--target-php)
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|

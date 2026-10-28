@@ -368,7 +368,11 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'score.accepted[].if_counted.modifiers[].divide_by' => self::ONLY_PSR_LOG,
         'score.accepted[].if_counted.modifiers[].reason' => self::ONLY_PSR_LOG,
         'age.release.dated_by' => 'No case of the model dates its newest release by a monorepo parent.',
-        'security.partial.unverified' => 'No case of the model leaves a fact of a partial fix unverified.',
+        'security.partial.unverified' => self::PARTIAL_UNVERIFIED,
+        'security.partial.if_applied.at_most=true' => self::PARTIAL_UNVERIFIED,
+        'score.accepted[].if_counted.at_least=true' => 'No case of the model accepts a `stale` that S4 did not decide.',
+        'next_step.also[].held_by[].holder.direct=false' => 'Each also[] move of a case with inputs that a package holds is held by a direct requirement.',
+        'next_step.also[].php_check.target_runs=false' => 'No also[] move of a case with inputs needs a PHP that the target does not run.',
         'unchecked_accepted[].accepted_by.reason' => self::ACCEPT_UNCHECKED,
         'unchecked_accepted[].check' => self::ACCEPT_UNCHECKED,
         'unchecked_accepted[].reason' => self::ACCEPT_UNCHECKED,
@@ -400,6 +404,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].moves_with[].package' => self::ALSO_CHECK,
         'next_step.also[].moves_with[].version' => self::ALSO_CHECK,
     ];
+
+    private const PARTIAL_UNVERIFIED = 'No case of the model leaves a fact of a partial fix unverified, so no partial score is an upper bound. NextStepTest builds both sides.';
 
     private const ONLY_PSR_LOG = 'Only psr-log accepts a flag on a halved finding, and it carries no branch rows, so the projector gives it no inputs.';
 
@@ -547,15 +553,29 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         }
     }
 
-    /** Each path of a line is filled by the model's fields of some case, or listed in UNFILLED. */
+    /**
+     * Each path of a line is filled by the model's fields of some case, or listed in UNFILLED. A
+     * boolean path also needs a case for each value, `path=true` and `path=false`: a relation such
+     * as "unverified is not empty exactly when at_most" then has a case on both sides.
+     */
     public function testEveryPathOfALineIsFilledByACase(): void
     {
         $filled = [];
+        $booleans = [];
         foreach (self::caseLines() as [$id, $line]) {
             $case = CaseHydrator::case($id);
             $model = self::documentOf(JsonPath::arrayAt($case, ['finding']), JsonPath::arrayAt($case, ['run']), self::branchesOf($case['details'] ?? null));
             foreach (self::paths(self::LINES[$line]) as $path) {
-                $filled[$path] = ($filled[$path] ?? false) || self::holdsAValue(Fields::only($model, [$path]));
+                $leaves = self::leaves(Fields::only($model, [$path]));
+                $filled[$path] = ($filled[$path] ?? false) || $leaves !== [];
+                foreach (array_filter($leaves, 'is_bool') as $value) {
+                    $booleans[$path][$value ? 'true' : 'false'] = true;
+                }
+            }
+        }
+        foreach ($booleans as $path => $seen) {
+            foreach (['true', 'false'] as $value) {
+                $filled[$path.'='.$value] = isset($seen[$value]);
             }
         }
         self::assertNotSame([], $filled);
@@ -567,19 +587,22 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         self::assertSame($listed, $unfilled, 'list each path that no case fills in UNFILLED, and take each filled path off it');
     }
 
-    /** @param mixed $node */
-    private static function holdsAValue($node): bool
+    /**
+     * @param mixed $node
+     *
+     * @return list<scalar> the values that are not null
+     */
+    private static function leaves($node): array
     {
         if (!\is_array($node)) {
-            return $node !== null;
+            return \is_scalar($node) ? [$node] : [];
         }
+        $leaves = [];
         foreach ($node as $value) {
-            if (self::holdsAValue($value)) {
-                return true;
-            }
+            $leaves = array_merge($leaves, self::leaves($value));
         }
 
-        return false;
+        return $leaves;
     }
 
     /**

@@ -5510,7 +5510,7 @@
                 {
                     "executionSuccessful": true,
                     "exitCode": 1,
-                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 38 findings fail it \u00b7 advisories not applied to 200 packages: not checked (Composer below 2.4) \u00b7 target php 8.4 (--target-php)",
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 38 findings fail it \u00b7 advisories not applied to 200 packages: not checked (no repository publishes advisories) \u00b7 target php 8.4 (--target-php)",
                     "properties": {
                         "gate": {
                             "fails": true,
@@ -5579,10 +5579,10 @@
                                 {
                                     "check": "advisories",
                                     "packages": 200,
-                                    "reason": "composer_too_old"
+                                    "reason": "no_feed"
                                 }
                             ],
-                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 38 findings fail it \u00b7 advisories not applied to 200 packages: not checked (Composer below 2.4) \u00b7 target php 8.4 (--target-php)"
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 38 findings fail it \u00b7 advisories not applied to 200 packages: not checked (no repository publishes advisories) \u00b7 target php 8.4 (--target-php)"
                         },
                         "fail_on": "high",
                         "fail_on_source": "option",

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -45,6 +46,7 @@ final class RendererScriptsTest extends TestCase
             [ ${#patterns[@]} -gt 0 ] || exit 97
             for pattern in "${patterns[@]}"; do cp "$FAKE_RELEASE/$pattern" "$dir"/ || exit 95; done ;;
           "attestation verify") [ "${FAKE_ATTESTATION:-0}" = 0 ] || exit "$FAKE_ATTESTATION"; printf '%s' "${FAKE_DIGEST:-}" ;;
+          "api repos/somework/lockrot-report/compare/"*) printf '%s\n' "${FAKE_COMPARE:-ahead}" ;;
           *) exit 99 ;;
         esac
         BASH;
@@ -188,6 +190,30 @@ final class RendererScriptsTest extends TestCase
         self::assertSame(1, $process->getExitCode());
         self::assertStringContainsString('resources/report/ holds lockrot-report 1.2.3-rc.1, not a release', $process->getOutput());
         self::assertSame('', $this->log());
+    }
+
+    /** @dataProvider renderedOnMain */
+    #[DataProvider('renderedOnMain')]
+    public function testTheCheckPassesOnlyACommitOnTheRenderersMain(string $status, bool $passes): void
+    {
+        $this->vendored('1.2.3');
+
+        $process = $this->runScript('check-vendored', [], ['FAKE_COMPARE' => $status]);
+
+        self::assertSame($passes, $process->getExitCode() === 0, $process->getOutput().$process->getErrorOutput());
+        self::assertStringContainsString('api repos/somework/lockrot-report/compare/'.self::COMMIT.'...main --jq .status', $this->log());
+        if (!$passes) {
+            self::assertStringContainsString('is not on the main branch of somework/lockrot-report', $process->getOutput());
+        }
+    }
+
+    /** @return iterable<string, array{string, bool}> */
+    public static function renderedOnMain(): iterable
+    {
+        yield 'main is ahead of the commit' => ['ahead', true];
+        yield 'main is the commit' => ['identical', true];
+        yield 'the commit left main' => ['diverged', false];
+        yield 'the commit is ahead of main' => ['behind', false];
     }
 
     public function testTheCheckRefusesAPageWithoutAnAttestation(): void

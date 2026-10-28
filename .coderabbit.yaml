@@ -113,11 +113,10 @@ reviews:
         breaks them:
         - PHP 7.4 is the language floor. No match expressions, enums, constructor promotion,
           readonly, union types in signatures, or str_contains()/str_starts_with() without a guard.
-        - Composer 2.2 is the plugin-API floor. Anything a later Composer added needs a version
-          guard.
-        - Only the symfony/console 2.8 API. require-dev resolves a newer console, but the plugin runs
-          inside the Composer 2.2 process that bundles console 2.8, so newer Console API passes
-          locally and fails on the 2.2 rows of the matrix.
+        - Composer 2.10 is the plugin floor (composer-plugin-api ^2.9 and the version check in
+          LockrotPlugin). Anything a later Composer added needs a version guard.
+        - Only the symfony/console 5.4 API. The plugin runs inside the Composer process, and the
+          Composer PHAR bundles console 5.4, so newer Console API passes locally and fails there.
     - path: 'bin/**'
       instructions: |
         The PHP scripts (bin/lockrot, bin/record-fixtures, bin/refresh-monorepo-parents) are

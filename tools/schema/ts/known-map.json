@@ -131,7 +131,6 @@
   ],
   "values": [
    "offline",
-   "composer_too_old",
    "install_time_budget",
    "lookup_failed"
   ],
@@ -912,7 +911,6 @@
   ],
   "values": [
    "offline",
-   "composer_too_old",
    "install_time_budget",
    "lookup_failed",
    "not_from_composer_repository",
@@ -1317,7 +1315,6 @@
    "offline",
    "undated_releases",
    "releases_unknown",
-   "composer_too_old",
    "lookup_failed",
    "host_not_supported",
    "no_feed",
@@ -2118,7 +2115,6 @@
   ],
   "values": [
    "offline",
-   "composer_too_old",
    "install_time_budget",
    "not_from_composer_repository",
    "transport",
@@ -3625,7 +3621,6 @@
   ],
   "values": [
    "offline",
-   "composer_too_old",
    "install_time_budget",
    "lookup_failed",
    "no_feed",

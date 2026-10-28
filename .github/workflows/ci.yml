@@ -1,14 +1,15 @@
 name: CI
-# A push runs CI only on main and release/**, so another branch with an open PR runs once per push,
-# on its pull_request event. A push to main or release/** runs the mutation gate over the whole
-# tree. A tag runs phar.yml, not this file. A new push to a PR cancels the run for the old head,
-# because the ruleset waits for the new head's checks. On main, every push gets a group of its own:
-# GitHub cancels a pending run when a newer run joins its group, and phar.yml refuses a tag whose
-# commit has no successful push run. On release/**, a newer push replaces a pending run.
-# full-check.yml, not this file, runs on a push to release/full-check-**.
+# A push runs CI only on main, release/** and integration/**, so another branch with an open PR runs
+# once per push, on its pull_request event. A push to one of those branches runs the mutation gate
+# over the whole tree, so a direct push to a release branch gets every job. A final tag runs
+# phar.yml, and an rc tag runs full-check.yml, not this file. A new push to a PR cancels the run for
+# the old head, because the ruleset waits for the new head's checks. On main, every push gets a
+# group of its own: GitHub cancels a pending run when a newer run joins its group, and phar.yml
+# refuses a tag whose commit has no successful push run. On another pushed branch, a newer push
+# replaces a pending run. full-check.yml, not this file, runs on a push to release/full-check-**.
 on:
   push:
-    branches: [main, 'release/**', '!release/full-check-**']
+    branches: [main, 'release/**', 'integration/**', '!release/full-check-**']
   pull_request:
 # No job of this workflow writes to the repository: the token reads only.
 permissions:
@@ -29,32 +30,23 @@ jobs:
       # A pull request into a branch other than main runs the rows below. They hold each PHPUnit major
       # that composer.json allows, because the majors read options and events differently. The
       # rows resolve 9.6 on 7.4 and 8.0, 10.5 on 8.1 only, and 11.5 on 8.2 and later. They also
-      # hold both PHPUnit configurations, both ends of the PHP range and the middle of
-      # composer/composer. A pull request into main and a push run them all. A ruleset requires a
-      # check by its job name, so a renamed row drops out of the ruleset.
-      # The move check solves with the classes of composer/composer, which change at 2.4, 2.6 and
-      # 2.9 (src/Solver). The 2.2 and latest rows cover the ends, and the 2.6 row the middle.
-      # The ignore-list readers (src/Data/Advisory, src/Data/Abandoned) and the blocking settings
-      # (src/Solver/AdvisoryBlocking.php) read Composer 2.9's AuditConfig by property name, and only
-      # the 2.9 row has that class. The 2.6 row runs the readers' Auditor leg of Composer 2.4 to 2.8.
+      # hold both PHPUnit configurations and both ends of the PHP range. A pull request into main and
+      # a push run them all. A ruleset requires a check by its job name, so a renamed row drops out
+      # of the ruleset. lockrot supports Composer 2.10 and later (composer.json), so every row runs
+      # the newest composer/composer that require-dev allows.
       # The covers-nothing tests pin their target PHP, so they run on the two covers_nothing rows,
-      # at both ends of PHP and of composer/composer. Each row runs the runtime-php group.
+      # at both ends of PHP. Each row runs the runtime-php group.
       matrix: >-
         ${{ fromJSON(github.event_name == 'pull_request' && github.base_ref != 'main' && '{
         "include": [
-        {"php": "7.4", "composer": "2.2", "covers_nothing": true},
+        {"php": "7.4", "composer": "latest", "covers_nothing": true},
         {"php": "8.0", "composer": "latest"},
         {"php": "8.1", "composer": "latest"},
-        {"php": "8.3", "composer": "2.6"},
-        {"php": "8.3", "composer": "2.9"},
         {"php": "8.5", "composer": "latest", "covers_nothing": true}]}' || '{
         "php": ["7.4", "8.0", "8.1", "8.2", "8.3", "8.4", "8.5"],
-        "composer": ["2.2", "latest"],
-        "exclude": [{"php": "8.5", "composer": "2.2"}],
+        "composer": ["latest"],
         "include": [
-        {"php": "8.3", "composer": "2.6"},
-        {"php": "8.3", "composer": "2.9"},
-        {"php": "7.4", "composer": "2.2", "covers_nothing": true},
+        {"php": "7.4", "composer": "latest", "covers_nothing": true},
         {"php": "8.5", "composer": "latest", "covers_nothing": true}]}') }}
     steps:
       - uses: actions/checkout@v7
@@ -63,16 +55,9 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: none
           tools: composer:v2
-      - name: Pin composer/composer for the matrix
-        run: |
-          if [ "${{ matrix.composer }}" = "2.2" ]; then composer require --dev --no-update "composer/composer:~2.2.25"; fi
-          # Composer 2.9 and later block every 2.6 release of composer/composer for its advisories. The job tests lockrot against that library and never runs it.
-          if [ "${{ matrix.composer }}" = "2.6" ]; then composer require --dev --no-update "composer/composer:~2.6.6" && composer config --json policy.advisories.ignore '["composer/composer"]'; fi
-          if [ "${{ matrix.composer }}" = "2.9" ]; then composer require --dev --no-update "composer/composer:~2.9.2" && composer config --json policy.advisories.ignore '["composer/composer"]'; fi
-          composer update --no-interaction --prefer-dist
+      - run: composer update --no-interaction --prefer-dist
       - name: Run tests with the matrix Composer binary
         run: |
-          if [ "${{ matrix.composer }}" = "2.2" ]; then composer self-update --2.2; fi
           composer -V
           config=phpunit.xml.dist
           if [ "${{ matrix.php }}" = "7.4" ] || [ "${{ matrix.php }}" = "8.0" ]; then config=phpunit9.xml.dist; fi
@@ -86,60 +71,32 @@ jobs:
             # A configuration whose <groups> element the sed does not match runs the wrong groups.
             grep -qF "<groups>$2</groups>" "$1" || { echo "::error::$1 does not hold the <groups> of its process"; return 1; }
           }
-          # Composer 2.4 to 2.6 write no advisory severity, which the advisory tests read. This row tests the move check.
-          if [ "${{ matrix.composer }}" = "2.6" ]; then
-            groups_config phpunit-ci.xml "<exclude>$slow<group>covers-nothing</group></exclude>"
-            vendor/bin/phpunit -c phpunit-ci.xml tests/Unit/Solver tests/Unit/Verdict tests/Unit/Analyzer
-            # The Auditor parameter leg of the ignore-list reader (Composer 2.4 to 2.8) runs only here,
-            # so a skip or an empty run fails the row.
-            vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AuditParityTest.php
-          elif [ "${{ matrix.composer }}" = "2.9" ]; then
-            # The Composer 2.9 legs of the parity tests and of the blocking settings must run here, so
-            # a skip or an empty run fails the row. The filter leaves out the Composer 2.10 test of the blocking.
-            groups_config phpunit-ci.xml "<exclude>$slow</exclude>"
-            vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AuditParityTest.php
-            vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter 'testTheAuditConfigLeg' tests/Integration/AbandonedIgnoreParityTest.php
-            vendor/bin/phpunit -c phpunit-ci.xml --fail-on-skipped --fail-on-empty-test-suite --filter '/^(?!.*testOnComposer210)/' tests/Unit/Solver/AdvisoryBlockingTest.php
-            vendor/bin/phpunit -c phpunit-ci.xml tests/Unit/Data
+          # Processes side by side shorten the row. Each writes its own log, and the step checks every exit code.
+          # A runtime-php test reads the PHP that runs it, so a row without covers-nothing still runs it.
+          # On a covers_nothing row, schema-sweep holds the longest covers-nothing class and gets a process of its own.
+          runs=("<exclude>$slow<group>covers-nothing</group></exclude>")
+          if [ "${{ matrix.covers_nothing }}" = "true" ]; then
+            runs+=("<include><group>covers-nothing</group></include><exclude>$slow<group>schema-sweep</group></exclude>")
+            runs+=("<include><group>schema-sweep</group></include><exclude>$slow</exclude>")
           else
-            # Processes side by side shorten the row. Each writes its own log, and the step checks every exit code.
-            # A runtime-php test reads the PHP that runs it, so a row without covers-nothing still runs it.
-            # On a covers_nothing row, schema-sweep holds the longest covers-nothing class and gets a process of its own.
-            runs=("<exclude>$slow<group>covers-nothing</group></exclude>")
-            if [ "${{ matrix.covers_nothing }}" = "true" ]; then
-              runs+=("<include><group>covers-nothing</group></include><exclude>$slow<group>schema-sweep</group></exclude>")
-              runs+=("<include><group>schema-sweep</group></include><exclude>$slow</exclude>")
-            else
-              runs+=("<include><group>runtime-php</group></include><exclude>$slow</exclude>")
-            fi
-            mkdir -p build
-            # The copies stay beside the configuration, because PHPUnit resolves its paths from there.
-            # All of them exist before a process starts, so a failed copy leaves no process running.
-            for i in "${!runs[@]}"; do groups_config "phpunit-ci-$i.xml" "${runs[$i]}"; done
-            pids=()
-            for i in "${!runs[@]}"; do
-              vendor/bin/phpunit -c "phpunit-ci-$i.xml" > "build/phpunit-$i.log" 2>&1 &
-              pids+=($!)
-            done
-            failed=0
-            for i in "${!runs[@]}"; do
-              status=0; wait "${pids[$i]}" || status=$?
-              echo "=== phpunit ${runs[$i]}: exit $status"; cat "build/phpunit-$i.log"
-              if [ "$status" -ne 0 ]; then failed=1; fi
-            done
-            if [ "$failed" -ne 0 ]; then exit 1; fi
+            runs+=("<include><group>runtime-php</group></include><exclude>$slow</exclude>")
           fi
-      # Composer 2.2 LTS bundles symfony/console 2.8, older than the version that require-dev resolves.
-      # This step runs the plugin e2e test through the real 2.2 binary, so it exercises the bundled 2.8 API.
-      - name: Run the plugin e2e test through the Composer 2.2 binary
-        if: matrix.composer == '2.2'
-        env: {LOCKROT_E2E: '1', GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'}
-        run: |
-          if [ "${{ matrix.php }}" = "7.4" ] || [ "${{ matrix.php }}" = "8.0" ]; then
-            vendor/bin/phpunit -c phpunit9.xml.dist --group e2e --filter PluginTest
-          else
-            vendor/bin/phpunit --group e2e --filter PluginTest
-          fi
+          mkdir -p build
+          # The copies stay beside the configuration, because PHPUnit resolves its paths from there.
+          # All of them exist before a process starts, so a failed copy leaves no process running.
+          for i in "${!runs[@]}"; do groups_config "phpunit-ci-$i.xml" "${runs[$i]}"; done
+          pids=()
+          for i in "${!runs[@]}"; do
+            vendor/bin/phpunit -c "phpunit-ci-$i.xml" > "build/phpunit-$i.log" 2>&1 &
+            pids+=($!)
+          done
+          failed=0
+          for i in "${!runs[@]}"; do
+            status=0; wait "${pids[$i]}" || status=$?
+            echo "=== phpunit ${runs[$i]}: exit $status"; cat "build/phpunit-$i.log"
+            if [ "$status" -ne 0 ]; then failed=1; fi
+          done
+          if [ "$failed" -ne 0 ]; then exit 1; fi
   # The tests rows exclude MoveCheckComposerOracleTest, or skip it on a composer/composer that
   # recorded none of train 7d's answers. The latest rows follow each new Composer release. This job
   # runs the oracle test once on each recorded version, so the test runs on every head. A ruleset
@@ -259,15 +216,18 @@ jobs:
     # is too slow for one job, so each shard mutates a group of src directories. The shards have
     # unequal populations, and one shared min_msi leaves a shard a few mutants from red. So a
     # shard's min_msi is its covered MSI rounded down, minus one, and a shard cut from another keeps
-    # that one's. Every src directory must belong to one shard: a directory in none is never
-    # mutated. Measurements: https://github.com/somework/lockrot/pull/65
+    # that one's. Every src file must belong to one shard: a file in none is never mutated
+    # (tools/mutation/tests/test_mutation_options.py). A shard can list single files of a directory
+    # that is too slow for one shard. Measurements: https://github.com/somework/lockrot/pull/65
     # full-check.yml repeats this matrix, and tools/mutation/tests/test_full_check_matrix.py keeps
     # the two equal.
     strategy:
       fail-fast: false
       matrix:
         shard:
-          - {name: verdicts, filter: 'src/Verdict', min_msi: 98}
+          - {name: moves, filter: 'src/Verdict/Move.php src/Verdict/MoveBuilder.php src/Verdict/MoveContext.php src/Verdict/MoveText.php src/Verdict/MaintenanceMove.php', min_msi: 98}
+          - {name: findings, filter: 'src/Verdict/Finding.php src/Verdict/FindingDetails.php src/Verdict/GradedPackage.php src/Verdict/NextStep.php src/Verdict/Score.php src/Verdict/SecurityPartial.php src/Verdict/SecurityStanding.php', min_msi: 98}
+          - {name: verdicts, filter: 'src/Verdict/Age.php src/Verdict/CommandArgument.php src/Verdict/FailOn.php src/Verdict/FailOnValue.php src/Verdict/FlagSentence.php src/Verdict/FlagSet.php src/Verdict/Latest.php src/Verdict/MoveChecks.php src/Verdict/MoveDraft.php src/Verdict/MoveFact.php src/Verdict/MoveSubject.php src/Verdict/Moves.php src/Verdict/Replacement.php src/Verdict/ScoreModel.php src/Verdict/ShellCommand.php src/Verdict/ThroughCheck.php src/Verdict/ThroughEntry.php src/Verdict/Verdict.php', min_msi: 98}
           - {name: score, filter: 'src/Score', min_msi: 98}
           - {name: output and security, filter: 'src/Output src/Html src/Explain src/Security', min_msi: 98}
           - {name: signals and analyzer, filter: 'src/Signal src/Analyzer', min_msi: 98}
@@ -280,10 +240,10 @@ jobs:
       # A pull request is diffed against its base branch: it needs the history down to the merge base.
       - uses: actions/checkout@v7
         with: {fetch-depth: "${{ github.event_name == 'pull_request' && '0' || '1' }}"}
-      # A push to main or release/** mutates the whole tree against the shard's minimum MSI. A pull
-      # request mutates only its changed lines, where a minimum MSI over few mutants is noise. There,
-      # tools/mutation/pr_gate.py fails on an escape that tests/infection-equivalents.md does not
-      # account for. A ruleset requires a check by its job name, so a renamed shard drops out of the
+      # A push mutates the whole tree against the shard's minimum covered MSI. A pull request mutates
+      # only its changed lines, where a minimum MSI over few mutants is noise. There,
+      # tools/mutation/pr_gate.py fails on an escaped, uncovered, ignored or skipped mutant that
+      # tests/infection-equivalents.md does not account for. A ruleset requires a check by its job name, so a renamed shard drops out of the
       # ruleset. Reasons: https://github.com/somework/lockrot/pull/65
       - name: What this shard mutates
         id: scope
@@ -291,13 +251,25 @@ jobs:
         run: |
           if [ "$EVENT" != pull_request ]; then echo "mode=full" >> "$GITHUB_OUTPUT"; exit 0; fi
           base=$(git merge-base "origin/$BASE_REF" HEAD)
-          dirs=(); files=()
-          for path in $FILTER; do if [ -d "$path" ]; then dirs+=("$path"); else files+=("$path"); fi; done
-          changed_dirs=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${dirs[@]}" | grep '\.php$' || true)
+          # members: the files of a directory that the shard lists one by one. Their changed lines are
+          # mutated with their whole directory's, and the gate keeps the shard's own mutants.
+          dirs=(); files=(); members=()
+          for path in $FILTER; do
+            if [ -d "$path" ]; then dirs+=("$path"); elif [ "$(dirname "$path")" = src ]; then files+=("$path"); else members+=("$path"); fi
+          done
+          own=("${dirs[@]}" "${members[@]}")
+          for member in "${members[@]}"; do dirs+=("$(dirname "$member")"); done
+          dirs=($(printf '%s\n' "${dirs[@]}" | sort -u))
+          # Git reads a rename into a file pathspec as an added file, and Infection reads it over the
+          # directories as a rename. So the diff runs over the directories and keeps the shard's own paths.
+          mine() { while read -r path; do for o in "${own[@]}"; do case "$path" in "$o" | "$o"/*) echo "$path"; break ;; esac; done; done; }
+          changed_dirs=""
+          if [ ${#dirs[@]} -gt 0 ]; then changed_dirs=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${dirs[@]}" | grep '\.php$' | mine || true); fi
           changed_files=""
           if [ ${#files[@]} -gt 0 ]; then changed_files=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${files[@]}" | tr '\n' ' '); fi
           # --git-diff-lines reads added and modified files only. A renamed file is mutated whole, by path.
-          renamed=$(git diff --name-only --diff-filter=R "$base" HEAD -- "${dirs[@]}" "${files[@]}" | grep '\.php$' | tr '\n' ' ' || true)
+          renamed=""
+          if [ ${#dirs[@]} -gt 0 ]; then renamed=$(git diff --name-only --diff-filter=R "$base" HEAD -- "${dirs[@]}" | grep '\.php$' | mine | tr '\n' ' ' || true); fi
           changed_files=$(echo $changed_files $renamed)
           if [ -z "$changed_dirs" ] && [ -z "$changed_files" ]; then
             echo "mode=none" >> "$GITHUB_OUTPUT"
@@ -321,20 +293,23 @@ jobs:
         if: steps.scope.outputs.mode == 'diff' && steps.scope.outputs.files != ''
         run: |
           ulimit -v 4194304
-          $(composer global config bin-dir --absolute)/infection --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --min-msi=0 --min-covered-msi=0 ${{ steps.scope.outputs.files }}
+          $(composer global config bin-dir --absolute)/infection --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --with-uncovered --min-msi=0 --min-covered-msi=0 ${{ steps.scope.outputs.files }}
           if [ -f build/infection.log ]; then mv build/infection.log build/infection-files.log; fi
+          if [ -f build/infection.json ]; then mv build/infection.json build/infection-files.json; fi
       - name: Mutate the lines the pull request changes
         if: steps.scope.outputs.mode == 'diff' && steps.scope.outputs.diff == 'true'
         run: |
           python3 tools/mutation/shard_config.py infection.json5 ${{ steps.scope.outputs.dirs }} > infection.shard.json5
           ulimit -v 4194304
-          $(composer global config bin-dir --absolute)/infection --configuration=infection.shard.json5 --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --git-diff-lines --git-diff-base=${{ steps.scope.outputs.base }} --min-msi=0 --min-covered-msi=0
-      - name: Escapes against tests/infection-equivalents.md
+          $(composer global config bin-dir --absolute)/infection --configuration=infection.shard.json5 --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --git-diff-lines --git-diff-base=${{ steps.scope.outputs.base }} --with-uncovered --min-msi=0 --min-covered-msi=0
+      # --paths keeps the shard's own mutants: a shard of single files mutates their whole directory's lines.
+      - name: Mutants against tests/infection-equivalents.md
         if: steps.scope.outputs.mode == 'diff'
+        env: {FILTER: '${{ matrix.shard.filter }}'}
         run: |
-          logs=(); for log in build/infection.log build/infection-files.log; do if [ -f "$log" ]; then logs+=("$log"); fi; done
+          logs=(); for log in build/infection.json build/infection-files.json; do if [ -f "$log" ]; then logs+=("$log"); fi; done
           if [ ${#logs[@]} -eq 0 ]; then echo "The changed lines hold no code Infection mutates." | tee -a "$GITHUB_STEP_SUMMARY"; exit 0; fi
-          status=0; python3 tools/mutation/pr_gate.py "${logs[@]}" tests/infection-equivalents.md > gate.md || status=$?
+          status=0; python3 tools/mutation/pr_gate.py --paths "$FILTER" "${logs[@]}" tests/infection-equivalents.md > gate.md || status=$?
           cat gate.md >> "$GITHUB_STEP_SUMMARY"; cat gate.md; exit $status
       - if: always()
         uses: actions/upload-artifact@v7

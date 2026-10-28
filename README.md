@@ -29,7 +29,7 @@ composer lockrot
 
 ## Install
 
-The Composer plugin needs PHP 7.4+ and Composer 2.2+ and adds `composer lockrot` (alias
+The Composer plugin needs PHP 7.4+ and Composer 2.10+ and adds `composer lockrot` (alias
 `composer rot`):
 
 ```bash

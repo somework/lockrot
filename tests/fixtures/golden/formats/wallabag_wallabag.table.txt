@@ -353,6 +353,7 @@ scheb/2fa-google-authenticator 3 路 friendsofsymfony/oauth-server-bundle 2 路 鈥
 advisories: 0 packages asked, 200 not asked
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
 <fg=red>gate: fails 路 --fail-on=high 路 38 findings fail it 路</fg=red>
-<fg=red>advisories not applied to 200 packages: not checked (Composer below 2.4) 路 target php 8.4 (--target-php)</fg=red>
+<fg=red>advisories not applied to 200 packages: not checked (no repository publishes advisories) 路</fg=red>
+<fg=red>target php 8.4 (--target-php)</fg=red>
 Data as of 2026-09-14 (package repositories, repository hosts) 路 score model 1. Run composer lockrot --format=json for
 details.

@@ -33,8 +33,11 @@ class FullCheckMatrixTest(unittest.TestCase):
         self.assertEqual(CAP.findall(mutation_job(read('ci.yml'))), CAP.findall(mutation_job(read('full-check.yml'))))
 
     def test_ci_ignores_the_branches_that_full_check_runs_on(self):
-        self.assertIn("branches: [main, 'release/**', '!release/full-check-**']", read('ci.yml'))
+        self.assertIn("branches: [main, 'release/**', 'integration/**', '!release/full-check-**']", read('ci.yml'))
         self.assertIn("branches: ['release/full-check-**']", read('full-check.yml'))
+
+    def test_an_rc_tag_runs_the_full_check(self):
+        self.assertIn("tags: ['v*-rc.*']", read('full-check.yml'))
 
     def test_a_changed_shard_is_seen(self):
         changed = mutation_job(read('full-check.yml')).replace('min_msi: 98}', 'min_msi: 97}', 1)

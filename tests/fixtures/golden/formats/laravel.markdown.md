@@ -1,6 +1,6 @@
 ### lockrot: 1 of 76 packages flagged — low 1
 
-**gate: passes** · --fail-on=high · no finding fails it · advisories not applied to 76 packages: not checked (Composer below 2.4) · target php 8.4 (--target-php)
+**gate: passes** · --fail-on=high · no finding fails it · advisories not applied to 76 packages: not checked (no repository publishes advisories) · target php 8.4 (--target-php)
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|

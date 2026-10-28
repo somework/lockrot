@@ -450,8 +450,6 @@ When the lookup does not run, or runs in part, the finding carries S10 `{check: 
 
 - `--offline`.
 
-- Composer older than 2.4: the plugin on an LTS Composer. The PHAR bundles a newer one.
-
 - At install time, for the repositories that remain once the budget is spent.
 
 - A repository that failed. The run gets a [note](notes.md#advisories_unavailable) and, under
@@ -1159,7 +1157,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
 | `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8 |
 | `release_dates` | `undated_releases` | A release that S2 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it | S2 when the highest tag is undated. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
-| `advisories` | `offline`, `composer_too_old`, `install_time_budget`, `lookup_failed`, `no_feed` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
+| `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
 
 S10's `data` lists each missing check as `unchecked` (`{check, reason, blocks}`) and every blocked

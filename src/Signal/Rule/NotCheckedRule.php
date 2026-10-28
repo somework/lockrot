@@ -49,7 +49,6 @@ final class NotCheckedRule implements SignalRule
      */
     private const ADVISORY_CAUSES = [
         self::OFFLINE => 'the run is offline',
-        AdvisoryCoverage::COMPOSER_TOO_OLD => 'Composer is older than 2.4',
         self::BUDGET => 'the install-time budget ran out',
         AdvisoryCoverage::LOOKUP_FAILED => 'an advisory repository failed',
         AdvisoryCoverage::NO_FEED => 'no configured repository publishes advisories',

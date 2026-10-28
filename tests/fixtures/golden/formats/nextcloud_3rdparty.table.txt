@@ -58,7 +58,7 @@ microsoft/azure-storage-blob 1
 advisories: 0 packages asked, 94 not asked
 php: the lock installs on PHP 8.3 to 8.5; Composer checks it at 8.3.0 from config.platform.php
 <fg=red>gate: fails · --fail-on=high · 3 findings fail it ·</fg=red>
-<fg=red>advisories not applied to 94 packages: not checked (Composer below 2.4) · target php 8.4 (--target-php)</fg=red>
+<fg=red>advisories not applied to 94 packages: not checked (no repository publishes advisories) · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
 note: Repository activity not checked for 3 packages on hosts lockrot cannot ask: codeberg.org (3). A host that runs

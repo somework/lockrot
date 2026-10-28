@@ -92,7 +92,7 @@
       "type": "boolean"
     },
     "not_from_composer_repository": {
-      "description": "How many of the packages checked lockrot asked no repository about: the lock entry carries no Composer notification-url — a path, vcs, artifact or inline package entry, or a package from a `type: composer` repository that advertises no notify URL. Equals the number of findings whose `from_composer_repository` is false.",
+      "description": "How many of the packages checked came from no Composer repository: the lock entry carries no Composer notification-url — a path, vcs, artifact or inline package entry, or a package from a `type: composer` repository that advertises no notify URL. lockrot asks no repository for their metadata or repository activity. It asks for their advisories by name, except under `advisory-lookup: composer-repositories`. Equals the number of findings whose `from_composer_repository` is false.",
       "type": "integer",
       "minimum": 0
     },
@@ -261,7 +261,7 @@
       }
     },
     "exposure": {
-      "description": "Direct requirements that pull in attributable flagged packages (see `exposure_rule`), with how many, most first, then by name: the same count S7 carries on the requirement's finding. A direct requirement appears here only when it pulls in such a package; a flagged direct requirement that pulls in none is not listed, and its own verdict is on its finding.",
+      "description": "Direct requirements that pull in graded transitive packages, `[{package, flagged}]`, one per finding that carries S7, its `flagged` equal to S7's: every graded transitive package reached from 1 to `exposure_rule.max_fan_in` direct requirements is named by each of them (vulnerable-only ones included).",
       "type": "array",
       "items": {
         "type": "object",
@@ -1167,7 +1167,7 @@
       ]
     },
     "forgeId": {
-      "description": "The kind of repository host a note is about: `github`, `gitlab` (gitlab.com and every host in Composer's `gitlab-domains`) or `bitbucket`. An open set: a later release can add a host; read one you do not know as \"other\". The display name (`GitHub`) is the explanation's `activity.forge`, which is not this set.",
+      "description": "The kind of repository host a note is about: `github`, `gitlab` (gitlab.com and every host in Composer's `gitlab-domains`) or `bitbucket`. An open set: a later release can add a host; read one you do not know as \"other\".",
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$",
       "x-known-values": [
@@ -1287,12 +1287,11 @@
       ]
     },
     "advisoriesNotCheckedReason": {
-      "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `composer_too_old` (Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw). An open set: read a reason you do not know as another reason.",
+      "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw). An open set: read a reason you do not know as another reason.",
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$",
       "x-known-values": [
         "offline",
-        "composer_too_old",
         "install_time_budget",
         "lookup_failed"
       ]
@@ -7210,7 +7209,7 @@
           "minimum": 0
         },
         "feeds": {
-          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/advisoryFeed"
@@ -7794,7 +7793,7 @@
           "minimum": 0
         },
         "feeds": {
-          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/advisoryFeed"
@@ -8026,14 +8025,13 @@
           "type": "boolean"
         },
         "unchecked_reason": {
-          "description": "Why the lookup did not complete: `offline composer_too_old install_time_budget lookup_failed`, and `not_from_composer_repository` (outside the composer-repositories scope), `unparseable_version`, `no_feed`; an open set; null on a complete lookup.",
+          "description": "Why the lookup did not complete: `offline install_time_budget lookup_failed`, and `not_from_composer_repository` (outside the composer-repositories scope), `unparseable_version`, `no_feed`; an open set; null on a complete lookup.",
           "oneOf": [
             {
               "type": "string",
               "pattern": "^[a-z][a-z0-9_]*$",
               "x-known-values": [
                 "offline",
-                "composer_too_old",
                 "install_time_budget",
                 "lookup_failed",
                 "not_from_composer_repository",
@@ -8055,7 +8053,7 @@
           "minimum": 0
         },
         "feeds": {
-          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/advisoryFeed"
@@ -9089,7 +9087,6 @@
             "offline",
             "undated_releases",
             "releases_unknown",
-            "composer_too_old",
             "lookup_failed",
             "host_not_supported",
             "no_feed",
@@ -12638,14 +12635,13 @@
           ]
         },
         "reason": {
-          "description": "Why. On `not_asked`: `offline`, `composer_too_old`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set.",
+          "description": "Why. On `not_asked`: `offline`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set.",
           "oneOf": [
             {
               "type": "string",
               "pattern": "^[a-z][a-z0-9_]*$",
               "x-known-values": [
                 "offline",
-                "composer_too_old",
                 "install_time_budget",
                 "not_from_composer_repository",
                 "transport",
@@ -13088,7 +13084,7 @@
           "x-deprecated": true
         },
         "lead": {
-          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.",
+          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding when no Composer abandoned ignore list applies: jq reads `.lead` where it read `.verdict`.",
           "oneOf": [
             {
               "$ref": "#/definitions/maintenanceFlag"
@@ -19920,7 +19916,7 @@
           ]
         },
         "share": {
-          "description": "A fraction.",
+          "description": "The share a `select` or `share` rule takes (`{num, den}`: ¼ for corroborating).",
           "type": "object",
           "required": [
             "num",
@@ -20607,7 +20603,7 @@
                     "$ref": "#/definitions/severity"
                   },
                   "share": {
-                    "description": "A fraction.",
+                    "description": "On `share`: the fraction.",
                     "type": "object",
                     "required": [
                       "num",
@@ -20887,7 +20883,7 @@
                 ]
               },
               "order": {
-                "description": "Groups.",
+                "description": "On `dir: order`: the groups, first first (finished and ok are one group).",
                 "type": "array",
                 "items": {
                   "description": "A group.",
@@ -21527,7 +21523,7 @@
           ]
         },
         "thresholds": {
-          "description": "The ages, in years, that separate one verdict from the next.",
+          "description": "The ages, in years, that raise `silent`, `left-behind` and `stale`: each flag of `score_model.flags` names the keys that it reads in `thresholds`.",
           "oneOf": [
             {
               "type": "object",
@@ -22279,7 +22275,7 @@
       "properties": {}
     },
     "noteMetadataUnavailable": {
-      "description": "`metadata_unavailable`: metadata was asked for and did not come for `package_count` packages. `reasons` groups them by message, in the order the text lists them, and their `package_count`s sum to the note's. Each such finding is `unknown`, with `libyears_unmeasured` `metadata_unavailable`.",
+      "description": "`metadata_unavailable`: metadata was asked for and did not come for `package_count` packages. `reasons` groups them by message, in the order the text lists them, and their `package_count`s sum to the note's. Each such finding has `metadata.status` `unavailable` and `libyears_unmeasured` `unavailable`. Its verdict comes from what lockrot could still read, so a counted advisory still grades it.",
       "type": "object",
       "required": [
         "package_count",
@@ -22474,7 +22470,7 @@
       }
     },
     "noteRepositoryActivityNotFound": {
-      "description": "`repository_activity_not_found`: the host answered 404 for `repositories` (private, renamed or removed). An answer, not a network failure; where the host did not also rate-limit, this is the only record of them: their findings carry no S10 and their explanation's `activity` is null.",
+      "description": "`repository_activity_not_found`: the host answered 404 for `repositories` (private, renamed or removed). An answer, not a network failure. Their findings carry no S10, and their `activity.status` is `not_found`.",
       "type": "object",
       "required": [
         "forge_id",
@@ -23955,7 +23951,6 @@
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
             "offline",
-            "composer_too_old",
             "install_time_budget",
             "lookup_failed",
             "no_feed",

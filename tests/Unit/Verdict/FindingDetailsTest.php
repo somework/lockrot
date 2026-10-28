@@ -75,6 +75,7 @@ final class FindingDetailsTest extends TestCase
         $security = FindingDetails::of(F::looked(new PackageFacts(F::package(), null, null)), null, new PhpFloor('8.4', null), [], [], null, FindingBuilder::unmeasuredAge())->toSecurityArray([], null);
 
         self::assertSame([[], null], [$security['feeds'], $security['records']]);
+        self::assertSame(['not_run', 'no_feed'], [$security['check'], $security['unchecked_reason']], 'a run that asks no feed reads as the lookup of a project with no advisory feed');
     }
 
     /**

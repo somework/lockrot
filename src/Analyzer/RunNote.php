@@ -86,14 +86,13 @@ final class RunNote
     public const ADVISORIES_OFFLINE = 'offline';
     public const ADVISORIES_COMPOSER_TOO_OLD = 'composer_too_old';
     public const INSTALL_TIME_BUDGET = 'install_time_budget';
-    public const ADVISORIES_NOT_CHECKED_REASONS = [self::ADVISORIES_OFFLINE, self::ADVISORIES_COMPOSER_TOO_OLD, self::INSTALL_TIME_BUDGET];
+    public const ADVISORIES_NOT_CHECKED_REASONS = [self::ADVISORIES_OFFLINE, self::INSTALL_TIME_BUDGET];
     /** The same reason strings as S10 carries on the findings that the note concerns. */
     public const REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS = [NotCheckedRule::BUDGET];
 
     /** Each text states the cost of the missing check: no advisory adds points, and `if_applied` assumes none on the move's versions. */
     private const ADVISORIES_NOT_CHECKED_TEXT = [
         self::ADVISORIES_OFFLINE => 'security advisories not checked (offline)'.self::ADVISORIES_NOT_CHECKED_COST,
-        self::ADVISORIES_COMPOSER_TOO_OLD => 'security advisories not checked (needs Composer 2.4 or newer)'.self::ADVISORIES_NOT_CHECKED_COST,
         self::INSTALL_TIME_BUDGET => 'security advisories not checked (install-time budget spent)'.self::ADVISORIES_NOT_CHECKED_COST,
     ];
 
