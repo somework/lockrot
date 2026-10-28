@@ -79,6 +79,10 @@ What each value fails the run on, and which to start with, is in [In CI](ci.md).
 | `--output=<format>:<path>` | Also write the report to a file. Repeatable ([Writing reports to files](#writing-reports-to-files)) | — (command line only) |
 | `--markdown-max-bytes=<bytes>` | Keep each markdown report written through `--output` within this many bytes: rows are left out from the end, and a last row counts them. The heading, the `gate:` line, the table head, that row and the footer always print. The report on stdout is never cut | — (command line only) |
 
+`--fail-on`, `--baseline` and `--target-php` can be given once only: a second one is exit `2`,
+also with the same value, because a later value can loosen the gate. Every other option that takes
+one value keeps the last one.
+
 Composer's global options apply as well: `-d <dir>` (`--working-dir`) runs lockrot in another
 project directory, and `-q` silences everything lockrot prints, the report on stdout included.
 Join the directory to the option (`--working-dir=app` or `-dapp`): Composer 2.2 does not read

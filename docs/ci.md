@@ -75,17 +75,24 @@ with `lockrot:`, any other failure with `lockrot failed:`. `-v` adds the stack t
   gate has failed still exits `2` when a write then fails.
 - A `composer.json` or `composer.lock` lockrot cannot parse, a missing `composer.lock`, or a lock
   entry Composer's loader rejects (no `name` or `version`, a version it cannot normalise).
+- A lock that Composer cannot read: a `platform`, `platform-dev` or `platform-overrides` that is no
+  object, a `platform-overrides` value that Composer refuses, or a malformed `aliases`.
+- A lock that breaks a lockrot rule: `packages` is missing or is no list, `packages-dev` is no list,
+  a `name` is no string, or one name is listed twice, case ignored. The message names the lock
+  that Composer reads, such as `alt.lock` under `COMPOSER=alt.json`.
 - A value the configuration rejects: in `extra.lockrot`, in an environment variable, or on the
   command line ([configuration.md](configuration.md#extralockrot-keys)). That includes two values
   of one kind in `--fail-on`, `none` beside another value, and `vulnerable-low`.
 - A command line lockrot cannot read: an unknown option, an option without its value, a value given
-  to a flag, an argument too many.
+  to a flag, an argument too many. lockrot checks it before it reads any file.
+- `--fail-on`, `--baseline` or `--target-php` given twice, also with the same value
+  ([configuration.md](configuration.md#cli-options)).
 - A baseline lockrot cannot read, a baseline-1 file included
   ([baseline.md](baseline.md#when-lockrot-cannot-read-the-file)).
 - An `--output` lockrot refuses before the analysis, such as an unknown format or `composer.lock`
   ([configuration.md](configuration.md#writing-reports-to-files)).
 - An `--explain` lockrot cannot answer: a package the run did not analyse, or `--explain` combined
-  with `--output` or with a format other than `table` and `json`
+  with `--output`, `--generate-baseline` or a format other than `table` and `json`
   ([configuration.md](configuration.md#explaining-one-package)).
 
 **Network failures do not change the exit code on their own.** An unreachable Composer repository or

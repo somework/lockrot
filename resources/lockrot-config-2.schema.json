@@ -53,37 +53,45 @@
                     "check",
                     "reason"
                 ],
-                "not": {
-                    "description": "The advisories check is never scoped by host.",
-                    "properties": {
-                        "check": {
-                            "enum": [
-                                "advisories"
+                "allOf": [
+                    {
+                        "description": "An entry with `check: advisories` cannot have `host`.",
+                        "not": {
+                            "description": "The advisories check is never scoped by host.",
+                            "properties": {
+                                "check": {
+                                    "enum": [
+                                        "advisories"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "check",
+                                "host"
                             ]
                         }
                     },
-                    "required": [
-                        "check",
-                        "host"
-                    ]
-                },
-                "oneOf": [
                     {
-                        "description": "Scoped by host.",
-                        "required": [
-                            "host"
-                        ]
-                    },
-                    {
-                        "description": "Scoped by repository.",
-                        "required": [
-                            "repository"
-                        ]
-                    },
-                    {
-                        "description": "Scoped by package.",
-                        "required": [
-                            "package"
+                        "description": "An entry needs exactly one of `host`, `repository` and `package`.",
+                        "oneOf": [
+                            {
+                                "description": "Scoped by host.",
+                                "required": [
+                                    "host"
+                                ]
+                            },
+                            {
+                                "description": "Scoped by repository.",
+                                "required": [
+                                    "repository"
+                                ]
+                            },
+                            {
+                                "description": "Scoped by package.",
+                                "required": [
+                                    "package"
+                                ]
+                            }
                         ]
                     }
                 ]
@@ -104,74 +112,89 @@
         },
         "fail-on": {
             "description": "When the run fails. `none` is the default and must stand alone. A grade (`critical high medium low`) fails when the band of the gate score is at or above it. A maintenance flag (`abandoned silent pinned left-behind old-promise stale capped`) fails on a counted flag at or above it in flag order that the baseline does not cover, as the verdict gate of 0.13 did. A raw advisory severity (`vulnerable`, `vulnerable-medium`, `vulnerable-high`, `vulnerable-critical`) fails on a counted advisory at or above it that the baseline does not know. `vulnerable` means any severity, so `vulnerable-low` is not a value. `unchecked` fails on S10. A list holds at most one value per kind. lockrot trims and lower-cases each value and accepts whitespace around commas. `--fail-on` and `LOCKROT_FAIL_ON` replace this value whole. This schema checks the spelling of each value. Two values of one kind and `none` beside another value are errors of lockrot itself (exit 2), which name the values. `run.fail_on` writes the list in canonical form.",
-            "oneOf": [
+            "allOf": [
                 {
-                    "description": "A comma-separated list in one string: `\"high\"`, `\"left-behind, vulnerable-high\"`.",
-                    "type": "string",
-                    "anyOf": [
+                    "description": "`fail-on` is a string or a non-empty array of strings.",
+                    "oneOf": [
                         {
-                            "description": "One value, as an editor offers it.",
-                            "enum": [
-                                "none",
-                                "critical",
-                                "high",
-                                "medium",
-                                "low",
-                                "abandoned",
-                                "silent",
-                                "pinned",
-                                "left-behind",
-                                "old-promise",
-                                "stale",
-                                "capped",
-                                "vulnerable",
-                                "vulnerable-medium",
-                                "vulnerable-high",
-                                "vulnerable-critical",
-                                "unchecked"
+                            "description": "A comma-separated list in one string: `\"high\"`, `\"left-behind, vulnerable-high\"`.",
+                            "type": "string",
+                            "allOf": [
+                                {
+                                    "description": "A fail-on string is one value or a comma-separated list of values.",
+                                    "anyOf": [
+                                        {
+                                            "description": "One value, as an editor offers it.",
+                                            "enum": [
+                                                "none",
+                                                "critical",
+                                                "high",
+                                                "medium",
+                                                "low",
+                                                "abandoned",
+                                                "silent",
+                                                "pinned",
+                                                "left-behind",
+                                                "old-promise",
+                                                "stale",
+                                                "capped",
+                                                "vulnerable",
+                                                "vulnerable-medium",
+                                                "vulnerable-high",
+                                                "vulnerable-critical",
+                                                "unchecked"
+                                            ]
+                                        },
+                                        {
+                                            "pattern": "^\\s*([vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[cC][rR][iI][tT][iI][cC][aA][lL]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[mM][eE][dD][iI][uU][mM]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[hH][iI][gG][hH]|[lL][eE][fF][tT]-[bB][eE][hH][iI][nN][dD]|[oO][lL][dD]-[pP][rR][oO][mM][iI][sS][eE]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]|[aA][bB][aA][nN][dD][oO][nN][eE][dD]|[uU][nN][cC][hH][eE][cC][kK][eE][dD]|[cC][rR][iI][tT][iI][cC][aA][lL]|[mM][eE][dD][iI][uU][mM]|[sS][iI][lL][eE][nN][tT]|[pP][iI][nN][nN][eE][dD]|[cC][aA][pP][pP][eE][dD]|[sS][tT][aA][lL][eE]|[nN][oO][nN][eE]|[hH][iI][gG][hH]|[lL][oO][wW])\\s*(,\\s*([vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[cC][rR][iI][tT][iI][cC][aA][lL]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[mM][eE][dD][iI][uU][mM]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[hH][iI][gG][hH]|[lL][eE][fF][tT]-[bB][eE][hH][iI][nN][dD]|[oO][lL][dD]-[pP][rR][oO][mM][iI][sS][eE]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]|[aA][bB][aA][nN][dD][oO][nN][eE][dD]|[uU][nN][cC][hH][eE][cC][kK][eE][dD]|[cC][rR][iI][tT][iI][cC][aA][lL]|[mM][eE][dD][iI][uU][mM]|[sS][iI][lL][eE][nN][tT]|[pP][iI][nN][nN][eE][dD]|[cC][aA][pP][pP][eE][dD]|[sS][tT][aA][lL][eE]|[nN][oO][nN][eE]|[hH][iI][gG][hH]|[lL][oO][wW])\\s*)*$"
+                                        }
+                                    ]
+                                }
                             ]
                         },
                         {
-                            "pattern": "^\\s*([vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[cC][rR][iI][tT][iI][cC][aA][lL]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[mM][eE][dD][iI][uU][mM]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[hH][iI][gG][hH]|[lL][eE][fF][tT]-[bB][eE][hH][iI][nN][dD]|[oO][lL][dD]-[pP][rR][oO][mM][iI][sS][eE]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]|[aA][bB][aA][nN][dD][oO][nN][eE][dD]|[uU][nN][cC][hH][eE][cC][kK][eE][dD]|[cC][rR][iI][tT][iI][cC][aA][lL]|[mM][eE][dD][iI][uU][mM]|[sS][iI][lL][eE][nN][tT]|[pP][iI][nN][nN][eE][dD]|[cC][aA][pP][pP][eE][dD]|[sS][tT][aA][lL][eE]|[nN][oO][nN][eE]|[hH][iI][gG][hH]|[lL][oO][wW])\\s*(,\\s*([vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[cC][rR][iI][tT][iI][cC][aA][lL]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[mM][eE][dD][iI][uU][mM]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[hH][iI][gG][hH]|[lL][eE][fF][tT]-[bB][eE][hH][iI][nN][dD]|[oO][lL][dD]-[pP][rR][oO][mM][iI][sS][eE]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]|[aA][bB][aA][nN][dD][oO][nN][eE][dD]|[uU][nN][cC][hH][eE][cC][kK][eE][dD]|[cC][rR][iI][tT][iI][cC][aA][lL]|[mM][eE][dD][iI][uU][mM]|[sS][iI][lL][eE][nN][tT]|[pP][iI][nN][nN][eE][dD]|[cC][aA][pP][pP][eE][dD]|[sS][tT][aA][lL][eE]|[nN][oO][nN][eE]|[hH][iI][gG][hH]|[lL][oO][wW])\\s*)*$"
+                            "description": "A JSON array, read as the string form is read: `[\"left-behind\", \"vulnerable-high\"]`.",
+                            "type": "array",
+                            "minItems": 1,
+                            "uniqueItems": true,
+                            "items": {
+                                "description": "One value.",
+                                "type": "string",
+                                "allOf": [
+                                    {
+                                        "description": "Each item is one fail-on value.",
+                                        "anyOf": [
+                                            {
+                                                "description": "As an editor offers it.",
+                                                "enum": [
+                                                    "none",
+                                                    "critical",
+                                                    "high",
+                                                    "medium",
+                                                    "low",
+                                                    "abandoned",
+                                                    "silent",
+                                                    "pinned",
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "stale",
+                                                    "capped",
+                                                    "vulnerable",
+                                                    "vulnerable-medium",
+                                                    "vulnerable-high",
+                                                    "vulnerable-critical",
+                                                    "unchecked"
+                                                ]
+                                            },
+                                            {
+                                                "pattern": "^\\s*([vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[cC][rR][iI][tT][iI][cC][aA][lL]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[mM][eE][dD][iI][uU][mM]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[hH][iI][gG][hH]|[lL][eE][fF][tT]-[bB][eE][hH][iI][nN][dD]|[oO][lL][dD]-[pP][rR][oO][mM][iI][sS][eE]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]|[aA][bB][aA][nN][dD][oO][nN][eE][dD]|[uU][nN][cC][hH][eE][cC][kK][eE][dD]|[cC][rR][iI][tT][iI][cC][aA][lL]|[mM][eE][dD][iI][uU][mM]|[sS][iI][lL][eE][nN][tT]|[pP][iI][nN][nN][eE][dD]|[cC][aA][pP][pP][eE][dD]|[sS][tT][aA][lL][eE]|[nN][oO][nN][eE]|[hH][iI][gG][hH]|[lL][oO][wW])\\s*$"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
                         }
                     ]
-                },
-                {
-                    "description": "A JSON array, read as the string form is read: `[\"left-behind\", \"vulnerable-high\"]`.",
-                    "type": "array",
-                    "minItems": 1,
-                    "uniqueItems": true,
-                    "items": {
-                        "description": "One value.",
-                        "type": "string",
-                        "anyOf": [
-                            {
-                                "description": "As an editor offers it.",
-                                "enum": [
-                                    "none",
-                                    "critical",
-                                    "high",
-                                    "medium",
-                                    "low",
-                                    "abandoned",
-                                    "silent",
-                                    "pinned",
-                                    "left-behind",
-                                    "old-promise",
-                                    "stale",
-                                    "capped",
-                                    "vulnerable",
-                                    "vulnerable-medium",
-                                    "vulnerable-high",
-                                    "vulnerable-critical",
-                                    "unchecked"
-                                ]
-                            },
-                            {
-                                "pattern": "^\\s*([vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[cC][rR][iI][tT][iI][cC][aA][lL]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[mM][eE][dD][iI][uU][mM]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[hH][iI][gG][hH]|[lL][eE][fF][tT]-[bB][eE][hH][iI][nN][dD]|[oO][lL][dD]-[pP][rR][oO][mM][iI][sS][eE]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]|[aA][bB][aA][nN][dD][oO][nN][eE][dD]|[uU][nN][cC][hH][eE][cC][kK][eE][dD]|[cC][rR][iI][tT][iI][cC][aA][lL]|[mM][eE][dD][iI][uU][mM]|[sS][iI][lL][eE][nN][tT]|[pP][iI][nN][nN][eE][dD]|[cC][aA][pP][pP][eE][dD]|[sS][tT][aA][lL][eE]|[nN][oO][nN][eE]|[hH][iI][gG][hH]|[lL][oO][wW])\\s*$"
-                            }
-                        ]
-                    }
                 }
             ]
         },

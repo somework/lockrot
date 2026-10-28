@@ -265,17 +265,22 @@
                     }
                 }
             },
-            "anyOf": [
+            "allOf": [
                 {
-                    "description": "An entry stores at least one counted maintenance flag...",
-                    "required": [
-                        "flags"
-                    ]
-                },
-                {
-                    "description": "...or at least one counted advisory. A graded finding has a counted fact, and a carried entry keeps the facts it recorded.",
-                    "required": [
-                        "advisories"
+                    "description": "An entry needs `flags`, `advisories` or both.",
+                    "anyOf": [
+                        {
+                            "description": "An entry stores at least one counted maintenance flag...",
+                            "required": [
+                                "flags"
+                            ]
+                        },
+                        {
+                            "description": "...or at least one counted advisory. A graded finding has a counted fact, and a carried entry keeps the facts it recorded.",
+                            "required": [
+                                "advisories"
+                            ]
+                        }
                     ]
                 }
             ]
