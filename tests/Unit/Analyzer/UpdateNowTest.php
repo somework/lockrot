@@ -53,6 +53,26 @@ final class UpdateNowTest extends TestCase
         self::assertSame(['composer', 'update', self::PACKAGE.':^2.3.2'], $report->updateNowCommand());
     }
 
+    /**
+     * @dataProvider raises
+     *
+     * @param list<string> $raises
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('raises')]
+    public function testTheHighestRaiseOfTheMembersWins(array $raises, ?string $highest): void
+    {
+        self::assertSame($highest, UpdateNow::highestRaise($raises));
+    }
+
+    /** @return iterable<string, array{list<string>, ?string}> */
+    public static function raises(): iterable
+    {
+        yield 'the first is higher' => [['>=8.10', '>=8.9'], '>=8.10'];
+        yield 'the second is higher' => [['>=8.9', '>=8.10'], '>=8.10'];
+        yield 'one member raises' => [['>=8.2'], '>=8.2'];
+        yield 'no member raises' => [[], null];
+    }
+
     public function testACombinedUpdateThatIsNotCheckedHasNoMembersAndANoteSaysWhy(): void
     {
         $document = self::document(['result' => 'not_checked', 'form' => null, 'reason' => 'install_time_budget', 'holds' => []]);

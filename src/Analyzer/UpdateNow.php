@@ -101,17 +101,30 @@ final class UpdateNow
      */
     private static function raiseOf(array $inline, array $findings): ?string
     {
-        $raise = null;
+        $raises = [];
         foreach ($findings as $finding) {
             $move = isset($inline[$finding->package()]) ? $finding->nextStep() : null;
             $check = $move === null ? null : $move->phpCheck();
             $to = $check === null ? null : $check->raiseTo();
-            if ($to !== null && ($raise === null || version_compare(substr($to, 2), substr($raise, 2), '>'))) {
-                $raise = $to;
+            if ($to !== null) {
+                $raises[] = $to;
             }
         }
 
-        return $raise;
+        return self::highestRaise($raises);
+    }
+
+    /** @param list<string> $raises `>=` constraints */
+    public static function highestRaise(array $raises): ?string
+    {
+        $highest = null;
+        foreach ($raises as $raise) {
+            if ($highest === null || version_compare($raise, $highest, '>')) {
+                $highest = $raise;
+            }
+        }
+
+        return $highest;
     }
 
     /** The `>=` constraint that require.php needs before the command, null when it needs none. */
