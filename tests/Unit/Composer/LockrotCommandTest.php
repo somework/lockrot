@@ -2184,7 +2184,7 @@ final class LockrotCommandTest extends TestCase
         [, , $verbose] = $this->runCommandWithSplitStreams($command, ['--target-php' => '8.4']);
 
         self::assertSame(2, $code);
-        self::assertStringContainsString('findings.acme/empty: What the baseline knows about one package', $plain);
+        self::assertStringContainsString('findings.acme/empty: An entry needs `flags`, `advisories` or both.', $plain);
         self::assertStringNotContainsString('required', $plain);
         self::assertStringContainsString('required', $verbose);
     }

@@ -63,7 +63,7 @@ final class ConfigErrorOrderTest extends TestCase
     {
         $error = self::configError(['accept-unchecked' => [['check' => 'advisories', 'package' => 'a/*', 'repository' => 'https://mirror.example.org', 'reason' => 'two scopes']]]);
 
-        self::assertSame("extra.lockrot is invalid:\n  - accept-unchecked[0]: One accepted check.", $error->getMessage());
+        self::assertSame("extra.lockrot is invalid:\n  - accept-unchecked[0]: An entry needs exactly one of `host`, `repository` and `package`.", $error->getMessage());
         self::assertNotSame([], $error->details(), 'the branch errors are details');
         self::assertStringContainsString('accept-unchecked[0]', implode("\n", $error->details()));
     }
@@ -87,7 +87,7 @@ final class ConfigErrorOrderTest extends TestCase
         }
 
         self::assertNotNull($error);
-        self::assertStringStartsWith("baseline file is invalid:\n  - findings.acme/empty: What the baseline knows about one package", $error->getMessage());
+        self::assertStringStartsWith("baseline file is invalid:\n  - findings.acme/empty: An entry needs `flags`, `advisories` or both.", $error->getMessage());
         self::assertStringNotContainsString('required', $error->getMessage(), 'the branch errors wait for -v');
         self::assertStringContainsString('flags', implode("\n", $error->details()));
     }

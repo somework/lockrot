@@ -42,7 +42,7 @@ final class ConfigSchemaTest extends TestCase
         self::assertIsArray($properties);
         $failOn = $properties['fail-on'] ?? null;
         self::assertIsArray($failOn);
-        self::assertSame(FailOn::allowed(), JsonPath::arrayAt($failOn, ['oneOf', 0, 'anyOf', 0, 'enum']));
+        self::assertSame(FailOn::allowed(), JsonPath::arrayAt($failOn, ['allOf', 0, 'oneOf', 0, 'allOf', 0, 'anyOf', 0, 'enum']));
     }
 
     public function testFullValidConfigIsValid(): void
