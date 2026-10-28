@@ -392,7 +392,7 @@ final class ComposerHttpClientTest extends TestCase
         ]], $downloader->requests);
     }
 
-    /** The timeout is what the install-time budget has left at the moment the requests go out, never the default. */
+    /** The timeout is what the install-time budget has left when the requests go out, never the default. */
     public function testAPartlySpentDeadlineShortensEachRequestsTimeout(): void
     {
         $readings = [0.0, 2.6];
