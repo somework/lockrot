@@ -8,7 +8,6 @@ use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Version\StabilityFilter;
-use Composer\Pcre\Preg;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\ConfigurableRepositoryInterface;
@@ -327,7 +326,7 @@ final class RepositoryVersions implements VersionSource
     /** A repository URL as the lock and the config compare: no case, no trailing slash, no trailing `.git`. */
     public static function urlKey(string $url): string
     {
-        return Preg::replace('{/*(?:\.git)?/*$}', '', strtolower($url));
+        return (string) preg_replace('{/*(?:\.git)?/*$}', '', strtolower($url));
     }
 
     /**
