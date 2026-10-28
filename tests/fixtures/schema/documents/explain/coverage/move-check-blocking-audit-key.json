@@ -1188,7 +1188,13 @@
    "blocking_disabled_by": [
     "config.audit.block-insecure"
    ],
-   "ignores_extensions": true,
+   "ignored_platform": [
+    "ext-*",
+    "lib-*",
+    "php-debug",
+    "php-ipv6",
+    "php-zts"
+   ],
    "baseline": "resolves",
    "reason": null
   },

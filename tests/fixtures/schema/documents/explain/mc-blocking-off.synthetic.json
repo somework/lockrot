@@ -1219,7 +1219,13 @@
    "blocking_disabled_by": [
     "COMPOSER_NO_SECURITY_BLOCKING"
    ],
-   "ignores_extensions": true,
+   "ignored_platform": [
+    "ext-*",
+    "lib-*",
+    "php-debug",
+    "php-ipv6",
+    "php-zts"
+   ],
    "baseline": "resolves",
    "reason": null
   },
