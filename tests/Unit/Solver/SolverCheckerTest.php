@@ -733,6 +733,26 @@ final class SolverCheckerTest extends TestCase
     }
 
     /**
+     * The listed form stops on the shadowed acme/zeta, and the wider forms refuse on acme/mid. A
+     * shadowed name has loaded versions, so the refusal does not want it, yet its hidden releases
+     * can resolve the listed form: the move reads not_checked, never refused.
+     */
+    public function testARefusalOfAWiderFormAfterAShadowedNameIsNotChecked(): void
+    {
+        $locked = [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']], ['name' => 'acme/other', 'version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']], ['name' => 'acme/mid', 'version' => '1.0.0']];
+        $source = new ArrayVersionSource([
+            'acme/lib' => [['version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/zeta' => '^1.0', 'acme/mid' => '^1.0']]],
+            'acme/other' => [['version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']]],
+            'acme/mid' => [['version' => '1.0.0']],
+            'acme/zeta' => [['version' => '1.0.0']],
+        ], ['acme/zeta' => VersionSource::SHADOWED]);
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0', 'acme/other' => '^1.0']), LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, ['acme/mid' => [(new VersionParser())->parseConstraints('<1.1')]]);
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize());
+    }
+
+    /**
      * R5-33: a canonical vcs repository before the Composer repository can serve acme/zeta and hide
      * the release that the solve installs, so even a solve that installs the newest proves nothing.
      */

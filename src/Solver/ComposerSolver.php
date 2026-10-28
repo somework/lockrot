@@ -192,8 +192,10 @@ final class ComposerSolver
             }
             $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $requested, $locked);
             $setsPhp = $this->setsPhp;
+            // A shadowed name has loaded versions, so the refusal never wants it, yet its hidden releases can change the answer.
+            $shadowed = array_intersect($this->failures($loaded->asked()), [VersionSource::SHADOWED]);
 
-            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $this->failures($holds->wanted()));
+            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $this->failures($holds->wanted()) + $shadowed);
         }
 
         $installs = self::installs($answer);
