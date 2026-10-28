@@ -24,8 +24,8 @@ use Lockrot\Deadline;
  * that this process already fetched from its cache, so a name that the run read costs no request.
  * The first canonical repository that lists a name shadows the later ones. A repository with `only`,
  * `exclude` or `canonical` is asked as Composer asks it, through its FilterRepository. A vcs or
- * other repository is not loaded. It serves the names that the lock records from its URL, so a
- * later repository's versions of such a name are {@see VersionSource::SHADOWED}
+ * other repository is not loaded. It serves the names that the lock records from its URL. A name
+ * that it serves before a canonical repository lists the name is {@see VersionSource::SHADOWED}
  * (docs/verdicts.md#the-move-check).
  *
  * @internal
@@ -215,11 +215,8 @@ final class RepositoryVersions implements VersionSource
                 continue;
             }
             $loaded = self::withNewVersions($loaded, $versions);
-            if ($hidden && $versions !== []) {
-                $this->failures += [$name => self::SHADOWED];
-            }
             if (\in_array($name, $found, true)) {
-                return $loaded;
+                return $this->shadowedIf($hidden, $name, $loaded);
             }
         }
         if ($failed) {
@@ -229,6 +226,20 @@ final class RepositoryVersions implements VersionSource
         }
         if ($loaded === []) {
             $this->failUnlisted([$name]);
+        }
+
+        return $this->shadowedIf($hidden, $name, $loaded);
+    }
+
+    /**
+     * @param list<BasePackage> $loaded
+     *
+     * @return list<BasePackage>
+     */
+    private function shadowedIf(bool $hidden, string $name, array $loaded): array
+    {
+        if ($hidden && $loaded !== []) {
+            $this->failures += [$name => self::SHADOWED];
         }
 
         return $loaded;

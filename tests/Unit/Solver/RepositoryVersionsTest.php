@@ -714,6 +714,20 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([['1.0.0'], VersionSource::SHADOWED, VersionSource::FAILED], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib'), $versions->failure('acme/bad')]);
     }
 
+    /** A vcs repository after a repository that is not canonical adds versions that lockrot does not load, whether the name loads alone or not. */
+    public function testANameAfterANonCanonicalRepositoryAndBeforeAVcsRepositoryThatServesItIsShadowed(): void
+    {
+        $served = ['https://github.com/acme/lib' => ['acme/lib']];
+        $vcs = new ConfiguredRepository(['url' => 'https://github.com/acme/lib']);
+        $together = new RepositoryVersions([new FilterRepository(self::recording(['acme/lib' => ['1.0.0']]), ['canonical' => false]), $vcs], [], false, Deadline::never(), 'stable', [], $served);
+        $alone = new RepositoryVersions([new FilterRepository(self::recording(['acme/lib' => ['1.0.0']], ['acme/bad']), ['canonical' => false]), $vcs], [], false, Deadline::never(), 'stable', [], $served);
+
+        $alone->versionsOf(['acme/lib', 'acme/bad']);
+
+        self::assertSame([['1.0.0'], VersionSource::SHADOWED], [self::pretty($together->versions('acme/lib')), $together->failure('acme/lib')]);
+        self::assertSame([['1.0.0'], VersionSource::SHADOWED], [self::pretty($alone->versions('acme/lib')), $alone->failure('acme/lib')]);
+    }
+
     public function testOfflineANameThatNoComposerRepositoryListsStaysOffline(): void
     {
         $versions = new RepositoryVersions([self::repository([]), new ArrayRepository()], [], true, Deadline::never());

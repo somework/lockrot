@@ -20,7 +20,7 @@ interface VersionSource
     public const FAILED = 'failed';
     /** No Composer repository lists the name, and a path, VCS or package repository that the source does not ask can serve it. */
     public const UNREACHED = 'unreached';
-    /** A repository lists the name after a canonical repository that the source does not load, which can serve the name and hide it. */
+    /** A repository that the source does not load serves the name before a repository claims it, so its releases can hide or join the loaded ones. */
     public const SHADOWED = 'shadowed';
     /** The install-time budget ran out before the source asked. */
     public const BUDGET = 'install_time_budget';
