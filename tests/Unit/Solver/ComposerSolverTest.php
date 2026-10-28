@@ -501,7 +501,7 @@ final class ComposerSolverTest extends TestCase
 
         self::assertStringContainsString('affected by security advisories', $problem);
         self::assertStringContainsString('PKSA-1111-2222-3330', $problem);
-        foreach (['<href=', '</>', '<warning>'] as $markup) {
+        foreach (['<href=', '</>', '<warning>', "\033"] as $markup) {
             self::assertStringNotContainsString($markup, $problem);
         }
     }
@@ -554,12 +554,27 @@ final class ComposerSolverTest extends TestCase
         self::assertSame([true, ['acme/p' => '1.1.0'], ['acme/p', 'acme/q']], [$solution->resolves(), $solution->installs(), $solution->advisoryUnread()]);
     }
 
+    /** Composer blocks no release by a name that it only provides, so an unread provided name stays out. */
+    public function testASolveLeavesOutTheUnreadNameThatAHeldReleaseOnlyProvides(): void
+    {
+        $lookup = static fn (array $names, bool $complete): ?array => \in_array('acme/a-virtual', $names, true) ? null : [];
+        $solver = self::solver(
+            ['require' => ['acme/a-virtual' => '^1.0', 'acme/p' => '^1.0']],
+            [['name' => 'acme/p', 'version' => '1.0.0', 'provide' => ['acme/a-virtual' => '1.0.0']]],
+            ['acme/p' => [['version' => '1.0.0', 'provide' => ['acme/a-virtual' => '1.0.0']], ['version' => '1.1.0', 'provide' => ['acme/a-virtual' => '1.1.0']]], 'acme/a-virtual' => [['version' => '1.5.0']]]
+        )->withAdvisories(new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), $lookup));
+
+        $solution = $solver->solve(SolveRequest::update(['acme/p' => '^1.1']));
+
+        self::assertSame([true, ['acme/p' => '1.1.0'], ['acme/p']], [$solution->resolves(), $solution->installs(), $solution->advisoryUnread()]);
+    }
+
     public function testAFilterThatCannotBeBuiltFailsEverySolveThatBlocks(): void
     {
         $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]);
         $broken = $solver->withAdvisories(new PoolAdvisories(AdvisoryBlocking::unbuildable(new \Error('drift')), static fn (array $names, bool $complete): array => []));
 
-        self::assertSame(\RuntimeException::class, ($broken->solve(SolveRequest::baseline())->error() ?? [])['class'] ?? null);
+        self::assertSame(['class' => \RuntimeException::class, 'message' => 'Composer\'s advisory pool filter cannot be built: drift'], $broken->solve(SolveRequest::baseline())->error());
         self::assertTrue($solver->solve(SolveRequest::baseline())->resolves(), 'a solver without advisories runs no filter');
     }
 

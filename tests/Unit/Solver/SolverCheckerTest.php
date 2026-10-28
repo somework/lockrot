@@ -704,6 +704,19 @@ final class SolverCheckerTest extends TestCase
         yield 'the install-time budget ran out' => [VersionSource::BUDGET, MoveCheck::INSTALL_TIME_BUDGET];
     }
 
+    /** A resolving solve drops an unreached name from its unloaded names, so the update-now request reads each of its own. */
+    public function testAnUpdateNowOfANameNoComposerRepositoryListsIsNotChecked(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]],
+            ['acme/lib' => VersionSource::UNREACHED]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->combined(['acme/lib' => '^1.1.0'])->check()->jsonSerialize());
+    }
+
     /** R4-1: a release needs a name that only a path, VCS or package repository serves, and Composer can install it. */
     public function testARefusalThatWantsANameNoComposerRepositoryListsIsNotChecked(): void
     {
