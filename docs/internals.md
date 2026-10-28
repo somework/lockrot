@@ -88,7 +88,7 @@ carries `User-Agent: lockrot`.
 
 - When a host redirects to another origin, lockrot asks that origin again without its own header.
   Where Composer cannot stop a redirect (below 2.10, or without the curl extension), lockrot
-  follows each redirect of a request with its header itself.
+  follows each same-origin redirect of a request with its header itself.
 
 - Where Composer cannot stop a redirect, lockrot sends the requests with its header one at a time,
   not in parallel. In an install-time run, the [budget](install-time.md#time-budget) can end before
