@@ -90,6 +90,10 @@ carries `User-Agent: lockrot`.
   Where Composer cannot stop a redirect (below 2.10, or without the curl extension), lockrot
   follows each redirect of a request with its header itself.
 
+- Where Composer cannot stop a redirect, lockrot sends the requests with its header one at a time,
+  not in parallel. In an install-time run, the [budget](install-time.md#time-budget) can end before
+  the later requests. lockrot sends no request after the budget ends.
+
 - lockrot exchanges a `bitbucket-oauth` consumer for a bearer token, once per run, the first time
   it asks about a Bitbucket repository: a `client_credentials` request to
   `https://bitbucket.org/site/oauth2/access_token`. lockrot writes nothing to `auth.json`. When the
