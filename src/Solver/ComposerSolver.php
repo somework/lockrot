@@ -283,7 +283,7 @@ final class ComposerSolver
      */
     private function answer(DefaultPolicy $policy, Request $request, Pool $pool, BasePackage $root, ?array $preferred): array
     {
-        $inputs = SolverInputs::of($pool, $request, $root).json_encode($preferred);
+        $inputs = SolverInputs::of($pool, $request, $root).serialize($preferred);
         if ($inputs !== $this->lastInputs) {
             $optimized = (new PoolOptimizer($policy))->optimize($request, $pool);
             try {
