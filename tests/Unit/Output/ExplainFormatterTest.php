@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Allowlist\AcceptedCheck;
 use Lockrot\Allowlist\UncheckedAcceptanceEntry;
 use Lockrot\Analyzer\LibyearsMeasurement;
@@ -77,6 +78,30 @@ final class ExplainFormatterTest extends TestCase
         self::assertIsArray($json);
         self::assertIsArray($json['finding']);
         self::assertSame('dev-##[add-mask]x', $json['finding']['version']);
+    }
+
+    /** The branches that the monorepo dates are one list in the line that names it. */
+    public function testTheBranchesThatTheMonorepoDatesReadAsOneList(): void
+    {
+        $loader = new ArrayLoader();
+        $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
+        $tags = [];
+        foreach (['10', '9', '8'] as $major) {
+            foreach (['.40.0', '.30.0', '.20.0'] as $minor) {
+                $tags[] = $loader->load($on('illuminate/contracts', 'v'.$major.$minor, 'split', '2023-06-05T12:46:42+00:00'));
+            }
+        }
+        $child = PackageMetadata::fromPackages('illuminate/contracts', $tags, new \DateTimeImmutable(F::NOW));
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $loader->load($on('laravel/framework', 'v10.40.0', 'f10', '2026-08-12T03:46:26+00:00', ['illuminate/contracts' => 'self.version'])),
+            $loader->load($on('laravel/framework', 'v9.40.0', 'f9', '2026-07-12T03:46:26+00:00', ['illuminate/contracts' => 'self.version'])),
+            $loader->load($on('laravel/framework', 'v8.40.0', 'f8', '2026-06-12T03:46:26+00:00', ['illuminate/contracts' => 'self.version'])),
+        ], new \DateTimeImmutable(F::NOW));
+        $finding = (new FindingBuilder())->withPackage('illuminate/contracts')->withVersion('v8.20.0')->withVerdict(Verdict::OK)->build();
+
+        $text = self::plain(new Explanation($finding, F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v8.20.0', 'time' => '2023-06-05T12:46:42+00:00']), $child->datedBy($parent)), new Thresholds(), '8.4', self::report()));
+
+        self::assertStringContainsString('branches 10.x, 9.x and 8.x dated by laravel/framework, the monorepo', $text);
     }
 
     public function testTheMonologBridgeCaseReadsEveryBlockInOrder(): void

@@ -125,7 +125,7 @@ final class MoveSubject
 
     /**
      * The section option of the package's `composer require`. `--no-interaction` keeps a name that
-     * both sections list in `require` under any terminal answer, and `--dev` would delete that line.
+     * both sections list in `require` under any terminal answer, and `--dev` deletes that line.
      *
      * @return list<string>
      */

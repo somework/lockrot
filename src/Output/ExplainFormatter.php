@@ -419,7 +419,7 @@ final class ExplainFormatter
         $datedBy = $explanation->branchesDatedBy();
         if ($datedBy !== null) {
             [$parent, $branches] = $datedBy;
-            $lines[] = self::escape(\sprintf('%s %s dated by %s, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo\'s by their release', \count($branches) === 1 ? 'branch' : 'branches', implode(', ', $branches), $parent));
+            $lines[] = self::escape(\sprintf('%s %s dated by %s, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo\'s by their release', \count($branches) === 1 ? 'branch' : 'branches', ListWords::of($branches), $parent));
         }
 
         return $lines;

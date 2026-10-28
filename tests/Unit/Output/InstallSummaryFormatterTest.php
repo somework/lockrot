@@ -14,6 +14,7 @@ use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ConsoleMarkup;
+use Lockrot\Output\FindingBlock;
 use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Output\TerminalText;
 use Lockrot\Tests\Support\CaseHydrator;
@@ -212,6 +213,29 @@ final class InstallSummaryFormatterTest extends TestCase
         self::assertStringEndsWith('…', $line);
         self::assertGreaterThanOrEqual(InstallSummaryFormatter::MAX_FINDING_LINE - 2, TerminalText::characters($line), $line);
         self::assertLessThanOrEqual(InstallSummaryFormatter::MAX_FINDING_LINE + 1, TerminalText::characters($line), $line);
+    }
+
+    /**
+     * However little room the head leaves, the shown move is a run of its whole words: a cut never
+     * splits the word after ` — `.
+     */
+    public function testTheMoveAfterTheHeadIsCutOnlyAtAWordBoundary(): void
+    {
+        $cuts = [];
+        foreach (range(100, 150) as $length) {
+            $finding = self::withMove('acme/'.str_repeat('a', $length), null, []);
+            $line = self::lines(self::report([$finding]))[1];
+            $move = (string) FindingBlock::move($finding);
+            $at = strpos($line, ' — ');
+            if ($at !== false && substr($line, -\strlen(TerminalText::ELLIPSIS)) === TerminalText::ELLIPSIS) {
+                $cuts[$length] = [substr($line, $at + \strlen(' — '), -\strlen(TerminalText::ELLIPSIS)), $move];
+            }
+        }
+        self::assertNotSame([], $cuts);
+
+        foreach ($cuts as $length => [$shown, $move]) {
+            self::assertTrue($shown === '' || ($shown === substr($move, 0, \strlen($shown)) && substr($move, \strlen($shown), 1) === ' '), $length.': "'.$shown.'" of "'.$move.'"');
+        }
     }
 
     /** A name with no space is cut between whole units: never inside an escape or a UTF-8 sequence. */

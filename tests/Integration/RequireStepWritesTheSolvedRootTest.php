@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * A printed `composer require` writes the root that the move check solves, under any terminal
  * answer: Composer's own JsonManipulator applies the step as `RequireCommand` does without
- * interaction (R6-3, decisions 14 and 15).
+ * interaction (R6-3).
  */
 final class RequireStepWritesTheSolvedRootTest extends TestCase
 {
@@ -46,6 +46,8 @@ final class RequireStepWritesTheSolvedRootTest extends TestCase
     {
         yield 'require only' => [['require' => ['vendor/pkg' => '^1.0']], 'vendor/pkg', ProjectConfig::REQUIRE];
         yield 'require-dev only' => [['require-dev' => ['vendor/pkg' => '^1.0']], 'vendor/pkg', ProjectConfig::REQUIRE_DEV];
+        yield 'require only, mixed case' => [['require' => ['Vendor/Pkg' => '^1.0']], 'vendor/pkg', ProjectConfig::REQUIRE];
+        yield 'require-dev only, mixed case' => [['require-dev' => ['Vendor/Pkg' => '^1.0']], 'vendor/pkg', ProjectConfig::REQUIRE_DEV];
         yield 'both sections' => [['require' => ['vendor/pkg' => '^1.0'], 'require-dev' => ['vendor/pkg' => '^1.1']], 'vendor/pkg', ProjectConfig::REQUIRE];
         yield 'both sections, mixed case' => [['require' => ['vendor/pkg' => '^1.0'], 'require-dev' => ['Vendor/Pkg' => '^1.1']], 'vendor/pkg', ProjectConfig::REQUIRE];
         yield 'php in both sections' => [['require' => ['php' => '>=7.4'], 'require-dev' => ['PHP' => '>=8.0']], 'php', ProjectConfig::REQUIRE];

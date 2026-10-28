@@ -269,7 +269,7 @@ final class ProjectConfig
     /**
      * The literal sections that list a package or platform name, as Composer reads them: the name
      * in any case, the later of two keys, a string constraint only. Composer's `require` command
-     * picks its section and removes a key by this spelling.
+     * removes a key from the other section by this spelling.
      *
      * @return array<self::REQUIRE|self::REQUIRE_DEV, string> section => the key as written, `require` first
      */

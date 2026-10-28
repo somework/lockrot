@@ -136,9 +136,10 @@ final class InstallSummaryFormatter
 
     /**
      * The neutralised pieces in order within $room characters. A prose piece that does not fit is
-     * cut at a word boundary, and nothing follows it. A command shows whole when the prose before it
-     * fits, even past $room, because a cut command runs as another one. A cut that leaves no word
-     * after a command ends with ` …`, so a copied command takes no ellipsis.
+     * cut at a word boundary, and nothing follows it. The first piece with no boundary in its room
+     * is cut where the room ends, and a later one shows no word. A command shows whole when the
+     * prose before it fits, even past $room, because a cut command runs as another one. A cut that
+     * leaves no word after a command ends with ` …`, so a copied command takes no ellipsis.
      *
      * @param list<array{0: string, 1: bool}> $parts
      */
@@ -157,7 +158,7 @@ final class InstallSummaryFormatter
             }
             $cut = substr(TerminalText::neutralise($text, max(0, $room)), 0, -\strlen(TerminalText::ELLIPSIS));
             $space = strrpos($cut, ' ');
-            $cut = $space === false ? $cut : substr($cut, 0, $space);
+            $cut = $space === false ? ($line === '' ? $cut : '') : substr($cut, 0, $space);
 
             return $line.($afterCommand && trim($cut) === '' ? ' '.TerminalText::ELLIPSIS : $cut.TerminalText::ELLIPSIS);
         }

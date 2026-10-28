@@ -99,7 +99,6 @@ final class TerminalTextTest extends TestCase
         self::assertSame('a\\tbc…', TerminalText::escape("a\tbcdef", 5));
     }
 
-    /** neutralise() is for text people read rather than compare: a Windows path keeps its backslashes. */
     public function testCharactersCountsAMultibyteCharacterOnce(): void
     {
         self::assertSame([0, 3, 5, 1], [TerminalText::characters(''), TerminalText::characters('a—b'), TerminalText::characters('a · b'), TerminalText::characters("\u{1F600}")]);
@@ -129,6 +128,7 @@ final class TerminalTextTest extends TestCase
         yield 'no room' => ['ab', 0, '…'];
     }
 
+    /** neutralise() is for text people read rather than compare: a Windows path keeps its backslashes. */
     public function testNeutraliseLeavesBackslashesAlone(): void
     {
         self::assertSame('C:\\project\\composer.json \\x1B[31m', TerminalText::neutralise("C:\\project\\composer.json \x1B[31m"));

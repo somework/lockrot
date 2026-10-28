@@ -11,6 +11,7 @@ use Lockrot\Security\PhpCheck;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\CaseHydrator;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\GradedPackage;
 use Lockrot\Verdict\Latest;
@@ -380,24 +381,31 @@ final class MoveTextTest extends TestCase
      * most one piece is a command, it is the POSIX rendering of one of the move's commands, and no
      * piece is empty or only whitespace.
      */
-    public function testThePiecesOfEveryCaseMoveAreItsTextAndAtMostOneOfItsCommands(): void
+    /** The pieces of each case move join to the `text` that tests/fixtures/golden/moves.json records. */
+    public function testThePiecesOfEveryCaseMoveAreItsRecordedTextAndAtMostOneOfItsCommands(): void
     {
+        $golden = JsonPath::decodeFile(__DIR__.'/../../fixtures/golden/moves.json');
         $moves = [];
-        foreach (CaseHydrator::everyCase()->findings() as $finding) {
-            $move = $finding->nextStep();
-            if ($move !== null) {
-                $moves[$finding->package()] = $move;
+        foreach (MoveTest::casesWithInputs() as $id => [$caseId]) {
+            $case = CaseHydrator::case($caseId);
+            $package = JsonPath::stringAt($case, ['inputs', 'lock', 0, 'name']);
+            foreach (CaseHydrator::report($case)->findings() as $finding) {
+                $move = $finding->package() === $package ? $finding->nextStep() : null;
+                if ($move === null) {
+                    continue;
+                }
+                $moves[$id] = [$move, JsonPath::stringAt($golden, [$id, 'next_step', 'text'])];
                 foreach ($move->also() as $index => $also) {
-                    $moves[$finding->package().' also['.$index.']'] = $also;
+                    $moves[$id.' also['.$index.']'] = [$also, JsonPath::stringAt($golden, [$id, 'next_step', 'also', $index, 'text'])];
                 }
             }
         }
         self::assertNotSame([], $moves);
 
-        foreach ($moves as $name => $move) {
+        foreach ($moves as $name => [$move, $recorded]) {
             $parts = MoveText::parts($move);
             $commands = array_values(array_filter($parts, static fn (array $part): bool => $part[1]));
-            self::assertSame($move->text(), implode('', array_column($parts, 0)), $name);
+            self::assertSame($recorded, implode('', array_column($parts, 0)), $name);
             self::assertLessThanOrEqual(1, \count($commands), $name);
             foreach ($commands as [$command]) {
                 self::assertContains($command, array_map([ShellCommand::class, 'posix'], $move->commands()), $name);

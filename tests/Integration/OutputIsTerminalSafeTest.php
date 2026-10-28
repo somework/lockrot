@@ -20,6 +20,7 @@ use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
+use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Move;
 use Lockrot\Verdict\Moves;
@@ -56,6 +57,7 @@ final class OutputIsTerminalSafeTest extends TestCase
 
         self::assertStringContainsString('`'.$command.'`', implode("\n", $outputs['markdown']));
         self::assertContains($command, array_map(static fn (string $line): string => (string) preg_replace('/^\s*(do: )?/', '', $line), $outputs['table']), 'a table line of its own');
+        self::assertStringContainsString($command, implode("\n", $outputs['install-time']));
         foreach (['markdown', 'table', 'install-time'] as $name) {
             $text = implode("\n", $outputs[$name]);
             preg_match_all('/'.preg_quote($command, '/').'(.|$)/su', $text, $after);
@@ -92,17 +94,28 @@ final class OutputIsTerminalSafeTest extends TestCase
         return $outputs;
     }
 
+    /**
+     * An abandoned finding whose update move runs $command after the platform step of $override.
+     *
+     * @param list<Signal> $signals
+     * @param list<string> $command
+     */
+    private static function moved(string $package, string $override, array $signals, array $command): Finding
+    {
+        $subject = new MoveSubject($package, '1.0.0', true, [], '8.4', null, null, $override);
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '1.x', '1.0.3', '1.0.3', null, null, null, false, [], [], [], [], [], null, [], [$command], $subject);
+
+        return (new FindingBuilder())->withPackage($package)->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, null, []))->build()->withMoves(new Moves($move, null, null, null, []));
+    }
+
     /** Graded findings whose text from the lock, a repository and an advisory holds {@see UNSAFE}. */
     private static function hostile(): Report
     {
         $abandoned = [new Signal(Signal::LEVEL_HIGH, 'marked'.self::UNSAFE, SignalDataStub::of(Signal::S1, ['marked_by' => 'repository', 'replacement' => 'evil/next'.self::UNSAFE]))];
         $vulnerable = [new Signal(Signal::LEVEL_HIGH, 'advisory'.self::UNSAFE, SignalDataStub::of(Signal::S9, ['advisories' => [['id' => 'PKSA-1', 'title' => 'title'.self::UNSAFE, 'severity' => 'high', 'affected_versions' => '<2.0']]]))];
-        $moved = (new FindingBuilder())->withPackage(self::MOVED)->withSignals($abandoned)->withFlags(FlagSet::fromSignals($abandoned, null, []))->build();
-        $subject = new MoveSubject(self::MOVED, '1.0.0', true, [], '8.4', null, null, '7.4'.self::UNSAFE);
-        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '1.x', '1.0.3', '1.0.3', null, null, null, false, [], [], [], [], [], null, [], [self::COMMAND], $subject);
-
         return new Report([
-            $moved->withMoves(new Moves($move, null, null, null, [])),
+            self::moved(self::MOVED, '7.4', $abandoned, self::COMMAND),
+            self::moved('evil/platform', '7.4'.self::UNSAFE, $abandoned, ['composer', 'update', 'evil/platform']),
             (new FindingBuilder())->withPackage('evil/name'.self::UNSAFE)->withVersion('1.0'.self::UNSAFE)->withSignals($abandoned)->withFlags(FlagSet::fromSignals($abandoned, null, []))->withAllowlistReason('reason'.self::UNSAFE)->build(),
             (new FindingBuilder())->withPackage('evil/advised')->withSignals($vulnerable)->withFlags(FlagSet::fromSignals($vulnerable, null, []))->build(),
         ], Notes::texts(['note'.self::UNSAFE]), new \DateTimeImmutable(F::NOW), 3, 0);
