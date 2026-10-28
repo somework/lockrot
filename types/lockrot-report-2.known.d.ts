@@ -430,7 +430,7 @@ export type PhpWindowReqTarget = "php" | "php-64bit";
 /** closed set at #/definitions/targetFix/properties/check */
 export type TargetFixCheck = "resolves" | "refused" | "not_checked";
 /** open set at #/definitions/targetFix/properties/reason/oneOf/0 */
-export type TargetFixReason = "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "solver_error" | (string & {});
+export type TargetFixReason = "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "solver_error" | "advisory_lookup_incomplete" | (string & {});
 /** closed set at #/definitions/targetFix/anyOf/0/properties/check */
 export type TargetFixCheck2 = "resolves";
 /** closed set at #/definitions/targetFix/anyOf/1/properties/check */

@@ -3188,7 +3188,8 @@
    "not_from_composer_repository",
    "no_composer_json",
    "composer_json_invalid",
-   "solver_error"
+   "solver_error",
+   "advisory_lookup_incomplete"
   ],
   "open": true,
   "integer": false

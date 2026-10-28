@@ -21,6 +21,8 @@ final class ArrayVersionSource implements VersionSource
     private array $asked = [];
     /** @var array<string, \Throwable> */
     private array $throws;
+    /** @var array<string, \Throwable> */
+    private array $throwsOnce = [];
 
     /**
      * @param array<string, list<array<string, mixed>>> $entries  name => its versions, each without `name`
@@ -34,11 +36,24 @@ final class ArrayVersionSource implements VersionSource
         $this->throws = $throws;
     }
 
+    /** The next load of $name throws $throw, and the later loads answer. */
+    public function throwingOnce(string $name, \Throwable $throw): self
+    {
+        $this->throwsOnce[$name] = $throw;
+
+        return $this;
+    }
+
     public function versions(string $name): array
     {
         $this->asked[] = $name;
         if (isset($this->throws[$name])) {
             throw $this->throws[$name];
+        }
+        if (isset($this->throwsOnce[$name])) {
+            $throw = $this->throwsOnce[$name];
+            unset($this->throwsOnce[$name]);
+            throw $throw;
         }
         if (!isset($this->loaded[$name])) {
             $loader = new ArrayLoader();

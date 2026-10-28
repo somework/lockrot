@@ -756,6 +756,82 @@ final class SolverCheckerTest extends TestCase
     }
 
     /**
+     * R6-1: the listed form stops on the offline acme/virtual. `-w` and `-W` free acme/mid, whose
+     * locked 1.0.0 no repository serves, so Composer refuses both cleanly. A refusal never replaces
+     * the first stopped form: the move reads not_checked with the stopped form's reason.
+     *
+     * @dataProvider stoppingFailures
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('stoppingFailures')]
+    public function testACleanRefusalOfAWiderFormNeverReplacesTheFormThatALoadStopped(string $failure, string $reason): void
+    {
+        $checker = self::checkerWith(['acme/lib' => '^1.0', 'acme/other' => '^1.0'], self::stoppedLock(), self::stoppedSource($failure));
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function stoppingFailures(): iterable
+    {
+        yield 'offline' => [VersionSource::OFFLINE, MoveCheck::OFFLINE];
+        yield 'failed' => [VersionSource::FAILED, MoveCheck::UNLOADED_NAME];
+    }
+
+    /** R6-1: a target fix walks the same forms, so the stopped listed form wins over the clean refusals of `-w` and `-W`. */
+    public function testATargetFixWhoseListedFormALoadStoppedIsNotRefused(): void
+    {
+        $checker = self::checkerWith(['acme/lib' => '^1.0', 'acme/other' => '^1.0'], self::stoppedLock(), self::stoppedSource(VersionSource::OFFLINE));
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::OFFLINE, 'installs' => null], $checker->solveAt(['acme/lib'])->check()->jsonSerialize());
+    }
+
+    /** R6-1: a stopped move names no hold, so MoveChecks asks no joint request and keeps no refusal of the package. */
+    public function testAMoveThatALoadStoppedHasNoHoldsAndNoRefusal(): void
+    {
+        $checks = MoveChecks::of(self::checkerWith(['acme/lib' => '^1.0', 'acme/other' => '^1.0'], self::stoppedLock(), self::stoppedSource(VersionSource::OFFLINE)));
+
+        $outcome = $checks->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0', null, '1.2.0'));
+
+        self::assertSame([MoveCheck::NOT_CHECKED, [], false], [$outcome->check()->result(), $outcome->holds(), $outcome->isJoint()]);
+        self::assertFalse($checks->refused('acme/lib')->refuses('1.1.0.0'));
+    }
+
+    /** R6-1: Composer fails on the listed form, and `-w` and `-W` refuse cleanly: the failure is the move's reason. */
+    public function testACleanRefusalOfAWiderFormNeverReplacesAFormThatComposerFailedOn(): void
+    {
+        $source = self::stoppedSource(null);
+        $checker = self::checkerWith(['acme/lib' => '^1.0', 'acme/other' => '^1.0'], self::stoppedLock(), $source);
+        $checker->baseline();
+        $source->throwingOnce('acme/lib', new \UnexpectedValueException('Could not parse version constraint'));
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::SOLVER_ERROR, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0', null, '1.2.0'))->check()->jsonSerialize());
+    }
+
+    /** @return list<array<string, mixed>> acme/other provides acme/virtual, and acme/lib and acme/other require acme/mid ^1.0 */
+    private static function stoppedLock(): array
+    {
+        return [
+            ['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']],
+            ['name' => 'acme/mid', 'version' => '1.0.0'],
+            ['name' => 'acme/other', 'version' => '1.0.0', 'require' => ['acme/mid' => '^1.0'], 'provide' => ['acme/virtual' => '1.0.0']],
+        ];
+    }
+
+    /** acme/lib 1.1.0 needs acme/virtual, which fails to load with $failure. acme/lib 1.2.0 needs an unserved acme/other ^2.0. */
+    private static function stoppedSource(?string $failure): ArrayVersionSource
+    {
+        return new ArrayVersionSource([
+            'acme/lib' => [
+                ['version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']],
+                ['version' => '1.1.0', 'require' => ['acme/mid' => '^1.0', 'acme/virtual' => '^1.0']],
+                ['version' => '1.2.0', 'require' => ['acme/mid' => '^2.0', 'acme/other' => '^2.0']],
+            ],
+            'acme/mid' => [['version' => '2.0.0']],
+            'acme/other' => [['version' => '1.0.0', 'require' => ['acme/mid' => '^1.0'], 'provide' => ['acme/virtual' => '1.0.0']]],
+        ], $failure === null ? [] : ['acme/virtual' => $failure]);
+    }
+
+    /**
      * R5-33: a canonical vcs repository before the Composer repository can serve acme/zeta and hide
      * the release that the solve installs, so even a solve that installs the newest proves nothing.
      */
