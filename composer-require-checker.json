@@ -81,6 +81,7 @@
         "Composer\\Util\\Platform",
         "Composer\\Util\\RemoteFilesystem",
         "Composer\\Util\\Url",
+        "Composer\\XdebugHandler\\XdebugHandler",
         "JsonSchema\\Constraints\\BaseConstraint",
         "JsonSchema\\Validator",
         "OPENSSL_ALGO_SHA384",

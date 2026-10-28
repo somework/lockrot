@@ -205,6 +205,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **PHAR:** the archive restarts without Xdebug, as `composer` does, so a run with Xdebug loaded
+  is no slower than one without it. PHP errors go to stderr, and the locale is C. Action: to keep
+  Xdebug, set `COMPOSER_ALLOW_XDEBUG=1`. ([What the PHAR does](docs/phar.md#what-the-phar-does-and-does-not-do))
 - **Breaking:** **gitlab, sarif:** one record per flag, plus one per advisory in SARIF. 0.13
   identities stay. SARIF `properties.verdict` is the grade, `signals` is `signal_ids`, `baseline` is
   `baseline_status`. A baseline-covered result carries `suppressions`. Action: guard on
