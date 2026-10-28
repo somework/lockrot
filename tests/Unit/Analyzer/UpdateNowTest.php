@@ -266,6 +266,23 @@ final class UpdateNowTest extends TestCase
         self::assertSame([self::JWT, self::SODIUM], $note->data()['left_out'] ?? null);
     }
 
+    /** A release that the solve spells without the `v` of the move's version still reads as below the fix. */
+    public function testOnAComposerWithoutInlineConstraintsOnAnyPackageAReleaseBelowTheFixReadsAsBelowInAnySpelling(): void
+    {
+        $findings = self::reportOf('replace-graded', [])->sorted();
+        $checker = new RecordedMoveChecker([
+            'combined '.self::JWT.' '.self::SODIUM => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => [], 'installs' => [self::JWT => '3.4.10', self::SODIUM => '1.21.5']],
+            'combined '.self::JWT => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => [], 'installs' => [self::JWT => '3.4.10']],
+        ], []);
+
+        $updateNow = UpdateNow::of($findings, new MoveChecks($checker, false));
+
+        self::assertSame([self::JWT], $updateNow->members());
+        $note = $updateNow->note();
+        self::assertNotNull($note);
+        self::assertSame([self::SODIUM], $note->data()['left_out'] ?? null);
+    }
+
     /** Composer 2.2 and 2.3: after a refusal leaves one member out, the solve keeps the other below its fix, and the note names both and the refusal. */
     public function testOnAComposerWithoutInlineConstraintsOnAnyPackageARefusalAndAMemberBelowItsFixAreNamedTogether(): void
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
-use Composer\Semver\Comparator;
 use Lockrot\Solver\CheckOutcome;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Verdict\CommandArgument;
@@ -139,7 +138,7 @@ final class UpdateNow
                 continue;
             }
             $gets = $changes[$package] ?? $finding->version();
-            if (Comparator::lessThan($gets, $fix)) {
+            if (MoveCheck::resolves(MoveCheck::INLINE, $gets)->installsBelow($fix) !== null) {
                 $below[$package] = [$gets, $fix];
             }
         }
