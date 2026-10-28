@@ -253,7 +253,8 @@ final class ComposerHttpClientTest extends TestCase
         $config = new Config(false, sys_get_temp_dir());
         $downloader = new ScriptedDownloader($io, $config, $script);
 
-        return [new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), $deadline), $downloader];
+        // The scripted downloader stops a redirect on any Composer, so a request with a token goes through it.
+        return [new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), $deadline, true), $downloader];
     }
 
     /**
