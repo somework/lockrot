@@ -85,8 +85,7 @@ one value keeps the last one.
 
 Composer's global options apply as well: `-d <dir>` (`--working-dir`) runs lockrot in another
 project directory, and `-q` silences everything lockrot prints, the report on stdout included.
-Join the directory to the option (`--working-dir=app` or `-dapp`): Composer 2.2 does not read
-`-d app`. Exit codes are in [ci.md](ci.md#exit-codes).
+Exit codes are in [ci.md](ci.md#exit-codes).
 
 ## Environment overrides
 
@@ -338,7 +337,8 @@ after the built-in list, so a package that the built-in list matches keeps the b
 ### Composer's abandoned ignore list {#composer-abandoned-ignore}
 
 Composer has its own list of abandoned packages that `composer audit` does not report:
-`config.policy.abandoned.ignore` on Composer 2.10 and later, `config.audit.ignore-abandoned` on 2.9.
+`config.policy.abandoned.ignore`, or the legacy `config.audit.ignore-abandoned` when
+`config.policy.abandoned` is not set.
 lockrot reads it as `composer audit` does, and it differs from an `ignore` entry:
 
 | | Composer's list | `ignore` entry with `flags: ["abandoned"]` |

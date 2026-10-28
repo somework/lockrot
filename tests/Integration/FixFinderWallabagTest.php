@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Semver\Comparator;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
@@ -122,9 +121,6 @@ final class FixFinderWallabagTest extends TestCase
     /** @return array<string, array{0: ?string, 1: PackageFixes}> package => its normalized installed version, and its scan */
     private static function scans(): array
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURE.'/composer.lock']);
         $server->withRecordedAdvisoryApi(self::FIXTURE);
         $server->start();

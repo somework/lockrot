@@ -87,7 +87,7 @@ final class InstallTimeSummary
     /**
      * The line is raw, past Symfony's tag formatter, because it quotes the project's own text,
      * which is not console markup (see {@see TerminalText}). IOInterface says only whether stdout is
-     * decorated, so stderr is assumed to match. writeErrorRaw() needs Composer 2.2 or later.
+     * decorated, so stderr is assumed to match.
      */
     private static function writeWarning(IOInterface $io, string $line): void
     {

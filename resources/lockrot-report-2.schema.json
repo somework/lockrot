@@ -7113,7 +7113,7 @@
           "$ref": "#/definitions/severity"
         },
         "by": {
-          "description": "The Composer setting that ignores it (`policy.advisories` on 2.10+, `audit.ignore` or `audit.ignore-severity` on 2.4–2.9). An open set: read an unknown key as another setting.",
+          "description": "The Composer setting that ignores it: `policy.advisories`, or `audit.ignore` or `audit.ignore-severity` when composer.json sets no `config.policy.advisories`. An open set: read an unknown key as another setting.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_.-]*$",
           "x-known-values": [
@@ -12412,7 +12412,7 @@
           ],
           "properties": {
             "by": {
-              "description": "The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`, Composer 2.10 and later) or `audit.ignore-abandoned` (Composer 2.9, and the legacy fallback of 2.10). An open set: read an unknown key as another setting.",
+              "description": "The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`), or `audit.ignore-abandoned` when composer.json sets no `config.policy.abandoned`. An open set: read an unknown key as another setting.",
               "type": "string",
               "pattern": "^[a-z][a-z0-9_.-]*$",
               "x-known-values": [
@@ -12769,7 +12769,7 @@
       ]
     },
     "advisoryLookup": {
-      "description": "How the run's own advisory lookup went: its scope, the packages it asked, and the outcome of each advisory-capable repository. The lookups that the move check's solves make on Composer 2.9 and later are not in it.",
+      "description": "How the run's own advisory lookup went: its scope, the packages it asked, and the outcome of each advisory-capable repository. The lookups that the move check's solves make are not in it.",
       "type": "object",
       "required": [
         "scope",
@@ -21629,11 +21629,11 @@
                   "minLength": 1
                 },
                 "blocks_advisories": {
-                  "description": "Whether the solve removed the versions that an advisory affects, as Composer 2.9 and later do in an update.",
+                  "description": "Whether the solve removed the versions that an advisory affects, as Composer does in an update.",
                   "type": "boolean"
                 },
                 "blocking_disabled_by": {
-                  "description": "The switches that turn off the advisory blocking of the running Composer, in this order: `COMPOSER_NO_BLOCKING`, `COMPOSER_NO_SECURITY_BLOCKING`, `COMPOSER_POLICY`, `COMPOSER_POLICY_ADVISORIES_BLOCK`, `config.policy`, `config.policy.advisories`, `config.policy.advisories.block`, `config.audit.block-insecure`. A switch is listed when it holds a value that turns the blocking off and no switch that Composer reads after it turns the blocking on again. Composer 2.9.0 and 2.9.1 read only `config.audit.block-insecure`, and later 2.9 releases also read `COMPOSER_NO_SECURITY_BLOCKING`. Composer 2.10 and later read every switch, and read `config.audit.block-insecure` only when `config.policy.advisories` is not set. Empty when no switch turns the blocking off. Closed.",
+                  "description": "The switches that turn off the advisory blocking of the running Composer, in this order: `COMPOSER_NO_BLOCKING`, `COMPOSER_NO_SECURITY_BLOCKING`, `COMPOSER_POLICY`, `COMPOSER_POLICY_ADVISORIES_BLOCK`, `config.policy`, `config.policy.advisories`, `config.policy.advisories.block`, `config.audit.block-insecure`. A switch is listed when it holds a value that turns the blocking off and no switch that Composer reads after it turns the blocking on again. Composer reads `config.audit.block-insecure` only when `config.policy.advisories` is not set. Empty when no switch turns the blocking off. Closed.",
                   "type": "array",
                   "items": {
                     "description": "One switch: an environment variable, or a key of composer.json `config`. Closed.",
@@ -22547,7 +22547,7 @@
       ],
       "properties": {
         "by": {
-          "description": "The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`, Composer 2.10 and later) or `audit.ignore-abandoned` (Composer 2.9, and the legacy fallback of 2.10). An open set: read an unknown key as another setting.",
+          "description": "The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`), or `audit.ignore-abandoned` when composer.json sets no `config.policy.abandoned`. An open set: read an unknown key as another setting.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_.-]*$",
           "x-known-values": [
@@ -24242,7 +24242,7 @@
           }
         },
         "update_now_command": {
-          "description": "The one command the overview's \"Update now\" copies, as an argv list: `composer`, `update`, then each member with its constraint inline (`vendor/pkg:^1.2`) in the order of `update_now`. Under Composer 2.2 or 2.3, a member whose move is the plain `update` is written plain (`vendor/pkg`), and the solve reads it so. Composer's solver checked it as one request: a member that the combined request refuses is left out (the `update_now_reduced` note). Null when `update_now` is empty, and when Composer refuses the members together (the `update_now_refused` note); then the line is hidden (a page never builds a command, and a bare `composer update` updates the whole lock).",
+          "description": "The one command the overview's \"Update now\" copies, as an argv list: `composer`, `update`, then each member with its constraint inline (`vendor/pkg:^1.2`) in the order of `update_now`. Composer's solver checked it as one request: a member that the combined request refuses is left out (the `update_now_reduced` note). Null when `update_now` is empty, and when Composer refuses the members together (the `update_now_refused` note); then the line is hidden (a page never builds a command, and a bare `composer update` updates the whole lock).",
           "oneOf": [
             {
               "description": "The argv: `composer`, `update`, then one argument per member.",

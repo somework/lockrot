@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Composer\Repository\AdvisoryProviderInterface;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
@@ -47,9 +46,6 @@ final class AdvisoryLookupTest extends TestCase
 
     protected function setUp(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $this->server = FixtureRepositoryServer::fromLockFiles([self::FIXTURE.'/composer.lock']);
         $this->server->withRecordedAdvisoryApi(self::FIXTURE);
         $this->server->start();

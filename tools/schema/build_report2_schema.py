@@ -581,8 +581,8 @@ defs['ignoredAdvisory'] = obj("An advisory Composer's audit ignore lists match (
     'cve': nul('Its CVE, null when it has none.', {'type': 'string'}),
     'title': nul('Its title, without a leading `<cve>: `.', {'type': 'string'}),
     'severity': ref('severity'),
-    'by': open_set(['policy.advisories', 'audit.ignore', 'audit.ignore-severity'], ("The Composer setting that ignores it (SPEC §4.1: `policy.advisories` on 2.10+, `audit.ignore` or "
-                   "`audit.ignore-severity` on 2.4–2.9). An open set: read an unknown key as another setting."), DOTTED),
+    'by': open_set(['policy.advisories', 'audit.ignore', 'audit.ignore-severity'], ("The Composer setting that ignores it (SPEC §4.1): `policy.advisories`, or `audit.ignore` or "
+                   "`audit.ignore-severity` when composer.json sets no `config.policy.advisories`. An open set: read an unknown key as another setting."), DOTTED),
     'matched': open_set(['id', 'cve', 'remote_id', 'package', 'severity'], ("What the entry matched on (SPEC §4.1): the advisory `id`, its `cve`, its `remote_id`, the `package`, "
                         "or the `severity`. An open set.")),
     'reason': nul("The reason the policy entry gives, the project's words (data, never inside a machine string); null when it gives none.", {'type': 'string'}),
@@ -1090,8 +1090,8 @@ defs['age'] = obj(("How old four dates are on the run clock (C72). The dates are
 }, allOf=[{'description': f'`{k}` is null exactly when `{k}_unmeasured` is set.',
            'anyOf': [{'properties': {k: {'type': 'object'}, k + '_unmeasured': _N}}, {'properties': {k: _N, k + '_unmeasured': {'type': 'string'}}}]}
           for k in ('installed', 'release', 'branch_release', 'push')])
-AI_BY = open_set(['policy.abandoned', 'audit.ignore-abandoned'], ("The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`, "
-                 "Composer 2.10 and later) or `audit.ignore-abandoned` (Composer 2.9, and the legacy fallback of 2.10). An open set: read an unknown key as another setting."), DOTTED)
+AI_BY = open_set(['policy.abandoned', 'audit.ignore-abandoned'], ("The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`), "
+                 "or `audit.ignore-abandoned` when composer.json sets no `config.policy.abandoned`. An open set: read an unknown key as another setting."), DOTTED)
 defs['abandonedIgnored'] = nul(("Composer's abandoned ignore list (the audit operation) matched this package. So lockrot did not raise its abandoned marking (S1), "
                                 "and the marking does not count. An archived repository (S3) and the liveness dates still count (C69). Null when no rule removed S1."),
     obj('The ignored marking.', {
@@ -1137,7 +1137,7 @@ defs['advisoryRepository'] = obj("One advisory-capable Composer repository of th
     {'description': '`not_asked`: a reason, no message.', 'properties': {'outcome': {'enum': ['not_asked']}, 'reason': {'type': 'string'}, 'message': _N, 'packages_with_records': _N, 'records': _N}},
 ])
 defs['advisoryLookup'] = obj("How the run's own advisory lookup went (C75): its scope, the packages it asked, and the outcome of each advisory-capable repository. "
-                             "The lookups that the move check's solves make on Composer 2.9 and later are not in it.", {
+                             "The lookups that the move check's solves make are not in it.", {
     'scope': closed(['all', 'composer-repositories'], ("`extra.lockrot.advisory-lookup` as config-2 spells it: `all` (every locked package, the default) or "
                                                        "`composer-repositories`. Closed.")),
     'scope_source': closed(['config', 'default'], 'Where `scope` came from. Closed.'),
@@ -1412,11 +1412,10 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'advisory_lookup': ref('advisoryLookup'),
     'move_check': nul("How Composer's solver checked the run's moves (§5.6). `composer lockrot` always writes it. A run that checks no move says why in `baseline` and `reason`.", obj('The move check of the run.', {
         'composer': nul('The version of the Composer that solved; null when nothing solved.', {'type': 'string', 'minLength': 1}),
-        'blocks_advisories': d('Whether the solve removed the versions that an advisory affects, as Composer 2.9 and later do in an update.', {'type': 'boolean'}),
+        'blocks_advisories': d('Whether the solve removed the versions that an advisory affects, as Composer does in an update.', {'type': 'boolean'}),
         'blocking_disabled_by': arr("The switches that turn off the advisory blocking of the running Composer, in this order: " + ', '.join('`%s`' % n for n in BLOCKING_SWITCHES) + ". "
                                     "A switch is listed when it holds a value that turns the blocking off and no switch that Composer reads after it turns the blocking on again. "
-                                    "Composer 2.9.0 and 2.9.1 read only `config.audit.block-insecure`, and later 2.9 releases also read `COMPOSER_NO_SECURITY_BLOCKING`. "
-                                    "Composer 2.10 and later read every switch, and read `config.audit.block-insecure` only when `config.policy.advisories` is not set. Empty when no switch turns the blocking off. Closed.",
+                                    "Composer reads `config.audit.block-insecure` only when `config.policy.advisories` is not set. Empty when no switch turns the blocking off. Closed.",
                                     closed(BLOCKING_SWITCHES, 'One switch: an environment variable, or a key of composer.json `config`. Closed.'), uniqueItems=True),
         'ignored_platform': arr("The platform patterns whose requirements the solve ignores, as `--ignore-platform-req` does, so the machine that runs lockrot decides no move. "
                                 "A name that composer.json `config.platform` sets is checked even when a pattern matches it (ruling R6-2).",
@@ -1712,8 +1711,7 @@ defs['rootSecurity'] = obj("The root security block (SPEC root block, §7.6, §8
     'update_now': arr(("The vulnerable packages whose lead move is an `update` that Composer's solver resolves inline, in report order; in a run that checks no move, "
                        "the packages whose `security.fix_kind` is `update` (§5.3). A name outside the command argument set of `next_step.commands` (§5.6) is left out."), ref('packageName')),
     'update_now_command': nul(("The one command the overview's \"Update now\" copies, as an argv list: `composer`, `update`, then each member with its constraint inline "
-                               "(`vendor/pkg:^1.2`) in the order of `update_now`. Under Composer 2.2 or 2.3, a member whose move is the plain `update` is written plain "
-                               "(`vendor/pkg`), and the solve reads it so. Composer's solver checked it as one request: a member that the combined request refuses is "
+                               "(`vendor/pkg:^1.2`) in the order of `update_now`. Composer's solver checked it as one request: a member that the combined request refuses is "
                                "left out (the `update_now_reduced` note). Null when `update_now` is empty, and when Composer refuses the members together (the "
                                "`update_now_refused` note); then the line is hidden (attack round 1: a page never builds a command, and a bare `composer update` updates the whole lock)."),
                               {'description': 'The argv: `composer`, `update`, then one argument per member.', 'type': 'array',

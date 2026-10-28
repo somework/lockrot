@@ -132,8 +132,8 @@ If the successor is already in the lock, remove the old package. An `abandoned` 
 ### <a name="abandoned"></a>Composer's abandoned ignore list {#abandoned}
 
 lockrot reads Composer's abandoned ignore list as `composer audit` reads it: a listed package raises
-no S1. The list is `config.policy.abandoned.ignore` on Composer 2.10 and later, and
-`config.audit.ignore-abandoned` on Composer 2.9. Older Composer releases have no such list.
+no S1. The list is `config.policy.abandoned.ignore`. When `config.policy.abandoned` is not set,
+Composer reads the legacy `config.audit.ignore-abandoned` in its place.
 
 - Only the mark goes. An archived repository (S3) still raises `abandoned`, and the release and
   push dates still give `silent` or `stale`. A package whose only fact was the mark reads `ok`, not
@@ -474,7 +474,7 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
 - lockrot asks each configured Composer repository that publishes advisories. A repository without
   a feed is listed with the outcome `no_feed`.
 
-- On Composer 2.9 and later, while advisory blocking is on, [the move check](#the-move-check)
+- While advisory blocking is on, [the move check](#the-move-check)
   asks for the advisories of each name that a solve loads and that no earlier lookup covered,
   such as a new dependency of a move.
   `run.advisory_lookup` describes the run's own lookup only.
@@ -570,8 +570,8 @@ the move.
 ### Accepting advisories {#accepting-advisories}
 
 Accept an advisory where `composer audit` accepts it: `config.policy.advisories` (`ignore-id`,
-`ignore`, `ignore-severity`) on Composer 2.10 and later, `config.audit.ignore` from 2.4 and
-`config.audit.ignore-severity` from 2.9. What audit drops on the Composer that runs lockrot,
+`ignore`, `ignore-severity`), or the legacy `config.audit.ignore` and `config.audit.ignore-severity`
+when `config.policy.advisories` is not set. What audit drops on the Composer that runs lockrot,
 lockrot drops.
 
 - An ignored advisory is listed in `security.ignored[]`, with the setting that matched (`by`) and
@@ -787,7 +787,7 @@ Limits of the check:
   resolve in lockrot and fail in Composer, or the reverse. So can a package that requires the root
   package. In plugin mode, the root version is Composer's own guess.
 - It reads [`update-with-minimal-changes`](https://getcomposer.org/doc/06-config.md#update-with-minimal-changes)
-  and `COMPOSER_MINIMAL_CHANGES` on Composer 2.7 and later, as Composer does. It does not read
+  and `COMPOSER_MINIMAL_CHANGES`, as Composer does. It does not read
   `COMPOSER_PREFER_STABLE`, `COMPOSER_PREFER_LOWEST`, `COMPOSER_WITH_DEPENDENCIES` or
   `COMPOSER_WITH_ALL_DEPENDENCIES`.
 - With `--offline`, a package that composer.json admits at `dev` needs its `~dev` file in
@@ -800,7 +800,7 @@ Limits of the check:
     - A repository whose `packages.json` inlines `packages` beside `metadata-url`.
     - A server that answers 404 for a missing `~dev` file.
 
-- On Composer 2.9 and later, it removes the versions that an advisory affects, as Composer does in
+- It removes the versions that an advisory affects, as Composer does in
   an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
   severities and the blocking of abandoned packages. It blocks every name that the update can move,
   packages-dev and new dependencies included. A switch that turns Composer's advisory blocking off
@@ -813,10 +813,9 @@ Limits of the check:
       `config.policy.advisories.block` and `config.audit.block-insecure`.
 
     The list names only the switches that the running Composer reads. It omits a switch when a
-    switch that Composer reads later turns the blocking on again. Composer 2.9.0 and 2.9.1 read only
-    `config.audit.block-insecure`, and later 2.9 releases also read `COMPOSER_NO_SECURITY_BLOCKING`.
-    Composer 2.10 and later read every switch. They read `config.audit.block-insecure` only when
-    `config.policy.advisories` is not set. `policy.advisories.audit` is not a switch.
+    switch that Composer reads later turns the blocking on again. Composer reads
+    `config.audit.block-insecure` only when `config.policy.advisories` is not set.
+    `policy.advisories.audit` is not a switch.
 
     When Composer refuses the value of one of the variables, such as `COMPOSER_NO_BLOCKING=maybe`,
     or a key under `config.policy` or `config.audit`, lockrot stops with exit code 2. It prints
@@ -843,15 +842,12 @@ Limits of the check:
 - When Composer's solver fails on a request, the move is not checked (`check.reason`
   `solver_error`), and the run note [`move_check_failed`](notes.md#move_check_failed) names the
   failure. The run still writes its report.
-- Composer 2.2 and 2.3 accept an inline constraint only on a root requirement. There, the
-  `update` move of a package that composer.json does not require gets the plain `composer update
-  <package>`. A `require`, `raise-php` or `tag` move of such a package gets no package step.
 - The solver stops at the first failing chain. The scan adds what `composer prohibits` names, but
   `held_by[]` can still miss a hold that a deeper chain holds.
 - A run without composer.json checks no move (`check.reason` `no_composer_json`).
 - A run whose composer.json Composer cannot load checks no move (`check.reason`
   `composer_json_invalid`). Composer refuses such a file, for example for a requirement name that
-  is no package name. Composer 2.2 stops the run with its own error instead.
+  is no package name.
 - The check does not read whether the lock has a `packages-dev` key. A lock without that key can
   get a move that resolves and its command, but Composer refuses an update with require-dev on
   such a lock.

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Composer\Repository\AdvisoryProviderInterface;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
@@ -78,13 +77,6 @@ final class ScoreFactsConsistencyTest extends TestCase
 
     /** @var list<FixtureRepositoryServer> */
     private array $servers = [];
-
-    protected function setUp(): void
-    {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer 2.2 has no advisory API, so no run carries S9.');
-        }
-    }
 
     protected function tearDown(): void
     {

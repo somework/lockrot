@@ -6,7 +6,6 @@ namespace Lockrot\Tests\Integration;
 
 use Composer\Factory;
 use Composer\IO\NullIO;
-use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\RepositoryFactory;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Allowlist\BuiltinAllowlist;
@@ -114,14 +113,11 @@ final class PublishedReportPrivacyTest extends TestCase
 
         $codes = array_map(static fn (RunNote $note): string => $note->code(), $report->runNotes());
         self::assertContains(RunNote::METADATA_UNAVAILABLE, $codes, 'the repositories failed, which the test is about');
-        // Composer 2.2 has no advisories to ask a repository for.
-        self::assertContains(interface_exists(AdvisoryProviderInterface::class) ? RunNote::ADVISORIES_UNAVAILABLE : RunNote::ADVISORIES_NOT_CHECKED, $codes);
+        self::assertContains(RunNote::ADVISORIES_UNAVAILABLE, $codes);
         self::assertStringContainsString('http://127.0.0.1:'.$port.'/other', $written['json'], 'the host stays, which the reader is checking');
-        if (interface_exists(AdvisoryProviderInterface::class)) {
-            $lookup = JsonPath::arrayAt(JsonPath::decoded(json_decode($written['json'], true)), ['run', 'advisory_lookup', 'repositories']);
-            self::assertNotSame([], $lookup, 'run.advisory_lookup names the repositories that it asked');
-            self::assertStringContainsString('127.0.0.1:'.$port.'/sub', (string) json_encode($lookup, \JSON_UNESCAPED_SLASHES), 'the repository is named without its credentials');
-        }
+        $lookup = JsonPath::arrayAt(JsonPath::decoded(json_decode($written['json'], true)), ['run', 'advisory_lookup', 'repositories']);
+        self::assertNotSame([], $lookup, 'run.advisory_lookup names the repositories that it asked');
+        self::assertStringContainsString('127.0.0.1:'.$port.'/sub', (string) json_encode($lookup, \JSON_UNESCAPED_SLASHES), 'the repository is named without its credentials');
         // SARIF's %SRCROOT% is the project directory: code scanning resolves results against it.
         $sarif = json_decode($written['sarif'], true);
         self::assertIsArray($sarif);
