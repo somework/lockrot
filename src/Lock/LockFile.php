@@ -65,7 +65,8 @@ final class LockFile
     public static function fromArray(array $lock, string $name = FormatContext::DEFAULT_LOCK_NAME): self
     {
         $aliases = self::aliases($lock['aliases'] ?? null, $name);
-        $overridePhp = self::overridePhpOf(['platform' => $lock['platform'] ?? null, 'platform-dev' => $lock['platform-dev'] ?? null], $lock['platform-overrides'] ?? [], $name);
+        self::checkPlatformLinks(['platform' => $lock['platform'] ?? null, 'platform-dev' => $lock['platform-dev'] ?? null], $name);
+        $overridePhp = self::overridePhpOf($lock['platform-overrides'] ?? [], $name);
         $packages = [];
         $loader = new ArrayLoader();
         // Composer's Locker loads the lock for an update with these options.
@@ -175,17 +176,10 @@ final class LockFile
         return [$loaded, $forUpdate, $aliasVersions];
     }
 
-    /**
-     * `platform-overrides.php` as Composer's PlatformRepository reads it: names in lower case, the
-     * later of two keys wins, and each value is a string or `false`.
-     *
-     * @param array{platform: mixed, platform-dev: mixed} $platform
-     * @param mixed                                       $overrides
-     */
-    private static function overridePhpOf(array $platform, $overrides, string $name): ?string
+    /** @param array{platform: mixed, platform-dev: mixed} $platform */
+    private static function checkPlatformLinks(array $platform, string $name): void
     {
-        // Composer's Locker passes `platform` and `platform-dev` to parseLinks() when they are not
-        // empty, and `platform-overrides` to PlatformRepository when it is set.
+        // Composer's Locker passes `platform` and `platform-dev` to parseLinks() when they are not empty.
         $parser = new VersionParser();
         foreach ($platform as $key => $links) {
             if (empty($links)) {
@@ -202,6 +196,17 @@ final class LockFile
                 }
             }
         }
+    }
+
+    /**
+     * `platform-overrides.php` as Composer's PlatformRepository reads it: names in lower case, the
+     * later of two keys wins, and each value is a string or `false`. Composer's Locker passes
+     * `platform-overrides` to PlatformRepository when it is set.
+     *
+     * @param mixed $overrides
+     */
+    private static function overridePhpOf($overrides, string $name): ?string
+    {
         if (!\is_array($overrides)) {
             throw new ConfigException($name.': platform-overrides must be an object');
         }
