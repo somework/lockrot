@@ -258,13 +258,18 @@ jobs:
             if [ -d "$path" ]; then dirs+=("$path"); elif [ "$(dirname "$path")" = src ]; then files+=("$path"); else members+=("$path"); fi
           done
           own=("${dirs[@]}" "${members[@]}")
-          changed_dirs=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${own[@]}" | grep '\.php$' || true)
           for member in "${members[@]}"; do dirs+=("$(dirname "$member")"); done
-          mapfile -t dirs < <(printf '%s\n' "${dirs[@]}" | sort -u)
+          dirs=($(printf '%s\n' "${dirs[@]}" | sort -u))
+          # Git reads a rename into a file pathspec as an added file, and Infection reads it over the
+          # directories as a rename. So the diff runs over the directories and keeps the shard's own paths.
+          mine() { while read -r path; do for o in "${own[@]}"; do case "$path" in "$o" | "$o"/*) echo "$path"; break ;; esac; done; done; }
+          changed_dirs=""
+          if [ ${#dirs[@]} -gt 0 ]; then changed_dirs=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${dirs[@]}" | grep '\.php$' | mine || true); fi
           changed_files=""
           if [ ${#files[@]} -gt 0 ]; then changed_files=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${files[@]}" | tr '\n' ' '); fi
           # --git-diff-lines reads added and modified files only. A renamed file is mutated whole, by path.
-          renamed=$(git diff --name-only --diff-filter=R "$base" HEAD -- "${own[@]}" "${files[@]}" | grep '\.php$' | tr '\n' ' ' || true)
+          renamed=""
+          if [ ${#dirs[@]} -gt 0 ]; then renamed=$(git diff --name-only --diff-filter=R "$base" HEAD -- "${dirs[@]}" | grep '\.php$' | mine | tr '\n' ' ' || true); fi
           changed_files=$(echo $changed_files $renamed)
           if [ -z "$changed_dirs" ] && [ -z "$changed_files" ]; then
             echo "mode=none" >> "$GITHUB_OUTPUT"
