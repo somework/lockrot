@@ -11,9 +11,11 @@ use Composer\Util\Filesystem;
 use Composer\Util\HttpDownloader;
 use Lockrot\Clock;
 use Lockrot\Composer\ComposerHttpClient;
+use Lockrot\Data\Http\HttpResult;
 use Lockrot\Deadline;
 use Lockrot\Tests\Support\HermeticComposerConfig;
 use Lockrot\Tests\Support\PhpBuiltinServer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -30,6 +32,30 @@ final class ComposerHttpClientRedirectTest extends TestCase
         header('Connection: close');
         $path = (string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $port = $_SERVER['SERVER_PORT'];
+        file_put_contents(__DIR__.'/requests.log', $_SERVER['HTTP_HOST'].' '.($_SERVER['HTTP_AUTHORIZATION'] ?? '-')."\n", FILE_APPEND);
+        if (preg_match('{^/chain/(\d+)$}', $path, $hops) && $hops[1] > 0) {
+            header('Location: /chain/'.($hops[1] - 1), true, 302);
+            exit;
+        }
+        if ($path === '/nested/absolute') {
+            header('Location: /headers', true, 302);
+            exit;
+        }
+        if ($path === '/nested/relative') {
+            header('Location: headers', true, 302);
+            exit;
+        }
+        if ($path === '/multiple-choices') {
+            header('Location: /headers', true, 300);
+            exit;
+        }
+        if ($path === '/ok-with-location') {
+            header('Location: /headers', true, 200);
+        }
+        if ($path === '/limited') {
+            header('X-RateLimit-Remaining: 0', true, 403);
+            exit;
+        }
         if ($path === '/other-host') {
             header('Location: http://localhost:'.$port.'/headers', true, 302);
             exit;
@@ -43,6 +69,7 @@ final class ComposerHttpClientRedirectTest extends TestCase
             'authorization' => $_SERVER['HTTP_AUTHORIZATION'] ?? null,
             'private_token' => $_SERVER['HTTP_PRIVATE_TOKEN'] ?? null,
             'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null,
+            'path' => $path,
         ]);
         PHP;
 
@@ -67,16 +94,26 @@ final class ComposerHttpClientRedirectTest extends TestCase
         (new Filesystem())->removeDirectory($this->dir);
     }
 
-    /** @return array<mixed> */
-    private function headersSeenAfter(string $path, ?bool $refusesRedirects = null): array
+    private function client(?bool $refusesRedirects): ComposerHttpClient
     {
         $io = new NullIO();
         $config = HermeticComposerConfig::create($this->dir.'/home', $io);
         $config->merge(['config' => ['secure-http' => false]]);
-        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'), null, $refusesRedirects);
+
+        return new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'), null, $refusesRedirects);
+    }
+
+    private function fetch(string $path, ?bool $refusesRedirects = null): HttpResult
+    {
         $url = $this->server->url().$path;
 
-        $result = $client->fetchAll([$url], self::HEADERS)[$url];
+        return $this->client($refusesRedirects)->fetchAll([$url], self::HEADERS)[$url];
+    }
+
+    /** @return array<mixed> */
+    private function headersSeenAfter(string $path, ?bool $refusesRedirects = null): array
+    {
+        $result = $this->fetch($path, $refusesRedirects);
 
         self::assertSame(200, $result->status(), (string) $result->error());
         $seen = json_decode((string) $result->body(), true);
@@ -94,7 +131,7 @@ final class ComposerHttpClientRedirectTest extends TestCase
             self::markTestSkipped('Composer takes prevent_url_access_callable from 2.10: the OnAnyComposer test covers an older one');
         }
         self::assertSame(
-            ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot'],
+            ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot', 'path' => '/headers'],
             $this->headersSeenAfter('/other-host')
         );
     }
@@ -102,7 +139,7 @@ final class ComposerHttpClientRedirectTest extends TestCase
     public function testARedirectOnTheSameHostKeepsLockrotsCredentials(): void
     {
         self::assertSame(
-            ['authorization' => 'token secret', 'private_token' => 'secret', 'user_agent' => 'lockrot'],
+            ['authorization' => 'token secret', 'private_token' => 'secret', 'user_agent' => 'lockrot', 'path' => '/headers'],
             $this->headersSeenAfter('/same-host')
         );
     }
@@ -111,7 +148,7 @@ final class ComposerHttpClientRedirectTest extends TestCase
     public function testARedirectToAnotherHostArrivesWithoutLockrotsCredentialsOnAnyComposer(): void
     {
         self::assertSame(
-            ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot'],
+            ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot', 'path' => '/headers'],
             $this->headersSeenAfter('/other-host', false)
         );
     }
@@ -137,8 +174,64 @@ final class ComposerHttpClientRedirectTest extends TestCase
     public function testARedirectOnTheSameHostKeepsLockrotsCredentialsOnAnyComposer(): void
     {
         self::assertSame(
-            ['authorization' => 'token secret', 'private_token' => 'secret', 'user_agent' => 'lockrot'],
+            ['authorization' => 'token secret', 'private_token' => 'secret', 'user_agent' => 'lockrot', 'path' => '/headers'],
             $this->headersSeenAfter('/same-host', false)
         );
+    }
+
+    /** A downloader that cannot stop a redirect names the other host to lockrot, and lockrot sends that host only a request without its credentials. */
+    public function testNoRequestToAnotherHostCarriesLockrotsCredentialsOnAnyComposer(): void
+    {
+        $this->headersSeenAfter('/other-host', false);
+
+        $toOtherHost = array_values(preg_grep('{^localhost:}', file($this->dir.'/root/requests.log', \FILE_IGNORE_NEW_LINES) ?: []) ?: []);
+
+        self::assertSame(['localhost:'.parse_url($this->server->url(), \PHP_URL_PORT).' -'], $toOtherHost);
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function locations(): iterable
+    {
+        yield 'a path from the root' => ['/nested/absolute', '/headers'];
+        yield 'a path beside the request' => ['/nested/relative', '/nested/headers'];
+        yield 'a 300 answer' => ['/multiple-choices', '/headers'];
+        yield 'a Location on a 200 answer, which is not a redirect' => ['/ok-with-location', '/ok-with-location'];
+    }
+
+    /**
+     * @dataProvider locations
+     */
+    #[DataProvider('locations')]
+    public function testARedirectWithLockrotsCredentialsGoesWhereComposerSendsItOnAnyComposer(string $path, string $answeredPath): void
+    {
+        self::assertSame($answeredPath, $this->headersSeenAfter($path, false)['path']);
+    }
+
+    /** Composer's own downloaders follow at most 20 redirects. */
+    public function testARequestWithLockrotsCredentialsFollowsAtMostTwentyRedirectsOnAnyComposer(): void
+    {
+        self::assertSame('/chain/0', $this->headersSeenAfter('/chain/20', false)['path']);
+
+        $tooFar = $this->fetch('/chain/21', false);
+
+        self::assertSame([0, null], [$tooFar->status(), $tooFar->body()]);
+    }
+
+    public function testAFailedRequestWithLockrotsCredentialsKeepsTheAnswersHeadersOnAnyComposer(): void
+    {
+        $result = $this->fetch('/limited', false);
+
+        self::assertSame([403, '0'], [$result->status(), $result->header('X-RateLimit-Remaining')]);
+    }
+
+    public function testEachRequestWithLockrotsCredentialsGetsItsAnswerOnAnyComposer(): void
+    {
+        $urls = [$this->server->url().'/headers', $this->server->url().'/same-host'];
+
+        $results = $this->client(false)->fetchAll($urls, self::HEADERS);
+
+        self::assertSame([200, 200], [$results[$urls[0]]->status(), $results[$urls[1]]->status()]);
     }
 }
