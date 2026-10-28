@@ -1217,7 +1217,9 @@
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",

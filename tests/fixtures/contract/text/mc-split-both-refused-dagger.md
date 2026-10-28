@@ -12,7 +12,7 @@ depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 1 advisory: 1 high
 libyears: 0.7 behind across all 2 packages · 0.7 from direct requirements · furthest behind symfony/routing v6.4.28 at 0.7
 advisories: 2 packages asked · packagist.org answered (4 on record for 1 package)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by `config.audit.block-insecure`; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 8.1 to 8.4; `symfony/routing` excludes 8.5
 
 <sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

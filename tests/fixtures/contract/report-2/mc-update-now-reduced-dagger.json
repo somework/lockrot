@@ -797,7 +797,9 @@
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
             "ignored_platform": [
                 "ext-*",
                 "lib-*",
@@ -1183,12 +1185,12 @@
     },
     "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [
-        "update now: the command leaves out symfony/yaml, typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0."
+        "update now: the command leaves out symfony/yaml and typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0."
     ],
     "note_details": [
         {
             "code": "update_now_reduced",
-            "text": "update now: the command leaves out symfony/yaml, typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0.",
+            "text": "update now: the command leaves out symfony/yaml and typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0.",
             "docs_url": "https://lockrot.dev/notes/#update_now_reduced",
             "sets_network_failures": false,
             "data": {
