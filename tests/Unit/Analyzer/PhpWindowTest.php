@@ -369,7 +369,6 @@ final class PhpWindowTest extends TestCase
         yield 'a package that replaces php-64bit' => [['packages' => [self::package('acme/a') + ['replace' => ['php-64bit' => '*']]]], null];
         yield 'a root that replaces php' => [['packages' => []], ['replace' => ['PHP' => '*']]];
         yield 'a root php link that does not parse' => [['packages' => []], ['require' => ['php' => '>=8.0 <<<']]];
-        yield 'a lock platform link that does not parse' => [['packages' => [], 'platform' => ['php-64bit' => 'not a constraint']], null];
     }
 
     /**

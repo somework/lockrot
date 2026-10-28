@@ -9,6 +9,7 @@ use Composer\Package\BasePackage;
 use Composer\Package\CompleteAliasPackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\Version\VersionParser;
 use Composer\Repository\LockArrayRepository;
 use Composer\Repository\PlatformRepository;
 use Lockrot\Exception\ConfigException;
@@ -183,11 +184,22 @@ final class LockFile
      */
     private static function overridePhpOf(array $platform, $overrides, string $name): ?string
     {
-        // Composer's Locker passes `platform` and `platform-dev` to an array parameter when they are
-        // not empty, and `platform-overrides` to PlatformRepository when it is set.
+        // Composer's Locker passes `platform` and `platform-dev` to parseLinks() when they are not
+        // empty, and `platform-overrides` to PlatformRepository when it is set.
+        $parser = new VersionParser();
         foreach ($platform as $key => $links) {
-            if (!empty($links) && !\is_array($links)) {
+            if (empty($links)) {
+                continue;
+            }
+            if (!\is_array($links)) {
                 throw new ConfigException(\sprintf('%s: %s must be an object', $name, $key));
+            }
+            foreach (array_filter($links, 'is_string') as $constraint) {
+                try {
+                    $parser->parseConstraints($constraint);
+                } catch (\UnexpectedValueException $e) {
+                    throw new ConfigException(\sprintf('%s: %s cannot be loaded: %s', $name, $key, $e->getMessage()), 0, $e);
+                }
             }
         }
         if (!\is_array($overrides)) {

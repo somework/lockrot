@@ -26,16 +26,17 @@ final class RefusedLockTest extends TestCase
         (new Process(['rm', '-rf', $this->dir]))->run();
     }
 
-    /** @return iterable<string, array{0: string}> */
+    /** @return iterable<string, array{0: string, 1: string}> */
     public static function lockBodies(): iterable
     {
-        yield 'an empty object' => ['{}'];
-        yield 'an empty list' => ['[]'];
+        yield 'an empty object' => ['{}', 'lockrot: composer.lock: packages must be a list of package entries'];
+        yield 'an empty list' => ['[]', 'lockrot: composer.lock: packages must be a list of package entries'];
+        yield 'a platform constraint that Composer cannot parse' => ['{"packages": [], "platform": {"php": "not a constraint"}}', 'lockrot: composer.lock: platform cannot be loaded: '];
     }
 
     /** @dataProvider lockBodies */
     #[DataProvider('lockBodies')]
-    public function testALockWithoutPackagesIsExitTwo(string $body): void
+    public function testALockThatComposerCannotUseIsExitTwo(string $body, string $refusal): void
     {
         file_put_contents($this->dir.'/composer.lock', $body);
         $process = new Process(
@@ -47,6 +48,6 @@ final class RefusedLockTest extends TestCase
 
         self::assertSame(2, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
         self::assertSame('', $process->getOutput());
-        self::assertStringContainsString('lockrot: composer.lock: packages must be a list of package entries', $process->getErrorOutput());
+        self::assertStringContainsString($refusal, $process->getErrorOutput());
     }
 }
