@@ -84,7 +84,6 @@ final class RunNote
     public const DOCS_URL = 'https://lockrot.dev/notes/#';
 
     public const ADVISORIES_OFFLINE = 'offline';
-    public const ADVISORIES_COMPOSER_TOO_OLD = 'composer_too_old';
     public const INSTALL_TIME_BUDGET = 'install_time_budget';
     public const ADVISORIES_NOT_CHECKED_REASONS = [self::ADVISORIES_OFFLINE, self::INSTALL_TIME_BUDGET];
     /** The same reason strings as S10 carries on the findings that the note concerns. */

@@ -32,7 +32,6 @@ final class AdvisoryCoverage
 
     /** Why a repository or a name was not asked, or why a name's lookup is not complete. */
     public const OFFLINE = 'offline';
-    public const COMPOSER_TOO_OLD = 'composer_too_old';
     public const INSTALL_TIME_BUDGET = 'install_time_budget';
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
     public const UNPARSEABLE_VERSION = 'unparseable_version';
