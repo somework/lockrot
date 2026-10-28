@@ -53,15 +53,15 @@ trait RejectsUnreadableInput
 
     /**
      * The first of $names that the command line gives more than once, as a refusal. The console
-     * keeps only the last value of a repeated option, so a copy of the input is bound again with
-     * each named option read as a list.
+     * keeps only the last value of a repeated option, so this method binds a copy of the input again
+     * and reads each named option as a list.
      *
      * @param list<string> $names options that require a value
      */
     private function repeatedOption(InputInterface $input, array $names): ?string
     {
         $definition = $this->getDefinition();
-        $probe = array_values($definition->getArguments());
+        $probe = $definition->getArguments();
         foreach ($definition->getOptions() as $option) {
             $probe[] = \in_array($option->getName(), $names, true)
                 ? new InputOption($option->getName(), $option->getShortcut(), InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, $option->getDescription())

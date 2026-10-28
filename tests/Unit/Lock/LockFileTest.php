@@ -435,8 +435,7 @@ final class LockFileTest extends TestCase
     }
 
     /**
-     * Each body is valid JSON that Composer's Locker cannot use, or that breaks a lockrot rule: before
-     * the boundary, each one loaded as a clean lock.
+     * Each body is valid JSON that Composer's Locker cannot use, or that breaks a lockrot rule.
      *
      * @return iterable<string, array{0: array<string, mixed>, 1: string}>
      */
@@ -455,10 +454,16 @@ final class LockFileTest extends TestCase
         yield 'string platform-dev' => [['packages' => [], 'platform-dev' => 'x'], 'alt.lock: platform-dev must be an object'];
         yield 'string platform-overrides' => [['packages' => [], 'platform-overrides' => 'x'], 'alt.lock: platform-overrides must be an object'];
         yield 'number as platform override' => [['packages' => [], 'platform-overrides' => ['php' => 8.1]], 'alt.lock: platform-overrides cannot be loaded: '];
+        yield 'platform constraint that Composer cannot parse' => [['packages' => [], 'platform' => ['php' => 'not a constraint !!']], 'alt.lock: platform cannot be loaded: '];
+        yield 'platform-dev constraint that Composer cannot parse' => [['packages' => [], 'platform-dev' => ['ext-json' => '>= ~']], 'alt.lock: platform-dev cannot be loaded: '];
+        yield 'override of a package that is not a platform package' => [['packages' => [], 'platform-overrides' => ['foo/bar' => '1.0']], 'alt.lock: platform-overrides cannot be loaded: foo/bar is no platform package'];
         yield 'php override false' => [['packages' => [], 'platform-overrides' => ['php' => false]], 'alt.lock: platform-overrides cannot be loaded: '];
         yield 'string aliases' => [['packages' => [], 'aliases' => 'x'], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
         yield 'alias without alias_normalized' => [['packages' => [$entry], 'aliases' => [['package' => 'a/b', 'version' => '1.0.0', 'alias' => '1.0.x-dev']]], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
         yield 'alias that is a string' => [['packages' => [$entry], 'aliases' => ['a/b']], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
+        yield 'alias without package' => [['packages' => [$entry], 'aliases' => [['version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
+        yield 'a broken alias before a whole one' => [['packages' => [$entry], 'aliases' => ['a/b', ['package' => 'a/b', 'version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
+        yield 'aliases as an object' => [['packages' => [$entry], 'aliases' => ['a' => ['package' => 'a/b', 'version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
         yield 'number as name' => [['packages' => [['name' => 5, 'version' => '1.0.0']]], 'alt.lock entry #0 in packages cannot be loaded: "name" must be a string'];
         yield 'number as type' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'type' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: '];
         yield 'name in both sections' => [['packages' => [$entry], 'packages-dev' => [['name' => 'a/b', 'version' => '2.0.0']]], 'alt.lock lists a/b twice: entry #0 in packages and entry #0 in packages-dev'];
@@ -548,13 +553,44 @@ final class LockFileTest extends TestCase
         self::assertNull(LockFile::fromArray(['packages' => [], 'platform-overrides' => ['php' => '8.1.5', 'PHP' => false]])->platformOverridePhp(), 'a later false wins over the earlier string');
     }
 
-    public function testAMixedCaseAliasNamesTheLockedPackage(): void
+    public function testEachAliasNamesItsLockedPackage(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [['name' => 'vendor/a', 'version' => 'dev-main'], ['name' => 'vendor/b', 'version' => 'dev-main']],
+            'aliases' => [
+                ['package' => 'vendor/a', 'version' => 'dev-main', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev'],
+                ['package' => 'vendor/b', 'version' => 'dev-main', 'alias' => '2.0.x-dev', 'alias_normalized' => '2.0.9999999.9999999-dev'],
+            ],
+        ]);
+
+        self::assertCount(4, $lock->lockedRepository()->getPackages(), 'two locked packages and one alias of each');
+    }
+
+    /** Composer's Locker matches an alias against the lower-case package names as written. */
+    public function testAMixedCaseAliasNamesNoPackageAsInComposer(): void
     {
         $lock = LockFile::fromArray([
             'packages' => [['name' => 'vendor/a', 'version' => 'dev-main']],
             'aliases' => [['package' => 'Vendor/A', 'version' => 'dev-main', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']],
         ]);
 
-        self::assertCount(2, $lock->lockedRepository()->getPackages());
+        self::assertCount(1, $lock->lockedRepository()->getPackages());
+    }
+
+    public function testAnOverrideThatComposerRefusesKeepsComposersReason(): void
+    {
+        $thrown = null;
+        try {
+            LockFile::fromArray(['packages' => [], 'platform-overrides' => ['php' => false]], 'alt.lock');
+        } catch (ConfigException $e) {
+            $thrown = $e;
+        }
+
+        self::assertNotNull($thrown);
+        $cause = $thrown->getPrevious();
+        self::assertNotNull($cause, 'the PlatformRepository failure is kept as the cause');
+        self::assertNotSame('', $cause->getMessage());
+        self::assertSame('alt.lock: platform-overrides cannot be loaded: '.$cause->getMessage(), $thrown->getMessage());
+        self::assertSame(0, $thrown->getCode(), 'lockrot carries no exception codes; a run exits on its verdict, not on these');
     }
 }

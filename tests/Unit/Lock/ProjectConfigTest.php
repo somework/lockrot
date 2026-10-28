@@ -122,9 +122,11 @@ final class ProjectConfigTest extends TestCase
      */
     public function testANumericRequireKeyIsReportedAsAStringName(): void
     {
-        $cfg = ProjectConfig::fromArray(['require' => [123 => '^1.0', 'a/b' => '^1.0']]);
+        $cfg = ProjectConfig::fromArray(['require' => [123 => '^1.0', 'a/b' => '^1.0'], 'require-dev' => [456 => '^2.0']]);
 
         self::assertSame(['123', 'a/b'], $cfg->directRequires());
+        self::assertSame(['456'], $cfg->directDevRequires());
+        self::assertSame([ProjectConfig::REQUIRE => '123'], $cfg->listedIn('123'));
     }
 
     /**

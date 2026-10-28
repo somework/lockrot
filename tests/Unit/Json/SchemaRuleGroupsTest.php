@@ -11,9 +11,9 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * A refusal names the rule that a document breaks. The message of a broken group is its
- * `description` ({@see \Lockrot\Json\SchemaErrors}), so each group in config-2 and baseline-2 is
+ * `description` ({@see \Lockrot\Json\SchemaErrors}). So each group in config-2 and baseline-2 is
  * an `allOf` member that holds only the rule and the group (`rule_group()` in
- * tools/schema/build_other_schemas.py), and an editor description stays on the node around it.
+ * tools/schema/build_other_schemas.py). An editor description stays on the node around it.
  */
 final class SchemaRuleGroupsTest extends TestCase
 {
@@ -87,7 +87,7 @@ final class SchemaRuleGroupsTest extends TestCase
             ConfigSchema::validate(['fail-on' => 5]);
         });
 
-        self::assertStringContainsString('  - fail-on: `fail-on` is a string or a non-empty array of strings.', $message);
+        self::assertStringContainsString('  - fail-on: `fail-on` is one value, a comma-separated list of values, or a non-empty array of distinct values.', $message);
     }
 
     public function testAFailOnItemThatIsNoValueNamesTheValueRule(): void

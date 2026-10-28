@@ -3019,8 +3019,8 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * Each rule of the command line is checked before composer.json is read, so the broken manifest
-     * here never speaks, and no baseline is written.
+     * lockrot checks each rule of the command line before it reads composer.json. The refusal is
+     * the only error, though the manifest is broken, and lockrot writes no baseline.
      *
      * @dataProvider refusedCommandLines
      */
@@ -3053,17 +3053,20 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(['lockrot disabled via LOCKROT_DISABLE'], $errors);
     }
 
-    /** An option outside the once-only set keeps the console's rule: the last value wins. */
+    /** An option outside the once-only set keeps the console's rule: the last value wins, and `--output` is a list. */
     public function testARepeatedOptionOutsideTheOnceOnlySetStillRuns(): void
     {
         chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        $dir = $this->tempDir('lockrot-twice-');
         $command = $this->command($this->loader());
         $output = new SplitStreamOutput();
 
-        $code = $command->run(new StringInput('lockrot --target-php=8.4 --format=table --format=json --dev --dev'), $output);
+        $code = $command->run(new StringInput('lockrot --target-php=8.4 --format=table --format=json --dev --dev --output=json:'.$dir.'/a.json --output=json:'.$dir.'/b.json'), $output);
 
         self::assertSame(0, $code, $output->fetchErrors());
         self::assertIsArray(json_decode($output->fetch(), true));
+        self::assertFileExists($dir.'/a.json');
+        self::assertFileExists($dir.'/b.json');
     }
 
     /**

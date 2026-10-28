@@ -78,6 +78,10 @@ final class LockLineIndexTest extends TestCase
                     {
                         "name": "symfony\/console",
                         "version": "1.0.0"
+                    },
+                    {
+                        "name": "Acme\u002FLib",
+                        "version": "1.0.0"
                     }
                 ]
             }
@@ -86,6 +90,7 @@ final class LockLineIndexTest extends TestCase
 
         self::assertSame(4, $index->lineOf('myvendor/mypkg'));
         self::assertSame(8, $index->lineOf('symfony/console'));
+        self::assertSame(12, $index->lineOf('acme/lib'));
     }
 
     /** `\q` is no JSON escape: that name decodes to nothing, and the scan goes on. */

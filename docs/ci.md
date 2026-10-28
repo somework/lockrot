@@ -75,11 +75,17 @@ with `lockrot:`, any other failure with `lockrot failed:`. `-v` adds the stack t
   gate has failed still exits `2` when a write then fails.
 - A `composer.json` or `composer.lock` lockrot cannot parse, a missing `composer.lock`, or a lock
   entry Composer's loader rejects (no `name` or `version`, a version it cannot normalise).
-- A lock that Composer cannot read: a `platform`, `platform-dev` or `platform-overrides` that is no
-  object, a `platform-overrides` value that Composer refuses, or a malformed `aliases`.
-- A lock that breaks a lockrot rule: `packages` is missing or is no list, `packages-dev` is no list,
-  a `name` is no string, or one name is listed twice, case ignored. The message names the lock
-  that Composer reads, such as `alt.lock` under `COMPOSER=alt.json`.
+- A lock that Composer cannot read. A non-empty `platform` or `platform-dev` is no JSON object or
+  array, or holds a constraint that Composer cannot parse. Or `platform-overrides` is no JSON object
+  or array, or holds a value or a package name that Composer refuses.
+- A lock that breaks a lockrot rule. The message names the lock that Composer reads, such as
+  `alt.lock` under `COMPOSER=alt.json`. The rules:
+
+    - `packages` is a list.
+    - `packages-dev` and `aliases` are null or a list.
+    - Each `aliases` entry has the strings `package`, `alias` and `alias_normalized`.
+    - Each `name` is a string, and no name is listed twice, case ignored.
+
 - A value the configuration rejects: in `extra.lockrot`, in an environment variable, or on the
   command line ([configuration.md](configuration.md#extralockrot-keys)). That includes two values
   of one kind in `--fail-on`, `none` beside another value, and `vulnerable-low`.

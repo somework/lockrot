@@ -8,6 +8,7 @@ use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Package\CompleteAliasPackage;
 use Composer\Package\CompletePackage;
+use Composer\Package\Link;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Repository\LockArrayRepository;
 use Composer\Repository\PlatformRepository;
@@ -51,10 +52,10 @@ final class LockFile
     }
 
     /**
-     * A lock loads only when Composer's ArrayLoader loads every entry and Composer's Locker can read
-     * its other keys. Three rules are lockrot's own: `packages` is present and is a list, each `name`
-     * is a string, and no name is listed twice, case ignored, because a finding needs one entry. A
-     * platform map follows Composer instead: the later of two keys that differ in case wins.
+     * A lock loads only when Composer can install it and it keeps lockrot's own rules. `packages` is
+     * a list, `packages-dev` and `aliases` are null or a list, and each `name` is a string. No name is
+     * listed twice, case ignored, because a finding needs one entry per package. A platform map
+     * follows Composer: the later of two keys that differ in case wins.
      *
      * @param array<string, mixed> $lock
      * @param string               $name the lock's name in messages
@@ -63,12 +64,12 @@ final class LockFile
      */
     public static function fromArray(array $lock, string $name = FormatContext::DEFAULT_LOCK_NAME): self
     {
-        $aliases = self::aliases($lock['aliases'] ?? null, $name);
-        $overridePhp = self::overridePhpOf(['platform' => $lock['platform'] ?? null, 'platform-dev' => $lock['platform-dev'] ?? null], $lock['platform-overrides'] ?? [], $name);
-        $packages = [];
-        $loader = new ArrayLoader();
         // Composer's Locker loads the lock for an update with these options.
         $lockLoader = new ArrayLoader(null, true);
+        $aliases = self::aliases($lock['aliases'] ?? null, $name);
+        $overridePhp = self::overridePhpOf(['platform' => $lock['platform'] ?? null, 'platform-dev' => $lock['platform-dev'] ?? null], $lock['platform-overrides'] ?? [], $name, $lockLoader);
+        $packages = [];
+        $loader = new ArrayLoader();
         $locked = new LockArrayRepository();
         $aliased = [];
         $skipped = [];
@@ -97,7 +98,7 @@ final class LockFile
             }
         }
         foreach ($aliases as $alias) {
-            $of = $aliased[PackageName::key($alias['package'])] ?? null;
+            $of = $aliased[$alias['package']] ?? null;
             if ($of instanceof CompletePackage) {
                 $rootAlias = new CompleteAliasPackage($of, $alias['alias_normalized'], $alias['alias']);
                 $rootAlias->setRootPackageAlias(true);
@@ -181,13 +182,21 @@ final class LockFile
      * @param array{platform: mixed, platform-dev: mixed} $platform
      * @param mixed                                       $overrides
      */
-    private static function overridePhpOf(array $platform, $overrides, string $name): ?string
+    private static function overridePhpOf(array $platform, $overrides, string $name, ArrayLoader $lockLoader): ?string
     {
-        // Composer's Locker passes `platform` and `platform-dev` to an array parameter when they are
-        // not empty, and `platform-overrides` when it is set.
+        // Composer's Locker passes `platform` and `platform-dev` to parseLinks() when they are not
+        // empty, and `platform-overrides` to PlatformRepository when it is set.
         foreach ($platform as $key => $links) {
-            if (!empty($links) && !\is_array($links)) {
+            if (empty($links)) {
+                continue;
+            }
+            if (!\is_array($links)) {
                 throw new ConfigException(\sprintf('%s: %s must be an object', $name, $key));
+            }
+            try {
+                $lockLoader->parseLinks('__root__', '1.0.0', Link::TYPE_REQUIRE, array_filter($links, 'is_string'));
+            } catch (\Throwable $e) {
+                throw new ConfigException(\sprintf('%s: %s cannot be loaded: %s', $name, $key, $e->getMessage()), 0, $e);
             }
         }
         if (!\is_array($overrides)) {
@@ -198,6 +207,12 @@ final class LockFile
             new PlatformRepository([], $overrides);
         } catch (\Throwable $e) {
             throw new ConfigException($name.': platform-overrides cannot be loaded: '.$e->getMessage(), 0, $e);
+        }
+        // PlatformRepository::initialize() refuses these names when Composer installs the lock.
+        foreach (array_keys($overrides) as $override) {
+            if (!PlatformRepository::isPlatformPackage((string) $override)) {
+                throw new ConfigException(\sprintf('%s: platform-overrides cannot be loaded: %s is no platform package', $name, $override));
+            }
         }
 
         $php = array_change_key_case($overrides, \CASE_LOWER)['php'] ?? null;

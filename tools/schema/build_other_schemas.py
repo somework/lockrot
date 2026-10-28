@@ -64,8 +64,10 @@ def ref(name, desc=None):
 
 
 def rule_group(rule, keyword, branches):
-    """one rule group of config-2 or baseline-2, as an `allOf` member: SchemaErrors prints `rule` for a document that breaks the group,
-    so the editor description stays on the node around it (tests/Unit/Json/SchemaRuleGroupsTest.php)."""
+    """one rule group of config-2 or baseline-2, as an `allOf` member.
+
+    SchemaErrors prints `rule` for a document that breaks the group. The editor description stays on
+    the node around it (tests/Unit/Json/SchemaRuleGroupsTest.php)."""
     return {'description': rule, keyword: branches}
 
 
@@ -812,7 +814,7 @@ def config_schema():
                         'each value and accepts whitespace around commas. `--fail-on` and `LOCKROT_FAIL_ON` replace this value whole. This schema checks the '
                         'spelling of each value. Two values of one kind and `none` beside another value are errors of lockrot itself (exit 2), which name the values. '
                         '`run.fail_on` writes the list in canonical form.'),
-        'allOf': [rule_group('`fail-on` is a string or a non-empty array of strings.', 'oneOf', [
+        'allOf': [rule_group('`fail-on` is one value, a comma-separated list of values, or a non-empty array of distinct values.', 'oneOf', [
             {'description': 'A comma-separated list in one string: `"high"`, `"left-behind, vulnerable-high"`.', 'type': 'string',
              'allOf': [rule_group('A fail-on string is one value or a comma-separated list of values.', 'anyOf', [
                  {'description': 'One value, as an editor offers it.', 'enum': FAIL_ON_VALUES}, {'pattern': lst}])]},

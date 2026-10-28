@@ -138,7 +138,7 @@ final class LockrotCommand extends BaseCommand
         return $this->unreadableInput($input, $output) ?? parent::run($input, $output);
     }
 
-    /** docs/configuration.md#cli-options: the rules of the command line, checked before any file is read. */
+    /** The rules of the command line: docs/configuration.md#cli-options. */
     protected function inputRefusal(InputInterface $input): ?string
     {
         $repeated = $this->repeatedOption($input, self::ONCE_ONLY_OPTIONS);
