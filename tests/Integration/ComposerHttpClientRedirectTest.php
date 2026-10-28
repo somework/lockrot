@@ -140,7 +140,7 @@ final class ComposerHttpClientRedirectTest extends TestCase
         );
     }
 
-    /** A downloader that cannot stop a redirect, as Composer's without curl. */
+    /** A downloader that cannot stop a redirect, as Composer's downloader is without curl. */
     public function testARedirectToAnotherHostArrivesWithoutLockrotsCredentialsWithoutCurl(): void
     {
         self::assertSame(

@@ -157,6 +157,23 @@ final class PharTest extends TestCase
     }
 
     /**
+     * bin/lockrot omits Composer's SAPI check because Box's requirement checker stops the archive
+     * first. On a web SAPI with register_argc_argv=On, a query string can set the command line.
+     */
+    public function testTheArchiveDoesNotRunOnAWebSapiThatReadsArgvFromTheQueryString(): void
+    {
+        $cgi = \dirname(\PHP_BINARY).'/php-cgi';
+        if (!is_executable($cgi)) {
+            self::markTestSkipped('no php-cgi beside '.\PHP_BINARY);
+        }
+        $process = new Process([$cgi, '-q', '-d', 'register_argc_argv=1', $this->phar(), '--version']);
+        $process->setTimeout(300)->run();
+
+        self::assertNotSame(0, $process->getExitCode(), $process->getOutput());
+        self::assertStringNotContainsString('lockrot '.Version::STRING, $process->getOutput());
+    }
+
+    /**
      * box.json's finder and compactors put the vendored page into the archive, and no source-tree
      * check reads the archive. The page that the archive writes must keep the manifest's policy,
      * hashed over its own inline script and stylesheet as a browser hashes them, and embed report-2.

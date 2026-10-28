@@ -103,7 +103,6 @@ entry in the commit that changes the line.
 - `src/Data/Advisory/AdvisoryIgnore.php` FalseValue `return new self([], [], false);` — the flag sets only the `by` of a match, and an empty list matches nothing.
 - `src/Data/Advisory/AdvisoryIgnore.php` FalseValue `return new self([], [], false, $why);` — the flag sets only the `by` of a match, and an empty list matches nothing.
 - `src/Data/Advisory/AdvisoryIgnore.php` TrueValue `return new self([], [], true, null, ['policy_key' => $policyKey, 'value' => $value]);` — the flag sets only the `by` of a match, and an empty list matches nothing.
-- `src/Data/Advisory/AdvisoryIgnore.php` CastString `$ids[(string) $key] = \is_string($reason) ? $reason : null;` — PHP stores a numeric string key as an integer either way, and `array_key_exists()` finds it by the string.
 - `src/Data/Advisory/AdvisoryIgnore.php` UnwrapArrayFilter `return array_filter($config, 'is_string', \ARRAY_FILTER_USE_KEY);` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` TrueValue `$ids[$advisory->advisoryId] = true;` — only the keys are counted.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in attribute(): a package name holds a `/`, so PHP never stores it as an integer key.
