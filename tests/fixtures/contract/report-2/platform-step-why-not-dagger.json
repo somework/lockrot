@@ -1406,7 +1406,7 @@
                     }
                 ],
                 "also": [],
-                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle and php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "vulnerable",

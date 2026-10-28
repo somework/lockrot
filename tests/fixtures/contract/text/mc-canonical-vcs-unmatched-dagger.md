@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **high** | `symfony/routing` | v6.4.28 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** composer update 'symfony/routing:^6.4.41' --with-all-dependencies (gets v6.4.41) — clears the advisory; Composer's solver checked it against the lock<br>*vulnerable:* 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained \`../\` or \`./\` → Generated URL Collapses Off-Route Under RFC 3986 Normalization<br>*age:* installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-03 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago) | direct |
+| **high** | `symfony/routing` | v6.4.28 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** `composer update 'symfony/routing:^6.4.41' --with-all-dependencies` (gets v6.4.41) — clears the advisory; Composer's solver checked it against the lock<br>*vulnerable:* 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained \`../\` or \`./\` → Generated URL Collapses Off-Route Under RFC 3986 Normalization<br>*age:* installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-03 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago) | direct |
 | ok | `acme/pk-x` | 1.0.0 | ok | `0` | direct |
 
 flags: vulnerable 1

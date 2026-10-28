@@ -112,6 +112,20 @@ final class CommandArgumentTest extends TestCase
         );
     }
 
+    public function testNoInteractionPassesOnlyAfterThePackageOfARequire(): void
+    {
+        self::assertSame(
+            [true, true, false, false, false],
+            [
+                CommandArgument::allPass(['composer', 'require', 'Vendor/Pkg:^2.0', '--no-interaction']),
+                CommandArgument::allPass(['composer', 'require', 'PHP:>=8.1', '--no-interaction', '--no-update']),
+                CommandArgument::allPass(['composer', 'require', '--no-interaction', 'vendor/pkg:^2.0']),
+                CommandArgument::allPass(['composer', 'update', 'vendor/pkg', '--no-interaction']),
+                CommandArgument::allPass(['composer', 'why-not', 'vendor/pkg', '2.0.0', '--no-interaction']),
+            ]
+        );
+    }
+
     public function testAnEmptyArgumentFails(): void
     {
         self::assertFalse(CommandArgument::passes(''));

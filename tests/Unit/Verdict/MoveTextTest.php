@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Data\Repository\StableRelease;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\Holder;
 use Lockrot\Security\PhpCheck;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Solver\MoveCheck;
+use Lockrot\Tests\Support\CaseHydrator;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\GradedPackage;
 use Lockrot\Verdict\Latest;
@@ -16,6 +19,7 @@ use Lockrot\Verdict\Move;
 use Lockrot\Verdict\MoveFact;
 use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\MoveText;
+use Lockrot\Verdict\ShellCommand;
 use Lockrot\Verdict\ThroughEntry;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -193,7 +197,7 @@ final class MoveTextTest extends TestCase
         $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '7.4', null);
         $move = new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, null, true, $holds, [], [], [], [], null, [], [], $subject);
 
-        self::assertStringEndsWith('; held by composer.json (requires ^1.2) and acme/lib 2.0.0, its own release (requires psr/log ^1) and acme/lib 2.0.0, its own release (conflicts with psr/clock <2) and a/early 1.0.0 (requires acme/lib ^1.2; itself left-behind)', MoveText::render($move));
+        self::assertStringEndsWith('; held by composer.json (requires ^1.2), acme/lib 2.0.0, its own release (requires psr/log ^1), acme/lib 2.0.0, its own release (conflicts with psr/clock <2) and a/early 1.0.0 (requires acme/lib ^1.2; itself left-behind)', MoveText::render($move));
     }
 
     public function testARootHoldFromRequireDevSaysRequireDev(): void
@@ -243,6 +247,45 @@ final class MoveTextTest extends TestCase
         self::assertStringStartsWith('require acme/lib ^2.0 in require-dev (gets 2.0.4, below the newest 2.1.0)', MoveText::render($move));
     }
 
+    /** Composer moves a name that both sections list to require, so the text names the removed line (R6-3). */
+    public function testARequireMoveOfANameThatBothSectionsListSaysItRemovesTheRequireDevLine(): void
+    {
+        $subject = (new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null))->withKeys([ProjectConfig::REQUIRE => 'acme/lib', ProjectConfig::REQUIRE_DEV => 'Acme/Lib'], []);
+        $move = (new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, null, true, [], [], [], [], [], null, [], [['composer', 'require', 'Acme/Lib:^2.0', '--no-interaction']], $subject))
+            ->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0'));
+
+        self::assertStringStartsWith('require acme/lib ^2.0, which removes it from require-dev;', MoveText::render($move));
+    }
+
+    public function testATagMoveOfANameThatBothSectionsListSaysItRemovesTheRequireDevLine(): void
+    {
+        $subject = (new MoveSubject('acme/lib', '1.2.0', false, [], '8.4', null))->withKeys([ProjectConfig::REQUIRE => 'acme/lib', ProjectConfig::REQUIRE_DEV => 'acme/lib'], []);
+        $move = new Move(Move::TAG, FlagSet::PINNED, [], null, null, null, null, null, '2.0.0', '2.0.0', null, new Latest('2.0.0', null, false, null, null), null, false, [], [], [], [], [], null, [], [['composer', 'require', 'acme/lib:^2.0.0', '--no-interaction']], $subject);
+
+        self::assertStringStartsWith('require a tag, which removes it from require-dev — the newest is 2.0.0', MoveText::render($move));
+    }
+
+    public function testAPhpRaiseThatRequireDevListsSaysItRemovesTheRequireDevLine(): void
+    {
+        $subject = (new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', '7.4'))->withKeys([ProjectConfig::REQUIRE => 'acme/lib'], [ProjectConfig::REQUIRE => 'php', ProjectConfig::REQUIRE_DEV => 'php']);
+        $phpCheck = PhpCheck::of('>=8.1', new PhpFloor('8.4', '>=7.4'));
+        $move = (new Move(Move::RAISE_PHP, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, $phpCheck, true, [], [], [], [], [], null, [], [['composer', 'require', 'php:>=8.1', '--no-interaction', '--no-update'], ['composer', 'require', 'acme/lib:^2.0']], $subject))
+            ->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0'));
+
+        self::assertStringStartsWith('raise require.php to >=8.1, which removes it from require-dev, then ', MoveText::render($move));
+    }
+
+    public function testThePhpRaiseBeforeAnUpdateIsProseAndTheUpdateIsTheOneCommand(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', '7.4');
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '1.x', '1.2.5', '1.2.5', null, null, PhpCheck::of('>=8.1', new PhpFloor('8.4', '>=7.4')), false, [], [], [], [], [], null, [], [['composer', 'update', 'acme/lib']], $subject);
+
+        $parts = MoveText::parts($move);
+
+        self::assertStringStartsWith('raise require.php to >=8.1, then ', $parts[0][0]);
+        self::assertSame(['composer update acme/lib'], array_column(array_values(array_filter($parts, static fn (array $part): bool => $part[1])), 0));
+    }
+
     public function testASelfVersionHoldNamesTheHoldersVersion(): void
     {
         $hold = new Holder(Holder::PACKAGE, 'acme/suite', '3.1.0', Holder::REQUIRE, 'self.version', 'acme/lib');
@@ -262,7 +305,7 @@ final class MoveTextTest extends TestCase
         $move = (new Move(Move::FIND_ALTERNATIVE, FlagSet::ABANDONED, [], null, null, null, null, null, null, null, null, null, null, null, [], [], [], [], [], null, [Move::TRANSITIVE], [], $subject))->asLead($through, []);
 
         self::assertStringContainsString(
-            '; it comes in through mautic/core-lib (jbroadway/urlify requires it), c/unread, l/newest: change your own package mautic/core-lib, or replace or update c/unread, or replace l/newest',
+            '; it comes in through mautic/core-lib (jbroadway/urlify requires it), c/unread and l/newest: change your own package mautic/core-lib, or replace or update c/unread, or replace l/newest',
             MoveText::render($move)
         );
     }
@@ -300,6 +343,88 @@ final class MoveTextTest extends TestCase
 
         self::assertNull($move->check());
         self::assertNotNull($checked->check());
+    }
+
+    /**
+     * @dataProvider movesAndTheirParts
+     *
+     * @param list<list<string>>              $commands
+     * @param list<array{0: string, 1: bool}> $parts
+     */
+    #[DataProvider('movesAndTheirParts')]
+    public function testTheMoveTextIsBuiltFromProseAndTheCommandThatItNames(string $kind, string $source, ?string $override, array $commands, array $parts): void
+    {
+        $move = new Move($kind, $source, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], $commands, new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, $override));
+
+        self::assertSame($parts, MoveText::parts($move));
+    }
+
+    /** @return iterable<string, array{string, string, ?string, list<list<string>>, list<array{0: string, 1: bool}>}> */
+    public static function movesAndTheirParts(): iterable
+    {
+        $update = ['composer', 'update', 'acme/lib'];
+        yield 'the command first' => [Move::UPDATE, FlagSet::VULNERABLE, null, [$update], [['composer update acme/lib', true], [' (gets 2.0.0)', false]]];
+        yield 'a platform step before the command' => [Move::UPDATE, FlagSet::VULNERABLE, '7.4.29', [$update], [['First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. ', false], ['composer update acme/lib', true], [' (gets 2.0.0)', false]]];
+        yield 'a command that no shell takes, before the named one' => [Move::UPDATE, FlagSet::VULNERABLE, null, [['composer', 'update', 'acme/lib;x'], $update], [['composer update acme/lib', true], [' (gets 2.0.0)', false]]];
+        yield 'no command that a shell takes' => [Move::UPDATE, FlagSet::VULNERABLE, null, [['composer', 'update', 'acme/lib;x']], [['update it with Composer (gets 2.0.0)', false]]];
+        yield 'no command in the text' => [Move::FIND_ALTERNATIVE, FlagSet::ABANDONED, null, [], [['find a replacement (none named)', false]]];
+    }
+
+    /**
+     * The lock's `platform-overrides.php` is printed as written when it is not a stable release of
+     * the target minor, so it can spell the command. The command piece is the move's own.
+     */
+    public function testAPlatformValueThatSpellsTheCommandStaysProse(): void
+    {
+        $override = '7.4 composer update acme/c0ffee12 --with-dependencies';
+        $subject = new MoveSubject('acme/c0ffee12', '1.0.0', true, [], '8.4', null, null, $override);
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '1.x', '1.0.3', '1.0.3', null, null, null, false, [], [], [], [], [], null, [], [['composer', 'update', 'acme/c0ffee12', '--with-dependencies']], $subject);
+
+        self::assertSame([
+            ['First set config.platform.php to your PHP 8.4 release: the lock records '.$override.'. ', false],
+            ['composer update acme/c0ffee12 --with-dependencies', true],
+            [' (gets 1.0.3)', false],
+        ], MoveText::parts($move));
+    }
+
+    /**
+     * Over every model case and its `also[]` moves: the pieces concatenate to `next_step.text`, at
+     * most one piece is a command, it is the POSIX rendering of one of the move's commands, and no
+     * piece is empty or only whitespace.
+     */
+    /** The pieces of each case move join to the `text` that tests/fixtures/golden/moves.json records. */
+    public function testThePiecesOfEveryCaseMoveAreItsRecordedTextAndAtMostOneOfItsCommands(): void
+    {
+        $golden = JsonPath::decodeFile(__DIR__.'/../../fixtures/golden/moves.json');
+        $moves = [];
+        foreach (MoveTest::casesWithInputs() as $id => [$caseId]) {
+            $case = CaseHydrator::case($caseId);
+            $package = JsonPath::stringAt($case, ['inputs', 'lock', 0, 'name']);
+            foreach (CaseHydrator::report($case)->findings() as $finding) {
+                $move = $finding->package() === $package ? $finding->nextStep() : null;
+                if ($move === null) {
+                    continue;
+                }
+                $moves[$id] = [$move, JsonPath::stringAt($golden, [$id, 'next_step', 'text'])];
+                foreach ($move->also() as $index => $also) {
+                    $moves[$id.' also['.$index.']'] = [$also, JsonPath::stringAt($golden, [$id, 'next_step', 'also', $index, 'text'])];
+                }
+            }
+        }
+        self::assertNotSame([], $moves);
+
+        foreach ($moves as $name => [$move, $recorded]) {
+            $parts = MoveText::parts($move);
+            $commands = array_values(array_filter($parts, static fn (array $part): bool => $part[1]));
+            self::assertSame($recorded, implode('', array_column($parts, 0)), $name);
+            self::assertLessThanOrEqual(1, \count($commands), $name);
+            foreach ($commands as [$command]) {
+                self::assertContains($command, array_map([ShellCommand::class, 'posix'], $move->commands()), $name);
+            }
+            foreach ($parts as [$text]) {
+                self::assertNotSame('', trim($text), $name);
+            }
+        }
     }
 
     /** @param list<string> $because */

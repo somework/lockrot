@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **high** | `symfony/http-foundation` | v6.4.29 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** composer update 'symfony/http-foundation:^6.4.41' --with-all-dependencies (gets v6.4.41) — clears the advisory; Composer's solver checked it against the lock<br>*vulnerable:* 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48736 IpUtils::PRIVATE\_SUBNETS Omits IPv6 Transition Forms (6to4, NAT64, Teredo, IPv4-compatible): SSRF Bypass in NoPrivateNetworkHttpClient<br>*age:* installed v6.4.29 released 2025-11-08 (0.9 years ago); 6.x last released v6.4.41 2026-07-03 (0.2 years ago), its newest release; last push 2026-10-01 (less than three weeks ago) | direct |
+| **high** | `symfony/http-foundation` | v6.4.29 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** `composer update 'symfony/http-foundation:^6.4.41' --with-all-dependencies` (gets v6.4.41) — clears the advisory; Composer's solver checked it against the lock<br>*vulnerable:* 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48736 IpUtils::PRIVATE\_SUBNETS Omits IPv6 Transition Forms (6to4, NAT64, Teredo, IPv4-compatible): SSRF Bypass in NoPrivateNetworkHttpClient<br>*age:* installed v6.4.29 released 2025-11-08 (0.9 years ago); 6.x last released v6.4.41 2026-07-03 (0.2 years ago), its newest release; last push 2026-10-01 (less than three weeks ago) | direct |
 | ok | `acme/hf-mime` | 1.0.0 | ok | `0` | direct |
 
 flags: vulnerable 1

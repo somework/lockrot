@@ -85,7 +85,7 @@ final class ReferenceText
         array_multisort($keys, $ordered);
         $holders = array_map(static fn ($hold): string => self::holder($hold, $package), $ordered);
         if ($holders !== []) {
-            $text .= '; held by '.implode(' and ', $holders);
+            $text .= '; held by '.self::joined($holders);
         }
         $because = Fields::strings($move, 'composer_moves_because');
         foreach ($because as $reason) {
@@ -515,7 +515,7 @@ final class ReferenceText
         }
         $text = '';
         foreach ($byBasis as $basis => $ids) {
-            $text .= '; '.(self::ADDS[$basis] ?? str_replace('_', ' ', (string) $basis)).', so '.implode(' and ', $ids).' would count';
+            $text .= '; '.(self::ADDS[$basis] ?? str_replace('_', ' ', (string) $basis)).', so '.self::joined($ids).' would count';
         }
 
         return $text;
@@ -577,7 +577,7 @@ final class ReferenceText
             return '';
         }
 
-        return '; '.implode(', ', $items).(\count($items) === 1 && substr($items[0], -10) !== 'advisories' ? ' stays' : ' stay');
+        return '; '.self::joined($items).(\count($items) === 1 && substr($items[0], -10) !== 'advisories' ? ' stays' : ' stay');
     }
 
     /** @param array<mixed, mixed> $move */
@@ -758,7 +758,7 @@ final class ReferenceText
     /** @param list<string> $names */
     private static function list(array $names): string
     {
-        return \count($names) > self::DEPENDENTS_SHOWN ? implode(', ', \array_slice($names, 0, self::DEPENDENTS_SHOWN)).' and '.(\count($names) - self::DEPENDENTS_SHOWN).' more' : implode(', ', $names);
+        return \count($names) > self::DEPENDENTS_SHOWN ? implode(', ', \array_slice($names, 0, self::DEPENDENTS_SHOWN)).' and '.(\count($names) - self::DEPENDENTS_SHOWN).' more' : ($names === [] ? '' : self::joined($names));
     }
 
     /** @param list<string> $items */

@@ -88,7 +88,7 @@
                     "level": "error",
                     "rank": 80.0,
                     "message": {
-                        "text": "league/commonmark 2.9.1 is affected by PKSA-m4t9-vsgq-8khn (high advisory): league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan. Do: move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch, spatie/laravel-markdown \u2014 clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock."
+                        "text": "league/commonmark 2.9.1 is affected by PKSA-m4t9-vsgq-8khn (high advisory): league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan. Do: move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch and spatie/laravel-markdown \u2014 clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "league/commonmark",
@@ -223,7 +223,7 @@
                     "level": "warning",
                     "rank": 80.0,
                     "message": {
-                        "text": "league/commonmark 2.9.1 is affected by PKSA-zyf5-hrxv-hrd7 (high advisory): league/commonmark: Denial of service via distinctly-named attributes in the Attributes extension. Do: move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch, spatie/laravel-markdown \u2014 clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock."
+                        "text": "league/commonmark 2.9.1 is affected by PKSA-zyf5-hrxv-hrd7 (high advisory): league/commonmark: Denial of service via distinctly-named attributes in the Attributes extension. Do: move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch and spatie/laravel-markdown \u2014 clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "league/commonmark",
@@ -284,7 +284,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "league/commonmark 2.9.1 is affected by PKSA-m2dq-1fhr-29b1 (medium advisory): league/commonmark: DisallowedRawHtml bypassed when a disallowed tag name ends the raw-HTML literal. Do: move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch, spatie/laravel-markdown \u2014 clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock."
+                        "text": "league/commonmark 2.9.1 is affected by PKSA-m2dq-1fhr-29b1 (medium advisory): league/commonmark: DisallowedRawHtml bypassed when a disallowed tag name ends the raw-HTML literal. Do: move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch and spatie/laravel-markdown \u2014 clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "league/commonmark",

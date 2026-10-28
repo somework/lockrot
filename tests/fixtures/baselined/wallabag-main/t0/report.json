@@ -11821,7 +11821,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through guzzlehttp/guzzle, php-http/guzzle5-adapter, php-http/httplug-bundle: replace or update guzzlehttp/guzzle, or replace php-http/guzzle5-adapter, php-http/httplug-bundle; the newest release of guzzlehttp/guzzle (7.8.1) no longer requires it"
+                "text": "find a replacement (none named); it comes in through guzzlehttp/guzzle, php-http/guzzle5-adapter and php-http/httplug-bundle: replace or update guzzlehttp/guzzle, or replace php-http/guzzle5-adapter and php-http/httplug-bundle; the newest release of guzzlehttp/guzzle (7.8.1) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -12210,7 +12210,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -15000,7 +15000,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through sensio/framework-extra-bundle, willdurand/hateoas, willdurand/hateoas-bundle: replace sensio/framework-extra-bundle, willdurand/hateoas, willdurand/hateoas-bundle; the newest releases of sensio/framework-extra-bundle (v6.2.10) and willdurand/hateoas (3.10.0) still require it"
+                "text": "find a replacement (none named); it comes in through sensio/framework-extra-bundle, willdurand/hateoas and willdurand/hateoas-bundle: replace sensio/framework-extra-bundle, willdurand/hateoas and willdurand/hateoas-bundle; the newest releases of sensio/framework-extra-bundle (v6.2.10) and willdurand/hateoas (3.10.0) still require it"
             },
             "security": {
                 "status": "clear",
@@ -15682,7 +15682,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16001,7 +16001,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/exception requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/exception requires it) and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16321,7 +16321,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/consistency requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/consistency requires it) and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16640,7 +16640,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16959,7 +16959,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -17279,7 +17279,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -17599,7 +17599,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -17918,7 +17918,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -18237,7 +18237,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -18541,7 +18541,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/file requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/file requires it) and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -18848,7 +18848,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/regex requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/regex requires it) and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -19169,7 +19169,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -19488,7 +19488,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/math requires it), wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through rulerz-php/doctrine-orm, wallabag/rulerz (hoa/math requires it) and wallabag/rulerz-bundle: replace or update rulerz-php/doctrine-orm, wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -19822,7 +19822,7 @@
                     }
                 ],
                 "also": [],
-                "text": "replace with psr/http-factory (named by its registry); it comes in through j0k3r/graby, php-http/httplug-bundle, sentry/sentry-symfony: replace j0k3r/graby, php-http/httplug-bundle, or replace or update sentry/sentry-symfony; the newest release of php-http/httplug-bundle (1.33.0) still requires it"
+                "text": "replace with psr/http-factory (named by its registry); it comes in through j0k3r/graby, php-http/httplug-bundle and sentry/sentry-symfony: replace j0k3r/graby and php-http/httplug-bundle, or replace or update sentry/sentry-symfony; the newest release of php-http/httplug-bundle (1.33.0) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -20201,7 +20201,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update friendsofsymfony/oauth-server-bundle, scheb/2fa-backup-code, scheb/2fa-bundle and 4 more, or replace friendsofsymfony/user-bundle, scheb/2fa-qr-code; the newest release of symfony/security-bundle (v7.0.7) no longer requires it"
+                "text": "find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update friendsofsymfony/oauth-server-bundle, scheb/2fa-backup-code, scheb/2fa-bundle and 4 more, or replace friendsofsymfony/user-bundle and scheb/2fa-qr-code; the newest release of symfony/security-bundle (v7.0.7) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -24651,7 +24651,7 @@
                     }
                 ],
                 "also": [],
-                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. move willdurand/jsonp-callback-validator to ^2.0 through friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle \u2014 clears left-behind and old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; held by friendsofsymfony/jsrouting-bundle 2.8.0 (requires ~1.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. move willdurand/jsonp-callback-validator to ^2.0 through friendsofsymfony/jsrouting-bundle and friendsofsymfony/rest-bundle \u2014 clears left-behind and old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; held by friendsofsymfony/jsrouting-bundle 2.8.0 (requires ~1.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",

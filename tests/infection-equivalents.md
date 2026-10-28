@@ -147,6 +147,8 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Output/MarkdownFormatter.php` DecrementInteger `$nonce = bin2hex(random_bytes(16));` — the footer replaces each stand-in before it returns, so the nonce length never reaches the output, and 15 random bytes are as far out of reach of the data.
 - `src/Output/MarkdownFormatter.php` IncrementInteger `$nonce = bin2hex(random_bytes(16));` — the footer replaces each stand-in before it returns, so the nonce length never reaches the output.
 - `src/Output/InstallSummaryFormatter.php` LogicalAnd `$gateLine = $gate !== null && $run !== null && $gate->fails() ? '  '.self::text(RunGateText::render($gate, $run)) : null;` — a report decides its gate only from its run settings, so the gate and the run are null together.
+- `src/Output/InstallSummaryFormatter.php` FalseValue `$afterCommand = false;` — the first piece is the head, which is prose and holds a space, so a head that does not fit keeps a word and the start value never decides the ellipsis.
+- `src/Output/InstallSummaryFormatter.php` IncrementInteger `$cut = TerminalText::neutralise($text, max(0, $room));` — a room of 0 or 1 holds no space after a first character, so both cuts show no word.
 - `src/Output/AgeText.php` Coalesce `$key = ReleaseBranch::of($version) ?? ReleaseBranch::aliasLine($version);` — `ReleaseBranch::of()` answers only a release and `aliasLine()` only a branch alias, so at most one of them is not null.
 - `src/Output/HtmlFormatter.php` BitwiseOr `return htmlspecialchars($value, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');` — `title()` is the one caller, and its string holds no quote and no invalid byte.
 - `src/Output/JsonFormatter.php` FalseValue `public function format(Report $report, bool $showAll = false): string` — the JSON document lists every finding and does not read `$showAll`.
@@ -171,6 +173,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 
 - `src/Signal/PhpFloor.php` CastString `return ($kind === self::PROJECT ? 'the project\'s php ' : 'the target PHP ').(string) $this->php($kind);` — `php($kind)` is null only for an absent floor, and no caller describes one.
 - `src/Signal/PhpFloor.php` ReturnRemoval `return null;` — in parse(): composer/semver reads null as `""` and throws, and the `catch` returns the same value.
+- `src/Signal/PhpFloor.php` CastInt `foreach ([$point, $major.'.'.$minor.'.'.((int) $patch + 1)] as $candidate) {` — `startPoint()` writes the patch as digits, and PHP adds a digit string as the integer it spells. The cast is for the type.
 - `src/Signal/Rule/LeftBehindRule.php` LessThanOrEqualTo `if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {` — a higher branch released at the instant of the installed branch cannot be alive while the installed branch is old enough for S8.
 
 ## src/Solver

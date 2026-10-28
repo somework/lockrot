@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **unknown** | `bower-asset/jquery` | 3.7.1 | unknown | `0`<br>checks missing: S2, S3, S4, S8 (origin unknown) | yiisoft/yii2, yiisoft/yii2-bootstrap5, yiisoft/yii2-symfonymailer |
+| **unknown** | `bower-asset/jquery` | 3.7.1 | unknown | `0`<br>checks missing: S2, S3, S4, S8 (origin unknown) | yiisoft/yii2, yiisoft/yii2-bootstrap5 and yiisoft/yii2-symfonymailer |
 
 libyears: the one package could not be measured
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)

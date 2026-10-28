@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| low | `league/config` | v1.2.0 | stale | `4 = stale 8 ÷ 2 transitive`<br>**Do:** —<br>*stale:* last release 2022-12-11 (3.8 years ago) | laravel/framework, laravel/tinker |
+| low | `league/config` | v1.2.0 | stale | `4 = stale 8 ÷ 2 transitive`<br>**Do:** —<br>*stale:* last release 2022-12-11 (3.8 years ago) | laravel/framework and laravel/tinker |
 
 flags: stale 1
 depth: 1 of 1 flagged package is named by no line of composer.json · 2 hops 1 · deepest: `league/config`, 2 hops (`laravel/framework` › `league/commonmark` › `league/config`)

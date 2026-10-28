@@ -14,6 +14,7 @@ use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Security\Holder;
 use Lockrot\Security\Severity;
 use Lockrot\Solver\MoveCheck;
+use Lockrot\Verdict\ListWords;
 use Lockrot\Verdict\MoveText;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\ShellCommand;
@@ -231,7 +232,8 @@ final class RunFooter
         $data = $run->jsonSerialize();
         switch ($data['baseline']) {
             case MoveCheck::RESOLVES:
-                $off = $data['blocking_disabled_by'] === [] ? '' : ', with advisory blocking turned off by '.self::listed($name === null ? $data['blocking_disabled_by'] : array_map($name, $data['blocking_disabled_by']));
+                $by = $run->blockingDisabledBy();
+                $off = $by === [] ? '' : ', with advisory blocking turned off by '.ListWords::of($name === null ? $by : array_map($name, $by));
 
                 return 'moves: checked with the solver of Composer '.$data['composer'].' against the lock'.$off.'; '.self::listed($data['ignored_platform']).' requirements not checked';
             case MoveCheck::REFUSED:
@@ -392,7 +394,7 @@ final class RunFooter
             ? 'composer.json '.MoveText::linkWords($hold, $name).($hold->link() !== Holder::REQUIRE_DEV && \in_array($hold->target(), $dev, true) ? ' in require-dev' : '')
             : $name((string) $hold->package()).' '.$hold->version().' '.MoveText::linkWords($hold, $name), $fix['held_by']);
 
-        return $holds === [] ? '' : ': '.implode(' and ', $holds);
+        return $holds === [] ? '' : ': '.ListWords::of($holds);
     }
 
     /** @param array{reason: ?string} $fix */
@@ -408,7 +410,7 @@ final class RunFooter
      */
     private static function ceilingWords(array $holds): string
     {
-        return implode(' and ', array_map(static fn (Holder $hold): string => $hold->link().'.'.$hold->target().($hold->link() === Holder::CONFLICT ? ' excludes ' : ' allows only ').$hold->constraint(), $holds));
+        return ListWords::of(array_map(static fn (Holder $hold): string => $hold->link().'.'.$hold->target().($hold->link() === Holder::CONFLICT ? ' excludes ' : ' allows only ').$hold->constraint(), $holds));
     }
 
     /**
@@ -432,9 +434,8 @@ final class RunFooter
             $previous = $index;
         }
         $parts = array_map(static fn (array $run): string => \count($run) === 1 ? $run[0] : $run[0].' to '.$run[\count($run) - 1], $runs);
-        $last = array_pop($parts);
 
-        return 'on PHP '.($parts === [] ? $last : implode(', ', $parts).' and '.$last);
+        return 'on PHP '.ListWords::of($parts);
     }
 
     /**
@@ -529,19 +530,9 @@ final class RunFooter
     /** @param non-empty-list<string> $names */
     private static function names(array $names): string
     {
-        if (\count($names) > self::NAMES_SHOWN) {
-            return implode(', ', \array_slice($names, 0, self::NAMES_SHOWN)).' and '.(\count($names) - self::NAMES_SHOWN).' more';
-        }
+        $more = \count($names) - self::NAMES_SHOWN;
 
-        return self::listed($names);
-    }
-
-    /** @param non-empty-list<string> $names */
-    private static function listed(array $names): string
-    {
-        $last = array_pop($names);
-
-        return $names === [] ? $last : implode(', ', $names).' and '.$last;
+        return ListWords::of(array_merge(\array_slice($names, 0, self::NAMES_SHOWN), $more > 0 ? [$more.' more'] : []));
     }
 
     private static function nOf(int $count, string $one, string $many): string

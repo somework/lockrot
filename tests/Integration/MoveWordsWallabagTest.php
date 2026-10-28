@@ -98,7 +98,7 @@ final class MoveWordsWallabagTest extends TestCase
     {
         $text = JsonPath::stringAt(self::move('7.4', 'symfony/mailer'), ['text']);
 
-        self::assertStringContainsString('composer.json (requires symfony/mime ^4.4.47) and symfony/mailer v5.4.52, its own release (requires psr/event-dispatcher ^1) and symfony/mailer v5.4.0, its own release (requires symfony/mime ^5.2.6|^6.0) and ', $text);
+        self::assertStringContainsString('composer.json (requires symfony/mime ^4.4.47), symfony/mailer v5.4.52, its own release (requires psr/event-dispatcher ^1), symfony/mailer v5.4.0, its own release (requires symfony/mime ^5.2.6|^6.0), ', $text);
         self::assertStringNotContainsString('symfony/mailer v5.4.52 (requires', $text);
     }
 

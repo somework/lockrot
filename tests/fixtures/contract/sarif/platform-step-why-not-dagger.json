@@ -88,7 +88,7 @@
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
-                        "text": "symfony/yaml v5.3.14 is affected by CVE-2026-45133 (low advisory): YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings. Do: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock."
+                        "text": "symfony/yaml v5.3.14 is affected by CVE-2026-45133 (low advisory): YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings. Do: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle and php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/yaml",
@@ -221,7 +221,7 @@
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
-                        "text": "symfony/yaml v5.3.14 is affected by CVE-2026-45305 (low advisory): YAML Parser ReDoS via Catastrophic Backtracking in Parser::cleanup() Regex. Do: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock."
+                        "text": "symfony/yaml v5.3.14 is affected by CVE-2026-45305 (low advisory): YAML Parser ReDoS via Catastrophic Backtracking in Parser::cleanup() Regex. Do: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle and php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/yaml",
@@ -299,7 +299,7 @@
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
-                        "text": "symfony/yaml v5.3.14 is affected by CVE-2026-45304 (low advisory): YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion (\"Billion Laughs\"). Do: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock."
+                        "text": "symfony/yaml v5.3.14 is affected by CVE-2026-45304 (low advisory): YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion (\"Billion Laughs\"). Do: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle and php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/yaml",

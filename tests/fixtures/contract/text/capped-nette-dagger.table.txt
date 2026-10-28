@@ -1,5 +1,5 @@
 <options=bold>low (1)</options=bold>
-  nette/schema v1.3.2  via laravel/framework, pragmarx/google2fa-laravel  ·  capped
+  nette/schema v1.3.2  via laravel/framework and pragmarx/google2fa-laravel  ·  capped
       4 = capped 8 ÷ 2 transitive
       do: composer update nette/schema
           (gets v1.3.6) — clears capped

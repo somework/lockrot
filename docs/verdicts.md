@@ -731,6 +731,11 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
 - **A package that composer.json lists.** It gets the `composer require` step of the section that
   lists it, also in a run without `--dev`. For a package that only `require-dev` lists, the step
   adds `--dev`, and the line reads "require <package> <constraint> in require-dev".
+- **A package that both sections list.** The step adds `--no-interaction` and names the package
+  as the `require-dev` key spells it. Composer then writes the requirement to `require` and
+  removes the `require-dev` line, whatever the terminal answers. The line reads "require <package>
+  <constraint>, which removes it from require-dev". The php step does the same when `require-dev`
+  lists php.
 - **Update now.** lockrot solves the candidates of `update now:` as one request. A move that
   resolves only through a joint request is no candidate: its own step moves its holders. It leaves out the
   candidates that Composer refuses together with the others, and writes a run note. The members of

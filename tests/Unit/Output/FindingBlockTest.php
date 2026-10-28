@@ -76,7 +76,7 @@ final class FindingBlockTest extends TestCase
         $three = (new FindingBuilder())->withPackage('a/leaf')->withChain(['a/r1', 'a/leaf'])->withDirectDependents(['a/r1', 'a/r2', 'a/r3'])->build();
 
         self::assertSame('via a/r1, a/r2, a/r3 and 2 more', FindingBlock::reach($five));
-        self::assertSame('via a/r1, a/r2, a/r3', FindingBlock::reach($three));
+        self::assertSame('via a/r1, a/r2 and a/r3', FindingBlock::reach($three));
     }
 
     public function testALostFixReadsTheRecordedAndTheCurrentFixKind(): void

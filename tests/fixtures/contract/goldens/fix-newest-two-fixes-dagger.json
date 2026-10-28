@@ -1,6 +1,6 @@
 {
     "score_text": "16 = vulnerable 16 [high advisory]",
-    "next_step_text": "move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch, spatie/laravel-markdown — clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock",
+    "next_step_text": "move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch and spatie/laravel-markdown — clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 2.9.1 released 2026-08-09 (0.1 years ago); 2.x last released 2.10.3 2026-09-21 (less than three weeks ago), its newest release; last push 2026-10-01 (less than three weeks ago)",

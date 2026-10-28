@@ -35,6 +35,12 @@ final class MoveCheckRun implements \JsonSerializable
         return $this->baseline;
     }
 
+    /** @return list<string> */
+    public function blockingDisabledBy(): array
+    {
+        return $this->blockingDisabledBy;
+    }
+
     /**
      * `ignored_platform` is {@see ComposerSolver::IGNORED_PLATFORM}: the machine that runs lockrot decides no move.
      *

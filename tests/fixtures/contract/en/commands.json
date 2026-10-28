@@ -45,6 +45,40 @@
             "argv": [
                 "composer",
                 "require",
+                "--no-interaction",
+                "vendor/package:^2.0"
+            ],
+            "posix": null,
+            "cmd": null,
+            "powershell": null
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "PHP:>=8.1",
+                "--no-interaction",
+                "--no-update"
+            ],
+            "posix": "composer require 'PHP:>=8.1' --no-interaction --no-update",
+            "cmd": "composer require \"PHP:>=8.1\" --no-interaction --no-update",
+            "powershell": "composer --% require \"PHP:>=8.1\" --no-interaction --no-update"
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "Vendor/Package:^2.0",
+                "--no-interaction"
+            ],
+            "posix": "composer require 'Vendor/Package:^2.0' --no-interaction",
+            "cmd": "composer require \"Vendor/Package:^2.0\" --no-interaction",
+            "powershell": "composer --% require \"Vendor/Package:^2.0\" --no-interaction"
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "friendsofsymfony/oauth-server-bundle:^1.6.2"
             ],
             "posix": "composer require 'friendsofsymfony/oauth-server-bundle:^1.6.2'",
@@ -761,6 +795,17 @@
             "argv": [
                 "composer",
                 "update",
+                "vendor/package",
+                "--no-interaction"
+            ],
+            "posix": null,
+            "cmd": null,
+            "powershell": null
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
                 "vendor/package\ncalc"
             ],
             "posix": null,
@@ -1328,6 +1373,17 @@
             "posix": "composer why-not typo3/html-sanitizer v2.3.2 --locked",
             "cmd": "composer why-not typo3/html-sanitizer v2.3.2 --locked",
             "powershell": "composer --% why-not typo3/html-sanitizer v2.3.2 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "vendor/package",
+                "--no-interaction"
+            ],
+            "posix": null,
+            "cmd": null,
+            "powershell": null
         },
         {
             "argv": [

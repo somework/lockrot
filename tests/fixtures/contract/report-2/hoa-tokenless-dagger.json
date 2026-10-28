@@ -1152,12 +1152,12 @@
     },
     "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [
-        "GitHub token not set: repository activity checked for 0 candidate packages, 1 package skipped (set GITHUB_TOKEN to check all)"
+        "GitHub token not set: repository activity checked for 0 candidate packages, 1 package skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)"
     ],
     "note_details": [
         {
             "code": "repository_activity_anonymous_cap",
-            "text": "GitHub token not set: repository activity checked for 0 candidate packages, 1 package skipped (set GITHUB_TOKEN to check all)",
+            "text": "GitHub token not set: repository activity checked for 0 candidate packages, 1 package skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)",
             "docs_url": "https://lockrot.dev/notes/#repository_activity_anonymous_cap",
             "sets_network_failures": false,
             "data": {
