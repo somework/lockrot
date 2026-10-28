@@ -19,7 +19,8 @@ does. tests/infection-equivalents.md gives the form of an entry. In --shard mode
 claim must match exactly its count: once the dependencies are pinned, the uncovered set is
 deterministic, but a kill or a timeout is not, so an unused escape claim is only a warning.
 --report-only exits 0 on undocumented mutants. Exit code 1 when a mutant is not accounted for, 2
-when a log or the list cannot be read or a log's arrays disagree with its stats, 0 otherwise.
+when a log or the list cannot be read, a log's arrays disagree with its stats, or a log names a file
+that the checkout at the working directory does not hold, 0 otherwise.
 Standard library only.
 """
 
@@ -35,7 +36,6 @@ NOT_COVERED = 'NotCovered'
 NOT_COVERED_METHOD = 'NotCoveredMethod'
 # Each array of the log that the gate reads, with the stats count its length must equal.
 SECTIONS = {ESCAPED: 'escapedCount', UNCOVERED: 'notCoveredCount', 'ignored': 'ignoredCount'}
-SOURCE_PATH = re.compile(r'(?:^|/)(src/\S+\.php)$')
 MUTATOR = r'[A-Z]\w*(?: x\d+)?'
 ENTRY = re.compile(
     r'^- `(?P<path>src/[\w/]+\.php)` (?P<mutators>' + MUTATOR + r'(?:(?:,| and|, and) ' + MUTATOR + r')*) (?P<fence>`+) ?(?P<code>.+?) ?(?P=fence)(?!`)(?P<reason>.*)$'
@@ -74,18 +74,18 @@ def removed_line(diff: str) -> str:
     return ''
 
 
-def mutant(section: str, row) -> Mutant:
+def mutant(section: str, row, root: str) -> Mutant:
     try:
         mutator = row['mutator']
-        match = SOURCE_PATH.search(mutator['originalFilePath'])
-        return Mutant(section, match.group(1) if match else mutator['originalFilePath'],
+        return Mutant(section, os.path.relpath(mutator['originalFilePath'], root),
                       int(mutator['originalStartLine']), mutator['mutatorName'], removed_line(row.get('diff', '')))
     except (KeyError, TypeError, ValueError) as error:
         raise LogError('a {} mutant lacks {}'.format(section, error))
 
 
-def read_log(text: str) -> Log:
-    """The escaped, uncovered and ignored mutants of an Infection JSON log, and its skipped count."""
+def read_log(text: str, root: str) -> Log:
+    """The escaped, uncovered and ignored mutants of an Infection JSON log, and its skipped count.
+    Each path is relative to root, the checkout that Infection mutated."""
     try:
         data = json.loads(text)
     except ValueError as error:
@@ -102,8 +102,8 @@ def read_log(text: str) -> Log:
         rows[section] = data[section]
     if not isinstance(stats.get('skippedCount'), int):
         raise LogError('no stats.skippedCount')
-    return Log([mutant(s, row) for s in (ESCAPED, UNCOVERED) for row in rows[s]],
-               [mutant('ignored', row) for row in rows['ignored']], stats['skippedCount'])
+    return Log([mutant(s, row, root) for s in (ESCAPED, UNCOVERED) for row in rows[s]],
+               [mutant('ignored', row, root) for row in rows['ignored']], stats['skippedCount'])
 
 
 class Source:
@@ -293,13 +293,17 @@ def main(argv: List[str], root: str = '.') -> Tuple[int, str]:
     try:
         for path in args[:-1]:
             with open(path, encoding='utf-8') as handle:
-                logs.append(read_log(handle.read()))
+                logs.append(read_log(handle.read(), os.path.abspath(root)))
         with open(args[-1], encoding='utf-8') as handle:
             markdown = handle.read()
     except OSError as error:
         return 2, 'Cannot read the mutation log or the documented list: {}\n'.format(error)
     except LogError as error:
         return 2, 'The mutation log cannot be read: {}\n'.format(error)
+    # A path outside the checkout matches no --paths entry, so the run would pass on nothing.
+    elsewhere = sorted({m.path for log in logs for m in log.mutants + log.ignored if not os.path.isfile(os.path.join(root, m.path))})
+    if elsewhere:
+        return 2, 'The mutation log names files that this checkout does not hold: {}\n'.format(', '.join(elsewhere))
     source = Source(root)
     merged = Log([m for log in logs for m in log.mutants if in_shard(m.path, shard)],
                  [m for log in logs for m in log.ignored if in_shard(m.path, shard)], sum(log.skipped for log in logs))

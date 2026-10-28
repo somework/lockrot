@@ -30,19 +30,21 @@ final class Openness
     }
 }
 """
+# The checkout a fixture log names. Gate.run_gate swaps it for the test's own checkout.
+CHECKOUT = '/home/runner/work/lockrot/lockrot'
 
 
-def row(line, mutator, original):
+def row(line, mutator, original, checkout=CHECKOUT):
     return {'mutator': {'mutatorName': mutator, 'originalSourceCode': '', 'mutatedSourceCode': '',
-                        'originalFilePath': '/home/runner/work/lockrot/lockrot/src/Signal/Openness.php', 'originalStartLine': line},
+                        'originalFilePath': checkout + '/src/Signal/Openness.php', 'originalStartLine': line},
             'diff': '@@ @@\n     {\n-' + original + '\n+        changed\n', 'processOutput': ''}
 
 
-def log(*escaped, uncovered=(), ignored=(), skipped=0, stats=None):
+def log(*escaped, uncovered=(), ignored=(), skipped=0, stats=None, checkout=CHECKOUT):
     data = {'stats': {'escapedCount': len(escaped), 'notCoveredCount': len(uncovered), 'ignoredCount': len(ignored),
                       'skippedCount': skipped, 'timeOutCount': 0},
-            'escaped': [row(*e) for e in escaped], 'uncovered': [row(*u) for u in uncovered],
-            'ignored': [row(*i) for i in ignored], 'killed': [], 'timeouted': []}
+            'escaped': [row(*e, checkout) for e in escaped], 'uncovered': [row(*u, checkout) for u in uncovered],
+            'ignored': [row(*i, checkout) for i in ignored], 'killed': [], 'timeouted': []}
     data['stats'].update(stats or {})
     return json.dumps(data)
 
@@ -51,23 +53,28 @@ class Gate(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.root = self.directory.name
-        os.makedirs(os.path.join(self.root, 'src', 'Signal'))
-        with open(os.path.join(self.root, 'src', 'Signal', 'Openness.php'), 'w', encoding='utf-8') as handle:
+        self.check_out(self.root)
+
+    @staticmethod
+    def check_out(root):
+        os.makedirs(os.path.join(root, 'src', 'Signal'))
+        with open(os.path.join(root, 'src', 'Signal', 'Openness.php'), 'w', encoding='utf-8') as handle:
             handle.write(SOURCE)
 
     def tearDown(self):
         self.directory.cleanup()
 
-    def run_gate(self, logs, ledger, options=()):
+    def run_gate(self, logs, ledger, options=(), root=None):
+        root = root or self.root
         paths = list(options)
         for n, text in enumerate(logs):
             paths.append(os.path.join(self.root, 'infection{}.json'.format(n)))
             with open(paths[-1], 'w', encoding='utf-8') as handle:
-                handle.write(text)
+                handle.write(text.replace(CHECKOUT, root))
         paths.append(os.path.join(self.root, 'equivalents.md'))
         with open(paths[-1], 'w', encoding='utf-8') as handle:
             handle.write(ledger)
-        return pr_gate.main(paths, self.root)
+        return pr_gate.main(paths, root)
 
 
 class ReadingTheLog(Gate):
@@ -75,7 +82,7 @@ class ReadingTheLog(Gate):
         text = log((7, 'Plus', '        return (int) $parts[0] + 0;'), uncovered=[(12, 'IncrementInteger', '        return 1;')])
         self.assertEqual([('escaped', 'src/Signal/Openness.php', 7, 'Plus', 'return (int) $parts[0] + 0;'),
                           ('uncovered', 'src/Signal/Openness.php', 12, 'IncrementInteger', 'return 1;')],
-                         [tuple(m) for m in pr_gate.read_log(text).mutants])
+                         [tuple(m) for m in pr_gate.read_log(text, CHECKOUT).mutants])
 
     def test_a_log_without_the_uncovered_array_is_an_error(self):
         data = json.loads(log())
@@ -88,6 +95,22 @@ class ReadingTheLog(Gate):
 
     def test_a_text_log_is_an_error_not_a_pass(self):
         self.assertEqual(2, self.run_gate(['Escaped mutants:\n================\n'], '')[0])
+
+    def test_a_checkout_under_a_directory_named_src_keeps_its_own_paths(self):
+        checkout = os.path.join(self.root, 'src', 'lockrot')
+        self.check_out(checkout)
+
+        code, summary = self.run_gate([log((7, 'Plus', PLUS))], '', ('--paths', 'src/Signal/Openness.php'), checkout)
+
+        self.assertEqual(1, code, summary)
+        self.assertIn('`src/Signal/Openness.php` Plus (line 7)', summary)
+
+    def test_a_log_of_another_checkout_is_an_error_not_a_pass(self):
+        escape = log((7, 'Plus', PLUS), checkout='/elsewhere/src/lockrot')
+
+        for options in (('--paths', 'src/Signal'), ('--shard', 'src/Signal'), ('--report-only',)):
+            with self.subTest(options=options):
+                self.assertEqual(2, self.run_gate([escape], '', options)[0])
 
 
 class TheKey(Gate):
