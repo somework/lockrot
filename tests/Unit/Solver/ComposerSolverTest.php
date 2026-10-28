@@ -583,6 +583,20 @@ final class ComposerSolverTest extends TestCase
         yield 'an extension set to false' => [['ext-lockrotprobe' => false], 'ext-lockrotprobe', '*'];
     }
 
+    /** Composer's solve takes the require-dev constraint of a name that both sections list, so the root hold names it. */
+    public function testTheRootHoldOfANameInBothSectionsIsItsRequireDevConstraint(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0', 'acme/dep' => '^1.0'], 'require-dev' => ['acme/dep' => '^1.2']],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/dep', 'version' => '1.2.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/dep' => '^2.0']]], 'acme/dep' => [['version' => '1.2.0'], ['version' => '2.0.0']]]
+        );
+
+        $holds = self::rows($solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->holds());
+
+        self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'acme/dep', 'constraint' => '^1.2'], $holds, json_encode($holds) ?: '');
+    }
+
     /** The copy offers the locked path package, and the solver it comes from still offers no version of it. */
     public function testALockedOnlyCopyLeavesTheSolverItComesFromAsItWas(): void
     {

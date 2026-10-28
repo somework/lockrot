@@ -147,9 +147,8 @@ final class ComposerSolver
     private function solveOrThrow(SolveRequest $request): Solution
     {
         $root = $this->rootWith($request->rootChanges(), $request->devChanges());
-        $links = array_merge($root->getRequires(), $root->getDevRequires());
         $requires = [];
-        foreach ($links as $name => $link) {
+        foreach (self::rootLinks($root) as $name => $link) {
             $requires[$name] = $link->getConstraint();
         }
         $parser = new VersionParser();
@@ -179,6 +178,16 @@ final class ComposerSolver
         $held = array_map(static fn (BasePackage $package): string => $package->getName(), $answer->getNewLockPackages(false));
 
         return Solution::resolved(self::installs($answer), self::updatedFrom($answer), array_diff($this->failures($loaded->asked()), [VersionSource::UNREACHED]), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)));
+    }
+
+    /**
+     * The root links that Composer's solve reads: a require-dev link replaces the require link of its name.
+     *
+     * @return array<string, Link>
+     */
+    public static function rootLinks(RootPackageInterface $root): array
+    {
+        return array_merge($root->getRequires(), $root->getDevRequires());
     }
 
     /**

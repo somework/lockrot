@@ -123,6 +123,20 @@ final class SolverCheckerTest extends TestCase
         self::assertSame([true, false], [$checks->refused('acme/lib')->refuses('1.2.5.0'), $checks->refused('acme/lib')->refuses('1.3.0.0')]);
     }
 
+    /** Composer's solve takes the require-dev constraint of a name that both sections list, so the refused range reads only it. */
+    public function testARefusedUpdateOfANameInBothSectionsHoldsTheReleasesThatTheDevRequirementAdmits(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '~1.2.0'], 'require-dev' => ['acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $locked = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.2.3']]])->lockedRepository();
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.2.3'], ['version' => '1.2.5', 'require' => ['acme/gone' => '^1.0']], ['version' => '1.3.0', 'require' => ['acme/gone' => '^1.0']]]]);
+        $checks = MoveChecks::of(new SolverChecker(new ComposerSolver($root, $locked, new PlatformRepository([], ['php' => '8.4.99']), $source), [], '8.4.99', false, Deadline::never()));
+
+        self::assertSame(MoveCheck::REFUSED, $checks->check(MoveQuery::update('acme/lib', '^1.2.5', '1.2.5'))->check()->result());
+
+        self::assertSame([true, true], [$checks->refused('acme/lib')->refuses('1.2.5.0'), $checks->refused('acme/lib')->refuses('1.3.0.0')]);
+    }
+
     public function testTheCheckerNamesTheVariableThatTurnedTheAdvisoryBlockingOff(): void
     {
         $solver = new ComposerSolver(self::root([]), LockFile::fromArray(['packages' => []])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource([]));

@@ -61,6 +61,15 @@ final class HoldScanTest extends TestCase
         yield 'require-dev' => [['require-dev' => ['acme/dep' => '^1.0', 'acme/open' => '>=1.0']]];
     }
 
+    /** Composer's solve takes the require-dev constraint of a name that both sections list. */
+    public function testTheRootHoldOfANameInBothSectionsIsItsRequireDevConstraint(): void
+    {
+        $scan = self::scan(['require' => ['acme/dep' => '^1.0'], 'require-dev' => ['acme/dep' => '^1.2']], [['name' => 'acme/dep', 'version' => '1.2.0']]);
+        $target = self::target(['require' => ['acme/dep' => '^2.0']]);
+
+        self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'acme/dep', 'constraint' => '^1.2'], self::rows($scan->of($target, null)));
+    }
+
     public function testAPhpRequirementThatTheTargetPhpDoesNotMeetHoldsTheMove(): void
     {
         $scan = self::scan([], [['name' => 'acme/dep', 'version' => '1.0.0']]);

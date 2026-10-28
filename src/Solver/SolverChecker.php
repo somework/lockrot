@@ -344,14 +344,12 @@ final class SolverChecker implements MoveChecker
         if ($query->isRequire()) {
             return $outcome;
         }
-        // An update keeps the root requirements on the package beside its inline constraint.
+        // An update keeps the root requirement that the solve reads on the package beside its inline constraint.
         $parser = new VersionParser();
         $range = [$parser->parseConstraints($query->constraint())];
-        $root = $this->solver->root();
-        foreach ([$root->getRequires(), $root->getDevRequires()] as $links) {
-            if (isset($links[$query->package()])) {
-                $range[] = $links[$query->package()]->getConstraint();
-            }
+        $link = ComposerSolver::rootLinks($this->solver->root())[$query->package()] ?? null;
+        if ($link !== null) {
+            $range[] = $link->getConstraint();
         }
 
         return \count($range) === 1 ? $outcome : $outcome->withRange(MultiConstraint::create($range, true));

@@ -41,7 +41,7 @@ final class HoldScan
     {
         $holds = [];
         $version = $target->getPrettyVersion();
-        $rootRequires = array_merge($this->root->getDevRequires(), $this->root->getRequires());
+        $rootRequires = ComposerSolver::rootLinks($this->root);
         foreach ($target->getConflicts() as $name => $link) {
             $locked = $this->locked[$name] ?? null;
             if ($locked !== null && $link->getConstraint()->matches(new Constraint('==', $locked->getVersion()))) {
