@@ -75,12 +75,6 @@ final class FindingBlock
         return $items;
     }
 
-    /** The counted flags joined ` · `, the github title's and the markdown Flags cell's list. */
-    public static function flagList(Finding $finding): string
-    {
-        return implode(' · ', $finding->flagIds());
-    }
-
     /** `score.text`. */
     public static function scoreLine(Finding $finding): string
     {
