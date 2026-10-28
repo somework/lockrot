@@ -47,8 +47,8 @@ Document an escaped mutant that no test can kill, with the reason, in
 | Floor | Declared in | What it rules out |
 |---|---|---|
 | PHP 7.4 | `composer.json` `require.php`, `phpstan.neon.dist` `phpVersion` | PHP 8 syntax: `match`, enums, constructor promotion, `readonly`, union types in signatures, the nullsafe operator, named arguments. PHP 8 functions such as `str_contains()` without a guard |
-| Composer plugin API 2.2 | `composer.json` `"composer-plugin-api": "^2.2"` | Composer API added after 2.2 without a version guard |
-| symfony/console 2.8 API | The Composer 2.2 LTS binary, which bundles console 2.8 | Console API added after 2.8. `require-dev` resolves a newer console. Such a call passes locally and fails only in the plugin e2e step on the Composer 2.2 rows of CI |
+| Composer 2.10 | `composer.json` `"composer-plugin-api": "^2.9"` and the version check of `LockrotPlugin` (Composer 2.9 also reports plugin API 2.9.0) | Composer API added after 2.10 without a version guard |
+| symfony/console 5.4 API | The Composer PHAR, which Composer builds for PHP 7.2.5 and which bundles console 5.4 | Console API added after 5.4 |
 
 PHPUnit 9 runs the 7.4 and 8.0 rows, so a test declares each data provider twice: `@dataProvider`
 in the docblock and `#[DataProvider]` as an attribute.

@@ -25,7 +25,7 @@ ones.
 
 ## Install
 
-The Composer plugin needs PHP 7.4+ and Composer 2.2+:
+The Composer plugin needs PHP 7.4+ and Composer 2.10+:
 
 ```bash
 composer require --dev somework/lockrot
