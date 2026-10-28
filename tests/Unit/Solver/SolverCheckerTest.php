@@ -713,6 +713,25 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize());
     }
 
+    /**
+     * R5-4: the listed form stops on acme/private, which no Composer repository lists. `-w` unlocks
+     * acme/mid, whose only release a blocked advisory covers. Composer's refusal of the wider forms
+     * still explains acme/lib 1.1.0 by acme/private, so the move reads not_checked, never refused.
+     */
+    public function testARefusalOfAWiderFormStillWantsTheNameThatStoppedTheListedForm(): void
+    {
+        $locked = [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']], ['name' => 'acme/other', 'version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']], ['name' => 'acme/mid', 'version' => '1.0.0']];
+        $source = new ArrayVersionSource([
+            'acme/lib' => [['version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/private' => '^1.0', 'acme/mid' => '^1.0']]],
+            'acme/other' => [['version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']]],
+            'acme/mid' => [['version' => '1.0.0']],
+        ], ['acme/private' => VersionSource::UNREACHED]);
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0', 'acme/other' => '^1.0']), LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, ['acme/mid' => [(new VersionParser())->parseConstraints('<1.1')]]);
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize());
+    }
+
     /** A virtual name such as `psr/log-implementation` is listed by no repository: a solve that a provider meets proves the move. */
     public function testASolveThatResolvesBelowTheNewestWithANameNoComposerRepositoryListsResolves(): void
     {

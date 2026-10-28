@@ -258,7 +258,7 @@ final class SolverChecker implements MoveChecker
             if ($solution->resolves()) {
                 $resolved = $resolved !== null && !self::installsHigher($solution, $resolved[1], $moved[0]) ? $resolved : [$form, $solution];
             }
-            // A wider form asks for each name that a narrower form asks for, so no form refuses after one that stopped.
+            // A wider form's refusal explains each release that a narrower form asked for, so it wants the name that stopped that form.
             $fallback = [null, $solution];
         }
 
