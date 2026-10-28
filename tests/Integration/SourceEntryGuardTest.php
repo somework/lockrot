@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Lockrot\Composer\LockrotPlugin;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -77,5 +78,14 @@ final class SourceEntryGuardTest extends TestCase
         self::assertSame(1, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
         self::assertSame('', $process->getOutput());
         self::assertSame("lockrot requires Composer 2.10 or newer, not 2.9.5\n", $process->getErrorOutput());
+    }
+
+    /** bin/lockrot repeats the floor as a literal, because no lockrot class can load before its check. */
+    public function testTheSourceScriptChecksTheFloorOfThePlugin(): void
+    {
+        $floor = (new \ReflectionClassConstant(LockrotPlugin::class, 'COMPOSER_FLOOR'))->getValue();
+        self::assertIsString($floor);
+
+        self::assertStringContainsString("'".$floor."', '<')", (string) file_get_contents(\dirname(__DIR__, 2).'/bin/lockrot'));
     }
 }
