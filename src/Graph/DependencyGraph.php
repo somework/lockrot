@@ -12,17 +12,19 @@ final class DependencyGraph
 {
     /** @var array<string, list<string>> package => list of packages it requires */
     private array $edges;
-    /** @var list<string> */
-    private array $roots;
     /** @var array<string, list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV>> package => the root sections that name it */
     private array $namedIn = [];
     /**
-     * BFS parent maps, one per root, memoised by {@see tree()}. The edges are immutable, so a map
-     * never goes stale.
+     * The constructor runs every walk, and the edges never change, so a query only reads these maps.
+     * Each is a BFS parent map: node => the node it was first reached from, null for a root.
      *
-     * @var array<string, array<string, string|null>>
+     * @var array<string, string|null> the walk from every root at once
      */
+    private array $nearest;
+    /** @var array<string, array<string, string|null>> root => the walk from that root alone */
     private array $trees = [];
+    /** @var array<string, list<string>> node => the roots whose walk reaches it */
+    private array $reachedFrom = [];
 
     /**
      * @param array<string, list<string>> $edges
@@ -32,7 +34,15 @@ final class DependencyGraph
     private function __construct(array $edges, array $roots)
     {
         $this->edges = $edges;
-        $this->roots = $roots;
+        $this->nearest = self::bfs($edges, $roots);
+        foreach ($roots as $root) {
+            $this->trees[$root] = self::bfs($edges, [$root]);
+        }
+        foreach ($this->trees as $root => $tree) {
+            foreach ($tree as $node => $_) {
+                $this->reachedFrom[$node][] = $root;
+            }
+        }
     }
 
     /**
@@ -109,30 +119,7 @@ final class DependencyGraph
     /** @return list<string> */
     public function shortestChain(string $target): array
     {
-        if (!isset($this->edges[$target])) {
-            return [];
-        }
-        /** @var array<string, string|null> $parent */
-        $parent = [];
-        $queue = [];
-        foreach ($this->roots as $root) {
-            $parent[$root] = null;
-            $queue[] = $root;
-        }
-        while ($queue !== []) {
-            $current = array_shift($queue);
-            if ($current === $target) {
-                return $this->unwind($parent, $target);
-            }
-            foreach ($this->edges[$current] ?? [] as $next) {
-                if (!\array_key_exists($next, $parent) && isset($this->edges[$next])) {
-                    $parent[$next] = $current;
-                    $queue[] = $next;
-                }
-            }
-        }
-
-        return [];
+        return isset($this->edges[$target]) && \array_key_exists($target, $this->nearest) ? $this->unwind($this->nearest, $target) : [];
     }
 
     /**
@@ -151,11 +138,8 @@ final class DependencyGraph
             return [];
         }
         $chains = [];
-        foreach ($this->roots as $root) {
-            $tree = $this->tree($root);
-            if (\array_key_exists($target, $tree)) {
-                $chains[$root] = $this->unwind($tree, $target);
-            }
+        foreach ($this->reachedFrom[$target] ?? [] as $root) {
+            $chains[$root] = $this->unwind($this->trees[$root], $target);
         }
         ksort($chains, \SORT_STRING);
 
@@ -163,29 +147,33 @@ final class DependencyGraph
     }
 
     /**
-     * The BFS tree from one root: node => the node it was first reached from, null for the root.
+     * Every source is seeded in order, duplicates included, and a node is visited at its first
+     * discovery through an edge to a locked package. This order decides the tie-breaks between
+     * equally short chains: change it and the chains of real locks change.
+     *
+     * @param array<string, list<string>> $edges
+     * @param list<string>                $sources
      *
      * @return array<string, string|null>
      */
-    private function tree(string $root): array
+    private static function bfs(array $edges, array $sources): array
     {
-        if (isset($this->trees[$root])) {
-            return $this->trees[$root];
+        $parent = [];
+        $queue = [];
+        foreach ($sources as $source) {
+            $parent[$source] = null;
+            $queue[] = $source;
         }
-        /** @var array<string, string|null> $parent */
-        $parent = [$root => null];
-        $queue = [$root];
-        while ($queue !== []) {
-            $current = array_shift($queue);
-            foreach ($this->edges[$current] ?? [] as $next) {
-                if (!\array_key_exists($next, $parent) && isset($this->edges[$next])) {
-                    $parent[$next] = $current;
+        for ($i = 0; $i < \count($queue); ++$i) {
+            foreach ($edges[$queue[$i]] ?? [] as $next) {
+                if (!\array_key_exists($next, $parent) && isset($edges[$next])) {
+                    $parent[$next] = $queue[$i];
                     $queue[] = $next;
                 }
             }
         }
 
-        return $this->trees[$root] = $parent;
+        return $parent;
     }
 
     /**
