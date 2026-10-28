@@ -112,10 +112,9 @@ final class PluginTest extends TestCase
         self::assertSame(0, $alias->getExitCode(), $alias->getErrorOutput());
 
         // The table path is the only code that touches symfony/console's style tags and its terminal-width
-        // API. Composer 2.2 LTS bundles symfony/console 2.8 while require-dev resolves 5.4, so only a run
-        // through the real binary covers 2.8. COLUMNS stays unset: with it set, TerminalWidth::detect()
-        // answers first and neither console's own width lookup is entered. Without it, each console finds
-        // no terminal and the width differs per Composer version, so every assertion is width-agnostic.
+        // API. COLUMNS stays unset: with it set, TerminalWidth::detect() answers first and the console's
+        // own width lookup is not entered. Without it, the console finds no terminal and the width
+        // differs per Composer version, so every assertion is width-agnostic.
         $table = $this->composer(['lockrot', '--target-php=8.4'], [], 120);
         $stdout = $table->getOutput();
         self::assertSame(0, $table->getExitCode(), $table->getErrorOutput().$stdout);
@@ -131,8 +130,7 @@ final class PluginTest extends TestCase
     /**
      * `composer -d <dir>` changes into the project before any command runs, so relative `--output`
      * paths land there, not in the shell's directory. The plugin's own symfony/console strips the
-     * markup from the table file, 2.8 under Composer 2.2 LTS and 5.4 under 2.10, and this test covers
-     * both. It runs offline, so no verdict depends on GitHub.
+     * markup from the table file. It runs offline, so no verdict depends on GitHub.
      */
     public function testOutputFilesAreRelativeToTheDirectoryComposerRunsIn(): void
     {
@@ -227,9 +225,8 @@ final class PluginTest extends TestCase
 
     /**
      * A command line `composer lockrot` cannot read is lockrot's usage error — exit 2 and one
-     * `lockrot:` line — not Composer's error box and exit 1. This runs through the real binary, so on
-     * the Composer 2.2 leg of CI it is the check that the binding works on symfony/console 2.8 too.
-     * No network is needed: nothing is analysed.
+     * `lockrot:` line — not Composer's error box and exit 1. No network is needed: nothing is
+     * analysed.
      */
     public function testAnUnreadableCommandLineIsExitTwoWithOneLockrotLine(): void
     {

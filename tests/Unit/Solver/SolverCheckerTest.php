@@ -29,8 +29,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Each case is the shape of a corpus move that the solver spike measured against
- * `composer ... --dry-run`. The tests run on every Composer of the CI matrix, so they cover the
- * inline-constraint path of Composer 2.4 and later and the joined root requirement of 2.2.
+ * `composer ... --dry-run`.
  */
 final class SolverCheckerTest extends TestCase
 {
@@ -1165,10 +1164,7 @@ final class SolverCheckerTest extends TestCase
         self::assertNotContains('package', array_column(self::rows($outcome->holds()), 'source'), 'the root is no locked package');
     }
 
-    /**
-     * On Composer 2.2 and 2.3 the inline constraint of a transitive package joins the root
-     * requirements: that requirement is the request, never a hold of composer.json.
-     */
+    /** The inline constraint of a transitive package is the request, never a hold of composer.json. */
     public function testATransitiveMoveThatADependentHoldsNamesNoRootHoldForItsOwnConstraint(): void
     {
         $checker = self::checker(
@@ -1327,11 +1323,7 @@ final class SolverCheckerTest extends TestCase
         self::assertSame([], $outcome->movesWith());
     }
 
-    /**
-     * acme/lib is a lock entry that nothing requires. Composer before 2.4 joins the inline
-     * constraint to the root requirement, which alone keeps acme/lib installed. Composer 2.4 and
-     * later drop it.
-     */
+    /** acme/lib is a lock entry that nothing requires, so Composer drops it from the solve. */
     public function testAnUpdateOfALockEntryThatNothingRequiresInstallsNoRelease(): void
     {
         $checker = self::checker(

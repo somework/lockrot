@@ -20,10 +20,7 @@ use Lockrot\Solver\SolveRequest;
 use Lockrot\Tests\Support\ArrayVersionSource;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Each solve runs on every Composer of the CI matrix. A case that differs between the inline
- * constraint of Composer 2.4 and later and the joined root requirement of 2.2 says so.
- */
+/** Each solve runs on every Composer of the CI matrix. */
 final class ComposerSolverTest extends TestCase
 {
     public function testAnUpdateInstallsTheNewestReleaseThatTheConstraintAdmitsAndItsNewDependencyByName(): void
@@ -48,7 +45,7 @@ final class ComposerSolverTest extends TestCase
         self::assertSame(['acme/lib' => 'v1.0.0'], $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->updatedFrom());
     }
 
-    /** Composer 2.7 and later keep every name off the allow list at its locked release where they can (`update --minimal-changes`). */
+    /** Composer keeps every name off the allow list at its locked release where it can (`update --minimal-changes`). */
     public function testAMinimalChangesSolveKeepsADependencyThatTheMoveDoesNotNeedToChange(): void
     {
         $solver = self::solver(
