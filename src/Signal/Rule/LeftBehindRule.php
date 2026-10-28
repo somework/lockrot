@@ -106,7 +106,7 @@ final class LeftBehindRule implements SignalRule
             $newest['at']->format('Y-m-d')
         );
         if ($blocking !== null) {
-            $summary .= ', needs php '.(string) $newest['php'].PhpFloor::missWords($this->floor->misses($blocking, $newest['php']), $this->floor->describe($blocking));
+            $summary .= ', needs php '.$newest['php'].PhpFloor::missWords($this->floor->misses($blocking, $newest['php']), $this->floor->describe($blocking));
             $summary .= $reachable === null
                 ? '; no releasing branch within reach'
                 : \sprintf('; %s released %s (%s)', ReleaseBranch::label($reachable['branch']), $reachable['version'], $reachable['at']->format('Y-m-d'));

@@ -128,6 +128,7 @@ final class MoveBuilderTest extends TestCase
 
         self::assertSame(['1.1.0', '1.2.0'], [$installedRow->lowest(), $installedRow->newest()], 'the row');
         self::assertSame(['1.3.0', '1.3.0'], [$move->version(), $move->newest()], 'the move');
+        self::assertSame('1.2.0', $context->rowTarget($row), 'a move without its own version reads the row');
     }
 
     /** The project's php point 7.4 does not run the release, so the request raises php too. */
