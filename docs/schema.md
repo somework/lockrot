@@ -569,9 +569,10 @@ An entry is `unknown` when lockrot cannot decide, for example:
 Read a kind that you do not know by `from_composer_repository`. Show it as written and link nothing.
 
 - **`from_composer_repository`** is true when the lock entry carries a `notification-url`. True
-  does not mean packagist.org. lockrot asks a repository for metadata, advisories and repository
-  activity only about such an entry, so a false one has no metadata, advisories, activity or
-  libyears. `--explain` writes it as `lock.from_composer_repository`. It stays a boolean in 1.x,
+  does not mean packagist.org. lockrot asks a repository for metadata and repository activity only
+  about such an entry, so a false one has no metadata, activity or libyears. lockrot still asks for
+  its advisories by name, except under `advisory-lookup: composer-repositories`. `--explain` writes
+  it as `lock.from_composer_repository`. It stays a boolean in 1.x,
   and `origin` is the finer account.
 
 - **`registry`** takes its values from the schema's `x-known-values`, the hosts that this release

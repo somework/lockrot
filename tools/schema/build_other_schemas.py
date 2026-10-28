@@ -663,6 +663,14 @@ def explain_schema():
     for k, dsc in [('dev', 'Whether the entry is in packages-dev.'), ('branch_snapshot', 'Whether the installed version is a branch snapshot.'),
                    ('type', 'The entry\'s package type.')]:
         lock['properties'][k]['description'] = dsc
+    lock['properties']['from_composer_repository']['description'] = (
+        "True when the lock entry carries a Composer `notification-url`. Composer writes one only for a package served by a `type: composer` repository that "
+        "advertises a notify URL (`notify-batch` or `notify` in its packages.json); packagist.org and Private Packagist do. False otherwise: a `path`, `vcs`, "
+        "`artifact` or inline `package` repository entry, and also a package from a `type: composer` repository that advertises no notify URL (asset-packagist.org; "
+        "a Satis build without `notify-batch`). lockrot asks no repository for the metadata or the repository activity of a false entry, so the finding has no "
+        "metadata, activity or libyears. It asks for its advisories by name, except under `advisory-lookup: composer-repositories`. True does not mean "
+        "packagist.org. Stays a boolean for 1.x: the finer account of where an entry came from is `origin`, and this key is true exactly when `origin.kind` is "
+        "`packagist` or `composer`. Same value as the finding's `from_composer_repository`.")
     D['lock'] = lock
     D['metadata'] = explain_metadata()
     D['repositoryMetadata'] = D.pop('metadata')

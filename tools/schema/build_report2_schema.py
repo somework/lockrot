@@ -83,9 +83,9 @@ def ref(name):
 
 
 def d(desc, schema):
-    """a property schema with its description first."""
+    """a property schema with its description first; `desc` replaces a description that a copied node carries."""
     out = {'description': desc}
-    out.update(schema)
+    out.update((k, v) for k, v in schema.items() if k != 'description')
     return out
 
 
@@ -140,6 +140,8 @@ for k in ('dateTime', 'date', 'packageName', 'level', 'years', 'datedBy', 'forge
           'forgeRepository', 'failedForgeRepository', 'originKind', 'originRegistry', 'signalId'):
     defs[k] = copy.deepcopy(R1['definitions'][k])
 defs['signalId']['x-known-values'] = defs['signalId']['x-known-values'] + ['S11']  # CAPPED (§5.10)
+defs['forgeId']['description'] = defs['forgeId']['description'].replace(" The display name (`GitHub`) is the explanation's `activity.forge`, which is not this set.", '')
+assert 'display name' not in defs['forgeId']['description']
 defs['dateTime']['description'] = 'An ISO 8601 date-time with its offset, as lockrot writes every instant (`2026-10-01T17:39:31+00:00`).'
 defs['date']['description'] = 'A calendar date, `YYYY-MM-DD`.'
 defs['level']['description'] = "A signal's own level, as report-1 (`info`, `warn`, `high`); kept for consumers, never printed beside a grade (§2.1). Closed."
@@ -1177,7 +1179,7 @@ FINDING = {
     'verdict': ref('verdict'),
     'priority': {**closed(['critical', 'high', 'medium', 'low', 'none'], '`verdict` when graded, else `none` (§4.2): a deprecated alias that leaves in report-3.'),
                  'x-deprecated': True},
-    'lead': nul("The first counted maintenance flag; null when none counts (§4.2). Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.", ref('maintenanceFlag')),
+    'lead': nul("The first counted maintenance flag; null when none counts (§4.2). Equal to 0.13's verdict word on every 0.13-flagged finding when no Composer abandoned ignore list applies (§6.6): jq reads `.lead` where it read `.verdict`.", ref('maintenanceFlag')),
     'rank': d("Position in the run's order (`run.score_model.sort`), 1 first. A report writes `findings[]` in rank order, and re-sorting by `run.score_model.sort[]` gives the same order (I20); an explain document carries the rank the package has in the run it explains. SARIF's `rank` is the opposite polarity.", INT1),
     'flags': arr('Every fired flag in flag order, accepted in place (§8.2); each id once.', ref('findingFlag'), uniqueItems=True),
     'score': ref('score'),
@@ -1397,7 +1399,7 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'include_dev': d("Whether packages-dev were analysed (`--dev`): the graph then walks `require-dev` too, so a reach sentence names the requirements it walked. Equal to the report's root `include_dev`.",
                      {'type': 'boolean'}),
     'mode': copy.deepcopy(R1RUN['mode']),
-    'thresholds': d("The ages, in years, that separate the liveness words (report-1).", copy.deepcopy(R1RUN['thresholds'])),
+    'thresholds': d("The ages, in years, that raise `silent`, `left-behind` and `stale`: each flag of `score_model.flags` names the keys that it reads in `thresholds`.", copy.deepcopy(R1RUN['thresholds'])),
     'flag_ids': arr('The eight flag ids in flag order (the vocabulary used, not a setting).', ref('flag'), minItems=1, uniqueItems=True),
     'verdicts': arr('The seven verdicts, highest first.', ref('verdict'), minItems=1, uniqueItems=True),
     'graded_verdicts': arr('The grades, highest first (replaces `flagged_verdicts`).', ref('grade'), minItems=1, uniqueItems=True),
@@ -1490,6 +1492,12 @@ for c in NOTE_CODES:
              'moves_not_checked', 'update_now_reduced', 'update_now_refused', 'update_now_not_checked', 'move_check_failed', 'package_name_invalid'):
         continue
     defs[NOTE_DEFS[c]] = copy.deepcopy(R1['definitions'][NOTE_DEFS[c]])
+defs['noteMetadataUnavailable']['description'] = ("`metadata_unavailable`: metadata was asked for and did not come for `package_count` packages. `reasons` groups them by "
+    "message, in the order the text lists them, and their `package_count`s sum to the note's. Each such finding has `metadata.status` `unavailable` and "
+    "`libyears_unmeasured` `unavailable`. Its verdict comes from what lockrot could still read, so a counted advisory still grades it.")
+defs['noteRepositoryActivityNotFound']['description'] = ("`repository_activity_not_found`: the host answered 404 for `repositories` (private, renamed or removed). An answer, "
+    "not a network failure; where the host did not also rate-limit, this is the only record of them: their findings carry no S10, and their `activity.status` "
+    "is `not_found`.")
 defs['noteAdvisoriesNotChecked']['description'] = ("`advisories_not_checked` (0.13's code and data, reworded, §6.2): no advisory was looked up, so no finding is graded "
     "for an advisory and each move's score after it assumes its versions carry none. One lookup per run asks every advisory of every name, so the installed "
     "versions and the moves' versions are checked together or not at all.")
@@ -1761,7 +1769,11 @@ ROOT = {
     'packages_flagged': COUNT('Graded findings: the number at the top of the report (§8.4).'),
     'packages_multi_flag': COUNT('Graded findings with two or more counted flags (the `flags:` line, §7.6).'),
     'include_dev': d('Whether packages-dev were analysed (report-1).', {'type': 'boolean'}),
-    'not_from_composer_repository': copy.deepcopy(R1['properties']['not_from_composer_repository']),
+    'not_from_composer_repository': d("How many of the packages checked came from no Composer repository: the lock entry carries no Composer notification-url — a path, vcs, artifact or "
+                                      "inline package entry, or a package from a `type: composer` repository that advertises no notify URL. lockrot asks no repository for their "
+                                      "metadata or repository activity. It asks for their advisories by name, except under `advisory-lookup: composer-repositories`. "
+                                      "Equals the number of findings whose `from_composer_repository` is false.",
+                                      copy.deepcopy(R1['properties']['not_from_composer_repository'])),
     'packages_unchecked_accepted': COUNT("Findings with at least one check that the project accepted in `extra.lockrot.accept-unchecked` (a non-empty `unchecked_accepted[]`)."),
     'network_failures': d('Whether some note sets it (report-1).', {'type': 'boolean'}),
     'counts': obj('Findings per verdict, all seven required (§8.2; `.counts.<cause>` is null in report-2: read `.flags.<cause>.leading`).', {v: COUNT(f'Findings whose verdict is `{v}`.') for v in VERDICTS}),
