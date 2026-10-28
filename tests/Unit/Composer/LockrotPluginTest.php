@@ -10,6 +10,7 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\InstallerEvent;
 use Composer\Installer\InstallerEvents;
 use Composer\IO\BufferIO;
+use Composer\Package\CompletePackage;
 use Composer\Plugin\Capability\CommandProvider as CommandProviderCapability;
 use Lockrot\Composer\CommandProvider;
 use Lockrot\Composer\LockrotPlugin;
@@ -65,15 +66,21 @@ final class LockrotPluginTest extends TestCase
         self::assertSame([], $plugin->getCapabilities());
     }
 
-    public function testBelowComposer210TheInstallTimeSummaryDoesNotRun(): void
+    public function testOnlyFromComposer210TheInstallTimeSummaryRuns(): void
     {
-        $io = new BufferIO();
-        // A Composer with no configuration: the summary cannot read it, so a run would throw.
-        $event = new InstallerEvent(InstallerEvents::PRE_OPERATIONS_EXEC, new Composer(), $io, true, true, new Transaction([], []));
+        $output = [];
+        foreach (['2.9.5', '2.10.0'] as $version) {
+            $io = new BufferIO();
+            // A Composer with no configuration: the summary cannot analyse with it and writes its skip line.
+            $event = new InstallerEvent(InstallerEvents::PRE_OPERATIONS_EXEC, new Composer(), $io, true, true, new Transaction([], [new CompletePackage('vendor/a', '1.0.0.0', '1.0.0')]));
 
-        (new LockrotPlugin('2.9.5'))->onPreOperationsExec($event);
+            (new LockrotPlugin($version))->onPreOperationsExec($event);
 
-        self::assertSame('', $io->getOutput());
+            $output[$version] = $io->getOutput();
+        }
+
+        self::assertSame('', $output['2.9.5']);
+        self::assertStringContainsString('lockrot: install-time check skipped', $output['2.10.0']);
     }
 
     /** @return iterable<string, array{string}> */
