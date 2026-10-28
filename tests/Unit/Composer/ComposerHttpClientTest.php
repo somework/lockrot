@@ -428,6 +428,27 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame(['http' => ['timeout' => ComposerHttpClient::DEFAULT_TIMEOUT, 'header' => self::WITHOUT_AUTHORIZATION], 'retry-auth-failure' => false], $downloader->requests[1]['options']);
     }
 
+    /**
+     * The request to a redirect's target goes out after the first wait(). When the install-time
+     * budget ends in between, the downloader could start it after the budget.
+     */
+    public function testARedirectTargetIsNotRequestedAfterTheBudgetEnds(): void
+    {
+        self::skipBelowComposer210();
+        $url = 'https://api.github.com/repos/vendor/name';
+        $target = 'https://objects.example.com/name';
+        $readings = [0.0, 0.0, 6.0];
+        $now = static function () use (&$readings): float {
+            return \count($readings) > 1 ? (float) array_shift($readings) : $readings[0];
+        };
+        [$client, $downloader] = self::clientWith([$url => $target, $target => [200, 'moved']], Deadline::inSeconds(5.0, $now));
+
+        $results = $client->fetchAll([$url], self::HEADERS);
+
+        self::assertSame([$url => [0, null, 'install-time budget spent']], self::summarize($results));
+        self::assertSame([$url], array_column($downloader->requests, 'url'), 'no request to the target after the budget');
+    }
+
     /** @return iterable<string, array{string, string}> */
     public static function redirectsToAnotherOrigin(): iterable
     {

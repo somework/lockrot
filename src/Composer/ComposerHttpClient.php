@@ -178,6 +178,11 @@ final class ComposerHttpClient implements HttpClientInterface
         // Composer replays the request's own headers to a redirect's target, so the request goes
         // again to that target without lockrot's credentials.
         foreach ($redirects as $url => $target) {
+            if ($this->deadline->isPast()) {
+                $results[$url] = HttpResult::failure($url, 'install-time budget spent', $this->clock->now());
+
+                continue;
+            }
             $this->add($url, $target, self::options($timeout, self::withoutCredentials($headers)), $results);
         }
         if ($redirects !== []) {
