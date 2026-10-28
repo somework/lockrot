@@ -46,6 +46,8 @@ use PHPUnit\Framework\TestCase;
 #[Group('covers-nothing')]
 final class MoveCheckComposerOracleTest extends TestCase
 {
+    private const WORLDS = __DIR__.'/../fixtures/move-check-oracle/worlds.json';
+
     private ?string $project = null;
 
     protected function tearDown(): void
@@ -64,6 +66,12 @@ final class MoveCheckComposerOracleTest extends TestCase
             if (\is_array($case) && \is_array($case['solver_world'] ?? null)) {
                 yield JsonPath::stringAt($case, ['id']) => [$case['solver_world'], JsonPath::stringAt($case, ['run', 'move_check', 'composer'])];
             }
+        }
+        // A world that no report case needs, such as one with advisory blocking on: tests/fixtures/move-check-oracle/README.md.
+        $oracle = JsonPath::decodeFile(self::WORLDS);
+        foreach (JsonPath::arrayAt($oracle, ['worlds']) as $world) {
+            self::assertIsArray($world);
+            yield 'oracle '.JsonPath::stringAt($world, ['world_id']) => [$world, JsonPath::stringAt($oracle, ['composer'])];
         }
     }
 
@@ -85,6 +93,9 @@ final class MoveCheckComposerOracleTest extends TestCase
         $world = JsonPath::arrayAt($solverWorld, ['world']);
         $answers = JsonPath::arrayAt($solverWorld, ['answers']);
         $server = FixtureRepositoryServer::fromReleases(self::releases(JsonPath::arrayAt($world, ['repo'])));
+        if (JsonPath::has($world, ['advisories'])) {
+            $server->withSecurityAdvisories(self::releases(JsonPath::arrayAt($world, ['advisories'])));
+        }
         $server->start();
         try {
             $checker = $this->checker($server, $world, JsonPath::stringAt($world, ['platform_php']));

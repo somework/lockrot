@@ -1,0 +1,256 @@
+{
+ "composer": "2.10.3",
+ "worlds": [
+  {
+   "world_id": "blocking",
+   "world": {
+    "platform_php": "8.4.99",
+    "config": {
+     "audit": {
+      "block-insecure": true
+     }
+    },
+    "root": {
+     "name": "acme/app",
+     "require": {
+      "php": "^8.1",
+      "acme/lib": "^1.0",
+      "acme/tool": "^1.0"
+     }
+    },
+    "lock": {
+     "packages": [
+      {
+       "name": "acme/dep",
+       "version": "1.0.0",
+       "require": {
+        "php": ">=8.1"
+       },
+       "time": "2026-07-01T10:00:00+00:00"
+      },
+      {
+       "name": "acme/lib",
+       "version": "1.0.0",
+       "require": {
+        "php": ">=8.1",
+        "acme/dep": "^1.0"
+       },
+       "time": "2026-07-01T10:00:00+00:00"
+      },
+      {
+       "name": "acme/tool",
+       "version": "1.0.0",
+       "require": {
+        "php": ">=8.1"
+       },
+       "time": "2026-07-01T10:00:00+00:00"
+      }
+     ],
+     "packages-dev": []
+    },
+    "repo": {
+     "acme/dep": [
+      {
+       "version": "1.0.0",
+       "require": {
+        "php": ">=8.1"
+       },
+       "time": "2026-07-01T10:00:00+00:00"
+      },
+      {
+       "version": "1.1.0",
+       "require": {
+        "php": ">=8.1"
+       },
+       "time": "2026-07-01T10:00:00+00:00"
+      },
+      {
+       "version": "1.1.1",
+       "require": {
+        "php": ">=8.1"
+       },
+       "time": "2026-07-01T10:00:00+00:00"
+      },
+      {
+       "version": "1.2.0",
+       "require": {
+        "php": ">=8.1"
+       },
+       "time": "2026-07-01T10:00:00+00:00"
+      }
+     ],
+     "acme/lib": [
+      {
+       "version": "1.0.0",
+       "require": {
+        "php": ">=8.1",
+        "acme/dep": "^1.0"
+       },
+       "time": "2026-07-01T10:00:00+00:00"
+      },
+      {
+       "version": "1.1.0",
+       "require": {
+        "php": ">=8.1",
+        "acme/dep": "^1.1"
+       },
+       "time": "2026-07-01T10:00:00+00:00"
+      },
+      {
+       "version": "1.2.0",
+       "require": {
+        "php": ">=8.1",
+        "acme/dep": "^1.2"
+       },
+       "time": "2026-07-01T10:00:00+00:00"
+      }
+     ],
+     "acme/tool": [
+      {
+       "version": "1.0.0",
+       "require": {
+        "php": ">=8.1"
+       },
+       "time": "2026-07-01T10:00:00+00:00"
+      },
+      {
+       "version": "1.0.1",
+       "require": {
+        "php": ">=8.1"
+       },
+       "time": "2026-07-01T10:00:00+00:00"
+      }
+     ]
+    },
+    "advisories": {
+     "acme/dep": [
+      {
+       "advisoryId": "PKSA-dep1-0000-0001",
+       "packageName": "acme/dep",
+       "remoteId": "PKSA-dep1-0000-0001",
+       "cve": null,
+       "title": "Designed advisory PKSA-dep1-0000-0001",
+       "link": "https://example.test/PKSA-dep1-0000-0001",
+       "affectedVersions": ">=1.1.0,<1.1.1",
+       "sources": [
+        {
+         "name": "FriendsOfPHP/security-advisories",
+         "remoteId": "PKSA-dep1-0000-0001"
+        }
+       ],
+       "reportedAt": "2026-07-01 10:00:00",
+       "severity": "high"
+      },
+      {
+       "advisoryId": "PKSA-dep2-0000-0002",
+       "packageName": "acme/dep",
+       "remoteId": "PKSA-dep2-0000-0002",
+       "cve": null,
+       "title": "Designed advisory PKSA-dep2-0000-0002",
+       "link": "https://example.test/PKSA-dep2-0000-0002",
+       "affectedVersions": ">=1.2.0,<2.0",
+       "sources": [
+        {
+         "name": "FriendsOfPHP/security-advisories",
+         "remoteId": "PKSA-dep2-0000-0002"
+        }
+       ],
+       "reportedAt": "2026-07-01 10:00:00",
+       "severity": "high"
+      }
+     ],
+     "acme/tool": [
+      {
+       "advisoryId": "PKSA-tool-0000-0003",
+       "packageName": "acme/tool",
+       "remoteId": "PKSA-tool-0000-0003",
+       "cve": null,
+       "title": "Designed advisory PKSA-tool-0000-0003",
+       "link": "https://example.test/PKSA-tool-0000-0003",
+       "affectedVersions": "<1.0.1",
+       "sources": [
+        {
+         "name": "FriendsOfPHP/security-advisories",
+         "remoteId": "PKSA-tool-0000-0003"
+        }
+       ],
+       "reportedAt": "2026-07-01 10:00:00",
+       "severity": "high"
+      }
+     ]
+    }
+   },
+   "check_passes": null,
+   "update_now": null,
+   "answers": {
+    "baseline": {
+     "result": "resolves",
+     "form": "inline",
+     "installs": {},
+     "holds": [],
+     "problem": null
+    },
+    "update acme/dep ^1.1.0 ": {
+     "result": "resolves",
+     "form": "inline",
+     "installs": {
+      "acme/dep": "1.1.1"
+     },
+     "holds": [],
+     "problem": null
+    },
+    "update acme/tool ^1.0.1 ": {
+     "result": "resolves",
+     "form": "inline",
+     "installs": {
+      "acme/tool": "1.0.1"
+     },
+     "holds": [],
+     "problem": null
+    },
+    "combined acme/tool": {
+     "result": "resolves",
+     "form": "inline",
+     "installs": {
+      "acme/tool": "1.0.1"
+     },
+     "holds": [],
+     "problem": null
+    },
+    "update acme/lib ^1.1.0 ": {
+     "result": "resolves",
+     "form": "with-dependencies",
+     "installs": {
+      "acme/dep": "1.1.1",
+      "acme/lib": "1.1.0"
+     },
+     "holds": [],
+     "problem": null
+    },
+    "update acme/lib ^1.2.0 ": {
+     "result": "refused",
+     "form": null,
+     "holds": [
+      {
+       "constraint": "^1.0",
+       "link": "require",
+       "package": null,
+       "source": "root",
+       "target": null,
+       "version": null
+      },
+      {
+       "constraint": "^1.2",
+       "link": "require",
+       "package": "acme/lib",
+       "source": "package",
+       "target": "acme/dep",
+       "version": "1.2.0"
+      }
+     ],
+     "problem": "  Problem 1\n    - Root composer.json requires acme/lib ^1.0 -> satisfiable by acme/lib[1.2.0].\n    - acme/lib 1.2.0 requires acme/dep ^1.2 -> found acme/dep[1.2.0] but these were not loaded, because they are affected by security advisories (\"PKSA-dep2-0000-0002\"). Go to https://packagist.org/security-advisories/ to find advisory details. To ignore the advisories, add their IDs to the \"policy.advisories.ignore-id\" config or add the package to \"policy.advisories.ignore\". To turn the feature off entirely, you can set \"policy.advisories.block\" to false."
+    }
+   }
+  }
+ ]
+}
