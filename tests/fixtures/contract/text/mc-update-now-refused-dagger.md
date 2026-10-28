@@ -12,7 +12,7 @@ depth: every flagged package is named in composer.json · direct 2
 security: 2 vulnerable packages · 2 advisories: 2 high
 libyears: 2.7 behind across all 2 packages · 2.7 from direct requirements · furthest behind typo3/html-sanitizer v2.2.0 at 2.0
 advisories: 2 packages asked · packagist.org answered (11 on record for 2 packages)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-\* requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 8.1 to 8.5
 
 - note: update now: no command, because Composer's solver refuses these packages together; run each package's own command: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0.

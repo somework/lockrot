@@ -83,7 +83,7 @@ security: 2 vulnerable packages · 3 advisories: 1 high, 2 medium
 libyears: at least 264.2 behind across 265 of 271 packages · 132.7 from direct requirements · furthest behind sebastian/version 3.0.2 at 6.0
 pulled in by: `wallabag/rulerz-bundle` 15 · `wallabag/rulerz` 14 · `phpunit/phpunit` 13 · `wallabag/phpepub` 5 · `friendsofphp/php-cs-fixer` 3 · … and 27 more
 advisories: 271 packages asked · composer repo (http\://127.0.0.1) answered (187 on record for 53 packages)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-\* requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 8.2 to 8.4; `lcobucci/clock` excludes 8.5
 baseline: 47 known · 26 new · 2 worsened · 9 stale (lockrot-baseline.json)
 

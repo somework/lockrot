@@ -122422,7 +122422,13 @@ export const d_fix_newest_held_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": true,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -124134,7 +124140,13 @@ export const d_fix_newest_two_fixes_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": true,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -127552,7 +127564,13 @@ export const d_gets_below_clears_left_behind_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": true,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -162375,7 +162393,13 @@ export const d_mc_baseline_refused_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "refused",
             "reason": null
         },
@@ -164044,7 +164068,13 @@ export const d_mc_blocking_off_both_dagger = {
                 "COMPOSER_NO_BLOCKING",
                 "COMPOSER_NO_SECURITY_BLOCKING"
             ],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -165549,7 +165579,13 @@ export const d_mc_blocking_off_dagger = {
             "blocking_disabled_by": [
                 "COMPOSER_NO_SECURITY_BLOCKING"
             ],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -167052,7 +167088,13 @@ export const d_mc_canonical_package_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -168601,7 +168643,13 @@ export const d_mc_canonical_vcs_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -170269,7 +170317,13 @@ export const d_mc_canonical_vcs_unmatched_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -171931,7 +171985,13 @@ export const d_mc_composite_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -175974,7 +176034,13 @@ export const d_mc_dev_update_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -177688,7 +177754,13 @@ export const d_mc_filter_only_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -179334,7 +179406,13 @@ export const d_mc_gets_below_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -181001,7 +181079,13 @@ export const d_mc_gets_next_form_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -182663,7 +182747,13 @@ export const d_mc_inline_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -184166,7 +184256,13 @@ export const d_mc_joint_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -185809,7 +185905,13 @@ export const d_mc_joint_dev_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": true,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -187307,7 +187409,13 @@ export const d_mc_joint_down_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -188975,7 +189083,13 @@ export const d_mc_joint_retag_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -190643,7 +190757,13 @@ export const d_mc_link_newest_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -192294,7 +192414,13 @@ export const d_mc_lookup_incomplete_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": true,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -193798,7 +193924,13 @@ export const d_mc_minimal_changes_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -195608,7 +195740,13 @@ export const d_mc_newest_above_row_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -197460,7 +197598,13 @@ export const d_mc_package_hold_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -199205,7 +199349,13 @@ export const d_mc_pass_cap_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -200955,7 +201105,13 @@ export const d_mc_raise_php_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -202474,7 +202630,13 @@ export const d_mc_replan_major_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -204161,7 +204323,13 @@ export const d_mc_root_hold_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -205828,7 +205996,13 @@ export const d_mc_root_version_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -207377,7 +207551,13 @@ export const d_mc_split_both_refused_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -209198,7 +209378,13 @@ export const d_mc_split_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -211052,7 +211238,13 @@ export const d_mc_split_maintenance_larger_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -212887,7 +213079,13 @@ export const d_mc_split_not_checked_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "refused",
             "reason": null
         },
@@ -214816,7 +215014,13 @@ export const d_mc_update_now_reduced_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -215208,7 +215412,6 @@ export const d_mc_update_now_reduced_dagger = {
                     "symfony/yaml",
                     "typo3/html-sanitizer"
                 ],
-                "held_below": [],
                 "problem": "  Problem 1\n    - Root composer.json requires symfony/yaml ^6.4 -> satisfiable by symfony/yaml[v6.4.40].\n    - Root composer.json requires typo3/html-sanitizer ^2.2 -> satisfiable by typo3/html-sanitizer[v2.3.2].\n    - symfony/yaml v6.4.40 conflicts with acme/un-x 2.0.0.\n    - typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0 -> satisfiable by acme/un-x[2.0.0]."
             }
         }
@@ -217076,7 +217279,13 @@ export const d_mc_update_now_refused_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -218955,7 +219164,13 @@ export const d_mc_with_all_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -220617,7 +220832,13 @@ export const d_mc_with_deps_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -222279,7 +222500,13 @@ export const d_move_check_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": false,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -242016,7 +242243,13 @@ export const d_platform_step_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": true,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "refused",
             "reason": null
         },
@@ -243567,7 +243800,13 @@ export const d_platform_step_inside_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": true,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "refused",
             "reason": null
         },
@@ -246527,7 +246766,13 @@ export const d_platform_step_why_not_dagger = {
             "composer": "2.10.3",
             "blocks_advisories": true,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },

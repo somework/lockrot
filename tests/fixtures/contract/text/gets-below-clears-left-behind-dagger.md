@@ -10,7 +10,7 @@ flags: left-behind 1
 depth: every flagged package is named in composer.json · direct 1
 libyears: 4.1 behind across the one package · 4.1 from direct requirements · furthest behind symfony/google-mailer v4.4.41 at 4.1
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-\* requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 7.4 to 8.5
 
 <sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

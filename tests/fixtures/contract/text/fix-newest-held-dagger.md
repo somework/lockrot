@@ -12,7 +12,7 @@ security: 1 vulnerable package · 3 advisories: 3 low
 libyears: 4.7 behind across the one package · 0.0 from direct requirements · furthest behind symfony/yaml v5.3.14 at 4.7
 pulled in by: `incenteev/composer-parameter-handler` 1 · `nelmio/api-doc-bundle` 1 · `php-amqplib/rabbitmq-bundle` 1
 advisories: 1 package asked · packagist.org answered (5 on record for 1 package)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-\* requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 7.4 to 8.5
 
 <sub>4 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

@@ -20,7 +20,7 @@ fix, by package: composer update 1
 libyears: 0.9 behind across all 2 packages · 0.9 from direct requirements ·
 furthest behind guzzlehttp/guzzle 7.10.0 at 0.9
 advisories: 2 packages asked · packagist.org answered (15 on record for 1 package)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 8.1 to 8.5
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
