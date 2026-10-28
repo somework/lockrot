@@ -13,7 +13,6 @@ namespace Lockrot\Solver;
  */
 final class MoveQuery
 {
-
     private string $package;
     private string $constraint;
     private string $version;

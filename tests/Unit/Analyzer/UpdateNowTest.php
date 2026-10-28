@@ -5,16 +5,11 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\Report;
-use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\UpdateNow;
-use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\RunFooter;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingRelations;
 use Lockrot\Tests\Support\JsonPath;
-use Lockrot\Tests\Support\RecordedMoveChecker;
-use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\MoveChecks;
 use PHPUnit\Framework\TestCase;
 
 /**
