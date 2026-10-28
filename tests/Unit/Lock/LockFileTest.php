@@ -577,20 +577,33 @@ final class LockFileTest extends TestCase
         self::assertCount(1, $lock->lockedRepository()->getPackages());
     }
 
-    public function testAnOverrideThatComposerRefusesKeepsComposersReason(): void
+    /** @return iterable<string, array{0: array<string, mixed>, 1: string}> */
+    public static function platformDataThatComposerRefuses(): iterable
+    {
+        yield 'a php override of false' => [['packages' => [], 'platform-overrides' => ['php' => false]], 'alt.lock: platform-overrides cannot be loaded: '];
+        yield 'a platform constraint that Composer cannot parse' => [['packages' => [], 'platform' => ['php' => 'not a constraint !!']], 'alt.lock: platform cannot be loaded: '];
+    }
+
+    /**
+     * @dataProvider platformDataThatComposerRefuses
+     *
+     * @param array<string, mixed> $lock
+     */
+    #[DataProvider('platformDataThatComposerRefuses')]
+    public function testPlatformDataThatComposerRefusesKeepsComposersReason(array $lock, string $prefix): void
     {
         $thrown = null;
         try {
-            LockFile::fromArray(['packages' => [], 'platform-overrides' => ['php' => false]], 'alt.lock');
+            LockFile::fromArray($lock, 'alt.lock');
         } catch (ConfigException $e) {
             $thrown = $e;
         }
 
         self::assertNotNull($thrown);
         $cause = $thrown->getPrevious();
-        self::assertNotNull($cause, 'the PlatformRepository failure is kept as the cause');
+        self::assertNotNull($cause, 'the Composer failure is kept as the cause');
         self::assertNotSame('', $cause->getMessage());
-        self::assertSame('alt.lock: platform-overrides cannot be loaded: '.$cause->getMessage(), $thrown->getMessage());
+        self::assertSame($prefix.$cause->getMessage(), $thrown->getMessage());
         self::assertSame(0, $thrown->getCode(), 'lockrot carries no exception codes; a run exits on its verdict, not on these');
     }
 }

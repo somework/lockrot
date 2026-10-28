@@ -66,10 +66,11 @@ entry in the commit that changes the line.
 - `src/Composer/LockrotCommand.php` LogicalOr `if ($finding === null || $facts === null) {` — in explain(): one loop fills both, so one is null exactly when the other is.
 - `src/Composer/LockrotCommand.php` CastArray `foreach ((array) $input->getOption('output') as $spec) {` — `--output` is `VALUE_IS_ARRAY`, so symfony/console always returns an array. The cast is for PHPStan.
 - `src/Composer/LockrotCommand.php` ReturnRemoval `return null;` — in resolveComposer(): without a composer.json, `tryComposer()` returns null too.
-- `src/Composer/LockrotCommand.php` Ternary, FalseValue `$composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);` — the vendored Composer has `tryComposer()`, and its `getComposer(false)` calls `tryComposer()`.
 - `src/Composer/SelfUpdateCommand.php` FalseValue `$phar = $this->runningPhar ?? \Phar::running(false);` — the two calls differ only inside a running PHAR. Infection does not run the e2e `PharTest`.
 - `src/Composer/SelfUpdateCommand.php` FunctionCallRemoval `class_exists(TerminalText::class);` — the call loads the class before the archive is replaced. From the source tree the autoloader also finds it later.
 - `src/Composer/LockrotCommand.php` Coalesce `$lockrot->project() ?? $project->name(),` — in explain(): explain-2 writes no `run.project`, so no output reads the project name of this run.
+- `src/Composer/RejectsUnreadableInput.php` ProtectedVisibility `protected function inputRefusal(InputInterface $input): ?string` — `LockrotCommand` declares its own `inputRefusal()`, which wins over the trait's. `SelfUpdateCommand` calls the trait's from the same class, where `private` works too.
+- `src/Composer/RejectsUnreadableInput.php` CloneRemoval `$copy = clone $input;` — both commands call `parent::run()` next, and Symfony's `run()` binds the input again with the command's own definition.
 
 ## src/Config
 
@@ -123,6 +124,7 @@ entry in the commit that changes the line.
 - `src/Json/JsonReader.php` ReturnRemoval `return false;` — for an empty array, `array_keys([]) === range(0, -1)` is false, so the method returns false too.
 - `src/Lock/ConfiguredRepositories.php` CastString `$host = (string) preg_replace('{:\d+$}', '', strtolower($parts[0]));` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Lock/ConfiguredRepositories.php` CastString `$path = (string) preg_replace('{\.git$}', '', trim(strtolower($parts[1]), '/'));` — the pattern is a literal, so `preg_replace()` never returns null.
+- `src/Lock/LockFile.php` UnwrapArrayFilter `$lockLoader->parseLinks('__root__', '1.0.0', Link::TYPE_REQUIRE, array_filter($links, 'is_string'));` — `parseLinks()` skips a value that is no string itself. The filter is for PHPStan.
 
 ## src/Output
 
