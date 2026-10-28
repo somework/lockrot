@@ -47,6 +47,16 @@ class MutationOptionsTest(unittest.TestCase):
     def test_the_infection_configuration_writes_the_json_log_that_the_gate_reads(self):
         self.assertIn('"json": "build/infection.json"', read('infection.json5'))
 
+    def test_no_configuration_or_annotation_hides_code_from_the_gate(self):
+        # Infection writes no mutant for an ignore key, a source exclude or the annotation, so the gate cannot see that code.
+        config = read('infection.json5')
+        self.assertNotRegex(config, r'"(ignore|ignoreSourceCodeByRegex|excludes)"\s*:')
+        for directory, _, files in os.walk(os.path.join(ROOT, 'src')):
+            for name in files:
+                with self.subTest(path=name):
+                    with open(os.path.join(directory, name), encoding='utf-8') as handle:
+                        self.assertNotIn('@infection-ignore-all', handle.read())
+
     def test_every_src_file_is_in_exactly_one_shard(self):
         shards = SHARD.findall(read('.github', 'workflows', 'ci.yml'))
         self.assertNotEqual([], shards)
