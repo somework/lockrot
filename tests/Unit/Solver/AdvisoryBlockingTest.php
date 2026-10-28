@@ -181,6 +181,7 @@ final class AdvisoryBlockingTest extends TestCase
             AdvisoryBlocking::fromConfig($config);
             self::fail('a policy that Composer rejects must stop the run');
         } catch (ConfigException $e) {
+            self::assertStringStartsWith('Composer rejects the policy configuration: ', $e->getMessage());
             self::assertStringContainsString($named, $e->getMessage());
         } finally {
             foreach (array_keys($variables) as $name) {
