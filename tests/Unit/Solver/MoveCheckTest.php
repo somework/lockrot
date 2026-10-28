@@ -24,6 +24,17 @@ final class MoveCheckTest extends TestCase
         self::assertNull(MoveCheck::resolves(MoveCheck::INLINE, 'dev-main')->installsBelow('not a version'));
     }
 
+    /** Under Composer 2.2 or 2.3 the plain `composer update <pkg>` has no root cap, so it can install a release above the newest. */
+    public function testAReleaseAboveTheNewestIsNamed(): void
+    {
+        self::assertSame('3.0.0', MoveCheck::resolves(MoveCheck::INLINE, '3.0.0')->installsAbove('2.12.3'));
+        self::assertNull(MoveCheck::resolves(MoveCheck::INLINE, '2.12.3')->installsAbove('v2.12.3'));
+        self::assertNull(MoveCheck::resolves(MoveCheck::INLINE, '2.12.2')->installsAbove('2.12.3'));
+        self::assertNull(MoveCheck::resolves(MoveCheck::INLINE, '3.0.0')->installsAbove(null));
+        self::assertNull(MoveCheck::refused()->installsAbove('2.12.3'));
+        self::assertNull(MoveCheck::resolves(MoveCheck::INLINE, 'dev-main')->installsAbove('not a version'));
+    }
+
     /** SPEC §7.9.21 holds the words, and the update-now note of §6.2 reads them. */
     public function testAnIncompleteAdvisoryLookupNamesThePackageThatTheLookupDidNotCover(): void
     {

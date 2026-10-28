@@ -314,6 +314,20 @@ final class MoveTest extends TestCase
         self::assertStringStartsWith('move symfony/routing to ^5.4.53 through mautic/core-lib', JsonPath::stringAt($move, ['text']));
     }
 
+    /** Case `E` with a solve above the newest v5.4.53, as the plain form gives under Composer 2.2 or 2.3: the move and `security.gets` name the release that Composer installs. */
+    public function testAnUpdateThatInstallsAboveTheNewestReleaseNamesTheReleaseItGets(): void
+    {
+        $case = CaseHydrator::case('E');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => [], 'installs' => 'v6.0.0']];
+        $case['inputs'] = $inputs;
+
+        $finding = self::hydrated($case);
+
+        self::assertSame('v6.0.0', JsonPath::stringAt($finding, ['security', 'gets', 'version']));
+        self::assertStringContainsString('(gets v6.0.0) — ', JsonPath::stringAt($finding, ['next_step', 'text']));
+    }
+
     /** Case `E`: the resolving form installs v5.4.52, below the branch's newest v5.4.53, so the move and `security.gets` name v5.4.52. */
     public function testAnUpdateThatInstallsBelowTheNewestReleaseNamesTheReleaseItGets(): void
     {
