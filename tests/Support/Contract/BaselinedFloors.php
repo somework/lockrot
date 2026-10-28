@@ -13,9 +13,6 @@ use Lockrot\Tests\Support\JsonPath;
  */
 final class BaselinedFloors
 {
-    /** The floors that only an advisory lookup can meet. */
-    public const ADVISORY_FLOORS = ['worsened by a new advisory on a recorded lead', 'advisory known'];
-
     /**
      * The floors each scenario must meet. `limited_by: equal` is the estimate's for wallabag-2.6, and
      * the recorded data does not reach it, so no floor asks for it.

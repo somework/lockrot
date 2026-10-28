@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Composer\Config;
-use Composer\Policy\AbandonedPolicyConfig;
 use Composer\Semver\VersionParser;
 use Composer\Util\Platform;
 use Lockrot\Allowlist\Allowlist;
@@ -320,9 +319,6 @@ final class AnalyzerLookupTest extends TestCase
 
     public function testAnUnreadableListIsNoted(): void
     {
-        if (!class_exists(AbandonedPolicyConfig::class)) {
-            self::markTestSkipped('Composer without the policy API (2.10 and later)');
-        }
         Platform::putEnv('COMPOSER_POLICY', 'maybe');
         try {
             $ignore = AbandonedIgnore::fromConfig(new Config(false));

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Composer\Repository\AdvisoryProviderInterface;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\WallabagSite;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -32,9 +31,6 @@ final class MoveWordsWallabagTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer 2.2 has no AdvisoryProviderInterface: no move reaches a vulnerable package');
-        }
         foreach (['7.4', '8.4'] as $target) {
             self::$reports[$target] = JsonPath::decoded(WallabagSite::analyze($target)->toArray());
         }

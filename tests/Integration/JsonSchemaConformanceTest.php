@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Composer\Downloader\TransportException;
-use Composer\Repository\AdvisoryProviderInterface;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
 use Lockrot\Allowlist\BuiltinAllowlist;
@@ -341,10 +340,7 @@ final class JsonSchemaConformanceTest extends TestCase
         }
         uksort($seen, 'strnatcmp');
 
-        $expected = [Signal::S1, Signal::S2, Signal::S3, Signal::S4, Signal::S5, Signal::S6, Signal::S7, Signal::S8];
-        if (interface_exists(AdvisoryProviderInterface::class)) {
-            $expected[] = Signal::S9;
-        }
+        $expected = [Signal::S1, Signal::S2, Signal::S3, Signal::S4, Signal::S5, Signal::S6, Signal::S7, Signal::S8, Signal::S9];
         // S10 rides on the fixtures that carry an undated newest release — symfony/polyfill-* in
         // wallabag's lock, whose tags are cut by a monorepo and share their commit.
         $expected[] = Signal::S10;
@@ -801,9 +797,6 @@ final class JsonSchemaConformanceTest extends TestCase
     /** S9's `releases_read` is a required boolean in the report schema. The explain schema types signal data as any object. */
     public function testS9SaysWhetherTheReleasesWereRead(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer 2.2 has no advisory API, so doctrine/cache carries no S9.');
-        }
         [$report] = self::documentsFor('doctrine/cache')[Schemas::REPORT];
         $signals = JsonPath::arrayAt($report, ['findings', 0, 'signals']);
         $at = array_search(Signal::S9, array_column($signals, 'id'), true);

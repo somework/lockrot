@@ -63,17 +63,14 @@ final class BaselinedProjectTest extends TestCase
         $files = BaselinedScenario::record($scenario);
 
         // The recording holds the move check of the Composer that made it, and another Composer solves,
-        // blocks and words it otherwise: the exact files hold only on that Composer. Composer below 2.4 has
-        // no advisory API either, so there only the floors that need no advisory and the invariants hold.
-        $advisories = version_compare(Composer::VERSION, '2.4', '>=');
+        // blocks and words it otherwise: the exact files hold only on that Composer.
         if (Composer::VERSION === self::recordedComposer($scenario)) {
             self::assertSame(self::committed($dir), array_keys($files), $scenario.': the recorder writes every committed file and no other');
             foreach ($files as $path => $contents) {
                 self::assertSame((string) @file_get_contents($dir.$path), $contents, $scenario.'/'.$path.': re-record with tools/report/record --baselined '.$scenario);
             }
         }
-        $missed = BaselinedFloors::missed($scenario, $files);
-        self::assertSame([], $advisories ? $missed : array_values(array_diff($missed, BaselinedFloors::ADVISORY_FLOORS)));
+        self::assertSame([], BaselinedFloors::missed($scenario, $files));
         $provenance = json_decode($files['provenance.json']);
         $validator = new Validator();
         $validator->validate($provenance, json_decode((string) file_get_contents(BaselinedScenario::FIXTURES.'baselined/provenance.schema.json')));
