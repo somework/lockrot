@@ -11,7 +11,7 @@ namespace Lockrot\Verdict;
  */
 final class ListWords
 {
-    /** @param list<string> $items an empty list gives '' */
+    /** @param array<string> $items in order, an empty array gives '' */
     public static function of(array $items): string
     {
         $last = array_pop($items);

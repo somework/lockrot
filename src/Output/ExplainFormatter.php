@@ -445,7 +445,7 @@ final class ExplainFormatter
         $holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json'
             : ($holder->package() === $package ? $package.' '.$holder->version().', its own release' : (string) $holder->package()), MoveText::inTextOrder($joint ? [] : $candidate->heldBy(), $package));
         if ($holders !== []) {
-            $cell .= '; held by '.ListWords::of(array_values(array_unique($holders)));
+            $cell .= '; held by '.ListWords::of(array_unique($holders));
         }
         if ($after !== null) {
             // D10: the caveat stays only where Composer's solver did not check the move.

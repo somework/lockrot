@@ -394,7 +394,7 @@ final class RunFooter
             ? 'composer.json '.MoveText::linkWords($hold, $name).($hold->link() !== Holder::REQUIRE_DEV && \in_array($hold->target(), $dev, true) ? ' in require-dev' : '')
             : $name((string) $hold->package()).' '.$hold->version().' '.MoveText::linkWords($hold, $name), $fix['held_by']);
 
-        return $holds === [] ? '' : ': '.ListWords::of(array_values($holds));
+        return $holds === [] ? '' : ': '.ListWords::of($holds);
     }
 
     /** @param array{reason: ?string} $fix */

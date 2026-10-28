@@ -263,6 +263,12 @@ final class ProjectConfigTest extends TestCase
         self::assertSame([], ProjectConfig::empty()->platformConstraints(ProjectConfig::REQUIRE));
     }
 
+    /** PHP turns a numeric key of composer.json into an int: the listing gives it as written. */
+    public function testAListingGivesANumericKeyAsAString(): void
+    {
+        self::assertSame([ProjectConfig::REQUIRE => '123'], ProjectConfig::fromArray(['require' => ['123' => '^1.0']])->listedIn('123'));
+    }
+
     public function testAListingNamesEachLiteralSectionWithItsKeyAsWritten(): void
     {
         $cfg = ProjectConfig::fromArray([

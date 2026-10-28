@@ -275,6 +275,17 @@ final class MoveTextTest extends TestCase
         self::assertStringStartsWith('raise require.php to >=8.1, which removes it from require-dev, then ', MoveText::render($move));
     }
 
+    public function testThePhpRaiseBeforeAnUpdateIsProseAndTheUpdateIsTheOneCommand(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', '7.4');
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '1.x', '1.2.5', '1.2.5', null, null, PhpCheck::of('>=8.1', new PhpFloor('8.4', '>=7.4')), false, [], [], [], [], [], null, [], [['composer', 'update', 'acme/lib']], $subject);
+
+        $parts = MoveText::parts($move);
+
+        self::assertStringStartsWith('raise require.php to >=8.1, then ', $parts[0][0]);
+        self::assertSame(['composer update acme/lib'], array_column(array_values(array_filter($parts, static fn (array $part): bool => $part[1])), 0));
+    }
+
     public function testASelfVersionHoldNamesTheHoldersVersion(): void
     {
         $hold = new Holder(Holder::PACKAGE, 'acme/suite', '3.1.0', Holder::REQUIRE, 'self.version', 'acme/lib');
