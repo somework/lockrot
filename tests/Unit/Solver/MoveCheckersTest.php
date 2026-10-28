@@ -12,6 +12,7 @@ use Composer\Package\RootPackageInterface;
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\PlatformRepository;
+use Composer\Util\Platform;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
@@ -181,6 +182,40 @@ final class MoveCheckersTest extends TestCase
         $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
 
         self::assertSame([MoveCheck::RESOLVES, MoveCheck::WITH_DEPENDENCIES], [$check->result(), $check->form()]);
+    }
+
+    /**
+     * UpdateCommand and RequireCommand read `--minimal-changes` from COMPOSER_MINIMAL_CHANGES, cast
+     * to bool, or from the config key.
+     *
+     * @dataProvider minimalChangesSettings
+     *
+     * @param array<string, mixed> $config
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('minimalChangesSettings')]
+    public function testTheMoveCheckReadsMinimalChangesAsComposerDoes(array $config, ?string $variable, bool $minimal): void
+    {
+        $composerConfig = new Config(false);
+        $composerConfig->merge(['config' => $config]);
+        if ($variable !== null) {
+            Platform::putEnv('COMPOSER_MINIMAL_CHANGES', $variable);
+        }
+        try {
+            self::assertSame($minimal, MoveCheckers::minimalChanges($composerConfig));
+        } finally {
+            Platform::clearEnv('COMPOSER_MINIMAL_CHANGES');
+        }
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, ?string, bool}> the Composer config, the variable's value, whether the solve keeps changes minimal */
+    public static function minimalChangesSettings(): iterable
+    {
+        yield 'neither' => [[], null, false];
+        yield 'the config key' => [['update-with-minimal-changes' => true], null, true];
+        yield 'the config key off' => [['update-with-minimal-changes' => false], null, false];
+        yield 'the variable' => [[], '1', true];
+        yield 'the variable at 0' => [[], '0', false];
+        yield 'the variable at an empty value' => [[], '', false];
     }
 
     /** `-W` frees a root requirement that a VCS repository serves: the solve offers its locked version, and no other. */
