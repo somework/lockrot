@@ -759,18 +759,21 @@ Limits of the check:
   [stability flag](https://getcomposer.org/doc/04-schema.md#package-links) admits `dev` for the
   package, and so does the check. A move to a dev snapshot is
   not a move that lockrot proposes.
-- It reads package and path repositories as Composer reads them. It does not load a vcs, git or
-  artifact repository, because a load clones or downloads the repository. It knows a name that such
-  a repository serves only from the source or dist URL of a lock entry.
+- It reads package and path repositories as Composer reads them, and each serves the names that it
+  declares. A canonical repository of any type that serves a name hides that name in every later
+  repository.
+- It does not load a vcs, git or artifact repository, because a load clones or downloads the
+  repository. Such a repository serves only the names that the lock records with a `source` or
+  `dist` URL equal to the repository URL. The URLs compare without case, a trailing `.git` or a
+  trailing slash.
 - It offers a name that the lock records from a vcs repository at its locked version only. A move
-  of that name reads `not_checked` with `not_from_composer_repository`.
-- A canonical vcs repository before a Composer repository serves the names that the lock records
-  from its URL. Composer then takes such a name from the vcs repository only. A move whose solve
-  needs that name reads `not_checked` with `unloaded_name`. A vcs repository that no lock entry
-  names hides no name.
-- It takes the root version from composer.json's `version`, else from `COMPOSER_ROOT_VERSION`, as
-  Composer does. Without both, the standalone run solves the root at `1.0.0`, and Composer guesses
-  the root version from the vcs checkout. A root `replace` or `provide` of `self.version` can then
+  of that name reads `not_checked` with `not_from_composer_repository`. A move whose solve needs
+  such a name at a release other than the locked one reads `not_checked` with `unloaded_name`.
+- A vcs repository that no lock entry matches shadows no name in the check. In Composer, its
+  packages can shadow a name that lockrot reads from a later repository.
+- It takes the root version from composer.json's `version`, else from `COMPOSER_ROOT_VERSION` when
+  it is set and not empty, as Composer does. Without both, the standalone run solves the root at
+  `1.0.0`, and Composer guesses the root version from the vcs checkout. A root `replace` or `provide` of `self.version` can then
   resolve in lockrot and fail in Composer, or the reverse. So can a package that requires the root
   package. In plugin mode, the root version is Composer's own guess.
 - It reads [`update-with-minimal-changes`](https://getcomposer.org/doc/06-config.md#update-with-minimal-changes)

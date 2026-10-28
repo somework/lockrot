@@ -149,9 +149,9 @@ Matching rules:
   [`baseline_fix_model_differs`](notes.md#baseline_fix_model_differs)).
 - **Whichever value.** A `known` finding fails no `--fail-on` value, `unchecked` included. A
   `worsened` finding fails `unchecked` on whatever S10 it carries.
-- **Graded findings only.** A baseline never covers an `ok`, `finished` or `unknown` finding, so
-  one that carries [S10](verdicts.md#what-was-not-checked) still fails `--fail-on=unchecked`
-  however often you regenerate.
+- **Graded findings only.** An entry covers graded findings only. An `ok`, `finished` or `unknown`
+  finding that carries [S10](verdicts.md#what-was-not-checked) fails `--fail-on=unchecked`, also
+  when an incomplete lookup carried its entry forward.
 - **Stale entries stay.** A normal run never edits the file. Regenerate the file to drop them.
 
 ### The gate score
