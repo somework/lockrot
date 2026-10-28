@@ -528,9 +528,9 @@ final class RunNote
         }
         $refused = array_values(array_diff($leftOut, array_keys($below)));
         $text = \sprintf(
-            'update now: the command leaves out %s, because the solve of the line keeps %s below its fix: %s',
+            'update now: the command leaves out %s, because the solve of the line keeps %s: %s',
             implode(', ', $leftOut),
-            $refused === [] && \count($below) === 1 ? 'it' : implode(', ', array_keys($below)),
+            \count($below) > 1 ? implode(', ', array_keys($below)).' below their fixes' : ($refused === [] ? 'it' : implode('', array_keys($below))).' below its fix',
             implode('; ', $gets)
         );
         if ($problem !== null && $refused !== []) {

@@ -347,6 +347,13 @@ final class RunNoteTest extends TestCase
             false,
             ['left_out' => ['acme/b', 'acme/c'], 'problem' => self::CONFLICT],
         ];
+        yield 'update now without packages that the line keeps below their fixes, with no refused package' => [
+            static fn (): RunNote => RunNote::updateNowBelowFix(['acme/b', 'acme/c'], ['acme/b' => ['1.0.0', '1.2.0'], 'acme/c' => ['2.0.0', '2.1.0']], self::CONFLICT),
+            'update_now_reduced',
+            'update now: the command leaves out acme/b, acme/c, because the solve of the line keeps acme/b, acme/c below their fixes: acme/b gets 1.0.0, below 1.2.0; acme/c gets 2.0.0, below 2.1.0',
+            false,
+            ['left_out' => ['acme/b', 'acme/c'], 'problem' => self::CONFLICT],
+        ];
         yield 'update now refused' => [
             static fn (): RunNote => RunNote::updateNowRefused(self::CONFLICT),
             'update_now_refused',

@@ -133,13 +133,14 @@ final class UpdateNow
         $below = [];
         foreach ($findings as $finding) {
             $move = $finding->nextStep();
+            $fix = $move === null ? null : $move->version();
             $package = $finding->package();
-            if (($inline[$package] ?? null) !== '' || $move === null) {
+            if (($inline[$package] ?? null) !== '' || $fix === null) {
                 continue;
             }
             $gets = $changes[$package] ?? $finding->version();
-            if (Comparator::lessThan($gets, (string) $move->version())) {
-                $below[$package] = [$gets, (string) $move->version()];
+            if (Comparator::lessThan($gets, $fix)) {
+                $below[$package] = [$gets, $fix];
             }
         }
 

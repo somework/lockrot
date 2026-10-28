@@ -35,6 +35,8 @@ entry in the commit that changes the line.
 - `src/Analyzer/Report.php` AssignCoalesce `$gate ??= $this->gate();` — the gate is derived from the report alone, so computing it again gives the gate that the caller passed.
 - `src/Analyzer/Report.php` UnwrapArraySlice ``$rows[$finding->package()] = \array_slice($row, 0, $lead, true) + ['rank' => $at + 1] + \array_slice($row, $lead, null, true) + [`` — in findingRows(): the union keeps the first of each key, so the whole row in place of its tail adds the same keys in the same order.
 - `src/Analyzer/RunNote.php` CastString `$host = (string) $where->host();` — every entry of the host note comes from `LocatedRepository::unsupported()`, which always names a host.
+- `src/Analyzer/RunNote.php` UnwrapArrayValues `$refused = array_values(array_diff($leftOut, array_keys($below)));` — `implode()` and the `=== []` test read no key.
+- `src/Analyzer/UpdateNow.php` CastString `return self::reachingTheFix($kept, $retry, $findings, $checks, [array_keys(array_diff_key($inline, $kept)), (string) $outcome->problem()]);` — a refused combined outcome always carries its problem text.
 
 ## src/Baseline
 
@@ -170,3 +172,4 @@ entry in the commit that changes the line.
 ## src/Verdict
 
 - `src/Verdict/FindingDetails.php` CastString `$skipped[] = new Check('advisories', (string) $advisoryReason, [Signal::S9]);` — the `in_array()` guard admits two strings only.
+- `src/Verdict/FindingDetails.php` Coalesce `return ($check === null ? null : $check->installsBelow($version) ?? $check->installsAbove($version)) ?? $version;` — a release is below or above the version, never both, so at most one side is not null.

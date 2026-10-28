@@ -28,6 +28,9 @@ final class UpdateNowTest extends TestCase
     private const PACKAGE = 'typo3/html-sanitizer';
     private const COMMONMARK = 'league/commonmark';
     private const LARAVEL = 'laravel/framework';
+    private const JWT = 'web-token/jwt-library';
+    private const SODIUM = 'paragonie/sodium_compat';
+    private const CONFLICT = "Problem 1\n    - laravel/framework v12.69.0 conflicts with league/commonmark <2.10.3.";
 
     public function testACombinedUpdateThatResolvesNamesItsMembersInTheCommand(): void
     {
@@ -223,6 +226,62 @@ final class UpdateNowTest extends TestCase
         self::assertNotNull($note);
         self::assertSame([RunNote::UPDATE_NOW_REDUCED, [self::COMMONMARK]], [$note->code(), $note->data()['left_out'] ?? null]);
         self::assertSame([[self::COMMONMARK => '']], $checker->combinedAsked());
+    }
+
+    /** Composer 2.2 and 2.3: the solve keeps two plain members below their fixes, so the line has no command and the note names both. */
+    public function testOnAComposerWithoutInlineConstraintsOnAnyPackageTwoMembersBelowTheirFixesLeaveNoCommand(): void
+    {
+        $findings = self::reportOf('replace-graded', [])->sorted();
+        $checker = new RecordedMoveChecker(['combined '.self::JWT.' '.self::SODIUM => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => [], 'installs' => []]], []);
+
+        $updateNow = UpdateNow::of($findings, new MoveChecks($checker, false));
+
+        self::assertNull($updateNow->command());
+        $note = $updateNow->note();
+        self::assertNotNull($note);
+        self::assertSame([self::JWT, self::SODIUM], $note->data()['left_out'] ?? null);
+    }
+
+    /** Composer 2.2 and 2.3: a member that the second solve keeps below its fix joins the one that the first solve left out. */
+    public function testOnAComposerWithoutInlineConstraintsOnAnyPackageEachSolveLeavesOutTheMembersBelowTheirFixes(): void
+    {
+        $findings = self::reportOf('replace-graded', [])->sorted();
+        $fix = '';
+        foreach ($findings as $finding) {
+            $move = $finding->nextStep();
+            $fix = $finding->package() === self::JWT && $move !== null ? (string) $move->version() : $fix;
+        }
+        $checker = new RecordedMoveChecker([
+            'combined '.self::JWT.' '.self::SODIUM => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => [], 'installs' => [self::JWT => $fix]],
+            'combined '.self::JWT => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => [], 'installs' => []],
+        ], []);
+
+        $updateNow = UpdateNow::of($findings, new MoveChecks($checker, false));
+
+        self::assertSame([[self::JWT => '', self::SODIUM => ''], [self::JWT => '']], $checker->combinedAsked());
+        self::assertNull($updateNow->command());
+        $note = $updateNow->note();
+        self::assertNotNull($note);
+        self::assertSame([self::JWT, self::SODIUM], $note->data()['left_out'] ?? null);
+    }
+
+    /** Composer 2.2 and 2.3: after a refusal leaves one member out, the solve keeps the other below its fix, and the note names both and the refusal. */
+    public function testOnAComposerWithoutInlineConstraintsOnAnyPackageARefusalAndAMemberBelowItsFixAreNamedTogether(): void
+    {
+        $refusal = self::refusalNaming(self::LARAVEL) + ['problem' => self::CONFLICT];
+        $findings = self::reportOf('commonmark', [])->sorted();
+        $checker = new RecordedMoveChecker([
+            'combined '.self::COMMONMARK.' '.self::LARAVEL => $refusal,
+            'combined '.self::COMMONMARK => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => [], 'installs' => []],
+        ], []);
+
+        $updateNow = UpdateNow::of($findings, new MoveChecks($checker, false));
+
+        self::assertNull($updateNow->command());
+        $note = $updateNow->note();
+        self::assertNotNull($note);
+        self::assertSame(['left_out' => [self::COMMONMARK, self::LARAVEL], 'problem' => self::CONFLICT], $note->data());
+        self::assertStringContainsString("Composer's solver refuses ".self::LARAVEL.' together with the others', $note->text());
     }
 
     /** Composer 2.2 and 2.3: a plain candidate whose own check installs a release below its fix is no member. */
