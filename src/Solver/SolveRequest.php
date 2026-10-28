@@ -57,7 +57,7 @@ final class SolveRequest
         return new self([self::BASELINE_NAME => self::BASELINE_NAME], [], [], self::LISTED);
     }
 
-    /** @param array<string, string> $inline name => constraint, each name on the allow list */
+    /** @param array<string, string> $inline name => constraint, empty for a name with no inline constraint, each name on the allow list */
     public static function update(array $inline): self
     {
         $allow = [];
@@ -65,7 +65,7 @@ final class SolveRequest
             $allow[$name] = $name;
         }
 
-        return new self($allow, $inline, [], self::LISTED);
+        return new self($allow, array_filter($inline, static fn (string $constraint): bool => $constraint !== ''), [], self::LISTED);
     }
 
     /** `composer update <package>` with no inline constraint: Composer 2.2 and 2.3 take none on a package that composer.json does not require. */

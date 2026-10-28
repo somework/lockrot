@@ -48,7 +48,8 @@ final class UpdateNow
             $move = $finding->nextStep();
             $check = $move === null ? null : $move->check();
             if ($finding->securityStanding()->isVulnerable() && $move !== null && $move->kind() === Move::UPDATE && $move->movesWith() === [] && $check !== null && $check->isResolved() && $check->form() === MoveCheck::INLINE) {
-                $inline[$finding->package()] = '^'.ltrim((string) $move->version(), 'vV');
+                // Composer 2.2 and 2.3 list a package that composer.json does not require plain, and the check solves the line as printed.
+                $inline[$finding->package()] = $checks->writesInline($finding->isDirect() || $finding->namedIn() !== []) ? '^'.ltrim((string) $move->version(), 'vV') : '';
             }
         }
         $members = array_keys($inline);
@@ -57,7 +58,7 @@ final class UpdateNow
         }
         $outcome = $checks->checker()->combined($inline);
         if ($outcome->check()->isResolved()) {
-            return self::resolved($inline, $checks, $findings, null);
+            return self::resolved($inline, $findings, null);
         }
         if (!$outcome->check()->isRefused()) {
             return new self([], null, RunNote::updateNowNotChecked((string) $outcome->check()->reason(), $members));
@@ -70,7 +71,7 @@ final class UpdateNow
         $kept = array_diff_key($inline, array_flip(array_filter($named, 'is_string')));
         $retry = $kept === [] || $kept === $inline ? null : $checks->checker()->combined($kept);
         if ($retry !== null && $retry->check()->isResolved()) {
-            return self::resolved($kept, $checks, $findings, RunNote::updateNowReduced(array_keys(array_diff_key($inline, $kept)), (string) $outcome->problem()));
+            return self::resolved($kept, $findings, RunNote::updateNowReduced(array_keys(array_diff_key($inline, $kept)), (string) $outcome->problem()));
         }
         if ($retry !== null && !$retry->check()->isRefused()) {
             return new self([], null, RunNote::updateNowNotChecked((string) $retry->check()->reason(), $members));
@@ -85,9 +86,9 @@ final class UpdateNow
      * @param array<string, string> $inline
      * @param list<Finding>         $findings
      */
-    private static function resolved(array $inline, MoveChecks $checks, array $findings, ?RunNote $note): self
+    private static function resolved(array $inline, array $findings, ?RunNote $note): self
     {
-        $argv = self::argv($inline, $checks, $findings);
+        $argv = self::argv($inline, $findings);
 
         return new self($argv === null ? [] : array_keys($inline), $argv, $note, $argv === null ? null : self::raiseOf($inline, $findings));
     }
@@ -156,13 +157,13 @@ final class UpdateNow
      *
      * @return list<string>|null
      */
-    private static function argv(array $inline, MoveChecks $checks, array $findings): ?array
+    private static function argv(array $inline, array $findings): ?array
     {
         $argv = ['composer', 'update'];
         foreach ($findings as $finding) {
             $package = $finding->package();
             if (isset($inline[$package])) {
-                $argv[] = $checks->writesInline($finding->isDirect() || $finding->namedIn() !== []) ? $package.':'.$inline[$package] : $package;
+                $argv[] = $inline[$package] === '' ? $package : $package.':'.$inline[$package];
             }
         }
 

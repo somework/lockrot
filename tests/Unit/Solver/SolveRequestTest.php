@@ -18,6 +18,15 @@ final class SolveRequestTest extends TestCase
     }
 
     /** `run.php_window.target_fix`: no inline constraint, and each hold keeps its target. */
+    /** The `update now:` line under Composer 2.2 or 2.3 lists a package that composer.json does not require plain. */
+    public function testAnUpdateTakesNoInlineConstraintForANameThatItListsPlain(): void
+    {
+        $request = SolveRequest::update(['acme/plain' => '', 'acme/capped' => '^1.2']);
+
+        self::assertSame(['acme/plain' => 'acme/plain', 'acme/capped' => 'acme/capped'], $request->allow());
+        self::assertSame(['acme/capped' => '^1.2'], $request->inline());
+    }
+
     public function testAnUnlockAllowsEachNameWithNoConstraintAndMovesNoName(): void
     {
         $request = SolveRequest::unlock(['acme/a', 'acme/b']);

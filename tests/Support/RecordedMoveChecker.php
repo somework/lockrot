@@ -26,6 +26,8 @@ final class RecordedMoveChecker implements MoveChecker
     private bool $strict;
     /** @var list<string>|null the names that the run's advisory lookup asked, null before the run passes them */
     private ?array $covered = null;
+    /** @var list<array<string, string>> */
+    private array $combinedAsked = [];
 
     /**
      * @param array<string, array<mixed, mixed>> $checks key => `{result, form, reason, installs, holds, problem}`, with
@@ -120,12 +122,19 @@ final class RecordedMoveChecker implements MoveChecker
 
     public function combined(array $inline): CheckOutcome
     {
+        $this->combinedAsked[] = $inline;
         if ($this->baselineRefused()) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::BASELINE_REFUSED));
         }
         $check = $this->recorded('combined '.implode(' ', array_keys($inline)), 'combined');
 
         return $check === null ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : $this->unread($check) ?? self::outcome($check);
+    }
+
+    /** @return list<array<string, string>> the argument of each combined update asked, in order */
+    public function combinedAsked(): array
+    {
+        return $this->combinedAsked;
     }
 
     /**

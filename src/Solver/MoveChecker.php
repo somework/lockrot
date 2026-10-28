@@ -30,7 +30,7 @@ interface MoveChecker
      */
     public function joint(MoveQuery $query, array $holders): CheckOutcome;
 
-    /** @param array<string, string> $inline name => constraint: one `composer update` of every name */
+    /** @param array<string, string> $inline name => constraint, empty for a name listed plain: one `composer update` of every name */
     public function combined(array $inline): CheckOutcome;
 
     /**

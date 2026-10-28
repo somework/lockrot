@@ -172,6 +172,17 @@ final class UpdateNowTest extends TestCase
         self::assertSame(['composer', 'update', self::COMMONMARK, self::LARAVEL.':^12.69.0'], $updateNow->command());
     }
 
+    /** Composer 2.2 and 2.3: the check solves the line as it prints, so the package that the line lists plain has no constraint. */
+    public function testOnAComposerWithoutInlineConstraintsOnAnyPackageTheCheckSolvesTheLineAsPrinted(): void
+    {
+        $findings = self::reportOf('commonmark', [])->sorted();
+        $checker = new RecordedMoveChecker([], []);
+
+        UpdateNow::of($findings, new MoveChecks($checker, false));
+
+        self::assertSame([[self::COMMONMARK => '', self::LARAVEL => '^12.69.0']], $checker->combinedAsked());
+    }
+
     /** A package that only require-dev lists is a root requirement, also in a run without `--dev`: its constraint stays inline (ruling R13). */
     public function testOnAComposerWithoutInlineConstraintsOnAnyPackageARequireDevPackageKeepsItsConstraint(): void
     {
