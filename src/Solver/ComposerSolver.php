@@ -175,7 +175,8 @@ final class ComposerSolver
 
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
         // A virtual name, which a package provides, is unreached too: only a refusal that wants an unreached name proves nothing.
-        $held = array_map(static fn (BasePackage $package): string => $package->getName(), $answer->getNewLockPackages(false));
+        // Composer blocks a release by each name that it replaces too.
+        $held = array_merge([], ...array_map(static fn (BasePackage $package): array => $package->getNames(false), $answer->getNewLockPackages(false)));
 
         return Solution::resolved(self::installs($answer), self::updatedFrom($answer), array_diff($this->failures($loaded->asked()), [VersionSource::UNREACHED]), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)));
     }
@@ -394,7 +395,11 @@ final class ComposerSolver
      */
     private static function problemText(string $text, bool $setsPhp): string
     {
-        $text = (new OutputFormatter(false))->format($text) ?? $text;
+        try {
+            $text = (new OutputFormatter(false))->format($text) ?? $text;
+        } catch (\InvalidArgumentException $markup) {
+            // Composer puts a repository's advisory id into the text unescaped, and a style that the id names can be unknown.
+        }
         if ($setsPhp) {
             $text = preg_replace('/(php(?:-[a-z0-9]+)? version \([^;)]*); overridden via config\.platform(?=[,)])/', '$1', $text) ?? $text;
         }

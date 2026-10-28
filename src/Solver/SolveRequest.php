@@ -133,7 +133,7 @@ final class SolveRequest
         return $clone;
     }
 
-    /** @return array<string, string> name => name: Composer before 2.6 reads the allow list's keys, later versions its values */
+    /** @return array<string, string> name => name: Composer reads the values, and `isset()` and the union read the keys */
     public function allow(): array
     {
         return $this->allow + $this->joined;

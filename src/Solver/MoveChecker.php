@@ -63,7 +63,7 @@ interface MoveChecker
      */
     public function solverError(): ?array;
 
-    /** Whether the solve removes the versions that an advisory affects, as Composer 2.9 and later do. */
+    /** Whether the solve removes the versions that an advisory affects, as Composer's update does with advisory blocking on. */
     public function blocksAdvisories(): bool;
 
     /** @return list<string> the environment variables that turned Composer's blocking off (`run.move_check.blocking_disabled_by`) */

@@ -506,6 +506,19 @@ final class ComposerSolverTest extends TestCase
         }
     }
 
+    /** Composer puts an advisory id into the problem text unescaped, so the id can hold markup that no colour reads. */
+    public function testAnAdvisoryIdWithConsoleMarkupLeavesTheProblemTextReadable(): void
+    {
+        $record = PartialSecurityAdvisory::create('acme/lib', ['advisoryId' => 'GHSA-<fg=nocolor>x', 'affectedVersions' => '>=1.1,<1.2'], new VersionParser());
+        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]])
+            ->withAdvisories(new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): array => ['acme/lib' => [$record]]));
+
+        $problem = (string) $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^1.1'], false))->problem();
+
+        self::assertStringContainsString('affected by security advisories', $problem);
+        self::assertStringContainsString('GHSA-<fg=nocolor>x', $problem);
+    }
+
     /**
      * Ruling R2-47, per solve: the names whose advisories the lookup could not read travel with the
      * Solution of the solve that asked them, and only the names that its result holds.
@@ -526,6 +539,21 @@ final class ComposerSolverTest extends TestCase
         self::assertSame([true, []], [$read->resolves(), $read->advisoryUnread()]);
     }
 
+    /** Composer blocks a release by each name that it replaces too (`SecurityAdvisoryPoolFilter::getMatchingAdvisories()`). */
+    public function testASolveCarriesTheUnreadNameThatAHeldReleaseReplaces(): void
+    {
+        $lookup = static fn (array $names, bool $complete): ?array => \in_array('acme/q', $names, true) ? null : [];
+        $solver = self::solver(
+            ['require' => ['acme/p' => '^1.0', 'acme/q' => '^1.0']],
+            [['name' => 'acme/p', 'version' => '1.0.0'], ['name' => 'acme/q', 'version' => '1.0.0']],
+            ['acme/p' => [['version' => '1.0.0'], ['version' => '1.1.0', 'replace' => ['acme/q' => 'self.version']]], 'acme/q' => [['version' => '1.0.0']]]
+        )->withAdvisories(new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), $lookup));
+
+        $solution = $solver->solve(SolveRequest::update(['acme/p' => '^1.1', 'acme/q' => '']));
+
+        self::assertSame([true, ['acme/p' => '1.1.0'], ['acme/p', 'acme/q']], [$solution->resolves(), $solution->installs(), $solution->advisoryUnread()]);
+    }
+
     public function testAFilterThatCannotBeBuiltFailsEverySolveThatBlocks(): void
     {
         $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]);
@@ -537,14 +565,14 @@ final class ComposerSolverTest extends TestCase
 
     /**
      * Ruling R6-2: the machine that runs lockrot decides no move. The solve ignores each
-     * requirement in ComposerSolver::IGNORED_PLATFORM, which no runner provides here.
+     * requirement in ComposerSolver::IGNORED_PLATFORM, here at a version that no runner provides.
      *
      * @dataProvider hostRequirements
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('hostRequirements')]
     public function testAReleaseThatRequiresAnIgnoredPlatformPackageResolves(string $name): void
     {
-        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => [$name => '*']]]]);
+        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => [$name => '<1.0']]]]);
 
         self::assertSame(['acme/lib' => '1.1.0'], $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->installs());
     }

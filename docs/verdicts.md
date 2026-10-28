@@ -686,7 +686,8 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
       version. With no `target`, it is the move's own constraint, and no release that Composer can
       install meets it.
     - `platform`: a requirement on a platform package that the solve checks: `php`, `php-64bit`,
-      `composer-plugin-api`, or a name that `config.platform` sets.
+      `composer-plugin-api`, `composer-runtime-api`, `composer`, or a name that `config.platform`
+      sets.
     - `require` or `conflict` of the target release, or a `conflict` that composer.json declares.
     - `replace`: a package that replaces `target`, or the moved package when `target` is null.
       Composer installs only one of the two.
@@ -753,9 +754,9 @@ Limits of the check:
   `--ignore-platform-req` does, so the machine that runs lockrot decides no move. It checks a name
   that `config.platform` sets, because that name is the project's own fact. `run.move_check` lists
   the patterns once per run (`ignored_platform`), and the `moves:` footer line names them.
-- It checks `php`, `php-64bit` and `composer-plugin-api`. `php-64bit` takes the version of the
-  solve's php on a 64-bit PHP. `composer-plugin-api` is the plugin API of the Composer that runs
-  lockrot.
+- It checks `php`, `php-64bit`, `composer-plugin-api`, `composer-runtime-api` and `composer`.
+  `php-64bit` takes the version of the solve's php on a 64-bit PHP. The other three take the
+  versions of the Composer that runs lockrot.
 - It solves at `config.platform.php` when that version is in the target PHP's minor, else at the
   newest patch of the target minor (`8.4.99`). Composer reads `8.4` as `8.4.0`. It keeps every
   other `config.platform` override.

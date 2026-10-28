@@ -11,11 +11,13 @@ use Composer\Package\Loader\RootPackageLoader;
 use Composer\Repository\RepositoryFactory;
 use Composer\Semver\Semver;
 use Composer\Semver\VersionParser;
+use Composer\Util\Platform;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\Holder;
+use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\CheckOutcome;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveChecker;
@@ -50,8 +52,27 @@ final class MoveCheckComposerOracleTest extends TestCase
 
     private ?string $project = null;
 
+    /** @var array<string, string|false> each environment switch of the advisory blocking => its value before the test */
+    private array $switches = [];
+
+    protected function setUp(): void
+    {
+        // The CLI ran each world without these variables: a value in the shell would turn a world's blocking off.
+        foreach (AdvisoryBlocking::SWITCHES as $switch) {
+            if (strpos($switch, 'config.') !== 0) {
+                $this->switches[$switch] = getenv($switch);
+                Platform::clearEnv($switch);
+            }
+        }
+    }
+
     protected function tearDown(): void
     {
+        foreach ($this->switches as $switch => $value) {
+            if ($value !== false) {
+                Platform::putEnv($switch, $value);
+            }
+        }
         if ($this->project !== null) {
             array_map('unlink', glob($this->project.'/*') ?: []);
             rmdir($this->project);

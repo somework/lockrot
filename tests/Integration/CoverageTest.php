@@ -317,6 +317,8 @@ final class CoverageTest extends TestCase
                 self::NOT_REACHED.' (a branch row that fixes something beside an incomplete lookup). next_step.if_applied.assumes carries the value'],
             [self::D.'noteUpdateNowNotChecked/properties/reason', ['baseline_refused', 'unloaded_name', 'offline', 'not_from_composer_repository', 'no_composer_json', 'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete'],
                 "the note's reason is a value of check.reason, which the move-check documents carry each. A document carries install_time_budget"],
+            [self::D.'targetFix/properties/reason/oneOf/0', ['advisory_lookup_incomplete'],
+                'R6-1: a target fix whose resolving solve holds a name that the advisory lookup did not read. The model documents predate the reason'],
             [self::D.'noteAdvisoriesDisabledByPolicy/properties/policy_key', ['COMPOSER_POLICY'],
                 'the variable that switches the policy off. The documents run under policy and policy.advisories'],
             [self::D.'noteAbandonedNotAuditedByComposer/properties/policy_key', ['COMPOSER_POLICY'],
