@@ -54,22 +54,21 @@
     "model_goldens": {
         "compared": {
             "age_line": 169,
-            "baseline_suffix": 170,
+            "baseline_suffix": 171,
             "commands_cmd": 153,
             "commands_posix": 153,
-            "gate_line": 171,
+            "gate_line": 172,
             "next_step_text": 129,
-            "run_gate_line": 172,
+            "run_gate_line": 173,
             "score_text": 172
         },
         "inputs_differ": {
             "age_line": 4,
-            "baseline_suffix": 3,
+            "baseline_suffix": 2,
             "commands_cmd": 20,
             "commands_posix": 20,
-            "gate_line": 2,
+            "gate_line": 1,
             "next_step_text": 44,
-            "run_gate_line": 1,
             "score_text": 1
         }
     },

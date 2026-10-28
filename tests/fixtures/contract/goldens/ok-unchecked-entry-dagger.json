@@ -1,7 +1,7 @@
 {
     "score_text": "0",
     "next_step_text": null,
-    "gate_line": null,
+    "gate_line": "gate 0 = min(0, 2 × 0) (the new facts bound it); new: 0",
     "run_gate_line": "gate: fails · --fail-on=high,unchecked · 1 finding fails it (unchecked 1) · target php 8.4 (--target-php)",
     "age_line": "age: installed v8.6.1, release date not known (dated only by a commit its tags share); last push 2026-07-10 (0.2 years ago)",
     "explain_age": [
@@ -11,7 +11,7 @@
         "last push            2026-07-10   0.2 years ago                 below push-warn-years 3",
         "libyears not measured: dated only by a commit its tags share"
     ],
-    "baseline_suffix": null,
+    "baseline_suffix": "(baseline: known)",
     "commands_posix": [],
     "commands_cmd": []
 }

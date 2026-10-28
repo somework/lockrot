@@ -110,7 +110,7 @@ final class FindingBlock
      */
     public static function baselineSuffix(Finding $finding, ?Standing $standing): ?string
     {
-        if ($standing === null || !$finding->isGraded()) {
+        if ($standing === null) {
             return null;
         }
         if (!$standing->hasEntry()) {

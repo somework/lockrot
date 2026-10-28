@@ -80,7 +80,7 @@
                         "direct": false,
                         "dev": false,
                         "data_date": "2026-10-01T17:41:20+00:00",
-                        "baseline_status": null,
+                        "baseline_status": "known",
                         "error_by": [],
                         "chain": [
                             "pimcore/pimcore",
@@ -148,7 +148,7 @@
                         "direct": false,
                         "dev": false,
                         "data_date": "2026-10-01T17:41:20+00:00",
-                        "baseline_status": null,
+                        "baseline_status": "known",
                         "error_by": [
                             "unchecked"
                         ]
@@ -186,10 +186,10 @@
                                 "baseline": 0
                             },
                             "standing": {
-                                "known": 0,
+                                "known": 1,
                                 "new": 0,
                                 "worsened": 0,
-                                "none": 1
+                                "none": 0
                             },
                             "failing_packages": [
                                 "scheb/2fa-google-authenticator"
