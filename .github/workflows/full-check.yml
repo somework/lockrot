@@ -1,8 +1,9 @@
 name: full-check
 # A full check pushes a pull request's head unchanged to release/full-check-<sha>. This workflow runs
-# there the whole-tree mutation gate that ci.yml runs on a push to main or release/**, and ci.yml's
-# move-check-oracle job. The pull request's own run has checked every other job on that commit.
-# ci.yml ignores these branches. The two workflows share .github/actions/mutation-coverage,
+# there the whole-tree mutation gate that ci.yml runs on a push, and ci.yml's move-check-oracle job.
+# The pull request's own run has checked every other job on that commit. ci.yml ignores these
+# branches. A push of an rc tag runs this workflow too: the renderer pins the rc-tagged commit, so
+# the whole-tree gate runs on exactly that commit, whatever branch holds it. The two workflows share .github/actions/mutation-coverage,
 # .github/actions/mutation-shard and .github/actions/move-check-oracle, and
 # tools/mutation/tests/test_full_check_matrix.py keeps the shard
 # matrix equal to the one in ci.yml. A branch named release/full-check-<sha>--solver,verdicts runs only
@@ -11,6 +12,7 @@ name: full-check
 on:
   push:
     branches: ['release/full-check-**']
+    tags: ['v*-rc.*']
 # No job of this workflow writes to the repository: the token reads only.
 permissions:
   contents: read
@@ -44,7 +46,9 @@ jobs:
       fail-fast: false
       matrix:
         shard:
-          - {name: verdicts, filter: 'src/Verdict', min_msi: 98}
+          - {name: moves, filter: 'src/Verdict/Move.php src/Verdict/MoveBuilder.php src/Verdict/MoveContext.php src/Verdict/MoveText.php src/Verdict/MaintenanceMove.php', min_msi: 98}
+          - {name: findings, filter: 'src/Verdict/Finding.php src/Verdict/FindingDetails.php src/Verdict/GradedPackage.php src/Verdict/NextStep.php src/Verdict/Score.php src/Verdict/SecurityPartial.php src/Verdict/SecurityStanding.php', min_msi: 98}
+          - {name: verdicts, filter: 'src/Verdict/Age.php src/Verdict/CommandArgument.php src/Verdict/FailOn.php src/Verdict/FailOnValue.php src/Verdict/FlagSentence.php src/Verdict/FlagSet.php src/Verdict/Latest.php src/Verdict/MoveChecks.php src/Verdict/MoveDraft.php src/Verdict/MoveFact.php src/Verdict/MoveSubject.php src/Verdict/Moves.php src/Verdict/Replacement.php src/Verdict/ScoreModel.php src/Verdict/ShellCommand.php src/Verdict/ThroughCheck.php src/Verdict/ThroughEntry.php src/Verdict/Verdict.php', min_msi: 98}
           - {name: score, filter: 'src/Score', min_msi: 98}
           - {name: output and security, filter: 'src/Output src/Html src/Explain src/Security', min_msi: 98}
           - {name: signals and analyzer, filter: 'src/Signal src/Analyzer', min_msi: 98}
@@ -64,7 +68,7 @@ jobs:
         with: {filter: '${{ matrix.shard.filter }}', min-msi: '${{ matrix.shard.min_msi }}', full: 'true'}
       - if: always() && contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)
         uses: actions/upload-artifact@v7
-        with: {name: 'infection (${{ matrix.shard.name }})', path: 'build/infection*.log', if-no-files-found: ignore}
+        with: {name: 'infection (${{ matrix.shard.name }})', path: 'build/infection*.*', if-no-files-found: ignore}
   # ci.yml's move-check-oracle job gives its reason.
   move-check-oracle:
     runs-on: ubuntu-latest

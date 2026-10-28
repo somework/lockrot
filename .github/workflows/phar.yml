@@ -1,8 +1,9 @@
 name: PHAR
-# A vX.Y.Z-rc.N tag only keeps a release-branch commit reachable for the renderer's pin (CONTRIBUTING,
-# "Cutting a release"). It is no release, so it builds nothing, on a push or a dispatch.
+# Only a final tag vX.Y.Z is a release, the predicate of tools/report/check-vendored. A
+# vX.Y.Z-rc.N tag only keeps a release-branch commit reachable for the renderer's pin (CONTRIBUTING,
+# "Cutting a release"), and full-check.yml runs on it. Another pre-release tag builds nothing either.
 on:
-  push: {tags: ['v*', '!v*-rc.*']}
+  push: {tags: ['v[0-9]+.[0-9]+.[0-9]+']}
   workflow_dispatch:
 # A signed build carries two signatures and a GitHub attestation. The GPG signature (lockrot.phar.asc)
 # is for people and PHIVE, and the build checks it against lockrot-release-key.asc. The RSA signature

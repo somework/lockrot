@@ -5,8 +5,12 @@ runs:
   steps:
     - uses: shivammathur/setup-php@v2
       with: {php-version: '8.4', coverage: pcov, extensions: pcntl}
-    - run: composer install --no-interaction
+    # The shards read this coverage, so it comes from the composer/composer that they install.
+    - name: Install the dependencies with the composer/composer of build/phar/composer.lock
       shell: bash
+      run: |
+        composer require --dev --no-update "composer/composer:$(jq -r '.packages[] | select(.name == "composer/composer") | .version' build/phar/composer.lock)"
+        composer update --no-interaction --prefer-dist
     # Keep the --exclude-group list equal to testFrameworkOptions in infection.json5: each shard reads
     # this coverage as its own run's.
     - run: vendor/bin/phpunit --exclude-group=e2e --exclude-group=network --exclude-group=sweep --exclude-group=covers-nothing --coverage-xml=build/coverage/coverage-xml --log-junit=build/coverage/junit.xml
