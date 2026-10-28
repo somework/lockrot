@@ -689,6 +689,17 @@
                 "composer",
                 "update",
                 "symfony/routing:^6.4.41",
+                "--with-all-dependencies"
+            ],
+            "posix": "composer update 'symfony/routing:^6.4.41' --with-all-dependencies",
+            "cmd": "composer update \"symfony/routing:^6.4.41\" --with-all-dependencies",
+            "powershell": "composer --% update \"symfony/routing:^6.4.41\" --with-all-dependencies"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "symfony/routing:^6.4.41",
                 "--with-dependencies"
             ],
             "posix": "composer update 'symfony/routing:^6.4.41' --with-dependencies",

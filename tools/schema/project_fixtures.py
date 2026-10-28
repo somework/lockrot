@@ -635,7 +635,8 @@ def recorded_checks(f, rows):
 
 def unhydrated(case):
     """Why the hydrator cannot rebuild the case, or None: an advisory lookup scope other than `all`, an accept-unchecked
-    entry of the project, or registry dates on a package that no registry serves."""
+    entry of the project, registry dates on a package that no registry serves, or a solver world whose designed branch
+    rows lack the branch of its newest stable release."""
     if (case['run'].get('advisory_lookup') or {}).get('scope', 'all') != 'all':
         return 'advisory-lookup'
     if any(c['reason'] == 'accepted_by_config' for c in case['finding'].get('checks_skipped') or []):
@@ -643,7 +644,22 @@ def unhydrated(case):
     if case['finding']['metadata']['status'] == 'not_from_composer_repository' and ((case['finding'].get('age') or {}).get('installed') or {}).get('dated_by'):
         # A variant that keeps a registry's dates on a package that no registry serves: no lock gives both.
         return 'registry-dates'
+    newest = (((case['finding'].get('age') or {}).get('release')) or {}).get('version') or ''
+    rows = [r['branch'] for r in rows_of(case.get('details'))]
+    if case.get('solver_world') is not None and rows and newest and '-' not in newest and not on_branch(newest, rows):
+        # lockrot opens a row for each branch of the releases, and the model designs the rows of a solver world.
+        return 'designed-rows'
     return None
+
+
+def on_branch(version, branches):
+    """Whether a row of $branches holds $version: `2.x` holds each 2.* release, and a row without `.x` only its own release."""
+    parts = version.lstrip('vV').split('.')
+    for branch in branches:
+        prefix = (branch[:-2] if branch.endswith('.x') else branch).lstrip('vV')
+        if '.'.join(parts[:len(prefix.split('.'))]) == prefix:
+            return True
+    return False
 
 
 def dump(path, doc):

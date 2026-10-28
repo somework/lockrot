@@ -61,7 +61,7 @@ final class CoverageTest extends TestCase
                 $this->record($name, $schema, $schema, '#', json_decode((string) file_get_contents(substr($path, -3) === '.gz' ? 'compress.zlib://'.$path : $path)));
             }
         }
-        self::assertSame([Schemas::REPORT => 363, Schemas::EXPLAIN => 279, Schemas::BASELINE => 141, Schemas::CONFIG => 79], $counts, 'tests/fixtures/schema/documents/provenance.json');
+        self::assertSame([Schemas::REPORT => 373, Schemas::EXPLAIN => 289, Schemas::BASELINE => 141, Schemas::CONFIG => 79], $counts, 'tests/fixtures/schema/documents/provenance.json');
 
         $shared = [];
         foreach ((array) $schemas[Schemas::EXPLAIN]->definitions as $definition => $node) {

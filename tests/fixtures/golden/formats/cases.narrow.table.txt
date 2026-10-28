@@ -815,7 +815,7 @@ php: the lock installs on no PHP, so your target, 8.4, is excluded; the update o
 baseline: 3 known · 49 new · 4 worsened ·
 0 stale (lockrot-baseline.json)
 gate: fails · --fail-on=high,unchecked ·
-32 findings fail it (high 31, unchecked 3); 2 reach it and are known to the baseline ·
+33 findings fail it (high 31, unchecked 4); 1 reaches it and is known to the baseline ·
 target php 8.4 (--target-php)
 Data as of 2026-10-01 (package repositories, repository
 hosts) · score model 1. Run composer lockrot --format=json

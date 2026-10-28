@@ -6404,7 +6404,7 @@
                                     "kind": "upgrade",
                                     "to_branch": "9.x",
                                     "version": "9.3.16",
-                                    "newest": "9.3.22",
+                                    "newest": "9.5.11",
                                     "on_installed_branch": true,
                                     "php": ">=7.3.0",
                                     "admits_target_php": true,
