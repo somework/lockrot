@@ -22821,10 +22821,11 @@
       }
     },
     "noteUpdateNowReduced": {
-      "description": "`update_now_reduced`: Composer refuses the members of `security.update_now` together, so the command leaves out the members that the refusal names.",
+      "description": "`update_now_reduced`: the command leaves out the members that Composer's refusal of the combined update names, and, under Composer 2.2 or 2.3, each plain member that the resolving solve installs below its move version.",
       "type": "object",
       "required": [
         "left_out",
+        "held_below",
         "problem"
       ],
       "properties": {
@@ -22837,9 +22838,34 @@
           "minItems": 1,
           "uniqueItems": true
         },
+        "held_below": {
+          "description": "The plain members that the combined solve installs below their move version, in report order, each also in `left_out`. Empty when only a refusal leaves members out.",
+          "type": "array",
+          "items": {
+            "description": "A member left out below its fix.",
+            "type": "object",
+            "required": [
+              "package",
+              "installs"
+            ],
+            "properties": {
+              "package": {
+                "$ref": "#/definitions/packageName"
+              },
+              "installs": {
+                "description": "The release that the combined solve installs for it, as the lock would write it.",
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
         "problem": {
-          "description": "Composer's problem text as a `--dry-run` prints it, without colour. Foreign text, not contract.",
-          "type": "string",
+          "description": "Composer's problem text of the refused combined update, without colour. Foreign text, not contract. Null when no refusal leaves a member out.",
+          "type": [
+            "string",
+            "null"
+          ],
           "minLength": 1
         }
       }
@@ -24245,7 +24271,7 @@
           }
         },
         "update_now_command": {
-          "description": "The one command the overview's \"Update now\" copies, as an argv list: `composer`, `update`, then each member with its constraint inline (`vendor/pkg:^1.2`) in the order of `update_now`. Composer's solver checked it as one request: a member that the combined request refuses is left out (the `update_now_reduced` note). Null when `update_now` is empty, and when Composer refuses the members together (the `update_now_refused` note); then the line is hidden (a page never builds a command, and a bare `composer update` updates the whole lock).",
+          "description": "The one command the overview's \"Update now\" copies, as an argv list: `composer`, `update`, then each member with its constraint inline (`vendor/pkg:^1.2`) in the order of `update_now`. Under Composer 2.2 or 2.3, a member whose move is the plain `update` is written plain (`vendor/pkg`), and the solve reads it so. Composer's solver checked it as one request: a member that the combined request refuses is left out (the `update_now_reduced` note). Null when `update_now` is empty, and when Composer refuses the members together (the `update_now_refused` note); then the line is hidden (a page never builds a command, and a bare `composer update` updates the whole lock).",
           "oneOf": [
             {
               "description": "The argv: `composer`, `update`, then one argument per member.",

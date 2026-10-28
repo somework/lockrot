@@ -208,8 +208,10 @@ final class UpdateNowTest extends TestCase
         self::assertSame([self::LARAVEL], $updateNow->members());
         $note = $updateNow->note();
         self::assertNotNull($note);
-        self::assertSame([RunNote::UPDATE_NOW_REDUCED, [self::COMMONMARK]], [$note->code(), $note->data()['left_out'] ?? null]);
-        self::assertStringContainsString(self::COMMONMARK.' gets '.$installed.', below 2.10.3', $note->text());
+        self::assertSame(
+            [RunNote::UPDATE_NOW_REDUCED, ['left_out' => [self::COMMONMARK], 'held_below' => [['package' => self::COMMONMARK, 'installs' => $installed]], 'problem' => null]],
+            [$note->code(), $note->data()]
+        );
     }
 
     /** Composer 2.2 and 2.3: when the solve keeps every member below its fix, the report writes no command, and the note names each one. */
@@ -225,6 +227,7 @@ final class UpdateNowTest extends TestCase
         $note = $updateNow->note();
         self::assertNotNull($note);
         self::assertSame([RunNote::UPDATE_NOW_REDUCED, [self::COMMONMARK]], [$note->code(), $note->data()['left_out'] ?? null]);
+        self::assertSame([self::COMMONMARK], self::heldBelow($note));
         self::assertSame([[self::COMMONMARK => '']], $checker->combinedAsked());
     }
 
@@ -241,6 +244,7 @@ final class UpdateNowTest extends TestCase
         $note = $updateNow->note();
         self::assertNotNull($note);
         self::assertSame([self::JWT, self::SODIUM], $note->data()['left_out'] ?? null);
+        self::assertSame([self::JWT, self::SODIUM], self::heldBelow($note));
     }
 
     /** Composer 2.2 and 2.3: a member that the second solve keeps below its fix joins the one that the first solve left out. */
@@ -264,6 +268,7 @@ final class UpdateNowTest extends TestCase
         $note = $updateNow->note();
         self::assertNotNull($note);
         self::assertSame([self::JWT, self::SODIUM], $note->data()['left_out'] ?? null);
+        self::assertSame([self::JWT, self::SODIUM], self::heldBelow($note));
     }
 
     /** A release that the solve spells without the `v` of the move's version still reads as below the fix. */
@@ -298,8 +303,9 @@ final class UpdateNowTest extends TestCase
         self::assertNull($updateNow->command());
         $note = $updateNow->note();
         self::assertNotNull($note);
-        self::assertSame(['left_out' => [self::COMMONMARK, self::LARAVEL], 'problem' => self::CONFLICT], $note->data());
-        self::assertStringContainsString("Composer's solver refuses ".self::LARAVEL.' together with the others', $note->text());
+        self::assertSame([self::COMMONMARK, self::LARAVEL], $note->data()['left_out'] ?? null);
+        self::assertSame([self::COMMONMARK], self::heldBelow($note));
+        self::assertSame(self::CONFLICT, $note->data()['problem'] ?? null);
     }
 
     /** Composer 2.2 and 2.3: a plain candidate whose own check installs a release below its fix is no member. */
@@ -394,5 +400,14 @@ final class UpdateNowTest extends TestCase
             }
         }
         self::fail('the report has no note '.$code);
+    }
+
+    /** @return list<mixed> the package of each `held_below` entry */
+    private static function heldBelow(RunNote $note): array
+    {
+        $heldBelow = $note->data()['held_below'] ?? null;
+        self::assertIsArray($heldBelow);
+
+        return array_map(static fn ($member) => \is_array($member) ? $member['package'] ?? null : null, array_values($heldBelow));
     }
 }

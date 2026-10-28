@@ -103,7 +103,7 @@ final class UpdateNow
             $below += $short;
             $asked = array_diff_key($asked, $short);
             if ($asked === []) {
-                return new self([], null, self::belowNote($below, $findings, $refused));
+                return new self([], null, self::reducedNote($below, $findings, $refused));
             }
             $outcome = $checks->checker()->combined($asked);
             if ($outcome->check()->isRefused()) {
@@ -113,11 +113,7 @@ final class UpdateNow
                 return new self([], null, RunNote::updateNowNotChecked((string) $outcome->check()->reason(), array_keys($inline)));
             }
         }
-        if ($below === []) {
-            return self::resolved($asked, $findings, $refused === null ? null : RunNote::updateNowReduced($refused[0], $refused[1]));
-        }
-
-        return self::resolved($asked, $findings, self::belowNote($below, $findings, $refused));
+        return self::resolved($asked, $findings, $below === [] && $refused === null ? null : self::reducedNote($below, $findings, $refused));
     }
 
     /**
@@ -125,7 +121,7 @@ final class UpdateNow
      * @param array<string, string> $changes the release of each name that the solve changes
      * @param list<Finding>         $findings
      *
-     * @return array<string, array{string, string}> each plain member that the solve keeps below its move version => [the release that it gets, its move version]
+     * @return array<string, string> each plain member that the solve installs below its move version => the release that it gets
      */
     private static function belowTheFix(array $inline, array $changes, array $findings): array
     {
@@ -139,7 +135,7 @@ final class UpdateNow
             }
             $gets = $changes[$package] ?? $finding->version();
             if (MoveCheck::resolves(MoveCheck::INLINE, $gets)->installsBelow($fix) !== null) {
-                $below[$package] = [$gets, $fix];
+                $below[$package] = $gets;
             }
         }
 
@@ -147,13 +143,18 @@ final class UpdateNow
     }
 
     /**
-     * @param non-empty-array<string, array{string, string}> $below
-     * @param list<Finding>                                  $findings
-     * @param array{list<string>, string}|null               $refused
+     * @param array<string, string>            $below
+     * @param list<Finding>                    $findings
+     * @param array{list<string>, string}|null $refused
      */
-    private static function belowNote(array $below, array $findings, ?array $refused): RunNote
+    private static function reducedNote(array $below, array $findings, ?array $refused): RunNote
     {
-        return RunNote::updateNowBelowFix(self::inReportOrder(array_merge($refused[0] ?? [], array_keys($below)), $findings), $below, $refused[1] ?? null);
+        $heldBelow = [];
+        foreach (self::inReportOrder(array_keys($below), $findings) as $package) {
+            $heldBelow[] = ['package' => $package, 'installs' => $below[$package]];
+        }
+
+        return RunNote::updateNowReduced(self::inReportOrder(array_merge($refused[0] ?? [], array_keys($below)), $findings), $refused[1] ?? null, $heldBelow);
     }
 
     /**

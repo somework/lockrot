@@ -1546,10 +1546,16 @@ defs['noteMovesNotChecked'] = obj(("`moves_not_checked`: Composer's solver refus
     'php': d('The php version that the solve ran at: `config.platform.php` in the target minor, else the target minor at its newest patch (`8.4.99`).', {'type': 'string', 'minLength': 1}),
     'problem': PROBLEM,
 })
-defs['noteUpdateNowReduced'] = obj(("`update_now_reduced`: Composer refuses the members of `security.update_now` together, so the command leaves out the members "
-                                    "that the refusal names."), {
+defs['noteUpdateNowReduced'] = obj(("`update_now_reduced`: the command leaves out the members that Composer's refusal of the combined update names, and, "
+                                    "under Composer 2.2 or 2.3, each plain member that the resolving solve installs below its move version (§5.6)."), {
     'left_out': arr('The members that `update_now_command` leaves out, in report order.', ref('packageName'), minItems=1, uniqueItems=True),
-    'problem': PROBLEM,
+    'held_below': arr(("The plain members that the combined solve installs below their move version, in report order, each also in `left_out`. "
+                  "Empty when only a refusal leaves members out."), obj('A member left out below its fix.', {
+        'package': ref('packageName'),
+        'installs': d('The release that the combined solve installs for it, as the lock would write it.', {'type': 'string', 'minLength': 1}),
+    })),
+    'problem': nul("Composer's problem text of the refused combined update, without colour. Foreign text, not contract. Null when no refusal leaves a member out.",
+                   {'type': 'string', 'minLength': 1}),
 })
 defs['noteUpdateNowRefused'] = obj("`update_now_refused`: Composer refuses the members of `security.update_now` together, even without the members its refusal names.", {
     'problem': PROBLEM,
@@ -1703,7 +1709,8 @@ defs['rootSecurity'] = obj("The root security block (SPEC root block, §7.6, §8
     'update_now': arr(("The vulnerable packages whose lead move is an `update` that Composer's solver resolves inline, in report order; in a run that checks no move, "
                        "the packages whose `security.fix_kind` is `update` (§5.3). A name outside the command argument set of `next_step.commands` (§5.6) is left out."), ref('packageName')),
     'update_now_command': nul(("The one command the overview's \"Update now\" copies, as an argv list: `composer`, `update`, then each member with its constraint inline "
-                               "(`vendor/pkg:^1.2`) in the order of `update_now`. Composer's solver checked it as one request: a member that the combined request refuses is "
+                               "(`vendor/pkg:^1.2`) in the order of `update_now`. Under Composer 2.2 or 2.3, a member whose move is the plain `update` is written plain "
+                               "(`vendor/pkg`), and the solve reads it so. Composer's solver checked it as one request: a member that the combined request refuses is "
                                "left out (the `update_now_reduced` note). Null when `update_now` is empty, and when Composer refuses the members together (the "
                                "`update_now_refused` note); then the line is hidden (attack round 1: a page never builds a command, and a bare `composer update` updates the whole lock)."),
                               {'description': 'The argv: `composer`, `update`, then one argument per member.', 'type': 'array',

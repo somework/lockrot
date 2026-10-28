@@ -324,35 +324,35 @@ final class RunNoteTest extends TestCase
             'update_now_reduced',
             "update now: the command leaves out acme/b, because Composer's solver refuses it together with the others: acme/a 2.1.0 conflicts with acme/b <3.0.",
             false,
-            ['left_out' => ['acme/b'], 'problem' => self::CONFLICT],
+            ['left_out' => ['acme/b'], 'held_below' => [], 'problem' => self::CONFLICT],
         ];
         yield 'update now without two packages' => [
             static fn (): RunNote => RunNote::updateNowReduced(['acme/b', 'acme/c'], self::CONFLICT),
             'update_now_reduced',
             "update now: the command leaves out acme/b, acme/c, because Composer's solver refuses them together with the others: acme/a 2.1.0 conflicts with acme/b <3.0.",
             false,
-            ['left_out' => ['acme/b', 'acme/c'], 'problem' => self::CONFLICT],
+            ['left_out' => ['acme/b', 'acme/c'], 'held_below' => [], 'problem' => self::CONFLICT],
         ];
-        yield 'update now without a package that the line keeps below its fix' => [
-            static fn (): RunNote => RunNote::updateNowBelowFix(['acme/b'], ['acme/b' => ['1.0.0', '1.2.0']], null),
+        yield 'update now without a package that the solve installs below its fix' => [
+            static fn (): RunNote => RunNote::updateNowReduced(['acme/b'], null, [['package' => 'acme/b', 'installs' => '1.0.0']]),
             'update_now_reduced',
-            'update now: the command leaves out acme/b, because the solve of the line keeps it below its fix: acme/b gets 1.0.0, below 1.2.0',
+            "update now: the command leaves out acme/b, because together with the others, Composer's solver installs acme/b at 1.0.0, below its fix",
             false,
-            ['left_out' => ['acme/b'], 'problem' => 'acme/b gets 1.0.0, below 1.2.0'],
+            ['left_out' => ['acme/b'], 'held_below' => [['package' => 'acme/b', 'installs' => '1.0.0']], 'problem' => null],
         ];
         yield 'update now without a refused package and a package below its fix' => [
-            static fn (): RunNote => RunNote::updateNowBelowFix(['acme/b', 'acme/c'], ['acme/c' => ['1.0.0', '1.2.0']], self::CONFLICT),
+            static fn (): RunNote => RunNote::updateNowReduced(['acme/b', 'acme/c'], self::CONFLICT, [['package' => 'acme/c', 'installs' => '1.0.0']]),
             'update_now_reduced',
-            "update now: the command leaves out acme/b, acme/c, because the solve of the line keeps acme/c below its fix: acme/c gets 1.0.0, below 1.2.0; Composer's solver refuses acme/b together with the others: acme/a 2.1.0 conflicts with acme/b <3.0.",
+            "update now: the command leaves out acme/b, acme/c, because Composer's solver refuses it together with the others: acme/a 2.1.0 conflicts with acme/b <3.0, and together with the others, Composer's solver installs acme/c at 1.0.0, below its fix",
             false,
-            ['left_out' => ['acme/b', 'acme/c'], 'problem' => self::CONFLICT],
+            ['left_out' => ['acme/b', 'acme/c'], 'held_below' => [['package' => 'acme/c', 'installs' => '1.0.0']], 'problem' => self::CONFLICT],
         ];
-        yield 'update now without packages that the line keeps below their fixes, with no refused package' => [
-            static fn (): RunNote => RunNote::updateNowBelowFix(['acme/b', 'acme/c'], ['acme/b' => ['1.0.0', '1.2.0'], 'acme/c' => ['2.0.0', '2.1.0']], self::CONFLICT),
+        yield 'update now without packages that the solve installs below their fixes' => [
+            static fn (): RunNote => RunNote::updateNowReduced(['acme/b', 'acme/c'], null, [['package' => 'acme/b', 'installs' => '1.0.0'], ['package' => 'acme/c', 'installs' => '2.0.0']]),
             'update_now_reduced',
-            'update now: the command leaves out acme/b, acme/c, because the solve of the line keeps acme/b, acme/c below their fixes: acme/b gets 1.0.0, below 1.2.0; acme/c gets 2.0.0, below 2.1.0',
+            "update now: the command leaves out acme/b, acme/c, because together with the others, Composer's solver installs acme/b at 1.0.0, acme/c at 2.0.0, below their fixes",
             false,
-            ['left_out' => ['acme/b', 'acme/c'], 'problem' => self::CONFLICT],
+            ['left_out' => ['acme/b', 'acme/c'], 'held_below' => [['package' => 'acme/b', 'installs' => '1.0.0'], ['package' => 'acme/c', 'installs' => '2.0.0']], 'problem' => null],
         ];
         yield 'update now refused' => [
             static fn (): RunNote => RunNote::updateNowRefused(self::CONFLICT),
