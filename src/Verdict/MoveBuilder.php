@@ -54,7 +54,7 @@ final class MoveBuilder
         $version = \in_array($kind, Move::ROW_KINDS, true) ? ($lower === null ? null : $lower->release()->pretty()) : ($kind === Move::TAG && $latest !== null ? $latest->version() : null);
         $newest = $row === null ? null : ($kind === Move::UPDATE ? $context->updateTarget($row) : (\in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $context->rowTarget($row, $lower) : ($kind === Move::BLOCKED ? $context->rowTarget($row) : null)));
         $checks = $context->checks();
-        $query = $checks === null ? null : self::query($kind, $subject, $constraint, $version, $phpCheck, $newest);
+        $query = $checks === null ? null : self::query($kind, $subject, $constraint, $version, $phpCheck, $newest, $checks);
         $outcome = $query === null || $checks === null ? null : $checks->check($query);
         $check = $outcome === null ? null : $outcome->check();
         if ($check === null && $checks !== null && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
@@ -143,9 +143,10 @@ final class MoveBuilder
 
     /**
      * The Composer request of a move that runs one: `composer require` for a package that
-     * composer.json requires, else `composer update` with the constraint inline.
+     * composer.json requires, else `composer update` with the constraint inline. An `update` step
+     * that {@see steps()} prints without the constraint is checked without it.
      */
-    private static function query(string $kind, MoveSubject $subject, ?string $constraint, ?string $version, ?PhpCheck $phpCheck, ?string $newest): ?MoveQuery
+    private static function query(string $kind, MoveSubject $subject, ?string $constraint, ?string $version, ?PhpCheck $phpCheck, ?string $newest, MoveChecks $checks): ?MoveQuery
     {
         if ($version === null) {
             return null;
@@ -155,7 +156,7 @@ final class MoveBuilder
         $package = $subject->package();
         switch ($kind) {
             case Move::UPDATE:
-                return MoveQuery::update($package, $caret, $version, $php, $newest);
+                return $checks->writesInline($subject->isListed()) ? MoveQuery::update($package, $caret, $version, $php, $newest) : MoveQuery::plainUpdate($package, $version, $php, $newest);
             case Move::REQUIRE:
             case Move::RAISE_PHP:
                 return $constraint === null ? null : self::requireOrUpdate($subject, $constraint, $version, $php, $newest);

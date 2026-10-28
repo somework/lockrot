@@ -68,6 +68,12 @@ final class SolveRequest
         return new self($allow, $inline, [], self::LISTED);
     }
 
+    /** `composer update <package>` with no inline constraint: Composer 2.2 and 2.3 take none on a package that composer.json does not require. */
+    public static function plain(string $package): self
+    {
+        return new self([$package => $package], [], [], self::LISTED);
+    }
+
     /**
      * @param array<string, string> $rootChanges name => constraint; a platform name such as `php`
      *                                           changes the root requirement without an update

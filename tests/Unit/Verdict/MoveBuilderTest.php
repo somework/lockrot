@@ -314,6 +314,23 @@ final class MoveBuilderTest extends TestCase
         self::assertSame([], $move->commands());
     }
 
+    /** Composer 2.2 and 2.3 run the plain `composer update a/b`, so the check solves that request and reads what it installs. */
+    public function testATransitiveUpdateOnAComposerWithoutInlineConstraintsChecksThePlainUpdateThatItPrints(): void
+    {
+        [$row, $context] = self::checked([
+            'update a/b ^2.0.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '2.0.0', 'holds' => []],
+            'update a/b * ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '3.0.0', 'holds' => []],
+        ], false, false);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::LEFT_BEHIND)->to($row, $lower, null), [], null, $context);
+        $check = $move->check();
+
+        self::assertSame([['composer', 'update', 'a/b']], $move->commands());
+        self::assertNotNull($check);
+        self::assertSame('3.0.0', $check->installs());
+    }
+
     public function testATransitiveRequireThatIsNotCheckedGetsOnlyItsWhyNotStep(): void
     {
         [$row, $context] = self::checked(['*' => ['result' => 'not_checked', 'form' => null, 'reason' => 'offline', 'holds' => []]], false);
