@@ -194,6 +194,7 @@ final class LockFile
             throw new ConfigException($name.': platform-overrides must be an object');
         }
         try {
+            // @phpstan-ignore argument.type (the constructor's own value check is the refusal)
             new PlatformRepository([], $overrides);
         } catch (\Throwable $e) {
             throw new ConfigException($name.': platform-overrides cannot be loaded: '.$e->getMessage(), 0, $e);
