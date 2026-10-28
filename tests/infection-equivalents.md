@@ -99,12 +99,12 @@ entry in the commit that changes the line.
 - `src/Data/Repository/RepositoryMetadataLoader.php` TrueValue `$seen[$id] = true;` — a set. Only `isset()` reads it.
 - `src/Data/Repository/RepositoryUrl.php` DecrementInteger `return strncmp($shown, '...', 3) === 0;` — nothing that `shown()` returns starts with `..` and no third dot.
 - `src/Data/Repository/RepositoryUrl.php` LessThan `return $at !== null && ($line === null || $at < $line) ? $at : null;` — in closer(): one pattern finds both offsets, each at its own character, so they are never equal.
-- `src/Data/Abandoned/ComposerAbandonedPolicyReader.php` UnwrapArrayFilter `return array_filter($config, 'is_string', \ARRAY_FILTER_USE_KEY);` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
+- `src/Data/Abandoned/AbandonedIgnore.php` UnwrapArrayFilter `return array_filter($config, 'is_string', \ARRAY_FILTER_USE_KEY);` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
 - `src/Data/Advisory/AdvisoryIgnore.php` FalseValue `return new self([], [], false);` — the flag sets only the `by` of a match, and an empty list matches nothing.
 - `src/Data/Advisory/AdvisoryIgnore.php` FalseValue `return new self([], [], false, $why);` — the flag sets only the `by` of a match, and an empty list matches nothing.
 - `src/Data/Advisory/AdvisoryIgnore.php` TrueValue `return new self([], [], true, null, ['policy_key' => $policyKey, 'value' => $value]);` — the flag sets only the `by` of a match, and an empty list matches nothing.
 - `src/Data/Advisory/AdvisoryIgnore.php` CastString `$ids[(string) $key] = \is_string($reason) ? $reason : null;` — PHP stores a numeric string key as an integer either way, and `array_key_exists()` finds it by the string.
-- `src/Data/Advisory/ComposerAdvisoryPolicyReader.php` UnwrapArrayFilter x2 `$advisories = AdvisoriesPolicyConfig::fromRawConfig(array_filter($policy, 'is_string', \ARRAY_FILTER_USE_KEY), array_filter($audit, 'is_string', \ARRAY_FILTER_USE_KEY), new VersionParser());` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
+- `src/Data/Advisory/AdvisoryIgnore.php` UnwrapArrayFilter `return array_filter($config, 'is_string', \ARRAY_FILTER_USE_KEY);` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` TrueValue `$ids[$advisory->advisoryId] = true;` — only the keys are counted.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in attribute(): a package name holds a `/`, so PHP never stores it as an integer key.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in coverage(): a package name holds a `/`, so PHP never stores it as an integer key.
