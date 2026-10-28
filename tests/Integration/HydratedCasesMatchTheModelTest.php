@@ -425,6 +425,13 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 
     private const ACCEPT_UNCHECKED = 'The cases that accept an unchecked check need an accept-unchecked entry of the project, which the hydrator does not take (`unhydrated()`).';
 
+    /** Case id => the note code and the `data` key of a model note that the recording leaves out, with the reason. */
+    private const NOTE_DIFFERENCES = [
+        'mc-update-now-reduced‡' => [['update_now_reduced', 'held_below', self::HELD_BELOW]],
+    ];
+
+    private const HELD_BELOW = 'The coordinator\'s ruling on the update-now fold (R6-1): no update now holds a name below its fix, so lockrot writes no `held_below`. The model writes an empty list.';
+
     /** @return iterable<string, array{string, string}> */
     public static function caseLines(): iterable
     {
@@ -515,9 +522,33 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             $id = JsonPath::stringAt($case, ['id']);
             $report = JsonPath::decodeFile(self::CONTRACT.'report-2/'.CaseRecording::fileName($id).'.json');
 
-            self::assertSame(self::codesAndData(JsonPath::has($case, ['run_notes']) ? JsonPath::arrayAt($case, ['run_notes']) : []), self::codesAndData(JsonPath::arrayAt($report, ['note_details'])), $id.': the recording\'s notes against the model\'s');
+            $model = self::codesAndData(JsonPath::has($case, ['run_notes']) ? JsonPath::arrayAt($case, ['run_notes']) : []);
+            self::assertSame(self::withoutNoteDifferences($id, $model), self::codesAndData(JsonPath::arrayAt($report, ['note_details'])), $id.': the recording\'s notes against the model\'s');
         }
         self::assertGreaterThan(0, $cases);
+    }
+
+    /**
+     * @param list<array{mixed, mixed}> $notes the model's notes as {@see codesAndData()} gives them
+     *
+     * @return list<array{mixed, mixed}>
+     */
+    private static function withoutNoteDifferences(string $id, array $notes): array
+    {
+        foreach (self::NOTE_DIFFERENCES[$id] ?? [] as [$code, $key, $reason]) {
+            self::assertNotSame('', $reason);
+            $found = false;
+            foreach ($notes as $at => [$noteCode, $data]) {
+                if ($noteCode === $code && \is_array($data) && \array_key_exists($key, $data)) {
+                    unset($data[$key]);
+                    $notes[$at] = [$noteCode, $data];
+                    $found = true;
+                }
+            }
+            self::assertTrue($found, $id.': the model writes no '.$code.' note with `'.$key.'`, so its difference is stale');
+        }
+
+        return $notes;
     }
 
     /**

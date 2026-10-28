@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Solver;
 
+use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\DependencyResolver\Pool;
 use Composer\DependencyResolver\Request;
 use Composer\Package\BasePackage;
@@ -15,7 +16,7 @@ use Composer\Semver\VersionParser;
 use Lockrot\Solver\SolverInputs;
 use PHPUnit\Framework\TestCase;
 
-/** @phpstan-type Spec array{pool: list<BasePackage>, unacceptable: list<BasePackage>, fixed: list<BasePackage>, locked: list<BasePackage>, requires: array<string, ConstraintInterface>} */
+/** @phpstan-type Spec array{pool: list<BasePackage>, unacceptable: list<BasePackage>, fixed: list<BasePackage>, locked: list<BasePackage>, requires: array<string, ConstraintInterface>, security?: array<string, array<string, array<PartialSecurityAdvisory>>>, abandoned?: array<string, array<string, string>>} */
 final class SolverInputsTest extends TestCase
 {
     public function testTwoCopiesOfTheRootWithTheSamePoolAndRequestGiveTheSameInputs(): void
@@ -66,6 +67,8 @@ final class SolverInputsTest extends TestCase
         yield 'another locked package' => [static fn (array $spec, BasePackage $root): array => ['locked' => [self::package('acme/locked', '1.0.0')]] + $spec];
         yield 'another constraint written the same' => [static fn (array $spec, BasePackage $root): array => ['requires' => ['acme/lib' => self::constraint('^2.0', '^1.0')]] + $spec];
         yield 'the same constraint written another way' => [static fn (array $spec, BasePackage $root): array => ['requires' => ['acme/lib' => self::constraint('1.*')]] + $spec];
+        yield 'a version that the advisory filter removed' => [static fn (array $spec, BasePackage $root): array => ['security' => ['acme/lib' => ['1.1.0.0' => []]]] + $spec];
+        yield 'a version that the abandoned filter removed' => [static fn (array $spec, BasePackage $root): array => ['abandoned' => ['acme/lib' => ['1.1.0.0' => '1.1.0']]] + $spec];
     }
 
     /**
@@ -84,7 +87,7 @@ final class SolverInputsTest extends TestCase
             $request->requireName($name, $constraint);
         }
 
-        return SolverInputs::of(new Pool($spec['pool'], $spec['unacceptable']), $request, $root);
+        return SolverInputs::of(new Pool($spec['pool'], $spec['unacceptable'], [], [], $spec['security'] ?? [], $spec['abandoned'] ?? []), $request, $root);
     }
 
     private static function constraint(string $constraint, ?string $written = null): ConstraintInterface

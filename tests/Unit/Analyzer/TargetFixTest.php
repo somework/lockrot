@@ -16,9 +16,11 @@ use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\Holder;
+use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveChecker;
+use Lockrot\Solver\PoolAdvisories;
 use Lockrot\Solver\SolverChecker;
 use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Solver\VersionSource;
@@ -206,6 +208,17 @@ final class TargetFixTest extends TestCase
         $fix = self::fix($lock, [], self::solving($lock, [], new ArrayVersionSource(['acme/legacy' => [['version' => '1.0.0', 'require' => ['php' => '<8.4']], ['version' => '1.1.0']]])));
 
         self::assertSame(['resolves', ['composer', 'update', 'Acme/Legacy']], [$fix['check'], $fix['command']]);
+    }
+
+    /** Ruling R2-47 on `solveAt()`: the printed `composer update` meets the same advisory filter as a move. */
+    public function testAFixWhoseResolveHoldsANameWithUnreadAdvisoriesIsNotChecked(): void
+    {
+        $lock = ['packages' => [['name' => 'acme/legacy', 'version' => '1.0.0', 'require' => ['php' => '<8.4']]], 'packages-dev' => []];
+        $unread = new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): ?array => null);
+
+        $fix = self::fix($lock, [], self::solving($lock, [], new ArrayVersionSource(['acme/legacy' => [['version' => '1.0.0', 'require' => ['php' => '<8.4']], ['version' => '1.1.0']]]), $unread));
+
+        self::assertSame(['not_checked', 'advisory_lookup_incomplete', null], [$fix['check'], $fix['reason'], $fix['command']]);
     }
 
     public function testASkippedNameThatExcludesNothingLeavesTheSolve(): void
@@ -404,13 +417,13 @@ final class TargetFixTest extends TestCase
      * @param array{packages: list<array{name: string, version: string}>} $lock
      * @param list<string>                                               $notFromComposerRepository
      */
-    private static function solving(array $lock, array $notFromComposerRepository, VersionSource $source): SolverChecker
+    private static function solving(array $lock, array $notFromComposerRepository, VersionSource $source, ?PoolAdvisories $advisories = null): SolverChecker
     {
         $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => array_fill_keys(array_column($lock['packages'], 'name'), '*')], RootPackage::class);
         self::assertInstanceOf(RootPackageInterface::class, $root);
-        $solver = new ComposerSolver($root, LockFile::fromArray($lock)->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, []);
+        $solver = new ComposerSolver($root, LockFile::fromArray($lock)->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source);
 
-        return new SolverChecker($solver, $notFromComposerRepository, '8.4.99', false, Deadline::never());
+        return new SolverChecker($solver, $notFromComposerRepository, '8.4.99', $advisories !== null, Deadline::never(), $advisories);
     }
 
     private static function resolving(): RecordedMoveChecker

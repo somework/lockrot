@@ -700,7 +700,7 @@ final class AnalyzerTest extends TestCase
         // Composer's merged config, COMPOSER_HOME/config.json included, sets the solve's php: composer.json sets none here.
         $lock = LockFile::fromArray(['packages' => [self::locked('vendor/pkg') + ['require' => ['php' => '>=8.2.15']]], 'packages-dev' => []]);
         $analyzer = $this->analyzer($this->loader(['vendor/pkg' => $this->ancient()]), $this->http([]), true, new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, null, null, '8.2')
-            ->withMoveChecks(new MoveChecks(new RecordedMoveChecker([], ['php' => '8.2.10']), true));
+            ->withMoveChecks(MoveChecks::of(new RecordedMoveChecker([], ['php' => '8.2.10'])));
 
         $window = $analyzer->analyze($lock, ProjectConfig::empty(), false)->phpWindow();
 
@@ -713,7 +713,7 @@ final class AnalyzerTest extends TestCase
         $lock = LockFile::fromArray(['packages' => [self::locked('vendor/pkg')]]);
         $analyzer = $this->analyzer($this->loader(['vendor/pkg' => $this->ancient()]), $this->http([]), true, new Allowlist([]));
 
-        $checked = $analyzer->withMoveChecks(new MoveChecks(new RecordedMoveChecker([], []), true));
+        $checked = $analyzer->withMoveChecks(MoveChecks::of(new RecordedMoveChecker([], [])));
 
         self::assertNull($analyzer->analyze($lock, ProjectConfig::empty(), false)->moveCheck());
         self::assertNotNull($checked->analyze($lock, ProjectConfig::empty(), false)->moveCheck());

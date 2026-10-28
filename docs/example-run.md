@@ -473,7 +473,7 @@ furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
 scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 23 more
 advisories: 200 packages asked · packagist.org answered (184 on record for 50 packages)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
 gate: off · --fail-on=none (default) · target php 8.4 (--target-php)
 Data as of 2026-10-26 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
@@ -873,7 +873,13 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             "composer": "2.10.3",
             "blocks_advisories": true,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -1986,7 +1992,7 @@ nothing to grade. The run exited `0` ([exit codes](ci.md#exit-codes)).
 libyears: 0.0 behind across all 20 packages · 0.0 from direct requirements ·
 furthest behind psr/container 2.0.2 at 0.0
 advisories: 20 packages asked · packagist.org answered (25 on record for 3 packages)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked
 php: without require-dev the lock installs on PHP 8.2 to 8.5, and with require-dev on PHP 8.4 to 8.5
 gate: off · --fail-on=none (default) · target php 8.4 (--target-php)
 Data as of 2026-10-26 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for

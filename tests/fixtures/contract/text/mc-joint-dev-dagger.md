@@ -11,7 +11,7 @@ depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 ·
 libyears: 3.9 behind across the one package · 0.0 from direct requirements · furthest behind symfony/translation v4.4.47 at 3.9
 pulled in by: `friendsofsymfony/user-bundle` 1
 advisories: 1 package asked · packagist.org answered (4 on record for 2 packages)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-\* requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 7.4 to 8.5
 
 <sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

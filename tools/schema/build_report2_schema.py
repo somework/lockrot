@@ -1416,8 +1416,9 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
                                     "Composer 2.9.0 and 2.9.1 read only `config.audit.block-insecure`, and later 2.9 releases also read `COMPOSER_NO_SECURITY_BLOCKING`. "
                                     "Composer 2.10 and later read every switch, and read `config.audit.block-insecure` only when `config.policy.advisories` is not set. Empty when no switch turns the blocking off. Closed.",
                                     closed(BLOCKING_SWITCHES, 'One switch: an environment variable, or a key of composer.json `config`. Closed.'), uniqueItems=True),
-        'ignores_extensions': d("Always true: the solve ignores every `ext-*` requirement, as `--ignore-platform-req=ext-*` does, so the extensions of the machine that runs lockrot decide no move.",
-                                {'type': 'boolean', 'enum': [True]}),
+        'ignored_platform': arr("The platform patterns whose requirements the solve ignores, as `--ignore-platform-req` does, so the machine that runs lockrot decides no move. "
+                                "A name that composer.json `config.platform` sets is checked even when a pattern matches it (ruling R6-2).",
+                                {'type': 'string', 'minLength': 1}),
         'baseline': closed(['resolves', 'refused', 'not_checked'], ("The partial update of a name outside the lock: `refused` means Composer refuses the lock "
                                                                    "itself, so no move is checked (the `moves_not_checked` note). Closed.")),
         'reason': nul("Why the baseline was not checked; null unless `baseline` is `not_checked`. An open set, with the values of `check.reason` that a whole run can have.",
@@ -1553,16 +1554,9 @@ defs['noteMovesNotChecked'] = obj(("`moves_not_checked`: Composer's solver refus
     'php': d('The php version that the solve ran at: `config.platform.php` in the target minor, else the target minor at its newest patch (`8.4.99`).', {'type': 'string', 'minLength': 1}),
     'problem': PROBLEM,
 })
-defs['noteUpdateNowReduced'] = obj(("`update_now_reduced`: the command leaves out the members that Composer's refusal of the combined update names, and, "
-                                    "under Composer 2.2 or 2.3, each plain member that the resolving solve installs below its move version (§5.6)."), {
+defs['noteUpdateNowReduced'] = obj("`update_now_reduced`: the command leaves out the members that Composer's refusal of the combined update names (§5.6).", {
     'left_out': arr('The members that `update_now_command` leaves out, in report order.', ref('packageName'), minItems=1, uniqueItems=True),
-    'held_below': arr(("The plain members that the combined solve installs below their move version, in report order, each also in `left_out`. "
-                  "Empty when only a refusal leaves members out."), obj('A member left out below its fix.', {
-        'package': ref('packageName'),
-        'installs': d('The release that the combined solve installs for it, as the lock would write it.', {'type': 'string', 'minLength': 1}),
-    })),
-    'problem': nul("Composer's problem text of the refused combined update, without colour. Foreign text, not contract. Null when no refusal leaves a member out.",
-                   {'type': 'string', 'minLength': 1}),
+    'problem': d("Composer's problem text of the refused combined update, without colour. Foreign text, not contract.", {'type': 'string', 'minLength': 1}),
 })
 defs['noteUpdateNowRefused'] = obj("`update_now_refused`: Composer refuses the members of `security.update_now` together, even without the members its refusal names.", {
     'problem': PROBLEM,
@@ -1624,7 +1618,7 @@ defs['targetFix'] = obj("`run.php_window.target_fix` (§5.9): one update that un
     'reason': nul(("Why the update was not checked, from the reasons of `next_step.check.reason`. Null on `resolves` and `refused`, and on `not_checked` "
                    "exactly when `run.move_check` is null (a run that checks no move)."), {'type': 'string', 'pattern': SNAKE,
                   'x-known-values': ['unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'no_composer_json', 'composer_json_invalid',
-                                     'solver_error']}),
+                                     'solver_error', 'advisory_lookup_incomplete']}),
     'held_by': arr(("On `refused`, the holds that the refusal names, as a move's `held_by[]`, less the `platform` holds on php of the listed "
                     "packages. `[]` when the refusal names no hold. At the root ceiling, which lockrot decides without a solve, the holds are "
                     "the root links that fail at `target.php`: `link` is the link's section, `require`, `require-dev` or `conflict`, and "

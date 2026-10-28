@@ -2959,18 +2959,6 @@
   "integer": false
  },
  {
-  "name": "RunMoveCheckIgnoresExtensions",
-  "pointer": "#/definitions/run/properties/move_check/oneOf/0/properties/ignores_extensions",
-  "pointers": [
-   "#/definitions/run/properties/move_check/oneOf/0/properties/ignores_extensions"
-  ],
-  "values": [
-   true
-  ],
-  "open": false,
-  "integer": false
- },
- {
   "name": "RunMoveCheckBaseline",
   "pointer": "#/definitions/run/properties/move_check/oneOf/0/properties/baseline",
   "pointers": [
@@ -3184,7 +3172,8 @@
    "not_from_composer_repository",
    "no_composer_json",
    "composer_json_invalid",
-   "solver_error"
+   "solver_error",
+   "advisory_lookup_incomplete"
   ],
   "open": true,
   "integer": false

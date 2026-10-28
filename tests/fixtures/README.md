@@ -55,6 +55,8 @@ other keys are for lockrot-report.
   in its `http/` directory. Its `provenance.json` names the commit and the recorder command. It is
   not under `apps/`, because the tests that read every app serve only the shared `http/` answers.
 - `baseline/` — valid and invalid baseline documents for `BaselineFileTest`.
+- `move-check-oracle/` — designed worlds with advisory blocking on and the Composer CLI's answers,
+  for `MoveCheckComposerOracleTest`. See its own README.
 - `sarif/` — the pinned SARIF 2.1.0 schema the SARIF output is validated against.
 - `phar/` — a minimal PHP archive for the self-update tests. See its own README.
 - `http/github-releases/` — for the self-update tests: `releases.json`, a release list in the shape

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\MoveCheck;
 
 /**
@@ -35,13 +36,12 @@ final class MoveCheckRun implements \JsonSerializable
     }
 
     /**
-     * `ignores_extensions` is always true: the solve ignores `ext-*` requirements, as
-     * `--ignore-platform-req=ext-*` does, so the machine that runs lockrot decides no move.
+     * `ignored_platform` is {@see ComposerSolver::IGNORED_PLATFORM}: the machine that runs lockrot decides no move.
      *
-     * @return array{composer: ?string, blocks_advisories: bool, blocking_disabled_by: list<string>, ignores_extensions: true, baseline: string, reason: ?string}
+     * @return array{composer: ?string, blocks_advisories: bool, blocking_disabled_by: list<string>, ignored_platform: non-empty-list<string>, baseline: string, reason: ?string}
      */
     public function jsonSerialize(): array
     {
-        return ['composer' => $this->composer, 'blocks_advisories' => $this->blocksAdvisories, 'blocking_disabled_by' => $this->blockingDisabledBy, 'ignores_extensions' => true, 'baseline' => $this->baseline->result(), 'reason' => $this->baseline->reason()];
+        return ['composer' => $this->composer, 'blocks_advisories' => $this->blocksAdvisories, 'blocking_disabled_by' => $this->blockingDisabledBy, 'ignored_platform' => ComposerSolver::IGNORED_PLATFORM, 'baseline' => $this->baseline->result(), 'reason' => $this->baseline->reason()];
     }
 }

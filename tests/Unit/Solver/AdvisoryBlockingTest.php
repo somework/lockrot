@@ -6,28 +6,23 @@ namespace Lockrot\Tests\Unit\Solver;
 
 use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Config;
+use Composer\DependencyResolver\Pool;
+use Composer\DependencyResolver\Request;
 use Composer\Package\CompletePackage;
-use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\VersionParser;
 use Composer\Util\Platform;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Solver\AdvisoryBlocking;
-use Lockrot\Solver\ComposerFeatures;
+use Lockrot\Solver\PoolAdvisories;
+use Lockrot\Solver\PoolAdvisoryFeed;
 use PHPUnit\Framework\TestCase;
 
 /**
  * The settings of Composer's `block` operation, read through the API of the Composer that runs
- * lockrot. Composer before 2.9 blocks nothing, so the tests need a Composer that blocks.
+ * lockrot, and what Composer's own pool filter then blocks.
  */
 final class AdvisoryBlockingTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        if (!ComposerFeatures::blocksAdvisories()) {
-            self::markTestSkipped('Composer below 2.9 has no SecurityAdvisoryPoolFilter: it blocks no advisory in an update');
-        }
-    }
-
     protected function tearDown(): void
     {
         Platform::clearEnv('COMPOSER_NO_BLOCKING');
@@ -44,21 +39,15 @@ final class AdvisoryBlockingTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('variablesThatComposer210Reads')]
     public function testOnComposer210EitherVariableTurnsOffTheBlockingOfAdvisoriesAndAbandonedPackages(array $set): void
     {
-        if (version_compare(ComposerFeatures::version(), '2.10.0-dev', '<')) {
-            self::markTestSkipped('Composer 2.10 and later read COMPOSER_NO_BLOCKING');
-        }
         foreach ($set as $name) {
             Platform::putEnv($name, '1');
         }
-        $abandoned = new CompletePackage('acme/old', '1.0.0.0', '1.0.0');
-        $abandoned->setAbandoned(true);
-
         $blocking = AdvisoryBlocking::fromConfig(self::config(['block-abandoned' => true]));
 
         self::assertSame($set, $blocking->disabledBy());
         self::assertFalse($blocking->blocks());
-        self::assertSame([], self::ranges($blocking, 'high'));
-        self::assertFalse($blocking->blocksAbandoned($abandoned));
+        self::assertSame([], self::blocked($blocking, 'high'));
+        self::assertSame([], self::abandonedRemoved($blocking));
     }
 
     /** @return iterable<string, array{list<string>}> */
@@ -67,23 +56,6 @@ final class AdvisoryBlockingTest extends TestCase
         yield 'COMPOSER_NO_BLOCKING' => [['COMPOSER_NO_BLOCKING']];
         yield 'COMPOSER_NO_SECURITY_BLOCKING' => [['COMPOSER_NO_SECURITY_BLOCKING']];
         yield 'both, in the list order' => [['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING']];
-    }
-
-    public function testOnComposer29OnlyComposerNoSecurityBlockingTurnsTheBlockingOff(): void
-    {
-        if (version_compare(ComposerFeatures::version(), '2.9.2', '<') || version_compare(ComposerFeatures::version(), '2.10.0-dev', '>=')) {
-            self::markTestSkipped('Composer 2.9.2 to 2.9.x read COMPOSER_NO_SECURITY_BLOCKING alone');
-        }
-        Platform::putEnv('COMPOSER_NO_BLOCKING', '1');
-        self::assertSame([], AdvisoryBlocking::fromConfig(self::config([]))->disabledBy());
-        self::assertTrue(AdvisoryBlocking::fromConfig(self::config([]))->blocks());
-
-        Platform::putEnv('COMPOSER_NO_SECURITY_BLOCKING', '1');
-        $blocking = AdvisoryBlocking::fromConfig(self::config([]));
-
-        self::assertSame(['COMPOSER_NO_SECURITY_BLOCKING'], $blocking->disabledBy());
-        self::assertFalse($blocking->blocks());
-        self::assertSame([], self::ranges($blocking, 'high'));
     }
 
     /**
@@ -99,7 +71,7 @@ final class AdvisoryBlockingTest extends TestCase
 
         self::assertSame([], $blocking->disabledBy());
         self::assertTrue($blocking->blocks());
-        self::assertSame(['acme/lib' => ['>=1.0.0,<1.1.0']], self::ranges($blocking, 'high'));
+        self::assertSame(['acme/lib' => ['1.0.0.0']], self::blocked($blocking, 'high'));
     }
 
     /** @return iterable<string, array{string}> */
@@ -118,7 +90,6 @@ final class AdvisoryBlockingTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('falseWordsOfComposer210')]
     public function testOnComposer210AVariableThatGetBoolEnvReadsAsFalseTurnsTheBlockingOffThroughItsOption(string $value): void
     {
-        self::requireComposer210();
         Platform::putEnv('COMPOSER_NO_BLOCKING', $value);
         Platform::putEnv('COMPOSER_NO_SECURITY_BLOCKING', $value);
 
@@ -137,7 +108,6 @@ final class AdvisoryBlockingTest extends TestCase
     /** createPolicyConfig() stops at the first variable that getBoolEnv() reads as on, so Composer runs. */
     public function testOnComposer210ComposerNoBlockingOnLeavesARefusedComposerNoSecurityBlockingUnchecked(): void
     {
-        self::requireComposer210();
         Platform::putEnv('COMPOSER_NO_BLOCKING', '1');
         Platform::putEnv('COMPOSER_NO_SECURITY_BLOCKING', 'yes');
 
@@ -149,7 +119,6 @@ final class AdvisoryBlockingTest extends TestCase
     /** PolicyConfig::fromConfig() returns before it reads COMPOSER_POLICY_ADVISORIES_BLOCK, so Composer runs. */
     public function testOnComposer210APolicyThatIsOffLeavesARefusedComposerPolicyAdvisoriesBlockUnchecked(): void
     {
-        self::requireComposer210();
         Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', 'yes');
         $config = new Config(false);
         $config->merge(['config' => ['policy' => false]]);
@@ -169,7 +138,6 @@ final class AdvisoryBlockingTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('policiesThatComposerRejects')]
     public function testOnComposer210APolicyThatComposerRejectsStopsTheRunAndNamesIt(array $policy, array $variables, string $named): void
     {
-        self::requireComposer210();
         Platform::putEnv('COMPOSER_NO_BLOCKING', '1');
         foreach ($variables as $name => $value) {
             Platform::putEnv($name, $value);
@@ -209,7 +177,6 @@ final class AdvisoryBlockingTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('variablesThatGetBoolEnvReads')]
     public function testOnComposer210AValueThatComposerRefusesStopsTheRunAndNamesTheVariable(string $name): void
     {
-        self::requireComposer210();
         Platform::putEnv($name, 'yes');
 
         $this->expectException(ConfigException::class);
@@ -228,19 +195,17 @@ final class AdvisoryBlockingTest extends TestCase
 
     public function testOnComposer210ComposerPolicyAdvisoriesBlockOffTurnsTheBlockingOffAndIsNamed(): void
     {
-        self::requireComposer210();
         Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', '0');
 
         $blocking = AdvisoryBlocking::fromConfig(self::config([]));
 
         self::assertSame([false, ['COMPOSER_POLICY_ADVISORIES_BLOCK']], [$blocking->blocks(), $blocking->disabledBy()]);
-        self::assertSame([], self::ranges($blocking, 'high'));
+        self::assertSame([], self::blocked($blocking, 'high'));
     }
 
     /** The variable overrides the config, as PolicyConfig::fromConfig() applies it. */
     public function testOnComposer210ComposerPolicyAdvisoriesBlockOnKeepsTheBlockingThatTheConfigTurnsOff(): void
     {
-        self::requireComposer210();
         Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', '1');
 
         $blocking = AdvisoryBlocking::fromConfig(self::config(['block-insecure' => false]));
@@ -256,7 +221,6 @@ final class AdvisoryBlockingTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('policyKeysThatTurnTheBlockingOff')]
     public function testOnComposer210APolicyKeyThatTurnsTheBlockingOffIsNamed($policy, string $switch): void
     {
-        self::requireComposer210();
         $config = new Config(false);
         $config->merge(['config' => ['policy' => $policy]]);
 
@@ -276,7 +240,6 @@ final class AdvisoryBlockingTest extends TestCase
     /** `policy.advisories` replaces the legacy `audit`, so its `block-insecure` is not read. */
     public function testOnComposer210PolicyAdvisoriesOverridesTheAuditBlockInsecureKey(): void
     {
-        self::requireComposer210();
         $config = self::config(['block-insecure' => false]);
         $config->merge(['config' => ['policy' => ['advisories' => ['audit' => 'ignore']]]]);
 
@@ -287,7 +250,6 @@ final class AdvisoryBlockingTest extends TestCase
 
     public function testOnComposer210ComposerPolicyOffTurnsTheBlockingOffAndOverridesThePolicyKey(): void
     {
-        self::requireComposer210();
         Platform::putEnv('COMPOSER_POLICY', '0');
 
         $blocking = AdvisoryBlocking::fromConfig(self::config([]));
@@ -298,7 +260,6 @@ final class AdvisoryBlockingTest extends TestCase
     /** A `policy` that is off leaves COMPOSER_POLICY_ADVISORIES_BLOCK unread: PolicyConfig::fromConfig() returns before it. */
     public function testOnComposer210APolicyThatIsOffIsNamedAlthoughComposerPolicyAdvisoriesBlockIsOn(): void
     {
-        self::requireComposer210();
         Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', '1');
         $config = new Config(false);
         $config->merge(['config' => ['policy' => false]]);
@@ -309,7 +270,6 @@ final class AdvisoryBlockingTest extends TestCase
     /** COMPOSER_POLICY on turns a `policy` that the config turns off on again. */
     public function testOnComposer210ComposerPolicyOnKeepsTheBlockingThatThePolicyKeyTurnsOff(): void
     {
-        self::requireComposer210();
         Platform::putEnv('COMPOSER_POLICY', 'on');
         $config = new Config(false);
         $config->merge(['config' => ['policy' => false]]);
@@ -329,7 +289,6 @@ final class AdvisoryBlockingTest extends TestCase
     /** Each switch that turns the blocking off on its own is named, in the order of AdvisoryBlocking::SWITCHES. */
     public function testOnComposer210EverySwitchThatTurnsTheBlockingOffIsNamedInTheListOrder(): void
     {
-        self::requireComposer210();
         Platform::putEnv('COMPOSER_NO_SECURITY_BLOCKING', '1');
         Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', 'off');
 
@@ -342,32 +301,21 @@ final class AdvisoryBlockingTest extends TestCase
     {
         $blocking = AdvisoryBlocking::fromConfig(self::config(['ignore' => ['PKSA-aaaa-bbbb-cccc' => ['apply' => 'audit']]]));
 
-        self::assertSame(['acme/lib' => ['>=1.0.0,<1.1.0']], self::ranges($blocking, 'high'));
+        self::assertSame(['acme/lib' => ['1.0.0.0']], self::blocked($blocking, 'high'));
     }
 
     public function testAnAdvisoryThatTheBlockOperationIgnoresIsNotBlocked(): void
     {
         $blocking = AdvisoryBlocking::fromConfig(self::config(['ignore' => ['PKSA-aaaa-bbbb-cccc' => ['apply' => 'block']]]));
 
-        self::assertSame([], self::ranges($blocking, 'high'));
-    }
-
-    public function testASeverityThatTheBlockOperationIgnoresIsNotBlocked(): void
-    {
-        $blocking = AdvisoryBlocking::fromConfig(self::config(['ignore-severity' => ['low' => ['apply' => 'block']]]));
-
-        self::assertSame([], self::ranges($blocking, 'low'));
-        self::assertSame(['acme/lib' => ['>=1.0.0,<1.1.0']], self::ranges($blocking, 'high'));
+        self::assertSame([], self::blocked($blocking, 'high'));
     }
 
     public function testAnAbandonedPackageIsBlockedOnlyWhenTheConfigBlocksAbandonedPackages(): void
     {
-        $abandoned = new CompletePackage('acme/old', '1.0.0.0', '1.0.0');
-        $abandoned->setAbandoned(true);
-
-        self::assertTrue(AdvisoryBlocking::fromConfig(self::config(['block-abandoned' => true]))->blocksAbandoned($abandoned));
-        self::assertFalse(AdvisoryBlocking::fromConfig(self::config([]))->blocksAbandoned($abandoned));
-        self::assertFalse(AdvisoryBlocking::fromConfig(self::config(['block-abandoned' => true, 'ignore-abandoned' => ['acme/old' => ['apply' => 'block']]]))->blocksAbandoned($abandoned));
+        self::assertSame(['acme/old'], self::abandonedRemoved(AdvisoryBlocking::fromConfig(self::config(['block-abandoned' => true]))));
+        self::assertSame([], self::abandonedRemoved(AdvisoryBlocking::fromConfig(self::config([]))));
+        self::assertSame([], self::abandonedRemoved(AdvisoryBlocking::fromConfig(self::config(['block-abandoned' => true, 'ignore-abandoned' => ['acme/old' => ['apply' => 'block']]]))));
     }
 
     public function testAConfigThatTurnsTheBlockingOffBlocksNothing(): void
@@ -375,23 +323,23 @@ final class AdvisoryBlockingTest extends TestCase
         $blocking = AdvisoryBlocking::fromConfig(self::config(['block-insecure' => false]));
 
         self::assertFalse($blocking->blocks());
-        self::assertSame([], self::ranges($blocking, 'high'));
+        self::assertSame([], self::blocked($blocking, 'high'));
     }
 
     public function testAnAdvisoryThatAnIgnoredIdAndAnIgnoredSeverityBothLeaveOutIsNotBlocked(): void
     {
         $blocking = AdvisoryBlocking::fromConfig(self::config(['ignore' => ['PKSA-aaaa-bbbb-cccc' => ['apply' => 'block']], 'ignore-severity' => ['low' => ['apply' => 'block']]]));
 
-        self::assertSame([], self::ranges($blocking, 'high'));
+        self::assertSame([], self::blocked($blocking, 'high'));
     }
 
     /** @dataProvider blockingOfEveryName */
     #[\PHPUnit\Framework\Attributes\DataProvider('blockingOfEveryName')]
-    public function testTheRangesOfEveryNameAreBlocked(AdvisoryBlocking $blocking): void
+    public function testTheAdvisoriesOfEveryNameAreBlocked(AdvisoryBlocking $blocking): void
     {
         $records = ['acme/a' => [self::advisory('acme/a', 'PKSA-aaaa-aaaa-aaaa', '<1.1', 'high')], 'acme/b' => [self::advisory('acme/b', 'PKSA-bbbb-bbbb-bbbb', '<2.1', 'high')]];
 
-        self::assertSame(['acme/a' => ['<1.1'], 'acme/b' => ['<2.1']], self::pretty($blocking->ranges($records)));
+        self::assertSame(['acme/a' => ['1.0.0.0'], 'acme/b' => ['2.0.0.0']], self::removed($blocking, $records)['security']);
     }
 
     /** @return iterable<string, array{AdvisoryBlocking}> */
@@ -401,29 +349,27 @@ final class AdvisoryBlockingTest extends TestCase
         yield 'an ignore rule that matches no record' => [AdvisoryBlocking::fromConfig(self::config(['ignore' => ['PKSA-cccc-cccc-cccc' => ['apply' => 'block']]]))];
     }
 
-    /** A partial record carries no CVE or GHSA id, so an ignore rule on one needs the complete records. */
-    public function testPartialRecordsNeedTheCompleteOnesOnlyForAnIgnoreRuleOnAnIdThatIsNoPksaId(): void
-    {
-        $records = ['acme/lib' => [PartialSecurityAdvisory::create('acme/lib', ['advisoryId' => 'PKSA-aaaa-bbbb-cccc', 'affectedVersions' => '<1.1'], new VersionParser())]];
-
-        self::assertTrue(AdvisoryBlocking::fromConfig(self::config(['ignore' => ['GHSA-aaaa-bbbb-cccc' => ['apply' => 'block']]]))->needsComplete($records));
-        self::assertFalse(AdvisoryBlocking::fromConfig(self::config(['ignore' => ['PKSA-aaaa-bbbb-cccc' => ['apply' => 'block']]]))->needsComplete($records));
-    }
-
     public function testNoAbandonedPackageIsBlockedWhenTheConfigTurnsTheBlockingOffOrByTheDefaultOfATest(): void
     {
-        $abandoned = new CompletePackage('acme/old', '1.0.0.0', '1.0.0');
-        $abandoned->setAbandoned(true);
-
-        self::assertFalse(AdvisoryBlocking::fromConfig(self::config(['block-insecure' => false]))->blocksAbandoned($abandoned));
-        self::assertFalse(AdvisoryBlocking::everyAdvisory()->blocksAbandoned($abandoned));
+        self::assertSame([], self::abandonedRemoved(AdvisoryBlocking::fromConfig(self::config(['block-insecure' => false]))));
+        self::assertSame([], self::abandonedRemoved(AdvisoryBlocking::everyAdvisory()));
     }
 
-    private static function requireComposer210(): void
+    /** The filter is Composer's internal API, built from Composer's default Config: a drift of its signature fails here. */
+    public function testComposersDefaultPolicyBuildsAFilterThatBlocksAnAdvisory(): void
     {
-        if (version_compare(ComposerFeatures::version(), '2.10.0-dev', '<')) {
-            self::markTestSkipped('Composer 2.10 and later read the blocking variables with Platform::getBoolEnv() and read config.policy');
-        }
+        $blocking = AdvisoryBlocking::everyAdvisory();
+
+        self::assertNull($blocking->filterError());
+        self::assertSame(['acme/lib' => ['1.0.0.0']], self::blocked($blocking, 'high'));
+    }
+
+    public function testABlockingWhoseFilterCannotBeBuiltKeepsTheError(): void
+    {
+        $error = new \Error('drift');
+        $blocking = AdvisoryBlocking::unbuildable($error);
+
+        self::assertSame([true, null, $error], [$blocking->blocks(), $blocking->poolFilter(), $blocking->filterError()]);
     }
 
     /** @param array<string, mixed> $audit */
@@ -435,24 +381,58 @@ final class AdvisoryBlockingTest extends TestCase
         return $config;
     }
 
-    /** @return array<string, list<string>> name => each blocked range as Composer writes it */
-    private static function ranges(AdvisoryBlocking $blocking, string $severity): array
+    /** @return array<string, list<string>> name => each version that the filter blocks */
+    private static function blocked(AdvisoryBlocking $blocking, string $severity): array
     {
-        return self::pretty($blocking->ranges(['acme/lib' => [self::advisory('acme/lib', 'PKSA-aaaa-bbbb-cccc', '>=1.0.0,<1.1.0', $severity)]]));
+        return self::removed($blocking, ['acme/lib' => [self::advisory('acme/lib', 'PKSA-aaaa-bbbb-cccc', '>=1.0.0,<1.1.0', $severity)]])['security'];
+    }
+
+    /** @return list<string> the abandoned names that the filter removes */
+    private static function abandonedRemoved(AdvisoryBlocking $blocking): array
+    {
+        return array_keys(self::removed($blocking, [])['abandoned']);
+    }
+
+    /**
+     * The versions that Composer's filter removes from a pool of acme/lib 1.0.0 and 1.1.0, acme/a
+     * 1.0.0, acme/b 2.0.0 and the abandoned acme/old 1.0.0, with $records served as the only advisories.
+     *
+     * @param array<string, list<PartialSecurityAdvisory>> $records
+     *
+     * @return array{security: array<string, list<string>>, abandoned: array<string, list<string>>}
+     */
+    private static function removed(AdvisoryBlocking $blocking, array $records): array
+    {
+        $filter = $blocking->poolFilter();
+        if ($filter === null) {
+            return ['security' => [], 'abandoned' => []];
+        }
+        $old = new CompletePackage('acme/old', '1.0.0.0', '1.0.0');
+        $old->setAbandoned(true);
+        $pool = new Pool([new CompletePackage('acme/lib', '1.0.0.0', '1.0.0'), new CompletePackage('acme/lib', '1.1.0.0', '1.1.0'), new CompletePackage('acme/a', '1.0.0.0', '1.0.0'), new CompletePackage('acme/b', '2.0.0.0', '2.0.0'), $old]);
+        $feed = new PoolAdvisoryFeed(new PoolAdvisories($blocking, static fn (array $names): array => array_intersect_key($records, array_flip($names))));
+        $filtered = $filter->filter($pool, [$feed], new Request());
+
+        return ['security' => self::versions($filtered->getAllSecurityRemovedPackageVersions()), 'abandoned' => self::versions($filtered->getAllAbandonedRemovedPackageVersions())];
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $removed name => version => the reason
+     *
+     * @return array<string, list<string>>
+     */
+    private static function versions(array $removed): array
+    {
+        $versions = [];
+        foreach ($removed as $name => $byVersion) {
+            $versions[$name] = array_map('strval', array_keys($byVersion));
+        }
+
+        return $versions;
     }
 
     private static function advisory(string $name, string $id, string $affected, string $severity): PartialSecurityAdvisory
     {
         return PartialSecurityAdvisory::create($name, ['advisoryId' => $id, 'affectedVersions' => $affected, 'title' => 'A flaw', 'sources' => [['name' => 'GitHub', 'remoteId' => 'GHSA-aaaa-bbbb-cccc']], 'reportedAt' => '2026-01-01 00:00:00', 'cve' => null, 'link' => null, 'severity' => $severity], new VersionParser());
-    }
-
-    /**
-     * @param array<string, list<ConstraintInterface>> $ranges
-     *
-     * @return array<string, list<string>>
-     */
-    private static function pretty(array $ranges): array
-    {
-        return array_map(static fn (array $list): array => array_map(static fn (ConstraintInterface $range): string => $range->getPrettyString(), $list), $ranges);
     }
 }

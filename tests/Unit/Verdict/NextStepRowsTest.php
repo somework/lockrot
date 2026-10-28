@@ -109,6 +109,6 @@ final class NextStepRowsTest extends TestCase
         )]);
 
         return (new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', null), $metadata, $rows, $fixes, new FixFinder(new PhpFloor('8.4'), LinkIndex::of($lock, ProjectConfig::empty())), new PhpFloor('8.4'), new \DateTimeImmutable(self::NOW), 2, null, [], [], true))
-            ->withChecks(new MoveChecks(new RecordedMoveChecker($checks === [] ? ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]] : $checks, []), true));
+            ->withChecks(MoveChecks::of(new RecordedMoveChecker($checks === [] ? ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]] : $checks, [])));
     }
 }

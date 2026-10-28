@@ -13,7 +13,7 @@ depth: every flagged package is named in composer.json · direct 3
 security: 3 vulnerable packages · 3 advisories: 3 high
 libyears: 3.4 behind across all 3 packages · 3.4 from direct requirements · furthest behind typo3/html-sanitizer v2.2.0 at 2.0
 advisories: 3 packages asked · packagist.org answered (15 on record for 3 packages)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-\* requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 8.1 to 8.5
 
 **Update now:** `composer update 'symfony/routing:^6.4.41'`

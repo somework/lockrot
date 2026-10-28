@@ -10,12 +10,10 @@ use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\PlatformRepository;
-use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\VersionParser;
 use Lockrot\Lock\LockFile;
 use Lockrot\Security\Holder;
 use Lockrot\Solver\AdvisoryBlocking;
-use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\PoolAdvisories;
 use Lockrot\Solver\SolveRequest;
@@ -53,9 +51,6 @@ final class ComposerSolverTest extends TestCase
     /** Composer 2.7 and later keep every name off the allow list at its locked release where they can (`update --minimal-changes`). */
     public function testAMinimalChangesSolveKeepsADependencyThatTheMoveDoesNotNeedToChange(): void
     {
-        if (version_compare(ComposerFeatures::version(), '2.7.0', '<')) {
-            self::markTestSkipped('Composer below 2.7 has no --minimal-changes');
-        }
         $solver = self::solver(
             ['require' => ['acme/lib' => '^1.0']],
             [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/zeta' => '^1.0']], ['name' => 'acme/zeta', 'version' => '1.0.0']],
@@ -66,7 +61,7 @@ final class ComposerSolverTest extends TestCase
         self::assertSame(['acme/lib' => '1.1.0', 'acme/zeta' => '1.1.0'], $solver->solve($request)->installs());
         self::assertSame(['acme/lib' => '1.1.0'], $solver->withMinimalChanges()->solve($request)->installs());
         self::assertSame(['acme/lib' => '1.1.0', 'acme/zeta' => '1.1.0'], $solver->solve($request)->installs(), 'the solver itself keeps its policy');
-        self::assertSame(['acme/lib' => '1.1.0'], $solver->withMinimalChanges()->solve(SolveRequest::plain('acme/lib'))->installs(), 'the name that the update allows is no preferred one');
+        self::assertSame(['acme/lib' => '1.1.0'], $solver->withMinimalChanges()->solve(SolveRequest::update(['acme/lib' => '']))->installs(), 'the name that the update allows is no preferred one');
     }
 
     /** monica's socialiteproviders/facebook: the solve takes another reference of the locked tag, which moves no version. */
@@ -90,7 +85,7 @@ final class ComposerSolverTest extends TestCase
         $root->setMinimumStability('dev');
         $locked = [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/other', 'version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'aaaa']]];
         $remote = ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']], 'acme/other' => [['version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'bbbb']]]];
-        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote), []);
+        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote));
 
         $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1'])->withJoined(['acme/other']));
 
@@ -106,7 +101,7 @@ final class ComposerSolverTest extends TestCase
         $root->setReferences(['acme/other' => 'aaaa']);
         $locked = [['name' => 'acme/other', 'version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'aaaa']]];
         $remote = ['acme/other' => [['version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'bbbb']]]];
-        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote), []);
+        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote));
 
         $solution = $solver->solve(SolveRequest::require('acme/other', ['acme/other' => 'dev-main'], false));
 
@@ -121,7 +116,7 @@ final class ComposerSolverTest extends TestCase
         $root->setMinimumStability('dev');
         $locked = [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/other', 'version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'aaaa']]];
         $remote = ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']], 'acme/other' => [['version' => 'dev-main', 'abandoned' => true, 'source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'aaaa']]]];
-        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote), []);
+        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote));
 
         $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1'])->withJoined(['acme/other']));
 
@@ -137,7 +132,7 @@ final class ComposerSolverTest extends TestCase
         $other = ['source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => 'aaaa'], 'dist' => ['type' => 'zip', 'url' => 'https://example.org/other.zip', 'reference' => 'dddd']];
         $locked = [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/other', 'version' => 'dev-main'] + $other];
         $remote = ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']], 'acme/other' => [['version' => 'dev-main', 'abandoned' => true] + $other]];
-        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote), []);
+        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote));
 
         $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1'])->withJoined(['acme/other']));
 
@@ -162,9 +157,6 @@ final class ComposerSolverTest extends TestCase
 
     public function testAnUpdatePastARequireDevConstraintIsRefusedByThatRootRequirement(): void
     {
-        if (!ComposerFeatures::hasTemporaryConstraints()) {
-            self::markTestSkipped('Composer 2.2 and 2.3 join the inline constraint to the root requirement: that requirement is the request');
-        }
         $solver = self::solver(['require-dev' => ['acme/dev' => '^1.0']], [], ['acme/dev' => [['version' => '1.0.0'], ['version' => '2.0.0']]], [['name' => 'acme/dev', 'version' => '1.0.0']]);
 
         $solution = $solver->solve(SolveRequest::update(['acme/dev' => '^2.0']));
@@ -189,9 +181,6 @@ final class ComposerSolverTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('bothSections')]
     public function testAnUpdatePastAConstraintInRequireAndRequireDevNamesTheSectionOfTheSolvedConstraint(string $require, string $dev, string $held, string $section): void
     {
-        if (!ComposerFeatures::hasTemporaryConstraints()) {
-            self::markTestSkipped('Composer 2.2 and 2.3 join the inline constraint to the root requirement: that requirement is the request');
-        }
         $solver = self::solver(['require' => ['acme/lib' => $require], 'require-dev' => ['acme/lib' => $dev]], [['name' => 'acme/lib', 'version' => '1.5.0']], ['acme/lib' => [['version' => '1.5.0'], ['version' => '2.0.0']]]);
 
         $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^2.0']));
@@ -249,9 +238,6 @@ final class ComposerSolverTest extends TestCase
     /** A root requirement holds a move only through a requirement that it leaves no candidate. */
     public function testARefusalNamesNoRootRequirementOfARequirementThatKeepsACandidate(): void
     {
-        if (!ComposerFeatures::hasTemporaryConstraints()) {
-            self::markTestSkipped('Composer 2.2 lists the root requirement of each dependency that -W frees as a rule of the problem');
-        }
         $solver = self::solver(
             ['require' => ['acme/lib' => '^1.0', 'acme/dep' => '^1.0', 'acme/y' => '^1.0']],
             [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/dep' => '^1.0']], ['name' => 'acme/dep', 'version' => '1.0.0'], ['name' => 'acme/y', 'version' => '1.0.0']],
@@ -393,24 +379,29 @@ final class ComposerSolverTest extends TestCase
         yield 'replace' => [['replace' => ['acme/virtual' => '1.0.0']]];
     }
 
-    /** The project itself can be an abandoned package: `block-abandoned` removes no root. */
-    public function testAnAbandonedRootStaysWhenTheConfigBlocksAbandonedPackages(): void
+    /**
+     * Ruling R6-37: Composer's filter removes an abandoned root too, so the root no longer provides
+     * acme/virtual. `composer update acme/user:^1.1` of Composer 2.10.3 refuses this project.
+     */
+    public function testAnAbandonedRootProvidesNothingWhenTheConfigBlocksAbandonedPackages(): void
     {
-        if (!ComposerFeatures::blocksAdvisories()) {
-            self::markTestSkipped('Composer below 2.9 has no SecurityAdvisoryPoolFilter: it blocks nothing in an update');
-        }
         $config = new Config(false);
         $config->merge(['config' => ['audit' => ['block-abandoned' => true]]]);
         $solver = self::solver(['require' => ['acme/user' => '^1.0'], 'provide' => ['acme/virtual' => '1.0.0'], 'abandoned' => true], [['name' => 'acme/user', 'version' => '1.0.0']], ['acme/user' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/virtual' => '^1.0']]]])
             ->withAdvisories(new PoolAdvisories(AdvisoryBlocking::fromConfig($config), static fn (array $names, bool $complete): array => []));
 
-        self::assertSame(['acme/user' => '1.1.0'], $solver->solve(SolveRequest::update(['acme/user' => '^1.1']))->installs());
+        $solution = $solver->solve(SolveRequest::update(['acme/user' => '^1.1']));
+
+        self::assertFalse($solution->resolves());
+        self::assertNull($solution->error());
+        self::assertStringContainsString('acme/user 1.1.0 requires acme/virtual ^1.0 -> could not be found in any version', (string) $solution->problem());
     }
 
     /** A package that only provides a blocked name is no version of it: Composer blocks by the names a package has and replaces. */
     public function testABlockedRangeOfANameThatAReleaseOnlyProvidesLeavesTheReleaseInThePool(): void
     {
-        $solver = self::solver(['require' => ['acme/impl' => '^1.0']], [['name' => 'acme/impl', 'version' => '1.0.0']], ['acme/impl' => [['version' => '1.0.0'], ['version' => '1.1.0', 'provide' => ['acme/virtual' => '1.1.0']]]], [], ['acme/virtual' => [(new VersionParser())->parseConstraints('*')]]);
+        $solver = self::solver(['require' => ['acme/impl' => '^1.0']], [['name' => 'acme/impl', 'version' => '1.0.0']], ['acme/impl' => [['version' => '1.0.0'], ['version' => '1.1.0', 'provide' => ['acme/virtual' => '1.1.0']]]])
+            ->withAdvisories(self::advisories(['acme/virtual' => ['*']]));
 
         self::assertSame(['acme/impl' => '1.1.0'], $solver->solve(SolveRequest::update(['acme/impl' => '^1.1']))->installs());
     }
@@ -438,17 +429,215 @@ final class ComposerSolverTest extends TestCase
         self::assertSame([['acme/lib']], $asked);
     }
 
-    public function testTheBlockedRangesAndTheAdvisoryRangesOfOneNameBothBlock(): void
+    public function testEveryAdvisoryRangeOfOneNameBlocks(): void
     {
-        if (!class_exists(PartialSecurityAdvisory::class)) {
-            self::markTestSkipped('Composer below 2.4 has no advisory records');
-        }
-        $parser = new VersionParser();
-        $lookup = static fn (array $names, bool $complete): array => ['acme/lib' => [PartialSecurityAdvisory::create('acme/lib', ['advisoryId' => 'PKSA-1111-2222-3333', 'affectedVersions' => '>=1.2,<1.3'], $parser)]];
-        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0'], ['version' => '1.2.0']]], [], ['acme/lib' => [$parser->parseConstraints('>=1.1,<1.2')]])
-            ->withAdvisories(new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), $lookup));
+        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0'], ['version' => '1.2.0']]])
+            ->withAdvisories(self::advisories(['acme/lib' => ['>=1.1,<1.2', '>=1.2,<1.3']]));
 
         self::assertFalse($solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->resolves());
+    }
+
+    /**
+     * Ruling R6-35: Composer reads the partial records first, and a partial record carries no
+     * severity, so `ignore-severity: low` leaves it blocking. The run's complete records only seed
+     * the answers that Composer asks after.
+     *
+     * @dataProvider seededOrNot
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('seededOrNot')]
+    public function testAnIgnoredSeverityDoesNotUnblockAPartialRecord(bool $seeded): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['audit' => ['ignore-severity' => ['low' => ['apply' => 'block']]]]]);
+        $parser = new VersionParser();
+        $partial = PartialSecurityAdvisory::create('acme/lib', ['advisoryId' => 'PKSA-1111-2222-3333', 'affectedVersions' => '>=2.0.0,<2.0.5'], $parser);
+        $full = PartialSecurityAdvisory::create('acme/lib', ['advisoryId' => 'PKSA-1111-2222-3333', 'affectedVersions' => '>=2.0.0,<2.0.5', 'title' => 'A flaw', 'sources' => [['name' => 'GitHub', 'remoteId' => 'GHSA-aaaa-bbbb-cccc']], 'reportedAt' => '2026-01-01 00:00:00', 'cve' => null, 'link' => null, 'severity' => 'low'], $parser);
+        $advisories = new PoolAdvisories(AdvisoryBlocking::fromConfig($config), static fn (array $names, bool $complete): array => array_intersect_key(['acme/lib' => [$complete ? $full : $partial]], array_flip($names)));
+        $advisories = $seeded ? $advisories->withRecords(['acme/lib' => [$full]], ['acme/lib']) : $advisories;
+        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0'], ['version' => '2.0.4']]])
+            ->withAdvisories($advisories);
+
+        self::assertFalse($solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0'], false))->resolves());
+    }
+
+    /** @return iterable<string, array{bool}> */
+    public static function seededOrNot(): iterable
+    {
+        yield 'the run\'s records seed the complete answer' => [true];
+        yield 'no seed' => [false];
+    }
+
+    /**
+     * Ruling R6-36: a root alias of a dev branch (`dev-main as 1.0.0`) is a stable 1.0.0, and the
+     * advisory covers it. Composer asks only about dev-main, so only a range that meets dev-main
+     * reaches the filter. Without the alias, acme/user's `^1.0` meets no release that the root allows.
+     */
+    public function testAnAdvisoryBlocksTheRootAliasOfADevBranch(): void
+    {
+        $dev = ['version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.com/lib.git', 'reference' => 'abc123']];
+        $aliases = [['package' => 'acme/lib', 'version' => 'dev-main', 'alias' => '1.0.0', 'alias_normalized' => '1.0.0.0']];
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => 'dev-main as 1.0.0', 'acme/user' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $root->setStabilityFlags(['acme/lib' => 20]);
+        $root->setAliases($aliases);
+        $locked = LockFile::fromArray(['packages' => [['name' => 'acme/lib'] + $dev, ['name' => 'acme/user', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']]], 'aliases' => $aliases])->lockedRepository();
+        $remote = new ArrayVersionSource(['acme/lib' => [$dev], 'acme/user' => [['version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']]]]);
+        $open = new ComposerSolver($root, $locked, new PlatformRepository([], ['php' => '8.4.99']), $remote);
+
+        $refused = $open->withAdvisories(self::advisories(['acme/lib' => ['*']]))->solve(SolveRequest::unlock(['acme/lib']));
+
+        self::assertTrue($open->solve(SolveRequest::unlock(['acme/lib']))->resolves(), 'the alias satisfies acme/user without blocking');
+        self::assertFalse($refused->resolves());
+        self::assertContains('acme/user', array_map(static fn (Holder $hold): ?string => $hold->package(), $refused->holds()));
+    }
+
+    /** Composer prints the problem text without colour: no console markup reaches a report. */
+    public function testTheProblemTextOfABlockedVersionCarriesNoConsoleMarkup(): void
+    {
+        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]])
+            ->withAdvisories(self::advisories(['acme/lib' => ['>=1.1,<1.2']]));
+
+        $problem = (string) $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^1.1'], false))->problem();
+
+        self::assertStringContainsString('affected by security advisories', $problem);
+        self::assertStringContainsString('PKSA-1111-2222-3330', $problem);
+        foreach (['<href=', '</>', '<warning>', "\033"] as $markup) {
+            self::assertStringNotContainsString($markup, $problem);
+        }
+    }
+
+    /** Composer puts an advisory id into the problem text unescaped, so the id can hold markup that no colour reads. */
+    public function testAnAdvisoryIdWithConsoleMarkupLeavesTheProblemTextReadable(): void
+    {
+        $record = PartialSecurityAdvisory::create('acme/lib', ['advisoryId' => 'GHSA-<fg=nocolor>x', 'affectedVersions' => '>=1.1,<1.2'], new VersionParser());
+        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]])
+            ->withAdvisories(new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): array => ['acme/lib' => [$record]]));
+
+        $problem = (string) $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^1.1'], false))->problem();
+
+        self::assertStringContainsString('affected by security advisories', $problem);
+        self::assertStringContainsString('GHSA-<fg=nocolor>x', $problem);
+    }
+
+    /**
+     * Ruling R2-47, per solve: the names whose advisories the lookup could not read travel with the
+     * Solution of the solve that asked them, and only the names that its result holds.
+     */
+    public function testASolveCarriesTheUnreadNamesThatItsResultHolds(): void
+    {
+        $lookup = static fn (array $names, bool $complete): ?array => \in_array('acme/new-dependency', $names, true) ? null : [];
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0', 'acme/other' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/other', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/new-dependency' => '^1.0']]], 'acme/new-dependency' => [['version' => '1.0.0']], 'acme/other' => [['version' => '1.0.0'], ['version' => '1.1.0']]]
+        )->withAdvisories(new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), $lookup));
+
+        $unread = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']));
+        $read = $solver->solve(SolveRequest::update(['acme/other' => '^1.1']));
+
+        self::assertSame([true, ['acme/lib', 'acme/new-dependency']], [$unread->resolves(), $unread->advisoryUnread()]);
+        self::assertSame([true, []], [$read->resolves(), $read->advisoryUnread()]);
+    }
+
+    /** Composer blocks a release by each name that it replaces too (`SecurityAdvisoryPoolFilter::getMatchingAdvisories()`). */
+    public function testASolveCarriesTheUnreadNameThatAHeldReleaseReplaces(): void
+    {
+        $lookup = static fn (array $names, bool $complete): ?array => \in_array('acme/q', $names, true) ? null : [];
+        $solver = self::solver(
+            ['require' => ['acme/p' => '^1.0', 'acme/q' => '^1.0']],
+            [['name' => 'acme/p', 'version' => '1.0.0'], ['name' => 'acme/q', 'version' => '1.0.0']],
+            ['acme/p' => [['version' => '1.0.0'], ['version' => '1.1.0', 'replace' => ['acme/q' => 'self.version']]], 'acme/q' => [['version' => '1.0.0']]]
+        )->withAdvisories(new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), $lookup));
+
+        $solution = $solver->solve(SolveRequest::update(['acme/p' => '^1.1', 'acme/q' => '']));
+
+        self::assertSame([true, ['acme/p' => '1.1.0'], ['acme/p', 'acme/q']], [$solution->resolves(), $solution->installs(), $solution->advisoryUnread()]);
+    }
+
+    /** Composer blocks no release by a name that it only provides, so an unread provided name stays out. */
+    public function testASolveLeavesOutTheUnreadNameThatAHeldReleaseOnlyProvides(): void
+    {
+        $lookup = static fn (array $names, bool $complete): ?array => \in_array('acme/a-virtual', $names, true) ? null : [];
+        $solver = self::solver(
+            ['require' => ['acme/a-virtual' => '^1.0', 'acme/p' => '^1.0']],
+            [['name' => 'acme/p', 'version' => '1.0.0', 'provide' => ['acme/a-virtual' => '1.0.0']]],
+            ['acme/p' => [['version' => '1.0.0', 'provide' => ['acme/a-virtual' => '1.0.0']], ['version' => '1.1.0', 'provide' => ['acme/a-virtual' => '1.1.0']]], 'acme/a-virtual' => [['version' => '1.5.0']]]
+        )->withAdvisories(new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), $lookup));
+
+        $solution = $solver->solve(SolveRequest::update(['acme/p' => '^1.1']));
+
+        self::assertSame([true, ['acme/p' => '1.1.0'], ['acme/p']], [$solution->resolves(), $solution->installs(), $solution->advisoryUnread()]);
+    }
+
+    public function testAFilterThatCannotBeBuiltFailsEverySolveThatBlocks(): void
+    {
+        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]);
+        $broken = $solver->withAdvisories(new PoolAdvisories(AdvisoryBlocking::unbuildable(new \Error('drift')), static fn (array $names, bool $complete): array => []));
+
+        self::assertSame(['class' => \RuntimeException::class, 'message' => 'Composer\'s advisory pool filter cannot be built: drift'], $broken->solve(SolveRequest::baseline())->error());
+        self::assertTrue($solver->solve(SolveRequest::baseline())->resolves(), 'a solver without advisories runs no filter');
+    }
+
+    /**
+     * Ruling R6-2: the machine that runs lockrot decides no move. The solve ignores each
+     * requirement in ComposerSolver::IGNORED_PLATFORM, here at a version that no runner provides.
+     *
+     * @dataProvider hostRequirements
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('hostRequirements')]
+    public function testAReleaseThatRequiresAnIgnoredPlatformPackageResolves(string $name): void
+    {
+        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => [$name => '<1.0']]]]);
+
+        self::assertSame(['acme/lib' => '1.1.0'], $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->installs());
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function hostRequirements(): iterable
+    {
+        foreach (['ext-lockrotprobe', 'lib-lockrotprobe', 'php-debug', 'php-ipv6', 'php-zts'] as $name) {
+            yield $name => [$name];
+        }
+    }
+
+    /**
+     * A name that `config.platform` sets is the project's own fact, so the solve checks it. An
+     * override of false removes the package, as Composer's PlatformRepository does.
+     *
+     * @dataProvider configuredPlatform
+     *
+     * @param array<string, string|false> $platform
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('configuredPlatform')]
+    public function testAReleaseThatRequiresMoreThanTheConfiguredPlatformIsRefused(array $platform, string $name, string $constraint): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => [$name => $constraint]]]]);
+        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99'] + $platform), $source, array_keys($platform));
+
+        self::assertFalse($solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->resolves());
+    }
+
+    /** @return iterable<string, array{array<string, string|false>, string, string}> */
+    public static function configuredPlatform(): iterable
+    {
+        yield 'a library below the requirement' => [['lib-icu' => '60.1'], 'lib-icu', '>=70'];
+        yield 'an extension set to false' => [['ext-lockrotprobe' => false], 'ext-lockrotprobe', '*'];
+    }
+
+    /** Composer's solve takes the require-dev constraint of a name that both sections list, so the root hold names it. */
+    public function testTheRootHoldOfANameInBothSectionsIsItsRequireDevConstraint(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0', 'acme/dep' => '^1.0'], 'require-dev' => ['acme/dep' => '^1.2']],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/dep', 'version' => '1.2.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/dep' => '^2.0']]], 'acme/dep' => [['version' => '1.2.0'], ['version' => '2.0.0']]]
+        );
+
+        $holds = self::rows($solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->holds());
+
+        self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'acme/dep', 'constraint' => '^1.2'], $holds, json_encode($holds) ?: '');
     }
 
     /** The copy offers the locked path package, and the solver it comes from still offers no version of it. */
@@ -477,7 +666,7 @@ final class ComposerSolverTest extends TestCase
             ],
             'aliases' => [['package' => 'acme/core', 'version' => 'dev-main', 'alias' => '1.0.0', 'alias_normalized' => '1.0.0.0']],
         ]);
-        $solver = (new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']]]]), []))->withLockedOnly(['acme/core']);
+        $solver = (new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']]]])))->withLockedOnly(['acme/core']);
 
         self::assertFalse($solver->solve(SolveRequest::baseline())->resolves());
     }
@@ -524,7 +713,7 @@ final class ComposerSolverTest extends TestCase
             'packages' => [['name' => 'acme/lib'] + $dev, ['name' => 'acme/consumer'] + $consumer],
             'aliases' => [['package' => 'acme/lib', 'version' => 'dev-main', 'alias' => '1.5.0', 'alias_normalized' => '1.5.0.0']],
         ])->lockedRepository();
-        $solver = new ComposerSolver($root, $locked, new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [$dev, ['version' => '1.5.0', 'require' => ['php' => '>=9.0']]], 'acme/consumer' => [$consumer]]), []);
+        $solver = new ComposerSolver($root, $locked, new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [$dev, ['version' => '1.5.0', 'require' => ['php' => '>=9.0']]], 'acme/consumer' => [$consumer]]));
 
         self::assertTrue($solver->solve(SolveRequest::baseline())->resolves(), 'the lock installs with its alias');
         self::assertFalse($solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => 'dev-main'], false))->resolves(), 'the branch satisfies the consumer only through the old alias');
@@ -544,14 +733,30 @@ final class ComposerSolverTest extends TestCase
      * @param list<array<string, mixed>>                $locked
      * @param array<string, list<array<string, mixed>>> $remote
      * @param list<array<string, mixed>>                $lockedDev
-     * @param array<string, list<ConstraintInterface>>  $blocked
      */
-    private static function solver(array $root, array $locked, array $remote, array $lockedDev = [], array $blocked = []): ComposerSolver
+    private static function solver(array $root, array $locked, array $remote, array $lockedDev = []): ComposerSolver
     {
         $package = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0'] + $root, RootPackage::class);
         self::assertInstanceOf(RootPackageInterface::class, $package);
 
-        return new ComposerSolver($package, LockFile::fromArray(['packages' => $locked, 'packages-dev' => $lockedDev])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote), $blocked);
+        return new ComposerSolver($package, LockFile::fromArray(['packages' => $locked, 'packages-dev' => $lockedDev])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote));
+    }
+
+    /**
+     * Composer's default blocking, with the lookup answering one record for each range.
+     *
+     * @param array<string, list<string>> $ranges name => each affected range
+     */
+    private static function advisories(array $ranges): PoolAdvisories
+    {
+        $records = [];
+        foreach ($ranges as $name => $list) {
+            foreach ($list as $i => $range) {
+                $records[$name][] = PartialSecurityAdvisory::create($name, ['advisoryId' => 'PKSA-1111-2222-333'.$i, 'affectedVersions' => $range], new VersionParser());
+            }
+        }
+
+        return new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): array => array_intersect_key($records, array_flip($names)));
     }
 
     /**
@@ -571,7 +776,7 @@ final class ComposerSolverTest extends TestCase
         $root->setStabilityFlags($flags);
         $root->setAliases($aliases);
 
-        return new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote), []);
+        return new ComposerSolver($root, LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote));
     }
 
     /**

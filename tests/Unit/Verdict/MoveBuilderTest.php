@@ -59,7 +59,7 @@ final class MoveBuilderTest extends TestCase
     public function testARefusedMoveKeepsTheHoldsOfItsReleaseAddsTheRefusalsAndPrintsNoStep(): void
     {
         $refusal = ['source' => 'package', 'package' => 'c/d', 'version' => '1.0.0', 'link' => 'conflict', 'target' => null, 'constraint' => '>=2.0', 'holder' => null];
-        [$row, $context] = self::checked(['*' => ['result' => 'refused', 'form' => null, 'reason' => null, 'holds' => [$refusal]]], true, true, null, ['a/b' => '^1.0']);
+        [$row, $context] = self::checked(['*' => ['result' => 'refused', 'form' => null, 'reason' => null, 'holds' => [$refusal]]], true, null, ['a/b' => '^1.0']);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::LEFT_BEHIND)->to($row, $lower, null), [], null, $context);
@@ -74,7 +74,7 @@ final class MoveBuilderTest extends TestCase
     /** composer.json holds the release at ^1.0, and Composer's check of the move settles that hold. */
     public function testAResolvedMoveAssumesNoSolveAndItsStepCarriesTheFormOption(): void
     {
-        [$row, $context] = self::checked(['update a/b ^2.0.0 ' => ['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'holds' => []]], true, true, null, ['a/b' => '^1.0']);
+        [$row, $context] = self::checked(['update a/b ^2.0.0 ' => ['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'holds' => []]], true, null, ['a/b' => '^1.0']);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::LEFT_BEHIND)->to($row, $lower, null), [], null, $context);
@@ -134,7 +134,7 @@ final class MoveBuilderTest extends TestCase
     /** The project's php point 7.4 does not run the release, so the request raises php too. */
     public function testARaisePhpMoveAsksTheRequireThatRaisesPhp(): void
     {
-        [$row, $context] = self::checked(['require a/b ^2.0 >=8.1' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], true, true, '>=8.1', [], '>=7.4');
+        [$row, $context] = self::checked(['require a/b ^2.0 >=8.1' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], true, '>=8.1', [], '>=7.4');
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $move = MoveBuilder::build(MoveDraft::of(Move::RAISE_PHP, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
@@ -193,7 +193,7 @@ final class MoveBuilderTest extends TestCase
         $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
         $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
         $context = (new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', '7.4.0'), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true))
-            ->withChecks(new MoveChecks(new RecordedMoveChecker(['update a/b ^2.1.0 >=8.1' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], []), true));
+            ->withChecks(MoveChecks::of(new RecordedMoveChecker(['update a/b ^2.1.0 >=8.1' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], [])));
         [$lower] = $context->lowestAdmitted($row, '^2.1');
         self::assertNotNull($lower);
 
@@ -215,7 +215,7 @@ final class MoveBuilderTest extends TestCase
         $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
         $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
         $context = (new MoveContext($finding, new MoveSubject('a/b', '1.x-dev', true, [], '8.4', '7.4.0'), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true))
-            ->withChecks(new MoveChecks(new RecordedMoveChecker(['require a/b ^2.0.0 >=8.1' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], []), true));
+            ->withChecks(MoveChecks::of(new RecordedMoveChecker(['require a/b ^2.0.0 >=8.1' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], [])));
 
         $move = MoveBuilder::build(MoveDraft::of(Move::TAG, FlagSet::PINNED)->withLatest(new Latest('2.0.0', '2026-01-01T00:00:00+00:00', false, 'newer', null), $row), [], null, $context);
         $check = $move->check();
@@ -274,7 +274,7 @@ final class MoveBuilderTest extends TestCase
 
     public function testAMoveThatComposerDidNotCheckAssumesThatComposerResolvesItsHold(): void
     {
-        [$row, $context] = self::checked(['*' => ['result' => 'not_checked', 'form' => null, 'reason' => 'offline', 'holds' => []]], true, true, null, ['a/b' => '^1.0']);
+        [$row, $context] = self::checked(['*' => ['result' => 'not_checked', 'form' => null, 'reason' => 'offline', 'holds' => []]], true, null, ['a/b' => '^1.0']);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $ifApplied = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::LEFT_BEHIND)->to($row, $lower, null), [], null, $context)->ifApplied();
@@ -296,40 +296,12 @@ final class MoveBuilderTest extends TestCase
     /** An advisory with no range read is left out, and the next one is still judged. */
     public function testAMoveClearsAnAdvisoryOutsideItsRangeAfterOneWithNoRange(): void
     {
-        [$row, $context] = self::checked([], true, true, null, [], null, ['GHSA-out' => (new VersionParser())->parseConstraints('<1.5')]);
+        [$row, $context] = self::checked([], true, null, [], null, ['GHSA-out' => (new VersionParser())->parseConstraints('<1.5')]);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         [$clears] = MoveBuilder::clearsFor($row, $lower, [], ['GHSA-unread', 'GHSA-out'], $context);
 
         self::assertSame([['kind' => 'advisory', 'id' => 'GHSA-out', 'basis' => 'outside_range']], array_map(static fn (MoveFact $fact): array => $fact->jsonSerialize(), $clears));
-    }
-
-    /** Composer 2.2 and 2.3 refuse an inline constraint on a package that composer.json does not require. */
-    public function testATransitiveRequireGetsNoStepOnAComposerWithoutInlineConstraints(): void
-    {
-        [$row, $context] = self::checked(['update a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, false);
-        [$lower] = $context->lowestAdmitted($row, '^2.0');
-
-        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
-
-        self::assertSame([], $move->commands());
-    }
-
-    /** Composer 2.2 and 2.3 run the plain `composer update a/b`, so the check solves that request and reads what it installs. */
-    public function testATransitiveUpdateOnAComposerWithoutInlineConstraintsChecksThePlainUpdateThatItPrints(): void
-    {
-        [$row, $context] = self::checked([
-            'update a/b ^2.0.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '2.0.0', 'holds' => []],
-            'update a/b * ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '3.0.0', 'holds' => []],
-        ], false, false);
-        [$lower] = $context->lowestAdmitted($row, '^2.0');
-
-        $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::LEFT_BEHIND)->to($row, $lower, null), [], null, $context);
-        $check = $move->check();
-
-        self::assertSame([['composer', 'update', 'a/b']], $move->commands());
-        self::assertNotNull($check);
-        self::assertSame('3.0.0', $check->installs());
     }
 
     public function testATransitiveRequireThatIsNotCheckedGetsOnlyItsWhyNotStep(): void
@@ -345,7 +317,7 @@ final class MoveBuilderTest extends TestCase
     /** monica's firebase/php-jwt: Composer refuses the move alone, and one request of the package and its holder h/x resolves it. */
     public function testARootRequirementThatAJointRequestResolvesWritesItThenUpdatesThePackageWithItsHolders(): void
     {
-        [$row, $context] = self::checked(self::refusedThenJoint('require a/b ^2.0 '), true, true, null, ['a/b' => '^1.0']);
+        [$row, $context] = self::checked(self::refusedThenJoint('require a/b ^2.0 '), true, null, ['a/b' => '^1.0']);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
@@ -370,7 +342,7 @@ final class MoveBuilderTest extends TestCase
 
     public function testAPackageThatOnlyRequireDevListsGetsTheRequireCommandOfThatSection(): void
     {
-        [$row, $context] = self::checked(['require a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, true, null, [], null, [], ['require-dev']);
+        [$row, $context] = self::checked(['require a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, null, [], null, [], ['require-dev']);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
@@ -384,7 +356,7 @@ final class MoveBuilderTest extends TestCase
     /** SPEC 5.6: `transitive` reads `direct`, so a require-dev name in a run without --dev keeps it (case require-dev-name). */
     public function testARequireDevNameThatTheRunDoesNotReachDirectlyMovesBecauseItIsTransitive(): void
     {
-        [$row, $context] = self::checked(['require a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, true, null, [], null, [], ['require-dev']);
+        [$row, $context] = self::checked(['require a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, null, [], null, [], ['require-dev']);
         [$lower] = $context->lowestAdmitted($row, '^2.0');
 
         $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
@@ -442,7 +414,7 @@ final class MoveBuilderTest extends TestCase
      *
      * @return array{0: BranchRow, 1: MoveContext}
      */
-    private static function checked(array $checks, bool $direct = true, bool $inlineOnAnyPackage = true, ?string $php = null, array $require = [], ?string $projectPhp = null, array $ranges = [], array $namedIn = []): array
+    private static function checked(array $checks, bool $direct = true, ?string $php = null, array $require = [], ?string $projectPhp = null, array $ranges = [], array $namedIn = []): array
     {
         $facts = self::facts($php);
         $floor = new PhpFloor('8.4', $projectPhp);
@@ -451,7 +423,7 @@ final class MoveBuilderTest extends TestCase
         $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
         $project = ProjectConfig::fromArray(['require' => $require]);
         $context = (new MoveContext($finding, (new MoveSubject('a/b', '1.0.0', $direct, $direct ? [] : ['c/d'], '8.4', null))->withNamedIn($namedIn), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, $project)), $floor, new \DateTimeImmutable(self::NOW), 2, null, $ranges, [], true))
-            ->withChecks(new MoveChecks(new RecordedMoveChecker($checks, []), $inlineOnAnyPackage));
+            ->withChecks(MoveChecks::of(new RecordedMoveChecker($checks, [])));
 
         return [$row, $context];
     }

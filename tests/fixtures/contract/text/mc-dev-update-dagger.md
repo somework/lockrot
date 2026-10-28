@@ -13,7 +13,7 @@ security: 1 vulnerable package · 1 advisory: 1 high
 libyears: 0.9 behind across all 2 packages · 0.0 from direct requirements · furthest behind guzzlehttp/psr7 2.8.0 at 0.9
 pulled in by: `guzzlehttp/guzzle` 1
 advisories: 2 packages asked · packagist.org answered (21 on record for 2 packages)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-\* requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 8.1 to 8.5
 
 **Update now:** `composer update 'guzzlehttp/psr7:^2.12.3'`

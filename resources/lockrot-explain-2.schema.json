@@ -3452,7 +3452,7 @@
                                 "composer",
                                 "blocks_advisories",
                                 "blocking_disabled_by",
-                                "ignores_extensions",
+                                "ignored_platform",
                                 "baseline",
                                 "reason"
                             ],
@@ -3488,12 +3488,13 @@
                                     },
                                     "uniqueItems": true
                                 },
-                                "ignores_extensions": {
-                                    "description": "Always true: the solve ignores every `ext-*` requirement, as `--ignore-platform-req=ext-*` does, so the extensions of the machine that runs lockrot decide no move.",
-                                    "type": "boolean",
-                                    "enum": [
-                                        true
-                                    ]
+                                "ignored_platform": {
+                                    "description": "The platform patterns whose requirements the solve ignores, as `--ignore-platform-req` does, so the machine that runs lockrot decides no move. A name that composer.json `config.platform` sets is checked even when a pattern matches it (ruling R6-2).",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "minLength": 1
+                                    }
                                 },
                                 "baseline": {
                                     "description": "The partial update of a name outside the lock: `refused` means Composer refuses the lock itself, so no move is checked (the `moves_not_checked` note). Closed.",
@@ -16242,11 +16243,10 @@
             }
         },
         "noteUpdateNowReduced": {
-            "description": "`update_now_reduced`: the command leaves out the members that Composer's refusal of the combined update names, and, under Composer 2.2 or 2.3, each plain member that the resolving solve installs below its move version.",
+            "description": "`update_now_reduced`: the command leaves out the members that Composer's refusal of the combined update names.",
             "type": "object",
             "required": [
                 "left_out",
-                "held_below",
                 "problem"
             ],
             "properties": {
@@ -16259,34 +16259,9 @@
                     "minItems": 1,
                     "uniqueItems": true
                 },
-                "held_below": {
-                    "description": "The plain members that the combined solve installs below their move version, in report order, each also in `left_out`. Empty when only a refusal leaves members out.",
-                    "type": "array",
-                    "items": {
-                        "description": "A member left out below its fix.",
-                        "type": "object",
-                        "required": [
-                            "package",
-                            "installs"
-                        ],
-                        "properties": {
-                            "package": {
-                                "$ref": "#/definitions/packageName"
-                            },
-                            "installs": {
-                                "description": "The release that the combined solve installs for it, as the lock would write it.",
-                                "type": "string",
-                                "minLength": 1
-                            }
-                        }
-                    }
-                },
                 "problem": {
-                    "description": "Composer's problem text of the refused combined update, without colour. Foreign text, not contract. Null when no refusal leaves a member out.",
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "description": "Composer's problem text of the refused combined update, without colour. Foreign text, not contract.",
+                    "type": "string",
                     "minLength": 1
                 }
             }
