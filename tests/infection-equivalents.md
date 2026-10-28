@@ -130,6 +130,7 @@ entry in the commit that changes the line.
 - `src/Output/MarkdownFormatter.php` Break_ `break;` — the room only shrinks row by row, so no row after the first that does not fit can fit.
 - `src/Output/MarkdownFormatter.php` CastString `$value = (string) preg_replace('/(?<![A-Za-z0-9])@|@(?=[A-Za-z0-9_\\\\-]+\\.[A-Za-z0-9])/', '@&#8203;', str_replace('://', '\\://', $value));` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Output/MarkdownFormatter.php` CastString `$value = (string) preg_replace('/:(?=(?:[A-Za-z0-9+-]|\\\\_)+:)/', ':&#8203;', str_replace('$', '<span>$</span>', $value));` — the pattern is a literal, so `preg_replace()` never returns null.
+- `src/Output/MarkdownFormatter.php` CastString `$value = (string) preg_replace(` — the patterns are literals, so `preg_replace()` never returns null.
 - `src/Output/MarkdownFormatter.php` DecrementInteger `$nonce = bin2hex(random_bytes(16));` — the footer replaces each stand-in before it returns, so the nonce length never reaches the output, and 15 random bytes are as far out of reach of the data.
 - `src/Output/MarkdownFormatter.php` IncrementInteger `$nonce = bin2hex(random_bytes(16));` — the footer replaces each stand-in before it returns, so the nonce length never reaches the output.
 - `src/Output/InstallSummaryFormatter.php` LogicalAnd `$gateLine = $gate !== null && $run !== null && $gate->fails() ? '  '.self::text(RunGateText::render($gate, $run)) : null;` — a report decides its gate only from its run settings, so the gate and the run are null together.
