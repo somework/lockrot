@@ -49,6 +49,22 @@ final class UpdateNowTest extends TestCase
         self::assertSame(['composer', 'update', self::PACKAGE.':^2.3.2'], $report->updateNowCommand());
     }
 
+    /** R6-3: when require-dev lists php too, the raise of the line says what it does to require-dev, as the member's own move does. */
+    public function testTheUpdateNowRaiseSaysItRemovesPhpFromRequireDevWhenRequireDevListsIt(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]];
+        $inputs['releases'] = array_merge(JsonPath::arrayAt($inputs, ['releases']), [['version' => 'v2.3.5', 'time' => '2026-07-01T00:00:00+00:00', 'php' => '>=8.2']]);
+        $inputs['root'] = JsonPath::arrayAt($inputs, ['root']) + ['require-dev' => ['php' => '^8.1']];
+        $case['inputs'] = $inputs;
+        $report = CaseHydrator::report($case);
+        $move = JsonPath::arrayAt(self::finding(JsonPath::decoded($report->toArray()), self::PACKAGE), ['next_step']);
+
+        self::assertSame(['composer', 'require', 'php:>=8.2', '--no-interaction', '--no-update'], JsonPath::arrayAt($move, ['commands', 0]), 'the member\'s own move');
+        self::assertSame('raise require.php to >=8.2, which removes it from require-dev, then ', RunFooter::platformStep($report));
+    }
+
     /**
      * @dataProvider raises
      *

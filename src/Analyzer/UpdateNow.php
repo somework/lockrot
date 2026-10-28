@@ -27,17 +27,19 @@ final class UpdateNow
     private ?array $command;
     private ?RunNote $note;
     private ?string $raiseTo;
+    private bool $phpInRequireDev;
 
     /**
      * @param list<string>      $members
      * @param list<string>|null $command
      */
-    private function __construct(array $members, ?array $command, ?RunNote $note, ?string $raiseTo = null)
+    private function __construct(array $members, ?array $command, ?RunNote $note, ?string $raiseTo = null, bool $phpInRequireDev = false)
     {
         $this->members = $members;
         $this->command = $command;
         $this->note = $note;
         $this->raiseTo = $raiseTo;
+        $this->phpInRequireDev = $phpInRequireDev;
     }
 
     /** @param list<Finding> $findings in report order */
@@ -107,7 +109,26 @@ final class UpdateNow
     {
         $argv = self::argv($inline, $findings);
 
-        return new self($argv === null ? [] : array_keys($inline), $argv, $note, $argv === null ? null : self::raiseOf($inline, $findings));
+        $first = self::member($inline, $findings);
+
+        return new self($argv === null ? [] : array_keys($inline), $argv, $note, $argv === null ? null : self::raiseOf($inline, $findings), $first !== null && $first->subject()->isPhpInRequireDev());
+    }
+
+    /**
+     * The move of the first member. Every move reads the php keys of one composer.json.
+     *
+     * @param array<string, string> $inline
+     * @param list<Finding>         $findings
+     */
+    private static function member(array $inline, array $findings): ?Move
+    {
+        foreach ($findings as $finding) {
+            if (isset($inline[$finding->package()])) {
+                return $finding->nextStep();
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -149,6 +170,12 @@ final class UpdateNow
     public function raiseTo(): ?string
     {
         return $this->raiseTo;
+    }
+
+    /** Whether require-dev lists php, so the raise removes that line. */
+    public function isPhpInRequireDev(): bool
+    {
+        return $this->phpInRequireDev;
     }
 
     /** @return list<string> */

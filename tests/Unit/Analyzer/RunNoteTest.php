@@ -319,12 +319,12 @@ final class RunNoteTest extends TestCase
             false,
             ['left_out' => ['acme/b'], 'problem' => self::CONFLICT],
         ];
-        yield 'update now without two packages' => [
-            static fn (): RunNote => RunNote::updateNowReduced(['acme/b', 'acme/c'], self::CONFLICT),
+        yield 'update now without three packages' => [
+            static fn (): RunNote => RunNote::updateNowReduced(['acme/b', 'acme/c', 'acme/d'], self::CONFLICT),
             'update_now_reduced',
-            "update now: the command leaves out acme/b, acme/c, because Composer's solver refuses them together with the others: acme/a 2.1.0 conflicts with acme/b <3.0.",
+            "update now: the command leaves out acme/b, acme/c and acme/d, because Composer's solver refuses them together with the others: acme/a 2.1.0 conflicts with acme/b <3.0.",
             false,
-            ['left_out' => ['acme/b', 'acme/c'], 'problem' => self::CONFLICT],
+            ['left_out' => ['acme/b', 'acme/c', 'acme/d'], 'problem' => self::CONFLICT],
         ];
         yield 'update now refused' => [
             static fn (): RunNote => RunNote::updateNowRefused(self::CONFLICT),

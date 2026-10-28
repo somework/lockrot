@@ -309,7 +309,13 @@ final class MoveText
             return '';
         }
 
-        return 'raise require.php to '.$check->raiseTo().($move->subject()->isPhpInRequireDev() ? self::REMOVES_DEV : '').', then ';
+        return self::raiseWords($check->raiseTo(), $move->subject()->isPhpInRequireDev());
+    }
+
+    /** The prose of a require.php raise before a step. */
+    public static function raiseWords(string $to, bool $phpInRequireDev): string
+    {
+        return 'raise require.php to '.$to.($phpInRequireDev ? self::REMOVES_DEV : '').', then ';
     }
 
     /** One clause per basis of `adds[]`: what the move raises that would count. */
