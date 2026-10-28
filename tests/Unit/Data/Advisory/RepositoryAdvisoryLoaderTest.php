@@ -84,9 +84,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testOnlyAdvisoriesMatchingTheInstalledVersionComeBack(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $loader = new RepositoryAdvisoryLoader($this->server()->repositories());
 
         $batch = $loader->load(['doctrine/cache' => '2.2.0', 'doctrine/annotations' => '2.0.2', 'symfony/console' => 'v5.4.47']);
@@ -110,9 +107,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testIgnoredAdvisoriesLeaveTheCountAndAreKeptWithTheirRecord(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $repositories = $this->server()->repositories();
         $load = static fn (AdvisoryIgnore $ignore): AdvisoryBatch => (new RepositoryAdvisoryLoader($repositories, false, null, $ignore))->load(['doctrine/cache' => '2.2.0']);
         $ids = static fn (AdvisoryBatch $batch): array => array_map(static fn (Advisory $a): string => $a->id(), $batch->for('doctrine/cache'));
@@ -138,9 +132,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testAnUnreadableIgnoreListIsANoteOnTheBatch(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $loader = new RepositoryAdvisoryLoader($this->server()->repositories(), false, null, AdvisoryIgnore::unreadable('Unknown key "licenses"'));
 
         $batch = $loader->load(['doctrine/cache' => '2.2.0']);
@@ -154,9 +145,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testAnUnparsableInstalledVersionIsSkippedNotFatal(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $loader = new RepositoryAdvisoryLoader($this->server()->repositories());
 
         $batch = $loader->load(['doctrine/cache' => 'not a version']);
@@ -176,9 +164,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
      */
     public function testARepositoryServingPartialRecordsIsANoteNotAFailure(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $partial = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $partial->withSecurityAdvisories(['doctrine/cache' => [['advisoryId' => 'GHSA-partial-only', 'affectedVersions' => '>=2.0,<3.0']]]);
         try {
@@ -207,9 +192,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testARepositoryWithoutAdvisoriesAndANonComposerRepositoryAreSteppedOver(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $plain = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         try {
             $plain->start();
@@ -226,9 +208,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testAnUnreachableRepositoryIsANoteAndANetworkFailureAndTheNextOneStillAnswers(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $loader = new RepositoryAdvisoryLoader(array_merge($unreachable->repositories(), $this->server()->repositories()));
 
@@ -255,9 +234,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
     /** ComposerRepository lets a JSON ParsingException past its retry loop. It is not a RuntimeException. */
     public function testARepositoryWhosePackagesJsonIsNotJsonIsANoteAndTheNextOneStillAnswers(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $corrupt = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $corrupt->withCorruptPackagesJson();
         try {
@@ -279,9 +255,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
     /** What a repository throws is a note, whatever its class — and an empty message names the class. */
     public function testAnyThrowableFromARepositoryIsANote(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $throwing = static function (\Throwable $e): ArrayRepository {
             return new class ($e) extends ArrayRepository implements AdvisoryProviderInterface {
                 private \Throwable $e;
@@ -352,9 +325,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testABudgetSpentAfterTheFirstRepositoryKeepsItsNote(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $calls = 0;
         // 0.0 while the first repository is queried, then past the 1-second budget
@@ -375,9 +345,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testAnExhaustedBudgetAsksNothing(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $loader = new RepositoryAdvisoryLoader($unreachable->repositories(), false, Deadline::inSeconds(0.0, static fn (): float => 0.0));
 
@@ -391,9 +358,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
     /** The move check reads a name as checked only when every repository with a feed answered for it (SPEC §5.6, ruling Q2). */
     public function testALookupThatAnAdvisoryRepositoryDidNotAnswerReadsNoName(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK])->repositories();
         $spent = Deadline::inSeconds(0.0, static fn (): float => 0.0);
         $answered = new RepositoryAdvisoryLoader($this->server()->repositories());
@@ -406,13 +370,9 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame(['doctrine/cache'], $answered->load(['doctrine/cache' => '2.2.0'])->asked());
     }
 
-    /** On the Composer 2.2 LTS the whole check is one note. On 2.4 or newer that note never appears. */
     /** A lookup that is not complete takes the partial records that Composer's metadata gives, and a complete one does not. */
     public function testTheRecordsOfALookupArePartialOnlyWhenTheLookupIsNotComplete(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         [$completeSpy, $complete] = self::spy();
         [$partialSpy, $partial] = self::spy();
 
@@ -421,23 +381,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         self::assertSame(['hasSecurityAdvisories', 'getSecurityAdvisories'], $complete->getArrayCopy());
         self::assertSame(['hasSecurityAdvisories', 'getSecurityAdvisories partial'], $partial->getArrayCopy());
-    }
-
-    public function testTheComposerVersionNoteMatchesTheApi(): void
-    {
-        $loader = new RepositoryAdvisoryLoader($this->server()->repositories());
-
-        $batch = $loader->load(['doctrine/cache' => '2.2.0']);
-
-        if (interface_exists(AdvisoryProviderInterface::class)) {
-            self::assertSame([], $batch->notes());
-        } else {
-            self::assertSame(['security advisories not checked (needs Composer 2.4 or newer): no finding is graded for an advisory, and each next step\'s score after the move assumes its versions carry none'], self::texts($batch));
-            self::assertSame(['reason' => 'composer_too_old', 'composer_repositories_checked' => 0], $batch->notes()[0]->data());
-            self::assertSame([], $batch->byName());
-            self::assertSame(AdvisoryCoverage::COMPOSER_TOO_OLD, self::nameCoverage($batch, 'doctrine/cache')->reason());
-            self::assertSame([[AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::COMPOSER_TOO_OLD]], self::outcomes($batch), 'Composer 2.2 names each Composer repository as not asked');
-        }
     }
 
     /** @var list<FixtureRepositoryServer> */
@@ -459,9 +402,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
      */
     private function api(array $advisories, array $patterns = []): FixtureRepositoryServer
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $server->withAdvisoryApi($advisories, $patterns);
         $server->start();
@@ -543,9 +483,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testAMetadataPathRepositoryCountsTheRecordsOfThePackageFile(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $batch = (new RepositoryAdvisoryLoader($this->server()->repositories()))->load(['doctrine/cache' => '2.2.0', 'symfony/console' => 'v5.4.47']);
 
         self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 3], self::feed($batch, 'doctrine/cache', 0));
@@ -602,9 +539,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testAnAnswerLockrotCannotReadIsAnInvalidResponseAndNoNetworkFailure(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $corrupt = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $corrupt->withCorruptPackagesJson();
         $corrupt->start();
@@ -683,9 +617,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testOfflineAsksNoRepositoryAndRecordsEachAsNotAsked(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         [$spy, $calls] = self::spy();
 
         [$other] = self::spy();
@@ -706,9 +637,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
     /** Composer's policy stops blocking, never `composer audit`: lockrot still asks and counts. */
     public function testAPolicyThatTurnsComposersAdvisoryChecksOffStillAsksAndNotesTheKey(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         [$spy, $calls] = self::spy();
         $ignore = AdvisoryIgnore::disabled('policy.advisories', false);
 
@@ -724,9 +652,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testNoRepositoryWithAFeedIsNoFeedAndAVcsRepositoryIsCountedNeverNamed(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         [$withoutFeed] = self::spy(false);
         $vcs = new class () extends ArrayRepository {
             public function getRepoName(): string
@@ -803,9 +728,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testAFilteredRepositoryIsNamedOnlyWhenItWrapsAnAdvisoryCapableOne(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $vcs = new class () extends ArrayRepository {
             public function getRepoName(): string
             {
@@ -822,9 +744,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testARepositoryWithoutAFeedLeavesTheLookupComplete(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         [$withoutFeed] = self::spy(false);
         $answering = $this->api(['doctrine/cache' => []]);
 

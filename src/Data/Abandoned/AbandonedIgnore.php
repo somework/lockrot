@@ -6,6 +6,9 @@ namespace Lockrot\Data\Abandoned;
 
 use Composer\Config;
 use Composer\Package\BasePackage;
+use Composer\Policy\AbandonedPolicyConfig;
+use Composer\Semver\Constraint\MatchAllConstraint;
+use Composer\Semver\VersionParser;
 use Composer\Util\Platform;
 
 /**
@@ -45,9 +48,9 @@ final class AbandonedIgnore
      * Composer's config can be wrong for this Composer: the PHAR reads projects written for
      * another one. A list Composer rejects is no list, with the first line of why, never no report.
      */
-    public static function fromConfig(Config $config, ?AbandonedPolicyReader $reader = null): self
+    public static function fromConfig(Config $config): self
     {
-        $ignore = self::listOf($config, $reader ?? new ComposerAbandonedPolicyReader());
+        $ignore = self::listOf($config);
         try {
             $ignore->notAuditedBy = self::notAudited($config);
         } catch (\Throwable $e) {
@@ -58,17 +61,10 @@ final class AbandonedIgnore
         return $ignore;
     }
 
-    private static function listOf(Config $config, AbandonedPolicyReader $reader): self
+    private static function listOf(Config $config): self
     {
         try {
-            switch ($reader->api()) {
-                case AbandonedPolicyReader::POLICY:
-                    return self::fromPolicy($config, $reader);
-                case AbandonedPolicyReader::AUDIT_CONFIG:
-                    return self::of(AbandonedIgnoreMatch::BY_AUDIT, self::fromAuditConfig($reader->auditConfigList($config)));
-                default:
-                    return self::none();
-            }
+            return self::fromPolicy($config);
         } catch (\Throwable $e) {
             return new self(AbandonedIgnoreMatch::BY_POLICY, [], (string) strtok($e->getMessage(), "\r\n"));
         }
@@ -106,7 +102,7 @@ final class AbandonedIgnore
      * Normalised as `PolicyConfig::fromConfig()` normalises it: Composer's default `policy` is
      * `true`, which the policy API rejects as an argument.
      */
-    private static function fromPolicy(Config $config, AbandonedPolicyReader $reader): self
+    private static function fromPolicy(Config $config): self
     {
         $raw = $config->get('policy');
         if ($raw === false) {
@@ -117,28 +113,44 @@ final class AbandonedIgnore
 
         return self::of(
             isset($policy['abandoned']) ? AbandonedIgnoreMatch::BY_POLICY : AbandonedIgnoreMatch::BY_AUDIT,
-            $reader->policyRules($policy, \is_array($audit) ? $audit : [])
+            self::policyRules($policy, \is_array($audit) ? $audit : [])
         );
     }
 
     /**
-     * @param array<mixed> $list
+     * The patterns `composer audit` applies, in config order.
+     *
+     * @param array<mixed> $policy
+     * @param array<mixed> $audit
      *
      * @return list<AbandonedIgnoreRule>
      */
-    private static function fromAuditConfig(array $list): array
+    private static function policyRules(array $policy, array $audit): array
     {
+        $list = AbandonedPolicyConfig::fromRawConfig(self::stringKeys($policy), self::stringKeys($audit), new VersionParser());
+        $rulesByPattern = $list->getIgnoreForOperation('audit');
         $rules = [];
-        $isList = array_values($list) === $list;
-        foreach ($list as $key => $value) {
-            if (!$isList) {
-                $rules[] = new AbandonedIgnoreRule((string) $key, \is_string($value) ? $value : null, []);
-            } elseif (\is_string($value)) {
-                $rules[] = new AbandonedIgnoreRule($value, null, []);
+        foreach ($list->getFlatIgnoreForOperation('audit') as $pattern => $reason) {
+            $constraints = [];
+            foreach ($rulesByPattern[$pattern] ?? [] as $rule) {
+                if (!$rule->constraint instanceof MatchAllConstraint) {
+                    $constraints[] = $rule->constraint->getPrettyString();
+                }
             }
+            $rules[] = new AbandonedIgnoreRule((string) $pattern, $reason, $constraints);
         }
 
         return $rules;
+    }
+
+    /**
+     * @param array<mixed> $config
+     *
+     * @return array<string, mixed>
+     */
+    private static function stringKeys(array $config): array
+    {
+        return array_filter($config, 'is_string', \ARRAY_FILTER_USE_KEY);
     }
 
     /** Every pattern that matches the name, in config order. Null when none does. */

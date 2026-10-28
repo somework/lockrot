@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Composer;
 
-use Composer\Composer;
 use Composer\Config;
 use Composer\Downloader\TransportException;
 use Composer\IO\BufferIO;
@@ -416,7 +415,6 @@ final class ComposerHttpClientTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('redirectsToAnotherOrigin')]
     public function testARedirectToAnotherOriginIsRequestedAgainWithoutTheToken(string $url, string $target): void
     {
-        self::skipBelowComposer210();
         [$client, $downloader] = self::clientWith([$url => $target, $target => [200, 'moved']]);
 
         $results = $client->fetchAll([$url], self::HEADERS);
@@ -434,7 +432,6 @@ final class ComposerHttpClientTest extends TestCase
      */
     public function testARedirectTargetIsNotRequestedAfterTheBudgetEnds(): void
     {
-        self::skipBelowComposer210();
         $url = 'https://api.github.com/repos/vendor/name';
         $target = 'https://objects.example.com/name';
         $held = new \stdClass();
@@ -453,7 +450,6 @@ final class ComposerHttpClientTest extends TestCase
     /** The downloader queues requests above its limit, so a request can start after the budget although add() came before it. */
     public function testAQueuedRequestDoesNotStartAfterTheBudgetEnds(): void
     {
-        self::skipBelowComposer210();
         $url = 'https://api.github.com/repos/vendor/name';
         $held = new \stdClass();
         $now = static function () use ($held): float {
@@ -470,7 +466,6 @@ final class ComposerHttpClientTest extends TestCase
 
     public function testAQueuedRedirectTargetDoesNotStartAfterTheBudgetEnds(): void
     {
-        self::skipBelowComposer210();
         $url = 'https://api.github.com/repos/vendor/name';
         $target = 'https://objects.example.com/name';
         $held = new \stdClass();
@@ -489,7 +484,6 @@ final class ComposerHttpClientTest extends TestCase
     /** The deadline is past for the first redirect, so it is past for each one after it. */
     public function testEachRedirectTargetAfterTheBudgetReadsBudgetSpent(): void
     {
-        self::skipBelowComposer210();
         $first = 'https://api.github.com/repos/vendor/one';
         $second = 'https://api.github.com/repos/vendor/two';
         $held = new \stdClass();
@@ -510,7 +504,6 @@ final class ComposerHttpClientTest extends TestCase
     /** Composer asks before each hop too, so a chain that reaches the budget stops at its next hop. */
     public function testASameOriginHopAfterTheBudgetEndsIsNotFollowed(): void
     {
-        self::skipBelowComposer210();
         $url = 'https://api.github.com/repos/vendor/name';
         $hop = 'https://api.github.com/repositories/1';
         $held = new \stdClass();
@@ -529,7 +522,6 @@ final class ComposerHttpClientTest extends TestCase
     /** The first wait() spends part of the budget, so the request to a redirect's target gets only what is left. */
     public function testARedirectTargetTakesTheTimeoutThatIsLeftAfterTheFirstWait(): void
     {
-        self::skipBelowComposer210();
         $url = 'https://api.github.com/repos/vendor/name';
         $target = 'https://objects.example.com/name';
         $held = new \stdClass();
@@ -561,7 +553,6 @@ final class ComposerHttpClientTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('redirectsOnTheSameOrigin')]
     public function testARedirectOnTheSameOriginIsFollowedWithTheToken(string $url, string $target): void
     {
-        self::skipBelowComposer210();
         [$client, $downloader] = self::clientWith([$url => $target, $target => [200, 'moved']]);
 
         $results = $client->fetchAll([$url], self::HEADERS);
@@ -577,31 +568,6 @@ final class ComposerHttpClientTest extends TestCase
         yield 'another path' => ['https://a.example.com/1', 'https://a.example.com/2'];
         yield 'the same port' => ['https://a.example.com:8443/1', 'https://a.example.com:8443/2'];
         yield 'another letter case' => ['HTTPS://A.Example.com/1', 'https://a.example.com/2'];
-    }
-
-    /**
-     * @dataProvider composersThatRefuseRedirects
-     */
-    #[\PHPUnit\Framework\Attributes\DataProvider('composersThatRefuseRedirects')]
-    public function testOnlyTheCurlDownloaderOfComposer210RefusesARedirect(string $version, bool $curl, bool $refuses): void
-    {
-        self::assertSame($refuses, ComposerHttpClient::refusesRedirects($version, $curl));
-    }
-
-    /** @return iterable<string, array{string, bool, bool}> */
-    public static function composersThatRefuseRedirects(): iterable
-    {
-        yield '2.10 with curl' => ['2.10.0', true, true];
-        yield 'a 2.10 snapshot with curl' => ['2.10.0-dev', true, true];
-        yield '2.10 without curl' => ['2.10.3', false, false];
-        yield '2.9 with curl' => ['2.9.5', true, false];
-    }
-
-    private static function skipBelowComposer210(): void
-    {
-        if (!ComposerHttpClient::refusesRedirects(Composer::getVersion(), true)) {
-            self::markTestSkipped('Composer 2.10 or later with curl: lockrot follows each redirect of an older Composer itself (ComposerHttpClientRedirectTest, OnAnyComposer)');
-        }
     }
 }
 

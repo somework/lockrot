@@ -7,7 +7,6 @@ namespace Lockrot\Data\Advisory;
 use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Downloader\TransportException;
 use Composer\Repository\AdvisoryProviderInterface;
-use Composer\Repository\ComposerRepository;
 use Composer\Repository\FilterRepository;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
@@ -142,10 +141,6 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         if ($this->offline) {
             return [AdvisoryCoverage::OFFLINE, RunNote::advisoriesNotChecked(RunNote::ADVISORIES_OFFLINE, 0)];
         }
-        // The interface exists only on Composer 2.4 and later. The guard must stay for 2.2.
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            return [AdvisoryCoverage::COMPOSER_TOO_OLD, RunNote::advisoriesNotChecked(RunNote::ADVISORIES_COMPOSER_TOO_OLD, 0)];
-        }
 
         return $asked === [] ? [AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, null] : null;
     }
@@ -154,12 +149,9 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
     private function notAsked(string $reason): array
     {
         $repositories = [];
-        // Below Composer 2.4 no repository is advisory-capable. A Composer repository still names
-        // the feed that a newer Composer asks, and naming it starts no I/O.
-        $capable = interface_exists(AdvisoryProviderInterface::class) ? AdvisoryProviderInterface::class : ComposerRepository::class;
         foreach ($this->repositories as $repository) {
             $inner = $repository instanceof FilterRepository ? $repository->getRepository() : $repository;
-            if ($inner instanceof $capable) {
+            if ($inner instanceof AdvisoryProviderInterface) {
                 $repositories[] = AdvisoryRepository::of($repository->getRepoName(), AdvisoryCoverage::NOT_ASKED, $reason);
             }
         }
