@@ -7,7 +7,7 @@ namespace Lockrot\Tests\Support;
 use PHPUnit\Framework\Assert;
 
 /**
- * The Composer version of train 7d's answers, and the rule that stops the oracle test on another
+ * The Composer versions of train 7d's answers, and the rule that stops the oracle test on another
  * version. `.github/actions/move-check-oracle` loads this file before `composer update`: keep it
  * free of other classes outside {@see guard()}.
  */
@@ -19,24 +19,29 @@ final class ComposerOracle
     /**
      * @param array<mixed, mixed> $document the decoded `tests/fixtures/flags/cases.json`
      *
-     * @throws \UnexpectedValueException when the cases with a `solver_world` record no version, or more than one
+     * @return non-empty-list<string> in version order
+     *
+     * @throws \UnexpectedValueException when the cases with a `solver_world` record no version, or a case records none
      */
-    public static function recordedVersion(array $document): string
+    public static function recordedVersions(array $document): array
     {
         $versions = [];
         foreach (\is_array($document['cases'] ?? null) ? $document['cases'] : [] as $case) {
-            $inputs = \is_array($case) && \is_array($case['inputs'] ?? null) ? $case['inputs'] : [];
-            if (\is_array($inputs['solver_world'] ?? null)) {
-                $versions[] = \is_array($inputs['move_check'] ?? null) && \is_string($inputs['move_check']['composer'] ?? null) ? $inputs['move_check']['composer'] : '(none)';
+            if (!\is_array($case) || !\is_array($case['solver_world'] ?? null)) {
+                continue;
             }
+            $composer = \is_array($case['run'] ?? null) && \is_array($case['run']['move_check'] ?? null) ? $case['run']['move_check']['composer'] ?? null : null;
+            if (!\is_string($composer)) {
+                throw new \UnexpectedValueException('a train 7d case with a solver_world records no Composer version in run.move_check.composer');
+            }
+            $versions[$composer] = $composer;
         }
-        $versions = array_values(array_unique($versions));
-        sort($versions);
-        if (\count($versions) !== 1 || $versions[0] === '(none)') {
-            throw new \UnexpectedValueException('the train 7d cases must record one Composer version in inputs.move_check.composer, and they record: '.($versions === [] ? 'none' : implode(', ', $versions)));
+        if ($versions === []) {
+            throw new \UnexpectedValueException('no train 7d case records a solver_world');
         }
+        usort($versions, static fn (string $a, string $b): int => version_compare($a, $b));
 
-        return $versions[0];
+        return $versions;
     }
 
     /**
@@ -64,14 +69,20 @@ final class ComposerOracle
             || strpos($version, 'dev-') === 0 || substr($version, -4) === '-dev', \ARRAY_FILTER_USE_BOTH);
     }
 
-    public static function guard(string $recorded, string $running, bool $required): void
+    /**
+     * Passes on the Composer that recorded the answers. Else it skips the test, and it fails a
+     * required run on a Composer that no world records.
+     *
+     * @param list<string> $recordedVersions the versions of every world ({@see recordedVersions()})
+     */
+    public static function guard(string $recorded, string $running, bool $required, array $recordedVersions): void
     {
         if ($running === $recorded) {
             return;
         }
         $reason = 'the answers are those of composer/composer '.$recorded.', and this run has '.$running;
-        if ($required) {
-            Assert::fail($reason);
+        if ($required && !\in_array($running, $recordedVersions, true)) {
+            Assert::fail($reason.', which no world records');
         }
         Assert::markTestSkipped($reason);
     }

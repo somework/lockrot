@@ -59,9 +59,10 @@ final class MoveCheckComposerOracleTest extends TestCase
     /** @return iterable<string, array{array<mixed, mixed>, string}> */
     public static function worlds(): iterable
     {
+        // A case that the hydrator cannot rebuild keeps its world: the oracle needs no other input.
         foreach (JsonPath::arrayAt(JsonPath::decodeFile(CaseHydrator::CASES), ['cases']) as $case) {
-            if (\is_array($case) && \is_array($case['inputs'] ?? null) && \is_array($case['inputs']['solver_world'] ?? null)) {
-                yield JsonPath::stringAt($case, ['id']) => [$case['inputs']['solver_world'], JsonPath::stringAt($case, ['inputs', 'move_check', 'composer'])];
+            if (\is_array($case) && \is_array($case['solver_world'] ?? null)) {
+                yield JsonPath::stringAt($case, ['id']) => [$case['solver_world'], JsonPath::stringAt($case, ['run', 'move_check', 'composer'])];
             }
         }
     }
@@ -80,7 +81,7 @@ final class MoveCheckComposerOracleTest extends TestCase
     #[DataProvider('worlds')]
     public function testLockrotsSolverGivesEachAnswerOfTheComposerCli(array $solverWorld, string $recordedBy): void
     {
-        ComposerOracle::guard($recordedBy, Composer::getVersion(), getenv(ComposerOracle::REQUIRED) === '1');
+        ComposerOracle::guard($recordedBy, Composer::getVersion(), getenv(ComposerOracle::REQUIRED) === '1', ComposerOracle::recordedVersions(JsonPath::decodeFile(CaseHydrator::CASES)));
         $world = JsonPath::arrayAt($solverWorld, ['world']);
         $answers = JsonPath::arrayAt($solverWorld, ['answers']);
         $server = FixtureRepositoryServer::fromReleases(self::releases(JsonPath::arrayAt($world, ['repo'])));
@@ -111,21 +112,43 @@ final class MoveCheckComposerOracleTest extends TestCase
     {
         $this->project = sys_get_temp_dir().'/lockrot-move-check-oracle-'.bin2hex(random_bytes(8));
         mkdir($this->project);
-        // As the oracle's project: Composer's own repository serves every name, and packagist.org none.
-        $root = JsonPath::arrayAt($world, ['root']) + ['repositories' => [['type' => 'composer', 'url' => $server->url()], ['packagist.org' => false]]];
+        // As the oracle's project: the world's repositories before Composer's own, which serves every name, and packagist.org none.
+        $before = array_merge(self::listAt($world, 'repos_before'), array_map(static fn ($url): array => ['type' => 'vcs', 'url' => $url], self::listAt($world, 'vcs_repos')));
+        $root = array_replace(JsonPath::arrayAt($world, ['root']), JsonPath::has($world, ['root_extra']) ? JsonPath::arrayAt($world, ['root_extra']) : []);
+        $root['repositories'] = array_merge($before, [['type' => 'composer', 'url' => $server->url()], ['packagist.org' => false]]);
         $lock = ['packages' => self::lockEntries($world, 'packages', $server->url()), 'packages-dev' => self::lockEntries($world, 'packages-dev', $server->url()), 'aliases' => [], 'minimum-stability' => 'stable', 'stability-flags' => [], 'prefer-stable' => false, 'prefer-lowest' => false, 'platform' => ['php' => JsonPath::has($root, ['require', 'php']) ? JsonPath::stringAt($root, ['require', 'php']) : '*'], 'platform-dev' => []];
         file_put_contents($this->project.'/composer.json', (string) json_encode($root));
         file_put_contents($this->project.'/composer.lock', (string) json_encode($lock));
 
         $config = $server->config();
-        $config->merge(['config' => ['platform' => ['php' => $platformPhp], 'audit' => ['block-insecure' => false]]]);
-        $repositories = $server->repositories();
+        /** @var array<string, mixed> $worldConfig */
+        $worldConfig = JsonPath::has($world, ['config']) ? JsonPath::arrayAt($world, ['config']) : [];
+        $config->merge(['config' => $worldConfig + ['platform' => ['php' => $platformPhp], 'audit' => ['block-insecure' => false]]]);
         $io = new NullIO();
+        $manager = RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config));
+        $repositories = array_merge(array_map(static function ($repository) use ($io, $config, $manager) {
+            self::assertIsArray($repository);
+            /** @var array<string, mixed> $repository */
+
+            return RepositoryFactory::createRepo($io, $config, $repository, $manager);
+        }, $before), $server->repositories());
+        // Composer takes the root version from COMPOSER_ROOT_VERSION, as the oracle's run of the CLI sets it.
+        $version = JsonPath::has($world, ['env', 'COMPOSER_ROOT_VERSION']) ? JsonPath::stringAt($world, ['env', 'COMPOSER_ROOT_VERSION']) : '1.0.0';
         /** @var array<string, mixed> $root */
-        $package = (new RootPackageLoader(RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config)), $config, null, null, $io))->load($root + ['version' => '1.0.0']);
+        $package = (new RootPackageLoader($manager, $config, null, null, $io))->load($root + ['version' => $version]);
         $minor = implode('.', \array_slice(explode('.', $platformPhp), 0, 2));
 
         return MoveCheckers::forProject($package, LockFile::fromFile($this->project.'/composer.lock'), ProjectConfig::fromFile($this->project.'/composer.json'), $config, $repositories, $minor, false, Deadline::never());
+    }
+
+    /**
+     * @param array<mixed, mixed> $world
+     *
+     * @return list<mixed>
+     */
+    private static function listAt(array $world, string $key): array
+    {
+        return JsonPath::has($world, [$key]) ? array_values(JsonPath::arrayAt($world, [$key])) : [];
     }
 
     /**

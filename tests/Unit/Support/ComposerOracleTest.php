@@ -11,47 +11,53 @@ use PHPUnit\Framework\TestCase;
 
 final class ComposerOracleTest extends TestCase
 {
-    public function testRecordedVersionIsTheOneVersionOfTheSolverWorldCases(): void
+    public function testRecordedVersionsAreTheVersionsOfTheSolverWorldCasesInVersionOrder(): void
     {
-        $cases = ['cases' => [self::world('a', '2.10.3'), self::world('b', '2.10.3'), ['id' => 'c', 'inputs' => ['move_check' => ['composer' => '2.2.25']]]]];
+        $cases = ['cases' => [self::world('a', '2.10.3'), self::world('b', '2.3.10'), self::world('c', '2.10.3'), ['id' => 'd', 'run' => ['move_check' => ['composer' => '2.2.25']]]]];
 
-        self::assertSame('2.10.3', ComposerOracle::recordedVersion($cases));
+        self::assertSame(['2.3.10', '2.10.3'], ComposerOracle::recordedVersions($cases));
     }
 
-    public function testRecordedVersionRefusesCasesThatRecordTwoVersionsAndNamesBoth(): void
-    {
-        $cases = ['cases' => [self::world('a', '2.10.3'), self::world('b', '2.11.0'), self::world('c', '2.10.3')]];
-
-        $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('2.10.3, 2.11.0');
-
-        ComposerOracle::recordedVersion($cases);
-    }
-
-    public function testRecordedVersionRefusesCasesWithoutASolverWorld(): void
+    public function testRecordedVersionsRefuseASolverWorldCaseWithoutAVersion(): void
     {
         $this->expectException(\UnexpectedValueException::class);
 
-        ComposerOracle::recordedVersion(['cases' => [['id' => 'c', 'inputs' => ['move_check' => ['composer' => '2.10.3']]]]]);
+        ComposerOracle::recordedVersions(['cases' => [self::world('a', '2.10.3'), ['id' => 'b', 'solver_world' => ['world_id' => 'b'], 'run' => ['move_check' => []]]]]);
+    }
+
+    public function testRecordedVersionsRefuseCasesWithoutASolverWorld(): void
+    {
+        $this->expectException(\UnexpectedValueException::class);
+
+        ComposerOracle::recordedVersions(['cases' => [['id' => 'c', 'run' => ['move_check' => ['composer' => '2.10.3']]]]]);
     }
 
     public function testGuardLetsTheRecordedVersionRun(): void
     {
         $this->expectNotToPerformAssertions();
 
-        ComposerOracle::guard('2.10.3', '2.10.3', true);
+        ComposerOracle::guard('2.10.3', '2.10.3', true, ['2.10.3']);
     }
 
     public function testGuardSkipsAnotherVersionWhereTheRunDoesNotRequireTheOracle(): void
     {
-        $thrown = self::thrownBy('2.10.3', '2.11.0', false);
+        $thrown = self::thrownBy('2.10.3', '2.11.0', false, ['2.10.3']);
 
         self::assertInstanceOf(SkippedTest::class, $thrown);
     }
 
-    public function testGuardFailsAnotherVersionWhereTheRunRequiresTheOracle(): void
+    /** One run per recorded version: each run skips the worlds of the other versions, and says which. */
+    public function testGuardSkipsTheWorldOfAnotherRecordedVersionAndNamesItsVersion(): void
     {
-        $thrown = self::thrownBy('2.10.3', '2.11.0', true);
+        $thrown = self::thrownBy('2.3.10', '2.10.3', true, ['2.3.10', '2.10.3']);
+
+        self::assertInstanceOf(SkippedTest::class, $thrown);
+        self::assertStringContainsString('2.3.10', $thrown->getMessage());
+    }
+
+    public function testGuardFailsAVersionThatNoWorldRecordsWhereTheRunRequiresTheOracle(): void
+    {
+        $thrown = self::thrownBy('2.10.3', '2.11.0', true, ['2.3.10', '2.10.3']);
 
         self::assertNotInstanceOf(SkippedTest::class, $thrown);
         self::assertStringContainsString('2.10.3', $thrown->getMessage());
@@ -69,10 +75,11 @@ final class ComposerOracleTest extends TestCase
     }
 
     /** A skip is an AssertionFailedError subclass in PHPUnit 9 to 11: the caller tells the two apart. */
-    private static function thrownBy(string $recorded, string $running, bool $required): AssertionFailedError
+    /** @param list<string> $recordedVersions */
+    private static function thrownBy(string $recorded, string $running, bool $required, array $recordedVersions): AssertionFailedError
     {
         try {
-            ComposerOracle::guard($recorded, $running, $required);
+            ComposerOracle::guard($recorded, $running, $required, $recordedVersions);
         } catch (AssertionFailedError $thrown) {
             return $thrown;
         }
@@ -82,6 +89,6 @@ final class ComposerOracleTest extends TestCase
     /** @return array<string, mixed> */
     private static function world(string $id, string $composer): array
     {
-        return ['id' => $id, 'inputs' => ['move_check' => ['composer' => $composer], 'solver_world' => ['world_id' => $id]]];
+        return ['id' => $id, 'run' => ['move_check' => ['composer' => $composer]], 'solver_world' => ['world_id' => $id]];
     }
 }
