@@ -236,6 +236,7 @@ final class UpdateNowTest extends TestCase
 
         $updateNow = UpdateNow::of($findings, new MoveChecks($checker, false));
 
+        self::assertSame([[self::JWT => '', self::SODIUM => '']], $checker->combinedAsked());
         self::assertNull($updateNow->command());
         $note = $updateNow->note();
         self::assertNotNull($note);
