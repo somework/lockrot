@@ -8,6 +8,7 @@ use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Version\StabilityFilter;
+use Composer\Pcre\Preg;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\ConfigurableRepositoryInterface;
@@ -24,8 +25,9 @@ use Lockrot\Deadline;
  * that this process already fetched from its cache, so a name that the run read costs no request.
  * The first canonical repository that lists a name shadows the later ones. A repository with `only`,
  * `exclude` or `canonical` is asked as Composer asks it, through its FilterRepository. A vcs or
- * other repository is not loaded, so a name that a later repository lists after a canonical one
- * is {@see VersionSource::SHADOWED} (docs/verdicts.md#the-move-check).
+ * other repository is not loaded. It serves the names that the lock records from its URL, so a
+ * later repository's versions of such a name are {@see VersionSource::SHADOWED}
+ * (docs/verdicts.md#the-move-check).
  *
  * @internal
  */
@@ -56,15 +58,19 @@ final class RepositoryVersions implements VersionSource
     private array $acceptable;
     /** @var array<string, BasePackage::STABILITY_*> */
     private array $stabilityFlags;
+    /** @var array<string, list<string>> */
+    private array $served;
 
     /**
      * @param list<RepositoryInterface> $repositories              a Composer, package or path repository is asked, through the FilterRepository that wraps it
      * @param list<string>              $notFromComposerRepository the locked names that a path, VCS or package repository serves: the lock's version is their only version
      * @param string                    $minimumStability          the root's `minimum-stability`
      * @param array<string, BasePackage::STABILITY_*> $stabilityFlags the root's stability flags, by name
+     * @param array<string, list<string>>             $served         by {@see urlKey()} of a repository URL, the names that the lock records from it
      */
-    public function __construct(array $repositories, array $notFromComposerRepository, bool $offline, Deadline $deadline, string $minimumStability = 'stable', array $stabilityFlags = [])
+    public function __construct(array $repositories, array $notFromComposerRepository, bool $offline, Deadline $deadline, string $minimumStability = 'stable', array $stabilityFlags = [], array $served = [])
     {
+        $this->served = $served;
         $floor = BasePackage::$stabilities[$minimumStability] ?? BasePackage::STABILITY_STABLE;
         $this->acceptable = array_filter(BasePackage::$stabilities, static fn (int $value): bool => $value <= $floor);
         $this->stabilityFlags = $stabilityFlags;
@@ -134,7 +140,7 @@ final class RepositoryVersions implements VersionSource
         $hidden = [];
         foreach ($this->repositories as $repository) {
             if (!self::isRead($repository)) {
-                $hidden += array_filter($pending, static fn (string $name): bool => self::canHide($repository, $name), \ARRAY_FILTER_USE_KEY);
+                $hidden += array_filter($pending, fn (string $name): bool => $this->canHide($repository, $name), \ARRAY_FILTER_USE_KEY);
 
                 continue;
             }
@@ -184,7 +190,7 @@ final class RepositoryVersions implements VersionSource
         $loaded = [];
         foreach ($this->repositories as $repository) {
             if (!self::isRead($repository)) {
-                $hidden = $hidden || self::canHide($repository, $name);
+                $hidden = $hidden || $this->canHide($repository, $name);
 
                 continue;
             }
@@ -318,18 +324,29 @@ final class RepositoryVersions implements VersionSource
         return $inner instanceof ComposerRepository || $inner instanceof PackageRepository || $inner instanceof PathRepository;
     }
 
-    /**
-     * Whether a repository that the source does not load could serve $name and hide it: it is
-     * canonical, and its `only` or `exclude` admits the name. Its FilterRepository asks a copy that
-     * holds only $name, because asking the repository itself loads it.
-     */
-    private static function canHide(RepositoryInterface $repository, string $name): bool
+    /** A repository URL as the lock and the config compare: no case, no trailing slash, no trailing `.git`. */
+    public static function urlKey(string $url): string
     {
+        return Preg::replace('{/*(?:\.git)?/*$}', '', strtolower($url));
+    }
+
+    /**
+     * Whether a repository that the source does not load serves $name and hides it: the lock
+     * records $name from its URL, the repository is canonical, and its `only` or `exclude` admits
+     * the name. Its FilterRepository asks a copy that holds only $name, because asking the
+     * repository itself loads it.
+     */
+    private function canHide(RepositoryInterface $repository, string $name): bool
+    {
+        $inner = $repository instanceof FilterRepository ? $repository->getRepository() : $repository;
+        $config = $inner instanceof ConfigurableRepositoryInterface ? $inner->getRepoConfig() : [];
+        $url = $config['url'] ?? null;
+        if (!\is_string($url) || !\in_array($name, $this->served[self::urlKey($url)] ?? [], true)) {
+            return false;
+        }
         if (!$repository instanceof FilterRepository) {
             return true;
         }
-        $inner = $repository->getRepository();
-        $config = $inner instanceof ConfigurableRepositoryInterface ? $inner->getRepoConfig() : [];
         $options = [];
         foreach (['only', 'exclude'] as $key) {
             if (isset($config[$key]) && \is_array($config[$key])) {

@@ -7,7 +7,7 @@ namespace Lockrot\Tests\Support;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\ConfigurableRepositoryInterface;
 
-/** A repository that the version source does not load, with the config that RepositoryManager gives a vcs repository. */
+/** A repository that the version source does not load, such as a vcs one, with the config that RepositoryManager gives it. */
 final class ConfiguredRepository extends ArrayRepository implements ConfigurableRepositoryInterface
 {
     /** @var array<string, mixed> */

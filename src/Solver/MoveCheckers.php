@@ -55,7 +55,13 @@ final class MoveCheckers
                 $notFromComposerRepository[] = $package->name();
             }
         }
-        $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline, $root->getMinimumStability(), $root->getStabilityFlags());
+        $served = [];
+        foreach ($lock->lockedRepository()->getPackages() as $package) {
+            foreach (array_unique(array_filter([$package->getSourceUrl(), $package->getDistUrl()])) as $url) {
+                $served[RepositoryVersions::urlKey($url)][] = $package->getName();
+            }
+        }
+        $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline, $root->getMinimumStability(), $root->getStabilityFlags(), $served);
         $solver = (new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], $overrides), $source, []))->withLockedOnly($notFromComposerRepository);
         $solver = $php === $configured ? $solver : $solver->withPhpSetByLockrot();
         $solver = self::minimalChanges($config) ? $solver->withMinimalChanges() : $solver;

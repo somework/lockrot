@@ -25,6 +25,7 @@ use Lockrot\Solver\MoveCheckers;
 use Lockrot\Solver\MoveQuery;
 use Lockrot\Solver\SolverChecker;
 use Lockrot\Tests\Support\ArrayVersionSource;
+use Lockrot\Tests\Support\ConfiguredRepository;
 use Lockrot\Tests\Support\RecordingComposerRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -236,6 +237,22 @@ final class MoveCheckersTest extends TestCase
         $check = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$package, $repository], '8.4', false, Deadline::never())->check(MoveQuery::require('acme/lib', '^2.0', '2.0.0'))->check();
 
         self::assertSame(MoveCheck::REFUSED, $check->result());
+    }
+
+    /** R5-33: the lock records acme/lib from the URL of the vcs repository, which lockrot does not load and which can hide its versions. */
+    public function testAMoveOfANameThatTheLockRecordsFromAnEarlierVcsRepositoryIsNotChecked(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://github.com/acme/lib.git', 'reference' => 'abc'], 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $loader = new ArrayLoader();
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://github.com/acme/lib']);
+        $repository = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.1.0']),
+        ]);
+
+        $check = MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), new Config(false), [$vcs, $repository], '8.4', false, Deadline::never())->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME], [$check->result(), $check->reason()]);
     }
 
     /** `-W` frees a root requirement that a VCS repository serves: the solve offers its locked version, and no other. */
