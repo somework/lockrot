@@ -9,6 +9,7 @@ use Lockrot\Security\Holder;
 use Lockrot\Security\PhpCheck;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Solver\MoveCheck;
+use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\GradedPackage;
 use Lockrot\Verdict\Latest;
@@ -16,6 +17,7 @@ use Lockrot\Verdict\Move;
 use Lockrot\Verdict\MoveFact;
 use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\MoveText;
+use Lockrot\Verdict\ShellCommand;
 use Lockrot\Verdict\ThroughEntry;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -300,6 +302,81 @@ final class MoveTextTest extends TestCase
 
         self::assertNull($move->check());
         self::assertNotNull($checked->check());
+    }
+
+    /**
+     * @dataProvider movesAndTheirParts
+     *
+     * @param list<list<string>>              $commands
+     * @param list<array{0: string, 1: bool}> $parts
+     */
+    #[DataProvider('movesAndTheirParts')]
+    public function testTheMoveTextIsBuiltFromProseAndTheCommandThatItNames(string $kind, string $source, ?string $override, array $commands, array $parts): void
+    {
+        $move = new Move($kind, $source, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], $commands, new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, $override));
+
+        self::assertSame($parts, MoveText::parts($move));
+    }
+
+    /** @return iterable<string, array{string, string, ?string, list<list<string>>, list<array{0: string, 1: bool}>}> */
+    public static function movesAndTheirParts(): iterable
+    {
+        $update = ['composer', 'update', 'acme/lib'];
+        yield 'the command first' => [Move::UPDATE, FlagSet::VULNERABLE, null, [$update], [['composer update acme/lib', true], [' (gets 2.0.0)', false]]];
+        yield 'a platform step before the command' => [Move::UPDATE, FlagSet::VULNERABLE, '7.4.29', [$update], [['First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. ', false], ['composer update acme/lib', true], [' (gets 2.0.0)', false]]];
+        yield 'a command that no shell takes, before the named one' => [Move::UPDATE, FlagSet::VULNERABLE, null, [['composer', 'update', 'acme/lib;x'], $update], [['composer update acme/lib', true], [' (gets 2.0.0)', false]]];
+        yield 'no command that a shell takes' => [Move::UPDATE, FlagSet::VULNERABLE, null, [['composer', 'update', 'acme/lib;x']], [['update it with Composer (gets 2.0.0)', false]]];
+        yield 'no command in the text' => [Move::FIND_ALTERNATIVE, FlagSet::ABANDONED, null, [], [['find a replacement (none named)', false]]];
+    }
+
+    /**
+     * The lock's `platform-overrides.php` is printed as written when it is not a stable release of
+     * the target minor, so it can spell the command. The command piece is the move's own.
+     */
+    public function testAPlatformValueThatSpellsTheCommandStaysProse(): void
+    {
+        $override = '7.4 composer update acme/c0ffee12 --with-dependencies';
+        $subject = new MoveSubject('acme/c0ffee12', '1.0.0', true, [], '8.4', null, null, $override);
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '1.x', '1.0.3', '1.0.3', null, null, null, false, [], [], [], [], [], null, [], [['composer', 'update', 'acme/c0ffee12', '--with-dependencies']], $subject);
+
+        self::assertSame([
+            ['First set config.platform.php to your PHP 8.4 release: the lock records '.$override.'. ', false],
+            ['composer update acme/c0ffee12 --with-dependencies', true],
+            [' (gets 1.0.3)', false],
+        ], MoveText::parts($move));
+    }
+
+    /**
+     * Over every model case and its `also[]` moves: the pieces concatenate to `next_step.text`, at
+     * most one piece is a command, it is the POSIX rendering of one of the move's commands, and no
+     * piece is empty or only whitespace.
+     */
+    public function testThePiecesOfEveryCaseMoveAreItsTextAndAtMostOneOfItsCommands(): void
+    {
+        $moves = [];
+        foreach (CaseHydrator::everyCase()->findings() as $finding) {
+            $move = $finding->nextStep();
+            if ($move !== null) {
+                $moves[$finding->package()] = $move;
+                foreach ($move->also() as $index => $also) {
+                    $moves[$finding->package().' also['.$index.']'] = $also;
+                }
+            }
+        }
+        self::assertNotSame([], $moves);
+
+        foreach ($moves as $name => $move) {
+            $parts = MoveText::parts($move);
+            $commands = array_values(array_filter($parts, static fn (array $part): bool => $part[1]));
+            self::assertSame($move->text(), implode('', array_column($parts, 0)), $name);
+            self::assertLessThanOrEqual(1, \count($commands), $name);
+            foreach ($commands as [$command]) {
+                self::assertContains($command, array_map([ShellCommand::class, 'posix'], $move->commands()), $name);
+            }
+            foreach ($parts as [$text]) {
+                self::assertNotSame('', trim($text), $name);
+            }
+        }
     }
 
     /** @param list<string> $because */

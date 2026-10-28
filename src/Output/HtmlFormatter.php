@@ -65,13 +65,15 @@ final class HtmlFormatter implements FormatterInterface
     /**
      * Safe inside `<script type="application/json">`: an HTML parser ends that element at the first
      * `</script` and stops parsing at `<!--`, and package metadata can hold both. JSON reads the
-     * escapes back as the same string. Not `JSON_HEX_*`: it also escapes every quote.
+     * escapes back as the same string. Not `JSON_HEX_*`: it also escapes every quote. Not
+     * `JSON_UNESCAPED_UNICODE`: the page can go to stdout, where a raw C1 or bidi control from the
+     * lock acts on the terminal. ASCII JSON reads back as the same strings.
      *
      * @param array<string, mixed> $document
      */
     private static function payload(array $document): string
     {
-        $json = JsonWriter::encode($document, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
+        $json = JsonWriter::encode($document, \JSON_UNESCAPED_SLASHES);
         if ($json === null) {
             throw new \RuntimeException('Cannot encode the report for the page: '.json_last_error_msg());
         }

@@ -39,9 +39,23 @@ final class MoveText
 
     public static function render(Move $move): string
     {
+        return implode('', array_column(self::parts($move), 0));
+    }
+
+    /**
+     * `next_step.text` as pieces, each with whether it is a command: the pieces concatenate to the
+     * text. At most one piece is a command, the POSIX rendering of an argv of `commands`. A text
+     * format prints it in its command form, never through a prose transform. No piece is empty or
+     * only whitespace.
+     *
+     * @return list<array{0: string, 1: bool}>
+     */
+    public static function parts(Move $move): array
+    {
         $subject = $move->subject();
         $kind = $move->kind();
-        $text = self::head($move, $subject);
+        $parts = self::head($move, $subject);
+        $text = '';
         if (\in_array($kind, array_merge(Move::ROW_KINDS, [Move::TAG]), true)) {
             $text .= self::leaves($move).self::unverified($move);
         }
@@ -57,10 +71,39 @@ final class MoveText
         if ($through !== '' && \in_array(Move::TRANSITIVE, $move->composerMovesBecause(), true)) {
             $text .= '; '.$through;
         }
-
+        $parts[] = [$text.self::checked($move->check()).self::movesWith($move), false];
         $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->refusedTargetInside());
+        array_unshift($parts, [$step, false]);
 
-        return $step.$text.self::checked($move->check()).self::movesWith($move);
+        return self::joined($parts);
+    }
+
+    /**
+     * Neighbouring prose pieces as one, with the empty pieces dropped.
+     *
+     * @param list<array{0: string, 1: bool}> $parts
+     *
+     * @return list<array{0: string, 1: bool}>
+     */
+    private static function joined(array $parts): array
+    {
+        $joined = [];
+        foreach ($parts as [$text, $isCommand]) {
+            if ($text === '') {
+                continue;
+            }
+            $last = array_pop($joined);
+            if ($last !== null && !$isCommand && !$last[1]) {
+                $joined[] = [$last[0].$text, false];
+                continue;
+            }
+            if ($last !== null) {
+                $joined[] = $last;
+            }
+            $joined[] = [$text, $isCommand];
+        }
+
+        return $joined;
     }
 
     /**
@@ -118,7 +161,26 @@ final class MoveText
         return implode(', ', $names);
     }
 
-    private static function head(Move $move, MoveSubject $subject): string
+    /** @return list<array{0: string, 1: bool}> */
+    private static function head(Move $move, MoveSubject $subject): array
+    {
+        if ($move->kind() === Move::UPDATE) {
+            $below = self::below($move, $move->newest());
+            $check = $move->check();
+            $gets = ($check === null ? null : $check->installsAbove($move->newest())) ?? $move->newest();
+            $command = self::update($move);
+
+            return [
+                [self::raise($move), false],
+                [$command ?? 'update it with Composer', $command !== null],
+                [($below === '' ? ' (gets '.$gets.')' : $below).self::clears($move).self::adds($move), false],
+            ];
+        }
+
+        return [[self::prose($move, $subject), false]];
+    }
+
+    private static function prose(Move $move, MoveSubject $subject): string
     {
         switch ($move->kind()) {
             case Move::REPLACE:
@@ -131,13 +193,6 @@ final class MoveText
                 $latest = $move->latest();
 
                 return 'test it on PHP '.$subject->targetPhp().($latest !== null && $latest->isInstalled() ? ' — '.$latest->version().' is its newest release' : '');
-            case Move::UPDATE:
-                $below = self::below($move, $move->newest());
-
-                $check = $move->check();
-                $gets = ($check === null ? null : $check->installsAbove($move->newest())) ?? $move->newest();
-
-                return self::raise($move).self::update($move).($below === '' ? ' (gets '.$gets.')' : $below).self::clears($move).self::adds($move);
             case Move::REQUIRE:
             case Move::RAISE_PHP:
                 return self::requirement($move, $subject);
@@ -161,8 +216,8 @@ final class MoveText
         }
     }
 
-    /** The POSIX rendering of the move's `composer update` step, or words when the command argument rule refused it. */
-    private static function update(Move $move): string
+    /** The POSIX rendering of the move's first `composer update` step that the command argument rule takes. */
+    private static function update(Move $move): ?string
     {
         foreach ($move->commands() as $argv) {
             $rendered = $argv[1] === 'update' ? ShellCommand::posix($argv) : null;
@@ -171,7 +226,7 @@ final class MoveText
             }
         }
 
-        return 'update it with Composer';
+        return null;
     }
 
     private static function replace(Move $move): string

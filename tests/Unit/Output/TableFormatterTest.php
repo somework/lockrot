@@ -31,10 +31,8 @@ use Lockrot\Tests\Support\TextGolden;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\FindingDetails;
-use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Move;
 use Lockrot\Verdict\MoveChecks;
-use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\ShellCommand;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -247,30 +245,6 @@ final class TableFormatterTest extends TestCase
                 self::assertContains($command, $lines, 'width '.$width);
             }
         }
-    }
-
-    /**
-     * @dataProvider movesAndTheirParts
-     *
-     * @param list<list<string>>              $commands
-     * @param list<array{0: string, 1: bool}> $parts
-     */
-    #[DataProvider('movesAndTheirParts')]
-    public function testTheMoveTextIsCutAroundTheCommandThatItNames(string $kind, string $source, ?string $override, array $commands, array $parts): void
-    {
-        $move = new Move($kind, $source, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], $commands, new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, $override));
-
-        self::assertSame($parts, TableFormatter::commandParts($move));
-    }
-
-    /** @return iterable<string, array{string, string, ?string, list<list<string>>, list<array{0: string, 1: bool}>}> */
-    public static function movesAndTheirParts(): iterable
-    {
-        $update = ['composer', 'update', 'acme/lib'];
-        yield 'the command first' => [Move::UPDATE, FlagSet::VULNERABLE, null, [$update], [['composer update acme/lib', true], ['(gets 2.0.0)', false]]];
-        yield 'a platform step before the command' => [Move::UPDATE, FlagSet::VULNERABLE, '7.4.29', [$update], [['First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29.', false], ['composer update acme/lib', true], ['(gets 2.0.0)', false]]];
-        yield 'a command that no shell takes, before the named one' => [Move::UPDATE, FlagSet::VULNERABLE, null, [['composer', 'update', 'acme/lib;x'], $update], [['composer update acme/lib', true], ['(gets 2.0.0)', false]]];
-        yield 'no command in the text' => [Move::FIND_ALTERNATIVE, FlagSet::ABANDONED, null, [], [['find a replacement (none named)', false]]];
     }
 
     public function testAKnownFlagReadsBaselineAndTheScoreLineCarriesTheSuffix(): void

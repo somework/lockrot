@@ -38,7 +38,8 @@ The block is at most ten lines, in this order:
 
 - The header, with the counts per grade.
 - One line per graded package, in the report's order: its grade, its score, its counted flags and
-  its move, cut at 160 characters. When `vulnerable` is the only counted flag, it adds its
+  its move, cut at a word boundary past 160 characters. A command in the move shows whole, even
+  past 160 characters, or not at all, and a space parts it from the `…`. When `vulnerable` is the only counted flag, it adds its
   advisories: the deciding severity and the count (`vulnerable (critical advisory; 15 in all)`).
   For one advisory or for low ones it gives the count before the severity
   (`vulnerable (1 high advisory)`, `vulnerable (2 low advisories)`).

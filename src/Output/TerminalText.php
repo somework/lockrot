@@ -69,10 +69,19 @@ final class TerminalText
         return self::render($text, true, $maxBytes);
     }
 
-    /** {@see self::escape()} with the backslash kept, for text people read, such as a path. */
-    public static function neutralise(string $text): string
+    /**
+     * {@see self::escape()} with the backslash kept, for text people read, such as a path. Past
+     * $maxCharacters characters of output, the text is cut as {@see self::escape()} cuts it.
+     */
+    public static function neutralise(string $text, int $maxCharacters = \PHP_INT_MAX): string
     {
-        return self::render($text, false, \PHP_INT_MAX);
+        return self::render($text, false, \PHP_INT_MAX, $maxCharacters);
+    }
+
+    /** UTF-8 characters, without ext-mbstring: every byte but a continuation byte starts one. */
+    public static function characters(string $text): int
+    {
+        return \strlen(preg_replace('/[\x80-\xBF]/', '', $text) ?? '');
     }
 
     /** {@see self::neutralise()} for each line, with the line feeds between the lines kept. */
@@ -126,22 +135,25 @@ final class TerminalText
         return implode("\n", array_map([$style, 'apply'], explode("\n", $text)));
     }
 
-    private static function render(string $text, bool $escapeBackslash, int $maxBytes): string
+    private static function render(string $text, bool $escapeBackslash, int $maxBytes, int $maxCharacters = \PHP_INT_MAX): string
     {
         $shown = '';
+        $characters = 0;
         $offset = 0;
         // One unit at a time, so an arbitrarily long key costs no more than the part that is shown.
         while (preg_match(self::UNIT, $text, $unit, \PREG_UNMATCHED_AS_NULL, $offset) === 1) {
             $offset += \strlen($unit[0]);
             $piece = self::show($unit, $escapeBackslash);
-            if (\strlen($shown) + \strlen($piece) > $maxBytes) {
+            $length = self::characters($piece);
+            if (\strlen($shown) + \strlen($piece) > $maxBytes || $characters + $length > $maxCharacters) {
                 // A run of printable ASCII shows byte for byte, so it can be cut anywhere. Anything
                 // else is shown whole or not at all.
-                $fits = $unit['printable'] === null ? '' : substr($piece, 0, $maxBytes - \strlen($shown));
+                $fits = $unit['printable'] === null ? '' : substr($piece, 0, min($maxBytes - \strlen($shown), $maxCharacters - $characters));
 
                 return $shown.$fits.self::ELLIPSIS;
             }
             $shown .= $piece;
+            $characters += $length;
         }
 
         return $shown;

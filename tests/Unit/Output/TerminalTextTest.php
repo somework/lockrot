@@ -100,6 +100,35 @@ final class TerminalTextTest extends TestCase
     }
 
     /** neutralise() is for text people read rather than compare: a Windows path keeps its backslashes. */
+    public function testCharactersCountsAMultibyteCharacterOnce(): void
+    {
+        self::assertSame([0, 3, 5, 1], [TerminalText::characters(''), TerminalText::characters('a—b'), TerminalText::characters('a · b'), TerminalText::characters("\u{1F600}")]);
+    }
+
+    /**
+     * A budget in characters of the shown text: the text whole when it fits, else at most the
+     * budget and the ellipsis, cut between whole units.
+     *
+     * @dataProvider characterBudgets
+     */
+    #[DataProvider('characterBudgets')]
+    public function testNeutraliseCutsAtACharacterBudget(string $text, int $budget, string $shown): void
+    {
+        self::assertSame($shown, TerminalText::neutralise($text, $budget));
+    }
+
+    /** @return iterable<string, array{string, int, string}> */
+    public static function characterBudgets(): iterable
+    {
+        yield 'a text that fits exactly' => ['a—b·c', 5, 'a—b·c'];
+        yield 'one character past the budget' => ['a—b·cd', 5, 'a—b·c…'];
+        yield 'ASCII cut inside a run' => ['abcdef', 3, 'abc…'];
+        yield 'an escape that does not fit' => ["ab\u{202E}cd", 9, 'ab…'];
+        yield 'an escape that fits' => ["ab\u{202E}cd", 10, 'ab\\u{202E}…'];
+        yield 'a multibyte character at the edge' => ['ab——', 3, 'ab—…'];
+        yield 'no room' => ['ab', 0, '…'];
+    }
+
     public function testNeutraliseLeavesBackslashesAlone(): void
     {
         self::assertSame('C:\\project\\composer.json \\x1B[31m', TerminalText::neutralise("C:\\project\\composer.json \x1B[31m"));

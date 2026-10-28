@@ -28,8 +28,13 @@ use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Support\TextGolden;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\Move;
 use Lockrot\Verdict\MoveChecks;
+use Lockrot\Verdict\Moves;
+use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /** The `markdown` format, and `--markdown-max-bytes`. */
@@ -429,5 +434,44 @@ final class MarkdownFormatterTest extends TestCase
             (new FindingBuilder())->withPackage('a/gone')->withVersion('2.2.0')->withVerdict(Verdict::ABANDONED)->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('a/deep')->withVerdict(Verdict::STALE)->withChain(['a/root', 'a/deep'])->withDirectDependents(['a/root', 'a/other'])->withDataDate($at)->build(),
         ], Notes::texts(['GitHub token not set']), $at, 2, 0);
+    }
+
+    /**
+     * R6-10: the command of a Do: line is a code span, so the prose escapes and the zero-width
+     * spaces that stop GitHub's links never land inside a copied argument.
+     *
+     * @dataProvider commandsInADoLine
+     *
+     * @param list<string> $argv
+     */
+    #[DataProvider('commandsInADoLine')]
+    public function testTheCommandOfADoLineIsACodeSpan(array $argv, string $span): void
+    {
+        $out = self::formatter()->format(self::withMove($argv));
+
+        self::assertStringContainsString('**Do:** '.$span.' (gets 1.0.3)', $out);
+        self::assertStringNotContainsString('&#8203;', $out);
+    }
+
+    /** @return iterable<string, array{list<string>, string}> */
+    public static function commandsInADoLine(): iterable
+    {
+        yield 'a hex name segment' => [['composer', 'update', 'acme/c0ffee12:^1.0', '--with-dependencies'], "`composer update 'acme/c0ffee12:^1.0' --with-dependencies`"];
+        yield 'a date constraint' => [['composer', 'update', 'acme/dates:^20240101.1'], "`composer update 'acme/dates:^20240101.1'`"];
+        yield 'an alternative in a constraint' => [['composer', 'update', 'acme/dates:^1.0 || ^2.0'], "`composer update 'acme/dates:^1.0 \\|\\| ^2.0'`"];
+    }
+
+    /**
+     * One graded finding whose move runs $argv.
+     *
+     * @param list<string> $argv
+     */
+    private static function withMove(array $argv): Report
+    {
+        $package = explode(':', $argv[2])[0];
+        $finding = (new FindingBuilder())->withPackage($package)->withVerdict(Verdict::ABANDONED)->build();
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '1.x', '1.0.3', '1.0.3', null, null, null, false, [], [], [], [], [], null, [], [$argv], new MoveSubject($package, '1.0.0', true, [], '8.4', null));
+
+        return new Report([$finding->withMoves(new Moves($move, null, null, null, []))], [], new \DateTimeImmutable('2026-10-01T00:00:00+00:00'), 1, 0);
     }
 }

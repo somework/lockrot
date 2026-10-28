@@ -24,7 +24,10 @@ final class InstallSummaryFormatter
     /** The notes the block prints; a later note is counted in the footer. */
     public const MAX_NOTES = 2;
 
-    /** A finding line is a display line: it is cut at a word boundary past this length. */
+    /**
+     * A finding line is a display line: past this many characters of the shown text, its prose is
+     * cut at a word boundary. A command shows whole or not at all (docs/install-time.md).
+     */
     public const MAX_FINDING_LINE = 160;
 
     private const FOOTER = 'Run composer lockrot for details';
@@ -111,10 +114,7 @@ final class InstallSummaryFormatter
         return $lines;
     }
 
-    /**
-     * `<grade> [<score>] <package> <version>: <counted flags> — <the move>`, cut at
-     * {@see MAX_FINDING_LINE} characters at a word boundary.
-     */
+    /** `<grade> [<score>] <package> <version>: <counted flags> — <the move>`, fitted by {@see fitted()}. */
     private function findingLine(Finding $finding): string
     {
         $flags = $finding->flagIds();
@@ -125,18 +125,44 @@ final class InstallSummaryFormatter
                 ? ' ('.$security->severity().' advisory; '.$count.' in all)'
                 : ' ('.$count.' '.$security->severity().' '.($count === 1 ? 'advisory' : 'advisories').')';
         }
-        $move = FindingBlock::move($finding);
+        $move = FindingBlock::moveParts($finding);
         $grade = $finding->verdict();
-        $text = \sprintf('%s [%2d] %s %s: %s', str_repeat(' ', 8 - \strlen($grade)), $finding->score()->total(), $finding->package(), $finding->version(), implode(' · ', $flags).($move === null ? '' : ' — '.$move));
-        $limit = self::MAX_FINDING_LINE - 2 - \strlen($grade);
-        if (\strlen($text) > $limit) {
-            $cut = substr($text, 0, $limit);
-            $space = strrpos($cut, ' ');
-            $text = ($space === false ? $cut : substr($cut, 0, $space)).'…';
-        }
+        $head = \sprintf('%s [%2d] %s %s: %s', str_repeat(' ', 8 - \strlen($grade)), $finding->score()->total(), $finding->package(), $finding->version(), implode(' · ', $flags));
+        $parts = array_merge([[$head.($move === null ? '' : ' — '), false]], $move ?? []);
         $colour = FindingBlock::colour($grade);
 
-        return '  '.($colour === null ? $grade : '<fg='.$colour.'>'.$grade.'</fg='.$colour.'>').self::text($text);
+        return '  '.($colour === null ? $grade : '<fg='.$colour.'>'.$grade.'</fg='.$colour.'>').ConsoleMarkup::escape(self::fitted($parts, self::MAX_FINDING_LINE - 2 - \strlen($grade)));
+    }
+
+    /**
+     * The neutralised pieces in order within $room characters. A prose piece that does not fit is
+     * cut at a word boundary, and nothing follows it. A command shows whole when the prose before it
+     * fits, even past $room, because a cut command runs as another one. A cut that leaves no word
+     * after a command ends with ` …`, so a copied command takes no ellipsis.
+     *
+     * @param list<array{0: string, 1: bool}> $parts
+     */
+    private static function fitted(array $parts, int $room): string
+    {
+        $line = '';
+        $afterCommand = false;
+        foreach ($parts as [$text, $isCommand]) {
+            $shown = TerminalText::neutralise($text);
+            $length = TerminalText::characters($shown);
+            if ($isCommand || $length <= $room) {
+                $line .= $shown;
+                $room -= $length;
+                $afterCommand = $isCommand;
+                continue;
+            }
+            $cut = substr(TerminalText::neutralise($text, max(0, $room)), 0, -\strlen(TerminalText::ELLIPSIS));
+            $space = strrpos($cut, ' ');
+            $cut = $space === false ? $cut : substr($cut, 0, $space);
+
+            return $line.($afterCommand && trim($cut) === '' ? ' '.TerminalText::ELLIPSIS : $cut.TerminalText::ELLIPSIS);
+        }
+
+        return $line;
     }
 
     /** Text lockrot did not write, as markup that prints it as written and obeys nothing in it. */

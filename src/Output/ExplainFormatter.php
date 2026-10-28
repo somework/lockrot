@@ -402,7 +402,7 @@ final class ExplainFormatter
         $widths = self::BRANCH_COLUMNS;
         foreach ($cells as [, $columns]) {
             foreach ($columns as $i => $column) {
-                $widths[$i] = max($widths[$i], self::characters($column));
+                $widths[$i] = max($widths[$i], TerminalText::characters($column));
             }
         }
         $lines = ['repository metadata', self::escape(self::branchRow(' ', ['branch', 'highest tag', 'released', 'php'], 'fixes', $widths))];
@@ -466,16 +466,10 @@ final class ExplainFormatter
     {
         $row = '   '.$mark;
         foreach ($columns as $i => $column) {
-            $row .= ' '.$column.str_repeat(' ', $widths[$i] - self::characters($column));
+            $row .= ' '.$column.str_repeat(' ', $widths[$i] - TerminalText::characters($column));
         }
 
         return rtrim($row.' '.$fix);
-    }
-
-    /** UTF-8 characters, without ext-mbstring: every byte but a continuation byte starts one. */
-    private static function characters(string $text): int
-    {
-        return \strlen(preg_replace('/[\x80-\xBF]/', '', $text) ?? '');
     }
 
     /**
