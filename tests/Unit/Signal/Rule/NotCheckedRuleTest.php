@@ -343,7 +343,6 @@ final class NotCheckedRuleTest extends TestCase
     public static function advisoryGaps(): iterable
     {
         yield 'offline' => ['offline', 'the run is offline'];
-        yield 'Composer below 2.4' => ['composer_too_old', 'Composer is older than 2.4'];
         yield 'the install-time budget' => ['install_time_budget', 'the install-time budget ran out'];
         yield 'a repository that threw' => ['lookup_failed', 'an advisory repository failed'];
         yield 'no feed' => ['no_feed', 'no configured repository publishes advisories'];

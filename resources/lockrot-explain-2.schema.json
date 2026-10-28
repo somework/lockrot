@@ -489,12 +489,11 @@
             }
         },
         "advisoriesNotCheckedReason": {
-            "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `composer_too_old` (Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw). An open set: read a reason you do not know as another reason.",
+            "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw). An open set: read a reason you do not know as another reason.",
             "type": "string",
             "pattern": "^[a-z][a-z0-9_]*$",
             "x-known-values": [
                 "offline",
-                "composer_too_old",
                 "install_time_budget",
                 "lookup_failed"
             ]
@@ -707,14 +706,13 @@
                     ]
                 },
                 "reason": {
-                    "description": "Why. On `not_asked`: `offline`, `composer_too_old`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set.",
+                    "description": "Why. On `not_asked`: `offline`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set.",
                     "oneOf": [
                         {
                             "type": "string",
                             "pattern": "^[a-z][a-z0-9_]*$",
                             "x-known-values": [
                                 "offline",
-                                "composer_too_old",
                                 "install_time_budget",
                                 "not_from_composer_repository",
                                 "transport",
@@ -3058,7 +3056,6 @@
                         "offline",
                         "undated_releases",
                         "releases_unknown",
-                        "composer_too_old",
                         "lookup_failed",
                         "host_not_supported",
                         "no_feed",
@@ -20315,7 +20312,7 @@
                     "minimum": 0
                 },
                 "feeds": {
-                    "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+                    "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/advisoryFeed"
@@ -20547,14 +20544,13 @@
                     "type": "boolean"
                 },
                 "unchecked_reason": {
-                    "description": "Why the lookup did not complete: `offline composer_too_old install_time_budget lookup_failed`, and `not_from_composer_repository` (outside the composer-repositories scope), `unparseable_version`, `no_feed`; an open set; null on a complete lookup.",
+                    "description": "Why the lookup did not complete: `offline install_time_budget lookup_failed`, and `not_from_composer_repository` (outside the composer-repositories scope), `unparseable_version`, `no_feed`; an open set; null on a complete lookup.",
                     "oneOf": [
                         {
                             "type": "string",
                             "pattern": "^[a-z][a-z0-9_]*$",
                             "x-known-values": [
                                 "offline",
-                                "composer_too_old",
                                 "install_time_budget",
                                 "lookup_failed",
                                 "not_from_composer_repository",
@@ -20576,7 +20572,7 @@
                     "minimum": 0
                 },
                 "feeds": {
-                    "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+                    "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/advisoryFeed"
@@ -20839,7 +20835,7 @@
                     "minimum": 0
                 },
                 "feeds": {
-                    "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+                    "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/advisoryFeed"

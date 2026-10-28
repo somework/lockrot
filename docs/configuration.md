@@ -387,8 +387,8 @@ names, for one of three reasons:
 | `not_from_composer_repository` | The package is installed from vcs, or from an origin that lockrot cannot tell | `host`, `repository` (its vcs URL) or `package`. For an unknown origin, by `package` |
 
 Every other reason stays S10, whatever the list says: `offline`, `rate_limit`, `lookup_failed`,
-`install_time_budget`, `composer_too_old`, `undated_releases`, `releases_unknown` and the rest. A
-rerun with a token, the network or a newer Composer closes most of them. `undated_releases` can stay
+`install_time_budget`, `undated_releases`, `releases_unknown` and the rest. A rerun with a token
+or the network closes most of them. `undated_releases` can stay
 on every run ([What `--fail-on=unchecked` fails on](ci.md#what-unchecked-fails-on)).
 
 - **A scope matches the package, never the cause of the gap.** So

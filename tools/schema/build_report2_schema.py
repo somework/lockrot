@@ -150,9 +150,9 @@ defs['years']['description'] = ('Years elapsed on the run clock (`Clock::yearsSi
                                 'The one-decimal rule is stated, not encoded: `multipleOf: 0.1` has no exact binary form and standard validators (ajv, '
                                 'python-jsonschema) reject a third of all tenths with it (attack round 1); only `multipleOf: 0.5` is used, which is exact.')
 defs['years'].pop('multipleOf', None)
-defs['advisoriesNotCheckedReason'] = open_set(['offline', 'composer_too_old', 'install_time_budget', 'lookup_failed'],
-    "Why security advisories were not checked (§5.1): `offline` (`--offline`; advisories are never served from a cache), `composer_too_old` "
-    "(Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw, §5.7). "
+defs['advisoriesNotCheckedReason'] = open_set(['offline', 'install_time_budget', 'lookup_failed'],
+    "Why security advisories were not checked (§5.1): `offline` (`--offline`; advisories are never served from a cache), "
+    "`install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw, §5.7). "
     "An open set: read a reason you do not know as another reason.")
 defs['flag'] = closed(FLAGS, 'A flag id (§2.1), in the frozen flag order `abandoned silent pinned left-behind old-promise stale capped vulnerable`. Closed: a new flag is a report-3 event (§3.7, §8.2).')
 defs['maintenanceFlag'] = closed(MAINT, 'A maintenance flag id: the flag order without `vulnerable` (§2.1). The same closed set as `flag`, restricted; the values `lead`, an accepted flag and a baseline entry can name.')
@@ -590,17 +590,17 @@ SEC_COMMON = {
     'check': open_set(['complete', 'partial', 'not_run'], ("How the advisory lookup went (§5.1, §5.5): `complete`, `partial`, `not_run` (round 4, underscore). "
                       "Composer's policy never stops the lookup. An open set (§8.2).")),
     'complete': d('`check` is `complete`.', {'type': 'boolean'}),
-    'unchecked_reason': nul(("Why the lookup did not complete: `offline composer_too_old install_time_budget lookup_failed`, and (C75) "
+    'unchecked_reason': nul(("Why the lookup did not complete: `offline install_time_budget lookup_failed`, and (C75) "
                              "`not_from_composer_repository` (outside the composer-repositories scope), `unparseable_version`, `no_feed`; an open set (§8.2, round 4); null on a complete lookup."),
-                            {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['offline', 'composer_too_old', 'install_time_budget', 'lookup_failed',
+                            {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['offline', 'install_time_budget', 'lookup_failed',
                                                                                   'not_from_composer_repository', 'unparseable_version', 'no_feed']}),
     'ignored': arr("The advisories Composer's audit policy ignores (§5.1; round 4 moves them here from S9).", ref('ignoredAdvisory')),
     'ignored_count': d('The length of `ignored` (I21).', INT0),
     'records': nul(("The distinct advisories that every answering feed holds for this name, for all versions, before the ignore lists and attribution (C75). "
                     "At least the counted advisories plus `ignored_count`. Null when no feed answered. Evidence only: no score, gate or flag reads it."), dict(INT0)),
     'feeds': arr(("One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order (C75). "
-                  "lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, "
-                  "Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none."),
+                  "lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline "
+                  "or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none."),
                  ref('advisoryFeed')),
 }
 defs['securityVulnerable'] = obj("`status: vulnerable` (§7.6): whenever an advisory counts, even on a partial lookup. `vulnerable`'s facts live here and in the S9 rows (§2.1).", dict({
@@ -608,7 +608,7 @@ defs['securityVulnerable'] = obj("`status: vulnerable` (§7.6): whenever an advi
 }, **{
     # an advisory counts only when a lookup returned it, so this shape's lookup is
     # `complete` or `partial` (never `not_run`), and an incomplete one stopped part-way (`install_time_budget`
-    # `lookup_failed`; `offline` and `composer_too_old` look nothing up). Still open sets: the strict
+    # `lookup_failed`; `offline` looks nothing up). Still open sets: the strict
     # reading holds lockrot's output to the values this shape can take
     'check': open_set(['complete', 'partial'], ("How the advisory lookup went: `complete`, or `partial` (a Composer repository did not return advisories, or "
                       "the install-time budget ran out part-way); an advisory counts only when a lookup returned it. An open set.")),
@@ -725,7 +725,7 @@ defs['checkMissing'] = obj("A check that did not run and raised S10 (S10's `unch
                       "age, dated only by a shared commit), `advisories` (S9: the advisory lookup did not complete), `releases` (S9's fix part: releases could not be read), "
                       "`release_metadata` (S2, S8: a package from a vcs or an unknown origin, whose release metadata no Composer repository serves). An open set.")),
     'reason': open_set(['no_token', 'anonymous_budget', 'install_time_budget', 'rate_limit', 'fetch_failed', 'offline', 'undated_releases', 'releases_unknown',
-                        'composer_too_old', 'lookup_failed', 'host_not_supported', 'no_feed', 'not_from_composer_repository'],
+                        'lookup_failed', 'host_not_supported', 'no_feed', 'not_from_composer_repository'],
                        ('Why it did not run (§2.3, §7.9 page vocabulary): `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4). '
                         '`no_feed`: no Composer repository of the run publishes advisories (S9). '
                         '`not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). On a path, artifact or '
@@ -1122,9 +1122,9 @@ defs['advisoryRepository'] = obj("One advisory-capable Composer repository of th
     'composer_repository': d('The name that Composer gives the repository, credentials stripped (the join key).', {'type': 'string', 'minLength': 1}),
     'registry': nul('The registry host for display. Null for another repository. An open set.', dict(REGISTRY)),
     'outcome': closed(['answered', 'failed', 'not_asked', 'no_feed'], 'What the repository did in this run. `no_feed`: it publishes no advisories. Closed.'),
-    'reason': nul(("Why. On `not_asked`: `offline`, `composer_too_old`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the "
+    'reason': nul(("Why. On `not_asked`: `offline`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the "
                    "composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set."),
-                  {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['offline', 'composer_too_old', 'install_time_budget', 'not_from_composer_repository',
+                  {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['offline', 'install_time_budget', 'not_from_composer_repository',
                                                                         'transport', 'invalid_response']}),
     'message': nul('The first line of what the repository threw, credentials stripped. Foreign text, not contract. Set on `failed`.', {'type': 'string'}),
     'packages_with_records': nul('Asked names with at least one record. Set on `answered`.', dict(INT0)),
@@ -1678,7 +1678,7 @@ defs['gateValueFailing'] = obj('One `run.gates` value and how many findings fail
 defs['gateNotApplied'] = obj('A check that the gate could not apply, on how many packages, and why: the gap where the gate failed open, as data.', {
     'check': open_set(['advisories'], "What was not checked (the `check` vocabulary of S10). An open set."),
     'packages': d('Packages that the gate could not judge on it for this reason: the covered unchecked findings whose `security.unchecked_reason` is `reason`.', INT1),
-    'reason': open_set(['offline', 'composer_too_old', 'install_time_budget', 'lookup_failed', 'no_feed', 'not_from_composer_repository', 'unparseable_version'],
+    'reason': open_set(['offline', 'install_time_budget', 'lookup_failed', 'no_feed', 'not_from_composer_repository', 'unparseable_version'],
                        "Why: the `security.unchecked_reason` of the unchecked findings. An open set."),
 })
 defs['rootGate'] = obj("The run's gate (report-1's, §6.2) plus the finding counts the `gate:` line prints (§7.6).", {

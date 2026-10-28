@@ -135,7 +135,6 @@ def s10_words(entry, f):
 # NotCheckedRule's cause words for an advisories entry.
 ADVISORY_CAUSES = {
     'offline': 'the run is offline',
-    'composer_too_old': 'Composer is older than 2.4',
     'install_time_budget': 'the install-time budget ran out',
     'lookup_failed': 'an advisory repository failed',
     'no_feed': 'no configured repository publishes advisories',

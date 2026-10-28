@@ -17,7 +17,7 @@ do, what each gap does to findings, and what to do about it.
 | [`advisory_ignore_unreadable`](#advisory_ignore_unreadable) | Composer rejected the advisory ignore settings | no | Every advisory counts, ignored ones included | Fix `config.policy` or `config.audit`, as the note's `message` says |
 | [`advisories_disabled_by_policy`](#advisories_disabled_by_policy) | Composer's policy turns off Composer's advisory blocking | no | None: lockrot still checks advisories | Nothing for lockrot. Composer does not block an affected version in an update (`composer update`, `require` or `remove`) of this project |
 | [`advisories_unavailable`](#advisories_unavailable) | A Composer repository's advisory request failed | yes when unreachable, no for any other error the repository raised, such as an answer lockrot could not read | That repository's advisories are missing | Rerun. For any other error, check the repository that `composer_repository` names |
-| [`advisories_not_checked`](#advisories_not_checked) | Advisories were not looked up, or only partly | no | The packages that the lookup missed carry S10 `advisories`, and their advisories add no points | `offline`: run online. `composer_too_old`: use Composer 2.4 or newer. `install_time_budget`: raise the [budget](install-time.md#time-budget) |
+| [`advisories_not_checked`](#advisories_not_checked) | Advisories were not looked up, or only partly | no | The packages that the lookup missed carry S10 `advisories`, and their advisories add no points | `offline`: run online. `install_time_budget`: raise the [budget](install-time.md#time-budget) |
 | [`repository_activity_not_checked`](#repository_activity_not_checked) | No repository host was asked | no | S10 `install_time_budget` | Raise the [budget](install-time.md#time-budget), or run `composer lockrot` |
 | [`repository_activity_anonymous_cap`](#repository_activity_anonymous_cap) | Without credentials, only some packages were asked about | no | S10 `no_token`, `anonymous_budget` | Set a token ([credentials](internals.md#repository-hosts-and-credentials)) |
 | [`repository_activity_rate_limited`](#repository_activity_rate_limited) | A host answered "too many requests" | yes | S10 `rate_limit` | Rerun, or add credentials for the host ([credentials](internals.md#repository-hosts-and-credentials)) |
@@ -163,7 +163,6 @@ The advisory lookup did not run, or stopped before it asked every repository.
 | `reason` | Cause | `composer_repositories_checked` |
 |---|---|---|
 | `offline` | `--offline`: advisories are never served from a cache | 0 |
-| `composer_too_old` | Composer below 2.4 has no advisory API | 0 |
 | `install_time_budget` | The install-time budget ran out | Above 0 when the check was partial: advisories from the repositories asked are in the findings, and lockrot never asked the rest |
 
 ## Repository activity

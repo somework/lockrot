@@ -55,4 +55,4 @@ flags: abandoned 19 · silent 8 · pinned 4 · left-behind 11 · old-promise 10 
 depth: 34 of 52 flagged packages are named by no line of composer.json · direct 18 · 1 hop 17 · 2 hops 10 · 3 hops 5 · 4 hops 2 · deepest: hoa/ustring and hoa/zformat, 4 hops (wallabag/rulerz › hoa/ruler › hoa/compiler › hoa/regex › hoa/ustring)
 security: no vulnerable package · advisories not checked
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
-gate: fails · --fail-on=high · 38 findings fail it · advisories not applied to 200 packages: not checked (Composer below 2.4) · target php 8.4 (--target-php)
+gate: fails · --fail-on=high · 38 findings fail it · advisories not applied to 200 packages: not checked (no repository publishes advisories) · target php 8.4 (--target-php)

@@ -156,8 +156,8 @@ alone: do not merge stderr into a report with `2>&1`.
 that lockrot did not run on a package it judges. It catches a workflow that does not pass
 `GITHUB_TOKEN`, and also these gaps:
 
-- an advisory lookup that did not complete: `--offline`, Composer below 2.4, a repository that
-  failed, the install-time budget, or no configured repository that publishes advisories
+- an advisory lookup that did not complete: `--offline`, a repository that failed, the
+  install-time budget, or no configured repository that publishes advisories
 - release data that did not come for a package with a counted advisory (`releases_unknown`)
 - a repository on a host that lockrot cannot ask (`host_not_supported`)
 - a package installed from vcs, or from an origin that lockrot cannot tell
@@ -199,9 +199,6 @@ one in [`extra.lockrot.accept-unchecked`](configuration.md#accept-unchecked), wi
   `packages_unchecked_accepted` at the root.
 - An accepted `no_feed` still leaves the advisories unchecked: the `gate:` line counts the package
   in its `advisories not applied` clause.
-- On Composer below 2.4 (the plugin on an LTS Composer, 2.2 or 2.3), advisories are never checked,
-  and `accept-unchecked` cannot accept that gap. Upgrade Composer, or run the
-  [PHAR](phar.md#in-ci), which bundles a newer one.
 
 A path package, an artifact or an inline `package` entry is a skip, not S10. To fail on such a
 package anyway, check its skips with jq:

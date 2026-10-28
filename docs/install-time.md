@@ -158,9 +158,6 @@ transaction before any package operation runs, and Composer exits `1`. The messa
   (`install_time_budget`), fails (`lookup_failed`) or finds no feed (`no_feed`) stops the install.
   So does a package whose metadata did not arrive and that carries a counted advisory
   (`releases_unknown`).
-- On Composer 2.2 and 2.3, lockrot cannot look up advisories (`composer_too_old`), so
-  `fail-on: unchecked` stops every install that changes a package. `accept-unchecked` cannot
-  accept that reason. Upgrade Composer to 2.4 or later, or remove `unchecked` from `fail-on`.
 - lockrot never stops a `--dry-run`, since no operation is about to run.
 
 A stopped `composer require` or `composer update` leaves `composer.lock` updated (and, for

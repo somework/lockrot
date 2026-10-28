@@ -27,7 +27,6 @@ final class RunGateText
     ];
     public const NOT_APPLIED = [
         'offline' => 'not checked (offline)',
-        'composer_too_old' => 'not checked (Composer below 2.4)',
         'install_time_budget' => 'not checked (install-time budget spent)',
         'lookup_failed' => 'not checked (a repository failed)',
         'no_feed' => 'not checked (no repository publishes advisories)',

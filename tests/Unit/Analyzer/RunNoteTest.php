@@ -131,13 +131,6 @@ final class RunNoteTest extends TestCase
             false,
             ['reason' => 'offline', 'composer_repositories_checked' => 0],
         ];
-        yield 'advisories on an old Composer' => [
-            static fn (): RunNote => RunNote::advisoriesNotChecked(RunNote::ADVISORIES_COMPOSER_TOO_OLD, 0),
-            'advisories_not_checked',
-            'security advisories not checked (needs Composer 2.4 or newer): no finding is graded for an advisory, and each next step\'s score after the move assumes its versions carry none',
-            false,
-            ['reason' => 'composer_too_old', 'composer_repositories_checked' => 0],
-        ];
         yield 'advisories past the budget' => [
             static fn (): RunNote => RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, 2),
             'advisories_not_checked',
@@ -480,7 +473,7 @@ final class RunNoteTest extends TestCase
             'update_now_not_checked',
             'move_check_failed',
         ], RunNote::CODES);
-        self::assertSame(['offline', 'composer_too_old', 'install_time_budget'], RunNote::ADVISORIES_NOT_CHECKED_REASONS);
+        self::assertSame(['offline', 'install_time_budget'], RunNote::ADVISORIES_NOT_CHECKED_REASONS);
         self::assertSame(['install_time_budget'], RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS);
     }
 
@@ -579,6 +572,7 @@ final class RunNoteTest extends TestCase
             'no repository not found' => static fn () => RunNote::repositoryActivityNotFound(RepoRef::GITHUB, []),
             'no host lockrot cannot ask' => static fn () => RunNote::repositoryActivityHostNotSupported([]),
             'a reason advisories are not checked for that is not one' => static fn () => RunNote::advisoriesNotChecked('tired', 0),
+            'an old Composer, which the plugin does not run on' => static fn () => RunNote::advisoriesNotChecked('composer_too_old', 0),
             'a checked count below zero' => static fn () => RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, -1),
             'a cap on GitLab, which has none' => static fn () => RunNote::repositoryActivityAnonymousCap(RepoRef::GITLAB, 1, 0, 0),
         ];

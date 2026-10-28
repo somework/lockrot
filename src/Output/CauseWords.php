@@ -25,7 +25,6 @@ final class CauseWords
         'unavailable' => 'metadata unavailable',
         'not_found' => 'not in the repository',
         'releases_unknown' => 'releases not read',
-        'composer_too_old' => 'Composer older than 2.4',
         'lookup_failed' => 'lookup failed',
         'branch_snapshot' => 'a branch snapshot has no release branch',
         'host_not_supported' => 'host not supported',

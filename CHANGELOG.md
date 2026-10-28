@@ -35,13 +35,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** **CLI:** `--fail-on=unchecked` also fails when advisories or an advisory's release
   data were not read, when a repository host cannot be asked, and on a package from vcs or an
   unknown origin. A path package and a package outside the `composer-repositories` scope are skips.
-  Action: list a GitLab host in `gitlab-domains`, or accept a lasting gap in `accept-unchecked`. On
-  Composer below 2.4, upgrade Composer or run the PHAR. ([What was not checked](docs/verdicts.md#what-was-not-checked))
+  Action: list a GitLab host in `gitlab-domains`, or accept a lasting gap in `accept-unchecked`.
+  ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **Breaking:** **Install-time:** with `install-time-strict` and `fail-on: unchecked`, an advisory
-  gap stops the install: `no_feed`, `lookup_failed`, an exhausted budget, and every changing install
-  on Composer 2.2 and 2.3 (`composer_too_old`, which `accept-unchecked` cannot accept). Action:
-  remove `unchecked` from that `fail-on`, or accept a `no_feed` gap in `accept-unchecked`. On
-  Composer 2.2 and 2.3, upgrade Composer to 2.4 or later.
+  gap stops the install: `no_feed`, `lookup_failed` and an exhausted budget. Action: remove
+  `unchecked` from that `fail-on`, or accept a `no_feed` gap in `accept-unchecked`.
   ([`install-time-strict`](docs/install-time.md#install-time-strict))
 - **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
   `require.php` stops below the newest PHP minor that the root php allows. It decides at once, and
