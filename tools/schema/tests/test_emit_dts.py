@@ -1,4 +1,4 @@
-"""The prototype mode of tools/schema/ts/emit_dts.py, which tools/schema/node/dts_check.js runs on a worktree."""
+"""`emit_dts.py --prototype` writes only the prototype file."""
 
 import os
 import subprocess

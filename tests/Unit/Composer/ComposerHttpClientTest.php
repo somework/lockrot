@@ -486,6 +486,46 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame([$url], $downloader->started, 'the target does not start after the budget');
     }
 
+    /** The deadline is past for the first redirect, so it is past for each one after it. */
+    public function testEachRedirectTargetAfterTheBudgetReadsBudgetSpent(): void
+    {
+        self::skipBelowComposer210();
+        $first = 'https://api.github.com/repos/vendor/one';
+        $second = 'https://api.github.com/repos/vendor/two';
+        $held = new \stdClass();
+        $now = static function () use ($held): float {
+            return ($held->downloader ?? null) instanceof ScriptedDownloader && $held->downloader->settled >= 1 ? 6.0 : 0.0;
+        };
+        [$client, $downloader] = self::clientWith([
+            $first => 'https://objects.example.com/one',
+            $second => 'https://objects.example.com/two',
+        ], Deadline::inSeconds(5.0, $now));
+        $held->downloader = $downloader;
+
+        $results = $client->fetchAll([$first, $second], self::HEADERS);
+
+        self::assertSame([$first => [0, null, 'install-time budget spent'], $second => [0, null, 'install-time budget spent']], self::summarize($results));
+    }
+
+    /** Composer asks before each hop too, so a chain that reaches the budget stops at its next hop. */
+    public function testASameOriginHopAfterTheBudgetEndsIsNotFollowed(): void
+    {
+        self::skipBelowComposer210();
+        $url = 'https://api.github.com/repos/vendor/name';
+        $hop = 'https://api.github.com/repositories/1';
+        $held = new \stdClass();
+        $now = static function () use ($held): float {
+            return ($held->downloader ?? null) instanceof ScriptedDownloader && $held->downloader->asked >= 2 ? 6.0 : 0.0;
+        };
+        [$client, $downloader] = self::clientWith([$url => $hop, $hop => [200, 'moved']], Deadline::inSeconds(5.0, $now));
+        $held->downloader = $downloader;
+
+        $results = $client->fetchAll([$url], self::HEADERS);
+
+        self::assertSame([$url => [0, null, 'install-time budget spent']], self::summarize($results));
+        self::assertSame([], $downloader->followed, 'the hop after the budget is not followed');
+    }
+
     /** The first wait() spends part of the budget, so the request to a redirect's target gets only what is left. */
     public function testARedirectTargetTakesTheTimeoutThatIsLeftAfterTheFirstWait(): void
     {
@@ -580,8 +620,10 @@ final class ScriptedDownloader extends HttpDownloader
     /** @var list<string> the requests that started in wait(), in order */
     public array $started = [];
     public int $waits = 0;
-    /** @var int the wait() calls that answered every request they started */
+    /** the wait() calls that returned */
     public int $settled = 0;
+    /** the times that it asked `prevent_url_access_callable` */
+    public int $asked = 0;
 
     /** @var array<string, array{0: int, 1: string}|\Throwable|string> */
     private array $script;
@@ -630,7 +672,7 @@ final class ScriptedDownloader extends HttpDownloader
         $this->pending = [];
         foreach ($pending as [$url, $deferred, $options]) {
             $refuse = $options['prevent_url_access_callable'] ?? null;
-            if (\is_callable($refuse) && $refuse($url) === true) {
+            if ($this->refuses($refuse, $url)) {
                 $deferred->reject(new TransportException('Access to "'.$url.'" is blocked.'));
 
                 continue;
@@ -638,7 +680,7 @@ final class ScriptedDownloader extends HttpDownloader
             $this->started[] = $url;
             $answer = $this->script[$url] ?? null;
             if (\is_string($answer)) {
-                if (\is_callable($refuse) && $refuse($answer) === true) {
+                if ($this->refuses($refuse, $answer)) {
                     $deferred->reject(new TransportException('Access to "'.$answer.'" is blocked.'));
 
                     continue;
@@ -654,5 +696,16 @@ final class ScriptedDownloader extends HttpDownloader
             }
         }
         ++$this->settled;
+    }
+
+    /** @param mixed $refuse the request's `prevent_url_access_callable`, if any */
+    private function refuses($refuse, string $url): bool
+    {
+        if (!\is_callable($refuse)) {
+            return false;
+        }
+        ++$this->asked;
+
+        return $refuse($url) === true;
     }
 }

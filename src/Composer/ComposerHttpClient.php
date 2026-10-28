@@ -154,14 +154,15 @@ final class ComposerHttpClient implements HttpClientInterface
         $results = [];
         /** @var array<string, string> $redirects url => the URL on another origin that a redirect named */
         $redirects = [];
-        /** @var array<string, true> $stopped the URLs whose request the install-time budget stopped before it started */
+        /** @var array<string, string> $stopped the URLs whose request, redirect hop or retry the install-time budget stopped */
         $stopped = [];
-        // The downloader queues the requests above its limit and asks this before each one starts.
+        // Composer 2.10's curl downloader asks this before each request, hop and retry starts.
+        // Requests above its limit wait in a queue.
         $budgetEnded = function (string $url) use (&$stopped): bool {
             if (!$this->deadline->isPast()) {
                 return false;
             }
-            $stopped[$url] = true;
+            $stopped[$url] = $url;
 
             return true;
         };
@@ -194,7 +195,7 @@ final class ComposerHttpClient implements HttpClientInterface
         $timeout = $this->timeoutSeconds();
         foreach ($redirects as $url => $target) {
             if ($this->deadline->isPast()) {
-                $stopped[$url] = true;
+                $stopped[$url] = $url;
 
                 continue;
             }
@@ -207,7 +208,7 @@ final class ComposerHttpClient implements HttpClientInterface
         if ($redirects !== []) {
             $this->downloader->wait();
         }
-        foreach (array_keys($stopped) as $url) {
+        foreach ($stopped as $url) {
             $results[$url] = HttpResult::failure($url, 'install-time budget spent', $this->clock->now());
         }
         foreach ($urls as $url) {
