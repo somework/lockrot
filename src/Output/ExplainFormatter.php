@@ -19,6 +19,7 @@ use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Signal;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\ListWords;
 use Lockrot\Verdict\MoveText;
 use Lockrot\Verdict\ScoreModel;
 
@@ -186,7 +187,7 @@ final class ExplainFormatter
         if ($finding->isDirect()) {
             return 'direct requirement: maintenance not halved for reach';
         }
-        $where = $finding->reach() === 'unreached' ? 'unreached' : 'via '.implode(', ', $finding->directDependents());
+        $where = $finding->reach() === 'unreached' ? 'unreached' : 'via '.ListWords::of($finding->directDependents());
 
         return $where.': maintenance '.($maintenance ? 'halved' : 'would be halved (none counts)').'; security is never halved for reach';
     }
@@ -204,7 +205,7 @@ final class ExplainFormatter
             $clears[] = $fact->id();
         }
         if ($clears !== []) {
-            $lines[] = 'clears '.implode(', ', $clears);
+            $lines[] = 'clears '.ListWords::of($clears);
         }
         foreach ($move->also() as $also) {
             $lines[] = 'also: '.$also->text();
@@ -444,7 +445,7 @@ final class ExplainFormatter
         $holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json'
             : ($holder->package() === $package ? $package.' '.$holder->version().', its own release' : (string) $holder->package()), MoveText::inTextOrder($joint ? [] : $candidate->heldBy(), $package));
         if ($holders !== []) {
-            $cell .= '; held by '.implode(' and ', array_unique($holders));
+            $cell .= '; held by '.ListWords::of(array_values(array_unique($holders)));
         }
         if ($after !== null) {
             // D10: the caveat stays only where Composer's solver did not check the move.

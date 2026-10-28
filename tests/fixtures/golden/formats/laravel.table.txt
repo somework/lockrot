@@ -1,5 +1,5 @@
 <options=bold>low (1)</options=bold>
-  league/config v1.2.0  via laravel/framework, laravel/tinker  ·  stale
+  league/config v1.2.0  via laravel/framework and laravel/tinker  ·  stale
       4 = stale 8 ÷ 2 transitive
       do: —
       stale        last release 2022-12-11 (3.8 years ago)

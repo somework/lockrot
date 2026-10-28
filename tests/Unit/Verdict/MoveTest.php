@@ -455,7 +455,7 @@ final class MoveTest extends TestCase
         self::assertSame([['composer', 'update', 'a/b'], ['composer', 'why-not', 'a/b', '1.9.0', '--locked']], $move['commands']);
         self::assertSame(['raise-php'], array_column(JsonPath::arrayAt($move, ['also']), 'kind'));
         self::assertArrayNotHasKey('through', JsonPath::arrayAt($move, ['also', 0]));
-        self::assertSame('composer update a/b (gets 1.9.0) — clears the advisory; left-behind, old-promise stay', $move['text']);
+        self::assertSame('composer update a/b (gets 1.9.0) — clears the advisory; left-behind and old-promise stay', $move['text']);
         self::assertSame(['next_step', 'update', null], [JsonPath::stringAt($finding, ['security', 'move_in']), JsonPath::stringAt($finding, ['security', 'fix_kind']), JsonPath::arrayAt($finding, ['security'])['partial']]);
     }
 

@@ -153,7 +153,7 @@ final class MarkdownFormatterTest extends TestCase
     public function testTheViaCellNamesTheDirectDependents(): void
     {
         self::assertStringContainsString('| low | `a/deep` | 1.0.0 | stale |', self::formatter()->format(self::report()));
-        self::assertMatchesRegularExpression('/\| `a\/deep` .* \| a\/root, a\/other \|$/m', self::formatter()->format(self::report()));
+        self::assertMatchesRegularExpression('/\| `a\/deep` .* \| a\/root and a\/other \|$/m', self::formatter()->format(self::report()));
     }
 
     public function testTheViaCellNamesAtMostThreeDirectDependents(): void

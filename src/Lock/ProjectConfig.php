@@ -35,6 +35,8 @@ final class ProjectConfig
     private array $constraints = [];
     /** @var array<string, array<string, string>> section => lowercased platform package name => constraint */
     private array $platformConstraints = [];
+    /** @var array<string, array<string, string>> section => lowercased name => the key as written */
+    private array $keys = [];
     private bool $read = true;
 
     /**
@@ -101,6 +103,13 @@ final class ProjectConfig
         }
         foreach ([self::REQUIRE, self::REQUIRE_DEV, self::CONFLICT, self::PROVIDE, self::REPLACE] as $section) {
             $config->platformConstraints[$section] = self::constraintsOf($json[$section] ?? null, true);
+        }
+        foreach ([self::REQUIRE, self::REQUIRE_DEV] as $section) {
+            foreach (\is_array($json[$section] ?? null) ? $json[$section] : [] as $key => $constraint) {
+                if (\is_string($constraint)) {
+                    $config->keys[$section][strtolower((string) $key)] = (string) $key;
+                }
+            }
         }
 
         return $config;
@@ -255,6 +264,26 @@ final class ProjectConfig
     public function platformConstraints(string $section): array
     {
         return $this->platformConstraints[$section] ?? [];
+    }
+
+    /**
+     * The literal sections that list a package or platform name, as Composer reads them: the name
+     * in any case, the later of two keys, a string constraint only. Composer's `require` command
+     * picks its section and removes a key by this spelling.
+     *
+     * @return array<self::REQUIRE|self::REQUIRE_DEV, string> section => the key as written, `require` first
+     */
+    public function listedIn(string $name): array
+    {
+        $listed = [];
+        foreach ([self::REQUIRE, self::REQUIRE_DEV] as $section) {
+            $key = $this->keys[$section][strtolower($name)] ?? null;
+            if ($key !== null) {
+                $listed[$section] = $key;
+            }
+        }
+
+        return $listed;
     }
 
     /** @return array<string, mixed> */

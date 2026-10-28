@@ -176,7 +176,7 @@ final class AnalyzerRunNotesTest extends TestCase
         $analysis = $this->analyze($packages, new MetadataBatch($metadata, [], []), $this->http($answers), false, null, false, false, ['gitlab.com'], 1);
         $cap = $analysis->report()->runNotes()[0];
 
-        self::assertSame('GitHub token not set: repository activity checked for 1 candidate package, 3 packages skipped (set GITHUB_TOKEN to check all)', $cap->text());
+        self::assertSame('GitHub token not set: repository activity checked for 1 candidate package, 3 packages skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)', $cap->text());
         self::assertSame(['forge_id' => 'github', 'checked' => 1, 'skipped_no_token' => 1, 'skipped_budget' => 2], $cap->data());
         $reasons = array_count_values(self::activityReasons($analysis, ['vendor/one', 'vendor/two', 'vendor/three', 'vendor/recent']));
         ksort($reasons);

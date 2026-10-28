@@ -1402,7 +1402,7 @@
                     "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
                 }
             ],
-            "text": "composer update symfony/monolog-bridge (gets v2.8.52) \u2014 clears the advisory; left-behind, old-promise stay"
+            "text": "composer update symfony/monolog-bridge (gets v2.8.52) \u2014 clears the advisory; left-behind and old-promise stay"
         },
         "fix_kind": "update",
         "installed_branch_fixes": {
@@ -6278,7 +6278,7 @@
                 }
             ],
             "also": [],
-            "text": "move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (conflicts with ^5.4); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+            "text": "move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle and php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (conflicts with ^5.4); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": {
@@ -6458,7 +6458,7 @@
                 }
             ],
             "also": [],
-            "text": "move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch, spatie/laravel-markdown \u2014 clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+            "text": "move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch and spatie/laravel-markdown \u2014 clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": {
@@ -7108,7 +7108,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4), php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": {
@@ -7381,7 +7381,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0), guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned), csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned), guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "raise-php",
         "installed_branch_fixes": {
@@ -13667,7 +13667,7 @@
                 }
             ],
             "also": [],
-            "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+            "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle and php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": {
@@ -15885,7 +15885,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38) and symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38), symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "raise-php",
         "installed_branch_fixes": {

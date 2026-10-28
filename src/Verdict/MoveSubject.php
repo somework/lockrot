@@ -25,6 +25,10 @@ final class MoveSubject
     private ?string $platformOverride;
     private ?bool $refusedTargetInside;
     private ?string $listedIn = null;
+    /** @var array<string, string> section => the key as written ({@see ProjectConfig::listedIn()}) */
+    private array $keys = [];
+    /** @var array<string, string> section => the key as written, for `php` */
+    private array $phpKeys = [];
     /** @var list<string> */
     private array $chain = [];
 
@@ -62,6 +66,22 @@ final class MoveSubject
     }
 
     /**
+     * A copy that knows the literal composer.json keys of the package and of `php`. A literal key
+     * chooses the section of a printed `composer require` over `named_in`, as Composer chooses it.
+     *
+     * @param array<string, string> $keys    {@see ProjectConfig::listedIn()} of the package
+     * @param array<string, string> $phpKeys {@see ProjectConfig::listedIn()} of `php`
+     */
+    public function withKeys(array $keys, array $phpKeys): self
+    {
+        $clone = clone $this;
+        $clone->keys = $keys;
+        $clone->phpKeys = $phpKeys;
+
+        return $clone;
+    }
+
+    /**
      * A copy that knows the finding's `chain`.
      *
      * @param list<string> $chain
@@ -89,12 +109,56 @@ final class MoveSubject
     /** Whether composer.json lists the package, so its command is the root command of that section, with or without `--dev`. */
     public function isListed(): bool
     {
-        return $this->listedIn !== null || $this->direct;
+        return $this->keys !== [] || $this->listedIn !== null || $this->direct;
     }
 
     public function isListedInRequireDevOnly(): bool
     {
-        return $this->listedIn === ProjectConfig::REQUIRE_DEV;
+        return $this->keys === [] ? $this->listedIn === ProjectConfig::REQUIRE_DEV : array_keys($this->keys) === [ProjectConfig::REQUIRE_DEV];
+    }
+
+    /** Whether both literal sections list the package, so its `composer require` removes the require-dev line. */
+    public function isListedInBoth(): bool
+    {
+        return \count($this->keys) === 2;
+    }
+
+    /**
+     * The section option of the package's `composer require`. `--no-interaction` keeps a name that
+     * both sections list in `require` under any terminal answer, and `--dev` would delete that line.
+     *
+     * @return list<string>
+     */
+    public function requireOptions(): array
+    {
+        if ($this->isListedInBoth()) {
+            return ['--no-interaction'];
+        }
+
+        return $this->isListedInRequireDevOnly() ? ['--dev'] : [];
+    }
+
+    /** The package argument: the require-dev key as written when both sections list it, because Composer removes that key exact-case. */
+    public function requireArgument(): string
+    {
+        return $this->isListedInBoth() ? $this->keys[ProjectConfig::REQUIRE_DEV] : $this->package;
+    }
+
+    /** Whether require-dev lists `php`, so the raise of require.php removes that line. */
+    public function isPhpInRequireDev(): bool
+    {
+        return isset($this->phpKeys[ProjectConfig::REQUIRE_DEV]);
+    }
+
+    /** @return list<string> the section option of the `composer require php:…` step */
+    public function phpRaiseOptions(): array
+    {
+        return $this->isPhpInRequireDev() ? ['--no-interaction'] : [];
+    }
+
+    public function phpRaiseArgument(): string
+    {
+        return $this->phpKeys[ProjectConfig::REQUIRE_DEV] ?? 'php';
     }
 
     public function package(): string

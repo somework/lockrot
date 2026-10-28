@@ -262,4 +262,22 @@ final class ProjectConfigTest extends TestCase
         self::assertSame(['php' => '8.3.0'], $cfg->platformConstraints(ProjectConfig::CONFLICT));
         self::assertSame([], ProjectConfig::empty()->platformConstraints(ProjectConfig::REQUIRE));
     }
+
+    public function testAListingNamesEachLiteralSectionWithItsKeyAsWritten(): void
+    {
+        $cfg = ProjectConfig::fromArray([
+            'require' => ['Vendor/A' => '^1.0', 'vendor/b' => '^1.0', 'PHP' => '>=8.1', 'vendor/c' => ['^1'], 'vendor/d' => '^1.0'],
+            'require-dev' => ['vendor/a' => '^2.0', 'Vendor/A' => '^2.1', 'vendor/c' => '^1.0', 'php' => '>=8.2', 'vendor/e' => false],
+            'provide' => ['vendor/f' => '1.0'],
+        ]);
+
+        self::assertSame([ProjectConfig::REQUIRE => 'Vendor/A', ProjectConfig::REQUIRE_DEV => 'Vendor/A'], $cfg->listedIn('vendor/a'), 'the later duplicate key wins');
+        self::assertSame([ProjectConfig::REQUIRE => 'vendor/b'], $cfg->listedIn('VENDOR/B'));
+        self::assertSame([ProjectConfig::REQUIRE_DEV => 'vendor/c'], $cfg->listedIn('vendor/c'), 'a value that is not a string lists nothing');
+        self::assertSame([ProjectConfig::REQUIRE => 'vendor/d'], $cfg->listedIn('vendor/d'));
+        self::assertSame([], $cfg->listedIn('vendor/e'));
+        self::assertSame([], $cfg->listedIn('vendor/f'), 'provide is not a literal section of a require');
+        self::assertSame([ProjectConfig::REQUIRE => 'PHP', ProjectConfig::REQUIRE_DEV => 'php'], $cfg->listedIn('php'));
+        self::assertSame([], ProjectConfig::empty()->listedIn('php'));
+    }
 }

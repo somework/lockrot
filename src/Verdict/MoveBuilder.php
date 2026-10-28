@@ -173,7 +173,7 @@ final class MoveBuilder
         if (!$subject->isListed()) {
             return MoveQuery::update($subject->package(), $constraint, $version, $php, $newest);
         }
-        return MoveQuery::require($subject->package(), $constraint, $version, $php, $newest)->withRequireDev($subject->isListedInRequireDevOnly());
+        return MoveQuery::require($subject->package(), $constraint, $version, $php, $newest)->withRequireDev($subject->requireOptions() === ['--dev']);
     }
 
     /** @return list<string> the counted maintenance flags in flag order */
@@ -418,7 +418,7 @@ final class MoveBuilder
         $form = $check === null ? null : $check->form();
         $option = $form !== null && isset(MoveCheck::OPTIONS[$form]) ? [MoveCheck::OPTIONS[$form]] : [];
         $package = $subject->package();
-        $raise = $phpCheck !== null && $phpCheck->raiseTo() !== null ? [['composer', 'require', 'php:'.$phpCheck->raiseTo(), '--no-update']] : [];
+        $raise = $phpCheck !== null && $phpCheck->raiseTo() !== null ? [array_merge(['composer', 'require', $subject->phpRaiseArgument().':'.$phpCheck->raiseTo()], $subject->phpRaiseOptions(), ['--no-update'])] : [];
         switch ($kind) {
             case Move::UPDATE:
                 $inline = $checks !== null && $version !== null && $checks->writesInline($subject->isListed());
@@ -435,8 +435,8 @@ final class MoveBuilder
     }
 
     /**
-     * `composer require` for a package that composer.json lists, with `--dev` when only
-     * `require-dev` lists it. A package that it does not list gets no root requirement: when the
+     * `composer require` for a package that composer.json lists, with its section option
+     * ({@see MoveSubject::requireOptions()}). A package that it does not list gets no root requirement: when the
      * check resolves its `update` request, the step is that `composer update` with the constraint
      * inline, on a Composer that takes one there. With holders, a listed package's step writes the
      * requirement with `--no-update` and updates the package with its holders.
@@ -450,12 +450,12 @@ final class MoveBuilder
     {
         $package = $subject->package();
         if ($subject->isListed()) {
-            $dev = $subject->isListedInRequireDevOnly() ? ['--dev'] : [];
+            $require = array_merge(['composer', 'require', $subject->requireArgument().':'.$constraint], $subject->requireOptions());
             if ($holders !== []) {
-                return [array_merge(['composer', 'require', $package.':'.$constraint], $dev, ['--no-update']), array_merge(['composer', 'update', $package], $holders)];
+                return [array_merge($require, ['--no-update']), array_merge(['composer', 'update', $package], $holders)];
             }
 
-            return [array_merge(['composer', 'require', $package.':'.$constraint], $dev, $option)];
+            return [array_merge($require, $option)];
         }
         if ($check !== null && $check->isResolved() && $checks !== null && $checks->writesInline(false)) {
             return [array_merge(['composer', 'update', $package.':'.$constraint], $holders, $option)];

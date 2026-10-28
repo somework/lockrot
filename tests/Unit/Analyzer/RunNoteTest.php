@@ -169,14 +169,14 @@ final class RunNoteTest extends TestCase
         yield 'the GitHub cap' => [
             static fn (): RunNote => RunNote::repositoryActivityAnonymousCap(RepoRef::GITHUB, 11, 80, 9),
             'repository_activity_anonymous_cap',
-            'GitHub token not set: repository activity checked for 11 candidate packages, 89 packages skipped (set GITHUB_TOKEN to check all)',
+            'GitHub token not set: repository activity checked for 11 candidate packages, 89 packages skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)',
             false,
             ['forge_id' => 'github', 'checked' => 11, 'skipped_no_token' => 80, 'skipped_budget' => 9],
         ];
         yield 'the GitHub cap counts one of each in the singular' => [
             static fn (): RunNote => RunNote::repositoryActivityAnonymousCap(RepoRef::GITHUB, 1, 1, 0),
             'repository_activity_anonymous_cap',
-            'GitHub token not set: repository activity checked for 1 candidate package, 1 package skipped (set GITHUB_TOKEN to check all)',
+            'GitHub token not set: repository activity checked for 1 candidate package, 1 package skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)',
             false,
             ['forge_id' => 'github', 'checked' => 1, 'skipped_no_token' => 1, 'skipped_budget' => 0],
         ];

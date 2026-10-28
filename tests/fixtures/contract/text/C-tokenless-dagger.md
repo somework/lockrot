@@ -12,6 +12,6 @@ libyears: 1.8 behind across the one package · 1.8 from direct requirements · f
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
 php: the lock installs on PHP 7.2 to 8.5
 
-- note: GitHub token not set: repository activity checked for 0 candidate packages, 1 package skipped (set GITHUB\_TOKEN to check all)
+- note: GitHub token not set: repository activity checked for 0 candidate packages, 1 package skipped (set LOCKROT\_GITHUB\_TOKEN or GITHUB\_TOKEN to a github.com token to check all)
 
 <sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

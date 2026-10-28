@@ -47,7 +47,7 @@ Every output format prints each note as a sentence. The [JSON report](schema.md)
 ```json
 {
     "code": "repository_activity_anonymous_cap",
-    "text": "GitHub token not set: repository activity checked for 11 candidate packages, 89 packages skipped (set GITHUB_TOKEN to check all)",
+    "text": "GitHub token not set: repository activity checked for 11 candidate packages, 89 packages skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)",
     "docs_url": "https://lockrot.dev/notes/#repository_activity_anonymous_cap",
     "sets_network_failures": false,
     "data": {"forge_id": "github", "checked": 11, "skipped_no_token": 80, "skipped_budget": 9}

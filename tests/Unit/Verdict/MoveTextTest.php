@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Data\Repository\StableRelease;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\Holder;
 use Lockrot\Security\PhpCheck;
 use Lockrot\Signal\PhpFloor;
@@ -195,7 +196,7 @@ final class MoveTextTest extends TestCase
         $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '7.4', null);
         $move = new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, null, true, $holds, [], [], [], [], null, [], [], $subject);
 
-        self::assertStringEndsWith('; held by composer.json (requires ^1.2) and acme/lib 2.0.0, its own release (requires psr/log ^1) and acme/lib 2.0.0, its own release (conflicts with psr/clock <2) and a/early 1.0.0 (requires acme/lib ^1.2; itself left-behind)', MoveText::render($move));
+        self::assertStringEndsWith('; held by composer.json (requires ^1.2), acme/lib 2.0.0, its own release (requires psr/log ^1), acme/lib 2.0.0, its own release (conflicts with psr/clock <2) and a/early 1.0.0 (requires acme/lib ^1.2; itself left-behind)', MoveText::render($move));
     }
 
     public function testARootHoldFromRequireDevSaysRequireDev(): void
@@ -245,6 +246,34 @@ final class MoveTextTest extends TestCase
         self::assertStringStartsWith('require acme/lib ^2.0 in require-dev (gets 2.0.4, below the newest 2.1.0)', MoveText::render($move));
     }
 
+    /** Composer moves a name that both sections list to require, so the text names the removed line (R6-3). */
+    public function testARequireMoveOfANameThatBothSectionsListSaysItRemovesTheRequireDevLine(): void
+    {
+        $subject = (new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null))->withKeys([ProjectConfig::REQUIRE => 'acme/lib', ProjectConfig::REQUIRE_DEV => 'Acme/Lib'], []);
+        $move = (new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, null, true, [], [], [], [], [], null, [], [['composer', 'require', 'Acme/Lib:^2.0', '--no-interaction']], $subject))
+            ->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0'));
+
+        self::assertStringStartsWith('require acme/lib ^2.0, which removes it from require-dev;', MoveText::render($move));
+    }
+
+    public function testATagMoveOfANameThatBothSectionsListSaysItRemovesTheRequireDevLine(): void
+    {
+        $subject = (new MoveSubject('acme/lib', '1.2.0', false, [], '8.4', null))->withKeys([ProjectConfig::REQUIRE => 'acme/lib', ProjectConfig::REQUIRE_DEV => 'acme/lib'], []);
+        $move = new Move(Move::TAG, FlagSet::PINNED, [], null, null, null, null, null, '2.0.0', '2.0.0', null, new Latest('2.0.0', null, false, null, null), null, false, [], [], [], [], [], null, [], [['composer', 'require', 'acme/lib:^2.0.0', '--no-interaction']], $subject);
+
+        self::assertStringStartsWith('require a tag, which removes it from require-dev — the newest is 2.0.0', MoveText::render($move));
+    }
+
+    public function testAPhpRaiseThatRequireDevListsSaysItRemovesTheRequireDevLine(): void
+    {
+        $subject = (new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', '7.4'))->withKeys([ProjectConfig::REQUIRE => 'acme/lib'], [ProjectConfig::REQUIRE => 'php', ProjectConfig::REQUIRE_DEV => 'php']);
+        $phpCheck = PhpCheck::of('>=8.1', new PhpFloor('8.4', '>=7.4'));
+        $move = (new Move(Move::RAISE_PHP, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, $phpCheck, true, [], [], [], [], [], null, [], [['composer', 'require', 'php:>=8.1', '--no-interaction', '--no-update'], ['composer', 'require', 'acme/lib:^2.0']], $subject))
+            ->withCheck(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0'));
+
+        self::assertStringStartsWith('raise require.php to >=8.1, which removes it from require-dev, then ', MoveText::render($move));
+    }
+
     public function testASelfVersionHoldNamesTheHoldersVersion(): void
     {
         $hold = new Holder(Holder::PACKAGE, 'acme/suite', '3.1.0', Holder::REQUIRE, 'self.version', 'acme/lib');
@@ -264,7 +293,7 @@ final class MoveTextTest extends TestCase
         $move = (new Move(Move::FIND_ALTERNATIVE, FlagSet::ABANDONED, [], null, null, null, null, null, null, null, null, null, null, null, [], [], [], [], [], null, [Move::TRANSITIVE], [], $subject))->asLead($through, []);
 
         self::assertStringContainsString(
-            '; it comes in through mautic/core-lib (jbroadway/urlify requires it), c/unread, l/newest: change your own package mautic/core-lib, or replace or update c/unread, or replace l/newest',
+            '; it comes in through mautic/core-lib (jbroadway/urlify requires it), c/unread and l/newest: change your own package mautic/core-lib, or replace or update c/unread, or replace l/newest',
             MoveText::render($move)
         );
     }

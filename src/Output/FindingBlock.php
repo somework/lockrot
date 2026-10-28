@@ -14,6 +14,7 @@ use Lockrot\Score\WorsenedFact;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\ListWords;
 use Lockrot\Verdict\MoveText;
 
 /**
@@ -46,10 +47,9 @@ final class FindingBlock
     public static function dependents(Finding $finding): string
     {
         $dependents = $finding->directDependents();
-        $named = implode(', ', \array_slice($dependents, 0, self::DEPENDENTS_NAMED));
         $more = \count($dependents) - self::DEPENDENTS_NAMED;
 
-        return $more > 0 ? $named.' and '.$more.' more' : $named;
+        return ListWords::of(array_merge(\array_slice($dependents, 0, self::DEPENDENTS_NAMED), $more > 0 ? [$more.' more'] : []));
     }
 
     /**

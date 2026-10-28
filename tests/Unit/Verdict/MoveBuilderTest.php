@@ -381,6 +381,50 @@ final class MoveBuilderTest extends TestCase
         self::assertSame([MoveCheck::RESOLVES, [['composer', 'require', 'a/b:^2.0', '--dev']]], [$check->result(), $move->commands()]);
     }
 
+    public function testANameThatBothSectionsListGetsNoInteractionAndTheSpellingOfItsRequireDevKey(): void
+    {
+        $keys = [ProjectConfig::REQUIRE => 'a/b', ProjectConfig::REQUIRE_DEV => 'A/b'];
+        [$row, $context] = self::checked(['require a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], true, true, null, [], null, [], [ProjectConfig::REQUIRE, ProjectConfig::REQUIRE_DEV], $keys);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertSame([['composer', 'require', 'A/b:^2.0', '--no-interaction']], $move->commands());
+    }
+
+    public function testANameThatBothSectionsListWritesItsRequirementBeforeTheUpdateWithItsHolders(): void
+    {
+        $keys = [ProjectConfig::REQUIRE => 'a/b', ProjectConfig::REQUIRE_DEV => 'a/b'];
+        [$row, $context] = self::checked(self::refusedThenJoint('require a/b ^2.0 '), true, true, null, [], null, [], [ProjectConfig::REQUIRE, ProjectConfig::REQUIRE_DEV], $keys);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertSame([['composer', 'require', 'a/b:^2.0', '--no-interaction', '--no-update'], ['composer', 'update', 'a/b', 'h/x']], $move->commands());
+    }
+
+    public function testAPhpRaiseThatRequireDevListsTakesNoInteractionAndTheSpellingOfThatKey(): void
+    {
+        $phpKeys = [ProjectConfig::REQUIRE => 'php', ProjectConfig::REQUIRE_DEV => 'PHP'];
+        [$row, $context] = self::checked(['require a/b ^2.0 >=8.1' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], true, true, '>=8.1', [], '>=7.4', [], [ProjectConfig::REQUIRE], [ProjectConfig::REQUIRE => 'a/b'], $phpKeys);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::RAISE_PHP, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertSame([['composer', 'require', 'PHP:>=8.1', '--no-interaction', '--no-update'], ['composer', 'require', 'a/b:^2.0']], $move->commands());
+    }
+
+    /** A literal require-dev key chooses `--dev`, though `named_in` holds `require` through a provided name. */
+    public function testALiteralRequireDevKeyChoosesDevOverTheNamedInOfAProvidedName(): void
+    {
+        [$row, $context] = self::checked(['require a/b ^2.0 ' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], false, true, null, [], null, [], [ProjectConfig::REQUIRE], [ProjectConfig::REQUIRE_DEV => 'a/b']);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertSame([['composer', 'require', 'a/b:^2.0', '--dev']], $move->commands());
+    }
+
     /** SPEC 5.6: `transitive` reads `direct`, so a require-dev name in a run without --dev keeps it (case require-dev-name). */
     public function testARequireDevNameThatTheRunDoesNotReachDirectlyMovesBecauseItIsTransitive(): void
     {
@@ -439,10 +483,12 @@ final class MoveBuilderTest extends TestCase
      * @param array<string, string>              $require composer.json's `require`
      * @param array<string, ConstraintInterface> $ranges  each advisory's affected range, by id
      * @param list<string>                       $namedIn the composer.json sections that list a/b
+     * @param array<string, string>              $keys    the literal keys of a/b and of php, by section ({@see ProjectConfig::listedIn()})
+     * @param array<string, string>              $phpKeys
      *
      * @return array{0: BranchRow, 1: MoveContext}
      */
-    private static function checked(array $checks, bool $direct = true, bool $inlineOnAnyPackage = true, ?string $php = null, array $require = [], ?string $projectPhp = null, array $ranges = [], array $namedIn = []): array
+    private static function checked(array $checks, bool $direct = true, bool $inlineOnAnyPackage = true, ?string $php = null, array $require = [], ?string $projectPhp = null, array $ranges = [], array $namedIn = [], array $keys = [], array $phpKeys = []): array
     {
         $facts = self::facts($php);
         $floor = new PhpFloor('8.4', $projectPhp);
@@ -450,7 +496,7 @@ final class MoveBuilderTest extends TestCase
         $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->withVerdict(Verdict::LEFT_BEHIND)->build();
         $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
         $project = ProjectConfig::fromArray(['require' => $require]);
-        $context = (new MoveContext($finding, (new MoveSubject('a/b', '1.0.0', $direct, $direct ? [] : ['c/d'], '8.4', null))->withNamedIn($namedIn), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, $project)), $floor, new \DateTimeImmutable(self::NOW), 2, null, $ranges, [], true))
+        $context = (new MoveContext($finding, (new MoveSubject('a/b', '1.0.0', $direct, $direct ? [] : ['c/d'], '8.4', null))->withNamedIn($namedIn)->withKeys($keys, $phpKeys), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, $project)), $floor, new \DateTimeImmutable(self::NOW), 2, null, $ranges, [], true))
             ->withChecks(new MoveChecks(new RecordedMoveChecker($checks, []), $inlineOnAnyPackage));
 
         return [$row, $context];

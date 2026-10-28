@@ -110,7 +110,7 @@ final class RunNote
 
     /** GitLab's anonymous limit needs no cap, so it has no sentence. */
     private const ANONYMOUS_CAP_TEXT = [
-        RepoRef::GITHUB => 'GitHub token not set: repository activity checked for %d candidate %s, %d %s skipped (set GITHUB_TOKEN to check all)',
+        RepoRef::GITHUB => 'GitHub token not set: repository activity checked for %d candidate %s, %d %s skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)',
         RepoRef::BITBUCKET => 'Bitbucket credentials not set: repository activity checked for %d candidate %s, %d %s skipped (add bitbucket.org credentials to auth.json to check all)',
     ];
 

@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/unknown",
-        "description": "bower-asset/jquery 3.7.1 \u2014 finding unknown (0). (via yiisoft/yii2, yiisoft/yii2-bootstrap5, yiisoft/yii2-symfonymailer)",
+        "description": "bower-asset/jquery 3.7.1 \u2014 finding unknown (0). (via yiisoft/yii2, yiisoft/yii2-bootstrap5 and yiisoft/yii2-symfonymailer)",
         "categories": [
             "Bug Risk"
         ],
@@ -18,7 +18,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/unchecked",
-        "description": "bower-asset/jquery 3.7.1 \u2014 finding unknown (0) \u2014 checks missing: S2, S3, S4, S8 (origin unknown). (via yiisoft/yii2, yiisoft/yii2-bootstrap5, yiisoft/yii2-symfonymailer)",
+        "description": "bower-asset/jquery 3.7.1 \u2014 finding unknown (0) \u2014 checks missing: S2, S3, S4, S8 (origin unknown). (via yiisoft/yii2, yiisoft/yii2-bootstrap5 and yiisoft/yii2-symfonymailer)",
         "categories": [
             "Bug Risk"
         ],

@@ -398,6 +398,7 @@ Each argument of `commands`, of `security.update_now_command` and of
 spaces. Only the Composer options that lockrot writes start with `-`:
 
 - `--no-update` and `--dev` in a `require` step
+- `--no-interaction` in a `require` step of a name that both `require` and `require-dev` list
 - `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step
 - `--locked` in a `why-not` step
 - `--lock` as the one argument of an `update` step: `composer update --lock`

@@ -20,6 +20,9 @@ final class MoveText
     /** A sentence names at most this many direct dependents, then "and N more". */
     public const DEPENDENTS_SHOWN = 3;
 
+    /** Composer's `require --no-interaction` of a name that both sections list writes `require` and deletes the require-dev line. */
+    private const REMOVES_DEV = ', which removes it from require-dev';
+
     private const NO_MOVE = [
         'package_quiet' => '—',
         'higher_undated' => 'no move: lockrot could not date the releases of the higher branches',
@@ -61,7 +64,7 @@ final class MoveText
         }
         $holders = array_map(static fn (Holder $holder): string => self::holderWords($holder, $subject), self::inTextOrder($move->heldBy(), $subject->package()));
         if ($holders !== []) {
-            $text .= '; held by '.implode(' and ', $holders);
+            $text .= '; held by '.ListWords::of($holders);
         }
         foreach ($move->composerMovesBecause() as $reason) {
             $words = self::because($reason, $move, $subject);
@@ -148,17 +151,15 @@ final class MoveText
             $parts[] = $moved['package'].' (to '.$moved['version'].')';
         }
 
-        return $parts === [] ? '' : ', with an update of '.self::join($parts);
+        return $parts === [] ? '' : ', with an update of '.ListWords::of($parts);
     }
 
     /** @param list<string> $names */
     private static function dependents(array $names): string
     {
-        if (\count($names) > self::DEPENDENTS_SHOWN) {
-            return implode(', ', \array_slice($names, 0, self::DEPENDENTS_SHOWN)).' and '.(\count($names) - self::DEPENDENTS_SHOWN).' more';
-        }
+        $more = \count($names) - self::DEPENDENTS_SHOWN;
 
-        return implode(', ', $names);
+        return ListWords::of(array_merge(\array_slice($names, 0, self::DEPENDENTS_SHOWN), $more > 0 ? [$more.' more'] : []));
     }
 
     /** @return list<array{0: string, 1: bool}> */
@@ -279,9 +280,16 @@ final class MoveText
         return $text.self::below($move, $move->newest()).self::clears($move).self::adds($move).self::phpClause($move, $subject, true);
     }
 
-    /** " in require-dev" for a package that only require-dev lists, when the run does not require it directly. */
+    /**
+     * " in require-dev" for a package that only require-dev lists, when the run does not require it
+     * directly. The require of a name that both sections list removes its require-dev line.
+     */
     private static function inRequireDev(MoveSubject $subject): string
     {
+        if ($subject->isListedInBoth()) {
+            return self::REMOVES_DEV;
+        }
+
         return $subject->isListedInRequireDevOnly() && !$subject->isDirect() ? ' in require-dev' : '';
     }
 
@@ -297,8 +305,11 @@ final class MoveText
     private static function raise(Move $move): string
     {
         $check = $move->phpCheck();
+        if ($check === null || $check->raiseTo() === null) {
+            return '';
+        }
 
-        return $check !== null && $check->raiseTo() !== null ? 'raise require.php to '.$check->raiseTo().', then ' : '';
+        return 'raise require.php to '.$check->raiseTo().($move->subject()->isPhpInRequireDev() ? self::REMOVES_DEV : '').', then ';
     }
 
     /** One clause per basis of `adds[]`: what the move raises that would count. */
@@ -306,7 +317,7 @@ final class MoveText
     {
         $text = '';
         foreach (self::addsByBasis($move) as $basis => $ids) {
-            $text .= '; '.(self::ADDS[$basis] ?? $basis).', so '.implode(' and ', $ids).' would count';
+            $text .= '; '.(self::ADDS[$basis] ?? $basis).', so '.ListWords::of($ids).' would count';
         }
 
         return $text;
@@ -361,7 +372,7 @@ final class MoveText
             $parts[] = $advisories === 1 ? 'the advisory' : $advisories.' advisories';
         }
 
-        return $parts === [] ? '' : ' — clears '.self::join($parts);
+        return $parts === [] ? '' : ' — clears '.ListWords::of($parts);
     }
 
     private static function leaves(Move $move): string
@@ -380,7 +391,7 @@ final class MoveText
             return '';
         }
 
-        return '; '.implode(', ', $items).' '.(\count($items) === 1 && $advisories < 2 ? 'stays' : 'stay');
+        return '; '.ListWords::of($items).' '.(\count($items) === 1 && $advisories < 2 ? 'stays' : 'stay');
     }
 
     private static function unverified(Move $move): string
@@ -556,7 +567,7 @@ final class MoveText
         }
         $one = \count($entries) === 1;
         $more = \count($entries) - self::DEPENDENTS_SHOWN;
-        $list = $more > 0 ? implode(', ', $names).' and '.$more.' more' : self::join($names);
+        $list = ListWords::of(array_merge($names, $more > 0 ? [$more.' more'] : []));
         $verb = $gone !== [] ? ($one ? 'no longer requires' : 'no longer require') : ($one ? 'still requires' : 'still require');
 
         return 'the newest release'.($one ? '' : 's').' of '.$list.' '.$verb.' it';
@@ -571,14 +582,6 @@ final class MoveText
         }
 
         return $by;
-    }
-
-    /** @param non-empty-list<string> $parts */
-    private static function join(array $parts): string
-    {
-        $last = array_pop($parts);
-
-        return $parts === [] ? $last : implode(', ', $parts).' and '.$last;
     }
 
     private static function years(?float $years): string

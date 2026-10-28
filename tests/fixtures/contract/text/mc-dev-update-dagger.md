@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **high** | `guzzlehttp/psr7` | 2.8.0 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** composer update 'guzzlehttp/psr7:^2.12.3' (gets 2.12.3) — clears the advisory; Composer's solver checked it against the lock<br>*vulnerable:* 1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-59882 guzzlehttp/psr7: Host Confusion via Weak URI Host Validation<br>*age:* installed 2.8.0 released 2025-08-23 (1.1 years ago); 2.x last released 2.12.3 2026-07-02 (0.3 years ago), its newest release; last push 2026-08-24 (0.1 years ago) | guzzlehttp/guzzle |
+| **high** | `guzzlehttp/psr7` | 2.8.0 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** `composer update 'guzzlehttp/psr7:^2.12.3'` (gets 2.12.3) — clears the advisory; Composer's solver checked it against the lock<br>*vulnerable:* 1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-59882 guzzlehttp/psr7: Host Confusion via Weak URI Host Validation<br>*age:* installed 2.8.0 released 2025-08-23 (1.1 years ago); 2.x last released 2.12.3 2026-07-02 (0.3 years ago), its newest release; last push 2026-08-24 (0.1 years ago) | guzzlehttp/guzzle |
 | ok | `guzzlehttp/guzzle` | 7.10.0 | ok | `0`<br>pulls in 1 flagged package: guzzlehttp/psr7 (vulnerable) | direct |
 
 flags: vulnerable 1

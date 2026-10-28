@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| medium | `moneyphp/money` | v4.7.1 | capped | `8 = capped 8`<br>**Do:** composer update moneyphp/money (gets v4.9.0) — clears capped<br>*capped:* requires php \~8.1.0 \|\| \~8.2.0 \|\| \~8.3.0 \|\| \~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded<br>*age:* installed v4.7.1 released 2025-06-06 (1.3 years ago); 4.x last released v4.9.0 2026-05-04 (0.4 years ago), its newest release; last push 2026-07-07 (0.2 years ago) | direct |
+| medium | `moneyphp/money` | v4.7.1 | capped | `8 = capped 8`<br>**Do:** `composer update moneyphp/money` (gets v4.9.0) — clears capped<br>*capped:* requires php \~8.1.0 \|\| \~8.2.0 \|\| \~8.3.0 \|\| \~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded<br>*age:* installed v4.7.1 released 2025-06-06 (1.3 years ago); 4.x last released v4.9.0 2026-05-04 (0.4 years ago), its newest release; last push 2026-07-07 (0.2 years ago) | direct |
 
 flags: capped 1
 depth: every flagged package is named in composer.json · direct 1
