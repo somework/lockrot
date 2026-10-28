@@ -653,7 +653,7 @@ def unhydrated(case):
 
 
 def on_branch(version, branches):
-    """Whether a row of $branches holds $version: `2.x` holds each 2.* release, and a row without `.x` only its own release."""
+    """Whether a row of $branches holds $version: `2.x` holds each 2.* release, and `2.12` each 2.12.* release."""
     parts = version.lstrip('vV').split('.')
     for branch in branches:
         prefix = (branch[:-2] if branch.endswith('.x') else branch).lstrip('vV')

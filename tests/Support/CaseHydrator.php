@@ -304,8 +304,8 @@ final class CaseHydrator
         $world = \is_array($inputs['solver_world'] ?? null) && \is_array($inputs['solver_world']['world'] ?? null) ? $inputs['solver_world']['world'] : null;
         $composer = \is_string($run['composer'] ?? null) ? $run['composer'] : null;
 
-        // A case with a `solver_world` records every request, so another request fails the test. In a world whose vcs
-        // repository serves a name of the lock, lockrot asks the solver no move, as SolverChecker answers it.
+        // A case with a `solver_world` records every request, so another request fails the test. A world whose vcs
+        // repository serves a name of the lock records no request of a move: lockrot reads that move as unloaded_name.
         // Composer before 2.4 takes an inline constraint only on a package that composer.json requires.
         return new MoveChecks(new RecordedMoveChecker($checks, $run, $world !== null && !self::shadowsALockedName($world)), $composer === null || version_compare($composer, '2.4.0', '>='));
     }

@@ -33,10 +33,10 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Each case of train 7d records the Composer CLI's answers to the requests of its designed world
- * (`inputs.solver_world`, SPEC-0.14.md §5.6). lockrot's move checker solves the same requests on
- * that world, served over HTTP, and gives the same result, form, installs, holds and `{cause}` (§6.2). The
- * test runs only on the Composer version that recorded the answers (`inputs.move_check.composer`),
- * and skips on another one, except where {@see ComposerOracle::REQUIRED} makes that a failure.
+ * (`solver_world`, SPEC-0.14.md §5.6). lockrot's move checker solves the same requests on
+ * that world, served over HTTP, and gives the same result, form, installs, holds and `{cause}` (§6.2). A
+ * world runs only on the Composer version that recorded its answers (`run.move_check.composer`), and
+ * skips on another one. {@see ComposerOracle::guard()} fails a required run on a version that no world records.
  * It covers nothing: each solve outlasts a mutant's time limit, and the rule tests kill the mutants.
  *
  * @coversNothing
@@ -76,7 +76,7 @@ final class MoveCheckComposerOracleTest extends TestCase
     /**
      * @dataProvider worlds
      *
-     * @param array<mixed, mixed> $solverWorld the case's `inputs.solver_world`
+     * @param array<mixed, mixed> $solverWorld the case's `solver_world`
      * @param string              $recordedBy  the Composer version that answered the requests
      */
     #[DataProvider('worlds')]
