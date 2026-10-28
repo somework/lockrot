@@ -527,6 +527,7 @@ final class LockFileTest extends TestCase
         yield 'null platform-overrides and aliases' => [['packages' => [], 'platform-overrides' => null, 'aliases' => null]];
         yield 'extension override false' => [['packages' => [], 'platform-overrides' => ['ext-redis' => false]]];
         yield 'number inside platform' => [['packages' => [], 'platform' => ['php' => 8.1]]];
+        yield 'list inside platform-dev' => [['packages' => [], 'platform-dev' => ['ext-json' => ['not a constraint']]]];
         yield 'platform constraints that Composer parses' => [['packages' => [], 'platform' => ['php' => '>=7.4 <8.5', 'ext-json' => '*'], 'platform-dev' => ['ext-intl' => '^1.0 || dev-main']]];
         yield 'empty aliases' => [['packages' => [], 'aliases' => []]];
     }
