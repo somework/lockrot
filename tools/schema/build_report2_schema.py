@@ -1383,8 +1383,8 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'target_php_source': closed(['option', 'env', 'config', 'platform', 'runtime'], "Which link of the chain set it (`config` = `extra.lockrot.target-php`, `platform` = `config.platform.php`). Closed (§8.2)."),
     'project_php': nul("The project's `require.php` as written (report-1); never parse it.", {'type': 'string', 'minLength': 1}),
     'project_php_lowest': nul("The lowest PHP `require.php` admits: `PhpFloor`'s lower bound normalised to MAJOR.MINOR.PATCH, a fourth segment and a stability suffix dropped "
-                              "(`7.2.5.0-dev` is `7.2.5`, `^7.4.0-RC1` gives `7.4.0`; `7.2.0` for `^7.2 || ^8.0.0`; an exclusive `>7.4` gives `7.4.0`, a patch the project excludes "
-                              "in a minor it allows). Null exactly when `PhpFloor` has no lowest: no `require.php`, `*`, an alternative with no lower bound (`<8`), or a constraint "
+                              "(`7.2.5.0-dev` is `7.2.5`, `^7.4.0-RC1` gives `7.4.0`; `7.2.0` for `^7.2 || ^8.0.0`; an exclusive bound gives the next patch: `>7.4` gives `7.4.1`, "
+                              "and the post-release bound `>=7.4.0-p1` gives `7.4.1`). Null exactly when `PhpFloor` has no lowest: no `require.php`, `*`, an alternative with no lower bound (`<8`), or a constraint "
                               "it cannot parse (§5.3). Print it with a trailing `.0` patch dropped.",
                               {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+\\.[0-9]+$'}),
     'lock_file': nul('The name of the lock (report-1), never its path.', {'type': 'string'}),
