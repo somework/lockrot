@@ -728,6 +728,55 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([['1.0.0'], VersionSource::SHADOWED], [self::pretty($alone->versions('acme/lib')), $alone->failure('acme/lib')]);
     }
 
+    /** The vcs repository can serve versions of the name that the canonical repository finds without one. */
+    public function testANameThatACanonicalRepositoryFindsWithNoVersionAfterAVcsRepositoryThatServesItIsShadowed(): void
+    {
+        $empty = new class () extends ComposerRepository {
+            public function __construct()
+            {
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                return ['namesFound' => array_keys($packageNameMap), 'packages' => []];
+            }
+        };
+        $versions = new RepositoryVersions([new ConfiguredRepository(['url' => 'https://github.com/acme/lib']), $empty], [], false, Deadline::never(), 'stable', [], ['https://github.com/acme/lib' => ['acme/lib']]);
+
+        self::assertSame([[], VersionSource::SHADOWED], [$versions->versions('acme/lib'), $versions->failure('acme/lib')]);
+    }
+
+    public function testANameThatLoadsAloneAfterAVcsRepositoryThatDoesNotServeItIsNoShadow(): void
+    {
+        $vcs = new ConfiguredRepository(['url' => 'https://github.com/acme/scim']);
+        $versions = new RepositoryVersions([$vcs, self::recording(['acme/lib' => ['1.0.0']], ['acme/bad'])], [], false, Deadline::never(), 'stable', [], ['https://github.com/acme/scim' => ['acme/scim']]);
+
+        $versions->versionsOf(['acme/lib', 'acme/bad']);
+
+        self::assertSame([['1.0.0'], null], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib')]);
+    }
+
+    public function testEachVcsRepositoryShadowsTheNamesThatItServes(): void
+    {
+        $served = ['https://github.com/acme/a' => ['acme/a'], 'https://github.com/acme/b' => ['acme/b']];
+        $repositories = [new ConfiguredRepository(['url' => 'https://github.com/acme/a']), new ConfiguredRepository(['url' => 'https://github.com/acme/b']), self::repository(['acme/a' => ['1.0.0'], 'acme/b' => ['1.0.0']])];
+        $versions = new RepositoryVersions($repositories, [], false, Deadline::never(), 'stable', [], $served);
+
+        $versions->versionsOf(['acme/a', 'acme/b']);
+
+        self::assertSame([VersionSource::SHADOWED, VersionSource::SHADOWED], [$versions->failure('acme/a'), $versions->failure('acme/b')]);
+    }
+
+    public function testAShadowedNameThatLoadsAloneKeepsTheFailureOfANameBeforeIt(): void
+    {
+        $vcs = new ConfiguredRepository(['url' => 'https://github.com/acme/lib']);
+        $versions = new RepositoryVersions([$vcs, self::recording(['acme/lib' => ['1.0.0']], ['acme/bad'])], [], false, Deadline::never(), 'stable', [], ['https://github.com/acme/lib' => ['acme/lib']]);
+
+        $versions->versionsOf(['acme/bad', 'acme/lib']);
+
+        self::assertSame([VersionSource::FAILED, VersionSource::SHADOWED], [$versions->failure('acme/bad'), $versions->failure('acme/lib')]);
+    }
+
     public function testOfflineANameThatNoComposerRepositoryListsStaysOffline(): void
     {
         $versions = new RepositoryVersions([self::repository([]), new ArrayRepository()], [], true, Deadline::never());

@@ -173,7 +173,7 @@ final class RepositoryVersions implements VersionSource
             $pending = array_diff_key($pending, $found);
         }
         $this->failUnlisted(array_keys(array_diff_key($pending, array_filter($this->loaded))));
-        $this->failures += array_fill_keys(array_keys(array_intersect_key($hidden, array_filter($this->loaded))), self::SHADOWED);
+        $this->failures += array_fill_keys(array_keys($hidden), self::SHADOWED);
     }
 
     /** @return list<BasePackage> */
@@ -238,7 +238,7 @@ final class RepositoryVersions implements VersionSource
      */
     private function shadowedIf(bool $hidden, string $name, array $loaded): array
     {
-        if ($hidden && $loaded !== []) {
+        if ($hidden) {
             $this->failures += [$name => self::SHADOWED];
         }
 
@@ -343,7 +343,7 @@ final class RepositoryVersions implements VersionSource
     /**
      * Whether a repository that the source does not load serves $name and hides it: the lock
      * records $name from its URL, the repository is canonical, and its `only` or `exclude` admits
-     * the name. Its FilterRepository asks a copy that holds only $name, because asking the
+     * the name. A copy that holds only $name answers with those options, because asking the
      * repository itself loads it.
      */
     private function canHide(RepositoryInterface $repository, string $name): bool
@@ -353,9 +353,6 @@ final class RepositoryVersions implements VersionSource
         $url = $config['url'] ?? null;
         if (!\is_string($url) || !\in_array($name, $this->served[self::urlKey($url)] ?? [], true)) {
             return false;
-        }
-        if (!$repository instanceof FilterRepository) {
-            return true;
         }
         $options = [];
         foreach (['only', 'exclude'] as $key) {
