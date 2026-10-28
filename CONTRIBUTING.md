@@ -385,8 +385,9 @@ maintainer.
            lists it as a pre-release, which a project on stable minimum-stability does not install.
         3. Pin the renderer to that commit, then tag a renderer pre-release `vX.Y.Z-rc.M`. Run
            `tools/report/update-renderer vX.Y.Z-rc.M`, commit the files that it writes, and wait
-           for the release pull request's CI to pass. A change to the renderer's `release.yml`
-           then runs first on a pre-release.
+           for the CI run of the push to the release branch to pass. A change to the renderer's
+           `release.yml` then runs first on a pre-release. The release pull request's
+           `check-vendored` step refuses a pre-release, so it passes only after step 5.
         4. Release lockrot-report `vX.Y.Z` with a commit that changes only the version of that
            pre-release.
         5. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This

@@ -183,8 +183,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   did. ([Run notes](docs/notes.md#abandoned_markings_ignored))
 - **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
   (`config.policy: false`, `policy.advisories: false` or `COMPOSER_POLICY=0`) that turns off
-  Composer's advisory blocking in an install or an update. lockrot still asks, and every advisory
-  still counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
+  Composer's advisory blocking in an update (`composer update`, `require` or `remove`). lockrot
+  still asks, and every advisory still counts.
+  ([Run notes](docs/notes.md#advisories_disabled_by_policy))
 - **markdown:** `--markdown-max-bytes` keeps a report written through `--output` within a byte
   budget. The report ends at a whole row, and a last row counts the rows it left out.
   ([In CI](docs/ci.md))
