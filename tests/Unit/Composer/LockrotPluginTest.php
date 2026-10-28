@@ -90,6 +90,7 @@ final class LockrotPluginTest extends TestCase
         yield 'a 2.2 LTS release' => ['2.2.25'];
         yield 'a 2.1 snapshot' => ['2.1-dev+0123456789abcdef0123456789abcdef01234567'];
         yield 'a 1.x release' => ['1.10.27'];
+        yield 'a version that does not start with its number' => ['v2.10.0'];
     }
 
     /** @dataProvider composer210AndLater */
