@@ -11,6 +11,7 @@ use Composer\Console\Application;
 use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginEvents;
+use Composer\Repository\ArrayRepository;
 use Composer\Util\Platform;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
@@ -1519,6 +1520,56 @@ final class LockrotCommandTest extends TestCase
                 'a PRE_FILE_DOWNLOAD listener registered on the Composer instance must see lockrot\'s own repository metadata requests'
             );
         });
+    }
+
+    /**
+     * R5-37: Composer's update and audit read the instance's RepositoryManager, which holds the
+     * repositories that plugins add. With --offline the run reads the rebuilt repositories only,
+     * because a plugin's repository holds Composer's HttpDownloader, built before --offline.
+     *
+     * @dataProvider pluginRepositoryRuns
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('pluginRepositoryRuns')]
+    public function testInPluginModeTheRunReadsTheRepositoriesThatAPluginAdds(bool $offline, bool $reads): void
+    {
+        $project = $this->tempDir('lockrot-plugin-repository-project-');
+        file_put_contents($project.'/composer.json', (string) json_encode([
+            'name' => 'lockrot/plugin-repository-test',
+            'repositories' => ['packagist.org' => false],
+        ]));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
+        chdir($project);
+        try {
+            $this->withComposerEnv($this->tempDir('lockrot-plugin-repository-cache-'), $this->tempDir('lockrot-plugin-repository-home-'), function () use ($offline, $reads): void {
+                $seen = null;
+                $loader = $this->emptyLoader();
+                $command = $this->buildCommand(static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock) use ($loader, &$seen): Analyzer {
+                    $seen = $repositories;
+
+                    return self::testAnalyzer($loader, $lockrot, $clock);
+                });
+                $application = $command->getApplication();
+                self::assertInstanceOf(Application::class, $application);
+                $composer = $application->getComposer(false, false);
+                self::assertInstanceOf(Composer::class, $composer);
+                $added = new ArrayRepository();
+                $composer->getRepositoryManager()->prependRepository($added);
+
+                (new CommandTester($command))->execute(['--offline' => $offline, '--target-php' => '8.4']);
+
+                self::assertIsArray($seen, 'the analyzer factory was never called');
+                self::assertSame($reads, \in_array($added, $seen, true));
+            });
+        } finally {
+            Platform::clearEnv('COMPOSER_DISABLE_NETWORK');
+        }
+    }
+
+    /** @return iterable<string, array{bool, bool}> --offline, whether the run reads the plugin's repository */
+    public static function pluginRepositoryRuns(): iterable
+    {
+        yield 'online' => [false, true];
+        yield 'offline' => [true, false];
     }
 
     /**
