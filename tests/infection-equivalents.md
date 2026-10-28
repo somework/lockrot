@@ -35,6 +35,7 @@ entry in the commit that changes the line.
 - `src/Analyzer/Report.php` AssignCoalesce `$gate ??= $this->gate();` — the gate is derived from the report alone, so computing it again gives the gate that the caller passed.
 - `src/Analyzer/Report.php` UnwrapArraySlice ``$rows[$finding->package()] = \array_slice($row, 0, $lead, true) + ['rank' => $at + 1] + \array_slice($row, $lead, null, true) + [`` — in findingRows(): the union keeps the first of each key, so the whole row in place of its tail adds the same keys in the same order.
 - `src/Analyzer/RunNote.php` CastString `$host = (string) $where->host();` — every entry of the host note comes from `LocatedRepository::unsupported()`, which always names a host.
+- `src/Analyzer/UpdateNow.php` CastString `return self::reachingTheFix($kept, $retry, $findings, $checks, [array_keys(array_diff_key($inline, $kept)), (string) $outcome->problem()]);` — a refused combined outcome always carries its problem text.
 
 ## src/Baseline
 
@@ -46,9 +47,18 @@ entry in the commit that changes the line.
 - `src/Clock.php` DecrementInteger, IncrementInteger `$seconds = max(0, $seconds);` — in tenthsOf(): one second either side of 0 rounds to 0 tenths of a year on both paths.
 
 ## src/Composer
+- `src/Composer/LockrotCommand.php` UnwrapArrayValues `return [$composer->getConfig(), array_values($composer->getRepositoryManager()->getRepositories()), $composer->getPackage()];` — Composer's `RepositoryManager` holds its repositories as a list.
 
 - `src/Composer/ComposerHttpClient.php` CastString `$origin = (string) substr($origin, 4);` — the `in_array()` before it admits only hosts longer than 4 characters, so `substr()` never returns false.
 - `src/Composer/ComposerHttpClient.php` CastInt `$status = $e instanceof TransportException ? (int) ($e->getStatusCode() ?? 0) : 0;` — `getStatusCode() ?? 0` is already an int.
+- `src/Composer/ComposerHttpClient.php` UnwrapArrayValues `$results[$url] = new HttpResult($url, $response->getStatusCode(), $response->getBody(), $this->clock->now(), null, array_values($response->getHeaders()));` — Composer's `Response` holds the header lines as a list.
+- `src/Composer/ComposerHttpClient.php` UnwrapArrayFilter, UnwrapArrayValues `return new HttpResult($url, $status, null, $this->clock->now(), RepositoryUrl::inText($e->getMessage()), array_values(array_filter($headers, 'is_string')));` — Composer's downloaders give a `TransportException` its header lines as a list of strings.
+- `src/Composer/ComposerHttpClient.php` FalseValue `$body = $filesystem->getContents(Url::getOrigin($this->config, $target), $target, false, $options + ['redirects' => \PHP_INT_MAX]);` — the `redirects` option marks the request as a redirect, and `RemoteFilesystem` shows no progress for a redirect.
+- `src/Composer/ComposerHttpClient.php` CastInt `$status = (int) RemoteFilesystem::findStatusCode($headers);` — `getContents()` returns only after an answer, and each answer starts with a status line.
+- `src/Composer/ComposerHttpClient.php` LessThan `$location = $status >= 300 && $status < 400 ? Response::findHeaderValue($headers, 'location') : null;` — `RemoteFilesystem` throws on a 400 answer, so no 400 status reaches this line.
+- `src/Composer/ComposerHttpClient.php` CastString `$scheme = (string) parse_url($base, \PHP_URL_SCHEME);` — the base is a URL that lockrot requested, so it has a scheme.
+- `src/Composer/ComposerHttpClient.php` CastString `return (string) preg_replace('{^([^:]+://[^/?#]+).*$}', '$1', $base).$location;` — the pattern is a literal, so `preg_replace()` never returns null.
+- `src/Composer/ComposerHttpClient.php` CastString `return (string) preg_replace('{^(.+/)[^/?]*(?:\?.*)?$}', '${1}', $base).$location;` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Composer/InstallTimeSummary.php` UnwrapArrayValues `$repositories = array_values($composer->getRepositoryManager()->getRepositories());` — the repository manager only appends and prepends, so its array is already a list.
 - `src/Composer/InstallTimeSummary.php` TrueValue, Foreach_ `foreach ($lock->packages(true) as $package) {` — these names reach `BaselineComparison::compare()` for the stale list only, and the install-time summary prints no stale list.
 - `src/Composer/LockrotCommand.php` Throw_ `throw $this->bootstrapError;` — the statements after it read the same manifest and throw the same exception, so the exit code and the message stay the same.
@@ -132,6 +142,7 @@ entry in the commit that changes the line.
 - `src/Output/SarifFormatter.php` CastString `return TerminalText::breakJsonLogCommands((string) preg_replace('{^( {20}"rank": -?\d+)(,?)$}m', '$1.0$2', $json))."\n";` — the pattern is a constant that compiles, so `preg_replace()` returns a string and never null.
 
 ## src/Security
+- `src/Security/FixFinder.php` UnwrapArrayValues `$onBranch = array_values(array_filter($this->candidates($package, $releases), static fn (Candidate $candidate): bool => $candidate->branchKey() === $for->branchKey()));` — `newestAllowed()` reads the candidates in order and never by key.
 
 - `src/Security/FixFinder.php` CastString `$newest[(string) $key] = $branch['highest']['pretty'];` — PHP stores a decimal string key such as `"1"` as an int, so the cast changes no key. The cast is for the type.
 - `src/Security/Holder.php` LogicalAnd `if ($stability !== null && $kept->stability() !== null && $stability !== $kept->stability()) {` — the stability is null only without a version, and only root entries have none. Two entries of one key are then both root entries, both null, so each `||` gives false as the `&&` does.
@@ -148,6 +159,16 @@ entry in the commit that changes the line.
 - `src/Signal/PhpFloor.php` ReturnRemoval `return null;` — in parse(): composer/semver reads null as `""` and throws, and the `catch` returns the same value.
 - `src/Signal/Rule/LeftBehindRule.php` LessThanOrEqualTo `if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {` — a higher branch released at the instant of the installed branch cannot be alive while the installed branch is old enough for S8.
 
+## src/Solver
+
+- `src/Solver/AdvisoryBlocking.php` DecrementInteger, IncrementInteger `throw new ConfigException('Composer rejects the policy configuration: '.$e->getMessage(), 0, $e);` — no code reads the code of this exception.
+- `src/Solver/ComposerSolver.php` Concat `$inputs = SolverInputs::of($pool, $request, $root).serialize($preferred);` — a cache key. A `serialize()` string ends where its own syntax ends, so either order tells the inputs apart.
+- `src/Solver/MoveCheckers.php` UnwrapArrayUnique `foreach (array_unique(array_filter([$package->getSourceUrl(), $package->getDistUrl()])) as $url) {` — only `in_array()` reads the names that a URL serves, so a name twice in the list changes no answer.
+- `src/Solver/MoveCheckers.php` Ternary `$solver = self::minimalChanges($config) ? $solver->withMinimalChanges() : $solver;` — a move check reads only the moved package's release, and minimal changes changes only the releases of the other names.
+- `src/Solver/MoveCheckers.php` CastBool x2 `return (bool) Platform::getEnv('COMPOSER_MINIMAL_CHANGES') || (bool) $config->get('update-with-minimal-changes');` — `||` returns a bool, and `(bool)` reads `'0'` as PHP's `||` does.
+- `src/Solver/RepositoryVersions.php` UnwrapArrayFilter, UnwrapArrayValues `$options[$key] = array_values(array_filter($config[$key], 'is_string'));` — Composer builds the repository's `FilterRepository` from the same config, and it fails on an entry that is neither a string nor a number. No number matches a `vendor/name`, and `FilterRepository` reads only the values.
+
 ## src/Verdict
 
 - `src/Verdict/FindingDetails.php` CastString `$skipped[] = new Check('advisories', (string) $advisoryReason, [Signal::S9]);` — the `in_array()` guard admits two strings only.
+- `src/Verdict/FindingDetails.php` Coalesce `return ($check === null ? null : $check->installsBelow($version) ?? $check->installsAbove($version)) ?? $version;` — a release is below or above the version, never both, so at most one side is not null.

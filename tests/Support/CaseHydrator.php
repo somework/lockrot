@@ -48,6 +48,7 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Solver\RepositoryVersions;
 use Lockrot\Tests\Support\Contract\CaseRecording;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\MoveChecks;
@@ -299,9 +300,36 @@ final class CaseHydrator
         /** @var array<string, array<mixed, mixed>> $checks */
         $checks = $inputs['checks'];
 
-        // The Composer of a recorded check takes an inline constraint on any package, as 2.4 and later do.
-        // A case with a `solver_world` records every request, so another request fails the test.
-        return new MoveChecks(new RecordedMoveChecker($checks, \is_array($inputs['move_check'] ?? null) ? $inputs['move_check'] : [], \is_array($inputs['solver_world'] ?? null)), true);
+        $run = \is_array($inputs['move_check'] ?? null) ? $inputs['move_check'] : [];
+        $world = \is_array($inputs['solver_world'] ?? null) && \is_array($inputs['solver_world']['world'] ?? null) ? $inputs['solver_world']['world'] : null;
+        $composer = \is_string($run['composer'] ?? null) ? $run['composer'] : null;
+
+        // A case with a `solver_world` records every request, so another request fails the test. A world whose vcs
+        // repository serves a name of the lock records no request of a move: lockrot reads that move as unloaded_name.
+        // Composer before 2.4 takes an inline constraint only on a package that composer.json requires.
+        return new MoveChecks(new RecordedMoveChecker($checks, $run, $world !== null && !self::shadowsALockedName($world)), $composer === null || version_compare($composer, '2.4.0', '>='));
+    }
+
+    /** @param array<mixed, mixed> $world a case's `inputs.solver_world.world` */
+    private static function shadowsALockedName(array $world): bool
+    {
+        $served = [];
+        foreach (\is_array($world['vcs_repos'] ?? null) ? $world['vcs_repos'] : [] as $url) {
+            $served[] = RepositoryVersions::urlKey(\is_string($url) ? $url : '');
+        }
+        $lock = \is_array($world['lock'] ?? null) ? $world['lock'] : [];
+        foreach (['packages', 'packages-dev'] as $section) {
+            foreach (\is_array($lock[$section] ?? null) ? $lock[$section] : [] as $entry) {
+                foreach (['source', 'dist'] as $origin) {
+                    $url = \is_array($entry) && \is_array($entry[$origin] ?? null) ? ($entry[$origin]['url'] ?? null) : null;
+                    if (\is_string($url) && \in_array(RepositoryVersions::urlKey($url), $served, true)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

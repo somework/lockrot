@@ -27,6 +27,8 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
     private const HOST = '{^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*(:[0-9]{1,5})?$}D';
     /** A port from 1 to 65535 without its leading zeros, which the host pattern allows. */
     private const PORT = '{^(?:[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$}D';
+    /** A URL that writes its scheme's default port names the same repository as one that omits it. */
+    private const DEFAULT_PORTS = ['http' => 80, 'https' => 443];
     /** config-2's `repository` pattern: a scheme URL without userinfo, or the scp form `user@host:path`. */
     private const URL = '{^([a-z][a-z0-9+.-]*://[^\s/?#@]+([/?#]\S*)?|[A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+:\S+)$}D';
 
@@ -101,6 +103,14 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
         }
     }
 
+    /** A host with its port written without leading zeros, as the host pattern lets an entry write it. */
+    private static function hostKey(string $host): string
+    {
+        $colon = strrpos($host, ':');
+
+        return $colon === false ? $host : substr($host, 0, $colon + 1).ltrim(substr($host, $colon + 1), '0');
+    }
+
     /** @param mixed $expires */
     private static function expires(string $at, $expires): ?string
     {
@@ -127,7 +137,8 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
         if (preg_match('{^[a-z][a-z0-9+.-]*://}i', $url) === 1) {
             $parts = parse_url($url);
             $parts = \is_array($parts) ? $parts : [];
-            $key = [strtolower($parts['host'] ?? ''), $parts['port'] ?? null, $parts['path'] ?? '', $parts['query'] ?? null, $parts['fragment'] ?? null];
+            $port = $parts['port'] ?? null;
+            $key = [strtolower($parts['host'] ?? ''), $port === (self::DEFAULT_PORTS[strtolower($parts['scheme'] ?? '')] ?? null) ? null : $port, $parts['path'] ?? '', $parts['query'] ?? null, $parts['fragment'] ?? null];
         } elseif (preg_match('{^[^@\s/]+@([^:\s/]+):(\S+)$}', $url, $m) === 1) {
             $key = [strtolower($m[1]), null, $m[2], null, null];
         } else {
@@ -163,7 +174,7 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
             case 'package':
                 return fnmatch($this->value, $package);
             case 'host':
-                return $activityHost === null ? false : strtok($activityHost, '/') === $this->value;
+                return $activityHost === null ? false : self::hostKey((string) strtok($activityHost, '/')) === self::hostKey($this->value);
             default:
                 foreach (array_merge([$sourceUrl, $activityRepo === null ? null : 'https://'.$activityHost.'/'.$activityRepo], $composerUrls) as $url) {
                     if ($url !== null && self::urlKey($url) === self::urlKey($this->value)) {

@@ -17,7 +17,17 @@ final class SolveRequestTest extends TestCase
         self::assertSame(['acme/a' => 'acme/a'], SolveRequest::require('acme/a', ['acme/a' => '^2.0', 'php' => '>=8.1'], false)->allow());
     }
 
+    /** On Composer 2.2 or 2.3, lockrot lists a package that composer.json does not require plain on the `update now:` line. */
+    public function testAnUpdateTakesNoInlineConstraintForANameThatItListsPlain(): void
+    {
+        $request = SolveRequest::update(['acme/plain' => '', 'acme/capped' => '^1.2']);
+
+        self::assertSame(['acme/plain' => 'acme/plain', 'acme/capped' => 'acme/capped'], $request->allow());
+        self::assertSame(['acme/capped' => '^1.2'], $request->inline());
+    }
+
     /** `run.php_window.target_fix`: no inline constraint, and each hold keeps its target. */
+
     public function testAnUnlockAllowsEachNameWithNoConstraintAndMovesNoName(): void
     {
         $request = SolveRequest::unlock(['acme/a', 'acme/b']);

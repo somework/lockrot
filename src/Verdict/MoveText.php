@@ -134,7 +134,10 @@ final class MoveText
             case Move::UPDATE:
                 $below = self::below($move, $move->newest());
 
-                return self::raise($move).self::update($move).($below === '' ? ' (gets '.$move->newest().')' : $below).self::clears($move).self::adds($move);
+                $check = $move->check();
+                $gets = ($check === null ? null : $check->installsAbove($move->newest())) ?? $move->newest();
+
+                return self::raise($move).self::update($move).($below === '' ? ' (gets '.$gets.')' : $below).self::clears($move).self::adds($move);
             case Move::REQUIRE:
             case Move::RAISE_PHP:
                 return self::requirement($move, $subject);

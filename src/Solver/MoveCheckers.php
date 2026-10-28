@@ -10,6 +10,7 @@ use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\VersionParser;
+use Composer\Util\Platform;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Deadline;
@@ -54,9 +55,16 @@ final class MoveCheckers
                 $notFromComposerRepository[] = $package->name();
             }
         }
-        $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline, $root->getMinimumStability(), $root->getStabilityFlags());
+        $served = [];
+        foreach ($lock->lockedRepository()->getPackages() as $package) {
+            foreach (array_unique(array_filter([$package->getSourceUrl(), $package->getDistUrl()])) as $url) {
+                $served[RepositoryVersions::urlKey($url)][] = $package->getName();
+            }
+        }
+        $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline, $root->getMinimumStability(), $root->getStabilityFlags(), $served);
         $solver = (new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], $overrides), $source, []))->withLockedOnly($notFromComposerRepository);
         $solver = $php === $configured ? $solver : $solver->withPhpSetByLockrot();
+        $solver = self::minimalChanges($config) ? $solver->withMinimalChanges() : $solver;
 
         $blocking = AdvisoryBlocking::fromConfig($config);
         $lookup = new RepositoryAdvisoryLoader($repositories, $offline, $deadline);
@@ -64,6 +72,12 @@ final class MoveCheckers
         $keptOut = $advisoryScope === AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES ? $notFromComposerRepository : [];
 
         return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): ?array => $lookup->records($names, $complete), $keptOut), $configured);
+    }
+
+    /** Whether the printed `composer update` and `composer require` run with `--minimal-changes`, as UpdateCommand and RequireCommand read it. */
+    public static function minimalChanges(Config $config): bool
+    {
+        return (bool) Platform::getEnv('COMPOSER_MINIMAL_CHANGES') || (bool) $config->get('update-with-minimal-changes');
     }
 
     /**

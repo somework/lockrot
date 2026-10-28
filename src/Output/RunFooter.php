@@ -182,12 +182,17 @@ final class RunFooter
         return $command === null ? null : ShellCommand::posix($command);
     }
 
-    /** The sentence that comes before the `update now:` command, and a space: empty without a pin outside the target minor. */
+    /**
+     * What comes before the `update now:` command: the platform sentence for a pin outside the target
+     * minor, then the require.php raise that a member's move needs. Empty with neither.
+     */
     public static function platformStep(Report $report): string
     {
         $window = $report->phpWindow();
+        $raise = $report->updateNowRaise();
 
-        return $window === null ? '' : MoveText::platformStep($window->targetMinor(), $window->platformOverride());
+        return ($window === null ? '' : MoveText::platformStep($window->targetMinor(), $window->platformOverride()))
+            .($raise === null ? '' : 'raise require.php to '.$raise.', then ');
     }
 
     /**

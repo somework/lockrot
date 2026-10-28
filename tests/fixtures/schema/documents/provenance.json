@@ -5,10 +5,10 @@
  "documents": {
   "corpus": 49,
   "variants": 3,
-  "cases": 185,
+  "cases": 197,
   "coverage/baselined": 49,
   "coverage/variants": 77,
-  "explain": 180,
+  "explain": 192,
   "explain/coverage": 99,
   "baseline/cases": 6,
   "baseline/corpus": 49,

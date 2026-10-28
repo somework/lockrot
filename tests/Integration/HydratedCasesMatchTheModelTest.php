@@ -87,7 +87,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'next_step.also[].check.{form,installs,reason,result}',
             'depth_unmeasured', 'direct', 'direct_dependents', 'flags[].id',
             'installed_php.{requires,target_runs}', 'metadata.status', 'origin.kind', 'package', 'replacement', 'score.terms[].flag',
-            'signals[].data.advisories[].id', 'version', 'run.{include_dev,project_php_lowest,target_php}',
+            'signals[].data.advisories[].id', 'version', 'run.{include_dev,project_php_lowest,target_php}', 'run.move_check.{baseline,composer,reason}',
         ],
         'held_by' => [
             'next_step.held_by[].{constraint,link,package,source,target,version}', 'next_step.held_by[].holder.{direct,flag_ids,verdict}',
@@ -148,7 +148,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
      *
      * @var array<string, array<string, list<array{list<string>, string}>>>
      */
-    private const DIFFERENCES = [
+    public const DIFFERENCES = [
         'F' => [
             'age_rows' => [
                 [['age.installed_unmeasured'], self::INSTALLED_COMMIT],
@@ -319,6 +319,11 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
+        'platform-step-no-command‡' => [
+            'moves' => [
+                [['run.move_check.baseline', 'run.move_check.composer', 'run.move_check.reason'], self::NO_SOLVER_WORLD],
+            ],
+        ],
         'platform-step-inside‡' => [
             'moves' => [
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
@@ -376,14 +381,13 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].through[].local' => self::ALSO_THROUGH,
         'next_step.also[].through[].newest_is_installed' => self::ALSO_THROUGH,
         'next_step.also[].held_by[].holder.flag_ids' => self::ALSO_HELD,
-        'next_step.also[].held_by[].holder.verdict' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.constraint' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.kind' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.to_branch' => self::ALSO_HELD,
-        'next_step.also[].held_by[].holder.direct' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.check' => self::ALSO_HELD,
         'next_step.also[].check.form' => self::ALSO_CHECK,
         'next_step.also[].check.reason' => self::ALSO_CHECK,
+        'run.move_check.reason' => 'No case of the model has a baseline that the move check does not reach.',
         'next_step.also[].check.installs' => self::ALSO_CHECK,
         'next_step.also[].moves_with[].installed_version' => self::ALSO_CHECK,
         'next_step.also[].moves_with[].package' => self::ALSO_CHECK,
@@ -403,6 +407,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     private const ALSO_HELD = 'No also[] move of a case with inputs is held by a package that has a finding of its own.';
 
     private const ALSO_CHECK = 'Each also[] move of a case with inputs that Composer\'s solver checks is refused, so no case gives it a form, a reason, an install or a joint move.';
+
+    private const NO_SOLVER_WORLD = 'The case has no solver inputs, so the recording checks no move and writes `run.move_check` null. The model writes the run\'s move check.';
 
     private const ACCEPT_UNCHECKED = 'The cases that accept an unchecked check need an accept-unchecked entry of the project, which the hydrator does not take (`unhydrated()`).';
 

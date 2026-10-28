@@ -32,7 +32,7 @@ final class Baseline
     private string $targetPhpSource;
     private int $scoreModelId;
     private int $fixModel;
-    /** @var list<string> */
+    /** @var array<string, string> package => what its carried entry holds: `flags`, `advisories` or both */
     private array $carriedForward = [];
 
     /** @param array<string, BaselineEntry> $entries already sorted by package name */
@@ -81,11 +81,11 @@ final class Baseline
                 $entry = self::entryOf($finding, $before, $today, $incomplete);
                 $entries[] = $entry;
                 if (self::keepsUncounted($entry, $finding)) {
-                    $carried[] = $finding->package();
+                    $carried[$finding->package()] = 'advisories';
                 }
             } elseif ($before !== null && $incomplete) {
                 $entries[] = $before;
-                $carried[] = $finding->package();
+                $carried[$finding->package()] = implode(' and ', array_keys(array_filter(['flags' => $before->flags() !== [], 'advisories' => $before->advisories() !== []])));
             }
         }
         $baseline = self::of(
@@ -253,10 +253,21 @@ final class Baseline
         return $this->fixModel;
     }
 
-    /** @return list<string> the packages whose recorded advisories a writer kept after an incomplete lookup */
+    /** @return list<string> the packages whose recorded entry or advisories a writer kept after an incomplete lookup */
     public function carriedForward(): array
     {
-        return $this->carriedForward;
+        return array_keys($this->carriedForward);
+    }
+
+    /** @return array<string, list<string>> the carried packages by what the writer kept of them: `flags`, `advisories` or `flags and advisories` */
+    public function carriedHolding(): array
+    {
+        $holding = [];
+        foreach ($this->carriedForward as $package => $kept) {
+            $holding[$kept][] = $package;
+        }
+
+        return $holding;
     }
 
     /**

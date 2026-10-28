@@ -56,6 +56,7 @@ final class ComposerSolver
     private ?PoolAdvisories $advisories = null;
     private ?ArrayRepository $lockedOnly = null;
     private bool $setsPhp = false;
+    private bool $minimalChanges = false;
     private string $lastInputs = '';
     /** @phpstan-ignore property.onlyWritten (the last built pool keeps the object ids of its packages taken: {@see SolverInputs}) */
     private Pool $lastBuilt;
@@ -122,6 +123,15 @@ final class ComposerSolver
         return $clone;
     }
 
+    /** A copy that solves as `--minimal-changes` does: each locked name off the allow list prefers its locked release. */
+    public function withMinimalChanges(): self
+    {
+        $clone = clone $this;
+        $clone->minimalChanges = true;
+
+        return $clone;
+    }
+
     public function root(): RootPackageInterface
     {
         return $this->root;
@@ -171,9 +181,10 @@ final class ComposerSolver
             $requested += $request->inline();
             $temporary = [];
         }
-        $policy = new DefaultPolicy($root->getPreferStable(), false);
+        $preferred = $this->preferredVersions($request);
+        $policy = new DefaultPolicy($root->getPreferStable(), false, $preferred);
         [$set, $composerRequest, $pool, $fixedRoot, $loaded] = $this->pool($root, $requires, $temporary, $request);
-        [$pool, $answer] = $this->answer($policy, $composerRequest, $pool, $fixedRoot);
+        [$pool, $answer] = $this->answer($policy, $composerRequest, $pool, $fixedRoot, $preferred);
         if ($answer instanceof SolverProblemsException) {
             $locked = [];
             foreach ($this->locked->getPackages() as $package) {
@@ -181,8 +192,10 @@ final class ComposerSolver
             }
             $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $requested, $locked);
             $setsPhp = $this->setsPhp;
+            // A shadowed name has loaded versions, so the refusal never wants it, yet its hidden releases can change the answer.
+            $shadowed = array_intersect($this->failures($loaded->asked()), [VersionSource::SHADOWED]);
 
-            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $this->failures($holds->wanted()));
+            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $this->failures($holds->wanted()) + $shadowed);
         }
 
         $installs = self::installs($answer);
@@ -197,6 +210,27 @@ final class ComposerSolver
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
         // A virtual name, which a package provides, is unreached too: only a refusal that wants an unreached name proves nothing.
         return Solution::resolved($installs, $from, array_diff($this->failures($loaded->asked()), [VersionSource::UNREACHED]));
+    }
+
+    /**
+     * As Installer::createPolicy() builds them for an update.
+     *
+     * @return array<string, string>|null name => locked version, null without minimal changes
+     */
+    private function preferredVersions(SolveRequest $request): ?array
+    {
+        if (!$this->minimalChanges) {
+            return null;
+        }
+        $preferred = [];
+        $allow = $request->allow();
+        foreach ($this->locked->getPackages() as $package) {
+            if (!$package instanceof AliasPackage && !isset($allow[$package->getName()])) {
+                $preferred[$package->getName()] = $package->getVersion();
+            }
+        }
+
+        return $preferred;
     }
 
     /**
@@ -245,11 +279,13 @@ final class ComposerSolver
      * The optimized pool and Composer's answer: the transaction, or the refusal. The forms of one
      * move often build the same pool, and Composer then answers the same.
      *
+     * @param array<string, string>|null $preferred the policy's preferred versions
+     *
      * @return array{0: Pool, 1: LockTransaction|SolverProblemsException}
      */
-    private function answer(DefaultPolicy $policy, Request $request, Pool $pool, BasePackage $root): array
+    private function answer(DefaultPolicy $policy, Request $request, Pool $pool, BasePackage $root, ?array $preferred): array
     {
-        $inputs = SolverInputs::of($pool, $request, $root);
+        $inputs = SolverInputs::of($pool, $request, $root).serialize($preferred);
         if ($inputs !== $this->lastInputs) {
             $optimized = (new PoolOptimizer($policy))->optimize($request, $pool);
             try {

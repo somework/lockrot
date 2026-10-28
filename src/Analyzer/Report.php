@@ -194,6 +194,12 @@ final class Report
         return $this->updateNow === null ? Report2Root::updateNow($this->sorted()) : $this->updateNow->members();
     }
 
+    /** The require.php raise that the `update now:` command needs first, null when it needs none. */
+    public function updateNowRaise(): ?string
+    {
+        return $this->updateNow === null ? null : $this->updateNow->raiseTo();
+    }
+
     /** @return list<string>|null `security.update_now_command`, null when it has no members or Composer refuses them together */
     public function updateNowCommand(): ?array
     {

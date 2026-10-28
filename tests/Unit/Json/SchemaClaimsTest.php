@@ -42,6 +42,7 @@ final class SchemaClaimsTest extends TestCase
         'move.moves_with' => 'engine (the holders whose release one joint solve changes; set only beside a resolving check and an empty held_by)',
         'alsoMove.moves_with' => 'as move.moves_with',
         '#.exposure' => 'membership against another list (S7 counts)',
+        'noteUpdateNowReduced.held_below' => 'membership: each package is also in left_out of the same note data (engine: the update now solve)',
         '#.unattributed' => 'fan-in against exposure_rule.max_fan_in (a number in another object)',
         '#.libyears' => 'a sum over findings',
         'clearedFact.basis' => 'branch dates and the GA date are outside the document',

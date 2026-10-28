@@ -30,7 +30,12 @@ interface MoveChecker
      */
     public function joint(MoveQuery $query, array $holders): CheckOutcome;
 
-    /** @param array<string, string> $inline name => constraint: one `composer update` of every name */
+    /**
+     * One `composer update` of every name: Composer's answer, with every release that a resolving
+     * solve changes ({@see CheckOutcome::changes()}).
+     *
+     * @param array<string, string> $inline name => constraint, empty for a name listed plain
+     */
     public function combined(array $inline): CheckOutcome;
 
     /**

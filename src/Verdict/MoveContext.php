@@ -216,14 +216,21 @@ final class MoveContext
     }
 
     /**
-     * The `newest` of a require, raise-php or blocked move: on the installed row, the row's
-     * `fixes.newest`, so the move and the S9 fix agree (ruling R3-2). Else the row's newest.
+     * The `newest` of a require, raise-php or blocked move. On the installed row it is the row's
+     * `fixes.newest`, so the security move and the S9 fix agree (ruling R3-2). A move to $lower reads
+     * it at $lower: no link in its own `held_by` lowers it. Else the row's newest.
      */
-    public function rowTarget(BranchRow $row): string
+    public function rowTarget(BranchRow $row, ?Candidate $lower = null): string
     {
         $fixes = $this->fixes === null || !$row->installed() ? null : $this->fixes->installedBranch();
+        if ($fixes === null) {
+            return $row->highest();
+        }
+        if ($lower === null) {
+            return $fixes->newest() ?? $row->highest();
+        }
 
-        return ($fixes === null ? null : $fixes->newest()) ?? $row->highest();
+        return $this->finder->newestOf($this->subject->package(), $this->releases ?? [], $lower) ?? $row->highest();
     }
 
     /** The date of the row's newest dated release, as S8 dates a branch, or S8's date for the same branch when the row has none. */

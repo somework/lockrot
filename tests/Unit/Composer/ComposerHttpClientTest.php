@@ -253,7 +253,8 @@ final class ComposerHttpClientTest extends TestCase
         $config = new Config(false, sys_get_temp_dir());
         $downloader = new ScriptedDownloader($io, $config, $script);
 
-        return [new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), $deadline), $downloader];
+        // The scripted downloader stops a redirect on any Composer, so a request with a token goes through it.
+        return [new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), $deadline, true), $downloader];
     }
 
     /**
@@ -391,7 +392,7 @@ final class ComposerHttpClientTest extends TestCase
         ]], $downloader->requests);
     }
 
-    /** The timeout is what the install-time budget has left at the moment the requests go out, never the default. */
+    /** The timeout is what the install-time budget has left when the requests go out, never the default. */
     public function testAPartlySpentDeadlineShortensEachRequestsTimeout(): void
     {
         $readings = [0.0, 2.6];
@@ -480,7 +481,7 @@ final class ComposerHttpClientTest extends TestCase
     private static function skipBelowComposer210(): void
     {
         if (!ComposerHttpClient::refusesRedirects(Composer::getVersion(), true)) {
-            self::markTestSkipped('Composer 2.10 or later: an older Composer replays the headers (docs/internals.md#which-credentials)');
+            self::markTestSkipped('Composer 2.10 or later with curl: lockrot follows each redirect of an older Composer itself (ComposerHttpClientRedirectTest, OnAnyComposer)');
         }
     }
 }

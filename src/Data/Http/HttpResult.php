@@ -12,16 +12,20 @@ final class HttpResult
     private ?string $body;
     private \DateTimeImmutable $fetchedAt;
     private ?string $error;
+    /** @var list<string> the response's header lines, never part of the envelope */
+    private array $headers;
     /** Set on the copy that {@see asCached()} returns, never part of the envelope. */
     private bool $fromCache = false;
 
-    public function __construct(string $url, int $status, ?string $body, \DateTimeImmutable $fetchedAt, ?string $error = null)
+    /** @param list<string> $headers the response's header lines, `Name: value` */
+    public function __construct(string $url, int $status, ?string $body, \DateTimeImmutable $fetchedAt, ?string $error = null, array $headers = [])
     {
         $this->url = $url;
         $this->status = $status;
         $this->body = $body;
         $this->fetchedAt = $fetchedAt;
         $this->error = $error;
+        $this->headers = $headers;
     }
 
     public static function failure(string $url, string $error, \DateTimeImmutable $at): self
@@ -131,9 +135,23 @@ final class HttpResult
         return $this->status === 404;
     }
 
+    /** A transport error, a 5xx or a 4xx other than 404: no answer that a rerun cannot change is kept. */
     public function isFailure(): bool
     {
-        return $this->status === 0 || $this->status >= 500 || $this->status === 403 || $this->status === 429 || $this->status === 401;
+        return $this->status === 0 || ($this->status >= 400 && !$this->isNotFound());
+    }
+
+    /** The value of the first header line named $name, in any case. */
+    public function header(string $name): ?string
+    {
+        foreach ($this->headers as $line) {
+            $colon = strpos($line, ':');
+            if ($colon !== false && strcasecmp(substr($line, 0, $colon), $name) === 0) {
+                return trim(substr($line, $colon + 1));
+            }
+        }
+
+        return null;
     }
 
     /** @return array<string, mixed>|null */

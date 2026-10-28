@@ -145,3 +145,18 @@ class APackageThatIsNotFoundHasNoReleases(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class ACaseWhoseDesignedRowsMissItsNewestReleaseIsNotHydrated(unittest.TestCase):
+    @staticmethod
+    def case(newest, world=True):
+        return {'run': {}, 'finding': {'metadata': {'status': 'read'}, 'age': {'release': {'version': newest}}},
+                'details': {'metadata': {'branches': [{'branch': '2.x'}]}}, 'solver_world': {} if world else None}
+
+    def test_a_world_whose_newest_release_opens_a_branch_without_a_row_is_not_hydrated(self):
+        self.assertEqual('designed-rows', project_fixtures.unhydrated(self.case('3.0.0')))
+
+    def test_a_newest_release_on_a_row_or_a_newest_pre_release_hydrates(self):
+        self.assertIsNone(project_fixtures.unhydrated(self.case('2.12.3')))
+        self.assertIsNone(project_fixtures.unhydrated(self.case('3.0.0-beta.1')))
+        self.assertIsNone(project_fixtures.unhydrated(self.case('3.0.0', world=False)))

@@ -57,13 +57,13 @@ final class AnalyzerTest extends TestCase
     private function http(array $map, ?\ArrayObject $requested = null): HttpClientInterface
     {
         return new class ($map, $requested) implements HttpClientInterface {
-            /** @var array<string, array{int, string}> */
+            /** @var array<string, array{0: int, 1: string, 2?: list<string>}> */
             private array $map;
             /** @var \ArrayObject<int, string>|null */
             private ?\ArrayObject $requested;
 
             /**
-             * @param array<string, array{int, string}> $map
+             * @param array<string, array{0: int, 1: string, 2?: list<string>}> $map
              * @param \ArrayObject<int, string>|null    $requested
              */
             public function __construct(array $map, ?\ArrayObject $requested)
@@ -78,8 +78,8 @@ final class AnalyzerTest extends TestCase
                     if ($this->requested !== null) {
                         $this->requested->append($url);
                     }
-                    [$status, $body] = $this->map[$url] ?? [404, ''];
-                    $out[$url] = new HttpResult($url, $status, $body, new \DateTimeImmutable('2026-09-14T06:00:00+00:00'));
+                    [$status, $body, $headers] = ($this->map[$url] ?? [404, '']) + [2 => []];
+                    $out[$url] = new HttpResult($url, $status, $body, new \DateTimeImmutable('2026-09-14T06:00:00+00:00'), null, $headers);
                 }
                 return $out;
             }
@@ -511,7 +511,7 @@ final class AnalyzerTest extends TestCase
     }
 
     /**
-     * @param array{int, string}|null $github status and body for api.github.com/repos/vendor/pkg
+     * @param array{0: int, 1: string, 2?: list<string>}|null $github status, body and headers for api.github.com/repos/vendor/pkg
      */
     private function singlePackageReport(PackageMetadata $meta, bool $token, ?array $github = null): Report
     {
@@ -589,7 +589,7 @@ final class AnalyzerTest extends TestCase
 
     public function testRateLimitedGitHubIsReportedAsANote(): void
     {
-        $report = $this->singlePackageReport($this->ancient(), true, [403, '{"message":"API rate limit exceeded"}']);
+        $report = $this->singlePackageReport($this->ancient(), true, [403, '{"message":"API rate limit exceeded"}', ['x-ratelimit-remaining: 0']]);
         self::assertStringContainsString('GitHub API rate limit reached; repository activity missing for 1 repositories', implode("\n", $report->notes()));
         self::assertTrue($report->hadNetworkFailures());
     }

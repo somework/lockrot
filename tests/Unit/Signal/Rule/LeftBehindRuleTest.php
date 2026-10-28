@@ -378,6 +378,27 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNull($data['suggested_constraint']);
     }
 
+    /** PhpFloor::missesTarget: laminas-style minors that stop at 8.3 exclude the target 8.4, and no newer PHP runs them. */
+    public function testABranchWhosePhpStopsBeforeTheTargetDoesNotReadAsNeedingANewerPhp(): void
+    {
+        $meta = F::metadata([['3.2.0', '2026-09-09', '~8.1.0 || ~8.2.0 || ~8.3.0'], ['2.11.1', '2026-09-02', '>=7.2'], ['1.27.1', '2022-06-09', '>=5.3.0']]);
+
+        $signal = $this->rule(new PhpFloor('8.4', '>=8.1'))->evaluate(F::facts(F::package(['version' => '1.27.1']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertSame('branch 1.x last released 2022-06-09 (4.3 years ago); 3.x released 3.2.0 (2026-09-09), needs php ~8.1.0 || ~8.2.0 || ~8.3.0, which stops before the target PHP 8.4; 2.x released 2.11.1 (2026-09-02)', $signal->summary());
+    }
+
+    public function testABranchWhosePhpSkipsTheProjectsLowestPhpSaysSo(): void
+    {
+        $meta = F::metadata([['3.2.0', '2026-09-09', '~7.4.0 || >=8.2'], ['2.11.1', '2026-09-02', '>=7.2'], ['1.27.1', '2022-06-09', '>=5.3.0']]);
+
+        $signal = $this->rule(new PhpFloor('8.4', '>=8.1'))->evaluate(F::facts(F::package(['version' => '1.27.1']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertStringContainsString('needs php ~7.4.0 || >=8.2, which skips the project\'s php >=8.1;', $signal->summary());
+    }
+
     public function testTheTargetPhpIsTheFloorWhenTheProjectDeclaresNone(): void
     {
         $meta = F::metadata([['3.12.0', '2026-09-09', '>=8.1'], ['2.11.1', '2026-09-02', '>=7.2'], ['1.27.1', '2022-06-09', '>=5.3.0']]);

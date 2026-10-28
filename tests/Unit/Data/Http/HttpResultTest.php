@@ -26,9 +26,8 @@ final class HttpResultTest extends TestCase
     }
 
     /**
-     * A failure is a transport error, a server error, or the three answers that mean "not this
-     * time": rate limited (429), forbidden (403) and unauthorized (401). Every other 4xx is the
-     * repository host answering, so a cached copy must not be preferred over it.
+     * A failure is a transport error, a server error or a 4xx other than 404, so none of them is
+     * cached for 24 hours (ruling R5-39). A 404 is the repository host's answer.
      *
      * @dataProvider statuses
      */
@@ -44,15 +43,24 @@ final class HttpResultTest extends TestCase
     public static function statuses(): iterable
     {
         yield 'no answer at all' => [0, true];
-        yield 'bad request' => [400, false];
+        yield 'bad request' => [400, true];
         yield 'unauthorized' => [401, true];
-        yield 'payment required' => [402, false];
+        yield 'payment required' => [402, true];
         yield 'forbidden' => [403, true];
         yield 'not found' => [404, false];
-        yield 'precondition required' => [428, false];
+        yield 'precondition required' => [428, true];
         yield 'too many requests' => [429, true];
-        yield 'the status after too many requests' => [430, false];
+        yield 'unavailable for legal reasons' => [451, true];
+        yield 'the last 4xx' => [499, true];
+        yield 'a redirect' => [302, false];
         yield 'internal server error' => [500, true];
+    }
+
+    public function testAHeaderIsReadByItsNameInAnyCase(): void
+    {
+        $result = new HttpResult('u', 403, '', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), null, ['HTTP/1.1 403 Forbidden', 'X-RateLimit-Remaining: 0', 'Retry-After:60']);
+
+        self::assertSame(['0', '60', null], [$result->header('x-ratelimit-remaining'), $result->header('retry-after'), $result->header('x-ratelimit')]);
     }
 
     public function testJsonAndEnvelopeRoundTrip(): void

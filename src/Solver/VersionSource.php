@@ -20,6 +20,8 @@ interface VersionSource
     public const FAILED = 'failed';
     /** No Composer repository lists the name, and a path, VCS or package repository that the source does not ask can serve it. */
     public const UNREACHED = 'unreached';
+    /** A repository that the source does not load serves the name before a repository claims it, so its releases can hide or join the loaded ones. */
+    public const SHADOWED = 'shadowed';
     /** The install-time budget ran out before the source asked. */
     public const BUDGET = 'install_time_budget';
 
@@ -37,8 +39,9 @@ interface VersionSource
 
     /**
      * Why the source has no versions of a name that it was asked for: {@see OFFLINE},
-     * {@see FAILED}, {@see UNREACHED} or {@see BUDGET}. Null when it was not asked, when it loaded versions, or when
-     * a repository answered that it does not list the name.
+     * {@see FAILED}, {@see UNREACHED} or {@see BUDGET}. Or why its versions are no proof:
+     * {@see SHADOWED}. Null when it was not asked, when it loaded versions that a repository can
+     * not hide, or when a repository answered that it does not list the name.
      */
     public function failure(string $name): ?string;
 }

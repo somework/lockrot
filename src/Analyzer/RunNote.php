@@ -203,7 +203,7 @@ final class RunNote
     }
 
     /**
-     * Information only: the setting stops Composer's own advisory warnings, and lockrot still asks.
+     * Information only: the setting stops Composer's own advisory blocking, and lockrot still asks.
      *
      * @param string      $policyKey the setting: `policy`, `policy.advisories` or `COMPOSER_POLICY`
      * @param bool|string $value     its value
@@ -212,7 +212,7 @@ final class RunNote
     {
         return self::of(
             self::ADVISORIES_DISABLED_BY_POLICY,
-            \sprintf("security advisories still checked: Composer's policy (%s: %s) stops Composer from warning about them", $policyKey, \is_bool($value) ? var_export($value, true) : $value),
+            \sprintf("security advisories still checked: Composer's policy (%s: %s) stops Composer from blocking them", $policyKey, \is_bool($value) ? var_export($value, true) : $value),
             false,
             ['policy_key' => $policyKey, 'value' => $value]
         );
@@ -493,23 +493,35 @@ final class RunNote
     }
 
     /**
-     * D9: the members of `security.update_now` that the combined command leaves out, because
-     * Composer refuses them together with the others.
+     * D9: the members of `security.update_now` that the combined command leaves out. Composer
+     * refuses the members that `$heldBelow` does not hold together with the others, and the solve
+     * installs each member of `$heldBelow` below its move version.
      *
-     * @param list<string> $leftOut in report order
+     * @param list<string>                                    $leftOut   in report order
+     * @param string|null                                     $problem   the refusal's problem text, null without a refusal
+     * @param list<array{package: string, installs: string}> $heldBelow in report order
      */
-    public static function updateNowReduced(array $leftOut, string $problem): self
+    public static function updateNowReduced(array $leftOut, ?string $problem, array $heldBelow = []): self
     {
         if ($leftOut === []) {
             throw new \InvalidArgumentException('A note about the update now command names at least one package that it leaves out.');
         }
+        $reasons = [];
+        if ($problem !== null) {
+            $refused = \count($leftOut) - \count($heldBelow) === 1 ? 'it' : 'them';
+            $cause = self::causeOfFirstProblem($problem);
+            $reasons[] = \sprintf("Composer's solver refuses %s together with the others: %s", $refused, $heldBelow === [] ? $cause : rtrim($cause, '.'));
+        }
+        if ($heldBelow !== []) {
+            $installs = array_map(static fn (array $member): string => $member['package'].' at '.$member['installs'], $heldBelow);
+            $reasons[] = \sprintf("together with the others, Composer's solver installs %s, %s", implode(', ', $installs), \count($heldBelow) === 1 ? 'below its fix' : 'below their fixes');
+        }
 
         return self::of(self::UPDATE_NOW_REDUCED, \sprintf(
-            "update now: the command leaves out %s, because Composer's solver refuses %s together with the others: %s",
+            'update now: the command leaves out %s, because %s',
             implode(', ', $leftOut),
-            \count($leftOut) === 1 ? 'it' : 'them',
-            self::causeOfFirstProblem($problem)
-        ), false, ['left_out' => $leftOut, 'problem' => $problem]);
+            implode(', and ', $reasons)
+        ), false, ['left_out' => $leftOut, 'held_below' => $heldBelow, 'problem' => $problem]);
     }
 
     /** D9: Composer refuses the members of `security.update_now` together, so the report writes no command. */

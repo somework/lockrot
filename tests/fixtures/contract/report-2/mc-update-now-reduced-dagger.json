@@ -1190,6 +1190,7 @@
                     "symfony/yaml",
                     "typo3/html-sanitizer"
                 ],
+                "held_below": [],
                 "problem": "  Problem 1\n    - Root composer.json requires symfony/yaml ^6.4 -> satisfiable by symfony/yaml[v6.4.40].\n    - Root composer.json requires typo3/html-sanitizer ^2.2 -> satisfiable by typo3/html-sanitizer[v2.3.2].\n    - symfony/yaml v6.4.40 conflicts with acme/un-x 2.0.0.\n    - typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0 -> satisfiable by acme/un-x[2.0.0]."
             }
         }

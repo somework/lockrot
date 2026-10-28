@@ -11,7 +11,9 @@ use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\ArrayRepository;
+use Composer\Repository\PackageRepository;
 use Composer\Repository\PlatformRepository;
+use Composer\Util\Platform;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
@@ -23,6 +25,7 @@ use Lockrot\Solver\MoveCheckers;
 use Lockrot\Solver\MoveQuery;
 use Lockrot\Solver\SolverChecker;
 use Lockrot\Tests\Support\ArrayVersionSource;
+use Lockrot\Tests\Support\ConfiguredRepository;
 use Lockrot\Tests\Support\RecordingComposerRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -181,6 +184,75 @@ final class MoveCheckersTest extends TestCase
         $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
 
         self::assertSame([MoveCheck::RESOLVES, MoveCheck::WITH_DEPENDENCIES], [$check->result(), $check->form()]);
+    }
+
+    /**
+     * UpdateCommand and RequireCommand read `--minimal-changes` from COMPOSER_MINIMAL_CHANGES, cast
+     * to bool, or from the config key.
+     *
+     * @dataProvider minimalChangesSettings
+     *
+     * @param array<string, mixed> $config
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('minimalChangesSettings')]
+    public function testTheMoveCheckReadsMinimalChangesAsComposerDoes(array $config, ?string $variable, bool $minimal): void
+    {
+        $composerConfig = new Config(false);
+        $composerConfig->merge(['config' => $config]);
+        if ($variable !== null) {
+            Platform::putEnv('COMPOSER_MINIMAL_CHANGES', $variable);
+        }
+        try {
+            self::assertSame($minimal, MoveCheckers::minimalChanges($composerConfig));
+        } finally {
+            Platform::clearEnv('COMPOSER_MINIMAL_CHANGES');
+        }
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, ?string, bool}> the Composer config, the variable's value, whether the solve keeps changes minimal */
+    public static function minimalChangesSettings(): iterable
+    {
+        yield 'neither' => [[], null, false];
+        yield 'the config key' => [['update-with-minimal-changes' => true], null, true];
+        yield 'the config key off' => [['update-with-minimal-changes' => false], null, false];
+        yield 'the variable' => [[], '1', true];
+        yield 'the variable at 0' => [[], '0', false];
+        yield 'the variable at an empty value' => [[], '', false];
+    }
+
+    /** R5-33: Composer takes acme/x from the canonical package repository, which defines 1.0.0 only, so it refuses acme/lib 2.0.0. */
+    public function testAPackageRepositoryBeforeTheComposerRepositoryHidesItsVersionsOfTheName(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $loader = new ArrayLoader();
+        $package = new PackageRepository(['package' => [['name' => 'acme/x', 'version' => '1.0.0']]]);
+        $repository = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '2.0.0', 'require' => ['acme/x' => '^2.0']]),
+            $loader->load(['name' => 'acme/x', 'version' => '2.0.0']),
+        ]);
+
+        $check = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$package, $repository], '8.4', false, Deadline::never())->check(MoveQuery::require('acme/lib', '^2.0', '2.0.0'))->check();
+
+        self::assertSame(MoveCheck::REFUSED, $check->result());
+    }
+
+    /** R5-33: the lock records acme/lib from the URL of the vcs repository, which lockrot does not load and which can hide its versions. */
+    public function testAMoveOfANameThatTheLockRecordsFromAnEarlierVcsRepositoryIsNotChecked(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://github.com/acme/lib.git', 'reference' => 'abc'], 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $loader = new ArrayLoader();
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://github.com/acme/lib']);
+        $repository = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.1.0']),
+        ]);
+
+        $check = MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), new Config(false), [$vcs, $repository], '8.4', false, Deadline::never())->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME], [$check->result(), $check->reason()]);
     }
 
     /** `-W` frees a root requirement that a VCS repository serves: the solve offers its locked version, and no other. */

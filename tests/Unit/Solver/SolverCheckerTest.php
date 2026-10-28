@@ -713,6 +713,86 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize());
     }
 
+    /**
+     * R5-4: the listed form stops on acme/private, which no Composer repository lists. `-w` unlocks
+     * acme/mid, whose only release a blocked advisory covers. Composer's refusal of the wider forms
+     * still explains acme/lib 1.1.0 by acme/private, so the move reads not_checked, never refused.
+     */
+    public function testARefusalOfAWiderFormStillWantsTheNameThatStoppedTheListedForm(): void
+    {
+        $locked = [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']], ['name' => 'acme/other', 'version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']], ['name' => 'acme/mid', 'version' => '1.0.0']];
+        $source = new ArrayVersionSource([
+            'acme/lib' => [['version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/private' => '^1.0', 'acme/mid' => '^1.0']]],
+            'acme/other' => [['version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']]],
+            'acme/mid' => [['version' => '1.0.0']],
+        ], ['acme/private' => VersionSource::UNREACHED]);
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0', 'acme/other' => '^1.0']), LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, ['acme/mid' => [(new VersionParser())->parseConstraints('<1.1')]]);
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize());
+    }
+
+    /** acme/virtual is unreached, and acme/prov provides it: the refusal on acme/mid needs no unreached name, so it proves the refusal. */
+    public function testARefusalThatDoesNotWantAnUnreachedNameThatItAskedForIsRefused(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/prov', 'version' => '1.0.0', 'provide' => ['acme/virtual' => '1.0.0']], ['name' => 'acme/mid', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/virtual' => '^1.0', 'acme/mid' => '^2.0']]], 'acme/prov' => [['version' => '1.0.0', 'provide' => ['acme/virtual' => '1.0.0']]], 'acme/mid' => [['version' => '1.0.0']]],
+            ['acme/virtual' => VersionSource::UNREACHED]
+        );
+
+        self::assertSame('refused', $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize()['result']);
+    }
+
+    /**
+     * The listed form stops on the shadowed acme/zeta, and the wider forms refuse on acme/mid. A
+     * shadowed name has loaded versions, so the refusal does not want it, yet its hidden releases
+     * can resolve the listed form: the move reads not_checked, never refused.
+     */
+    public function testARefusalOfAWiderFormAfterAShadowedNameIsNotChecked(): void
+    {
+        $locked = [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']], ['name' => 'acme/other', 'version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']], ['name' => 'acme/mid', 'version' => '1.0.0']];
+        $source = new ArrayVersionSource([
+            'acme/lib' => [['version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/zeta' => '^1.0', 'acme/mid' => '^1.0']]],
+            'acme/other' => [['version' => '1.0.0', 'require' => ['acme/mid' => '^1.0']]],
+            'acme/mid' => [['version' => '1.0.0']],
+            'acme/zeta' => [['version' => '1.0.0']],
+        ], ['acme/zeta' => VersionSource::SHADOWED]);
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0', 'acme/other' => '^1.0']), LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, ['acme/mid' => [(new VersionParser())->parseConstraints('<1.1')]]);
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize());
+    }
+
+    /**
+     * R5-33: a canonical vcs repository before the Composer repository can serve acme/zeta and hide
+     * the release that the solve installs, so even a solve that installs the newest proves nothing.
+     */
+    public function testASolveThatReadsAShadowedNameIsNotChecked(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/zeta' => '^2.0']]], 'acme/zeta' => [['version' => '2.0.0']]],
+            ['acme/zeta' => VersionSource::SHADOWED]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0', null, '1.1.0'))->check()->jsonSerialize());
+    }
+
+    public function testACombinedSolveThatReadsAShadowedNameIsNotChecked(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/zeta' => '^2.0']]], 'acme/zeta' => [['version' => '2.0.0']]],
+            ['acme/zeta' => VersionSource::SHADOWED]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->combined(['acme/lib' => '^1.1.0'])->check()->jsonSerialize());
+    }
+
     /** A virtual name such as `psr/log-implementation` is listed by no repository: a solve that a provider meets proves the move. */
     public function testASolveThatResolvesBelowTheNewestWithANameNoComposerRepositoryListsResolves(): void
     {
@@ -889,6 +969,21 @@ final class SolverCheckerTest extends TestCase
         $combined = $checker->combined(['acme/a' => '^1.1.0', 'acme/b' => '^1.1.0']);
         self::assertSame(MoveCheck::REFUSED, $combined->check()->result());
         self::assertContains(['source' => 'package', 'package' => 'acme/a', 'version' => '1.1.0', 'link' => 'conflict', 'target' => null, 'constraint' => '>=1.1'], self::rows($combined->holds()));
+    }
+
+    /** A plain member of the combined update can keep its locked release, so the outcome names what the solve installs. */
+    public function testTheCombinedUpdateCarriesTheReleaseThatTheSolveInstallsOfEachName(): void
+    {
+        $checker = self::checker(
+            ['acme/a' => '^1.0', 'acme/b' => '^1.0'],
+            [['name' => 'acme/a', 'version' => '1.0.0'], ['name' => 'acme/b', 'version' => '1.0.0']],
+            ['acme/a' => [['version' => '1.0.0'], ['version' => '1.1.0', 'conflict' => ['acme/b' => '>=1.1']]], 'acme/b' => [['version' => '1.0.0'], ['version' => '1.1.0']]]
+        );
+
+        $combined = $checker->combined(['acme/a' => '^1.1.0', 'acme/b' => '']);
+
+        self::assertSame(MoveCheck::RESOLVES, $combined->check()->result());
+        self::assertSame(['acme/a' => '1.1.0'], $combined->changes());
     }
 
     /** A release that starts to replace a package that the root keeps: Composer can install only one of the two. */

@@ -324,13 +324,12 @@ final class FindingDetails
         ];
     }
 
-    /** The release that the installed branch's checked move installs, when it sorts below the release `composer update` targets. */
+    /** The release that the installed branch's checked move installs, when it is not the release `composer update` targets. */
     private function getsVersion(?string $version, ?BranchFixes $installed): ?string
     {
         $check = $installed === null ? null : $this->moves()->rowCheck($installed->branch());
-        $below = $check === null ? null : $check->installsBelow($version);
 
-        return $below ?? $version;
+        return ($check === null ? null : $check->installsBelow($version) ?? $check->installsAbove($version)) ?? $version;
     }
 
     /**

@@ -35,11 +35,13 @@ final class FindingRelationsTest extends TestCase
     /** The case documents that hold a whole report: the composite, and each case whose finding comes with its `parents`. */
     private const WHOLE_CASES = [
         'cases/commonmark.json', 'cases/composite.json', 'cases/many-dependents.json', 'cases/mc-baseline-refused-dagger.json',
-        'cases/mc-blocking-off-both-dagger.json', 'cases/mc-blocking-off-dagger.json', 'cases/mc-composite-dagger.json',
+        'cases/mc-blocking-off-both-dagger.json', 'cases/mc-blocking-off-dagger.json', 'cases/mc-canonical-package-dagger.json',
+        'cases/mc-canonical-vcs-dagger.json', 'cases/mc-canonical-vcs-unmatched-dagger.json', 'cases/mc-composite-dagger.json',
         'cases/mc-dev-update-dagger.json', 'cases/mc-filter-only-dagger.json', 'cases/mc-gets-below-dagger.json', 'cases/mc-gets-next-form-dagger.json',
         'cases/mc-inline-dagger.json', 'cases/mc-joint-dagger.json', 'cases/mc-joint-down-dagger.json', 'cases/mc-joint-retag-dagger.json', 'cases/mc-link-newest-dagger.json',
-        'cases/mc-lookup-incomplete-dagger.json', 'cases/mc-package-hold-dagger.json', 'cases/mc-pass-cap-dagger.json',
-        'cases/mc-raise-php-dagger.json', 'cases/mc-replan-major-dagger.json', 'cases/mc-root-hold-dagger.json',
+        'cases/mc-lookup-incomplete-dagger.json', 'cases/mc-minimal-changes-dagger.json', 'cases/mc-newest-above-row-dagger.json',
+        'cases/mc-package-hold-dagger.json', 'cases/mc-pass-cap-dagger.json', 'cases/mc-raise-php-dagger.json',
+        'cases/mc-replan-major-dagger.json', 'cases/mc-root-hold-dagger.json', 'cases/mc-root-version-dagger.json',
         'cases/mc-split-both-refused-dagger.json', 'cases/mc-split-dagger.json', 'cases/mc-split-maintenance-larger-dagger.json',
         'cases/mc-split-not-checked-dagger.json', 'cases/mc-update-now-reduced-dagger.json', 'cases/mc-update-now-refused-dagger.json',
         'cases/mc-with-all-dagger.json', 'cases/mc-with-deps-dagger.json', 'cases/xmlseclibs.json',
@@ -50,7 +52,7 @@ final class FindingRelationsTest extends TestCase
     public function testEveryFixtureDocumentHoldsEveryRelation(): void
     {
         $paths = self::documents();
-        self::assertCount(363, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
+        self::assertCount(375, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
         $broken = [];
         foreach (array_merge($paths, [self::COMPOSITE]) as $path) {
             $document = self::read($path);
@@ -185,9 +187,10 @@ final class FindingRelationsTest extends TestCase
 
     public function testTheWholeCaseDocumentsAreTheCompositeAndTheCasesWithParents(): void
     {
+        $withoutInputs = JsonPath::arrayAt(JsonPath::decodeFile(\dirname(self::CASES).'/provenance.json'), ['cases_without_inputs']);
         $withParents = [];
         foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CASES), ['cases']) as $case) {
-            if (\is_array($case) && isset($case['parents'])) {
+            if (\is_array($case) && isset($case['parents']) && !\in_array($case['id'] ?? null, $withoutInputs, true)) {
                 $withParents[] = 'cases/'.CaseRecording::fileName(JsonPath::stringAt($case, ['id'])).'.json';
             }
         }

@@ -1696,6 +1696,36 @@ repository metadata
    * 3.x      v3.4.47       2020-10-24        ^5.5.9|>=7.0.8
      2.x      v2.8.52       commit 2018-11-11 >=5.3.9
 
+== case ok-unchecked-entry‡
+scheb/2fa-google-authenticator v8.6.1 — ok
+  via pimcore/pimcore > scheb/2fa-google-authenticator: 1 hop from the nearest composer.json line; no line of composer.json names it
+
+age       installed  v8.6.1    not read (dated only by a commit its tags share)
+          8.x                  not read (undated releases)
+          newest               not read (undated releases)
+          last push            2026-07-10   0.2 years ago                 below push-warn-years 3
+          libyears not measured: dated only by a commit its tags share
+repository GitHub github.com/scheb/2fa-google-authenticator: last push 2026-07-10 · fetched 2026-09-14
+
+score     0
+  reach        via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle, pimcore/studio-ui-bundle: maintenance would be halved (none counts); security is never halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        nothing to do: nothing counts
+
+flags
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  S2 (undated releases)
+
+repository metadata
+     branch   highest tag   released          php                                            fixes
+   * 8.x      v8.6.1        commit 2026-01-24 ~8.4.0 || ~8.5.0
+     7.x      v7.14.0       2026-01-24        ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     6.x      v6.13.1       2024-11-29        ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
+     5.x      v5.13.2       2022-01-03        —
+* the installed branch's highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch
+
 == case B-baselined‡
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
@@ -2104,6 +2134,48 @@ repository metadata
    * 2.x      v2.16.1       2024-09-09   >=7.1.3    0 of 15
      1.x      v1.44.8       2024-09-09   >=7.2.5    0 of 15
 
+== case E-dev‡
+symfony/yaml v5.4.23 — low: vulnerable
+  direct requirement (composer.json require-dev)
+
+age       installed  v5.4.23   2023-04-23   3.4 years ago
+          5.x        v5.4.53   2026-05-20   0.4 years ago                 below release-warn-years 3
+          newest     v8.1.8    2026-09-26   less than three weeks ago     below release-warn-years 3
+          last push            2026-10-01   less than three weeks ago     below push-warn-years 3
+          libyears 3.4 behind the newest stable release
+repository GitHub github.com/symfony/yaml: last push 2026-10-01 · fetched 2026-09-14
+
+score     1 = vulnerable 2 [low advisory] ÷ 2 dev     low from 1
+  security     vulnerable 2 (low advisory CVE-2026-45133)
+  reach        direct requirement: maintenance not halved for reach
+  dev          packages-dev: the score ÷ 2
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update symfony/yaml (gets v5.4.53) — clears 3 advisories
+          clears PKSA-b14r-zh1d-vdrc, PKSA-ft77-7h5f-p3r6, PKSA-v5yj-8nmz-sk2q
+
+flags
+  vulnerable   S9 · 3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings · lookup complete
+    low        CVE-2026-45133  YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings
+               PKSA-b14r-zh1d-vdrc · reported 2026-05-20 · 2 points · fix: composer update to 5.x from v5.4.52
+    low        CVE-2026-45305  YAML Parser ReDoS via Catastrophic Backtracking in Parser::cleanup() Regex
+               PKSA-ft77-7h5f-p3r6 · reported 2026-05-20 · 2 points · fix: composer update to 5.x from v5.4.52
+    low        CVE-2026-45304  YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion ("Billion Laughs")
+               PKSA-v5yj-8nmz-sk2q · reported 2026-05-20 · 2 points · fix: composer update to 5.x from v5.4.52
+  feeds        packagist.org: 5 on record, 3 affect v5.4.23
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released          php            fixes
+     8.x      v8.1.8        2026-09-26        >=8.4.1        3 of 3 · php floor raise; after it: 0, ok, if Composer resolves it
+     7.x      v7.4.20       2026-09-26        >=8.2          3 of 3 · php floor raise; after it: 0, ok, if Composer resolves it
+     6.x      v6.4.47       2026-09-26        >=8.1          3 of 3 · php floor raise; after it: 0, ok, if Composer resolves it
+   * 5.x      v5.4.53       2026-05-20        >=7.2.5        3 of 3 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
+     4.x      v4.4.45       2022-08-02        >=7.1.3        0 of 3
+     3.x      v3.4.47       2020-10-24        ^5.5.9|>=7.0.8 0 of 3
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9        0 of 3
+
 == case policy-off‡
 joomla/filter 2.0.5 — medium: vulnerable
   direct requirement (composer.json require)
@@ -2484,6 +2556,56 @@ repository metadata
      4.x      v4.4.45       2022-08-02        >=7.1.3        0 of 3
      3.x      v3.4.47       2020-10-24        ^5.5.9|>=7.0.8 0 of 3
      2.x      v2.8.52       commit 2018-11-11 >=5.3.9        0 of 3
+
+== case fix-newest-two-fixes‡
+league/commonmark 2.9.1 — high: vulnerable
+  via laravel/framework > league/commonmark: 1 hop from the nearest composer.json line; no line of composer.json names it
+
+age       installed  2.9.1     2026-08-09   0.1 years ago
+          2.x        2.10.3    2026-09-21   less than three weeks ago     below release-warn-years 3
+          newest     2.10.3    2026-09-21   less than three weeks ago     below release-warn-years 3
+          last push            2026-10-01   less than three weeks ago     below push-warn-years 3
+          libyears 0.1 behind the newest stable release
+repository GitHub github.com/thephpleague/commonmark: last push 2026-10-01 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory PKSA-m4t9-vsgq-8khn)
+  reach        via laravel/framework, laravel/nightwatch, spatie/laravel-markdown: maintenance would be halved (none counts); security is never halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch, spatie/laravel-markdown — clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock
+          clears PKSA-m4t9-vsgq-8khn, PKSA-zyf5-hrxv-hrd7, PKSA-m2dq-1fhr-29b1
+
+flags
+  vulnerable   S9 high · 3 advisories: 2 high, 1 medium — all fixed on 2.x (upgrade); worst: PKSA-m4t9-vsgq-8khn league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan · lookup complete
+    high       PKSA-m4t9-vsgq-8khn  league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan
+               PKSA-m4t9-vsgq-8khn · reported 2026-09-30 · 16 points · fix: upgrade to 2.x from 2.10.3
+    high       PKSA-zyf5-hrxv-hrd7  league/commonmark: Denial of service via distinctly-named attributes in the Attributes extension
+               PKSA-zyf5-hrxv-hrd7 · reported 2026-09-01 · 16 points · fix: composer update to 2.x from 2.10.0
+    medium     PKSA-m2dq-1fhr-29b1  league/commonmark: DisallowedRawHtml bypassed when a disallowed tag name ends the raw-HTML literal
+               PKSA-m2dq-1fhr-29b1 · reported 2026-09-30 · 8 points · fix: upgrade to 2.x from 2.10.3
+  feeds        packagist.org: 18 on record, 3 affect 2.9.1
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php          fixes
+   * 2.x      2.10.3        2026-09-21   ^7.4 || ^8.0 3 of 3 · upgrade (lowest fix); held by spatie/laravel-markdown; after it: 0, ok; Composer's solver refuses it
+     1.x      1.6.7         2022-01-13   ^7.1 || ^8.0 0 of 3
+     0.19.x   0.19.3        2019-06-18   ^7.1         0 of 3
+     0.18.x   0.18.5        2019-03-28   >=5.6.5      0 of 3
+     0.17.x   0.17.5        2018-03-29   >=5.6.5      0 of 3
+     0.16.x   0.16.0        2017-10-31   >=5.4.8      0 of 3
+     0.15.x   0.15.7        2017-10-26   >=5.4.8      0 of 3
+     0.14.x   0.14.0        2016-07-02   >=5.4.8      0 of 3
+     0.13.x   0.13.4        2016-06-14   >=5.4.8      0 of 3
+     0.12.x   0.12.0        2015-11-04   >=5.4.8      0 of 3
+     0.11.x   0.11.3        2015-09-25   >=5.4.8      0 of 3
+     0.10.x   0.10.0        2015-07-25   >=5.4.8      0 of 3
+     0.9.x    0.9.0         2015-06-19   >=5.4.8      0 of 3
+     0.8.x    0.8.0         2015-04-29   >=5.4.8      0 of 3
+     0.7.x    0.7.2         2015-03-08   >=5.3.3      0 of 3
+     … and 6 more
 
 == case rounded-dev‡
 jfcherng/php-color-output 2.0.2 — low: old-promise · stale
@@ -5904,6 +6026,195 @@ flags
 repository metadata
      branch   highest tag   released     php          fixes
    * 2.x      v2.3.2        2026-07-02   ^7.2 || ^8.0 1 of 1 · composer update (lowest fix); after it: 0, ok; Composer's solver resolves it
+
+== case mc-newest-above-row‡
+symfony/routing v6.4.28 — high: capped · vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-03   0.2 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-03   0.2 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     24 = capped 8 + vulnerable 16 [high advisory]     high from 16
+  maintenance  capped 8 (lead)
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update 'symfony/routing:^6.4.40' (gets v6.4.40) — clears the advisory; capped stays; Composer's solver checked it against the lock
+          clears PKSA-bf7t-jnpz-492k
+          also: require symfony/routing ^6.4.41 — clears capped and the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by acme/rt-cap 1.0.0 (conflicts with ~6.4.41); the packages that hold it may need to move too; Composer's solver refuses it against the lock
+
+flags
+  capped       S11 · requires php >=8.1 <8.5: it stops at 8.4, so the newest PHP, 8.5, is excluded
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: composer update to 6.x from v6.4.40
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-03   >=8.1      1 of 1 · composer update (lowest fix); after it: 8, medium; Composer's solver resolves it
+
+== case mc-minimal-changes‡
+symfony/routing v6.4.28 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-05   0.2 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-05   0.2 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update 'symfony/routing:^6.4.41' --with-dependencies (gets v6.4.41) — clears the advisory; Composer's solver checked it against the lock
+          clears PKSA-bf7t-jnpz-492k
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: composer update to 6.x from v6.4.41
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-05   >=8.1      1 of 1 · composer update (lowest fix); after it: 0, ok; Composer's solver resolves it
+
+== case mc-canonical-package‡
+symfony/routing v6.4.28 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-02   0.3 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-02   0.3 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require symfony/routing ^6.4.41 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by symfony/routing v6.4.41, its own release (requires acme/pk-x ^2.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock
+          clears PKSA-bf7t-jnpz-492k
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x (upgrade); advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: upgrade to 6.x from v6.4.41
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-02   >=8.1      1 of 1 · upgrade (lowest fix); held by symfony/routing v6.4.41, its own release; after it: 0, ok; Composer's solver refuses it
+
+== case mc-canonical-vcs‡
+symfony/routing v6.4.28 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-03   0.2 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-03   0.2 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update 'symfony/routing:^6.4.41' (gets v6.4.41) — clears the advisory; not checked with Composer's solver (a package it needs could not be loaded), so it holds only if Composer resolves it
+          clears PKSA-bf7t-jnpz-492k
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: composer update to 6.x from v6.4.41
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-03   >=8.1      1 of 1 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
+
+== case mc-canonical-vcs-unmatched‡
+symfony/routing v6.4.28 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-03   0.2 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-03   0.2 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update 'symfony/routing:^6.4.41' --with-all-dependencies (gets v6.4.41) — clears the advisory; Composer's solver checked it against the lock
+          clears PKSA-bf7t-jnpz-492k
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: composer update to 6.x from v6.4.41
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-03   >=8.1      1 of 1 · composer update (lowest fix); after it: 0, ok; Composer's solver resolves it
+
+== case mc-root-version‡
+symfony/routing v6.4.28 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-02   0.3 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-02   0.3 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require symfony/routing ^6.4.41 — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by symfony/routing v6.4.41, its own release (requires acme/rv-sub ^1.0); the packages that hold it may need to move too; Composer's solver refuses it against the lock
+          clears PKSA-bf7t-jnpz-492k
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x (upgrade); advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: upgrade to 6.x from v6.4.41
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-02   >=8.1      1 of 1 · upgrade (lowest fix); held by symfony/routing v6.4.41, its own release; after it: 0, ok; Composer's solver refuses it
 
 == case mc-composite‡
 typo3/html-sanitizer v2.2.0 — high: vulnerable

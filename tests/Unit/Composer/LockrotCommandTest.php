@@ -11,13 +11,17 @@ use Composer\Console\Application;
 use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginEvents;
+use Composer\Repository\ArrayRepository;
 use Composer\Util\Platform;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Clock;
 use Lockrot\Composer\LockrotCommand;
 use Lockrot\Composer\ServiceFactory;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
@@ -36,6 +40,7 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\BaselineEntries;
+use Lockrot\Tests\Support\FixedAdvisories;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
@@ -1522,6 +1527,56 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
+     * R5-37: Composer's update and audit read the instance's RepositoryManager, which holds the
+     * repositories that plugins add. With --offline the run reads the rebuilt repositories only,
+     * because a plugin's repository holds Composer's HttpDownloader, built before --offline.
+     *
+     * @dataProvider pluginRepositoryRuns
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('pluginRepositoryRuns')]
+    public function testInPluginModeTheRunReadsTheRepositoriesThatAPluginAdds(bool $offline, bool $reads): void
+    {
+        $project = $this->tempDir('lockrot-plugin-repository-project-');
+        file_put_contents($project.'/composer.json', (string) json_encode([
+            'name' => 'lockrot/plugin-repository-test',
+            'repositories' => ['packagist.org' => false],
+        ]));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
+        chdir($project);
+        try {
+            $this->withComposerEnv($this->tempDir('lockrot-plugin-repository-cache-'), $this->tempDir('lockrot-plugin-repository-home-'), function () use ($offline, $reads): void {
+                $seen = null;
+                $loader = $this->emptyLoader();
+                $command = $this->buildCommand(static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock) use ($loader, &$seen): Analyzer {
+                    $seen = $repositories;
+
+                    return self::testAnalyzer($loader, $lockrot, $clock);
+                });
+                $application = $command->getApplication();
+                self::assertInstanceOf(Application::class, $application);
+                $composer = $application->getComposer(false, false);
+                self::assertInstanceOf(Composer::class, $composer);
+                $added = new ArrayRepository();
+                $composer->getRepositoryManager()->prependRepository($added);
+
+                (new CommandTester($command))->execute(['--offline' => $offline, '--target-php' => '8.4']);
+
+                self::assertIsArray($seen, 'the analyzer factory was never called');
+                self::assertSame($reads, \in_array($added, $seen, true));
+            });
+        } finally {
+            Platform::clearEnv('COMPOSER_DISABLE_NETWORK');
+        }
+    }
+
+    /** @return iterable<string, array{bool, bool}> --offline, whether the run reads the plugin's repository */
+    public static function pluginRepositoryRuns(): iterable
+    {
+        yield 'online' => [false, true];
+        yield 'offline' => [true, false];
+    }
+
+    /**
      * Symfony's Command::run() calls initialize() with no try/catch, so a plugin's PRE_COMMAND_RUN
      * listener that throws inside BaseCommand::initialize() must still leave COMPOSER_DISABLE_NETWORK
      * and COMPOSER_ROOT_VERSION as initialize() found them, although execute() and its finally never
@@ -1684,8 +1739,7 @@ final class LockrotCommandTest extends TestCase
         // default it lands on anyway. Setting that default up front skips both.
         yield 'unset' => [false, '1.0.0'];
         yield 'empty' => ['', '1.0.0'];
-        // Anything the caller chose is theirs: lockrot never reads the root package's own version,
-        // so it has no reason to overwrite one.
+        // Composer solves the root at the version that the caller chose, so the move check does too.
         yield 'already set' => ['9.9.9', '9.9.9'];
     }
 
@@ -1918,6 +1972,26 @@ final class LockrotCommandTest extends TestCase
         self::assertNotSame([], $findings);
         self::assertStringContainsString('('.\count($findings).' findings)', $stderr);
         self::assertStringEndsWith("}\n", (string) file_get_contents($dir.'/lockrot-baseline.json'));
+    }
+
+    /** A run whose advisory lookup is unavailable keeps the advisory that the baseline records, and says so by what it keeps. */
+    public function testAGenerateRunWithoutAnAdvisoryAnswerNamesTheEntriesThatItCarries(): void
+    {
+        $this->fixtureCopy(self::WALLABAG_LOCK);
+        $counted = new AdvisoryBatch(['beberlei/assert' => [new Advisory('PKSA-test-0001', null, 'test', null, 'high', new \DateTimeImmutable('2026-01-01T00:00:00+00:00'))]], [], [], [], null, true);
+        $unavailable = AdvisoryBatch::unavailable(RunNote::advisoriesUnavailable('packagist.org', new \RuntimeException('test')));
+        $loader = $this->loader();
+        $commandWith = fn (AdvisoryBatch $batch): LockrotCommand => $this->buildCommand(static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock) use ($loader, $batch): Analyzer {
+            $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
+
+            return new Analyzer($loader, new ActivityClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), $auth), new ActivityFetchPlanner($auth), new RepoLocator(), BuiltinAllowlist::load(), SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()), $clock, $lockrot->offline(), new FixedAdvisories($batch));
+        });
+        self::assertSame(0, $this->runCommandWithSplitStreams($commandWith($counted), ['--generate-baseline' => true, '--target-php' => '8.4'])[0]);
+
+        [$code, , $stderr] = $this->runCommandWithSplitStreams($commandWith($unavailable), ['--generate-baseline' => true, '--target-php' => '8.4']);
+
+        self::assertSame(0, $code, $stderr);
+        self::assertStringContainsString("lockrot: the advisory lookup did not complete, so the baseline keeps the recorded advisories of 1 package: beberlei/assert\n", $stderr);
     }
 
     public function testASecondRunWithTheGeneratedBaselinePresentExitsZero(): void

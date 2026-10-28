@@ -50,6 +50,25 @@ final class ComposerSolverTest extends TestCase
         self::assertSame(['acme/lib' => 'v1.0.0'], $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->updatedFrom());
     }
 
+    /** Composer 2.7 and later keep every name off the allow list at its locked release where they can (`update --minimal-changes`). */
+    public function testAMinimalChangesSolveKeepsADependencyThatTheMoveDoesNotNeedToChange(): void
+    {
+        if (version_compare(ComposerFeatures::version(), '2.7.0', '<')) {
+            self::markTestSkipped('Composer below 2.7 has no --minimal-changes');
+        }
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/zeta' => '^1.0']], ['name' => 'acme/zeta', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/zeta' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/zeta' => '^1.0']]], 'acme/zeta' => [['version' => '1.0.0'], ['version' => '1.1.0']]]
+        );
+        $request = SolveRequest::update(['acme/lib' => '^1.1'])->withTransitive(SolveRequest::WITH_DEPENDENCIES);
+
+        self::assertSame(['acme/lib' => '1.1.0', 'acme/zeta' => '1.1.0'], $solver->solve($request)->installs());
+        self::assertSame(['acme/lib' => '1.1.0'], $solver->withMinimalChanges()->solve($request)->installs());
+        self::assertSame(['acme/lib' => '1.1.0', 'acme/zeta' => '1.1.0'], $solver->solve($request)->installs(), 'the solver itself keeps its policy');
+        self::assertSame(['acme/lib' => '1.1.0'], $solver->withMinimalChanges()->solve(SolveRequest::plain('acme/lib'))->installs(), 'the name that the update allows is no preferred one');
+    }
+
     /** monica's socialiteproviders/facebook: the solve takes another reference of the locked tag, which moves no version. */
     public function testAnUpdateOfATagToAnotherReferenceIsNoChange(): void
     {

@@ -1,12 +1,12 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "5fc183becb404a9a262403c9f270774cab5a71b291a077dc83133e6f2a5013be",
+  "cases.json": "d9fd1130c1711826f3e392355016eb36791f7ea341620c254d7940d2eb79410d",
   "model_run_date": "2026-10-28"
  },
  "suite": "the model suite reports every step passed",
  "page_goldens": {
-  "sha256": "00ceb9827c0a67eaa284c31062ae70421d8f0c425a8cbcaff3277c7326f106a0",
+  "sha256": "4aa51cc1c529b221341656b0b7770b202ca8a6c95f07c7ecf65acf9c8f9f1e62",
   "rendered": "the model's goldens"
  },
  "dropped": [],
@@ -27,7 +27,10 @@
   "host-accepted‡",
   "host-accept-expired‡",
   "no-feed-accepted‡",
-  "vcs-accepted‡"
+  "vcs-accepted‡",
+  "mc-plain-update‡",
+  "mc-update-now-plain‡",
+  "mc-update-now-below‡"
  ],
  "negative_bases": [
   "composite",

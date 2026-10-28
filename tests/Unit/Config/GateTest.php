@@ -302,6 +302,16 @@ final class GateTest extends TestCase
         self::assertSame([true, true, null], self::standing($gate, 'a/new'));
     }
 
+    /** docs/baseline.md, "Graded findings only": an entry that an incomplete lookup carried forward exempts no score-0 finding. */
+    public function testABaselineEntryDoesNotExemptAnUngradedFindingFromUnchecked(): void
+    {
+        $report = self::report(self::unread('a/unread'));
+        $baseline = BaselineEntries::baseline([BaselineEntries::of('a/unread', '1.0.0', 'abandoned', '2026-01-01')]);
+        $compared = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'b.json', ['a/unread']));
+
+        self::assertSame([true, true, null], self::standing(self::gate($compared, 'unchecked'), 'a/unread'));
+    }
+
     public function testAFindingWithoutS10DoesNotReachUnchecked(): void
     {
         $report = self::report(self::vulnerable('a/stale', ['stale'], []), FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true));

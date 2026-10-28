@@ -75,9 +75,8 @@ final class AdvisoryBlocking
     }
 
     /**
-     * A config that Composer rejects blocks every advisory: the update that it runs fails anyway.
-     *
-     * @throws ConfigException when Composer refuses the value of a variable that turns the blocking off
+     * @throws ConfigException when Composer rejects the policy or audit configuration, or a variable
+     *                         that it reads: each update that lockrot prints would fail on it
      */
     public static function fromConfig(Config $config): self
     {
@@ -92,7 +91,7 @@ final class AdvisoryBlocking
             try {
                 $policy = PolicyConfig::fromConfig($config);
             } catch (\Throwable $e) {
-                return self::everyAdvisory();
+                throw new ConfigException('Composer rejects the policy configuration: '.$e->getMessage(), 0, $e);
             }
             $disabledBy = self::noBlocking($version);
             if (!$policy->enabled || !$policy->advisories->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE)) {
@@ -110,7 +109,7 @@ final class AdvisoryBlocking
         try {
             $audit = \is_callable($factory) ? $factory($config) : null;
         } catch (\Throwable $e) {
-            return $disabledBy === [] ? self::everyAdvisory() : self::none($disabledBy);
+            throw new ConfigException('Composer rejects the audit configuration: '.$e->getMessage(), 0, $e);
         }
         $settings = \is_object($audit) ? get_object_vars($audit) : [];
         if (($settings['blockInsecure'] ?? true) === false) {

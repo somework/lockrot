@@ -159,8 +159,12 @@ final class GateAgreementTest extends TestCase
         }
     }
 
-    /** I15b under a baseline: an offline run whose every finding the baseline knows passes, with no `error` record. */
-    public function testAnOfflineRunThatTheBaselineKnowsWritesNoErrorRecord(): void
+    /**
+     * I15b under a baseline: an entry exempts only a graded finding (docs/baseline.md), so an
+     * ungraded finding with S10 still fails `--fail-on=unchecked`, and the run-level record stays
+     * at `error`.
+     */
+    public function testAnOfflineRunThatTheBaselineKnowsFailsUncheckedOnlyOnItsUngradedFindings(): void
     {
         $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURES.'mini/composer.lock']);
         $server->start();
@@ -177,11 +181,14 @@ final class GateAgreementTest extends TestCase
         $known = $report->withBaseline(BaselineComparison::compare(Baseline::of($entries, self::NOW, '8.4', 'option'), $report, 'lockrot-baseline.json', $names));
         $this->recorded($known, FormatContext::create(null, 'unchecked'), 'mini offline fail-on=unchecked, every finding known');
 
+        $ungradedUnchecked = array_values(array_map(static fn (Finding $f): string => $f->package(), array_filter($report->findings(), static fn (Finding $f): bool => !$f->isGraded() && $f->checksMissing() !== [])));
+        $gate = $known->gate();
         self::assertSame([], $this->mismatches);
-        self::assertNotNull($known->gate());
-        self::assertFalse($known->gate()->fails());
+        self::assertNotNull($gate);
+        self::assertNotSame([], $ungradedUnchecked, 'the fixture must hold an ungraded finding with S10');
+        self::assertSame($ungradedUnchecked, array_values(array_filter($names, static fn (string $name): bool => $gate->packageFails($name))));
         foreach (['github', 'gitlab', 'sarif'] as $format) {
-            self::assertArrayNotHasKey($format.' run-level error', $this->seen);
+            self::assertArrayHasKey($format.' run-level error', $this->seen);
         }
     }
 

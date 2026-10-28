@@ -309,6 +309,25 @@ final class FixFinderTest extends TestCase
         self::assertSame(['1.3.0', '1.3.0'], [$fix->version(), $fix->newest()]);
     }
 
+    /** SPEC 5.3, the S9 row: on one branch every fix reads the row's `newest`, also a fix whose own release h/h does not hold. */
+    public function testTwoFixesOnOneBranchReadTheRowsNewest(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['1.1.0', null], ['1.2.0', null], ['1.3.0', null]],
+            ['A1' => '<1.1.0', 'A2' => '<1.3.0'],
+            new PhpFloor('8.4', null),
+            [['name' => 'h/h', 'version' => '1.0.0', 'require' => ['a/b' => '<1.2']]]
+        );
+        $row = $fixes->installedBranch();
+        self::assertNotNull($row);
+
+        self::assertSame(
+            [['1.1.0', '1.3.0'], ['1.3.0', '1.3.0'], '1.3.0'],
+            [[$fixes->forAdvisory('A1')->version(), $fixes->forAdvisory('A1')->newest()], [$fixes->forAdvisory('A2')->version(), $fixes->forAdvisory('A2')->newest()], $row->newest()]
+        );
+    }
+
     /** No fixing release runs on the target PHP, so no allowed release lies at or above the fix: `newest` is the branch's newest. */
     public function testAFixThatTheTargetPhpCannotRunKeepsItsNewestAtOrAboveItsVersion(): void
     {

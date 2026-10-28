@@ -6,19 +6,27 @@ namespace Lockrot\Solver;
 
 use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
+use Composer\Package\CompletePackage;
 use Composer\Package\Version\StabilityFilter;
+use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
+use Composer\Repository\ConfigurableRepositoryInterface;
 use Composer\Repository\FilterRepository;
+use Composer\Repository\PackageRepository;
+use Composer\Repository\PathRepository;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Deadline;
 
 /**
- * Loads a name's versions from the project's Composer repositories: the tagged stabilities first,
+ * Loads a name's versions from the project's Composer, package and path repositories: the tagged stabilities first,
  * then `dev` for a name with no tagged release or one that the root admits at `dev`, as Composer's
  * repository loads a name's `~dev` file. Composer serves a file
  * that this process already fetched from its cache, so a name that the run read costs no request.
  * The first canonical repository that lists a name shadows the later ones. A repository with `only`,
- * `exclude` or `canonical` is asked as Composer asks it, through its FilterRepository.
+ * `exclude` or `canonical` is asked as Composer asks it, through its FilterRepository. A vcs or
+ * other repository is not loaded. It serves the names that the lock records from its URL. A name
+ * that it serves before a canonical repository lists the name is {@see VersionSource::SHADOWED}
+ * (docs/verdicts.md#the-move-check).
  *
  * @internal
  */
@@ -32,7 +40,7 @@ final class RepositoryVersions implements VersionSource
     ];
     private const DEV = ['dev' => BasePackage::STABILITY_DEV];
 
-    /** @var array<RepositoryInterface> each a ComposerRepository, or a FilterRepository around one */
+    /** @var list<RepositoryInterface> in Composer's order */
     private array $repositories;
     private bool $otherRepositories;
     /** @var array<string, true> */
@@ -49,20 +57,24 @@ final class RepositoryVersions implements VersionSource
     private array $acceptable;
     /** @var array<string, BasePackage::STABILITY_*> */
     private array $stabilityFlags;
+    /** @var array<string, list<string>> */
+    private array $served;
 
     /**
-     * @param list<RepositoryInterface> $repositories              only a ComposerRepository is asked, through the FilterRepository that wraps it
+     * @param list<RepositoryInterface> $repositories              a Composer, package or path repository is asked, through the FilterRepository that wraps it
      * @param list<string>              $notFromComposerRepository the locked names that a path, VCS or package repository serves: the lock's version is their only version
      * @param string                    $minimumStability          the root's `minimum-stability`
      * @param array<string, BasePackage::STABILITY_*> $stabilityFlags the root's stability flags, by name
+     * @param array<string, list<string>>             $served         by {@see urlKey()} of a repository URL, the names that the lock records from it
      */
-    public function __construct(array $repositories, array $notFromComposerRepository, bool $offline, Deadline $deadline, string $minimumStability = 'stable', array $stabilityFlags = [])
+    public function __construct(array $repositories, array $notFromComposerRepository, bool $offline, Deadline $deadline, string $minimumStability = 'stable', array $stabilityFlags = [], array $served = [])
     {
+        $this->served = $served;
         $floor = BasePackage::$stabilities[$minimumStability] ?? BasePackage::STABILITY_STABLE;
         $this->acceptable = array_filter(BasePackage::$stabilities, static fn (int $value): bool => $value <= $floor);
         $this->stabilityFlags = $stabilityFlags;
-        $this->repositories = array_filter($repositories, static fn (RepositoryInterface $repository): bool => ($repository instanceof FilterRepository ? $repository->getRepository() : $repository) instanceof ComposerRepository);
-        $this->otherRepositories = \count($this->repositories) < \count($repositories);
+        $this->repositories = $repositories;
+        $this->otherRepositories = array_filter($repositories, static fn (RepositoryInterface $repository): bool => !self::isRead($repository)) !== [];
         $this->notFromComposerRepository = array_fill_keys($notFromComposerRepository, true);
         $this->offline = $offline;
         $this->deadline = $deadline;
@@ -124,7 +136,13 @@ final class RepositoryVersions implements VersionSource
 
             return;
         }
+        $hidden = [];
         foreach ($this->repositories as $repository) {
+            if (!self::isRead($repository)) {
+                $hidden += array_filter($pending, fn (string $name): bool => $this->canHide($repository, $name), \ARRAY_FILTER_USE_KEY);
+
+                continue;
+            }
             $tagged = [];
             $listed = [];
             $found = [];
@@ -155,6 +173,7 @@ final class RepositoryVersions implements VersionSource
             $pending = array_diff_key($pending, $found);
         }
         $this->failUnlisted(array_keys(array_diff_key($pending, array_filter($this->loaded))));
+        $this->failures += array_fill_keys(array_keys($hidden), self::SHADOWED);
     }
 
     /** @return list<BasePackage> */
@@ -166,8 +185,14 @@ final class RepositoryVersions implements VersionSource
             return [];
         }
         $failed = false;
+        $hidden = false;
         $loaded = [];
         foreach ($this->repositories as $repository) {
+            if (!self::isRead($repository)) {
+                $hidden = $hidden || $this->canHide($repository, $name);
+
+                continue;
+            }
             $versions = [];
             try {
                 $tags = $repository->loadPackages([$name => null], self::STABLE, []);
@@ -191,7 +216,7 @@ final class RepositoryVersions implements VersionSource
             }
             $loaded = self::withNewVersions($loaded, $versions);
             if (\in_array($name, $found, true)) {
-                return $loaded;
+                return $this->shadowedIf($hidden, $name, $loaded);
             }
         }
         if ($failed) {
@@ -201,6 +226,20 @@ final class RepositoryVersions implements VersionSource
         }
         if ($loaded === []) {
             $this->failUnlisted([$name]);
+        }
+
+        return $this->shadowedIf($hidden, $name, $loaded);
+    }
+
+    /**
+     * @param list<BasePackage> $loaded
+     *
+     * @return list<BasePackage>
+     */
+    private function shadowedIf(bool $hidden, string $name, array $loaded): array
+    {
+        if ($hidden) {
+            $this->failures += [$name => self::SHADOWED];
         }
 
         return $loaded;
@@ -285,6 +324,48 @@ final class RepositoryVersions implements VersionSource
         $this->loaded[$name] = [];
 
         return true;
+    }
+
+    /** Whether the source asks $repository: a Composer, package or path repository, also through its FilterRepository. */
+    private static function isRead(RepositoryInterface $repository): bool
+    {
+        $inner = $repository instanceof FilterRepository ? $repository->getRepository() : $repository;
+
+        return $inner instanceof ComposerRepository || $inner instanceof PackageRepository || $inner instanceof PathRepository;
+    }
+
+    /** A repository URL as the lock and the config compare: no case, no trailing slash, no trailing `.git`. */
+    public static function urlKey(string $url): string
+    {
+        return (string) preg_replace('{/*(?:\.git)?/*$}', '', strtolower($url));
+    }
+
+    /**
+     * Whether a repository that the source does not load serves $name and hides it: the lock
+     * records $name from its URL, the repository is canonical, and its `only` or `exclude` admits
+     * the name. A copy that holds only $name answers with those options, because asking the
+     * repository itself loads it.
+     */
+    private function canHide(RepositoryInterface $repository, string $name): bool
+    {
+        $inner = $repository instanceof FilterRepository ? $repository->getRepository() : $repository;
+        $config = $inner instanceof ConfigurableRepositoryInterface ? $inner->getRepoConfig() : [];
+        $url = $config['url'] ?? null;
+        if (!\is_string($url) || !\in_array($name, $this->served[self::urlKey($url)] ?? [], true)) {
+            return false;
+        }
+        $options = [];
+        foreach (['only', 'exclude'] as $key) {
+            if (isset($config[$key]) && \is_array($config[$key])) {
+                $options[$key] = array_values(array_filter($config[$key], 'is_string'));
+            }
+        }
+        if (\is_bool($config['canonical'] ?? null)) {
+            $options['canonical'] = $config['canonical'];
+        }
+        $probe = new FilterRepository(new ArrayRepository([new CompletePackage($name, '1.0.0.0', '1.0.0')]), $options);
+
+        return $probe->loadPackages([$name => null], self::STABLE, [])['namesFound'] !== [];
     }
 
     private static function base(BasePackage $package): BasePackage

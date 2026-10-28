@@ -1,23 +1,24 @@
 name: Move check oracle
-description: Runs MoveCheckComposerOracleTest on the composer/composer version that train 7d's answers record, where a skip of the test is a failure.
+description: Runs MoveCheckComposerOracleTest once on each composer/composer version that train 7d's answers record, where a version that no world records fails.
 runs:
   using: composite
   steps:
     - uses: shivammathur/setup-php@v2
       with: {php-version: '8.4', coverage: none}
-    # The cases name the version, so a re-recording of the answers moves the pin with them.
-    # display_errors=stderr keeps the refusal of tests/Support/ComposerOracle.php in the log, out of $version.
-    - name: Pin composer/composer to the version of the recorded answers
-      shell: bash
-      run: |
-        version=$(php -d display_errors=stderr -r 'require "tests/Support/ComposerOracle.php"; echo Lockrot\Tests\Support\ComposerOracle::recordedVersion(json_decode((string) file_get_contents("tests/fixtures/flags/cases.json"), true));')
-        echo "The train 7d answers record composer/composer $version." >> "$GITHUB_STEP_SUMMARY"
-        composer require --dev --no-update "composer/composer:$version"
-        # Composer 2.9 and later block a composer/composer release once an advisory names it. The job tests lockrot against that library and never runs it.
-        composer config --json policy.advisories.ignore '["composer/composer"]'
-        composer update --no-interaction --prefer-dist
-    - name: Run the oracle test, where a skip fails
+    # The cases name the versions, so a re-recording of the answers moves the pins with them.
+    # display_errors=stderr keeps the refusal of tests/Support/ComposerOracle.php in the log, out of $versions.
+    # Each run skips the worlds of the other versions and names them. A failed run stops the job.
+    - name: Run the oracle test on each version of the recorded answers
       shell: bash
       env: {LOCKROT_COMPOSER_ORACLE: '1'}
-      # A group that phpunit.xml.dist excludes leaves no test to run: that run must fail too.
-      run: vendor/bin/phpunit --fail-on-empty-test-suite tests/Integration/MoveCheckComposerOracleTest.php
+      run: |
+        versions=$(php -d display_errors=stderr -r 'require "tests/Support/ComposerOracle.php"; echo implode("\n", Lockrot\Tests\Support\ComposerOracle::recordedVersions(json_decode((string) file_get_contents("tests/fixtures/flags/cases.json"), true)));')
+        # Composer 2.9 and later block a composer/composer release once an advisory names it. The job tests lockrot against that library and never runs it.
+        composer config --json policy.advisories.ignore '["composer/composer"]'
+        for version in $versions; do
+          echo "The train 7d answers record composer/composer $version." >> "$GITHUB_STEP_SUMMARY"
+          composer require --dev --no-update "composer/composer:$version"
+          composer update --no-interaction --prefer-dist
+          # A group that phpunit.xml.dist excludes leaves no test to run: that run must fail too.
+          vendor/bin/phpunit --fail-on-empty-test-suite tests/Integration/MoveCheckComposerOracleTest.php
+        done

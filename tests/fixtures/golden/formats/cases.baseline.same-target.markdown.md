@@ -1,6 +1,6 @@
 ### lockrot: 55 of 60 packages flagged — critical 11 · high 21 · medium 16 · low 7
 
-**gate: fails** · --fail-on=high,unchecked · 32 findings fail it (high 31, unchecked 3); 2 reach it and are known to the baseline · target php 8.4 (--target-php)
+**gate: fails** · --fail-on=high,unchecked · 33 findings fail it (high 31, unchecked 4); 1 reaches it and is known to the baseline · target php 8.4 (--target-php)
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|

@@ -343,6 +343,35 @@ final class MoveContractTest extends TestCase
     }
 
     /**
+     * Each listed case has inputs, fields and a reason. The list names exactly the cases whose
+     * `moves` line {@see HydratedCasesMatchTheModelTest::DIFFERENCES} lists with a `next_step` path.
+     */
+    public function testEveryListedDifferenceIsACaseWithInputsInStepWithTheMovesLine(): void
+    {
+        foreach (self::DIFFERENCES as $id => $groups) {
+            self::assertIsArray(CaseHydrator::case((string) $id)['inputs'] ?? null, $id.' has no inputs, so no recording');
+            foreach ($groups as [$fields, $reason]) {
+                self::assertNotSame([], $fields, (string) $id);
+                self::assertNotSame('', $reason, (string) $id);
+            }
+        }
+        $moves = [];
+        foreach (HydratedCasesMatchTheModelTest::DIFFERENCES as $id => $lines) {
+            foreach ($lines['moves'] ?? [] as [$paths]) {
+                if (array_filter($paths, static fn (string $path): bool => strpos($path, 'next_step.') === 0) !== []) {
+                    $moves[] = (string) $id;
+                }
+            }
+        }
+        $moves = array_values(array_unique($moves));
+        $listed = array_map('strval', array_keys(self::DIFFERENCES));
+        sort($moves);
+        sort($listed);
+
+        self::assertSame($moves, $listed, 'list a case whose move differs from the model in both DIFFERENCES');
+    }
+
+    /**
      * The model reference: the analyzer's move on a case's inputs is the case's own move, but for
      * the fields {@see DIFFERENCES} names with its reason.
      *

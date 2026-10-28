@@ -137,9 +137,10 @@ final class Gate
         $counted = array_map(static fn (Term $term): string => $term->flag(), $score->maintenanceTerms());
         $gate = $baseline === null ? null : $baseline->gateScore($score);
         $missing = $finding->checksMissing();
+        // A baseline covers graded findings only, so an entry carried forward for a score-0 one exempts nothing (docs/baseline.md).
         $by = RecordMarks::of(
             $score,
-            $gate,
+            $score->total() === 0 ? null : $gate,
             $baseline === null ? $counted : $baseline->uncoveredFlags(),
             $baseline === null ? $finding->flags()->advisories() : $baseline->unknownAdvisories(),
             $missing,
