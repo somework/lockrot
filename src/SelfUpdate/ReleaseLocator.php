@@ -7,6 +7,7 @@ namespace Lockrot\SelfUpdate;
 use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 use Lockrot\Data\Forge\GitHubApi;
+use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\Exception\ConfigException;
@@ -56,6 +57,7 @@ final class ReleaseLocator
     /**
      * @param string  $trustedKey the fingerprint of the key this archive verifies with
      *                            ({@see SignatureVerifierInterface::keyFingerprint()})
+     * @param ?string $token      sent only when $url is on api.github.com: `LOCKROT_RELEASE_URL` can name any host
      * @param string  $url        the release list, where a page after the first adds `page=N`
      * @param ?string $phpVersion the PHP to choose for as `major.minor.patch`, null for the running one
      */
@@ -69,10 +71,17 @@ final class ReleaseLocator
     ) {
         $this->http = $http;
         $this->trustedKey = $trustedKey;
-        $this->token = $token;
+        $this->token = self::isGitHubApi($url) ? $token : null;
         $this->url = $url;
         $this->currentVersion = $currentVersion;
         $this->phpVersion = $phpVersion ?? \sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION);
+    }
+
+    private static function isGitHubApi(string $url): bool
+    {
+        $parts = RepoLocator::hostAndPath($url);
+
+        return $parts !== null && strtolower($parts[0]) === 'api.github.com';
     }
 
     /** The first number of $version, so all of 0.x is major version 0. */

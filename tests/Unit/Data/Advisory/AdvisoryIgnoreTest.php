@@ -7,11 +7,9 @@ namespace Lockrot\Tests\Unit\Data\Advisory;
 use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Advisory\SecurityAdvisory;
 use Composer\Config;
-use Composer\Policy\AdvisoriesPolicyConfig;
 use Composer\Semver\Constraint\MatchAllConstraint;
 use Lockrot\Data\Advisory\AdvisoryIgnore;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
-use Lockrot\Data\Advisory\AdvisoryPolicyReader;
 use PHPUnit\Framework\TestCase;
 
 final class AdvisoryIgnoreTest extends TestCase
@@ -21,22 +19,12 @@ final class AdvisoryIgnoreTest extends TestCase
 
     protected function setUp(): void
     {
-        if (!class_exists(SecurityAdvisory::class)) {
-            self::markTestSkipped('Composer without the advisory API');
-        }
         $this->composerPolicy = getenv('COMPOSER_POLICY');
     }
 
     protected function tearDown(): void
     {
         putenv($this->composerPolicy === false ? 'COMPOSER_POLICY' : 'COMPOSER_POLICY='.$this->composerPolicy);
-    }
-
-    private static function needsPolicyApi(): void
-    {
-        if (!class_exists(AdvisoriesPolicyConfig::class)) {
-            self::markTestSkipped('Composer without the policy API (2.10 and later)');
-        }
     }
 
     private function full(string $id, ?string $cve, ?string $severity, string $remoteId = 'GHSA-remote', string $package = 'vendor/pkg'): SecurityAdvisory
@@ -124,7 +112,6 @@ final class AdvisoryIgnoreTest extends TestCase
     /** What phpmyadmin's composer.json does: `config.policy.advisories.ignore-id`. */
     public function testThePolicyListsKeepTheirReasonsAndSayPolicyAdvisories(): void
     {
-        self::needsPolicyApi();
         $ignore = self::read(['policy' => ['advisories' => [
             'ignore-id' => ['PKSA-policy' => 'reviewed'],
             'ignore' => ['other/pkg' => 'not shipped', 'wild/*' => 'a pattern'],
@@ -141,7 +128,6 @@ final class AdvisoryIgnoreTest extends TestCase
 
     public function testAProjectStillOnAuditIgnoreSaysAuditIgnoreUnder210(): void
     {
-        self::needsPolicyApi();
         $ignore = self::read(['audit' => ['ignore' => ['CVE-2024-0001' => 'accepted', 'PKSA-block' => ['apply' => 'block']], 'ignore-severity' => ['low']]]);
 
         self::assertSame([AdvisoryIgnoreMatch::CVE, 'CVE-2024-0001', 'accepted', AdvisoryIgnoreMatch::BY_AUDIT], self::record($ignore->match('vendor/pkg', $this->full('PKSA-9', 'CVE-2024-0001', null))));
@@ -152,7 +138,6 @@ final class AdvisoryIgnoreTest extends TestCase
     /** The advisory list is read on its own, so another section Composer rejects cannot empty it. */
     public function testABrokenMalwareSectionOrAReservedListNameDoesNotEmptyTheList(): void
     {
-        self::needsPolicyApi();
         foreach ([
             'a broken malware section' => ['malware' => ['ignore' => ['vendor/x' => 42]]],
             'a reserved custom list name' => ['licenses' => ['allow' => ['MIT']]],
@@ -166,7 +151,6 @@ final class AdvisoryIgnoreTest extends TestCase
 
     public function testAnAdvisoryListComposerRejectsIgnoresNothingAndSaysWhy(): void
     {
-        self::needsPolicyApi();
 
         $ignore = self::read(['policy' => ['advisories' => ['ignore' => ['vendor/pkg' => 42]]]]);
 
@@ -184,7 +168,6 @@ final class AdvisoryIgnoreTest extends TestCase
      */
     public function testARealComposerConfigReadsTheListWithoutANote(): void
     {
-        self::needsPolicyApi();
         $advisory = $this->full('PKSA-9', 'CVE-2024-0001', null);
 
         $none = AdvisoryIgnore::fromConfig(new Config(false));
@@ -202,7 +185,6 @@ final class AdvisoryIgnoreTest extends TestCase
 
     public function testComposerPolicyZeroTurnsTheLookupOffAndNamesTheVariable(): void
     {
-        self::needsPolicyApi();
         putenv('COMPOSER_POLICY=0');
 
         $ignore = self::read(['audit' => ['ignore' => ['CVE-2024-0001']]]);
@@ -214,7 +196,6 @@ final class AdvisoryIgnoreTest extends TestCase
 
     public function testThePolicyTurnsAdvisoriesOffByItsKeysAndNeverByTheAuditMode(): void
     {
-        self::needsPolicyApi();
 
         self::assertSame(['policy_key' => 'policy', 'value' => false], self::read(['policy' => false])->disabledBy());
         self::assertSame(['policy_key' => 'policy.advisories', 'value' => false], self::read(['policy' => ['advisories' => false]])->disabledBy());
@@ -225,122 +206,5 @@ final class AdvisoryIgnoreTest extends TestCase
         self::assertNull(self::read(['policy' => false, 'audit' => ['ignore' => ['PKSA-1']]])->match('vendor/pkg', $this->full('PKSA-1', null, null)), 'policy: false gives Composer no list');
         self::assertNull(self::read(['policy' => false])->whyUnreadable());
         self::assertNull(self::read(['policy' => ['abandoned' => false]])->disabledBy(), 'another list off');
-    }
-
-    /**
-     * @param AdvisoryPolicyReader::POLICY|AdvisoryPolicyReader::AUDIT_CONFIG|AdvisoryPolicyReader::AUDIT_SECTION|AdvisoryPolicyReader::AUDIT_IGNORE|AdvisoryPolicyReader::NONE $api
-     * @param array{list: array<string, ?string>, severities: array<string, ?string>}|\Throwable          $lists what Composer 2.9's AuditConfig holds for audit
-     */
-    private static function reader(string $api, $lists): AdvisoryPolicyReader
-    {
-        return new class ($api, $lists) implements AdvisoryPolicyReader {
-            /** @var AdvisoryPolicyReader::POLICY|AdvisoryPolicyReader::AUDIT_CONFIG|AdvisoryPolicyReader::AUDIT_SECTION|AdvisoryPolicyReader::AUDIT_IGNORE|AdvisoryPolicyReader::NONE */
-            private string $api;
-            /** @var array{list: array<string, ?string>, severities: array<string, ?string>}|\Throwable */
-            private $lists;
-
-            /**
-             * @param AdvisoryPolicyReader::POLICY|AdvisoryPolicyReader::AUDIT_CONFIG|AdvisoryPolicyReader::AUDIT_SECTION|AdvisoryPolicyReader::AUDIT_IGNORE|AdvisoryPolicyReader::NONE $api
-             * @param array{list: array<string, ?string>, severities: array<string, ?string>}|\Throwable $lists
-             */
-            public function __construct(string $api, $lists)
-            {
-                $this->api = $api;
-                $this->lists = $lists;
-            }
-
-            public function api(): string
-            {
-                return $this->api;
-            }
-
-            public function policy(array $policy, array $audit): array
-            {
-                throw new \LogicException('not the policy API');
-            }
-
-            public function auditConfig(Config $config): array
-            {
-                if ($this->lists instanceof \Throwable) {
-                    throw $this->lists;
-                }
-
-                return $this->lists;
-            }
-        };
-    }
-
-    public function testComposer29ReadsTheAuditListsAuditConfigKeeps(): void
-    {
-        $ignore = AdvisoryIgnore::fromConfig(new Config(false), self::reader(AdvisoryPolicyReader::AUDIT_CONFIG, ['list' => ['PKSA-1' => 'reviewed', 'vendor/pkg' => null], 'severities' => ['low' => null]]));
-
-        self::assertSame([AdvisoryIgnoreMatch::ID, 'PKSA-1', 'reviewed', AdvisoryIgnoreMatch::BY_AUDIT], self::record($ignore->match('other/pkg', $this->full('PKSA-1', null, null, 'GHSA-x', 'other/pkg'))));
-        self::assertSame(AdvisoryIgnoreMatch::PACKAGE, self::record($ignore->match('vendor/pkg', $this->full('PKSA-2', null, null)))[0] ?? null);
-        self::assertSame([AdvisoryIgnoreMatch::SEVERITY, 'low', null, AdvisoryIgnoreMatch::BY_AUDIT_SEVERITY], self::record($ignore->match('other/pkg', $this->full('PKSA-2', null, 'low', 'GHSA-x', 'other/pkg'))));
-        self::assertNull($ignore->disabledBy());
-    }
-
-    public function testComposer29RejectingTheListIgnoresNothingAndSaysWhy(): void
-    {
-        $ignore = AdvisoryIgnore::fromConfig(new Config(false), self::reader(AdvisoryPolicyReader::AUDIT_CONFIG, new \InvalidArgumentException("Invalid 'apply' value\nmore")));
-
-        self::assertNull($ignore->match('vendor/pkg', $this->full('PKSA-1', null, null)));
-        self::assertSame("Invalid 'apply' value", $ignore->whyUnreadable());
-    }
-
-    /** Composer 2.9.0 and 2.9.1 read `audit.ignore` and `audit.ignore-severity` raw, and match no package name. */
-    public function testComposer290ReadsTheRawAuditSectionWithoutPackageNames(): void
-    {
-        $config = new Config(false);
-        $config->merge(['config' => ['audit' => ['ignore' => ['PKSA-1' => 'reviewed', 'vendor/pkg' => 'a package'], 'ignore-severity' => ['low']]]]);
-
-        $ignore = AdvisoryIgnore::fromConfig($config, self::reader(AdvisoryPolicyReader::AUDIT_SECTION, new \LogicException('never asked')));
-
-        self::assertSame([AdvisoryIgnoreMatch::ID, 'PKSA-1', 'reviewed', AdvisoryIgnoreMatch::BY_AUDIT], self::record($ignore->match('vendor/pkg', $this->full('PKSA-1', null, null))));
-        self::assertSame(AdvisoryIgnoreMatch::SEVERITY, self::record($ignore->match('vendor/pkg', $this->full('PKSA-2', null, 'low')))[0] ?? null);
-        self::assertNull($ignore->match('vendor/pkg', $this->full('PKSA-2', null, 'high')), 'a package name ignores nothing there');
-        self::assertNull($ignore->whyUnreadable());
-    }
-
-    /** Composer 2.6 to 2.8 read only `audit.ignore`: no severity list, no package name. */
-    public function testComposer26To28ReadsOnlyAuditIgnore(): void
-    {
-        $config = new Config(false);
-        $config->merge(['config' => ['audit' => ['ignore' => ['CVE-2024-0001', 'vendor/pkg'], 'ignore-severity' => ['low']]]]);
-
-        $ignore = AdvisoryIgnore::fromConfig($config, self::reader(AdvisoryPolicyReader::AUDIT_IGNORE, new \LogicException('never asked')));
-
-        self::assertSame(AdvisoryIgnoreMatch::CVE, self::record($ignore->match('vendor/pkg', $this->full('PKSA-2', 'CVE-2024-0001', null)))[0] ?? null);
-        self::assertNull($ignore->match('vendor/pkg', $this->full('PKSA-2', null, 'low')));
-    }
-
-    public function testComposer24And25IgnoreNothing(): void
-    {
-        $config = new Config(false);
-        $config->merge(['config' => ['audit' => ['ignore' => ['CVE-2024-0001']]]]);
-
-        $ignore = AdvisoryIgnore::fromConfig($config, self::reader(AdvisoryPolicyReader::NONE, new \LogicException('never asked')));
-
-        self::assertNull($ignore->match('vendor/pkg', $this->full('PKSA-2', 'CVE-2024-0001', null)));
-    }
-
-    /** Composer 2.6 to 2.9.1 take the keys of a map and the values of a list, never both. */
-    public function testARawListIsReadWholeAsComposerReadsIt(): void
-    {
-        $config = new Config(false);
-        $config->merge(['config' => ['audit' => ['ignore' => ['CVE-2024-0001', 'CVE-2024-0002' => 'reviewed'], 'ignore-severity' => ['low', ['apply' => 'audit'], 'medium']]]]);
-
-        $ignore = AdvisoryIgnore::fromConfig($config, self::reader(AdvisoryPolicyReader::AUDIT_IGNORE, new \LogicException('never asked')));
-
-        self::assertNull($ignore->match('vendor/pkg', $this->full('PKSA-2', 'CVE-2024-0001', null)), 'an int key inside a map is no id');
-        self::assertNotNull($ignore->match('vendor/pkg', $this->full('PKSA-3', 'CVE-2024-0002', null)));
-
-        $section = AdvisoryIgnore::fromConfig($config, self::reader(AdvisoryPolicyReader::AUDIT_SECTION, new \LogicException('never asked')));
-        self::assertSame(AdvisoryIgnoreMatch::SEVERITY, self::record($section->match('vendor/pkg', $this->full('PKSA-4', null, 'low')))[0] ?? null, 'a severity list keeps its strings, and an object in it is no severity');
-        self::assertNotNull($section->match('vendor/pkg', $this->full('PKSA-5', null, 'medium')));
-
-        $list = new Config(false);
-        $list->merge(['config' => ['audit' => ['ignore' => ['CVE-2024-0001', ['apply' => 'audit']]]]]);
-        self::assertNotNull(AdvisoryIgnore::fromConfig($list, self::reader(AdvisoryPolicyReader::AUDIT_IGNORE, new \LogicException('never asked')))->match('vendor/pkg', $this->full('PKSA-2', 'CVE-2024-0001', null)), 'an object in a list is no id');
     }
 }

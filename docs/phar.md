@@ -156,6 +156,10 @@ image `ghcr.io/somework/lockrot`. Its README says how to verify the image.
   value with `=` (`--output=json:r.json`). With a space and no command name before it, the PHAR
   reads the value as a command name and the run exits `1`. `-d <dir>` takes a space.
 
+- **Process setup.** The PHAR sets up its process as `composer` does. It restarts without Xdebug,
+  writes PHP errors to stderr, uses the C locale and reads `COMPOSER_MEMORY_LIMIT`. To keep Xdebug,
+  for example to step through lockrot, set `COMPOSER_ALLOW_XDEBUG=1`.
+
 - **`COMPOSER`.** Honoured as Composer honours it: `COMPOSER=alt.json php lockrot.phar` reads
   `alt.json` and `alt.lock` ([Environment overrides](configuration.md#environment-overrides)).
 

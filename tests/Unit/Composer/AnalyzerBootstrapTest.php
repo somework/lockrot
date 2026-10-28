@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Composer;
 
 use Composer\Config;
+use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
 use Composer\IO\NullIO;
 use Lockrot\Allowlist\Allowlist;
@@ -17,6 +18,7 @@ use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
 use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
@@ -27,6 +29,7 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class AnalyzerBootstrapTest extends TestCase
 {
@@ -115,5 +118,60 @@ final class AnalyzerBootstrapTest extends TestCase
         AnalyzerBootstrap::create($factory, new NullIO(), new Config(false, sys_get_temp_dir()), [], ProjectConfig::empty(), $lockrot, [], $deadline);
 
         self::assertSame($deadline, $recorded);
+    }
+
+    /** A GitHub Enterprise Server runner's token stays home: the run is anonymous on github.com. */
+    public function testAnInstanceTokenIsNotPassedOnForGithubCom(): void
+    {
+        $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
+        $seen = null;
+        $factory = function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline) use (&$seen): Analyzer {
+            $seen = $tokens;
+
+            return $this->baseAnalyzer($clock, $lockrot);
+        };
+        $env = ['GITHUB_TOKEN' => 'ghs_instance', 'GITHUB_SERVER_URL' => 'https://ghes.example.com'];
+
+        AnalyzerBootstrap::create($factory, new NullIO(), new Config(false, sys_get_temp_dir()), [], ProjectConfig::empty(), $lockrot, $env, Deadline::never());
+
+        self::assertInstanceOf(Tokens::class, $seen);
+        $auth = ForgeAuth::withTokens($seen);
+        $github = new RepoRef(RepoRef::GITHUB, 'github.com', 'o/r');
+        self::assertNull($auth->tokenFor($github));
+        self::assertFalse($auth->isAuthenticated($github), 'the planner caps the run as anonymous');
+    }
+
+    public function testEachWithheldTokenWritesOneLineAtVerbose(): void
+    {
+        $env = ['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => "https://ghes.example.com", 'GITLAB_TOKEN' => 'g', 'GITLAB_HOST' => 'gitlab.example.com'];
+
+        self::assertSame(
+            "lockrot: GITHUB_TOKEN is for ghes.example.com, so lockrot does not send it to github.com. Set LOCKROT_GITHUB_TOKEN to a github.com token.\n"
+            ."lockrot: GITLAB_TOKEN is for gitlab.example.com, so lockrot does not send it to gitlab.com. Set LOCKROT_GITLAB_TOKEN to a gitlab.com token.\n",
+            $this->stderrOf($env, OutputInterface::VERBOSITY_VERBOSE)
+        );
+        self::assertSame('', $this->stderrOf($env, OutputInterface::VERBOSITY_NORMAL));
+        self::assertSame('', $this->stderrOf(['GITHUB_TOKEN' => 'b'], OutputInterface::VERBOSITY_VERBOSE));
+    }
+
+    /** An issuer that does not parse is named by its raw value, which can carry a terminal escape. */
+    public function testAWithheldIssuerIsNeutralised(): void
+    {
+        $stderr = $this->stderrOf(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => "https://?\x1b]8;;"], OutputInterface::VERBOSITY_VERBOSE);
+
+        self::assertStringNotContainsString("\x1b", $stderr);
+        self::assertStringContainsString('https://?\\x1B]8;;', $stderr);
+    }
+
+    /** @param array<string, string> $env */
+    private function stderrOf(array $env, int $verbosity): string
+    {
+        $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
+        $factory = fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline): Analyzer => $this->baseAnalyzer($clock, $lockrot);
+        $io = new BufferIO('', $verbosity);
+
+        AnalyzerBootstrap::create($factory, $io, new Config(false, sys_get_temp_dir()), [], ProjectConfig::empty(), $lockrot, $env, Deadline::never());
+
+        return $io->getOutput();
     }
 }

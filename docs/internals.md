@@ -17,8 +17,8 @@ For a missing or wrong date, start at
 | Source | What lockrot asks | Credentials | Without credentials | Cache |
 |---|---|---|---|---|
 | Composer repositories: Packagist, Private Packagist, Satis, mirrors | Metadata: abandoned flag, versions, release dates (S1, S2, S6, S8). The releases S9 looks in for a fix. Advisories on the installed version (S9) | Composer's own, from `auth.json` or `COMPOSER_AUTH` | What the repository serves anonymously | Composer's |
-| GitHub, `api.github.com` | Archived flag (S3), last push to any branch (S4) | `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN`, else Composer's `github-oauth`. Any other Composer credential for github.com counts too | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
-| GitLab: gitlab.com and every host in Composer's `gitlab-domains` | Newest commit on any branch (S4). Archived flag (S3) with credentials only | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN`, for gitlab.com only. Any Composer credential for the host, such as `gitlab-token` | Every package, but the archived flag is hidden, so S3 cannot fire | lockrot's, 24 h |
+| GitHub, `api.github.com` | Archived flag (S3), last push to any branch (S4) | `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` when github.com issued it, else Composer's `github-oauth`. Any other Composer credential for github.com counts too | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
+| GitLab: gitlab.com and every host in Composer's `gitlab-domains` | Newest commit on any branch (S4). Archived flag (S3) with credentials only | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` when gitlab.com issued it, for gitlab.com only. Any Composer credential for the host, such as `gitlab-token` | Every package, but the archived flag is hidden, so S3 cannot fire | lockrot's, 24 h |
 | Bitbucket Cloud, `api.bitbucket.org` | Newest commit on any branch (S4). Bitbucket has no archived state | Composer's `http-basic` (an Atlassian API token), `bearer` or `bitbucket-oauth` | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
 
 - A candidate has [S2](verdicts.md#the-signals) and no S1. A package with no dated release is
@@ -83,11 +83,23 @@ carries `User-Agent: lockrot`.
 
 - When both exist, lockrot sends only Composer's header.
 
+- A token goes only to the host that issued it. `GITHUB_TOKEN` counts only when
+  `GITHUB_SERVER_URL` is unset, empty or names github.com. `GITLAB_TOKEN` counts only when each of
+  `CI_SERVER_URL` and `GITLAB_HOST` is unset, empty or names gitlab.com. A port counts as part of
+  the host. So on GitHub Enterprise Server, GHE.com, Gitea or Forgejo Actions, or self-managed
+  GitLab CI, lockrot does not send the runner's token to the public host. It goes on to the next
+  source, and `-v` prints one line for each token that it does not send. `LOCKROT_GITHUB_TOKEN` and
+  `LOCKROT_GITLAB_TOKEN` always count, because they name the public host.
+
+- lockrot cannot keep Composer's own credentials from a host. A setup step that writes the
+  runner's token into Composer's `github-oauth` for github.com makes Composer send it to
+  api.github.com.
+
 - Exception: Composer's entry for the host can be a client certificate, or custom headers without a
   credential header. Then Composer adds no credential header, and lockrot sends its own.
 
 - When a host redirects to another origin, lockrot asks that origin again without its own header.
-  Where Composer cannot stop a redirect (below 2.10, or without the curl extension), lockrot
+  Where Composer cannot stop a redirect (without the curl extension), lockrot
   follows each same-origin redirect of a request with its header itself.
 
 - Where Composer cannot stop a redirect, lockrot sends the requests with its header one at a time,
@@ -100,8 +112,8 @@ carries `User-Agent: lockrot`.
   exchange fails, `-v` prints why, the run counts as anonymous on Bitbucket, and the refused
   requests appear in the [Unreachable](notes.md#repository_activity_unreachable) note.
 
-`self-update` sends the same GitHub token to GitHub's release API
-([Keeping it updated](phar.md#keeping-it-updated)).
+`self-update` sends the same GitHub token to GitHub's release API, and to no other host that
+`LOCKROT_RELEASE_URL` names ([Keeping it updated](phar.md#keeping-it-updated)).
 
 ### What a token adds {#what-a-token-adds}
 

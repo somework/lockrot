@@ -22,6 +22,12 @@ on repository-activity checks
 ([Repository hosts and credentials](internals.md#repository-hosts-and-credentials)).
 Without the plugin installed, run the PHAR instead ([phar.md](phar.md#in-ci)).
 
+On GitHub Enterprise Server, GHE.com, or Gitea or Forgejo Actions, the runner's `GITHUB_TOKEN` is
+not a github.com token, and lockrot does not send it there. Set `LOCKROT_GITHUB_TOKEN` to a
+github.com token instead. Keep the runner's token out of Composer's `github-oauth` for github.com.
+When lockrot runs in a container, pass `-e GITHUB_SERVER_URL` with `-e GITHUB_TOKEN`
+([Which credentials](internals.md#which-credentials)).
+
 `--fail-on` takes a comma-separated list, at most one value of each kind. A finding fails the run
 when it reaches any value of the list:
 
