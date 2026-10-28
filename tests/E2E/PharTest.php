@@ -157,8 +157,8 @@ final class PharTest extends TestCase
     }
 
     /**
-     * bin/lockrot omits Composer's SAPI check because Box's requirement checker stops the archive
-     * first. On a web SAPI with register_argc_argv=On, a query string can set the command line.
+     * Box's requirement checker stops the archive before the SAPI guard of bin/lockrot runs. On a web
+     * SAPI with register_argc_argv=On, a query string can set the command line.
      */
     public function testTheArchiveDoesNotRunOnAWebSapiThatReadsArgvFromTheQueryString(): void
     {

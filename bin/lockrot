@@ -3,6 +3,18 @@
 
 declare(strict_types=1);
 
+// Composer's SAPI guard of bin/composer. Box's requirement checker stops the archive first, but
+// nothing stops the source script: on a web SAPI with register_argc_argv=On, a query string sets the
+// command line.
+if (\PHP_SAPI !== 'cli' && \PHP_SAPI !== 'phpdbg') {
+    if ((bool) \ini_get('register_argc_argv')) {
+        echo 'lockrot cannot run safely on a non-CLI SAPI with register_argc_argv=On. Aborting.'.\PHP_EOL;
+        exit(1);
+    }
+
+    echo 'Warning: run lockrot with the CLI version of PHP, not the '.\PHP_SAPI.' SAPI'.\PHP_EOL;
+}
+
 // The floor of composer.json and of build/phar/composer.json: an older PHP prints one line instead
 // of a parse error, as the PHAR does.
 if (\PHP_VERSION_ID < 70400) {
@@ -26,10 +38,20 @@ if (!class_exists(\Composer\Console\Application::class)) {
     exit(2);
 }
 
+// The floor of LockrotPlugin. The source script runs on the host project's composer/composer, which
+// can be older, and then a Composer method that lockrot calls is a fatal error. A source checkout of
+// Composer reports its branch, such as `2.10-dev+source`, so only the minor counts.
+preg_match('/^\d+\.\d+/', \Composer\Composer::getVersion(), $lockrotComposerMinor);
+if (version_compare($lockrotComposerMinor[0] ?? '0', '2.10', '<')) {
+    fwrite(\STDERR, 'lockrot requires Composer 2.10 or newer, not '.\Composer\Composer::getVersion()."\n");
+    exit(1);
+}
+unset($lockrotComposerMinor);
+
 // The process setup of Composer's bin/composer, which the plugin path inherits from `composer`. The
 // restart without Xdebug follows Composer's switch: COMPOSER_ALLOW_XDEBUG=1 keeps Xdebug. Omitted:
-// the SAPI, PHP, HHVM and iconv checks (the floor check and Box's requirement checker cover them),
-// the opcache-preload hint (cosmetic), COMPOSER_BINARY (lockrot runs no scripts), and
+// the PHP check (the floor check covers it), the HHVM and iconv checks (Box's requirement checker
+// covers them in the archive), the opcache-preload hint (cosmetic), COMPOSER_BINARY (lockrot runs no scripts), and
 // error_reporting with ErrorHandler (Application::doRun() registers the handler). Without the
 // memory_limit step, the PHAR runs out of memory on a large lock at the default limit of PHP.
 setlocale(\LC_ALL, 'C');
