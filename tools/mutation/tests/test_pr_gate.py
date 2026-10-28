@@ -245,6 +245,14 @@ class ShardMode(Gate):
     def test_report_only_still_stops_on_an_unreadable_log(self):
         self.assertEqual(2, self.run_gate(['{}'], '', ('--report-only',))[0])
 
+    def test_paths_keep_only_the_mutants_of_their_files(self):
+        self.assertEqual(0, self.run_gate([log((7, 'Plus', PLUS))], '', ('--paths', 'src/Signal/Other.php'))[0])
+        self.assertEqual(1, self.run_gate([log((7, 'Plus', PLUS))], '', ('--paths', 'src/Signal/Openness.php'))[0])
+
+    def test_paths_leave_the_whole_count_check_to_shard_mode(self):
+        ledger = '- `src/Signal/Openness.php` NotCovered x2 `' + PLUS + '` -- why.\n'
+        self.assertEqual(0, self.run_gate([log(uncovered=[(7, 'Plus', PLUS)])], ledger, ('--paths', 'src/Signal'))[0])
+
     def test_an_unknown_option_is_an_error(self):
         self.assertEqual(2, self.run_gate([log()], '', ('--full',))[0])
 
