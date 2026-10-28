@@ -203,7 +203,7 @@ final class RunNote
     }
 
     /**
-     * Information only: the setting stops Composer's own advisory warnings, and lockrot still asks.
+     * Information only: the setting stops Composer's own advisory blocking, and lockrot still asks.
      *
      * @param string      $policyKey the setting: `policy`, `policy.advisories` or `COMPOSER_POLICY`
      * @param bool|string $value     its value
@@ -212,7 +212,7 @@ final class RunNote
     {
         return self::of(
             self::ADVISORIES_DISABLED_BY_POLICY,
-            \sprintf("security advisories still checked: Composer's policy (%s: %s) stops Composer from warning about them", $policyKey, \is_bool($value) ? var_export($value, true) : $value),
+            \sprintf("security advisories still checked: Composer's policy (%s: %s) stops Composer from blocking them", $policyKey, \is_bool($value) ? var_export($value, true) : $value),
             false,
             ['policy_key' => $policyKey, 'value' => $value]
         );

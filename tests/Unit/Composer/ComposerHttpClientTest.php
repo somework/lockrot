@@ -481,7 +481,7 @@ final class ComposerHttpClientTest extends TestCase
     private static function skipBelowComposer210(): void
     {
         if (!ComposerHttpClient::refusesRedirects(Composer::getVersion(), true)) {
-            self::markTestSkipped('Composer 2.10 or later: an older Composer replays the headers (docs/internals.md#which-credentials)');
+            self::markTestSkipped('Composer 2.10 or later with curl: lockrot follows each redirect of an older Composer itself (ComposerHttpClientRedirectTest, OnAnyComposer)');
         }
     }
 }
