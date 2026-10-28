@@ -512,6 +512,34 @@ final class RunNote
         ), false, ['left_out' => $leftOut, 'problem' => $problem]);
     }
 
+    /**
+     * D9: the members of `security.update_now` that the combined command leaves out, because its
+     * solve keeps a member that the line lists plain below its fix, and those that a refusal names.
+     *
+     * @param list<string>                             $leftOut in report order
+     * @param non-empty-array<string, array{string, string}> $below   name => [the release that it gets, its fix]
+     * @param string|null                              $problem the refusal's problem text, null without a refusal
+     */
+    public static function updateNowBelowFix(array $leftOut, array $below, ?string $problem): self
+    {
+        $gets = [];
+        foreach ($below as $name => [$release, $fix]) {
+            $gets[] = \sprintf('%s gets %s, below %s', $name, $release, $fix);
+        }
+        $refused = array_values(array_diff($leftOut, array_keys($below)));
+        $text = \sprintf(
+            'update now: the command leaves out %s, because the solve of the line keeps %s below its fix: %s',
+            implode(', ', $leftOut),
+            $refused === [] && \count($below) === 1 ? 'it' : implode(', ', array_keys($below)),
+            implode('; ', $gets)
+        );
+        if ($problem !== null && $refused !== []) {
+            $text .= \sprintf("; Composer's solver refuses %s together with the others: %s", implode(', ', $refused), self::causeOfFirstProblem($problem));
+        }
+
+        return self::of(self::UPDATE_NOW_REDUCED, $text, false, ['left_out' => $leftOut, 'problem' => $problem ?? implode('; ', $gets)]);
+    }
+
     /** D9: Composer refuses the members of `security.update_now` together, so the report writes no command. */
     public static function updateNowRefused(string $problem): self
     {

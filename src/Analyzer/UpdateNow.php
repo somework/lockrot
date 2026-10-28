@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Composer\Semver\Comparator;
+use Lockrot\Solver\CheckOutcome;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Verdict\CommandArgument;
 use Lockrot\Verdict\Finding;
@@ -48,8 +50,12 @@ final class UpdateNow
             $move = $finding->nextStep();
             $check = $move === null ? null : $move->check();
             if ($finding->securityStanding()->isVulnerable() && $move !== null && $move->kind() === Move::UPDATE && $move->movesWith() === [] && $check !== null && $check->isResolved() && $check->form() === MoveCheck::INLINE) {
-                // Composer 2.2 and 2.3 list a package that composer.json does not require plain, and the check solves the line as printed.
-                $inline[$finding->package()] = $checks->writesInline($finding->isDirect() || $finding->namedIn() !== []) ? '^'.ltrim((string) $move->version(), 'vV') : '';
+                // On Composer 2.2 and 2.3, lockrot lists a package that composer.json does not require plain, and the check solves the line as printed.
+                $constraint = $checks->writesInline($finding->isDirect() || $finding->namedIn() !== []) ? '^'.ltrim((string) $move->version(), 'vV') : '';
+                // A plain name has no constraint that holds it at its fix.
+                if ($constraint !== '' || $check->installsBelow((string) $move->version()) === null) {
+                    $inline[$finding->package()] = $constraint;
+                }
             }
         }
         $members = array_keys($inline);
@@ -58,7 +64,7 @@ final class UpdateNow
         }
         $outcome = $checks->checker()->combined($inline);
         if ($outcome->check()->isResolved()) {
-            return self::resolved($inline, $findings, null);
+            return self::reachingTheFix($inline, $outcome, $findings, $checks, null);
         }
         if (!$outcome->check()->isRefused()) {
             return new self([], null, RunNote::updateNowNotChecked((string) $outcome->check()->reason(), $members));
@@ -71,13 +77,101 @@ final class UpdateNow
         $kept = array_diff_key($inline, array_flip(array_filter($named, 'is_string')));
         $retry = $kept === [] || $kept === $inline ? null : $checks->checker()->combined($kept);
         if ($retry !== null && $retry->check()->isResolved()) {
-            return self::resolved($kept, $findings, RunNote::updateNowReduced(array_keys(array_diff_key($inline, $kept)), (string) $outcome->problem()));
+            return self::reachingTheFix($kept, $retry, $findings, $checks, [array_keys(array_diff_key($inline, $kept)), (string) $outcome->problem()]);
         }
         if ($retry !== null && !$retry->check()->isRefused()) {
             return new self([], null, RunNote::updateNowNotChecked((string) $retry->check()->reason(), $members));
         }
 
         return new self([], null, RunNote::updateNowRefused((string) ($retry === null ? $outcome->problem() : $retry->problem())));
+    }
+
+    /**
+     * A plain name has no constraint that holds it at its fix, so a resolving solve can keep it
+     * below its move version. Such a member is left out, and the rest is asked once more, until the
+     * solve installs each member at its fix.
+     *
+     * @param array<string, string>           $inline
+     * @param list<Finding>                   $findings
+     * @param array{list<string>, string}|null $refused the members that a refusal left out, and its problem
+     */
+    private static function reachingTheFix(array $inline, CheckOutcome $outcome, array $findings, MoveChecks $checks, ?array $refused): self
+    {
+        $below = [];
+        $asked = $inline;
+        // Each pass leaves out at least one member, so the loop ends.
+        while (($short = self::belowTheFix($asked, $outcome->changes(), $findings)) !== []) {
+            $below += $short;
+            $asked = array_diff_key($asked, $short);
+            if ($asked === []) {
+                return new self([], null, self::belowNote($below, $findings, $refused));
+            }
+            $outcome = $checks->checker()->combined($asked);
+            if ($outcome->check()->isRefused()) {
+                return new self([], null, RunNote::updateNowRefused((string) $outcome->problem()));
+            }
+            if (!$outcome->check()->isResolved()) {
+                return new self([], null, RunNote::updateNowNotChecked((string) $outcome->check()->reason(), array_keys($inline)));
+            }
+        }
+        if ($below === []) {
+            return self::resolved($asked, $findings, $refused === null ? null : RunNote::updateNowReduced($refused[0], $refused[1]));
+        }
+
+        return self::resolved($asked, $findings, self::belowNote($below, $findings, $refused));
+    }
+
+    /**
+     * @param array<string, string> $inline
+     * @param array<string, string> $changes the release of each name that the solve changes
+     * @param list<Finding>         $findings
+     *
+     * @return array<string, array{string, string}> each plain member that the solve keeps below its move version => [the release that it gets, its move version]
+     */
+    private static function belowTheFix(array $inline, array $changes, array $findings): array
+    {
+        $below = [];
+        foreach ($findings as $finding) {
+            $move = $finding->nextStep();
+            $package = $finding->package();
+            if (($inline[$package] ?? null) !== '' || $move === null) {
+                continue;
+            }
+            $gets = $changes[$package] ?? $finding->version();
+            if (Comparator::lessThan($gets, (string) $move->version())) {
+                $below[$package] = [$gets, (string) $move->version()];
+            }
+        }
+
+        return $below;
+    }
+
+    /**
+     * @param non-empty-array<string, array{string, string}> $below
+     * @param list<Finding>                                  $findings
+     * @param array{list<string>, string}|null               $refused
+     */
+    private static function belowNote(array $below, array $findings, ?array $refused): RunNote
+    {
+        return RunNote::updateNowBelowFix(self::inReportOrder(array_merge($refused[0] ?? [], array_keys($below)), $findings), $below, $refused[1] ?? null);
+    }
+
+    /**
+     * @param list<string>  $names
+     * @param list<Finding> $findings
+     *
+     * @return list<string>
+     */
+    private static function inReportOrder(array $names, array $findings): array
+    {
+        $ordered = [];
+        foreach ($findings as $finding) {
+            if (\in_array($finding->package(), $names, true)) {
+                $ordered[] = $finding->package();
+            }
+        }
+
+        return $ordered;
     }
 
     /**
