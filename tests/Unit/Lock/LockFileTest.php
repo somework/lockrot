@@ -454,8 +454,6 @@ final class LockFileTest extends TestCase
         yield 'string platform-dev' => [['packages' => [], 'platform-dev' => 'x'], 'alt.lock: platform-dev must be an object'];
         yield 'string platform-overrides' => [['packages' => [], 'platform-overrides' => 'x'], 'alt.lock: platform-overrides must be an object'];
         yield 'number as platform override' => [['packages' => [], 'platform-overrides' => ['php' => 8.1]], 'alt.lock: platform-overrides cannot be loaded: '];
-        yield 'platform constraint that Composer cannot parse' => [['packages' => [], 'platform' => ['php' => 'not a constraint !!']], 'alt.lock: platform cannot be loaded: '];
-        yield 'platform-dev constraint that Composer cannot parse' => [['packages' => [], 'platform-dev' => ['ext-json' => '>= ~']], 'alt.lock: platform-dev cannot be loaded: '];
         yield 'override of a package that is not a platform package' => [['packages' => [], 'platform-overrides' => ['foo/bar' => '1.0']], 'alt.lock: platform-overrides cannot be loaded: foo/bar is no platform package'];
         yield 'php override false' => [['packages' => [], 'platform-overrides' => ['php' => false]], 'alt.lock: platform-overrides cannot be loaded: '];
         yield 'string aliases' => [['packages' => [], 'aliases' => 'x'], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
@@ -577,33 +575,20 @@ final class LockFileTest extends TestCase
         self::assertCount(1, $lock->lockedRepository()->getPackages());
     }
 
-    /** @return iterable<string, array{0: array<string, mixed>, 1: string}> */
-    public static function platformDataThatComposerRefuses(): iterable
-    {
-        yield 'a php override of false' => [['packages' => [], 'platform-overrides' => ['php' => false]], 'alt.lock: platform-overrides cannot be loaded: '];
-        yield 'a platform constraint that Composer cannot parse' => [['packages' => [], 'platform' => ['php' => 'not a constraint !!']], 'alt.lock: platform cannot be loaded: '];
-    }
-
-    /**
-     * @dataProvider platformDataThatComposerRefuses
-     *
-     * @param array<string, mixed> $lock
-     */
-    #[DataProvider('platformDataThatComposerRefuses')]
-    public function testPlatformDataThatComposerRefusesKeepsComposersReason(array $lock, string $prefix): void
+    public function testAnOverrideThatComposerRefusesKeepsComposersReason(): void
     {
         $thrown = null;
         try {
-            LockFile::fromArray($lock, 'alt.lock');
+            LockFile::fromArray(['packages' => [], 'platform-overrides' => ['php' => false]], 'alt.lock');
         } catch (ConfigException $e) {
             $thrown = $e;
         }
 
         self::assertNotNull($thrown);
         $cause = $thrown->getPrevious();
-        self::assertNotNull($cause, 'the Composer failure is kept as the cause');
+        self::assertNotNull($cause, 'the PlatformRepository failure is kept as the cause');
         self::assertNotSame('', $cause->getMessage());
-        self::assertSame($prefix.$cause->getMessage(), $thrown->getMessage());
+        self::assertSame('alt.lock: platform-overrides cannot be loaded: '.$cause->getMessage(), $thrown->getMessage());
         self::assertSame(0, $thrown->getCode(), 'lockrot carries no exception codes; a run exits on its verdict, not on these');
     }
 }

@@ -8,7 +8,6 @@ use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Package\CompleteAliasPackage;
 use Composer\Package\CompletePackage;
-use Composer\Package\Link;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Repository\LockArrayRepository;
 use Composer\Repository\PlatformRepository;
@@ -64,12 +63,12 @@ final class LockFile
      */
     public static function fromArray(array $lock, string $name = FormatContext::DEFAULT_LOCK_NAME): self
     {
-        // Composer's Locker loads the lock for an update with these options.
-        $lockLoader = new ArrayLoader(null, true);
         $aliases = self::aliases($lock['aliases'] ?? null, $name);
-        $overridePhp = self::overridePhpOf(['platform' => $lock['platform'] ?? null, 'platform-dev' => $lock['platform-dev'] ?? null], $lock['platform-overrides'] ?? [], $name, $lockLoader);
+        $overridePhp = self::overridePhpOf(['platform' => $lock['platform'] ?? null, 'platform-dev' => $lock['platform-dev'] ?? null], $lock['platform-overrides'] ?? [], $name);
         $packages = [];
         $loader = new ArrayLoader();
+        // Composer's Locker loads the lock for an update with these options.
+        $lockLoader = new ArrayLoader(null, true);
         $locked = new LockArrayRepository();
         $aliased = [];
         $skipped = [];
@@ -182,21 +181,13 @@ final class LockFile
      * @param array{platform: mixed, platform-dev: mixed} $platform
      * @param mixed                                       $overrides
      */
-    private static function overridePhpOf(array $platform, $overrides, string $name, ArrayLoader $lockLoader): ?string
+    private static function overridePhpOf(array $platform, $overrides, string $name): ?string
     {
-        // Composer's Locker passes `platform` and `platform-dev` to parseLinks() when they are not
-        // empty, and `platform-overrides` to PlatformRepository when it is set.
+        // Composer's Locker passes `platform` and `platform-dev` to an array parameter when they are
+        // not empty, and `platform-overrides` to PlatformRepository when it is set.
         foreach ($platform as $key => $links) {
-            if (empty($links)) {
-                continue;
-            }
-            if (!\is_array($links)) {
+            if (!empty($links) && !\is_array($links)) {
                 throw new ConfigException(\sprintf('%s: %s must be an object', $name, $key));
-            }
-            try {
-                $lockLoader->parseLinks('__root__', '1.0.0', Link::TYPE_REQUIRE, array_filter($links, 'is_string'));
-            } catch (\Throwable $e) {
-                throw new ConfigException(\sprintf('%s: %s cannot be loaded: %s', $name, $key, $e->getMessage()), 0, $e);
             }
         }
         if (!\is_array($overrides)) {

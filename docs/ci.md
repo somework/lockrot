@@ -76,8 +76,8 @@ with `lockrot:`, any other failure with `lockrot failed:`. `-v` adds the stack t
 - A `composer.json` or `composer.lock` lockrot cannot parse, a missing `composer.lock`, or a lock
   entry Composer's loader rejects (no `name` or `version`, a version it cannot normalise).
 - A lock that Composer cannot read. A non-empty `platform` or `platform-dev` is no JSON object or
-  array, or holds a constraint that Composer cannot parse. Or `platform-overrides` is no JSON object
-  or array, or holds a value or a package name that Composer refuses.
+  array. Or `platform-overrides` is no JSON object or array, or holds a value or a package name that
+  Composer refuses.
 - A lock that breaks a lockrot rule. The message names the lock that Composer reads, such as
   `alt.lock` under `COMPOSER=alt.json`. The rules:
 

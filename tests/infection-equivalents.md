@@ -124,7 +124,6 @@ entry in the commit that changes the line.
 - `src/Json/JsonReader.php` ReturnRemoval `return false;` — for an empty array, `array_keys([]) === range(0, -1)` is false, so the method returns false too.
 - `src/Lock/ConfiguredRepositories.php` CastString `$host = (string) preg_replace('{:\d+$}', '', strtolower($parts[0]));` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Lock/ConfiguredRepositories.php` CastString `$path = (string) preg_replace('{\.git$}', '', trim(strtolower($parts[1]), '/'));` — the pattern is a literal, so `preg_replace()` never returns null.
-- `src/Lock/LockFile.php` UnwrapArrayFilter `$lockLoader->parseLinks('__root__', '1.0.0', Link::TYPE_REQUIRE, array_filter($links, 'is_string'));` — `parseLinks()` skips a value that is no string itself. The filter is for PHPStan.
 
 ## src/Output
 
