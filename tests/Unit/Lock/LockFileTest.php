@@ -437,7 +437,7 @@ final class LockFileTest extends TestCase
     /**
      * Each body is valid JSON that Composer's Locker cannot use, or that breaks a lockrot rule.
      *
-     * @return iterable<string, array{0: array<string, mixed>, 1: string}>
+     * @return iterable<string, array{0: array<string, mixed>, 1: non-empty-string}>
      */
     public static function refusedLocks(): iterable
     {
@@ -475,6 +475,7 @@ final class LockFileTest extends TestCase
      * @dataProvider refusedLocks
      *
      * @param array<string, mixed> $lock
+     * @param non-empty-string     $message
      */
     #[DataProvider('refusedLocks')]
     public function testALockThatComposerOrLockrotRefusesIsAConfigErrorThatNamesTheFile(array $lock, string $message): void

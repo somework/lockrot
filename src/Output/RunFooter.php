@@ -235,7 +235,7 @@ final class RunFooter
                 $by = $run->blockingDisabledBy();
                 $off = $by === [] ? '' : ', with advisory blocking turned off by '.ListWords::of($name === null ? $by : array_map($name, $by));
 
-                return 'moves: checked with the solver of Composer '.$data['composer'].' against the lock'.$off.'; '.self::listed($data['ignored_platform']).' requirements not checked';
+                return 'moves: checked with the solver of Composer '.$data['composer'].' against the lock'.$off.'; '.ListWords::of($data['ignored_platform']).' requirements not checked';
             case MoveCheck::REFUSED:
                 return "moves: not checked, because Composer's solver refuses the lock itself (see the moves_not_checked note)";
             default:
