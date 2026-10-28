@@ -77,4 +77,14 @@ final class ForgeAuthTest extends TestCase
         self::assertTrue($underApiHost->isAuthenticated(self::ref(self::BITBUCKET)), 'Composer finds credentials under the request host first');
         self::assertFalse(ForgeAuth::anonymous()->isAuthenticated(self::ref(self::BITBUCKET)));
     }
+
+    public function testTheGithubTokenNeverGoesToAnotherGithubHost(): void
+    {
+        $ghes = new RepoRef(RepoRef::GITHUB, 'ghes.example.com', 'a/b');
+        $auth = new ForgeAuth(new Tokens('gh', null), static fn (string $host): bool => $host === 'ghes.example.com');
+
+        self::assertNull($auth->tokenFor($ghes));
+        self::assertTrue($auth->isAuthenticated($ghes), "Composer's credentials for the host still count");
+        self::assertFalse(ForgeAuth::withTokens(new Tokens('gh', null))->isAuthenticated($ghes));
+    }
 }

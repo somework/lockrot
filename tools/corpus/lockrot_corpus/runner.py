@@ -58,6 +58,10 @@ def token_from_environment(anon: bool) -> 'str | None':
 # own. Otherwise an `--anon` run can authenticate while its manifest says anonymous.
 INHERITED = ('LOCKROT_GITHUB_TOKEN', 'GITHUB_TOKEN', 'LOCKROT_GITLAB_TOKEN', 'GITLAB_TOKEN',
              'COMPOSER_AUTH',
+             # These name the server that issued GITHUB_TOKEN or GITLAB_TOKEN, and lockrot withholds
+             # a token that another host issued. An inherited value from a host CI can make an
+             # authenticated run anonymous.
+             'GITHUB_SERVER_URL', 'CI_SERVER_URL', 'GITLAB_HOST',
              # Not credentials: LOCKROT_DISABLE skips the command. The runner passes no --fail-on,
              # so an inherited LOCKROT_FAIL_ON changes the exit code that the manifest records.
              'LOCKROT_DISABLE', 'LOCKROT_FAIL_ON')

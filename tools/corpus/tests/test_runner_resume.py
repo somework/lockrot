@@ -184,5 +184,25 @@ class TokenMode(unittest.TestCase):
                 os.environ['GITHUB_TOKEN'] = saved
 
 
+class Environment(unittest.TestCase):
+    def test_the_issuer_variables_of_the_host_ci_do_not_reach_the_child(self):
+        names = ('GITHUB_SERVER_URL', 'CI_SERVER_URL', 'GITLAB_HOST')
+        saved = {name: os.environ.get(name) for name in names}
+        root = tempfile.mkdtemp(prefix='corpus-environment-')
+        try:
+            for name in names:
+                os.environ[name] = 'https://instance.example.test'
+            environment = runner.run_environment('a-token', root, '2026-09-23')
+            self.assertEqual([], [name for name in names if name in environment])
+            self.assertEqual('a-token', environment['GITHUB_TOKEN'])
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+            for name, value in saved.items():
+                if value is None:
+                    os.environ.pop(name, None)
+                else:
+                    os.environ[name] = value
+
+
 if __name__ == '__main__':
     unittest.main()

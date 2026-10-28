@@ -76,6 +76,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- **Breaking:** **CLI, PHAR, self-update:** a token goes only to the host that issued it.
+  `GITHUB_TOKEN` is not sent to github.com when `GITHUB_SERVER_URL` names another host (GitHub
+  Enterprise Server, GHE.com, Gitea or Forgejo Actions). `GITLAB_TOKEN` is not sent to gitlab.com
+  when `CI_SERVER_URL` or `GITLAB_HOST` names another host. Such a run is anonymous on the public
+  host, also when a lockrot cache from another machine could answer, and `-v` names each token
+  that lockrot keeps back. `self-update` sends its token to api.github.com only, whatever
+  `LOCKROT_RELEASE_URL` names. lockrot cannot stop Composer from sending the runner's token, when a
+  setup step writes it into `github-oauth`. Action: if you put a github.com or gitlab.com token in
+  `GITHUB_TOKEN` or `GITLAB_TOKEN` on such a runner, move it to `LOCKROT_GITHUB_TOKEN` or
+  `LOCKROT_GITLAB_TOKEN`. ([Which credentials](docs/internals.md#which-credentials))
 - **All formats:** advisories are looked up by name for every package the run checks (packages-dev
   with `--dev`), so the names of packages from vcs, a path, an archive or an origin lockrot cannot
   tell now reach each Composer repository that publishes advisories. Action: set

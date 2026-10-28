@@ -723,6 +723,30 @@ final class ReleaseLocatorTest extends TestCase
         }
     }
 
+    /** `LOCKROT_RELEASE_URL` can name any host, and a GitHub token is for api.github.com alone. */
+    public function testTheTokenIsNotSentToAReleaseListOnAnotherHost(): void
+    {
+        $url = 'https://releases.example.test/list';
+        $http = self::http([GitHubReleases::entry('v0.14.0')], ['v0.14.0' => GitHubReleases::meta('7.4.0', self::releaseKey())], $url);
+
+        $this->locator($http, '0.14.0', self::PHP, null, 'ghp_x', $url)->locate();
+
+        self::assertSame($url, $http->requested()[0]);
+        foreach ($http->headers()[0] as $header) {
+            self::assertStringStartsNotWith('Authorization', $header);
+        }
+    }
+
+    public function testTheTokenGoesToTheGithubApiWhateverTheCaseOfItsHost(): void
+    {
+        $url = 'https://API.GitHub.com/repos/somework/lockrot/releases?per_page=100';
+        $http = self::http([GitHubReleases::entry('v0.14.0')], ['v0.14.0' => GitHubReleases::meta('7.4.0', self::releaseKey())], $url);
+
+        $this->locator($http, '0.14.0', self::PHP, null, 'ghp_x', $url)->locate();
+
+        self::assertContains('Authorization: token ghp_x', $http->headers()[0]);
+    }
+
     public function testAMissingListIsReportedAsNoPublishedRelease(): void
     {
         $http = new FakeHttpClient([self::URL => FakeHttpClient::status(self::URL, 404, self::fixture('not-found.json'))]);

@@ -8,8 +8,9 @@ namespace Lockrot\Data\Forge;
  * Whether a request to a repository is authenticated, and which of lockrot's own {@see Tokens} it
  * carries: docs/internals.md, "Which credentials".
  *
- * The GitLab token goes to gitlab.com only: a token that one instance issued must never reach
- * another. A `bitbucket-oauth` consumer is a usable bearer token only after Composer exchanges it
+ * A lockrot token goes only to the public host of its forge: a token that one instance issued must
+ * never reach another. An ambient env token counts only when its platform names that host as the
+ * issuer ({@see Tokens::fromEnvironment()}). A `bitbucket-oauth` consumer is a usable bearer token only after Composer exchanges it
  * on a 401 challenge that lockrot never lets through, so the exchange comes in as a callable.
  *
  * @internal
@@ -47,7 +48,7 @@ final class ForgeAuth
 
     public function tokenFor(RepoRef $repo): ?string
     {
-        if ($repo->forge() === RepoRef::GITHUB) {
+        if ($repo->forge() === RepoRef::GITHUB && $repo->host() === 'github.com') {
             return $this->tokens->github();
         }
         if ($repo->forge() === RepoRef::GITLAB && $repo->host() === 'gitlab.com') {
