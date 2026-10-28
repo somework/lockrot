@@ -1382,10 +1382,11 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
                     'always a string with `target_php_source` beside it (§8.2).', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}),
     'target_php_source': closed(['option', 'env', 'config', 'platform', 'runtime'], "Which link of the chain set it (`config` = `extra.lockrot.target-php`, `platform` = `config.platform.php`). Closed (§8.2)."),
     'project_php': nul("The project's `require.php` as written (report-1); never parse it.", {'type': 'string', 'minLength': 1}),
-    'project_php_lowest': nul("The lowest PHP `require.php` admits: `PhpFloor`'s lower bound normalised to MAJOR.MINOR.PATCH, a fourth segment and a stability suffix dropped "
-                              "(`7.2.5.0-dev` is `7.2.5`, `^7.4.0-RC1` gives `7.4.0`; `7.2.0` for `^7.2 || ^8.0.0`; an exclusive stable bound gives the next patch: `>7.4` gives `7.4.1`, "
-                              "and the post-release bound `>=7.4.0-p1` gives `7.4.1`; an exclusive pre-release bound gives its release: `>7.4.0-RC1` gives `7.4.0`). Null exactly when `PhpFloor` has no lowest: no `require.php`, `*`, an alternative with no lower bound (`<8`), or a constraint "
-                              "it cannot parse (§5.3). Print it with a trailing `.0` patch dropped.",
+    'project_php_lowest': nul("The lowest stable MAJOR.MINOR.PATCH that `require.php` admits: each range of the constraint is read at its start and at the next patch, "
+                              "and the first point that the constraint matches counts (`^7.4.0-RC1` gives `7.4.0`; `7.2.0` for `^7.2 || ^8.0.0`; an exclusive stable bound gives the next patch: `>7.4` gives `7.4.1`, "
+                              "and the post-release bound `>=7.4.0-p1` gives `7.4.1`; an exclusive pre-release bound gives its release: `>7.4.0-RC1` gives `7.4.0`; a `!=` hole moves it: `>=8.1 !=8.1.0` gives `8.1.1`; "
+                              "a range with no stable version is passed: `==7.4.0-RC1 || ^8.1` gives `8.1.0`). Null exactly when `PhpFloor` has no lowest: no `require.php`, `*`, an alternative with no lower bound (`<8`), "
+                              "a constraint that admits no stable version (`>=8.1 <8.1.0`, `>=8.2 <8.1`), or one it cannot parse (§5.3). Print it with a trailing `.0` patch dropped.",
                               {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+\\.[0-9]+$'}),
     'lock_file': nul('The name of the lock (report-1), never its path.', {'type': 'string'}),
     'fail_on': d("The parsed values in kind order (grade, flag, vulnerable, unchecked; a list holds one value per kind), joined with `,`, no spaces, lower case (`high`, "

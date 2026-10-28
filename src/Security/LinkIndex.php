@@ -37,9 +37,14 @@ final class LinkIndex
         $parser = new VersionParser();
         $root = $project->name();
         $required = $project->constraints(ProjectConfig::REQUIRE);
+        $devRequired = $project->constraints(ProjectConfig::REQUIRE_DEV);
         foreach ([Holder::REQUIRE => ProjectConfig::REQUIRE, Holder::REQUIRE_DEV => ProjectConfig::REQUIRE_DEV, Holder::CONFLICT => ProjectConfig::CONFLICT] as $link => $section) {
             foreach ($project->constraints($section) as $target => $constraint) {
+                // Composer solves a name that both sections list with its require-dev constraint (W4).
                 // One constraint in both sections is one hold: the `require` one.
+                if ($link === Holder::REQUIRE && isset($devRequired[$target]) && $devRequired[$target] !== $constraint) {
+                    continue;
+                }
                 if ($link === Holder::REQUIRE_DEV && ($required[$target] ?? null) === $constraint) {
                     continue;
                 }

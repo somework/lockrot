@@ -291,6 +291,27 @@ final class PhpFloorTest extends TestCase
         yield 'an unreadable constraint' => ['whatever', null];
         yield 'a date version' => ['>=201001', null];
         yield 'no require.php' => [null, null];
+        yield 'a hole at the bound' => ['>=8.1 !=8.1.0', '8.1.1'];
+        yield 'two holes at the bound' => ['>=8.1 !=8.1.0 !=8.1.1', '8.1.2'];
+        yield 'a pre-release alone, then a range' => ['==7.4.0-RC1 || ^8.1', '8.1.0'];
+        yield 'a range that holds no stable version' => ['>=8.1 <8.1.0', null];
+        yield 'an unsatisfiable constraint' => ['>=8.2 <8.1', null];
+    }
+
+    /**
+     * R6-5: every published point is a version that `require.php` itself admits.
+     *
+     * @dataProvider floorPoints
+     */
+    #[DataProvider('floorPoints')]
+    public function testTheLowestPointIsAdmittedByRequirePhp(?string $requirePhp, ?string $point): void
+    {
+        $lowest = $requirePhp === null ? null : PhpFloor::pointOf($requirePhp);
+
+        self::assertSame($point, $lowest);
+        if ($lowest !== null) {
+            self::assertTrue((new VersionParser())->parseConstraints((string) $requirePhp)->matches(new Constraint('==', $lowest.'.0')), $requirePhp.' admits '.$lowest);
+        }
     }
 
     /**
@@ -335,7 +356,7 @@ final class PhpFloorTest extends TestCase
     public function testTheDisplayRowsOfTheFloorPointAreRecorded(): void
     {
         $rows = [];
-        foreach (['^7.2', '>=7.2.5', '>7.1', '~8.0.0', '>=7.4.0-RC1', '7.*', '*', '<8', 'whatever', null] as $requirePhp) {
+        foreach (['^7.2', '>=7.2.5', '>7.1', '~8.0.0', '>=7.4.0-RC1', '7.*', '*', '<8', 'whatever', null, '>=8.1 !=8.1.0', '>=8.2 <8.1', '==7.4.0-RC1 || ^8.1'] as $requirePhp) {
             $point = (new PhpFloor(null, $requirePhp))->lowestAsString();
             $rows[] = [
                 'require_php' => $requirePhp,

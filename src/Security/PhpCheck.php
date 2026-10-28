@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Security;
 
-use Composer\Semver\Constraint\Constraint;
-use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
 use Lockrot\Signal\PhpFloor;
 
@@ -57,32 +55,14 @@ final class PhpCheck implements \JsonSerializable
         return new self($php, $allows, $floor->admitsTarget($php), $raiseTo, $raiseSize);
     }
 
-    /**
-     * The lowest stable `X.Y.Z` above the project's point that $php admits, read at the start of
-     * each of its ranges and at the patch after it: a start such as `>=7.4.0-p1` or `>7.4.0` admits
-     * no `X.Y.Z` of its own. A disjunction such as `7.1.* || >=8.1` starts below the project's
-     * point, so its first range above the point counts.
-     */
+    /** {@see PhpFloor::lowestStable()} of $php above the project's point. */
     private static function pointAbove(string $php, string $project): ?string
     {
         try {
-            $constraint = (new VersionParser())->parseConstraints($php);
+            return PhpFloor::lowestStable((new VersionParser())->parseConstraints($php), $project);
         } catch (\UnexpectedValueException $e) {
             return null;
         }
-        foreach (Intervals::get($constraint)['numeric'] as $interval) {
-            $point = PhpFloor::pointOf($interval->getStart()->getVersion());
-            if ($point === null) {
-                continue;
-            }
-            foreach ([$point, PhpFloor::pointOf('>'.$point)] as $candidate) {
-                if ($candidate !== null && version_compare($candidate, $project, '>') && $constraint->matches(new Constraint('==', $candidate.'.0'))) {
-                    return $candidate;
-                }
-            }
-        }
-
-        return null;
     }
 
     /** @return self::MAJOR|self::MINOR|self::PATCH */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal;
 
+use Composer\Semver\Constraint\Bound;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\Intervals;
@@ -242,30 +243,62 @@ final class PhpFloor
     }
 
     /**
-     * The lowest stable `X.Y.Z` that a php constraint admits by its lower bound, as
-     * {@see lowestAsString()} reads `require.php`. An exclusive bound, a post-release bound
-     * (`-p1`), or one with a non-zero fourth segment admits no `X.Y.Z` of its own, so the point is
-     * the next patch. Null with no lower bound, an unreadable constraint or a date version such as
-     * `>=201001`.
+     * {@see lowestStable()} of a constraint string, as {@see lowestAsString()} reads `require.php`.
+     * Null for an unreadable constraint.
      */
     public static function pointOf(string $constraint): ?string
     {
         try {
-            $lower = (new VersionParser())->parseConstraints($constraint)->getLowerBound();
+            return self::lowestStable((new VersionParser())->parseConstraints($constraint));
         } catch (\UnexpectedValueException $e) {
             return null;
         }
-        if ($lower->isZero()) {
-            return null;
+    }
+
+    /**
+     * The lowest stable `X.Y.Z` that $constraint admits, above $above when given. Each range is
+     * read at its start and at the patch after it, because a `!=` hole or a start such as `>7.4.0`
+     * or `>=7.4.0-p1` admits no `X.Y.Z` of its own there. Without $above, a constraint with no lower
+     * bound gives null (SPEC §8.2). With $above, a range with no lower bound is skipped. A date
+     * start (`>=201001`) is skipped.
+     */
+    public static function lowestStable(ConstraintInterface $constraint, ?string $above = null): ?string
+    {
+        foreach (Intervals::get($constraint)['numeric'] as $index => $interval) {
+            $start = $interval->getStart()->getLowerBound();
+            if ($start->isZero() && $index === 0 && $above === null) {
+                return null;
+            }
+            $point = $start->isZero() ? null : self::startPoint($start);
+            if ($point === null) {
+                continue;
+            }
+            [$major, $minor, $patch] = explode('.', $point);
+            foreach ([$point, $major.'.'.$minor.'.'.((int) $patch + 1)] as $candidate) {
+                if (($above === null || version_compare($candidate, $above, '>')) && $constraint->matches(new Constraint('==', $candidate.'.0'))) {
+                    return $candidate;
+                }
+            }
         }
-        $version = $lower->getVersion();
+
+        return null;
+    }
+
+    /**
+     * The first `X.Y.Z` at or above a range start: an exclusive start, a post-release start (`-p1`)
+     * or one with a non-zero fourth segment admits no `X.Y.Z` of its own, so the point is the next
+     * patch. Null for a date version.
+     */
+    private static function startPoint(Bound $start): ?string
+    {
+        $version = $start->getVersion();
         $numbers = explode('-', $version)[0];
         $segments = explode('.', $numbers);
         if (\count($segments) !== 4) {
             return null;
         }
         [$major, $minor, $patch, $fourth] = array_map('intval', $segments);
-        if ($fourth !== 0 || (!$lower->isInclusive() && $numbers === $version) || strpos($version, '-patch') !== false) {
+        if ($fourth !== 0 || (!$start->isInclusive() && $numbers === $version) || strpos($version, '-patch') !== false) {
             ++$patch;
         }
 
