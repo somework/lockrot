@@ -34,6 +34,12 @@ final class MoveCheckRun implements \JsonSerializable
         return $this->baseline;
     }
 
+    /** @return list<string> */
+    public function blockingDisabledBy(): array
+    {
+        return $this->blockingDisabledBy;
+    }
+
     /**
      * `ignores_extensions` is always true: the solve ignores `ext-*` requirements, as
      * `--ignore-platform-req=ext-*` does, so the machine that runs lockrot decides no move.

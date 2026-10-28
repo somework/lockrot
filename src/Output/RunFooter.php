@@ -232,7 +232,8 @@ final class RunFooter
         $data = $run->jsonSerialize();
         switch ($data['baseline']) {
             case MoveCheck::RESOLVES:
-                $off = $data['blocking_disabled_by'] === [] ? '' : ', with advisory blocking turned off by '.ListWords::of($name === null ? $data['blocking_disabled_by'] : array_map($name, $data['blocking_disabled_by']));
+                $by = $run->blockingDisabledBy();
+                $off = $by === [] ? '' : ', with advisory blocking turned off by '.ListWords::of($name === null ? $by : array_map($name, $by));
 
                 return 'moves: checked with the solver of Composer '.$data['composer'].' against the lock'.$off.'; ext-* requirements not checked';
             case MoveCheck::REFUSED:
