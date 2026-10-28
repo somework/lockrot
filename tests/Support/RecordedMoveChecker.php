@@ -128,7 +128,7 @@ final class RecordedMoveChecker implements MoveChecker
         }
         $check = $this->recorded('combined '.implode(' ', array_keys($inline)), 'combined');
 
-        return $check === null ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : $this->unread($check) ?? self::outcome($check);
+        return $check === null ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : $this->unread($check) ?? self::outcome($check)->withChanges(self::installs($check));
     }
 
     /** @return list<array<string, string>> the argument of each combined update asked, in order */

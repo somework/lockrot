@@ -971,6 +971,21 @@ final class SolverCheckerTest extends TestCase
         self::assertContains(['source' => 'package', 'package' => 'acme/a', 'version' => '1.1.0', 'link' => 'conflict', 'target' => null, 'constraint' => '>=1.1'], self::rows($combined->holds()));
     }
 
+    /** A plain member of the combined update can keep its locked release, so the outcome names what the solve installs. */
+    public function testTheCombinedUpdateCarriesTheReleaseThatTheSolveInstallsOfEachName(): void
+    {
+        $checker = self::checker(
+            ['acme/a' => '^1.0', 'acme/b' => '^1.0'],
+            [['name' => 'acme/a', 'version' => '1.0.0'], ['name' => 'acme/b', 'version' => '1.0.0']],
+            ['acme/a' => [['version' => '1.0.0'], ['version' => '1.1.0', 'conflict' => ['acme/b' => '>=1.1']]], 'acme/b' => [['version' => '1.0.0'], ['version' => '1.1.0']]]
+        );
+
+        $combined = $checker->combined(['acme/a' => '^1.1.0', 'acme/b' => '']);
+
+        self::assertSame(MoveCheck::RESOLVES, $combined->check()->result());
+        self::assertSame(['acme/a' => '1.1.0'], $combined->changes());
+    }
+
     /** A release that starts to replace a package that the root keeps: Composer can install only one of the two. */
     public function testAMoveWhoseTargetReplacesALockedPackageIsRefusedWithTheReplace(): void
     {

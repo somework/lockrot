@@ -115,7 +115,7 @@ final class SolverChecker implements MoveChecker
         }
 
         return $solution->resolves()
-            ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE))
+            ? (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)))->withChanges($solution->installs(), $solution->updatedFrom())
             : new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds()), $solution->problem());
     }
 
