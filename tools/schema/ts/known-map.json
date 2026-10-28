@@ -2963,18 +2963,6 @@
   "integer": false
  },
  {
-  "name": "RunMoveCheckIgnoresExtensions",
-  "pointer": "#/definitions/run/properties/move_check/oneOf/0/properties/ignores_extensions",
-  "pointers": [
-   "#/definitions/run/properties/move_check/oneOf/0/properties/ignores_extensions"
-  ],
-  "values": [
-   true
-  ],
-  "open": false,
-  "integer": false
- },
- {
   "name": "RunMoveCheckBaseline",
   "pointer": "#/definitions/run/properties/move_check/oneOf/0/properties/baseline",
   "pointers": [

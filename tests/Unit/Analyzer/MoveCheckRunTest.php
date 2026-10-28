@@ -14,7 +14,7 @@ final class MoveCheckRunTest extends TestCase
     {
         $run = new MoveCheckRun('2.10.3', true, [], MoveCheck::notChecked(MoveCheck::OFFLINE));
 
-        self::assertSame(['composer' => '2.10.3', 'blocks_advisories' => true, 'blocking_disabled_by' => [], 'ignores_extensions' => true, 'baseline' => 'not_checked', 'reason' => 'offline'], $run->jsonSerialize());
+        self::assertSame(['composer' => '2.10.3', 'blocks_advisories' => true, 'blocking_disabled_by' => [], 'ignored_platform' => ['ext-*', 'lib-*', 'php-debug', 'php-ipv6', 'php-zts'], 'baseline' => 'not_checked', 'reason' => 'offline'], $run->jsonSerialize());
     }
 
     public function testTheRunBlockListsTheVariablesThatTurnedTheBlockingOff(): void

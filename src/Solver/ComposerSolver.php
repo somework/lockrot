@@ -13,7 +13,6 @@ use Composer\DependencyResolver\PoolOptimizer;
 use Composer\DependencyResolver\Request;
 use Composer\DependencyResolver\Solver;
 use Composer\DependencyResolver\SolverProblemsException;
-use Composer\Filter\PlatformRequirementFilter\PlatformRequirementFilterFactory;
 use Composer\Filter\PlatformRequirementFilter\PlatformRequirementFilterInterface;
 use Composer\IO\NullIO;
 use Composer\Package\AliasPackage;
@@ -31,6 +30,7 @@ use Composer\Repository\RepositorySet;
 use Composer\Repository\RootPackageRepository;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
+use Lockrot\Analyzer\PhpWindow;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
@@ -38,12 +38,15 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  * `Composer\Installer::doUpdate()` builds for `composer update <names> --dry-run`: the root's
  * stability settings and requirements, the lock as the locked packages, the platform, and the
  * remote versions of the names that the pool builder asks for ({@see LoadedVersions}). It ignores
- * `ext-*` requirements, as `--ignore-platform-req=ext-*` does.
+ * the requirements on {@see IGNORED_PLATFORM} that `config.platform` does not set ({@see HostPlatformFilter}).
  *
  * @internal
  */
 final class ComposerSolver
 {
+    /** The platform patterns that the machine running lockrot provides, in the order of `run.move_check.ignored_platform`. */
+    public const IGNORED_PLATFORM = ['ext-*', 'lib-*', ...PhpWindow::HOST_FEATURES];
+
     private RootPackageInterface $root;
     private LockArrayRepository $locked;
     private PlatformRepository $platform;
@@ -59,13 +62,14 @@ final class ComposerSolver
     /** @var array{0: Pool, 1: LockTransaction|SolverProblemsException} the optimized pool and Composer's answer of the last solve */
     private array $lastAnswer;
 
-    public function __construct(RootPackageInterface $root, LockArrayRepository $locked, PlatformRepository $platform, VersionSource $source)
+    /** @param list<string> $configuredPlatform the lower-case names that `config.platform` sets */
+    public function __construct(RootPackageInterface $root, LockArrayRepository $locked, PlatformRepository $platform, VersionSource $source, array $configuredPlatform = [])
     {
         $this->root = $root;
         $this->locked = $locked;
         $this->platform = $platform;
         $this->source = $source;
-        $this->filter = PlatformRequirementFilterFactory::fromBoolOrList(['ext-*']);
+        $this->filter = new HostPlatformFilter($configuredPlatform);
     }
 
     /** A copy whose solves block what Composer blocks in an update, with the records that $advisories serves. */

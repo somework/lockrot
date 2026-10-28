@@ -1414,8 +1414,9 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
                                     "Composer 2.9.0 and 2.9.1 read only `config.audit.block-insecure`, and later 2.9 releases also read `COMPOSER_NO_SECURITY_BLOCKING`. "
                                     "Composer 2.10 and later read every switch, and read `config.audit.block-insecure` only when `config.policy.advisories` is not set. Empty when no switch turns the blocking off. Closed.",
                                     closed(BLOCKING_SWITCHES, 'One switch: an environment variable, or a key of composer.json `config`. Closed.'), uniqueItems=True),
-        'ignores_extensions': d("Always true: the solve ignores every `ext-*` requirement, as `--ignore-platform-req=ext-*` does, so the extensions of the machine that runs lockrot decide no move.",
-                                {'type': 'boolean', 'enum': [True]}),
+        'ignored_platform': arr("The platform patterns whose requirements the solve ignores, as `--ignore-platform-req` does, so the machine that runs lockrot decides no move. "
+                                "A name that composer.json `config.platform` sets is checked even when a pattern matches it (ruling R6-2).",
+                                {'type': 'string', 'minLength': 1}),
         'baseline': closed(['resolves', 'refused', 'not_checked'], ("The partial update of a name outside the lock: `refused` means Composer refuses the lock "
                                                                    "itself, so no move is checked (the `moves_not_checked` note). Closed.")),
         'reason': nul("Why the baseline was not checked; null unless `baseline` is `not_checked`. An open set, with the values of `check.reason` that a whole run can have.",

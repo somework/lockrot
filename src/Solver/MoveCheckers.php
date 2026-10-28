@@ -41,11 +41,13 @@ final class MoveCheckers
     {
         $overrides = [];
         $configured = $config->get('platform');
-        foreach (\is_array($configured) ? $configured : [] as $name => $version) {
+        // Composer's PlatformRepository lower-cases each override name.
+        foreach (\is_array($configured) ? array_change_key_case($configured, \CASE_LOWER) : [] as $name => $version) {
             if (\is_string($name) && (\is_string($version) || $version === false)) {
                 $overrides[$name] = $version;
             }
         }
+        $platformNames = array_keys($overrides);
         $configured = \is_string($overrides['php'] ?? null) ? $overrides['php'] : null;
         $php = self::platformPhp($targetPhp, $configured);
         $overrides['php'] = $php;
@@ -62,7 +64,7 @@ final class MoveCheckers
             }
         }
         $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline, $root->getMinimumStability(), $root->getStabilityFlags(), $served);
-        $solver = (new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], $overrides), $source))->withLockedOnly($notFromComposerRepository);
+        $solver = (new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], $overrides), $source, $platformNames))->withLockedOnly($notFromComposerRepository);
         $solver = $php === $configured ? $solver : $solver->withPhpSetByLockrot();
         $solver = self::minimalChanges($config) ? $solver->withMinimalChanges() : $solver;
 

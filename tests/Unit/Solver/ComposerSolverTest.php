@@ -535,6 +535,54 @@ final class ComposerSolverTest extends TestCase
         self::assertTrue($solver->solve(SolveRequest::baseline())->resolves(), 'a solver without advisories runs no filter');
     }
 
+    /**
+     * Ruling R6-2: the machine that runs lockrot decides no move. The solve ignores each
+     * requirement in ComposerSolver::IGNORED_PLATFORM, which no runner provides here.
+     *
+     * @dataProvider hostRequirements
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('hostRequirements')]
+    public function testAReleaseThatRequiresAnIgnoredPlatformPackageResolves(string $name): void
+    {
+        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => [$name => '*']]]]);
+
+        self::assertSame(['acme/lib' => '1.1.0'], $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->installs());
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function hostRequirements(): iterable
+    {
+        foreach (['ext-lockrotprobe', 'lib-lockrotprobe', 'php-debug', 'php-ipv6', 'php-zts'] as $name) {
+            yield $name => [$name];
+        }
+    }
+
+    /**
+     * A name that `config.platform` sets is the project's own fact, so the solve checks it. An
+     * override of false removes the package, as Composer's PlatformRepository does.
+     *
+     * @dataProvider configuredPlatform
+     *
+     * @param array<string, string|false> $platform
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('configuredPlatform')]
+    public function testAReleaseThatRequiresMoreThanTheConfiguredPlatformIsRefused(array $platform, string $name, string $constraint): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => [$name => $constraint]]]]);
+        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99'] + $platform), $source, array_keys($platform));
+
+        self::assertFalse($solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->resolves());
+    }
+
+    /** @return iterable<string, array{array<string, string|false>, string, string}> */
+    public static function configuredPlatform(): iterable
+    {
+        yield 'a library below the requirement' => [['lib-icu' => '60.1'], 'lib-icu', '>=70'];
+        yield 'an extension set to false' => [['ext-lockrotprobe' => false], 'ext-lockrotprobe', '*'];
+    }
+
     /** The copy offers the locked path package, and the solver it comes from still offers no version of it. */
     public function testALockedOnlyCopyLeavesTheSolverItComesFromAsItWas(): void
     {

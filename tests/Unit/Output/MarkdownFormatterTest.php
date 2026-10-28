@@ -418,7 +418,7 @@ final class MarkdownFormatterTest extends TestCase
         $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON));
         $report = self::report()->withMoveChecks(new MoveCheckRun('2.9.5', false, ['COMPOSER_NO_SECURITY_BLOCKING'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
 
-        self::assertStringContainsString('against the lock, with advisory blocking turned off by `COMPOSER_NO_SECURITY_BLOCKING`; ext-\\* requirements not checked', self::formatter()->format($report));
+        self::assertStringContainsString('against the lock, with advisory blocking turned off by `COMPOSER_NO_SECURITY_BLOCKING`; ext-\\*, lib-\\*, php-debug, php-ipv6 and php-zts requirements not checked', self::formatter()->format($report));
     }
 
     private static function report(): Report

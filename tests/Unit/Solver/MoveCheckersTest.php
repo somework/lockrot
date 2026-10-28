@@ -90,6 +90,34 @@ final class MoveCheckersTest extends TestCase
         self::assertSame('8.4.3', $checker->platformPhp());
     }
 
+    /** Composer lower-cases each `config.platform` name, so `PHP` is the project's php. */
+    public function testAConfiguredPlatformPhpWrittenInCapitalsIsTheProjectsPhp(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['platform' => ['PHP' => '8.4.3']]]);
+
+        $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
+
+        self::assertSame(['8.4.3', '8.4.3'], [$checker->platformPhp(), $checker->configuredPhp()]);
+    }
+
+    /** Ruling R6-2: a library that `config.platform` sets is the project's fact, whatever case it is written in. */
+    public function testAReleaseThatNeedsMoreThanAConfiguredLibraryIsRefused(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['platform' => ['Lib-Lockrot-Test' => '1.0.0']]]);
+        $loader = new ArrayLoader();
+        $repository = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.1.0', 'require' => ['lib-lockrot-test' => '^2.0']]),
+        ]);
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+
+        $check = MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), $config, [$repository], '8.4', false, Deadline::never())->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame(MoveCheck::REFUSED, $check->result());
+    }
+
     /** `target_fix.platform_step` reads the configured php: the solve runs at the target minor's newest patch instead. */
     public function testTheProjectsMoveCheckKeepsAConfiguredPlatformPhpOutsideTheTargetMinor(): void
     {
