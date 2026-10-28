@@ -4,7 +4,9 @@ The builders deep-copy report-1 and explain-1 nodes, and each copy carries its 0
 inherited-descriptions.json lists every copied description that was read against the number 2
 document and holds for it. A copy that the list does not name fails, so a new copy gets a review,
 and a listed path that is no copy any more fails too. A description that pairs a field with a value
-(`libyears_unmeasured` `unavailable`) must name a value that the field's known values hold.
+(`libyears_unmeasured` `unavailable`) must name a value that the field's known values hold. The
+description of a node with known values must name only ids that some value, field or definition of
+the schema holds.
 """
 
 import json
@@ -19,6 +21,10 @@ SOURCES = {
     'lockrot-explain-2.schema.json': ['lockrot-explain.schema.json', 'lockrot-report.schema.json'],
 }
 PAIR = re.compile(r'`([a-z][a-z0-9_.]*)` `([a-z][a-z0-9_-]*)`')
+TOKEN = re.compile(r'`([a-z][a-z0-9_]*)`')
+# Ids that a description of a closed or known set names and that are no value or field of schema 2:
+# Composer's severity word, a PHP function, and two report-1 field names.
+NOT_SCHEMA_IDS = {'moderate', 'strcmp', 'previous_verdict', 'flagged_verdicts'}
 
 
 def load(*path):
@@ -64,6 +70,30 @@ def values(schema, node, seen=()):
     return found | values(schema, node.get('items'), seen)
 
 
+def unknown_ids(schema):
+    """Each node with known values whose description names an id that no value, field or definition of the schema holds."""
+    known = known_by_field(schema)
+    ids = set().union(*known.values()) | set(known) | set(schema.get('definitions', {})) | NOT_SCHEMA_IDS
+    found = {}
+
+    def walk(node, pointer):
+        if isinstance(node, dict):
+            own = values(schema, node)
+            text = node.get('description')
+            if own and isinstance(text, str):
+                missing = [token for token in TOKEN.findall(text) if token not in own and token not in ids]
+                if missing:
+                    found[pointer] = missing
+            for key, value in node.items():
+                walk(value, pointer + '/' + key)
+        elif isinstance(node, list):
+            for index, value in enumerate(node):
+                walk(value, pointer + '/' + str(index))
+
+    walk(schema, '#')
+    return found
+
+
 def known_by_field(schema):
     """Each property name with the values that some property of that name knows. An empty set: the field has no closed or known set."""
     known = {}
@@ -103,6 +133,11 @@ class InheritedDescriptionsTest(unittest.TestCase):
                         with self.subTest(schema=schema_name, pointer=pointer, field=field):
                             self.assertIn(value, known[name], text)
 
+    def test_a_description_of_known_values_names_only_ids_that_the_schema_holds(self):
+        for schema_name in SOURCES:
+            with self.subTest(schema=schema_name):
+                self.assertEqual({}, unknown_ids(load('resources', schema_name)))
+
 
 class TheFieldValueCheck(unittest.TestCase):
     SCHEMA = {
@@ -115,6 +150,11 @@ class TheFieldValueCheck(unittest.TestCase):
 
     def test_a_field_without_known_values_gives_an_empty_set(self):
         self.assertEqual(set(), known_by_field(self.SCHEMA)['free'])
+
+    def test_a_listed_value_that_the_set_lost_is_an_unknown_id(self):
+        schema = {'properties': {'reason': {'description': '`offline` or `composer_too_old`, or a `free` one.', 'x-known-values': ['offline']},
+                                 'free': {'type': 'string'}}}
+        self.assertEqual({'#/properties/reason': ['composer_too_old']}, unknown_ids(schema))
 
     def test_a_pair_names_the_field_and_the_value(self):
         self.assertEqual([('libyears_unmeasured', 'metadata_unavailable')],
