@@ -135,7 +135,7 @@ final class HttpResult
         return $this->status === 404;
     }
 
-    /** A transport error, a 5xx or a 4xx other than 404: no answer that a rerun cannot change is kept (ruling R5-39). */
+    /** A transport error, a 5xx or a 4xx other than 404: no answer that a rerun cannot change is kept. */
     public function isFailure(): bool
     {
         return $this->status === 0 || ($this->status >= 400 && !$this->isNotFound());

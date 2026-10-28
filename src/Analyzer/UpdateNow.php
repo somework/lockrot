@@ -94,7 +94,7 @@ final class UpdateNow
 
     /**
      * The highest `raise_to` of the members' moves: each move raises require.php before its own
-     * update (ruling R5-5), so the combined update needs the highest one.
+     * update, so the combined update needs the highest one.
      *
      * @param array<string, string> $inline
      * @param list<Finding>         $findings

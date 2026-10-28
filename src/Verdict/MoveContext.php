@@ -218,7 +218,7 @@ final class MoveContext
     /**
      * The `newest` of a require, raise-php or blocked move. On the installed row it is the row's
      * `fixes.newest`, so the security move and the S9 fix agree (ruling R3-2). A move to $lower reads
-     * it at $lower: no link in its own `held_by` lowers it (ruling R5-1). Else the row's newest.
+     * it at $lower: no link in its own `held_by` lowers it. Else the row's newest.
      */
     public function rowTarget(BranchRow $row, ?Candidate $lower = null): string
     {
