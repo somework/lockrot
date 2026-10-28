@@ -49,6 +49,22 @@ final class UpdateNowTest extends TestCase
         self::assertSame(['composer', 'update', self::PACKAGE.':^2.3.2'], $report->updateNowCommand());
     }
 
+    /** R6-3: when require-dev lists php too, the raise of the line says what it does to require-dev, as the member's own move does. */
+    public function testTheUpdateNowRaiseSaysItRemovesPhpFromRequireDevWhenRequireDevListsIt(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]];
+        $inputs['releases'] = array_merge(JsonPath::arrayAt($inputs, ['releases']), [['version' => 'v2.3.5', 'time' => '2026-07-01T00:00:00+00:00', 'php' => '>=8.2']]);
+        $inputs['root'] = JsonPath::arrayAt($inputs, ['root']) + ['require-dev' => ['php' => '^8.1']];
+        $case['inputs'] = $inputs;
+        $report = CaseHydrator::report($case);
+        $move = JsonPath::arrayAt(self::finding(JsonPath::decoded($report->toArray()), self::PACKAGE), ['next_step']);
+
+        self::assertSame(['composer', 'require', 'php:>=8.2', '--no-interaction', '--no-update'], JsonPath::arrayAt($move, ['commands', 0]), 'the member\'s own move');
+        self::assertSame('raise require.php to >=8.2, which removes it from require-dev, then ', RunFooter::platformStep($report));
+    }
+
     /**
      * @dataProvider raises
      *
@@ -76,6 +92,14 @@ final class UpdateNowTest extends TestCase
         self::assertSame([[], null], [JsonPath::arrayAt($document, ['security', 'update_now']), JsonPath::arrayAt($document, ['security'])['update_now_command']]);
         self::assertSame(['reason' => 'install_time_budget', 'packages' => [self::PACKAGE]], JsonPath::arrayAt(self::note($document, 'update_now_not_checked'), ['data']));
         self::assertSame([], FindingRelations::violations($document), 'the root recount agrees');
+    }
+
+    /** With no command there is no raise, so the line removes nothing from require-dev. */
+    public function testAnUpdateNowWithoutACommandRemovesNothingFromRequireDev(): void
+    {
+        $report = self::reportOf('move-check‡', ['combined' => ['result' => 'not_checked', 'form' => null, 'reason' => 'install_time_budget', 'holds' => []]]);
+
+        self::assertSame([null, null, false], [$report->updateNowCommand(), $report->updateNowRaise(), $report->updateNowRaiseRemovesRequireDev()]);
     }
 
     public function testACombinedUpdateThatComposerRefusesHasNoMembers(): void

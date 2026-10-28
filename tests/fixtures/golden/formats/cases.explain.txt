@@ -5765,7 +5765,7 @@ flags
 repository metadata
      branch   highest tag   released     php        fixes
    * 6.x      v6.4.41       2026-07-03   >=8.1      1 of 1 · composer update (lowest fix); after it: 0, ok; Composer's solver resolves it
-note: update now: the command leaves out symfony/yaml, typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0.
+note: update now: the command leaves out symfony/yaml and typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0.
 
 == case mc-update-now-refused‡
 typo3/html-sanitizer v2.2.0 — high: vulnerable

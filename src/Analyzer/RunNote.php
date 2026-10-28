@@ -11,6 +11,7 @@ use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Solver\MoveCheck;
+use Lockrot\Verdict\ListWords;
 
 /**
  * Each code has one named constructor, which derives the sentence from the facts, so the text and
@@ -505,7 +506,7 @@ final class RunNote
 
         return self::of(self::UPDATE_NOW_REDUCED, \sprintf(
             "update now: the command leaves out %s, because Composer's solver refuses %s together with the others: %s",
-            implode(', ', $leftOut),
+            ListWords::of($leftOut),
             \count($leftOut) === 1 ? 'it' : 'them',
             self::causeOfFirstProblem($problem)
         ), false, ['left_out' => $leftOut, 'problem' => $problem]);

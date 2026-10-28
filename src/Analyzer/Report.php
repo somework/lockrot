@@ -200,6 +200,12 @@ final class Report
         return $this->updateNow === null ? null : $this->updateNow->raiseTo();
     }
 
+    /** Whether the raise of {@see updateNowRaise()} removes php from require-dev. */
+    public function updateNowRaiseRemovesRequireDev(): bool
+    {
+        return $this->updateNow !== null && $this->updateNow->isPhpInRequireDev();
+    }
+
     /** @return list<string>|null `security.update_now_command`, null when it has no members or Composer refuses them together */
     public function updateNowCommand(): ?array
     {

@@ -318,7 +318,7 @@ final class LockrotCommand extends BaseCommand
 
             // The annotation formats point back at the lock: an unreadable one throws
             // ConfigException here, which is exit 2.
-            $context = FormatContext::forFailOn($lockPath, $failOn, Version::STRING, TerminalWidth::detect($env, $this->getApplication()), $cwd);
+            $context = FormatContext::forFailOn($lockPath, $failOn, Version::STRING, TerminalWidth::detect($env), $cwd);
             // Written raw: lockrot renders console markup itself (see ConsoleMarkup), so a `<` in a
             // constraint or a package name reaches the terminal or the parser untouched.
             $rendered = Formatters::for($format, $context, $page)->format($report, $showAll);

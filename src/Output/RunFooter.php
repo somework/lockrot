@@ -13,6 +13,7 @@ use Lockrot\Analyzer\TargetFix;
 use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Security\Holder;
 use Lockrot\Security\Severity;
+use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Verdict\ListWords;
 use Lockrot\Verdict\MoveText;
@@ -193,7 +194,7 @@ final class RunFooter
         $raise = $report->updateNowRaise();
 
         return ($window === null ? '' : MoveText::platformStep($window->targetMinor(), $window->platformOverride()))
-            .($raise === null ? '' : 'raise require.php to '.$raise.', then ');
+            .($raise === null ? '' : MoveText::raiseWords($raise, $report->updateNowRaiseRemovesRequireDev()));
     }
 
     /**
@@ -235,7 +236,7 @@ final class RunFooter
                 $by = $run->blockingDisabledBy();
                 $off = $by === [] ? '' : ', with advisory blocking turned off by '.ListWords::of($name === null ? $by : array_map($name, $by));
 
-                return 'moves: checked with the solver of Composer '.$data['composer'].' against the lock'.$off.'; '.ListWords::of($data['ignored_platform']).' requirements not checked';
+                return 'moves: checked with the solver of Composer '.$data['composer'].' against the lock'.$off.'; '.ListWords::of(ComposerSolver::IGNORED_PLATFORM).' requirements not checked';
             case MoveCheck::REFUSED:
                 return "moves: not checked, because Composer's solver refuses the lock itself (see the moves_not_checked note)";
             default:
