@@ -424,7 +424,7 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame([$url => [200, 'moved', null]], self::summarize($results));
         self::assertSame([], $downloader->followed, 'no request followed the redirect with the token');
         self::assertSame([$url, $target], array_column($downloader->requests, 'url'));
-        unset($downloader->requests[0]['options']['prevent_url_access_callable']);
+        unset($downloader->requests[0]['options']['prevent_url_access_callable'], $downloader->requests[1]['options']['prevent_url_access_callable']);
         self::assertSame(['http' => ['timeout' => ComposerHttpClient::DEFAULT_TIMEOUT, 'header' => self::WITHOUT_AUTHORIZATION], 'retry-auth-failure' => false], $downloader->requests[1]['options']);
     }
 
@@ -437,16 +437,74 @@ final class ComposerHttpClientTest extends TestCase
         self::skipBelowComposer210();
         $url = 'https://api.github.com/repos/vendor/name';
         $target = 'https://objects.example.com/name';
-        $readings = [0.0, 0.0, 6.0];
-        $now = static function () use (&$readings): float {
-            return \count($readings) > 1 ? (float) array_shift($readings) : $readings[0];
+        $held = new \stdClass();
+        $now = static function () use ($held): float {
+            return ($held->downloader ?? null) instanceof ScriptedDownloader && $held->downloader->settled >= 1 ? 6.0 : 0.0;
         };
         [$client, $downloader] = self::clientWith([$url => $target, $target => [200, 'moved']], Deadline::inSeconds(5.0, $now));
+        $held->downloader = $downloader;
 
         $results = $client->fetchAll([$url], self::HEADERS);
 
         self::assertSame([$url => [0, null, 'install-time budget spent']], self::summarize($results));
         self::assertSame([$url], array_column($downloader->requests, 'url'), 'no request to the target after the budget');
+    }
+
+    /** The downloader queues requests above its limit, so a request can start after the budget although add() came before it. */
+    public function testAQueuedRequestDoesNotStartAfterTheBudgetEnds(): void
+    {
+        self::skipBelowComposer210();
+        $url = 'https://api.github.com/repos/vendor/name';
+        $held = new \stdClass();
+        $now = static function () use ($held): float {
+            return ($held->downloader ?? null) instanceof ScriptedDownloader && $held->downloader->waits >= 1 ? 6.0 : 0.0;
+        };
+        [$client, $downloader] = self::clientWith([$url => [200, 'body']], Deadline::inSeconds(5.0, $now));
+        $held->downloader = $downloader;
+
+        $results = $client->fetchAll([$url], self::HEADERS);
+
+        self::assertSame([$url => [0, null, 'install-time budget spent']], self::summarize($results));
+        self::assertSame([], $downloader->started, 'no request starts after the budget');
+    }
+
+    public function testAQueuedRedirectTargetDoesNotStartAfterTheBudgetEnds(): void
+    {
+        self::skipBelowComposer210();
+        $url = 'https://api.github.com/repos/vendor/name';
+        $target = 'https://objects.example.com/name';
+        $held = new \stdClass();
+        $now = static function () use ($held): float {
+            return ($held->downloader ?? null) instanceof ScriptedDownloader && $held->downloader->waits >= 2 ? 6.0 : 0.0;
+        };
+        [$client, $downloader] = self::clientWith([$url => $target, $target => [200, 'moved']], Deadline::inSeconds(5.0, $now));
+        $held->downloader = $downloader;
+
+        $results = $client->fetchAll([$url], self::HEADERS);
+
+        self::assertSame([$url => [0, null, 'install-time budget spent']], self::summarize($results));
+        self::assertSame([$url], $downloader->started, 'the target does not start after the budget');
+    }
+
+    /** The first wait() spends part of the budget, so the request to a redirect's target gets only what is left. */
+    public function testARedirectTargetTakesTheTimeoutThatIsLeftAfterTheFirstWait(): void
+    {
+        self::skipBelowComposer210();
+        $url = 'https://api.github.com/repos/vendor/name';
+        $target = 'https://objects.example.com/name';
+        $held = new \stdClass();
+        $now = static function () use ($held): float {
+            return ($held->downloader ?? null) instanceof ScriptedDownloader && $held->downloader->settled >= 1 ? 4.0 : 0.0;
+        };
+        [$client, $downloader] = self::clientWith([$url => $target, $target => [200, 'moved']], Deadline::inSeconds(5.0, $now));
+        $held->downloader = $downloader;
+
+        $client->fetchAll([$url], self::HEADERS);
+
+        self::assertSame([$url, $target], array_column($downloader->requests, 'url'));
+        $options = $downloader->requests[1]['options'];
+        self::assertIsArray($options['http']);
+        self::assertSame(1, $options['http']['timeout'], '5s budget, 4s gone at the redirect -> 1s left');
     }
 
     /** @return iterable<string, array{string, string}> */
@@ -509,8 +567,9 @@ final class ComposerHttpClientTest extends TestCase
 
 /**
  * A downloader that answers each URL from a script, leaves an unscripted URL pending, and records
- * every request and wait(). A string answer is a redirect, which it follows with the request's
- * headers, as Composer does, unless `prevent_url_access_callable` refuses the target.
+ * every request and wait(). It asks `prevent_url_access_callable` when a request starts, as Composer's
+ * CurlDownloader does. A string answer is a redirect, which it follows with the request's headers,
+ * as Composer does, unless `prevent_url_access_callable` refuses the target.
  */
 final class ScriptedDownloader extends HttpDownloader
 {
@@ -518,7 +577,11 @@ final class ScriptedDownloader extends HttpDownloader
     public array $requests = [];
     /** @var list<array{url: string, header: mixed}> the redirect targets that a request reached, with the headers it replayed */
     public array $followed = [];
+    /** @var list<string> the requests that started in wait(), in order */
+    public array $started = [];
     public int $waits = 0;
+    /** @var int the wait() calls that answered every request they started */
+    public int $settled = 0;
 
     /** @var array<string, array{0: int, 1: string}|\Throwable|string> */
     private array $script;
@@ -566,9 +629,15 @@ final class ScriptedDownloader extends HttpDownloader
         $pending = $this->pending;
         $this->pending = [];
         foreach ($pending as [$url, $deferred, $options]) {
+            $refuse = $options['prevent_url_access_callable'] ?? null;
+            if (\is_callable($refuse) && $refuse($url) === true) {
+                $deferred->reject(new TransportException('Access to "'.$url.'" is blocked.'));
+
+                continue;
+            }
+            $this->started[] = $url;
             $answer = $this->script[$url] ?? null;
             if (\is_string($answer)) {
-                $refuse = $options['prevent_url_access_callable'] ?? null;
                 if (\is_callable($refuse) && $refuse($answer) === true) {
                     $deferred->reject(new TransportException('Access to "'.$answer.'" is blocked.'));
 
@@ -584,5 +653,6 @@ final class ScriptedDownloader extends HttpDownloader
                 $deferred->resolve(new Response(['url' => $url], $answer[0], [], $answer[1]));
             }
         }
+        ++$this->settled;
     }
 }

@@ -154,6 +154,17 @@ final class ComposerHttpClient implements HttpClientInterface
         $results = [];
         /** @var array<string, string> $redirects url => the URL on another origin that a redirect named */
         $redirects = [];
+        /** @var array<string, true> $stopped the URLs whose request the install-time budget stopped before it started */
+        $stopped = [];
+        // The downloader queues the requests above its limit and asks this before each one starts.
+        $budgetEnded = function (string $url) use (&$stopped): bool {
+            if (!$this->deadline->isPast()) {
+                return false;
+            }
+            $stopped[$url] = true;
+
+            return true;
+        };
         $timeout = $this->timeoutSeconds();
         foreach (array_unique($urls) as $url) {
             $sent = self::withoutRedundantAuthorization($this->io, $this->config, $url, $headers);
@@ -163,7 +174,10 @@ final class ComposerHttpClient implements HttpClientInterface
                 continue;
             }
             if ($this->refusesRedirects) {
-                $options['prevent_url_access_callable'] = static function (string $target) use ($url, &$redirects): bool {
+                $options['prevent_url_access_callable'] = static function (string $target) use ($url, &$redirects, $budgetEnded): bool {
+                    if ($budgetEnded($url)) {
+                        return true;
+                    }
                     if ($target === '' || self::origin($target) === self::origin($url)) {
                         return false;
                     }
@@ -177,16 +191,24 @@ final class ComposerHttpClient implements HttpClientInterface
         $this->downloader->wait();
         // Composer replays the request's own headers to a redirect's target, so the request goes
         // again to that target without lockrot's credentials.
+        $timeout = $this->timeoutSeconds();
         foreach ($redirects as $url => $target) {
             if ($this->deadline->isPast()) {
-                $results[$url] = HttpResult::failure($url, 'install-time budget spent', $this->clock->now());
+                $stopped[$url] = true;
 
                 continue;
             }
-            $this->add($url, $target, self::options($timeout, self::withoutCredentials($headers)), $results);
+            $options = self::options($timeout, self::withoutCredentials($headers));
+            if ($this->refusesRedirects) {
+                $options['prevent_url_access_callable'] = static fn (): bool => $budgetEnded($url);
+            }
+            $this->add($url, $target, $options, $results);
         }
         if ($redirects !== []) {
             $this->downloader->wait();
+        }
+        foreach (array_keys($stopped) as $url) {
+            $results[$url] = HttpResult::failure($url, 'install-time budget spent', $this->clock->now());
         }
         foreach ($urls as $url) {
             if (!isset($results[$url])) {
