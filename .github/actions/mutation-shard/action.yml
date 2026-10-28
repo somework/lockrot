@@ -19,7 +19,7 @@ runs:
     - uses: shivammathur/setup-php@v2
       with: {php-version: '8.4', coverage: none, extensions: pcntl}
     # The gate compares a set of mutants with tests/infection-equivalents.md, so the set must follow
-    # from the commit. composer.lock is not committed, so composer install would take the newest
+    # from the commit. composer.lock is not committed, so composer install takes the newest
     # composer/composer. Pin the one of build/phar/composer.lock, as the coverage run does, and one
     # Infection release. A bump of either is a reviewed change.
     - name: Install the dependencies with the composer/composer of build/phar/composer.lock

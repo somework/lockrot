@@ -1496,8 +1496,7 @@ defs['noteMetadataUnavailable']['description'] = ("`metadata_unavailable`: metad
     "message, in the order the text lists them, and their `package_count`s sum to the note's. Each such finding has `metadata.status` `unavailable` and "
     "`libyears_unmeasured` `unavailable`. Its verdict comes from what lockrot could still read, so a counted advisory still grades it.")
 defs['noteRepositoryActivityNotFound']['description'] = ("`repository_activity_not_found`: the host answered 404 for `repositories` (private, renamed or removed). An answer, "
-    "not a network failure; where the host did not also rate-limit, this is the only record of them: their findings carry no S10, and their `activity.status` "
-    "is `not_found`.")
+    "not a network failure. Their findings carry no S10, and their `activity.status` is `not_found`.")
 defs['noteAdvisoriesNotChecked']['description'] = ("`advisories_not_checked` (0.13's code and data, reworded, §6.2): no advisory was looked up, so no finding is graded "
     "for an advisory and each move's score after it assumes its versions carry none. One lookup per run asks every advisory of every name, so the installed "
     "versions and the moves' versions are checked together or not at all.")

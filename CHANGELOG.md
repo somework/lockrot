@@ -280,8 +280,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - **Breaking:** **CLI, Install-time:** the Composer plugin needs Composer 2.10 or later
-  (`composer-plugin-api` `^2.9`). On an older Composer it does nothing and prints one line that
-  names the version it needs. Action: upgrade Composer to 2.10 or later, or run the PHAR.
+  (`composer-plugin-api` `^2.9`). Composer 2.8 and older do not install lockrot 0.14. On Composer
+  2.9 the plugin does nothing and prints one line that names the version it needs. Action: upgrade
+  Composer to 2.10 or later, or run the PHAR.
   ([Install](docs/index.md#install))
 - **Breaking:** **json, PHAR:** the unnumbered schema files in `resources/` are gone. Each file
   carries its number: `lockrot-report.schema.json` is `lockrot-report-1.schema.json`, and the same

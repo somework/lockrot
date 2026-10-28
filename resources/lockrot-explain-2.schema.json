@@ -16143,7 +16143,7 @@
             }
         },
         "noteRepositoryActivityNotFound": {
-            "description": "`repository_activity_not_found`: the host answered 404 for `repositories` (private, renamed or removed). An answer, not a network failure; where the host did not also rate-limit, this is the only record of them: their findings carry no S10, and their `activity.status` is `not_found`.",
+            "description": "`repository_activity_not_found`: the host answered 404 for `repositories` (private, renamed or removed). An answer, not a network failure. Their findings carry no S10, and their `activity.status` is `not_found`.",
             "type": "object",
             "required": [
                 "forge_id",

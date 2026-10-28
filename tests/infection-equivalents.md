@@ -21,8 +21,8 @@ Infection runs reaches. Write such an entry in one of two forms:
     - `src/Path/File.php` NotCoveredMethod xN `method()` — reason
 
 `NotCovered` accounts for N uncovered mutants of its line, of any mutator. `NotCoveredMethod`
-accounts for N uncovered mutants of the method, and it needs its count. A full run fails when an
-entry matches fewer mutants than its count. The reason is one of these three:
+accounts for N uncovered mutants of the method, and it needs its count. The report of a full run
+names an entry that matches fewer mutants than its count. The reason is one of these three:
 
 - a Composer-version leg: name the test and the CI matrix row that run it.
 - bootstrap code that only an e2e test runs.
