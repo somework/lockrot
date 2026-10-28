@@ -115,6 +115,15 @@ final class BaselineWriterTest extends TestCase
         self::assertSame(['flags' => ['acme/pkg']], $kept->carriedHolding());
     }
 
+    public function testCarriedEntriesThatHoldDifferentFactsAreNamedApart(): void
+    {
+        $before = Baseline::fromReport(self::report('2026-06-01', [self::finding(['abandoned'], []), self::finding([], [['A1', 'high', 'update']], 'acme/other')]));
+
+        $kept = Baseline::fromReport(self::report('2026-10-01', [self::incomplete(self::finding([], [])), self::incomplete(self::finding([], [], 'acme/other'))]), $before);
+
+        self::assertSame(['advisories' => ['acme/other'], 'flags' => ['acme/pkg']], $kept->carriedHolding());
+    }
+
     public function testAFirstEntryOnAnIncompleteLookupHoldsWhatItCountsAsAList(): void
     {
         $baseline = Baseline::fromReport(self::report('2026-10-01', [self::incomplete(self::finding(['stale'], [['B2', 'high', 'update'], ['A1', 'low', 'update']]))]));
@@ -145,7 +154,7 @@ final class BaselineWriterTest extends TestCase
      * @param list<string>                        $flags
      * @param list<array{string, string, string}> $advisories
      */
-    private static function finding(array $flags, array $advisories): Finding
+    private static function finding(array $flags, array $advisories, string $package = 'acme/pkg'): Finding
     {
         $signals = [];
         foreach ($flags as $flag) {
@@ -153,7 +162,7 @@ final class BaselineWriterTest extends TestCase
         }
         $counted = array_map(static fn (array $a): CountedAdvisory => new CountedAdvisory($a[0], $a[1], $a[2]), $advisories);
 
-        return (new FindingBuilder())->withPackage('acme/pkg')->withChain(['acme/pkg'])->withFlags(FlagSet::fromSignals($signals, null, $counted))->build();
+        return (new FindingBuilder())->withPackage($package)->withChain([$package])->withFlags(FlagSet::fromSignals($signals, null, $counted))->build();
     }
 
     /** @param list<Finding> $findings */

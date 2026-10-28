@@ -15,10 +15,13 @@ use Composer\Repository\ArrayRepository;
 use Composer\Util\Platform;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Clock;
 use Lockrot\Composer\LockrotCommand;
 use Lockrot\Composer\ServiceFactory;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
@@ -37,6 +40,7 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\BaselineEntries;
+use Lockrot\Tests\Support\FixedAdvisories;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
@@ -1968,6 +1972,26 @@ final class LockrotCommandTest extends TestCase
         self::assertNotSame([], $findings);
         self::assertStringContainsString('('.\count($findings).' findings)', $stderr);
         self::assertStringEndsWith("}\n", (string) file_get_contents($dir.'/lockrot-baseline.json'));
+    }
+
+    /** A run whose advisory lookup is unavailable keeps the advisory that the baseline records, and says so by what it keeps. */
+    public function testAGenerateRunWithoutAnAdvisoryAnswerNamesTheEntriesThatItCarries(): void
+    {
+        $this->fixtureCopy(self::WALLABAG_LOCK);
+        $counted = new AdvisoryBatch(['beberlei/assert' => [new Advisory('PKSA-test-0001', null, 'test', null, 'high', new \DateTimeImmutable('2026-01-01T00:00:00+00:00'))]], [], [], [], null, true);
+        $unavailable = AdvisoryBatch::unavailable(RunNote::advisoriesUnavailable('packagist.org', new \RuntimeException('test')));
+        $loader = $this->loader();
+        $commandWith = fn (AdvisoryBatch $batch): LockrotCommand => $this->buildCommand(static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock) use ($loader, $batch): Analyzer {
+            $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
+
+            return new Analyzer($loader, new ActivityClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), $auth), new ActivityFetchPlanner($auth), new RepoLocator(), BuiltinAllowlist::load(), SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()), $clock, $lockrot->offline(), new FixedAdvisories($batch));
+        });
+        self::assertSame(0, $this->runCommandWithSplitStreams($commandWith($counted), ['--generate-baseline' => true, '--target-php' => '8.4'])[0]);
+
+        [$code, , $stderr] = $this->runCommandWithSplitStreams($commandWith($unavailable), ['--generate-baseline' => true, '--target-php' => '8.4']);
+
+        self::assertSame(0, $code, $stderr);
+        self::assertStringContainsString("lockrot: the advisory lookup did not complete, so the baseline keeps the recorded advisories of 1 package: beberlei/assert\n", $stderr);
     }
 
     public function testASecondRunWithTheGeneratedBaselinePresentExitsZero(): void
