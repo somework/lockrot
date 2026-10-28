@@ -126,7 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   package that the lock records from a vcs repository stays at its locked version, and its move
   reads `not_checked`. ([The move check](docs/verdicts.md#the-move-check))
 - **json:** `security.update_now_command` holds no PHP raise step. Only the `update now:` line says
-  to raise `require.php` first. ([Security](docs/schema.md#security-advisories-with-no-fix-expected))
+  to raise `require.php` first. ([Security](docs/schema.md#advisories-with-no-fix-expected))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
   installs, with require-dev and without, and the links that set each edge. The minors and edges
   assume no override, and `platform_override` names the lock's `platform-overrides.php`. The text
