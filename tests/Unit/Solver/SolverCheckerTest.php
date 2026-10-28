@@ -732,6 +732,19 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize());
     }
 
+    /** acme/virtual is unreached, and acme/prov provides it: the refusal on acme/mid needs no unreached name, so it proves the refusal. */
+    public function testARefusalThatDoesNotWantAnUnreachedNameThatItAskedForIsRefused(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/prov', 'version' => '1.0.0', 'provide' => ['acme/virtual' => '1.0.0']], ['name' => 'acme/mid', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/virtual' => '^1.0', 'acme/mid' => '^2.0']]], 'acme/prov' => [['version' => '1.0.0', 'provide' => ['acme/virtual' => '1.0.0']]], 'acme/mid' => [['version' => '1.0.0']]],
+            ['acme/virtual' => VersionSource::UNREACHED]
+        );
+
+        self::assertSame('refused', $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize()['result']);
+    }
+
     /**
      * The listed form stops on the shadowed acme/zeta, and the wider forms refuse on acme/mid. A
      * shadowed name has loaded versions, so the refusal does not want it, yet its hidden releases

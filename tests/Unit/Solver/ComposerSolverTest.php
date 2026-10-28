@@ -65,6 +65,8 @@ final class ComposerSolverTest extends TestCase
 
         self::assertSame(['acme/lib' => '1.1.0', 'acme/zeta' => '1.1.0'], $solver->solve($request)->installs());
         self::assertSame(['acme/lib' => '1.1.0'], $solver->withMinimalChanges()->solve($request)->installs());
+        self::assertSame(['acme/lib' => '1.1.0', 'acme/zeta' => '1.1.0'], $solver->solve($request)->installs(), 'the solver itself keeps its policy');
+        self::assertSame(['acme/lib' => '1.1.0'], $solver->withMinimalChanges()->solve(SolveRequest::plain('acme/lib'))->installs(), 'the name that the update allows is no preferred one');
     }
 
     /** monica's socialiteproviders/facebook: the solve takes another reference of the locked tag, which moves no version. */
