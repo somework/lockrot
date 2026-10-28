@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Lock;
 
 use Lockrot\Exception\ConfigException;
+use Lockrot\Lock\LockFile;
 use Lockrot\Lock\LockLineIndex;
 use Lockrot\Tests\Support\UnreadableFiles;
 use PHPUnit\Framework\TestCase;
@@ -62,6 +63,85 @@ final class LockLineIndexTest extends TestCase
             }
             JSON;
         self::assertSame(4, LockLineIndex::fromString($json)->lineOf('acme/first'));
+    }
+
+    /** A name is found by Composer's lower-case name, whatever the lock's spelling or escape. */
+    public function testANameIsFoundByItsComposerName(): void
+    {
+        $json = <<<'JSON'
+            {
+                "packages": [
+                    {
+                        "name": "MyVendor/MyPkg",
+                        "version": "1.0.0"
+                    },
+                    {
+                        "name": "symfony\/console",
+                        "version": "1.0.0"
+                    }
+                ]
+            }
+            JSON;
+        $index = LockLineIndex::fromString($json);
+
+        self::assertSame(4, $index->lineOf('myvendor/mypkg'));
+        self::assertSame(8, $index->lineOf('symfony/console'));
+    }
+
+    /** `\q` is no JSON escape: that name decodes to nothing, and the scan goes on. */
+    public function testANameWithAnInvalidEscapeHasNoLine(): void
+    {
+        $json = <<<'JSON'
+            {
+                "packages": [
+                    {
+                        "name": "acme\q/lib",
+                        "version": "1.0.0"
+                    },
+                    {
+                        "name": "acme/next",
+                        "version": "1.0.0"
+                    }
+                ]
+            }
+            JSON;
+        $index = LockLineIndex::fromString($json);
+
+        self::assertNull($index->lineOf('acme\q/lib'));
+        self::assertSame(8, $index->lineOf('acme/next'));
+    }
+
+    /**
+     * Every package that LockFile reads from a committed lock has a line. A lock whose entries put
+     * `"name"` on the line of their brace has no line by contract ({@see testMinifiedLockYieldsNoLines()}).
+     */
+    public function testEachPackageOfEachCommittedLockHasALine(): void
+    {
+        $locks = [];
+        foreach ([__DIR__.'/../../fixtures', __DIR__.'/../../../tools/corpus/fixtures'] as $root) {
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS)) as $file) {
+                if ($file instanceof \SplFileInfo && $file->getFilename() === 'composer.lock') {
+                    $locks[] = $file->getPathname();
+                }
+            }
+        }
+        sort($locks);
+        self::assertNotSame([], $locks);
+
+        $missing = [];
+        foreach ($locks as $path) {
+            if (preg_match('/^\s*\{"name"/m', (string) file_get_contents($path)) === 1) {
+                continue;
+            }
+            $index = LockLineIndex::fromFile($path);
+            foreach (LockFile::fromFile($path)->packages(true) as $package) {
+                if ($index->lineOf($package->name()) === null) {
+                    $missing[] = $path.': '.$package->name();
+                }
+            }
+        }
+
+        self::assertSame([], $missing);
     }
 
     /**

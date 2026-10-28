@@ -12,7 +12,8 @@ use Lockrot\Exception\ConfigException;
  * accepts a `"name"` member only at depth 3 inside `packages` or `packages-dev`, because `authors[]`
  * and `extra.thanks.name` hold other names. The depth does not depend on indentation, so a
  * reformatted lock still resolves. A `"name"` member that does not stand alone on its line, as in a
- * minified lock, yields no line: {@see lineOf()} returns null.
+ * minified lock, yields no line: {@see lineOf()} returns null. A line is keyed by Composer's name
+ * ({@see PackageName}), and {@see LockFile} refuses a name listed twice, so both read one entry.
  *
  * @internal
  */
@@ -70,9 +71,11 @@ final class LockLineIndex
                 $depth === self::ENTRY_DEPTH
                 && \in_array($section, self::PACKAGE_SECTIONS, true)
                 && preg_match('/^\s*"name":\s*"([^"]+)"\s*,?\s*$/', $line, $match) === 1
-                && !isset($lines[$match[1]])
             ) {
-                $lines[$match[1]] = $index + 1;
+                $name = json_decode('"'.$match[1].'"');
+                if (\is_string($name) && !isset($lines[PackageName::key($name)])) {
+                    $lines[PackageName::key($name)] = $index + 1;
+                }
             }
 
             $depth += substr_count($structure, '{') + substr_count($structure, '[')
