@@ -2768,7 +2768,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4), php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -8561,7 +8561,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. require symfony/security-http ^5.4.53 \u2014 clears 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.50) and symfony/security-guard v4.4.46 (requires ^4.4.1; itself abandoned) and symfony/security-bundle v4.4.50 (requires ^4.4.50); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. require symfony/security-http ^5.4.53 \u2014 clears 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.50), symfony/security-guard v4.4.46 (requires ^4.4.1; itself abandoned) and symfony/security-bundle v4.4.50 (requires ^4.4.50); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -13501,7 +13501,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter and 1 more: replace bdunogier/guzzle-site-authenticator, php-http/guzzle5-adapter, or replace or update guzzlehttp/guzzle, php-http/httplug-bundle; the newest release of guzzlehttp/guzzle (7.9.2) no longer requires it"
+                "text": "find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter and 1 more: replace bdunogier/guzzle-site-authenticator and php-http/guzzle5-adapter, or replace or update guzzlehttp/guzzle and php-http/httplug-bundle; the newest release of guzzlehttp/guzzle (7.9.2) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -13913,7 +13913,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle (guzzlehttp/ringphp requires it), php-http/guzzle5-adapter and 1 more: replace bdunogier/guzzle-site-authenticator, php-http/guzzle5-adapter, or replace or update guzzlehttp/guzzle, php-http/httplug-bundle"
+                "text": "find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle (guzzlehttp/ringphp requires it), php-http/guzzle5-adapter and 1 more: replace bdunogier/guzzle-site-authenticator and php-http/guzzle5-adapter, or replace or update guzzlehttp/guzzle and php-http/httplug-bundle"
             },
             "security": {
                 "status": "clear",
@@ -14300,7 +14300,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16349,7 +16349,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 4 more: replace craue/config-bundle, sensio/framework-extra-bundle, willdurand/hateoas-bundle, or replace or update doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, nelmio/api-doc-bundle and 1 more; the newest releases of doctrine/doctrine-bundle (2.13.0) and nelmio/api-doc-bundle (v4.33.0) no longer require it"
+                "text": "find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 4 more: replace craue/config-bundle, sensio/framework-extra-bundle and willdurand/hateoas-bundle, or replace or update doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, nelmio/api-doc-bundle and 1 more; the newest releases of doctrine/doctrine-bundle (2.13.0) and nelmio/api-doc-bundle (v4.33.0) no longer require it"
             },
             "security": {
                 "status": "clear",
@@ -16992,7 +16992,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -17306,7 +17306,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/exception requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/exception requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -17621,7 +17621,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -17935,7 +17935,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -18249,7 +18249,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/compiler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/compiler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -18564,7 +18564,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/compiler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/compiler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -18879,7 +18879,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -19193,7 +19193,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/compiler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/compiler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -19508,7 +19508,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle; the newest release of kphoen/rulerz (0.21.1) still requires it"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle; the newest release of kphoen/rulerz (0.21.1) still requires it"
             },
             "security": {
                 "status": "clear",
@@ -19821,7 +19821,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/file requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/file requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -20136,7 +20136,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/regex requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/regex requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -20452,7 +20452,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -20766,7 +20766,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/math requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/math requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -25321,7 +25321,7 @@
                     }
                 ],
                 "also": [],
-                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. move willdurand/jsonp-callback-validator to ^2.0 through friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle \u2014 clears left-behind and old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; held by friendsofsymfony/jsrouting-bundle 2.8.0 (requires ~1.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+                "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. move willdurand/jsonp-callback-validator to ^2.0 through friendsofsymfony/jsrouting-bundle and friendsofsymfony/rest-bundle \u2014 clears left-behind and old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; held by friendsofsymfony/jsrouting-bundle 2.8.0 (requires ~1.1); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
